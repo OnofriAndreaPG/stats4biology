@@ -1,0 +1,132 @@
+---
+title: 'Sample variance and population variance: which of the two?'
+author: "Andrea Onofri"
+date: '2018-11-09'
+output: word_document
+slug: sample-variance
+tags: Variance
+categories: General
+---
+
+Teaching experimental methodology in agriculture related master courses poses some peculiar problems. One of these is to explain the difference between sample variance and population variance. For the students it is usually easy to grasp the idea that, being the mean the 'center' of the dataset, it is relevant to measure the average distance to the mean for all individuals in the dataset. Of course, we need to take the sum of squared distances, otherwise negative and positive residuals cancel each other out.
+
+It is also very intuitive that the average of squared residuals (mean square or variance) is calculated by using the following expression:
+
+$${\sigma ^2} = \frac{\sum\limits_{i = 1}^n ({X_i} - \mu )^2}{n}$$
+
+However, this is not what R (and other software) does. R divides by $n - 1$ and, at this stage, the students usually ask: "*why are you telling me that I have to divide the sum of squares by $n - 1$, instead of $n$? I have $n$ squared residuals, not $n - 1$!*".
+
+You may think that the answer is pretty obvious. I don't think so. The concept of variance is introduced at the beginning of the course, within the frame of descriptive statistics. At this stage, the students know nothing about probability distributions, sampling, inference and all the related concepts. They do not even know anything about degrees of freedom, yet!
+
+If I were a mathematician and were facing students in math/stat, I could show the class how clever I am by giving a formal proof that $n - 1$ is the correct denominator in most circumstances. In particular, this is true when we have a sample taken from a population and we want to infere the variance of the population by using the sample. The formal proof can be found in most stat books and I am attaching it at the end of this post. However, I will never show this formal proof to my students at this stage. Indeed, such a proof assumes that the students know what a sampling distribution is, what the standard error is and how it is calculated. Furthermore, students in agriculture are usually very reluctant, when it comes to dealing with maths!
+
+Therefore, I usually refrain from trying to appear more clever than I am. My question: "is it possible to teach the difference between the population variance and the sample variance, without talking about degrees of freedom or other 'difficult' concepts?". Here is how I try to put it.
+
+Let's take a big, but finite population, i.e. an hectar of maize plants (roughly 70,000 plants). Let's imagine that we know the individual yields for all plants in the population. With R we can get those yields by taking random values in the interval from 150 to 250 grams (this is reasonable... students in agriculture know these things pretty well! And, I am not referring to any density distribution... it would be too much at this stage).
+
+```{r}
+set.seed(1234)
+pop <- runif(70000, min = 150, max = 250)
+```
+
+We now have our population (I will not show it... lack of space!). It is a finite population, so we can easily calculate the mean and the variance, i.e. the mean squared distance of all 70,000 individuals to the mean. You see that I am using the equation above (with $n$ underneath).
+
+```{r}
+mean(pop)
+sigma2 <- sum( ( pop - mean(pop) )^2 )/70000
+sigma2
+```
+
+Let's now forget about the population. In the field, we would never be able to measure the yield for all the plants in one hectar, due to lack of resources (time and money). Therefore, let's measure 10 randomly selected plants (one in 7000; samples are often small in agriculture!). We can do this easily in R by sampling the original population.
+
+```{r}
+x <- sample(pop, 10)
+x
+```
+
+We now calculate the mean and the variance for the sample, by using the equation above (i.e. using $n = 10$ as the denominator).
+
+```{r}
+mean(x)
+sigma2_s <- sum( ( x - mean(x) )^2 )/10
+sigma2_s
+```
+
+We do not know the population but we know our sample. As usual, in lack of other information, we conclude that the population should have the same characteristics of our sample. This is usually seen as a reasonable guess; at least the most reasonable one. The procedure we use to make a guess is called 'estimator' and the guess in itself is an 'estimate'. Have we used a good estimator? 
+
+We can't answer. Unless we repeat the sampling process for a lot of times and see how our estimates behave in the long run. Our estimator is good if, in the long run, it converges on the real value for the population. Let's check this: we repeatedly take samples of 10 plants from our population and calculate the mean and variance as above. We repeat this process 10,000 times, storing the 10,000 means and variances in two vectors.
+
+```{r}
+meanS <- c(); varS <- c()
+for(i in 1:10000){
+  x <- sample(pop, 10)
+  meanS[i] <- mean(x)
+  varS[i] <- sum( ( x - mean(x) )^2 )/10
+}
+mean(meanS)
+mean(varS)
+```
+
+We see that the mean of the means is `r round(mean(meanS), 2)`. We got really very close to the real mean of the population. Indeed, the mean of the sample is a good (unbiased) estimator of the mean of the population.
+
+On the other hand, the mean of the variances is `r round(mean(varS), 2)`. Please note that this is much smaller than the real variance of the population. It means that if we use the equation above (with $n$ at the denominator) to calculate the variance for the sample, we do not have a good estimator of the variance for the whole population. We can now look at the ratio between the variance of the population and our guess in the long run:
+
+```{r}
+var(pop)/mean(varS)
+```
+
+We see that this is roughly equal to $10/9$. In other words, if we:
+
+1. take the sample and calculate the variance by using the equation above,
+2. multiply by $n = 10$ and
+3. divide by $n - 1 = 9$ 
+
+we can get a good estimator. This leads us to the following equation:
+
+$${\sigma ^2} = \frac{\sum\limits_{i = 1}^n ({X_i} - m )^2}{n - 1}$$
+
+that is exactly the variance for the sample. This one we can easily calculate with R.
+
+# Which of the two, then?
+
+Just rememeber:
+
+1. the variance (mean square) is calculated by dividing the sum of squared residuals by $n$. This makes sense, because we have $n$ squared residuals.
+2. However, if we have a random sample taken from a population, and if our aim is to estimate the variance for the whole population, we need to divide the sum of squared residuals by $n - 1$. Otherwise, we get an understimation. 
+
+
+# The formal proof (look how clever I am!)
+
+We have a population with mean equal to $\mu$ and variance equal to $\sigma^2$. Let's take a sample with its mean $m \neq \mu$ and $m - \mu = \varepsilon$. For the population, we can write:
+
+$$\sum\limits_{i = 1}^n (X_i - \mu )^2  = \sum\limits_{i = 1}^n (X_ i - m + \varepsilon)^2 = \sum\limits_{i = 1}^n ({X_i} - m)^2 + n \varepsilon^2$$
+
+We already see that the sum of squared residuals is higher if we take $m$ instead of $\mu$, unless $\varepsilon = 0$, i.e. $m = \mu$. From the above, we derive
+
+$$\sum\limits_{i = 1}^n (X_i - \mu)^2 =  \sum\limits_{i = 1}^n (X_i - \mu )^2  - n ( {m - \mu } )^2$$
+
+
+If we consider the first equation above (variance for the population) we have
+ 
+$$\sum\limits_{i = 1}^n (X_i - \mu)^2 =  n \sigma^2 - n( m - \mu  )^2$$
+
+We see that the rightmost term of this equation ($n ( m - \mu  )^2$ is the sum of squared distances for the sampling distribution of the mean. That is $n$ times the squared standard error. Therefore:
+
+$$\sum\limits_{i = 1}^n {{{({X_i} - \bar X)}^2} = } n{\sigma ^2} - n\left( {\frac{{{\sigma ^2}}}{n}} \right)$$
+
+
+and
+
+$$\sum\limits_{i = 1}^n {{{({X_i} - \bar X)}^2} = } (n - 1){\sigma ^2}$$
+
+
+Here we go! Indeed:
+
+$$ \frac{\sum\limits_{i = 1}^n (X_i - m)^2 }{n - 1} = {\sigma ^2}$$
+
+
+ 
+ 
+
+
+
