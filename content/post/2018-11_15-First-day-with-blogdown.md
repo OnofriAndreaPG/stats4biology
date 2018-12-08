@@ -15,6 +15,7 @@ This is my first day at work with blogdown. I must admit it is pretty overwhelmi
 
 I followed the instructions and used the 'NEW PROJECT' menu and added a 'New blogdown' site to my file system.   I used the 'hugo-blog-jeffprod' theme. This created a bunch of directories in my working directory. Here are my steps to learning the process.
 
+
 # STEP 1 - The MathJax problem
 
 I added a post to the 'content' directory. This was a trial post, with an equation in latex code. I immediately noted that there was no support to MathJax. Surfing the net, I found a solution for this. These were my steps:
