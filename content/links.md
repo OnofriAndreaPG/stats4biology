@@ -1,19 +1,17 @@
 +++
-title = "About Hugo"
+title = "Useful links"
 date = "2014-04-09"
 menu = "main"
 +++
 
-Hugo is the **world’s fastest framework for building websites**. It is written in Go.
+This site makes is written in markdown and Rmarkdown and makes use of a wide range of open source technologies. I'm adding a few links, for you to learn more.
 
-It makes use of a variety of open source projects including:
+* [The R project](https://www.r-project.org)
+* [R studio](https://www.rstudio.com)
+* [R markdown](https://rmarkdown.rstudio.com)
+* [Blogdown and bookdown](https://bookdown.org/yihui/blogdown/)
+* [Hugo](https://gohugo.io)
+* [GitHub](https://github.com/gohugoio)
 
-* [linked phrase](https://stats4biology.netlify.com/drcSeedGerm/)
-* https://github.com/russross/blackfriday
-* https://github.com/alecthomas/chroma
-* https://github.com/muesli/smartcrop
-* https://github.com/spf13/cobra
-* https://github.com/spf13/viper
 
-Learn more and contribute on [GitHub](https://github.com/gohugoio).
 
