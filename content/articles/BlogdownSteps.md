@@ -1,13 +1,12 @@
 ---
-title: 'My lerning path with blogdown'
+title: 'My learning path with blogdown'
 author: "Andrea Onofri"
 date: 2018-11-15
 tags: 
-   - R
    - blogdown
 categories: General
 archives:
-  - 2018
+  - 2019
 ---
 
 
