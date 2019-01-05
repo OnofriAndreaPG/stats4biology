@@ -11,7 +11,7 @@ This site makes is written in markdown and Rmarkdown and makes use of a wide ran
 * [R markdown](https://rmarkdown.rstudio.com)
 * [Blogdown and bookdown](https://bookdown.org/yihui/blogdown/)
 * [Hugo](https://gohugo.io)
-* [GitHub](https://github.com/gohugoio)
+* [GitHub](https://github.com)
 
 
 
