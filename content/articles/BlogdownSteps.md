@@ -69,5 +69,17 @@ After adding a few non-post pages to my content folder I wanted to avoid too muc
 
 I think I start feeling slightly more confident with blogdown!
 
+# Step 8 - Literature support (7/1/2019)!
+
+This problem took me a while to solve. Lately, I discovered that, in order to be able to insert citations, the post file needs to be '.Rmd' and not '.md.' Furthermore, the literature file ('.bib') and the '.csl' file need to be in the '/content/' folder. A reference to both files need to be put in the YAML header, e.g., :
+
+```
+bibliography: myFile.bib
+csl: myStyle.csl
+```
+
+
+
+
 
 
