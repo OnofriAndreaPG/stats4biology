@@ -1,3 +1,3 @@
 ---
-title: All models are wrong ...
+title: Models are wrong
 ---
