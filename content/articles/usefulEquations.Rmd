@@ -1,0 +1,455 @@
+---
+title: Some useful equations for nonlinear regression in R
+author: "Andrea Onofri"
+date: 2019-01-08
+tags: 
+   - nls
+   - drm
+   - "nonlinear regression"
+categories: General
+archives:
+  - 2018
+---
+
+# Introduction
+
+Very rarely, biological processes follow linear trends. Just think about how a crop grows, or responds to increasing doses of fertilisers/xenobiotics. Or think about how an herbicide degrades in the soil, or about the germination pattern of a seed population. It is very easy to realise that curvilinear trends are far more common than linear trends. Furthermore, asymptotes and/or inflection points are very common in nature. We can be sure: linear equations in biology are just a way to approximate a response over a very narrow range for the independent variable.
+
+Therefore, as biologists, we need to be able to describe our experimental data by using a wide range of curvilinear equations. We need to be able to 'read' those equations and use their parameters to interpret and understand biological processes. I thought that it would be useful to list the most commonly used curvilinear functions and show examples of how they can be fit by using R.
+
+When it comes to nonlinear regression, I have a strong personal preference for the 'drc' package and the 'drm()' function therein. However, it is also worth mentioning the traditional 'nls()' function in the 'stats' package. You may know that nonlinear least squares work iteratively: we need to provide initial guesses for model parameters and the algorithm adjusts them step by step, finally converging on the approximate least squares solution. To my experience, providing initial guesses may be troublesome. Therefore, it is very convenient to use R functions together with the appropriate self-starting routines, which can greatly semplify the fitting process. These self-starters can be found in the 'drc', 'nlme' and 'aomisc' packages.
+
+Let's load the necessary packages.
+
+```{r message=F}
+library(drc)
+library(nlme)
+library(aomisc)
+```
+
+
+# Curve shapes
+
+Curves can be easily classified by their shape, which is very helpful to select the correct one, according to the trend of the process under study. We have:
+
+- Polynomials
+    1. Straight line
+    2. Quadratic polynomial
+- Concave/Convex curves (no inflection)
+    1. Exponential curve
+    2. Asymptotic regression
+    3. Negative exponential function
+    4. Power curve
+    5. Logarithmic equation
+    6. Rectangular hyperbola
+- Sygmoidal curves
+    1. Logistic curve
+    2. Gompertz curve
+    3. Extreme value equation
+    4. Log-logistic curve (Hill equation)
+    5. Weibull-type 1
+    6. Weibull-type 2 
+
+# Polynomials
+
+Polynomials are the most flexible tool to describe biological processes. They are simple and, although curvilinear, they are linear in the parameters and can be fitted by using linear regression. One disadvantage is that they cannot describe asymptotic processes, which are very common in biology. Furthermore, they are prone to overfitting, as we may be tempted to add terms to improve the fit, with little care for biological realism.
+
+Nowadays, thanks to the wide availability of nonlinear regression algorithms, the use of polynomials has sensibly decreased; linear or quadratic polynomials are mainly used when we want to approximate the observed response within a narrow range of a quantitative predictor. On the other hand, higher order polynomials are very rarely seen, in practice.
+
+## Straight line
+
+Obviously, this is not a curve, although it deserves to be mentioned here. The equation is:
+
+$$Y = b_0 + b_1 \, X$$
+
+
+where $b_0$ is the value of $Y$ when $X = 0$, $b_1$ is the slope, i.e. the increase/decrease in $Y$ for a unit-increase in $X$. The Y increases as X increases when $b_1 > 0$, otherwise it decreases.
+
+## Quadratic function
+
+The equation is:
+
+$$Y = b_0 + b_1\, X + b_2 \, X^2$$
+    
+where $b_0$ is the value of $Y$ when $X = 0$, while $b_1$ and $b_2$, taken separately, lack a clear biological meaning. However, it is interesting to consider that the first derivative is:
+
+```{r}
+D(expression(a + b*X + c*X^2), "X")
+```
+
+which measures the increase/decrease in $Y$ for a unit-increase in $X$. We see that such an increase/decrease is not constant, but it changes according to the level of X. The stationary point is $X_m = - b_1 / 2 b_2$; it is a maximum when $b_2 > 0$, otherwise it is a minimum.
+
+At the maximum/minimum, it is:
+
+$$Y_m = \frac{4\,b_0\,b_2 - b_1^2}{4\,b_2}$$
+
+    
+## Polynomial fitting in R
+
+Polynomials in R are fit by using the linear model function 'lm()'. Although this is not efficient, in a couple of cases I found myself in the need of fitting a polynomial by using the 'nls()' o 'drm()' functions. For these unusual cases, one can use the 'NLS.Linear()', NLS.poly2(), 'DRC.Linear()' and DRC.Poly2() self-starting function, as available in the 'aomisc' package.
+
+# Concave/Convex curves
+
+## Exponential curve
+
+The exponential function describes an increasing/decreasing *trend*, with constant relative rate. The most common equation is: 
+
+$$ Y = a  e^{k X}$$ 
+
+Other possible parameterisations are:
+
+$$ Y = a  b^X  =  e^{d + k X}$$
+
+The above parameterisations are equivalent, as proved by setting $b = e^k$ e $a = e^d$:
+
+$$a  b^X  = a  (e^k)^{X} =  a  e^{kX}$$
+
+and:
+
+$$a  e^{kX} = e^d \cdot e^{kX} =  e^{d + kX}$$
+
+The meaning of parameters is clear: $a$ is the value of $Y$ when $X = 0$, while $k$ represents the relative increase/decrease of $Y$ for a unit increase of X. $Y$ increases as $X$ increases if $k > 0$ (exponential growth), while it decreases when $k < 0$ (exponential decay). This curve is used to describe the growth of populations in unlimiting environmental conditions, or to describe the degradation of xenobiotics in the environment (first-order degradation kinetic).
+
+The exponential function is nonlinear in $k$ and needs to be fitted by using 'nls()' or 'drm()'. It is possible to make profit of the self-starting routines in 'NLS.expoGrowth()', 'NLS.expoDecay()', 'DRC.expoGrowth()' and 'DRC.expoDecay()'. All these functions are available in the 'aomisc' package. The 'drc' package also contains the function 'EXD.2()', that fits an exponential decay model, with a slightly different parameterisation:
+
+$$ Y = d \exp(-x/e) $$
+
+where $d$ is the same as $a$ in the model above and $e = 1/k$. For all the forementioned exponential decay equations $Y \rightarrow 0$ as $X \rightarrow \infty$. The function 'EXD.3()' in the 'drc' package also includes a lower asymptote $c \neq 0$:
+
+$$ Y = c + (d -c) \exp(-x/e) $$
+
+```{r}
+data(degradation)
+degradation
+
+model <- drm(Conc ~ Time, fct = DRC.expoDecay(),
+             data = degradation)
+summary(model)
+plot(model, log="")
+```
+
+
+## Asymptotic regression model
+
+The asymptotic regression model describes a limited growth, where Y approaches an horizontal asymptote as X tends to infinity. The rate of growth is maximum at the beginning and approaches 0 as Y approaches the plateau. This equation is used in several different parameterisations and it is also known as Monomolecular Growth, Mitscherlich law or von Bertalanffy law.
+
+Due to its biological meaning, the most widespread parameterisation is:
+
+$$Y = a - (a - b) \, \exp (- c  X)$$
+where $a$ is the maximum attainable $Y$, $b$ is $Y$ at $x = 0$ and $c$ is proportional to the relative rate of Y increase while X increases. Indeed, we can see that the first derivative is:
+
+
+```{r}
+D(expression(a - (a - b) * exp (- c * X)), "X")
+```
+
+that is:
+
+$$ Y' = c \, (a - Y)$$
+    
+This model can be fit with R by using the self starter functions 'NLS.asymReg()' and DRC.asymReg(), in the 'aomisc' package. The 'drc' package contains the function AR.3(), that is a similar parameterisation where $c$ is replaced by $e = 1/c$. The 'nlme' package also contains an alternative parameterisation named 'SSasymp()', where $c$ is replaced by $\phi_3 = \log(c)$.
+
+We simulate an example.
+
+```{r}
+set.seed(1234)
+X <- c(1, 3, 5, 7, 9, 11, 13, 20)
+a <- 20; b <- 5; c <- 0.3
+Ye <- asymReg.fun(X, a, b, c)
+epsilon <- rnorm(8, 0, 0.5)
+Y <- Ye + epsilon
+model <- drm(Y ~ X, fct = DRC.asymReg())
+plot(model, log="")
+```
+
+If we take the above equation and add the constraint that $b = 0$, we get the following equation, that is often known as negative exponential equation:
+
+$$Y = a [1 -  \exp (- c  X) ]$$
+
+This equation has a similar shape to the asymptotic regression, but Y is 0 when X is 0 (the curve passes through the origin). It is often used to model the absorbed Photosintetically Active Radiation ($Y = PAR_a$) as a function of incident PAR ($a = PAR_i$), Leaf Area Index (X = LAI) and the extinction coefficient (c = k).
+
+This model can be fit with R by using the self starter functions 'NLS.negExp()' and DRC.negExp(), in the 'aomisc' package. The 'drc' package contains the function AR.2(), where $c$ is replaced by $e = 1/c$. The 'nlme' package also contains an alternative parameterisation, named 'SSasympOrig()', where $c$ is replaced by $\phi_3 = \log(c)$.
+
+ 
+## Power curve
+
+The power curve is also known as Freundlich equation or allometric function and the most common parameterisation is:
+
+$$Y = a \, X^b$$
+
+This curve is perfectly equivalent to an exponential curve on the
+logarithm of $X$. Indeed:
+
+$$a\,X^b  = a\, e^{\log( X^b )}  = a\,e^{b \, \log(x)}$$
+
+This curve does not have an asymptote for $X \rightarrow \infty$. The slope (first derivative) of the curve is:
+
+```{r}
+D(expression(a * X^b), "X")
+```
+
+We see that both paraeters relate to the slope of the curve and $b$ dictates its shape. If $0 <- b < 1$, Y increases as X increases and the curve is convex up. This is used, e.g., to model the number of plant species as a function of sampling area (Muller-Dumbois method).
+
+
+```{r}
+data(speciesArea)
+speciesArea
+model <- drm(numSpecies ~ Area, fct = DRC.powerCurve(),
+             data = speciesArea)
+summary(model)
+plot(model, log="")
+```
+
+If $b < 0$, the curve is concave up and $Y$ decreases as $X$ increases.
+
+```{r}
+curve(powerCurve.fun(x, coef(model)[1], -coef(model)[2]),
+      xlab = "X", ylab = "Y")
+```
+
+If $b > 1$ is negative, the curve is concave up and $Y$ increases as $X$ increases.
+
+```{r}
+curve(powerCurve.fun(x, coef(model)[1], 2),
+      xlab = "X", ylab = "Y")
+```
+
+## Logarithmic equation
+
+This is indeed a linear model on log-transformed X:
+
+$$y = a + b \, \log(X)$$
+
+Due to the logarithmic function, X must be $ > 0$. The parameter $b$ dictates the shape: if $b > 0$, the curve is convex up and $Y$ increases as $X$ increases. If $b < 0$, the curve is concave up and $Y$ decreases as $X$ increases.
+
+The logarithmic equation can be fit by using 'lm()'. If necessary, it can also be fit by using 'nls()' and 'drm()'; the self-starting functions 'NLS.logCurve()' and 'DRC.logCurve()' are available within the 'aomisc' package. We show some simulated data as examples.
+
+```{r}
+#b is positive
+set.seed(5678)
+X <- c(1,2,4,5,7,12)
+a<-2; b<- 0.5
+Ye <-  a + b*log(X)
+res <- rnorm(6, 0, 0.1)
+Y <- Ye + res
+model <- lm(Y ~ log(X) )
+summary(model)
+model <- drm(Y ~ X, fct = DRC.logCurve() )
+summary(model)
+plot(model, log="")
+
+#b is negative
+X <- c(1,2,4,5,7,12)
+a <- 2; b <- -0.5
+Ye <-  a + b*log(X)
+res <- rnorm(6, 0, 0.1)
+Y <- Ye + res
+model <- drm(Y ~ X, fct = DRC.logCurve() )
+summary(model)
+plot(model, log="")
+```
+
+
+## Michaelis-Menten equation
+
+This is a rectangular hyperbola, often parameterised as:
+
+$$Y = \frac{a \, X} {b + X}$$
+
+This curve is convex up and $Y$ increases as $X$ increases, up to a plateau level. The parameter $a$ represents the higher asymptote (for $X \rightarrow \infty$), while $b$ is the X value giving a response equal to $a/2$. Indeed, it is easily shown that:
+
+$$\frac{a}{2} = \frac{a\,X_{50} } {b + X_{50} }$$
+
+which leads to $b = x_{50}$.
+
+The slope (first derivative) is:
+
+```{r}
+D(expression( (a*X) / (b + X) ), "X")
+```
+
+From there, we can see that the initial slope (at $X = 0$) is $i = a/b $.
+
+In R, this model can be fit by using 'nls()' and the self starting functions 'SSmicmen()', within the package 'nlme'. If we prefer a 'drm()' fit, we can use the 'MM.2()' function in the package 'drc'.
+
+```{r}
+set.seed(1234)
+X <- c(3, 5, 7, 22, 28, 39, 46, 200)
+a <- 15; b <- 0.5
+Ye <- as.numeric( SSmicmen(X, a, b) )
+res <- rnorm(8, 0, 0.1)
+Y <- Ye + res
+
+#nls fit
+model <- nls(Y ~ SSmicmen(X, a, b))
+summary(model)
+
+#drm fit
+model <- drm(Y ~ X, fct = MM.2())
+summary(model)
+plot(model, log="")
+```
+
+The 'drc' package also contains the self starting function 'MM.3()', where $Y$ is allowed to be equal to $c \neq 0$, when $X = 0$.
+
+
+## Yield-loss curve
+
+Weed-crop competition studies make use of a reparameterised Michaelis-Menten model. Indeed, th initial slope of a Michaelis-Menten can be assumed as a measure of competition, that is the reduction in yield (Y) when the first weed is added to the system. Therefore, the Michaelis-Methen model has been reparameterised to include $i = a/b$ as an explicit parameter. The reparameterised equation is:
+
+$$Y = \frac{i \, X}{1 + \frac{i \, X}{a}}$$
+
+This model can be used to describe yield losses as a function of weed density. It can be fit by using the self starting functions 'NLS.YL()' or 'DRC.YL()' in the 'aomisc' package. Usually, competion studies produce yield data and, therefore, yield lossed need to be calculated by using the weed-free yield and the following equation:
+
+$$Y_L  = \frac{Y_{WF}  - Y_w }{Y_{WF} } \times 100$$
+
+where $Y_W$ is the observed yield and $Y_{WF}$ is the weed-free yield. We show an example relating to sunflower grown at increasing densities of the weed *Sinapis arvensis*.
+
+```{r}
+data(competition)
+Ywf <- mean( competition$Yield[competition$Dens == 0] )
+competition$YL <- ( Ywf - competition$Yield ) / Ywf * 100 
+
+#nls fit
+model <- nls(YL ~ NLS.YL(Dens, a, i), data = competition)
+summary(model)
+
+#drc fit
+model <- drm(YL ~ Dens, fct = DRC.YL(), data = competition)
+summary(model)
+plot(model, log="")
+```
+
+
+The above fit constrains the yield loss to be 0 when weed density is 0. This is logical, but, it has the important consequence that the weed-free yield is constrained to be equal to the observed weed-free yield, which is not realistic. Therefore, we can reparameterise the yield-loss function, in order to use the observed yield as the dependent variable. 
+
+Indeed, from the above equation we derive:
+
+$$Y_W  = Y_{WF}  - \frac{Y_L }{100}Y_{WF}  = Y_{WF} \left( {1 - \frac{Y_L }{100}} \right)$$
+
+and so:
+
+$$Y_W  = Y_{WF} \left( 1 - \frac{i\, X}{100 \left( 1 + \frac{i \, X}{a} \right) } \right)$$
+
+This function can be fit with 'drm()', by using the 'DRC.cousens85()' self starting function.
+
+```{r}
+model <- drm(Yield ~ Dens, fct = DRC.cousens85(), 
+             data = competition)
+summary(model)
+plot(model, log="")
+```
+
+# Sygmoidal curves
+
+Sygmoidal curves are S-shaped and they may be increasing, decreasing, symmetric or non-simmetric around the inflection point. They are parameterised in countless ways, which may be often confusing. Therefore, we will show a common parameterisation, that is very useful in biological terms.
+
+## Logistic curve
+
+The logistic curve derives from the cumulative logistic distribution function; the curve is symmetric around the inflection point and it it may be parameterised as:
+
+$$Y = c + \frac{d - c}{1 + exp(b (X - e))}$$
+
+where $d$ is the higher asymptote, $c$ is the lower asymptote, $e$ is $X$ value producing a response half-way between $d$ and $c$, while $b$ is the slope around the inflection point. The parameter $b$ can be positive or negative and, consequently, $Y$ may increase or decrease as $X$ increases.
+
+The above function is known as four-parameter logistic. If necessary, contraints can be put on parameter values, i.e. $c$ can be constrained to 0 (three-parameter logistic). Furthermore, $d$ can be also contrained to 1 (two-parameter logistic).
+
+The four- and three-parameter logistic curves can be fit by 'nls()', respectively with the self-starting functions 'SSfpl()' and 'SSlogis' ('nlme' package). In these functions, $b$ is replaced by $scal = -1/b$.
+
+With 'drm()', we can use the self-starting functions 'L.4()' and 'L.3()', The 'L.2()' function has been included in the 'aomisc' package.
+
+Logistic functions are very useful, e.g., for plant growth studies.
+
+```{r}
+data(beetGrowth)
+beetGrowth
+
+model <- drm(weightFree ~ DAE, fct = L.3(), data = beetGrowth)
+summary(model)
+plot(model, log="")
+```
+
+
+## Gompertz Curve
+
+The Gompertz curve is parameterised in very many ways. We favour a parameterisation that resambles the one used for the logistic function:
+
+$$ Y = c + (d - c) \exp \left\{- \exp \left[ b \, (X - e) \right] \right\} $$
+
+were the parameters have the same meaning as those in the logistic function. The difference is that this curve is not symmetric around the inflection point. As for the logistic, we can have a four-, three- and two-parameter Gompertz functions, which can be fit by using 'drm()' and, respectively the 'G.4()', 'G.3()' and 'G.2()' sef-starters. The three-parameter Gompertz can also be fit with 'nls()', by using the 'SSGompertz()' self-starter in the 'nlme' package, although this is a different parameterisation.
+
+We give an example of the different shapes for the logistic (red) and Gompertz (black) functions.
+
+## Another type of asimmetry
+
+We have seen that, with respect to the logistic, the Gompertz shows a longer lag at the beginning, but raises steadily afterwards. We could describe a different pattern by changing the Gompertz function as follows:
+
+$$ Y = c + (d - c) \left\{ 1 - \exp \left\{- \exp \left[ b \, (X - e) \right] \right\} \right\} $$
+
+We add to the previous graph this function (in blue), to show how it differs from the logistic and Gompertz.
+
+
+```{r}
+d <- 10; c <- 2; e <- 7; b <- - 0.5
+curve( G.fun(x, b, c, d, e), xlim = c(0, 20) , xlab="X", ylab = "Y")
+curve( L.fun(x, b, c, d, e), add = T, col = "red" )
+curve( E.fun(x, b, c, d, e), add = T, col = "blue" )
+```
+
+The self-starters for this function are not yet available, at least to the best of my knowledge.
+
+## Log-logistic curve
+
+In many applications, the sigmoidal response curve is symmetric on the logarithm of x, which requires a log-logistic curve (a log-normal curve would be practically equivalent, but it is used far less often). For example, in biologic assays (but also in germination assays), the log-logistic curve is defined as follows:
+
+$$Y = c + \frac{d - c}{1 + \exp \left\{ b \left[ \log(X) - \log(e) \right] \right\} } $$
+
+the parameters have the very same meanng as the logistic equationn given above. It is easy to see that the above equation is equivalent to: 
+
+$$Y = c + \frac{d - c}{1 + \left( \frac{X}{e} \right)^b}$$
+
+
+Another possible parameterisation is the so-called Hill function:
+
+$$ Y = \frac{a \, X^b}{ X^b + e^b} $$
+
+Indeed:
+
+$$ \frac{a \, X^b}{ X^b + e^b} =  \frac{a}{ \frac{X^b}{X^b} + \frac{c^b}{X^b}} = \frac{a}{ 1 + \left( \frac{c}{X} \right)^b} = \frac{a}{ 1 + \left( \frac{c}{X} \right)^b} $$
+
+Log-logistic functions are used for crop growth, seed germination and bioassay work and they can have the same constraints as the logistic function. The four-parameter logistic is available as 'LL.4()' in the 'drc' package and as 'SSfpl()' in the 'nlme' package. This latter function replaces $b$ with $scal = 1/b$. Also in 'drc', we have 'LL.3()' (three-parameter logistic, with $c = 0$) and 'LL.2()' (two-parameter logistic, with $d = 1$ and $c = 0$). In 'nlme' we have 'SSlogis()', that is a three-parameter logistic with $scal = 1/b$.
+
+We show an example of a log-logistic fit, relating to a bioassay with *Brassica rapa* treated at increasing dosages of an herbicide.
+
+```{r}
+data(brassica)
+model <- drm(FW ~ Dose, fct = LL.4(), data = brassica)
+summary(model)
+plot(model)
+```
+
+
+## Weibull curve (type 2)
+
+The type 2 Weibull curve is for the Gompertz curve what the log-logistic curve is for the logistic curve. The equation is as follows:
+
+$$ Y = c + (d - c) \exp \left\{- \exp \left[ b \, (log(X) - log(e)) \right] \right\} $$
+
+and the parameters have the very same meaning as the other sygmoidal curves given above.
+
+As for fitting, the 'drc' package contains the self-starting functions 'W2.2()', 'W2.3()' and 'W2.4()' that can be used to fit respectively the two-, three- and four-parameter type 2 Weibull functions.
+
+## Weibull curve (type 1)
+
+The type 1 Weibull is similar to the type 2 Weibull, but describes a different type of asymmetry (see above):
+
+$$ Y = c + (d - c) \left\{ 1 - \exp \left\{- \exp \left[ b \, (log(X) - log(e)) \right] \right\} \right\}$$
+
+```{r}
+model <- drm(FW ~ Dose, fct = W2.4(), data = brassica)
+model2 <- drm(FW ~ Dose, fct = W1.4(), data = brassica)
+plot(model)
+plot(model2, add=T, col = "red")
+```
+
+
