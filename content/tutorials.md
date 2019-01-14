@@ -8,7 +8,7 @@ author = "Andrea Onofri"
 # Tutorials
 
 1. [Non-linear regression analysis](/nonLinearRegression/)
-2. [Interval-censored data in agriculture](https://www.onofriandreapg.github.io/agriCensData/)
+2. [Interval-censored data in agriculture](https://onofriandreapg.github.io/agriCensData/)
 
 # Articles
 

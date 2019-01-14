@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Seed germination: time-to-event methods account for censoring</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.0.13/css/fa-svg-with-js.css" rel="stylesheet" />
+<script src="site_libs/font-awesome-5.0.13/js/fontawesome-all.min.js"></script>
+<script src="site_libs/font-awesome-5.0.13/js/fa-v4-shims.min.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = false;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Home</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fa fa-gear"></span>
+     
+    Navigation
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Censoring.html">The problem of censoring</a>
+    </li>
+    <li>
+      <a href="TimeToEvent.html">Time-to-event methods account for censoring</a>
+    </li>
+    <li>
+      <a href="GermIndices.html">Revisting germination indices</a>
+    </li>
+    <li>
+      <a href="HTnonlin.html">Nonlinear regression analysis</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="http://www.statforbiology.com">Back to blog</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Seed germination: time-to-event methods account for censoring</h1>
+<h4 class="date"><em>17 December, 2018</em></h4>
+
+</div>
+
+
+<hr />
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Seed germination data are characterised by a peculiar source of uncertainty, that is know as ‘censoring’. Due to the monitoring schedule, we are not able to record the exact germination time of each seed in the lot; we are only able to record that germination took place within a certain interval of time. If you would like to know more about censoring, you can find further information <a href="Censoring.html">in this page here</a>. In that page, we have also shown that neglecting censoring during data analyses may lead to unreliable results. The question is: “how do we account for censoring?”.</p>
+<p>There is indeed a class of models that are specifically devised to account for all types of censoring. These models have been largely used in medicine to describe the time to death or other events of interest. This body of methods usually goes under the name of survival analyses, but we’d preferably talk about time-to-events methods. We have extensively talked about these models and how they account for censoring in two of our recent papers and related appendices <span class="citation">(Onofri et al., 2018, 2019)</span>. Therefore, we will not go into detail, now. We think that the readers want to be mainly convinced that fitting these models is as easy as fitting traditional models, with a clear gain in terms of reliability and efficiency.</p>
+</div>
+<div id="a-monte-carlo-simulation" class="section level1">
+<h1>A Monte Carlo simulation</h1>
+<p>In our previous page about censoring we ideally took a seed population, with log-normal distribution of germination time, location parameter <span class="math inline">\(\mu = 4.5\)</span> days, scale parameter <span class="math inline">\(\sigma = 0.6\)</span> and a maximum germinated proportion <span class="math inline">\(\pi = 0.85\)</span>. For this population, we time to 50% germination (T50) was 5.14 days and the Mean Germination Time (MGT) was 5.39 days. We took a sample of 100 seeds from that population, by using Monte Carlo simulation. For the ease of reading, we replicate the simulation here.</p>
+<pre class="r"><code>#Real parameter values
+mu &lt;- 4.5; sigma &lt;- 0.6; pMax = 0.85
+
+#Monte Carlo simulation - Step 1
+#Simulating the number of germinated seeds
+#out of the 100 tesetd
+set.seed(1234)
+nGerm &lt;- rbinom(1, 100, pMax)
+nGerm</code></pre>
+<pre><code>## [1] 89</code></pre>
+<pre class="r"><code>#Monte Carlo simulation - Step 2
+#Simulating the germination time for each seed in the sample
+Gtimes &lt;- rlnorm(nGerm, log(mu), sigma)
+Gtimes &lt;- c(Gtimes, rep(Inf, 100 - nGerm))
+Gtimes</code></pre>
+<pre><code>##   [1]  5.424863  5.434125  5.582579  2.903142  4.597512  4.815609 10.603760
+##   [8]  8.118291  3.097525  2.901291  3.300505  1.574027  7.630397 10.237768
+##  [15]  1.635063  3.088284  4.549728  6.870408  3.052210  7.576004  5.637602
+##  [22]  5.420753  4.513539  4.399537  6.948064  3.340211  4.530872  4.526701
+##  [29]  6.760117  8.346274  1.594181  1.198977  6.233769  4.558227  4.961047
+##  [36]  9.479485  7.197573  4.631820  1.856768  5.844697  4.313697  4.810473
+##  [43]  9.661802  3.346942  9.584485  9.722689  2.299752  4.579095  1.412326
+##  [50]  6.645991  4.964877  2.740231  3.431359  2.289046  1.559058  2.091263
+##  [57]  2.235598 10.176567  3.167262  7.411185 10.289998 11.576995  3.191594
+##  [64]  4.522085  3.390061  5.527390  4.005285  4.286991  5.220449  8.824484
+##  [71] 16.204791  4.375652  5.469491  4.971624  5.054734  2.880597  8.386469
+##  [78] 17.489334 27.570654  4.890293  5.047498  2.859137  5.555705  1.878668
+##  [85]  3.429052  5.112954  4.029451  6.863120  4.933304       Inf       Inf
+##  [92]       Inf       Inf       Inf       Inf       Inf       Inf       Inf
+##  [99]       Inf       Inf</code></pre>
+<pre class="r"><code>#Monte carlo simulation - Step 3
+#Simulating the observed counts
+obsT &lt;- seq(1, 15, by=1) #Observation schedule
+table( cut(Gtimes, breaks = c(0, obsT)) )</code></pre>
+<pre><code>## 
+##   (0,1]   (1,2]   (2,3]   (3,4]   (4,5]   (5,6]   (6,7]   (7,8]   (8,9] 
+##       0       8       9      11      22      13       6       4       4 
+##  (9,10] (10,11] (11,12] (12,13] (13,14] (14,15] 
+##       4       4       1       0       0       0</code></pre>
+<pre class="r"><code>counts &lt;- as.numeric( table( cut(Gtimes, breaks = c(0, obsT)) ) )</code></pre>
+<p>Time-to-event methods directly consider the observed counts as the response variable. As the independent variable, they consider both the extremes of each time interval (timeBef and timeAf; see below). The dataset is organised as follows:</p>
+<pre class="r"><code>timeBef &lt;-  c(0, obsT)
+timeAf &lt;- c(obsT, Inf)
+Counts &lt;- c(counts, 100 - sum(counts))
+df &lt;- data.frame(timeBef, timeAf, Counts)
+df</code></pre>
+<pre><code>##    timeBef timeAf Counts
+## 1        0      1      0
+## 2        1      2      8
+## 3        2      3      9
+## 4        3      4     11
+## 5        4      5     22
+## 6        5      6     13
+## 7        6      7      6
+## 8        7      8      4
+## 9        8      9      4
+## 10       9     10      4
+## 11      10     11      4
+## 12      11     12      1
+## 13      12     13      0
+## 14      13     14      0
+## 15      14     15      0
+## 16      15    Inf     14</code></pre>
+<p>The organisation is clear: we see that we had, e.g., 8 seeds germinated between timeBef = 1 and timeAf = 2 and 9 seeds germinated between timeBef = 2 and timeAf = 3. Please, also note that there are 14 seeds with a germination time higher than 15 days (right censoring); they include both the dormant seeds (that were non-germinable) and the germinable seeds with a germination time higher than 15 days. It should be clear that the dataset above includes all forms of uncertainty due to censoring.</p>
+<p>If we compare the model definition, nonlinear regression analysis would use the following statement:</p>
+<pre><code>CumulativeProportion ~ timeAf</code></pre>
+<p>On the other hand, a time-to-event model is defined as:</p>
+<pre><code>Count ~ timeBef + timeAf</code></pre>
+<p>In order to fit a time-to-event model with log-normal distribution of germination time, we use the fallowing call (please note the argument ‘type’, which is set to ‘event’):</p>
+<pre class="r"><code>library(drc)
+#Time-to-event model
+modTE &lt;- drm(Counts ~ timeBef + timeAf, data = df, 
+           fct = LN.3(), type = &quot;event&quot;)
+summary(modTE)</code></pre>
+<pre><code>## 
+## Model fitted: Log-normal with lower limit at 0 (3 parms)
+## 
+## Parameter estimates:
+## 
+##               Estimate Std. Error t-value   p-value    
+## b:(Intercept) 1.883589   0.176355  10.681 &lt; 2.2e-16 ***
+## d:(Intercept) 0.871272   0.035926  24.252 &lt; 2.2e-16 ***
+## e:(Intercept) 4.596088   0.280083  16.410 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>#Nonlinear regression model
+propCum &lt;- I(cumsum(df$Counts)/100)
+modNL &lt;- drm(propCum ~ timeAf, data = df, 
+           fct = LN.3(), subset=is.finite(df$timeAf)==T)
+summary(modNL)</code></pre>
+<pre><code>## 
+## Model fitted: Log-normal with lower limit at 0 (3 parms)
+## 
+## Parameter estimates:
+## 
+##               Estimate Std. Error t-value   p-value    
+## b:(Intercept) 1.956496   0.132081  14.813 4.486e-09 ***
+## d:(Intercept) 0.877667   0.015404  56.977 5.039e-16 ***
+## e:(Intercept) 4.703950   0.103217  45.573 8.060e-15 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error:
+## 
+##  0.02302153 (12 degrees of freedom)</code></pre>
+<p>With respect to a nonlinear regression fit, the estimate of ‘e’ is very close, but the standard error is higher. Let’s compare the two methods with 1000 samples (be patient… it may take a while)</p>
+<pre class="r"><code>GermSampling &lt;- function(nSeeds, timeLast, stepOss, mu, shape, pMax){
+    
+    #Draw a sample as above
+    germ &lt;- rbinom(1, nSeeds, pMax)
+    Gtimes &lt;- rlnorm(nGerm, log(mu), sigma)
+    Gtimes &lt;- c(Gtimes, rep(Inf, 100 - nGerm))
+    
+    #Generate the observed data
+    obsT &lt;- seq(1, timeLast, by=stepOss) #Observation schedule (by 5 o 2)
+    counts &lt;- as.numeric( table( cut(Gtimes, breaks = c(0, obsT)) ) )
+    propCum &lt;- cumsum(counts)/nSeeds
+    timeBef &lt;- c(0, obsT)
+    timeAf &lt;- c(obsT, Inf)
+    counts &lt;- c(counts, nSeeds - sum(counts))
+    
+    #Calculate the T50 with two methods
+    mod &lt;- drm(propCum ~ obsT, fct = LN.3() )
+    modTE &lt;- drm(counts ~ timeBef + timeAf, 
+           fct = LN.3(), type = &quot;event&quot;)
+    c(T501 = summary(mod)[[3]][3,1],
+         ES1 = summary(mod)[[3]][3,2],
+         T502 = summary(modTE)[[3]][3,1],
+         ES2 = summary(modTE)[[3]][3,2] )
+}
+
+set.seed(1234)
+result &lt;- data.frame()
+for (i in 1:1000) {
+  res &lt;- GermSampling(100, 15, 1, 4.5, 0.6, 0.85)
+  result &lt;- rbind(result, res)
+} 
+names(result) &lt;- c(&quot;T501&quot;, &quot;ES1&quot;, &quot;T502&quot;, &quot;ES2&quot;)
+apply(result, 2, mean)</code></pre>
+<pre><code>##       T501        ES1       T502        ES2 
+## 4.52201859 0.09017022 4.53786873 0.32857552</code></pre>
+<pre class="r"><code>apply(result, 2, sd)</code></pre>
+<pre><code>##       T501        ES1       T502        ES2 
+## 0.34444186 0.03964712 0.34650017 0.06879141</code></pre>
+<p>We see that both methods lead to unbiased estimates. However, the sampling distribution of T50 shows a standard deviation of approximately 0.35 days. This is estimated correctely by the time-to-event method, which, on average, leads to an estimate of 0.33 days. On the contrary, nonlinear regression leads to an average estimate of 0.09, that is almost one fourth of the real value.</p>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
+<div id="refs" class="references">
+<div id="ref-onofri_hydrothermal-time_2018">
+<p>Onofri, A., Benincasa, P., Mesgaran, M.B., Ritz, C., 2018. Hydrothermal-time-to-event models for seed germination. European Journal of Agronomy 101, 129–139.</p>
+</div>
+<div id="ref-onofri_analysing_2019">
+<p>Onofri, A., Piepho, H.P., Kozak, M., 2019. Analysing censored data in agricultural research: A review with examples and software tips. Annals of Applied Biology.</p>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
