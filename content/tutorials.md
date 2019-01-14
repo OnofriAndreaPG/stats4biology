@@ -9,6 +9,8 @@ author = "Andrea Onofri"
 
 1. [Non-linear regression analysis](/nonLinearRegression/)
 2. [Interval-censored data in agriculture](https://onofriandreapg.github.io/agriCensData/)
+3. [Analysing seed germination data with R: a tutorial](/seedGermination/)
+
 
 # Articles
 
