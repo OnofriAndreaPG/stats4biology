@@ -32,8 +32,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="per-iniziare-introduzione-ad-r.html">
-<link rel="next" href="dalla-popolazione-al-campione-i-modelli-stocastici.html">
+<link rel="prev" href="una-variabile-indipendente-categorica-anova-ad-una-via.html">
+<link rel="next" href="la-regressione-lineare-semplice.html">
 <script src="book_assets/jquery-2.2.3/jquery.min.js"></script>
 <link href="book_assets/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="book_assets/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -320,222 +320,252 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="primo-passo-la-descrizione-dei-dati-raccolti" class="section level1">
-<h1><span class="header-section-number">Capitolo 5</span> Primo passo: la descrizione dei dati raccolti</h1>
-<div id="le-variabili-quantitative-analisi-chimiche-e-altre-misurazioni-fondamentali" class="section level2">
-<h2><span class="header-section-number">5.1</span> Le variabili quantitative: analisi chimiche e altre misurazioni fondamentali</h2>
-<p>In un precedente capitolo abbiamo visto che la replicazione è uno degli elementi fondamentali di un sperimento. Abbiamo anche visto che le <span class="math inline">\(n\)</span> repliche effettuate sono solo un campione delle infinite misure che avremmo potuto fare, ma che non abbiamo fatto per insufficienza di risorse (usualmente tempo, spazio e lavoro). Di conseguenza, dopo aver terminato un esperimento ci troviamo con un collettivo di misure, che debbono essere riassunte e descritte.</p>
-<p>Se i dati sono quantitativi (su scala continua o discreta), è possibile e necessario descrive almeno due caratteristiche del dataset, vale a dire:</p>
+<div id="la-verifica-delle-assunzioni-di-base-metodi-diagnostici" class="section level1">
+<h1><span class="header-section-number">Capitolo 11</span> La verifica delle assunzioni di base: metodi diagnostici</h1>
+<div id="introduzione-4" class="section level2">
+<h2><span class="header-section-number">11.1</span> Introduzione</h2>
+<p>Nel momento in cui eseguiamo test d’ipotesi nell’ambito di un modello lineare, assumiamo implicitamente che i dati rispondano ai seguenti requisiti:</p>
 <ol style="list-style-type: decimal">
-<li>tendenza centrale (location)</li>
-<li>dispersione (shape)</li>
+<li>il modello è corretto;</li>
+<li>la risposta osservata è una funzione del modello più o meno l’errore sperimentale;</li>
+<li>l’ errore sperimentale è indipendente dal modello;</li>
+<li>gli errori sono normalmente distribuiti, con media zero e varianze omogenee;</li>
+<li>gli errori rilevati in esperimenti ripetuti sono tra loro indipendenti.</li>
+<li>assenza di osservazioni aberranti;</li>
 </ol>
-<p>Vediamo ora quali sono le statistiche più utilizzate per descrivere un campione.</p>
-<div id="indicatori-di-tendenza-centrale" class="section level3">
-<h3><span class="header-section-number">5.1.1</span> Indicatori di tendenza centrale</h3>
-<p>La media aritmetica è un concetto molto intuitivo che non necessita di particolari spiegazioni: si calcola con R mediante la funzione <code>mean(vettore)</code>. In Excel, si calcola con la funzione “=MEDIA(intervallo)”.</p>
-<p>Per esempio, carichiamo il dataset ‘heights’ contenuto nel package ‘aomisc’ e calcoliamo la media delle altezze.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(aomisc)
-<span class="kw">data</span>(heights)
-<span class="kw">mean</span>(heights<span class="op">$</span>height)</code></pre></div>
-<pre><code>## [1] 164</code></pre>
-<p>Un altro indicatore di tendenza centrale è la <em>mediana</em>, data dal valore che bipartisce la distribuzione di frequenza in modo da lasciare lo stesso numero di termini a sinistra e a destra. Se abbiamo una serie di individui ordinati in graduatoria, la mediana è data dall’ individuo che occupa il posto (n + 1)/2 o, se gli individui sono in numero pari, dalla media delle due osservazioni centrali. Il comando per calcolare la mediana in R è <code>median(vettore)</code>. In Excel, si utilizza la funzione “=MEDIANA(intervallo)”.</p>
-<p>La mediana è un indicatore più robusto della media: infatti, supponiamo di avere cinque valori:</p>
-<p>1 - 4 - 7 - 9 - 10</p>
-<p>La media è pari a 6.2, mentre la mediana è pari a 7 (valore centrale). Se cambiano il numero più alto in questo modo:</p>
-<p>1 - 4 - 7 - 9 - 100</p>
-<p>la media di questi cinque valori sarà 24.2, mentre la mediana sarà sempre pari a 7. Insomma, la mediana non è influenzata da valori estremi (<em>outliers</em>), in senso positivo o negativo.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">median</span>(heights<span class="op">$</span>height)</code></pre></div>
-<pre><code>## [1] 162.5</code></pre>
+<p>In genere, le assunzioni di base non possono essere verificate <em>a priori</em>, perché per quasi nessuno dei fenomeni naturali sono note le vere relazioni causa-effetto. Per questo motivo, si procede in primo luogo al fitting del modello e, successivamente, si verifica il rispetto delle assunzioni di base.</p>
+<p>Il problema è importante perché ogni deviazione rispetto agli anzidetti requisiti può inficiare la validità dei test d’ipotesi, modificando il livello di significatività. A proposito dei dati aberranti, dobbiamo dire che, se è sbagliato correggerli arbitrariamente, senza aver prima accertato che siano effettivamente frutto di errore, potrebbe essere altrettanto sbagliato lasciarli nel dataset, in quanto essi possono influenzare in modo molto marcato il risultato dell’analisi. E’evidente comunque che l’eventuale correzione dovrebbe riguardare una larga minoranza dei dati sperimentali raccolti (orientativamente, non più del 5%), altrimenti si dovrà necessariamente pensare di ripetere l’esperimento.</p>
 </div>
-<div id="indicatori-di-variabilita" class="section level3">
-<h3><span class="header-section-number">5.1.2</span> Indicatori di variabilità</h3>
-<p>Gli indicatori di tendenza centrale, da soli, non ci informano su come le unità sperimentali tendono a differire l’una dall’altra: ad esempio una media pari a 100 può essere ottenuta con tre individui che misurano 99, 100 e 101 rispettivamente o con tre individui che misurano 1, 100 e 199. E’ evidente che in questo secondo gruppo gli individui sono molto più differenti tra loro (dispersi) che nel primo gruppo.</p>
-<p>Pertanto, i risultati di un processo di misurazione non possono essere descritti solo con la media, ma è necessario anche calcolare un indice di variabilità. Tra essi, il più semplice è il <em>campo di variazione</em>, che è la differenza tra la misura più bassa e la misura più alta. In realtà, non si tratta di un vero e proprio indice di variabilità, in quanto dipende solo dai termini estremi della distribuzione e non necessariamente cresce al crescere della variabilità degli individui.</p>
-<p>Invece del campo di variazione, possiamo utilizzare i cosiddetti <em>percentili</em>, che bipartiscono la popolazione di partenza in modo da lasciare una certa quantità di termini alla sua sinistra e la restante quantità alla sua destra. Ad esempio, il primo percentile bipartisce la popolazione in modo da lasciare a sinistra l’ 1% dei termini e alla destra il restante 99%. Allo stesso modo l’ ottantesimo percentile bipartisce la popolazione in modo da lasciare a sinistra l’80% dei termini e alla destra il restante 20%.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">percentile &lt;-<span class="st"> </span><span class="fl">0.8</span>
-<span class="kw">curve</span>(<span class="kw">dnorm</span>(x),<span class="dt">from=</span><span class="op">-</span><span class="dv">3</span>,<span class="dt">to=</span><span class="dv">3</span>,<span class="dt">axes=</span><span class="ot">FALSE</span>, <span class="dt">ylab=</span><span class="st">&quot;&quot;</span>, <span class="dt">xlab=</span><span class="st">&quot;&quot;</span>)
-<span class="kw">axis</span>(<span class="dv">1</span>)
-<span class="kw">lines</span>(<span class="kw">c</span>(<span class="op">-</span><span class="dv">3</span>,<span class="dv">3</span>),<span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>))
-valori.rosso&lt;-<span class="kw">seq</span>(<span class="op">-</span><span class="dv">3</span>,<span class="kw">qnorm</span>(percentile),<span class="dt">length=</span><span class="dv">100</span>)
-x.rosso&lt;-<span class="kw">c</span>(<span class="op">-</span><span class="dv">3</span>,valori.rosso,<span class="kw">qnorm</span>(percentile),<span class="op">-</span><span class="dv">3</span>)
-y.rosso&lt;-<span class="kw">c</span>(<span class="dv">0</span>,<span class="kw">dnorm</span>(valori.rosso),<span class="dv">0</span>,<span class="dv">0</span>)
-<span class="kw">polygon</span>(x.rosso,y.rosso,<span class="dt">density=</span><span class="dv">20</span>,<span class="dt">angle=</span><span class="dv">45</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>)
-valori.grigio&lt;-<span class="kw">seq</span>(<span class="kw">qnorm</span>(percentile),<span class="dv">3</span>,<span class="dt">length=</span><span class="dv">100</span>)
-x.grigio&lt;-<span class="kw">c</span>(<span class="kw">qnorm</span>(percentile),valori.grigio,<span class="dv">3</span>,<span class="kw">qnorm</span>(percentile))
-y.grigio&lt;-<span class="kw">c</span>(<span class="dv">0</span>,<span class="kw">dnorm</span>(valori.grigio),<span class="dv">0</span>,<span class="dv">0</span>)
-<span class="kw">polygon</span>(x.grigio,y.grigio,<span class="dt">density=</span><span class="dv">20</span>,<span class="dt">angle=</span><span class="dv">45</span>, <span class="dt">col=</span><span class="st">&quot;grey&quot;</span>)
-<span class="kw">text</span>(<span class="dt">x=</span><span class="dv">2</span>,<span class="dt">y=</span><span class="fl">0.1</span>,<span class="st">&quot;80° percentile&quot;</span>, <span class="dt">pos=</span><span class="dv">4</span>)
-<span class="kw">arrows</span>(<span class="dv">2</span>,<span class="fl">0.1</span>,<span class="kw">qnorm</span>(percentile),<span class="dv">0</span>)</code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-40-1.png" width="672" /></p>
-<p>Per descrivere la variabilità di un collettivo è possibile utilizzare, ad esempio, il 25esimo e il 75esimo percentile: se questi sono molto vicini, significa che il 50 % dei soggetti è compreso in un intervallo piccolo e quindi la variabilità della popolazione è bassa. Per calcolare questi due valori con Excel possiamo utilizzare le funzioni “=PERCENTILE.INC(intervallo, 0.25)” e “=PERCENTILE.INC(intervallo, 0.75)”. Per quanto riguarda R, i comandi sono dati più sotto.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">quantile</span>(heights<span class="op">$</span>height, <span class="dt">probs =</span> <span class="kw">c</span>(<span class="fl">0.25</span>, <span class="fl">0.75</span>))</code></pre></div>
-<pre><code>##    25%    75% 
-## 152.75 174.25</code></pre>
-<p>A questo proposito, possiamo introdurre il concetto di <em>boxplot</em> (grafico Box-Whisker). Si tratta di una scatola che ha per estremi il 25esimo e il 75esimo percentile ed è tagliata da una linea centrale in corrispondenza della mediana. Dalla scatola partono due linee verticali che identificano il valore massimo e il minimo. Se il massimo (o il minimo) distano dalla mediana più di 1.5 volte la differenza tra la mediana stessa e il 75esimo (o 25esimo) percentile, allora le linee verticali si fermano ad un valore pari ad 1.5 volte il 75esimo (o il 25esimo) percentile rispettivamente ed i dati esterni vengono raffigurati come outliers. I boxplot sono solitamente usati per descrivere campioni numerosi nei quali esista un qualche criterio di raggruppamento. In basso abbiamo create tre gruppi con una funzione di estrazione di numeri casuali.</p>
+<div id="procedure-diagnostiche" class="section level2">
+<h2><span class="header-section-number">11.2</span> Procedure diagnostiche</h2>
+<p>In questo capitolo ci occuperemo di diverse procedure, così classificate:</p>
+<ol style="list-style-type: decimal">
+<li>ispezione grafica dei residui</li>
+<li>test di Anscombe e Tukey per la ricerca degli outliers</li>
+<li>test di Bartlett e test di Levene per l’omogeneità delle varianze</li>
+<li>Procedura di Box e Cox per la scelta delle trasformazioni stabilizzanti</li>
+</ol>
+</div>
+<div id="analisi-grafica-dei-residui" class="section level2">
+<h2><span class="header-section-number">11.3</span> Analisi grafica dei residui</h2>
+<p>La gran parte dei pre-requisiti fondamentali di un dataset riguardano la struttura dei residui e, di conseguenza, l’ispezione grafica di questi ultimi, eventualmente accompagnata da semplici strumenti algebrici, possono permetterci di evidenziare la gran parte delle ’patologie’ di cui soffrono i dati sperimentali. Si può affermare che l’ispezione dei residui è uno strumento diagnostico fondamentale il cui impiego dovrebbe rientrare tra le metodiche di routine per ogni elaborazione statistica dei dati.</p>
+<p>Ricordo che i residui sono gli scostamenti tra i valori osservati e quelli attesi sulla base del modello in studio; hanno sempre media 0, mentre la deviazione standard cambia di volta in volta.</p>
+<div id="grafico-dei-residui-contro-i-valori-attesi" class="section level3">
+<h3><span class="header-section-number">11.3.1</span> Grafico dei residui contro i valori attesi</h3>
+<p>Il metodo grafico più utilizzato per l’analisi dei residui consiste nel plottare i residui verso i valori attesi. Se non vi sono problemi, i punti nel grafico dovrebbero essere distribuiti in modo assolutamente casuale, come nel grafico sottostante.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">1234</span>)
-A &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">20</span>)
-B &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">20</span>)
-C &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">20</span>)
-series &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="kw">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>), <span class="dt">each =</span> <span class="dv">20</span>)
-values &lt;-<span class="st"> </span><span class="kw">c</span>(A, B, C)
-<span class="kw">boxplot</span>(values <span class="op">~</span><span class="st"> </span>series)</code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-42-1.png" width="672" /></p>
-<p>Con Excel, non esiste una funzione in grado di disegnare un boxplot automaticamente e si possono seguire le indicazioni a <a href="http://www.dummies.com/how-to/content/boxandwhisker-charts-for-excel.html">questo link</a>.</p>
-<p>Oltre ad esprimere la variabilità di una popolazione con un intervallo (campo di variazione o coppia di percentili) è possibile utilizzare diversi indici sintetici di variabilità, tra cui i più diffusi sono la devianza, la varianza, la deviazione standard ed il coefficiente di variabilità.</p>
-<p>La <strong>devianza</strong> (generalmente nota come SS, cioè somma dei quadrati) è data da:</p>
-<p><span class="math display">\[SS = \sum\limits_{i = 1}^n {(x_i  - \bar x)^2 }\]</span></p>
-<p>Si tratta di un indicatore caratterizzato da significato geometrico molto preciso, collegabile alla somma dei quadrati delle distanze euclidee di ogni osservazione rispetto alla media. In R, non vi è una funzione per il calcolo della devianza (o meglio, esiste una possibilità nell’ambito dei modelli lineari, ma è troppo presto per introdurla…). Possiamo allora un’espressione del tipo:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>( (heights<span class="op">$</span>height <span class="op">-</span><span class="st"> </span><span class="kw">mean</span>(heights<span class="op">$</span>height))<span class="op">^</span><span class="dv">2</span> )</code></pre></div>
-<pre><code>## [1] 4050</code></pre>
-<p>Come misura di ’distanza’, la devianza ha alcune importanti proprietà (che vedremo meglio in seguito), ma essendo una somma, il valore finale dipende dal numero di scarti da sommare e quindi non è possibile operare confronti tra collettivi formati da un diverso numero di individui. Si può quindi definire un altro indice, detto <em>varianza</em> (nei software di uso più corrente si parla di varianza campionaria, e definito come segue:</p>
-<p><span class="math display">\[\sigma^2  = \frac{SS}{n - 1}\]</span></p>
-<p>La varianza permette di confrontare la variabilità di collettivi formati da un numero diverso di individui, anche se permane il problema che questo indicatore è espresso in un’unità di misura al quadrato, rispetto a quella delle osservazioni originali: ad esempio se le osservazioni sono espresse in metri, la varianza è espressa in metri quadrati.</p>
-<p>Per eliminare questo problema si ricorre alla radice quadrata della varianza, cioè la <em>deviazione standard</em>, che si indica con <em>s</em>. La deviazione standard è espressa nella stessa unità di misura dei dati originari ed è quindi molto informativa sulla banda di oscillazione dei dati rispetto alla media.</p>
-<p>Spesso la variabilità dei dati è in qualche modo proporzionale alla media: collettivi con una media alta hanno anche una variabilità alta e viceversa. Per questo motivo viene utilizzato spesso il <em>coefficiente di variabilità</em>:</p>
-<p><span class="math display">\[CV = \frac{\sigma }{\mu } \times 100\]</span></p>
-<p>che è un numero puro e non dipende dall’unità di misura e dall’ampiezza del collettivo, sicché è molto adatto ad esprimere ad esempio l’errore degli strumenti di misura e delle apparecchiature di analisi.</p>
-<p>Varianza e deviazione standard sono molto facili da calcolare in R, grazie alle funzioni <code>var()</code>, <code>sd()</code>. In Excel, abbiamo le funzioni “=DEV.Q(intervallo)”, “=VAR(intervallo)” e “=DEV.ST(intervallo)”, rispettivamentep er devianza, varianza e deviazione standard.</p>
-<p>In genere, la deviazione standard, per le sue caratteristiche, viene utilizzata come indicatore dell’incertezza assoluta associata ad una determinata misurazione, mentre il coefficiente di variabilità (incertezza relativa percentuale; CV), è molto adatto ad esprimere l’errore degli strumenti di misura e delle apparecchiature di analisi.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">var</span>(heights<span class="op">$</span>height)</code></pre></div>
-<pre><code>## [1] 213.1579</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sd</span>(heights<span class="op">$</span>height)</code></pre></div>
-<pre><code>## [1] 14.59993</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sd</span>(heights<span class="op">$</span>height)<span class="op">/</span><span class="kw">mean</span>(heights<span class="op">$</span>height) <span class="op">*</span><span class="st"> </span><span class="dv">100</span></code></pre></div>
-<pre><code>## [1] 8.902395</code></pre>
+<span class="kw">plot</span>(<span class="kw">rnorm</span>(<span class="dv">100</span>, <span class="dv">0</span>, <span class="fl">2.5</span>) <span class="op">~</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>), <span class="dt">xlab=</span><span class="st">&quot;Valori attesi&quot;</span>, 
+     <span class="dt">ylab =</span> <span class="st">&quot;Residui&quot;</span>, <span class="dt">pch=</span><span class="dv">21</span>, <span class="dt">bg=</span><span class="st">&quot;red&quot;</span>)</code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-119-1.png" width="672" /></p>
+<p>Le osservazioni aberranti (<em>outliers</em>) sono chiaramente indicate nel grafico dei residui come punti isolati rispetto agli altri (Figura sottostante).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">122</span>)
+<span class="kw">plot</span>(<span class="kw">c</span>(<span class="kw">rnorm</span>(<span class="dv">100</span>, <span class="dv">0</span>,<span class="fl">2.5</span>), <span class="dv">16</span>) <span class="op">~</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>, <span class="dv">60</span>), <span class="dt">xlab=</span><span class="st">&quot;Valori attesi&quot;</span>, 
+     <span class="dt">ylab =</span> <span class="st">&quot;Residui&quot;</span>, <span class="dt">pch=</span><span class="dv">21</span>, <span class="dt">bg=</span><span class="st">&quot;red&quot;</span>)</code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-120-1.png" width="672" /></p>
+<p>L’eterogeneità delle varianze è invece indicata da residui che si allargano o si stringono procedendo verso i margini del grafico (Figura sottostante), facendo emergere una sorta di proporzionalità tra media e varianza.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">424</span>)
+dati &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>)
+<span class="kw">plot</span>(<span class="kw">rnorm</span>(<span class="dv">100</span>, <span class="dv">0</span>, dati<span class="op">/</span><span class="dv">20</span>) <span class="op">~</span><span class="st"> </span>dati, <span class="dt">xlab=</span><span class="st">&quot;Valori attesi&quot;</span>, 
+     <span class="dt">ylab =</span> <span class="st">&quot;Residui&quot;</span>, <span class="dt">pch=</span><span class="dv">21</span>, <span class="dt">bg=</span><span class="st">&quot;red&quot;</span>)</code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-121-1.png" width="672" /></p>
+<p>A volte la relazione causa effetto non è lineare o, comunque, il modello devia sistematicamente dai dati osservati. Di conseguenza, i residui mostrano un evidente pattern legato al segno. Ad esempio, i residui sono tendenzialmente negativi per bassi valori attesi e positivi per alti valori.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">424</span>)
+dati &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>)
+<span class="kw">plot</span>(<span class="kw">rnorm</span>(<span class="dv">100</span>, <span class="op">-</span><span class="dv">5</span> <span class="op">+</span><span class="st"> </span><span class="fl">0.1</span><span class="op">*</span>dati, <span class="fl">1.5</span>) <span class="op">~</span><span class="st"> </span>dati, <span class="dt">xlab=</span><span class="st">&quot;Valori attesi&quot;</span>, <span class="dt">ylab =</span> <span class="st">&quot;Residui&quot;</span>, <span class="dt">pch=</span><span class="dv">21</span>, <span class="dt">bg=</span><span class="st">&quot;red&quot;</span>)
+<span class="kw">abline</span>()</code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-122-1.png" width="672" /></p>
 </div>
-<div id="arrotondamenti" class="section level3">
-<h3><span class="header-section-number">5.1.3</span> Arrotondamenti</h3>
-<p>Il calcolo della media e della deviazione standard (sia a mano che con il computer) porta all’ottenimento di un numero elevato di cifre decimali. E’ quindi lecito chiedersi quante cifre riportare nel riferire i risultati della misura. L’indicazione generale, da prendere con le dovute cautele è che nel caso della media si riportano un numero di cifre decimali pari a quello rilevato nella misura, mentre per gli indicatori di variabilità si dovrebbe utilizzare un decimale in più.</p>
-</div>
-</div>
-<div id="descrizione-dei-sottogruppi" class="section level2">
-<h2><span class="header-section-number">5.2</span> Descrizione dei sottogruppi</h2>
-<p>In biometria è molto comune che il gruppo di unità sperimentali sia divisibile in più sottogruppi, dei quali vogliamo conoscere alcune statistiche descrittive. Abbiamo già visto il boxplot; ora potremmo voler calcolare le medie per gruppo. Per questo, possiamo utilizzare la funzione ‘tapply()’:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">with</span>(heights, <span class="kw">tapply</span>(height, var, mean) )</code></pre></div>
-<pre><code>##      C      N      S      V 
-## 165.00 164.00 160.00 165.25</code></pre>
-<p>dove <code>height</code> è la variabile che contiene i valori da mediare, <code>var</code> è la variabile che contiene la codifica di gruppo, <code>mean</code> è la funzione che dobbiamo calcolare. Ovviamente <code>mean</code> può essere sostituito da qualunque altra funzione ammissibile in R, come ad esempio la deviazione standard.</p>
-<p>Spesso vogliamo calcolare più di una funzione (ad esempio, la media e la deviazione standard). Per questo possiamo tilizzare il package ‘plyr’ e la funzione ‘ddplyr()’.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(plyr)
-descript &lt;-<span class="st"> </span><span class="kw">ddply</span>(heights, <span class="op">~</span>var, summarise, 
-                  <span class="dt">Media =</span> <span class="kw">mean</span>(height), 
-                  <span class="dt">SD =</span> <span class="kw">sd</span>(height))
-descript</code></pre></div>
-<pre><code>##   var  Media       SD
-## 1   C 165.00 14.36431
-## 2   N 164.00 16.19877
-## 3   S 160.00 12.16553
-## 4   V 165.25 19.51709</code></pre>
-<p>Con la funzione soprastante abbia creato un nuovo dataset (descript), che può essere utilizzato per il plotting, ad esempio per creare un grafico a dispersione, con l’indicazione della dispersione dei dati. Per sapere le coordinate relative al centro di ogni barra, dobbiamo creare un oggetto con la funzione ‘barplot()’. Questa funzione, oltre che disegnare il grafico, restituisce appunto le coordinate necessarie.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">coord &lt;-<span class="st"> </span><span class="kw">barplot</span>(descript<span class="op">$</span>Media, <span class="dt">names.arg =</span> descript<span class="op">$</span>var, 
-                 <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">200</span>))
-<span class="kw">arrows</span>(coord, descript<span class="op">$</span>Media <span class="op">-</span><span class="st"> </span>descript<span class="op">$</span>SD, 
-       coord, descript<span class="op">$</span>Media <span class="op">+</span><span class="st"> </span>descript<span class="op">$</span>SD, 
-       <span class="dt">length =</span> <span class="fl">0.05</span>, <span class="dt">angle =</span> <span class="dv">90</span>, <span class="dt">code =</span> <span class="dv">3</span>)</code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-47-1.png" width="672" /></p>
-<p>Il grafico non è bellissimo; per ora ci accontenteremo, ma può essere migliorate con un po’ di esercizio.</p>
-<p>In Excel, è molto conveniente utilizzare la funzione “tabella pivot”.</p>
-</div>
-<div id="distribuzioni-di-frequenza-e-classamento" class="section level2">
-<h2><span class="header-section-number">5.3</span> Distribuzioni di frequenza e classamento</h2>
-<p>Avendo a che fare con variabili qualitative, possiamo considerare la <em>frequenza assoluta</em>, cioè il numero degli individui che presentano una certa modalità. Ad esempio, se su 500 insetti 100 sono eterotteri, 200 sono imenotteri e 150 sono ortotteri, possiamo concludere che la frequenza assoluta degli eterotteri è pari a 100.</p>
-<p>Oltre alle frequenze assolute, possiamo considerare anche le <em>frequenze relative</em>, che si calcolano dividendo le frequenze assolute per il numero totale degli individui del collettivo. Nel caso prima accennato, la frequenza relativa degli eterotteri è pari a 100/500, cioè 0.2.</p>
-<p>Se abbiamo una variabile nella quale le modalità possono essere logicamente ordinate, oltre alle frequenze assolute e relative possiamo prendere in considerazione le cosiddette <em>frequenze cumulate</em>, che si ottengono cumulando i valori di tutte le classi di frequenza che precedono quella considerata.</p>
-<p>Le distribuzioni di frequenza possono essere costruite anche per le variabili quantitative, tramite un’operazione di classamento, che consiste nel creare classi con intervalli opportuni. Su queste distribuzioni di frequenza possiamo quindi calcolare frequenze assolute, relative e cumulate. In genere, se abbiamo un collettivo molto numeroso è conveniente aggregare i <em>dati</em> in forma di distribuzioni di frequenza, perché la lettura delle informazioni è molto più facile. Qui facciamo un esempio, anche se il dataset che utilizzeremo (‘heights’) non è così numeroso.</p>
-<p>Vogliamo:</p>
-<ol style="list-style-type: decimal">
-<li>valutare la distribuzione delle frequenze assolute, relative e percentuali degli individui di ciascuna varietà;</li>
-<li>valutare la distribuzione delle frequenze assolute, relative, percentuali e cumulate dell’ altezza degli individui, considerando classi di ampiezza pari a 5 cm;</li>
-<li>disegnare la torta delle frequenze relative della varietà e l’istogramma delle frequenze assolute dell’altezza.</li>
-</ol>
-<p>La soluzione al punto 1 con R è facile, attraverso l’impiego della funzione <code>table()</code>. La funzione <code>length()</code> restituisce il numero di elementi in un vettore.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Frequenze assolute</span>
-<span class="kw">table</span>(heights<span class="op">$</span>var)</code></pre></div>
-<pre><code>## 
-## C N S V 
-## 7 6 3 4</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Frequenze relative</span>
-<span class="kw">with</span>(heights, <span class="kw">table</span>(var)<span class="op">/</span><span class="kw">length</span>(var) ) </code></pre></div>
-<pre><code>## var
-##    C    N    S    V 
-## 0.35 0.30 0.15 0.20</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Frequenze percentuali</span>
-<span class="kw">with</span>(heights, <span class="kw">table</span>(var)<span class="op">/</span><span class="kw">length</span>(var) <span class="op">*</span><span class="st"> </span><span class="dv">100</span> )</code></pre></div>
-<pre><code>## var
-##  C  N  S  V 
-## 35 30 15 20</code></pre>
-<p>Per la variabile altezza, che è di tipo quantitativo, si utilizza lo stesso comando <code>table(vettore)</code>, ma occorre specificare l’ampiezza delle classi di frequenza con la funzione <code>cut()</code> e l’argomento <code>breaks()</code>, con il quale vengono specificati gli estremi superiori della classe (inclusi per default nella classe stessa). Per le frequenze cumulate si usa invece la funzione <code>cumsum()</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">freq &lt;-<span class="st"> </span><span class="kw">table</span>(<span class="kw">cut</span> (heights<span class="op">$</span>height, 
-           <span class="dt">breaks =</span> <span class="kw">c</span>(<span class="dv">140</span>,<span class="dv">150</span>,<span class="dv">160</span>,<span class="dv">170</span>,<span class="dv">190</span>,<span class="dv">200</span>)))
-freq</code></pre></div>
-<pre><code>## 
-## (140,150] (150,160] (160,170] (170,190] (190,200] 
-##         4         5         4         6         1</code></pre>
-<p>Per disegnare i grafici si utilizzano le funzioni <code>pie()</code> e <code>barplot()</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">pie</span>(<span class="kw">table</span>(heights<span class="op">$</span>var))</code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-50-1.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">barplot</span>(freq, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>) </code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-50-2.png" width="672" /></p>
-<p>In Excel, l’operazione di classamento può essere effettuata utilizzando la formula “=FREQUENZA(matriceDati, matriceClassi)”, che tuttavia è una formula di matrice e quindi deve essere immessa in un intervallo e consolidata con la combinazione tasti “SHIFT+CTRL+INVIO”.</p>
-</div>
-<div id="statistiche-descrittive-per-le-distribuzioni-di-frequenza" class="section level2">
-<h2><span class="header-section-number">5.4</span> Statistiche descrittive per le distribuzioni di frequenza</h2>
-<p>Il più semplice indicatore di tendenza centrale, utilizzabile con qualunque tipo di dati è la <em>moda</em>, cioè il valore della classe che presenta la maggior frequenza. Ovviamente, se la variabile è quantitativa, si assume come moda il punto centrale della classe con maggior frequenza. L’individuazione della moda è banale e non richiede calcoli di sorta.</p>
-<p>Nel caso di distribuzioni di frequenza per caratteri ordinabili (qualitativi e quantitativi), oltre alla moda possiamo calcolare la <em>mediana</em> e gli altri percentili.</p>
-<p>Oltre a questi, per le distribuzioni di frequenza dicaratteri quantitativi è anche possibile calcolare la media, come illustrato in precedenza, insiema tutti gli indicatori di variabilità già citati.</p>
-</div>
-<div id="distribuzioni-di-frequenza-bivariate-le-tabelle-di-contingenza" class="section level2">
-<h2><span class="header-section-number">5.5</span> Distribuzioni di frequenza bivariate: le tabelle di contingenza</h2>
-<p>In alcuni casi in ciascuna unità sperimentale del collettivo vengono studiati due (o più) caratteri e, di conseguenza, si ha a che fare con distribuzioni di frequenza bivariate (o multivariate). In questo caso si possono costruire delle tabelle di contingenza, cioè delle tabelle a due entrate nelle quali ogni numero rappresenta la frequenza congiunta (in genere assoluta) per una particolare combinazione delle due variabili.</p>
-<p>Ad esempio consideriamo le variabili Varietà (con i valori SANREMO e FANO) e ‘Forma delle bacche’ (con i valori LUNGO, TONDO, OVALE), riportati nella tabella di contingenza che creeremo come matrice.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">tabCon &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="dv">37</span>, <span class="dv">45</span>, <span class="dv">32</span>, <span class="dv">74</span>, <span class="dv">61</span>, <span class="dv">59</span>), <span class="dt">nrow =</span> <span class="dv">2</span>, <span class="dt">ncol =</span> <span class="dv">3</span>,
-                 <span class="dt">byrow =</span> F)
-<span class="kw">row.names</span>(tabCon) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;SANREMO&quot;</span>, <span class="st">&quot;FANO&quot;</span>)
-<span class="kw">colnames</span>(tabCon) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;LUNGO&quot;</span>, <span class="st">&quot;TONDO&quot;</span>, <span class="st">&quot;OVALE&quot;</span>)
-tabCon</code></pre></div>
-<pre><code>##         LUNGO TONDO OVALE
-## SANREMO    37    32    61
-## FANO       45    74    59</code></pre>
-<p>Ogni riga della tabella sovrastante costituisce una distribuzione condizionata della forma del frutto, dato un certo valore della Varietà, mentre ogni colonna costituisce una distribuzione condizionata della Varietà, data una certa forma del frutto.</p>
-</div>
-<div id="connessione" class="section level2">
-<h2><span class="header-section-number">5.6</span> Connessione</h2>
-<p>Se guardiamo le due distribuzioni condizionate per SANREMO e FANO possiamo notare che esiste una certa differenza. Potremmo chiederci quindi se il presentarsi di una data modalità del carattere Varietà (SANREMO o FANO) influenza il presentarsi di una particolare modalità del carattere Forma del frutto. Se ciò non è vero si parla di indipendenza delle variabili (allora le distribuzioni condizionate sono uguali) altrimenti si parla di dipendenza o connessione. In caso di indipendenza, le distribuzioni condizionate delle due variabili dovrebbero essere uguali tra loro, cioè la frequenza relativa condizionale di X per una data modalità di Y deve essere uguale alla frequenza relativa condizionale di X per l’altra modalità di Y e quindi alla frequenza marginale di X.</p>
-<p>Ad esempio, per il carattere LUNGO la frequenza relativa marginale è pari ad 82/308=0.266 (82 è la somma dei pomodori di forma allungata, mentre 308 è il numero totale dei pomodori); in caso di indipendenza, questa frequenza dovrebbe essere la stessa, indipendentemente dal fatto che il pomodoro sia di varietà SANREMO oppure Fano. In cifre, la frequenza assoluta condizionata per LUNGO|SANREMO dovrebbe essere pari a 0.266x130=34.6. mentre LUNGO|FANO dovrebbe essere pari a 0.266x178=47.4. Con questi principi, possiamo costruire la tabella delle frequenze assolute attese, in caso di indipendenza completa tra i due caratteri.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">expF &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="fl">34.6</span>, <span class="fl">47.4</span>, <span class="fl">44.7</span>, <span class="fl">61.3</span>, <span class="fl">50.6</span>, <span class="fl">69.4</span>), 
-                 <span class="dt">nrow =</span> <span class="dv">2</span>, <span class="dt">ncol =</span> <span class="dv">3</span>,
-                 <span class="dt">byrow =</span> F)
-<span class="kw">row.names</span>(expF) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;SANREMO&quot;</span>, <span class="st">&quot;FANO&quot;</span>)
-<span class="kw">colnames</span>(expF) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;LUNGO&quot;</span>, <span class="st">&quot;TONDO&quot;</span>, <span class="st">&quot;OVALE&quot;</span>)</code></pre></div>
-<p>A questo punto è logico costruire un indice statistico di connessione, detto <span class="math inline">\(\chi^2\)</span>, che misuri lo scostamento tra le frequenze osservate e quelle attese nell’ipotesi di indipendenza perfetta:</p>
-<p><span class="math display">\[\chi ^2  = \frac{{\left( {f_o  - f_a } \right)^2 }}{{f_a }}\]</span></p>
-<p>dove <span class="math inline">\(f_o\)</span> sta per frequenza osservata ed <span class="math inline">\(f_a\)</span> sta per frequenza attesa nel caso indipendenza. Questo indice assume valore pari a zero nel caso di indipendenza completa (le frequenze osservate sono uguali a quelle attese) ed assume un valore positivo tanto più alto quanto maggiore è la connessione tra i due caratteri, fino ad un valore massimo dato dal prodotto del numero degli individui per il valore minimo tra il numero di righe - 1 e il numero di colonne - 1:</p>
-<p><span class="math display">\[\max \chi ^2  = n \cdot \min (r - 1,\,c - 1)\]</span></p>
-<p>Nel nostro caso, potremmo calcolare il chi quadro in questo modo:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>( ((tabCon <span class="op">-</span><span class="st"> </span>expF) <span class="op">^</span><span class="st"> </span><span class="dv">2</span>) <span class="op">/</span>expF )</code></pre></div>
-<pre><code>## [1] 10.22348</code></pre>
-<p>Esiste anche un comando più semplice, che consiste nell’utilizzare la funzione <code>as.table()</code> per forzare la matrice <code>dati</code> in una tabella di contingenza ed applicare la funzione ‘summary()’.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>( <span class="kw">as.table</span> (tabCon))</code></pre></div>
-<pre><code>## Number of cases in table: 308 
-## Number of factors: 2 
-## Test for independence of all factors:
-##  Chisq = 10.223, df = 2, p-value = 0.006027</code></pre>
-<p>Il valore massimo di chi quadro è pari a 308 e di conseguenza il valore osservato, espresso in relazione al valore massimo è pari a 10.22/308=0.033. Si può quindi concludere che la connessione tra i due caratteri è piuttosto debole.</p>
-</div>
-<div id="correlazione" class="section level2">
-<h2><span class="header-section-number">5.7</span> Correlazione</h2>
-<p>Se abbiamo a che fare con variabili quantitative, possiamo calcolare l’indice di connessione previa opportuna divisione in classi di frequenza delle due variabili in studio. Oltre a ciò, con variabili quantitative è possibile esplorare l’esistenza della cosidetta relazione di variazione congiunta, che si ha quando al variare di una variabile cambia anche il valore dell’altra.</p>
-<p>La variazione congiunta si quantifica tramite il <strong>coefficiente di correlazione</strong> costituito dal rapporto tra la codevianza (o somma dei prodotti) delle due variabili e il prodotto delle loro devianze. Il coefficiente di correlazione varia tra -1 e +1: un valore pari a +1 indica concordanza perfetta (tanto aumenta una variabile, tanto aumenta l’altra), mentre un valore pari a -1 indica discordanza perfetta (tanto aumenta una variabile tanto diminuisce l’altra). Un valore pari a 0 indica assenza di qualunque grado di variazione congiunta tra le due variabili (assenza di correlazione). Valori intermedi tra quelli anzidetti indicano correlazione positiva (se positivi) e negativa (se negativi).</p>
-<p>In R, per calcolare la correlazione tra due variabili si usa la funzione <code>cor()</code>. In Excel, abbiamo la funzione “=CORRELAZIONE(intervallo1, intervallo2)”</p>
-<p>Proviamo a considerare questo esempio: il contenuto di olio di 9 lotti di acheni di girasole è stato misurato con due metodi diversi ed è riportato più sotto.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">45</span>, <span class="dv">47</span>, <span class="dv">49</span>, <span class="dv">51</span>, <span class="dv">44</span>, <span class="dv">37</span>, <span class="dv">48</span>, <span class="dv">44</span>, <span class="dv">53</span>)
-b &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">44</span>, <span class="dv">44</span>, <span class="dv">49</span>, <span class="dv">53</span>, <span class="dv">48</span>, <span class="dv">34</span>, <span class="dv">47</span>, <span class="dv">46</span>, <span class="dv">51</span>)</code></pre></div>
-<p>Valutare la correlazione tra i risultati dei due metodi di analisi.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cor</span>(a, b)</code></pre></div>
-<pre><code>## [1] 0.8960795</code></pre>
-<p>Possiamo osservare che il coefficiente di correlazione è abbastanza vicino ad 1 e quindi possiamo concludere che esiste un buon grado di concordanza tra i due metodi di analisi.</p>
+<div id="qq-plot" class="section level3">
+<h3><span class="header-section-number">11.3.2</span> QQ-plot</h3>
+<p>Il grafico dei residui verso i valori attesi non è invece in grado di evidenza problemi di non-normalità. A questo fine, risulta molto utile un QQ-plot (quantile-quantile plot), nel quale i residui <em>standardizzati</em> vengono plottati contro i rispettivi quantili di una distribuzione normale standardizzata (figura sottostante).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))
+<span class="kw">curve</span>(<span class="kw">dnorm</span>(x, <span class="dv">0</span>, <span class="dv">1</span>), <span class="dt">from=</span><span class="op">-</span><span class="dv">5</span>, <span class="dt">to=</span><span class="dv">5</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>,
+      <span class="dt">ylab=</span><span class="st">&quot;Density&quot;</span>, <span class="dt">main=</span><span class="st">&quot;Distribuzione normale&quot;</span>)
+<span class="kw">set.seed</span>(<span class="dv">424</span>)
+res &lt;-<span class="st"> </span><span class="kw">scale</span>(<span class="kw">rnorm</span>(<span class="dv">100</span>, <span class="dv">0</span>, <span class="fl">2.5</span>), <span class="dt">scale=</span>T)
+<span class="kw">qqnorm</span>(res, <span class="dt">xlab=</span><span class="st">&quot;Valori attesi&quot;</span>, 
+     <span class="dt">ylab =</span> <span class="st">&quot;Residui&quot;</span>, <span class="dt">pch=</span><span class="dv">21</span>, <span class="dt">bg=</span><span class="st">&quot;red&quot;</span>, <span class="dt">xlim=</span><span class="kw">c</span>(<span class="op">-</span><span class="dv">4</span>,<span class="dv">4</span>),
+     <span class="dt">ylim=</span><span class="kw">c</span>(<span class="op">-</span><span class="dv">4</span>,<span class="dv">4</span>))
+<span class="kw">qqline</span>(res)</code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-123-1.png" width="672" /></p>
+<p>Le deviazioni più diffuse dalla normalità sono relative alla simmetria (skewness) e alla curtosi della popolazione. In particolare, i nostri residui potrebbero avere asimmetria positiva (right-skewed: la media è maggiore della mediana), in modo che abbiamo più residui negativi che positivi, mentre questi ultimi sono mediamente di più elevato valore assoluto. Ad esempio, una distribuzione log-normale centrata è right-skewed. In questa situazione, i residui alti positivi dovrebbero avere una maggior frequenza che nella distribuzione normale corrispondente, al contrario di quelli bassi negativi.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))
+<span class="kw">curve</span>(<span class="kw">dnorm</span>(x, <span class="dv">0</span>, <span class="dv">1</span>), <span class="dt">from=</span><span class="op">-</span><span class="dv">5</span>, <span class="dt">to=</span><span class="dv">5</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>,
+      <span class="dt">ylab=</span><span class="st">&quot;Density&quot;</span>, <span class="dt">main=</span><span class="st">&quot;Asimmetria positiva&quot;</span>,
+      <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="fl">0.5</span>))
+<span class="kw">curve</span>(<span class="kw">dlnorm</span>(x <span class="op">+</span><span class="st"> </span><span class="dv">3</span>, <span class="kw">log</span>(<span class="dv">3</span>), <span class="fl">0.35</span>), <span class="dt">add=</span>T)
+<span class="kw">legend</span>(<span class="st">&quot;topright&quot;</span>, <span class="dt">legend=</span><span class="kw">c</span>(<span class="st">&quot;n&quot;</span>, <span class="st">&quot;log-n&quot;</span>),
+       <span class="dt">lty=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>), <span class="dt">col=</span><span class="kw">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;black&quot;</span>), <span class="dt">bty=</span><span class="st">&quot;n&quot;</span>)
 
+<span class="co">#Estraggo una campione da una log-normale</span>
+<span class="kw">set.seed</span>(<span class="dv">1234</span>)
+d &lt;-<span class="st"> </span><span class="kw">rlnorm</span>(<span class="dv">100</span>, <span class="dv">2</span>, <span class="fl">0.5</span>)
+res &lt;-<span class="st"> </span><span class="kw">scale</span>(d, <span class="dt">scale=</span>T)
+
+<span class="co">#Produco un QQ-plot</span>
+<span class="kw">qqnorm</span>(res, <span class="dt">xlab=</span><span class="st">&quot;Quantili teorici&quot;</span>, 
+     <span class="dt">ylab =</span> <span class="st">&quot;Residui  standardizzati&quot;</span>, 
+     <span class="dt">pch=</span><span class="dv">21</span>, <span class="dt">bg=</span><span class="st">&quot;red&quot;</span>, <span class="dt">xlim=</span><span class="kw">c</span>(<span class="op">-</span><span class="dv">4</span>,<span class="dv">4</span>), <span class="dt">ylim=</span><span class="kw">c</span>(<span class="op">-</span><span class="dv">4</span>,<span class="dv">4</span>))
+<span class="kw">qqline</span>(res)</code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-124-1.png" width="672" /></p>
+<p>Al contrario, una distribuzione left-skewed (skewness negativo, cioè media minore della mediana; esempio: una distribuzione beta con traslazione, alto <span class="math inline">\(a\)</span> e basso <span class="math inline">\(b\)</span>), si comporta come indicato nel grafico seguente:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Estraggo una campione da una distribuzione beta</span>
+<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))
+<span class="kw">curve</span>(<span class="kw">dnorm</span>(x, <span class="dv">0</span>, <span class="fl">0.10</span>), <span class="dt">from=</span><span class="op">-</span><span class="fl">0.6</span>, <span class="dt">to=</span><span class="fl">0.6</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>, 
+      <span class="dt">ylab=</span><span class="st">&quot;Density&quot;</span>, <span class="dt">main=</span><span class="st">&quot;Asimmetria negativa&quot;</span>,
+      <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">5</span>))
+<span class="kw">curve</span>(<span class="kw">dbeta</span>(x <span class="op">+</span><span class="st"> </span><span class="fl">0.8</span>, <span class="dv">8</span>, <span class="dv">2</span>), <span class="dt">add=</span>T)
+<span class="kw">legend</span>(<span class="st">&quot;topleft&quot;</span>, <span class="dt">legend=</span><span class="kw">c</span>(<span class="st">&quot;normale&quot;</span>, <span class="st">&quot;beta&quot;</span>),
+       <span class="dt">lty=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>), <span class="dt">col=</span><span class="kw">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;black&quot;</span>), <span class="dt">bty=</span><span class="st">&quot;n&quot;</span>)
+<span class="kw">set.seed</span>(<span class="dv">1230</span>)
+d &lt;-<span class="st"> </span><span class="kw">rbeta</span>(<span class="dv">100</span>, <span class="dv">8</span>, <span class="dv">2</span>)
+res &lt;-<span class="st"> </span><span class="kw">scale</span>(d, <span class="dt">scale=</span>T)
+<span class="co">#Produco un QQ-plot</span>
+<span class="kw">qqnorm</span>(res, <span class="dt">xlab=</span><span class="st">&quot;Quantili teorici&quot;</span>, 
+     <span class="dt">ylab =</span> <span class="st">&quot;Residui  standardizzati&quot;</span>, 
+     <span class="dt">pch=</span><span class="dv">21</span>, <span class="dt">bg=</span><span class="st">&quot;red&quot;</span>, <span class="dt">xlim=</span><span class="kw">c</span>(<span class="op">-</span><span class="dv">2</span>,<span class="dv">3</span>), <span class="dt">ylim=</span><span class="kw">c</span>(<span class="op">-</span><span class="dv">2</span>,<span class="dv">3</span>))
+<span class="kw">qqline</span>(res)</code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-125-1.png" width="672" /></p>
+<p>Per quanto riguarda la curtosi, è necessario osservare le code della distribuzione: se queste sono più alte di una distribuzione normale parliamo di distribuzione leptocurtica, come, ad esempio, una distribuzione di t di Student con pochi gradi di libertà.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Estraggo una campione da una t di Student</span>
+<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))
+<span class="kw">curve</span>(<span class="kw">dnorm</span>(x), <span class="dt">from=</span><span class="op">-</span><span class="dv">5</span>, <span class="dt">to=</span><span class="dv">5</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>, 
+      <span class="dt">ylab=</span><span class="st">&quot;Density&quot;</span>, <span class="dt">main=</span><span class="st">&quot;Distribuzione leptocurtica&quot;</span>)
+<span class="kw">curve</span>(<span class="kw">dt</span>(x, <span class="dv">1</span>), <span class="dt">add=</span>T)
+<span class="kw">legend</span>(<span class="st">&quot;topleft&quot;</span>, <span class="dt">legend=</span><span class="kw">c</span>(<span class="st">&quot;normale&quot;</span>, <span class="st">&quot;t (1 DF)&quot;</span>),
+       <span class="dt">lty=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>), <span class="dt">col=</span><span class="kw">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;black&quot;</span>), <span class="dt">bty=</span><span class="st">&quot;n&quot;</span>)
+<span class="kw">set.seed</span>(<span class="dv">1230</span>)
+d &lt;-<span class="st"> </span><span class="kw">rt</span>(<span class="dv">100</span>, <span class="dv">1</span>)
+res &lt;-<span class="st"> </span><span class="kw">scale</span>(d, <span class="dt">scale=</span>T)
+<span class="co">#Produco un QQ-plot</span>
+<span class="kw">qqnorm</span>(res, <span class="dt">xlab=</span><span class="st">&quot;Quantili teorici&quot;</span>, 
+     <span class="dt">ylab =</span> <span class="st">&quot;Residui  standardizzati&quot;</span>,
+     <span class="dt">pch=</span><span class="dv">21</span>, <span class="dt">bg=</span><span class="st">&quot;red&quot;</span>, <span class="dt">xlim=</span><span class="kw">c</span>(<span class="op">-</span><span class="dv">2</span>,<span class="dv">3</span>), <span class="dt">ylim=</span><span class="kw">c</span>(<span class="op">-</span><span class="dv">2</span>,<span class="dv">3</span>))
+<span class="kw">qqline</span>(res)</code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-126-1.png" width="672" /></p>
+<p>Analogamente, vediamo come si presenta un QQ-plot per una distribuzione platicurtica (più bassa sulle code; esempio: distribuzione uniforme).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Estraggo una campione da una distribuzione uniforme</span>
+<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))
+<span class="kw">curve</span>(<span class="kw">dunif</span>(x, <span class="op">-</span><span class="dv">2</span>,<span class="dv">2</span>), <span class="dt">from=</span><span class="op">-</span><span class="dv">5</span>, <span class="dt">to=</span><span class="dv">5</span>, <span class="dt">ylab=</span><span class="st">&quot;Density&quot;</span>, <span class="dt">main=</span><span class="st">&quot;Distribuzione platicurtica&quot;</span>)
+<span class="kw">curve</span>(<span class="kw">dnorm</span>(x, <span class="dv">0</span>, <span class="dv">2</span>), <span class="dt">add=</span>T, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>)
+<span class="kw">set.seed</span>(<span class="dv">1230</span>)
+d &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">100</span>, <span class="op">-</span><span class="dv">2</span>, <span class="dv">2</span>)
+res &lt;-<span class="st"> </span><span class="kw">scale</span>(d, <span class="dt">scale=</span>T)
+<span class="co">#Produco un QQ-plot</span>
+<span class="kw">qqnorm</span>(res, <span class="dt">xlab=</span><span class="st">&quot;Quantili teorici&quot;</span>, 
+     <span class="dt">ylab =</span> <span class="st">&quot;Residui  standardizzati&quot;</span>, 
+     <span class="dt">pch=</span><span class="dv">21</span>, <span class="dt">bg=</span><span class="st">&quot;red&quot;</span>, <span class="dt">xlim=</span><span class="kw">c</span>(<span class="op">-</span><span class="dv">2</span>,<span class="dv">3</span>), <span class="dt">ylim=</span><span class="kw">c</span>(<span class="op">-</span><span class="dv">2</span>,<span class="dv">3</span>))
+<span class="kw">qqline</span>(res)</code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-127-1.png" width="672" /></p>
+</div>
+</div>
+<div id="altri-strumenti-diagnostici" class="section level2">
+<h2><span class="header-section-number">11.4</span> Altri strumenti diagnostici</h2>
+<p>La valutazioni precedentemente esposte sono di tipo grafico e sono considerate sufficientemente robuste per la maggior parte delle situazioni. Tuttavia, esistono anche test statistici che consentono di saggiare l’ipotesi nulla di ’assenza di deviazioni’. Per tutti questi test, l’ipotesi nulla è quella di assenza di deviazioni. Pertanto, basta guardare il ’p value’: se questo è inferiore a 0.05 l’ipotesi nulla deve essere rifiutata e può essere necessario intraprendere azioni correttive.</p>
+<p>Per l’omogeneità delle varianze veniva utilizzato il test di Bartlett, che, tuttavia, è oggi caduto in disuso, data la sua sensibilità alla non-normalità dei residui, quasi sempre presente, insieme all’eteroscedasticità. Oggi si preferisce utilizzare il test di Levene, che consiste in un’ANOVA dei residui, al posto dei dati osservati:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(aomisc)
+<span class="kw">data</span>(sinapis)
+<span class="kw">head</span>(sinapis)</code></pre></div>
+<pre><code>##   density yield
+## 1       0 36.63
+## 2      14 29.73
+## 3      19 32.12
+## 4      28 30.61
+## 5      32 27.70
+## 6      38 27.43</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">lm</span>(yield <span class="op">~</span><span class="st"> </span><span class="kw">factor</span>(density), <span class="dt">data=</span>sinapis)
+<span class="kw">anova</span>( <span class="kw">lm</span> (<span class="kw">abs</span>(<span class="kw">residuals</span>(model)) <span class="op">~</span><span class="st"> </span><span class="kw">factor</span>(density), <span class="dt">data=</span>sinapis))</code></pre></div>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: abs(residuals(model))
+##                 Df  Sum Sq Mean Sq F value Pr(&gt;F)
+## factor(density)  6  8.4359 1.40598  1.4215 0.2531
+## Residuals       21 20.7714 0.98911</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">car<span class="op">::</span><span class="kw">leveneTest</span>(yield <span class="op">~</span><span class="st"> </span><span class="kw">factor</span>(density), <span class="dt">data=</span>sinapis, <span class="dt">center=</span>mean)</code></pre></div>
+<pre><code>## Levene&#39;s Test for Homogeneity of Variance (center = mean)
+##       Df F value Pr(&gt;F)
+## group  6  1.4215 0.2531
+##       21</code></pre>
+<p>Il test di Levene può anche essere effettuato considerando gli scarti rispetto alla mediana (invece che alla media), in modo da ottenere un test più robusto nei confronti degli outliers.</p>
+<p>Per quanto riguarda le deviazioni dalla normalità, può essere utilizzato il test di Shapiro-Wilks. Per esempio, nel caso di un dataset ottenuto da una distribuzione uniforme, il test di Shapiro porta ai risultati sotto indicati.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">shapiro.test</span>(<span class="kw">runif</span>(<span class="dv">100</span>, <span class="dt">min =</span> <span class="op">-</span><span class="dv">2</span>, <span class="dt">max =</span> <span class="dv">2</span>))</code></pre></div>
+<pre><code>## 
+##  Shapiro-Wilk normality test
+## 
+## data:  runif(100, min = -2, max = 2)
+## W = 0.94318, p-value = 0.0003028</code></pre>
+</div>
+<div id="risultati-contraddittori" class="section level2">
+<h2><span class="header-section-number">11.5</span> Risultati contraddittori</h2>
+<p>La valutazione degli assunti di base è un passo fondamentale nell’analisi dei dati sperimentali è non può essere evitata in nessun modo. Il problema è importante perché ogni deviazione rispetto agli anzidetti requisiti può inficiare la validità dei test d’ipotesi, modificando il livello di significatività e di protezione.</p>
+<p>Tuttavia, ricordiamo sempre che la ’verità vera’ ci sfugge e, di conseguenza, le valutazioni sull’adozione di eventuali trasformazioni stabilizzanti debbono essere condotte con il massimo ’buon senso’!</p>
+<p>In particolare nella pratica è molto facile incontrare situazioni dubbie, nelle quali l’analisi dei residui mostra deviazioni, mentre il test di Bartlett è significativo e quello di Levene no. Come comportarsi? Misurare sempre la forza dell’evidenza ’patologica’: quanti campanelli di allarme abbiamo?</p>
+</div>
+<div id="terapia" class="section level2">
+<h2><span class="header-section-number">11.6</span> ‘Terapia’</h2>
+<p>Se le procedure diagnostiche hanno evidenziato deviazioni rispetto agli assunti di base, è necessario valutare se e come intraprendere azioni correttive. Ovviamente, la ‘terapia’ cambia al cambiare della ‘patologia’.</p>
+<div id="correzionerimozione-degli-outliers" class="section level3">
+<h3><span class="header-section-number">11.6.1</span> Correzione/Rimozione degli outliers</h3>
+<p>In presenza di outliers, la ‘terapia’ più opportuna è, banalmente, quella di rimuoverli, ottenendo così un dataset ‘sbilanciato’ (diverso numero di repliche per trattamento). Oggigiorno, trattare un dataset sbilanciato non costituisce un problema, ovviamente se si utilizzano le metodiche di analisi opportune. Qualche anno fa, al contrario, si cercava di evitare lo sbilanciamento a tutti i costi, utilizzando tecniche di imputing per l’immissione di valori ’ragionevoli’ in sostituzione di quelli mancanti/aberranti.</p>
+<p>Ad esempio, se il disegno sperimentale era a randomizzazione completa, il dato mancante veniva sostituito con la media delle altre repliche. Se invece il disegno era a blocchi randomizzati, allora si teneva conto non solo della media del trattamento di cui il dato mancante faceva parte, ma anche delle media del blocco nel quale esso si trovava. La formula era la seguente:</p>
+<p><span class="math display">\[Y = \frac{tT + rR - G}{(t - 1)(r - 1)}\]</span></p>
+<p>dove <em>t</em> è il numero delle tesi, <em>r</em> è il numero delle repliche, <em>T</em> è la somma dei dati relativi alla tesi che contiene il dato mancante (ovviamente escluso quest’ultimo), <em>R</em> è la somma dei dati relativi al blocco che contiene il dato mancante (sempre escluso quest’ultimo), <em>G</em> è il totale generale (escluso il dato mancante).</p>
+<p>Un aspetto da non trascurare è che, imputando un dato, si rimuove lo sbilanciamento, ma non si recuperano le informazioni mancanti. Infatti il dato imputato non fornisce informazioni aggiuntive, perché è ottenuti come combinazione lineare degli altri. Di conseguenza, per ogni dato imputato, è necessario ridurre di un’unità il numero dei gradi di libertà della varianza residua, e ricalcolare F, SEM e SED di conseguenza.</p>
+<p>Possiamo comunque ritenere che, oggigiorno, le tecniche di imputing dei dati aberranti/mancanti sono da ritenersi obsolete. Inoltre, vogliamo porre l’attenzione sul fatto che i dati aberranti sono dati molto ‘influenziali’, nel senso che possono influenzare in modo molto marcato il risultato dell’analisi. Pertanto, se è sbagliato correggerli arbitrariamente, senza aver prima accertato che siano effettivamente frutto di errore, è altrettanto sbagliato lasciarli nel dataset. Ovviamente, la correzione non può che riguardare una larga minoranza dei dati sperimentali raccolti (uno o due dati), altrimenti si dovrà necessariamente pensare di ripetere l’esperimento.</p>
+</div>
+<div id="correzione-del-modello" class="section level3">
+<h3><span class="header-section-number">11.6.2</span> Correzione del modello</h3>
+<p>Abbiamo visto che il modello impiegato potrebbe non essere adatto a descrivere il dataset (mancanza di adattamento). Gli effetti potrebbero non essere addittivi, ma moltiplicativi, oppure potrebbero essere non-lineari. Potrebbero essere presenti asintoti che il nostro modello non è in grado di descrivere, oppure la crescita/decrescita osservata potrebbero essere più lente/veloci di quanto la nostra funzione sia in grado di modellizzare.</p>
+<p>Per tutti questi casi, l’unica operazione consigliabile è quella di modificare il modello, adottando ai dati un diverso modello. Un’altra strategia è quella di trasformare la variabile dipendente, in modo che il modello impiegato possa descriverla più correttamente. Ad esempio, se i dati mostrano un andamento esponenziale, trasformandoli in logaritmo questi potreanno essere descritti molto meglio con un equazione lineare.</p>
+</div>
+<div id="non-normalita-dei-residui-ed-eterogeneita-delle-varianze" class="section level3">
+<h3><span class="header-section-number">11.6.3</span> Non-normalità dei residui ed eterogeneità delle varianze</h3>
+<p>Trattiamo queste due deviazioni insieme in quanto esse sono spesso associate nello stesso dataset. Entrambe hanno conseguenze gravi: gli intervalli di confidenza non hanno un buon grado di copertura e i test d’ipotesi sono invalidi. I reviewer delle riviste scientifiche sono sempre molto sospettosi delle eventuali deviazioni rispetto agli assunti di base, soprattutto quando i dati sono non-continui (conteggi e/o proporzioni) e, di conseguenza, non sono naturalmente riconducibilli ad una distribuzione normale.</p>
+<p>Evidentemente, la cosa più corretta è quella di chiedersi perché il dataset è non-normale e/o eteroscedastico ed incorporare queste informazioni nel modello. Ad esempio, un conteggio potrebbe seguire la distribuzione di Poisson, oppure una serie di proporzioni potrebbero seguire la distribuzione binomiale. In questi casi potrebbe essere opportuno utilizzare modelli lineari generalizzati (GLiM), oppure, in caso di eterogeneità delle varianze, si potrebbero incorporare nel modello eventuali relazioni di proporzionalità tra media e varianza, con tecniche di minimi quadrati generalizzati (GLS). Si tratta di tecniche statistiche piuttosto avanzate, che richiedono una buona esperienza per essere utilizzate con profitto.</p>
+<p>In altri casi si può ricorrere a metodiche statistiche che fanno meno assunzioni e che, pertanto, sono dette metodiche ‘non-parametriche’. Di queste non parleremo, per una questione di preferenze personali: a mio modo di vedere, utilizzare metodiche non-parametriche è come rinuciare in partenza a comprendere le basi biologiche del fenomeno e le intrinseche relazioni causa-effetto che sussistono nella realtà.</p>
+<p>Una strategia empirica, ma molto seguita in pratica e caratterizzata da un’efficacia non disprezzabile, è quella di ricorrere alle trasformazioni correttive. Con questa tecnica, si va a cercare una metrica sulla quale le assunzioni di base dell’ANOVA siano rispettate e si esegue l’elaborazione dei dati trasformati invece che di quelli non trasformati.</p>
+<p>Per i conteggi e per l’eterogeneità delle varianze di variabili continue, si consiglia la trasformazione in radice quadrata o in logaritmo, scegliendo in base a quella che consente la miglior distribuzione dei residui. Per le proporzioni, taluni consigliano la trasformazione nell’arcoseno della radice del valore, che è implementata nel package ‘aomisc’, nella funzione ‘angularTransform()’. Questa funzione rivceve come input un valore percentuale e resituisce l’arcoseno della radice quadrata della proporzione corrispondente.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">aomisc<span class="op">::</span><span class="kw">angularTransform</span>(<span class="kw">c</span>(<span class="dv">26</span>, <span class="dv">47</span>, <span class="dv">25</span>, <span class="dv">28</span>, <span class="dv">24</span>))</code></pre></div>
+<pre><code>## [1] 30.65730 43.28009 30.00000 31.94806 29.33387</code></pre>
+</div>
+<div id="la-procedura-di-box-e-cox" class="section level3">
+<h3><span class="header-section-number">11.6.4</span> La procedura di Box e Cox</h3>
+<p>Per evitare una trasformazione ‘al buio’, si può impiegare la procedura suggerita da Box e Cox (1964). Questa si basa su alcune famiglie di trasformazioni, tra cui la più diﬀusa è:</p>
+<p><span class="math display">\[ W = \left\{ \begin{array}{ll}
+\frac{Y^\lambda}{\lambda - 1} &amp; \quad \textrm{if} \, \lambda \neq 0 \\
+\log(Y) &amp; \quad \textrm{if} \, \lambda = 0
+\end{array} \right. \]</span></p>
+<p>dove W è la variabile trasformata, Y è la variabile originale e <span class="math inline">\(\lambda\)</span> è il parametro che deﬁnisce la trasformazione. In particolare, osserviamo che se <span class="math inline">\(\lambda\)</span> è pari ad 1 i dati non sono, di fatto, trasformati, se è pari a 0.5 abbiamo una trasformazione equivalente alla radice quadrata, se è pari a 0 abbiamo la trasformazione logaritmica, se è pari a -1 abbiamo una trasformazione equivalente al reciproco.</p>
+<p>Se consideriamo valori di λ variabili tra -2.5 e 2.5 (ad esempio) con uno scarto di 0.25, operiamo le relative trasformazioni e applichiamo il modello lineare ai dati trasformati, possiamo calcolare la verosimiglianza della trasformazione, individuare il valore di λ che la massimizza ed utilizzarlo per la trasformazione.</p>
+<p>In R questa procedura è automatizzata nella funzione ‘boxcox()’, disponibile nel package MASS. Proviamo ud utilizzare questa procedura nel dataset ‘insects’, disponibile nel package ‘aomisc’.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(insects)
+mod &lt;-<span class="st"> </span><span class="kw">lm</span>(Count <span class="op">~</span><span class="st"> </span>Insecticide, <span class="dt">data =</span> insects)
+<span class="kw">plot</span>(mod, <span class="dt">which =</span> <span class="dv">1</span>)</code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-131-1.png" width="672" /></p>
+<p>Questo dataset mostra una chiara eteroscedasticità. Utilizziamo quindi la funzione ‘boxcox()’ per individuare la trasformazione più adatta a correggere questa patologia.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">MASS<span class="op">::</span><span class="kw">boxcox</span>(mod)</code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-132-1.png" width="672" /></p>
+<p>Dal grafico si individua chiaramente che la trasformazione migliore, scelta tra quelle più semplici e comprensibili, è quella xhe corrisponde a <span class="math inline">\(\lambda = 0\)</span>, cioè la trasformazione logaritmica.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mod &lt;-<span class="st"> </span><span class="kw">lm</span>(<span class="kw">log</span>(Count) <span class="op">~</span><span class="st"> </span>Insecticide, <span class="dt">data =</span> insects)
+<span class="kw">plot</span>(mod, <span class="dt">which =</span> <span class="dv">1</span>)</code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-133-1.png" width="672" /></p>
+<p>Vediamo che i dati trasformati non mostrano più alcun sintomo di eteroscedasticità e, di conseguenza, l’ANOVA su questa metrica è affidabile.</p>
+<p>Ovviamente, vi sarà la complicazione che i risultati dovranno essere commentati nella scala trasformata e quindi la loro interpretazione risulterà più complicata.</p>
+</div>
+</div>
+<div id="referenze-bibliografiche-per-approfondimenti" class="section level2">
+<h2><span class="header-section-number">11.7</span> Referenze bibliografiche per approfondimenti</h2>
+<p>Ahrens, W. H., D. J. Cox, and G. Budwar. 1990, Use of the arcsin and square root trasformation for subjectively determined percentage data. Weed science 452-458.<br />
+Anscombe, F. J. and J. W. Tukey. 1963, The examination and analysis of residuals. Technometrics 5: 141-160.<br />
+Babbini, M., B. Chiandotto, G. Chisci, R. d. Cristofaro, G. A. Maccararo, N. Montanaro, F. Nicolis, E. Ottaviano, F. Salvi, and M. Turri. 1978. Biometria: principi e metodi per studenti e ricercatori biologi. Padova: P. 552.<br />
+Box, G. E. P. and D. R. Cox. 1964, An analysis of transformations. Journal of the Royal Statistical Society, B-26, 211-243, discussion 244-252.<br />
+Camussi , A., F. Moller , E. Ottaviano , and M. Sarli Gorla . 1986, Metodi statistici per la sperimentazione biologica. Ed. Zanichelli.<br />
+Chatfield, C. 1985, The initial examination of data. J. R. Statist. Soc. A-148, 3, 214-253 A-148: 214-253.<br />
+D’Elia, A. 2001, Un metodo grafico per la trasformazione di Box-Cox: aspetti esplorativi ed inferenziali. STATISTICA LXI: 630-648.<br />
+Draper, N. R. and H. Smith. 1981, Applied regression. John Wiley &amp; Sons, Inc. , New York, 2nd ed.<br />
+Saskia, R. M. 1992, The Box-Cox transformation technique: a review. Statistician 41: 169-178.<br />
+Snedecor, G. W. and W. G. Cochran. 1991. Statistical methods. AMES (Iowa): IOWA State University Press, VIII Edition. P. 503.<br />
+<!--chapter:end:10-AssunzioniBase.Rmd--></p>
 </div>
 </div>
             </section>
@@ -543,8 +573,8 @@ b &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">44</s
           </div>
         </div>
       </div>
-<a href="per-iniziare-introduzione-ad-r.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="dalla-popolazione-al-campione-i-modelli-stocastici.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="una-variabile-indipendente-categorica-anova-ad-una-via.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="la-regressione-lineare-semplice.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="book_assets/gitbook-2.6.7/js/app.min.js"></script>
