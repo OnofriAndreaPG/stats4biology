@@ -78,8 +78,27 @@ bibliography: myFile.bib
 csl: myStyle.csl
 ```
 
+# Step 9 - Google Analytics (6/2/2019)
 
+I would like to track the visits I receive. To do so I enabled Google Analytics and got my tracking id ([see here](https://support.google.com/analytics/answer/1008080)). I also worked on my 'config.toml' file and added the following statement.
 
+```
+GoogleAnalytics = "UA-my_ID"
+```
 
+In contrast to what I expected, Google Analytics did not work and no hits were recorded for my blog. Lately, I worked on the 'layouts/partials/header.html' and added the following code, right after the '<head>' tag (just replaced 'UA-my_ID' with my tracking id).
+
+```
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-my_ID"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-my_ID');
+</script>```
+
+Now Google Analytics works ok!
 
 
