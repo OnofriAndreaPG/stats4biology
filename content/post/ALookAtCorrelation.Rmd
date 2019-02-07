@@ -1,0 +1,162 @@
+---
+title: "Going back to the basics: the correlation coefficient"
+author: Andrea Onofri
+date: '2019-02-07'
+slug: correlation
+categories:
+  - R
+tags:
+  - R
+  - correlation
+archives:
+  - 2019
+---
+
+# A measure of joint variability
+
+In statistics, dependence or association is any statistical relationship, whether causal or not, between two random variables or bivariate data. It is often measured by the Pearson correlation coefficient:
+
+$$\rho _{X,Y} =\textrm{corr} (X,Y) = \frac {\textrm{cov}(X,Y) }{ \sigma_X \sigma_Y } = \frac{ \sum_{1 = 1}^n [(X - \mu_X)(Y - \mu_Y)] }{ \sigma_X \sigma_Y }$$
+
+Other measures of correlation can be thought of, such as the Spearman $\rho$ rank correlation coefficient or Kendall $\tau$ rank correlation coefficient.
+
+# Assumptions for the Pearson Correlation Coefficient
+
+The Pearson correlation coefficients makes a few assumptions, which should be carefully checked.
+
+1. Interval-level measurement. Both variables should be measured on a quantitative scale.
+2. Random sampling. Each subject in the sample should contribute one value on X, and one value on Y. The values for both variables should represent a random sample drawn from the population of interest.
+3. Linearity. The relationship between X and Y should be linear.
+4. Bivarlate normal distribution. This means that (i) values of X should form a normal distribution at each value of Y and (ii) values of Y should form a normal distribution at each value of X.
+
+# Hypothesis testing
+
+It is possible to test whether $r = 0$ against the alternative $ r \neq 0$. The test is based on the idea that the amount:
+
+$$ T = \frac{r \sqrt{n - 2}}{\sqrt{1 - r^2}}$$
+is distributed as a Student's t variable.
+
+Let's take the two variables 'cyl' and 'mpg' from the 'mtcars' data frame. The correlation is:
+
+```{r}
+r <- cor(mtcars$cyl, mtcars$gear)
+r
+```
+
+The T statistic is:
+
+```{r}
+T <- r * sqrt(32 - 2) / sqrt(1 - r^2)
+T
+```
+
+The p-value for the null is:
+
+```{r}
+2 * pt(T, 30)
+```
+
+which is clearly highly significant. The null can be rejected.
+
+As for hypothesis testing, it should be considered that the individuals where couple of measurements were taken should be independent. If they are not, the t test is invalid. I am dealing with this aspect somewhere else in my blog.
+
+
+#Correlation in R
+
+We have already seen that we can use the usual function 'cor(matrix, method=)'. In order to obtain the significance, we can use the 'rcorr()' function in the Hmisc package
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+# Correlations with significance levels
+library(Hmisc)
+corr2 <- rcorr(as.matrix(mtcars), type="pearson")
+print(corr2$r, digits = 2)
+print(corr2$P, digits = 2)
+```
+
+We could also use these functions with two matrices, to obtain the correlations of each column in one matrix with each column in the other
+
+```{r}
+# Correlation matrix from mtcars
+x <- mtcars[1:3]
+y <- mtcars[4:6]
+cor(x, y)
+```
+
+
+
+#Relationship to slope in linear regression
+
+The correlation coefficient and slope in linear regression bear some similarities, as both describe how Y changes when X is changed. However, in correlation, we have two random variables, while in regression we have Y random, X fixed and Y is regarded as a function of X (not the other way round).
+
+Without neglecting their different meaning, it may be useful to show the algebraic relationship between the correlation coefficient and the slope in regression. Let's simulate a dataset with two variables, coming from a multivariate normal distribution, with means respectively equal to 10 and 2, and variance-covariance matrix of:
+
+```{r}
+library(MASS)
+cov <- matrix(c(2.20, 0.48, 0.48, 0.20), 2, 2)
+cov
+```
+
+We use the 'mvrnomr()' function to generate the dataset.
+
+```{r}
+set.seed(1234)
+dataset <- data.frame( mvrnorm(n=10, mu = c(10, 2), Sigma = cov) )
+names(dataset) <- c("X", "Y")
+dataset
+```
+
+The correlation coefficient and slope are as follows:
+
+```{r}
+r <- with(dataset, cor(X, Y))
+b1 <- coef( lm(Y ~ X, data=dataset) )[2]
+r
+b1
+```
+
+The equation for the slope is:
+
+$$b_1 = \frac{ \sum_{i = 1}^n \left[ ( X-\mu_X )( Y-\mu_Y )\right] }{ \sigma^2_X } $$
+
+From there, we see that:
+
+$$ r = b_1 \frac{\sigma_X}{ \sigma_Y }$$
+
+and:
+
+$$ b_1 = r \frac{\sigma_Y}{\sigma_X}$$
+
+Indeed:
+
+```{r}
+sigmaX <- with(dataset, sd(X) )
+sigmaY <- with(dataset, sd(Y) )
+b1 * sigmaX / sigmaY 
+r * sigmaY / sigmaX
+```
+
+It is also easy to see that the correlation coefficient is the slope of regression of standardised Y against standardised X:
+
+```{r}
+Yst <- with(dataset, scale(Y, scale=T) )
+summary( lm(Yst ~ I(scale(X, scale = T) ), data = dataset) )
+```
+
+
+#Intra-class correlation (ICC)
+
+It describes how strongly units in the same group resemble each other. While it is viewed as a type of correlation, unlike most other correlation measures it operates on data structured as groups, rather than data structured as paired observations. The intra-class correlation coefficient is:
+
+$$IC = {\displaystyle {\frac {\sigma _{\alpha }^{2}}{\sigma _{\alpha }^{2}+\sigma _{\varepsilon }^{2}}}.}$$
+
+where $\sigma _{\alpha }^{2}$ is the variance between groups and $\sigma _{\varepsilon }^{2}$ is the variance within a group (better, the variance of one observation within a group). The sum of those two variances is the total variance of observations. In words, the intra-class correlation coefficient measures the joint variability of subjects in the same group (that relates on how groups are different from one another), with respect to the total variability of observations. If subjects in one group are very similar to one another (small $\sigma_{\varepsilon}$) but groups are very different (high $\sigma_{\alpha}$), the ICC is very high.
+
+The existence of grouping of residuals is very important in ANOVA, as it means that independence is violated, which calls for the use of mixed model. 
+
+But ... this is a totally different story ...
+
+
+
+
+
+
