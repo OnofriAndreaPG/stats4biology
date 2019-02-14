@@ -97,8 +97,17 @@ In contrast to what I expected, Google Analytics did not work and no hits were r
   gtag('js', new Date());
 
   gtag('config', 'UA-my_ID');
-</script>```
+</script>
+```
 
 Now Google Analytics works ok!
+
+# Step 10 - Add an RSS Template
+
+I wanted my RSS feed to contain the whole post and not only a description. I did the following:
+
+1. Took the default template from  [this site](https://gohugo.io/templates/rss/#the-embedded-rss-xml).
+2. Replaced '{{ .Summary | html }}' with '{{ .Content | html }}'
+3. Saved the file as 'RSS.xml'under the 'layouts' directory.
 
 
