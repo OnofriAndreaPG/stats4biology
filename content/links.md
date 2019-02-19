@@ -13,5 +13,9 @@ This site makes is written in markdown and Rmarkdown and makes use of a wide ran
 * [Hugo](https://gohugo.io)
 * [GitHub](https://github.com)
 
+I would also like to add a few other links, which I keep an eye on, to have useful hints on R and statistics
+
+* [R bloggers](https://www.r-bloggers.com)
+
 
 
