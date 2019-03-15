@@ -16,3 +16,8 @@ author = "Andrea Onofri"
 
 1. Blogdow: [My learning path with blogdown](/articles/BlogdownSteps/)
 
+# Other articles (Italian language)
+
+1. [L'analisi delle componenti principali](/PCA/)
+
+
