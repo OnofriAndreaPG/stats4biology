@@ -19,5 +19,6 @@ author = "Andrea Onofri"
 # Other articles (Italian language)
 
 1. [L'analisi delle componenti principali](/PCA/)
+2. [L'analisi delle variabili canoniche](/CVA/)
 
 
