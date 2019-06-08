@@ -1,0 +1,141 @@
+---
+title: 'Genotype experiments: fitting a stability variance model with R'
+author: "Andrea Onofri"
+date: 2019-06-06
+slug: 'Mixed models'
+categories:
+  - R
+  - 'Mixed_models'
+tags:
+  - R
+  - 'Mixed_models'
+  - 'Multi_environment_studies'
+archives:
+  - 2019
+---
+
+Yield stability is a fundamental aspect for the selection of crop genotypes. The definition of stability is rather complex (see, for example, Annichiarico, 2002); in simple terms, the yield is stable when it does not change much from one environment to the other. It is an important trait, that helps farmers to maintain a good income in most years.
+
+Agronomists and plant breeders are continuosly concerned with the assessment of genotype stability; this is accomplished by planning genotype experiments, where a number of genotypes is compared on randomised complete block designs, with three to five replicates. These experiments are repeated in several years and/or several locations, in order to measure how the environment influences yield level and the ranking of genotypes. 
+
+I would like to show an exemplary dataset, referring to a multienvironment experiment with winter wheat. Eight genotypes were compared in seven years in central Italy, on randomised complete block designs with three replicates. The 'WinterWheat' dataset is available in the 'aomisc' package, which is the accompanying package for this blog and it is available on gitHub. Information on how to download and install the 'aomisc' package are given in [this page](https://www.statforbiology.com/rpackages/).
+
+The first code snippet loads the 'aomisc' package and other necessary packages. Afterwards, it loads the 'WinterWheat' dataset and turns the 'Year' and 'Block' variables into factors.
+
+```{r setup, cache = F, echo = F}
+#Put at the beginning
+knitr::knit_hooks$set(document = function(x){ 
+  gsub("```\n*```r*\n*", "", x) 
+})
+```
+
+
+```{r}
+library(plyr)
+library(nlme)
+library(aomisc)
+data(WinterWheat)
+WinterWheat$Year <- factor(WinterWheat$Year)
+WinterWheat$Block <- factor(WinterWheat$Block)
+head(WinterWheat, 10)
+```
+ 
+Please, note that this is a multienvironment experiment as it is repeated in several years: each year is an 'environment' in itself. Furthermore, please note that the year effect (i.e. the environment effect) is of random nature: we select the years, but we cannot control the weather conditions.
+
+# Defining a linear mixed model
+
+Dealing with the above dataset, a good candidate model for data analyses is the following linear model: 
+
+$$y_{ijk} = \mu + \gamma_{kj} + g_i + e_j +  ge_{ij} + \varepsilon_{ijk}$$
+
+where $y$ is yield (or other trait) for the $k$-th block, $i$-th genotype and $j$-th environment, $\mu$ is the intercept, $\gamma$ is the effect of the $k$-th block in the $j$-th environment, $g$ is the effect of the $i$-th genotype, $e$ is the effect of the $j$-th environment, $ge$ is the interaction effect of the $i$-th genotype and $j$-th environment, while $\varepsilon$ is the residual random term, which is assumed as normally distributed with variance equal to $\sigma^2$.
+
+As I said before, the block effect, the environment effect and the 'genotype x environment' interaction are usually regarded as random. Therefore, they are assumed as normally distributed, with means equal to 0 and variances respectively equal to $\sigma^2_{\gamma}$, $\sigma^2_{e}$ and $\sigma^2_{ge}$. Indeed, the above model is a Linear Mixed Model (LMM).
+
+Let's concentrate on $\sigma^2_{ge}$. It is clear that this value is a measure of instability: if it is high, genotypes may respond differently to different environments. In this way, each genotype can be favored in some specific environments and disfavored in some others. Shukla (1974) has suggested that we should allow $\sigma^2_{ge}$ assume a different value for each genotype and use these components as a measure of stability (stability variances).  According to Shukla, a genotype is considered stable when its stability variance is lower than $\sigma^2$.
+
+Piepho (1999) has shown that stability variances can be obtained within the mixed model framework, by appropriately coding the variance-covariance matrix for random effects. He gave SAS code to accomplish this task and, to me, it was not straightforward to transport his code into R. I finally succeeded and I though I should better share my code, just in case it helps someone save a few headaches.
+
+
+# Fitting a stability variance model
+
+As we have to model the variance-covariance of random effects, we need to use the 'lme' function in the 'nlme' package (Pinheiro and Bates, 2000). The problem is that random effects are crossed and they are not easily coded with this package. After an extensive literature search, I could find the solution in the aforementioned book (at pag. 162-163) and in Galecki and Burzykowski (2013). The trick is made by appropriately using the 'pdMat' construct ('pdBlocked' and 'pdIdent'). In the code below, I have built a block-diagonal variance-covariance matrix for random effects, where blocks and genotypes are nested within years:
+
+```{r}
+model.mix <- lme(Yield ~ Genotype, 
+  random=list(Year = pdBlocked(list(pdIdent(~1),
+                                    pdIdent(~Block - 1),
+                                    pdIdent(~Genotype - 1)))),
+  data=WinterWheat)
+VarCorr(model.mix)
+```
+
+Wee see that the variance component for the 'genotype x environment' interaction is the same for all genotypes and equal to 0.170.
+
+Allowing for a different variance component per genotype is relatively easy, by replacing 'pdIdent()' with 'pdDiag()', as shown below:
+
+```{r}
+model.mix2 <- lme(Yield ~ Genotype, 
+  random=list(Year = pdBlocked(list(pdIdent(~1),
+                                    pdIdent(~Block - 1),
+                                    pdDiag(~Genotype - 1)))),
+  data=WinterWheat)
+VarCorr(model.mix2)
+```
+
+We see that we have now different variance components and we can classify some genotypes as stable (e.g. Sancarlo, Solex and Creso) and some others as unstable (e.g. Duilio and Simeto).
+
+# Working with the means
+
+In his original paper, Piepho (1999) also gave SAS code to analyse the means of the 'genotype x environment' combinations. Indeed, agronomists and plant breeders often adopt a two-steps fitting procedure: in the first step, the means across blocks are calculated for all genotypes in all environments. In the second step, these means are used to fit a stability variance model. This two-step process is less demanding in terms of computer resources and it is correct whenever the experiments are equireplicated, with no missing 'genotype x environment' combinations. Furthermore, we need to be able to assume similar variances within all experiments.
+
+I would also like to give an example of this two-step analysis method. In the first step, we can use the 'ddply()' function in the package 'plyr':
+
+```{r}
+#First step
+WinterWheatM <- ddply(WinterWheat, c("Genotype", "Year"), 
+      function(df) c(Yield = mean(df$Yield)) )
+```
+
+Once we have retreived the means for genotypes in all years, we can fit a stability variance model, although we have to use a different approach, with respect to the one we used with the whole dataset. In this case, we need to model the variance of residuals, introducing within-group (within-year) heteroscedasticity. The 'weights' argument can be used, together with the 'pdIdent()' variance function, to allow for a different variance for each genotype. See the code below.
+
+
+```{r}
+#Second step
+model.mixM <- lme(Yield ~ Genotype, random = ~ 1|Year, data = WinterWheatM,
+                 weights = varIdent(form=~1|Genotype))
+```
+
+The code to retrieve the within-year variances is not obvious, unfortunately. However, you can use the folllowing snippet as a guidance.
+
+```{r}
+vF <- model.mixM$modelStruct$varStruct
+sdRatios <- c(1, coef(vF, unconstrained = F))
+names(sdRatios)[1] <- "COLOSSEO"
+scalePar <- model.mixM$sigma
+sigma2i <- (scalePar * sdRatios)^2
+sigma2i
+```
+
+The above code outputs 'sigma2i', which does not contain the stability variances. Indeed, we should remove the within-experiment error ($\sigma^2$), which can only be estimated from the whole dataset. Indeed, if we take the estimate of 0.1488 (see code above), divide by three (the number of blocks) and subtract from 'sigma2i', we get:
+
+```{r}
+sigma2i - model.mix2$sigma^2/3
+```
+
+which are the stability variances, as obtained with the analyses of the whole dataset.
+
+Thanks for reading!
+
+#References
+
+- Annichiarico, P., 2002. Genotype x Environment Interactions - Challenges and Opportunities for Plant Breeding and Cultivar Recommendations. Plant Production and protection paper, Food & Agriculture Organization of the United Nations (FAO), Roma.
+variability. Heredity 29, 237–245.
+- Gałecki, A., Burzykowski, T., 2013. Linear mixed-effects models using R: a step-by-step approach. Springer, Berlin.
+- Piepho, H.-P., 1999. Stability Analysis Using the SAS System. Agronomy Journal 91, 154–160.
+- Pinheiro, J.C., Bates, D.M., 2000. Mixed-Effects Models in S and S-Plus, Springer-Verlag Inc. ed. Springer-Verlag Inc., New York.
+- Shukla, G.K., 1972. Some statistical aspects of partitioning genotype-environmental components of 
+
+
+
+
