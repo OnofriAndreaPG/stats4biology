@@ -6,10 +6,173 @@
     <description>Recent content in Linear_models on The broken bridge between biologists and statisticians</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2018, @AndreaOnofri</copyright>
-    <lastBuildDate>Mon, 15 Apr 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 15 Jun 2019 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="/tags/linear_models/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Stabilising transformations: how do I present my results?</title>
+      <link>/2019/stat_general_reportingresults/</link>
+      <pubDate>Sat, 15 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/2019/stat_general_reportingresults/</guid>
+      <description>
+
+
+&lt;p&gt;ANOVA is routinely used in applied biology for data analyses, although, in some instances, the basic assumptions of normality and homoscedasticity of residuals do not hold. In those instances, most biologists would be inclined to adopt some sort of stabilising transformations (logarithm, square root, arcsin square root…), prior to ANOVA. Yes, there might be more advanced and elegant solutions, but stabilising transformations are suggested in most traditional biometry books, they are very straightforward to apply and they do not require any specific statistical software. I do not think that this traditional technique should be underrated.&lt;/p&gt;
+&lt;p&gt;However, the use of stabilising transformations has one remarkable drawback, it may hinder the clarity of results. I’d like to give a simple, but relevant example.&lt;/p&gt;
+&lt;div id=&#34;an-example-with-counts&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;An example with counts&lt;/h1&gt;
+&lt;p&gt;Consider the following dataset, that represents the counts of insects on 15 independent leaves, treated with the insecticides A, B and C (5 replicates):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dataset &amp;lt;- structure(data.frame(
+  Insecticide = structure(c(1L, 1L, 1L, 1L, 1L, 
+    2L, 2L, 2L, 2L, 2L, 3L, 3L, 3L, 3L, 3L), 
+    .Label = c(&amp;quot;A&amp;quot;, &amp;quot;B&amp;quot;, &amp;quot;C&amp;quot;), class = &amp;quot;factor&amp;quot;), 
+  Count = c(448, 906, 484, 477, 634, 211, 276, 
+    415, 587, 298, 50, 90, 73, 44, 26)), 
+  .Names = c(&amp;quot;Insecticide&amp;quot;, &amp;quot;Count&amp;quot;))
+dataset
+##    Insecticide Count
+## 1            A   448
+## 2            A   906
+## 3            A   484
+## 4            A   477
+## 5            A   634
+## 6            B   211
+## 7            B   276
+## 8            B   415
+## 9            B   587
+## 10           B   298
+## 11           C    50
+## 12           C    90
+## 13           C    73
+## 14           C    44
+## 15           C    26&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We should not expect that a count variable is normally distributed with equal variances. Indeed, a graph of residuals against expected values shows clear signs of heteroscedasticity.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod &amp;lt;- lm(Count ~ Insecticide, data=dataset)
+plot(mod, which = 1)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/Stat_General_reportingResults_files/figure-html/unnamed-chunk-2-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;In this situation, a logarithmic transformation is often suggested to produce a new normal and homoscedastic dataset. Therefore we take the log-transformed variable and submit it to ANOVA.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model &amp;lt;- lm(log(Count) ~ Insecticide, data=dataset)
+print(anova(model), digits=6)
+## Analysis of Variance Table
+## 
+## Response: log(Count)
+##             Df   Sum Sq Mean Sq F value     Pr(&amp;gt;F)    
+## Insecticide  2 15.82001 7.91000 50.1224 1.4931e-06 ***
+## Residuals   12  1.89376 0.15781                       
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+summary(model)
+## 
+## Call:
+## lm(formula = log(Count) ~ Insecticide, data = dataset)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.6908 -0.1849 -0.1174  0.2777  0.5605 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&amp;gt;|t|)    
+## (Intercept)    6.3431     0.1777  35.704 1.49e-13 ***
+## InsecticideB  -0.5286     0.2512  -2.104   0.0572 .  
+## InsecticideC  -2.3942     0.2512  -9.529 6.02e-07 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error: 0.3973 on 12 degrees of freedom
+## Multiple R-squared:  0.8931, Adjusted R-squared:  0.8753 
+## F-statistic: 50.12 on 2 and 12 DF,  p-value: 1.493e-06&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In this example, the standard error for each mean (SEM) corresponds to &lt;span class=&#34;math inline&#34;&gt;\(\sqrt{0.158/5}\)&lt;/span&gt;. In the end, we might show the following table of means for transformed data:&lt;/p&gt;
+&lt;!-- table --&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;center&#34;&gt;Insecticide&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;Means (log n.)&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;A&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;6.343&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;B&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;5.815&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;C&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;3.985&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;SEM&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;0.178&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;!-- table --&gt;
+&lt;p&gt;Unfortunately, we loose clarity: how many insects did we have on each leaf? If we present in our manuscript a table like this one we might be asked by our readers or by the reviewer to report the means on the original measurement unit. What should we do, then? Here are some suggestions.&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;We can present the means of the original data with standard deviations. This is clearly less than optimal, if we want to suggest more than the bare variability of the observed sample. Furthermore, &lt;strong&gt;please remember that the means of original data may not be a good measure of central tendency, if the original population is strongly ‘asymmetric’ (skewed)!&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;We can show back-transformed means. Accordingly, if we have done, e.g., a logarithmic transformation, we can exponentiate the means of transformed data and report them back to the original measurement unit. Back-transformed means ‘estimate’ the medians of the original populations, which may be regarded as better measures of central tendency for skewed data.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;We suggest that the use of the second method. However, this leaves us with the problem of adding a measure of uncertainty to back-transformed means. No worries, we can use the delta method to back-transform standard errors. It is straightforward:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;take the first derivative of the back-transform function [in this case the first derivative of exp(X)=exp(X)] and&lt;/li&gt;
+&lt;li&gt;multiply it by the standard error of the transformed data.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This may be simply done by hand, with e.g &lt;span class=&#34;math inline&#34;&gt;\(exp(6.343) \times 0.178 = 101.19\)&lt;/span&gt; (for insecticide A). This ‘manual’ solution is always available, regardless of the statistical software at hand. With R, we can use the ‘emmeans’ package (Lenth, 2016):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(emmeans)
+countM &amp;lt;- emmeans(model, ~Insecticide, transform = &amp;quot;response&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It is enough to set the argument ‘transform’ to ’response, although the transformation must be embedded in the model. It means: it is ok if we coded the model as:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;log(Count) ~ Insecticide&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;On the contrary, it fails if we coded the model as:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;logCount ~ Insecticide&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;where the transformation was performed prior to fitting.&lt;/p&gt;
+&lt;p&gt;Obviously, the back-transformed standard error is different for each mean (there is no homogeneity of variances on the original scale, but we knew this already). Back-transformed data might be presented as follows:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;center&#34;&gt;Insecticide&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;Mean&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;SE&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;A&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;568.5&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;101.19&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;B&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;335.1&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;59.68&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;C&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;51.88&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;9.57&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;It would be appropriate to state it clearly (e.g. in a footnote), that means and SEs were obtained by back-transformation via the delta method. Far clearer, isn’t it? As I said, there are other solutions, such as fitting a GLM, but stabilising transformations are simple and they are easily acceptable in biological Journals.&lt;/p&gt;
+&lt;p&gt;If you want to know something more about the delta-method you might start from &lt;a href=&#34;https://www.statforbiology.com/2019/stat_general_thedeltamethod/&#34;&gt;my post here&lt;/a&gt;. A few years ago, some collegues and I have also discussed these issues in a journal paper (Onofri et al., 2010).&lt;/p&gt;
+&lt;p&gt;Thanks for reading!&lt;/p&gt;
+&lt;p&gt;Andrea Onofri&lt;br /&gt;
+University of Perugia (Italy)&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Lenth, R.V., 2016. Least-Squares Means: The R Package lsmeans. Journal of Statistical Software 69. &lt;a href=&#34;https://doi.org/10.18637/jss.v069.i01&#34; class=&#34;uri&#34;&gt;https://doi.org/10.18637/jss.v069.i01&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Onofri, A., Carbonell, E.A., Piepho, H.-P., Mortimer, A.M., Cousens, R.D., 2010. Current statistical issues in Weed Research. Weed Research 50, 5–24.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>How do we combine errors? The linear case</title>

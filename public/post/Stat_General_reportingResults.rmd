@@ -1,0 +1,124 @@
+---
+title: "Stabilising transformations: how do I present my results?"
+author: Andrea Onofri
+date: '2019-06-15'
+slug: stabilising-transformations
+categories:
+  - R
+  - linear_models
+tags:
+  - linear_models
+  - R
+  - delta_method
+archives:
+  - 2019
+---
+
+
+ANOVA is routinely used in applied biology for data analyses, although, in some instances, the basic assumptions of normality and homoscedasticity of residuals do not hold. In those instances, most biologists would be inclined to adopt some sort of stabilising transformations (logarithm, square root, arcsin square root...), prior to ANOVA. Yes, there might be more advanced and elegant solutions, but stabilising transformations are suggested in most traditional biometry books, they are very straightforward to apply and they do not require any specific statistical software. I do not think that this traditional technique should be underrated.
+
+However, the use of stabilising transformations has one remarkable drawback, it may hinder the clarity of results. I'd like to give a simple, but relevant example.
+
+# An example with counts
+
+Consider the following dataset, that represents the counts of insects on 15 independent leaves, treated with the insecticides A, B and C (5 replicates):
+
+```{r setup, cache = F, echo = F}
+knitr::knit_hooks$set(document = function(x){ 
+  gsub("```\n*```r*\n*", "", x) 
+})
+```
+
+```{r}
+dataset <- structure(data.frame(
+  Insecticide = structure(c(1L, 1L, 1L, 1L, 1L, 
+    2L, 2L, 2L, 2L, 2L, 3L, 3L, 3L, 3L, 3L), 
+    .Label = c("A", "B", "C"), class = "factor"), 
+  Count = c(448, 906, 484, 477, 634, 211, 276, 
+    415, 587, 298, 50, 90, 73, 44, 26)), 
+  .Names = c("Insecticide", "Count"))
+dataset
+```
+
+We should not expect that a count variable is normally distributed with equal variances. Indeed, a graph of residuals against expected values shows clear signs of heteroscedasticity.
+
+```{r}
+mod <- lm(Count ~ Insecticide, data=dataset)
+plot(mod, which = 1)
+```
+
+In this situation, a logarithmic transformation is often suggested to produce a new normal and homoscedastic dataset. Therefore we take the log-transformed variable and submit it to ANOVA.
+
+```{r}
+model <- lm(log(Count) ~ Insecticide, data=dataset)
+print(anova(model), digits=6)
+summary(model)
+```
+
+In this example, the standard error for each mean (SEM) corresponds to $\sqrt{0.158/5}$. In the end, we might show the following table of means for transformed data:
+
+<!-- table -->
+|Insecticide | Means (log n.)   |
+|:-----:|:----------:|
+|A     |     6.343
+|B     |     5.815
+|C     |     3.985
+|SEM   |     0.178
+<!-- table -->
+
+Unfortunately, we loose clarity: how many insects did we have on each leaf? If we present in our manuscript a table like this one we might be asked by our readers or by the reviewer to report the means on the original measurement unit. What should we do, then? Here are some suggestions.
+
+1. We can present the means of the original data with standard deviations. This is clearly less than optimal, if we want to suggest more than the bare variability of the observed sample. Furthermore, **please remember that the means of original data may not be a good measure of central tendency, if the original population is strongly 'asymmetric' (skewed)!**
+2. We can show back-transformed means. Accordingly, if we have done, e.g., a logarithmic transformation, we can exponentiate the means of transformed data and report them back to the original measurement unit. Back-transformed means 'estimate' the medians of the original populations, which may be regarded as better measures of central tendency for skewed data.
+
+We suggest that the use of the second method. However, this leaves us with the problem of adding a measure of uncertainty to back-transformed means. No worries, we can use the delta method to back-transform standard errors. It is straightforward:
+
+1. take the first derivative of the back-transform function [in this case the first derivative of exp(X)=exp(X)] and
+2. multiply it by the standard error of the transformed data. 
+
+This may be simply done by hand, with e.g $exp(6.343) \times 0.178 = 101.19$ (for insecticide A). This 'manual' solution is always available, regardless of the statistical software at hand. With R, we can use the 'emmeans' package (Lenth, 2016):
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+library(emmeans)
+countM <- emmeans(model, ~Insecticide, transform = "response")
+```
+
+It is enough to set the argument 'transform' to 'response, although the transformation must be embedded in the model. It means: it is ok if we coded the model as:
+
+```
+log(Count) ~ Insecticide
+```
+
+On the contrary, it fails if we coded the model as:
+
+```
+logCount ~ Insecticide
+```
+
+where the transformation was performed prior to fitting.
+
+Obviously, the back-transformed standard error is different for each mean (there is no homogeneity of variances on the original scale, but we knew this already). 
+Back-transformed data might be presented as follows:
+
+Insecticide | Mean | SE
+|:---------:|:----:|:-----:|
+A |          568.5 | 101.19
+B |          335.1 | 59.68
+C |          51.88 | 9.57
+
+
+It would be appropriate to state it clearly (e.g. in a footnote), that means and SEs were obtained by back-transformation via the delta method. Far clearer, isn't it? As I said, there are other solutions, such as fitting a GLM, but stabilising transformations are simple and they are easily acceptable in biological Journals.
+
+If you want to know something more about the delta-method you might start from [my post here](https://www.statforbiology.com/2019/stat_general_thedeltamethod/). A few years ago, some collegues and I have also discussed these issues in a journal paper (Onofri et al., 2010).
+
+Thanks for reading!
+
+Andrea Onofri    
+University of Perugia (Italy)
+
+#References
+
+1. Lenth, R.V., 2016. Least-Squares Means: The R Package lsmeans. Journal of Statistical Software 69. https://doi.org/10.18637/jss.v069.i01
+2. Onofri, A., Carbonell, E.A., Piepho, H.-P., Mortimer, A.M., Cousens, R.D., 2010. Current statistical issues in Weed Research. Weed Research 50, 5–24.
+
+
