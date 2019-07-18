@@ -9,6 +9,7 @@
 <meta name="generator" content="pandoc" />
 
 
+<meta name="author" content="Andrea Onofri" />
 
 
 <title>What’s the role of censoring in germination assays?</title>
@@ -19,9 +20,6 @@
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
-<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
-<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
-<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
@@ -172,107 +170,6 @@ $(document).ready(function () {
 
 
 
-<script>
-$(document).ready(function ()  {
-
-    // move toc-ignore selectors from section div to header
-    $('div.section.toc-ignore')
-        .removeClass('toc-ignore')
-        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
-
-    // establish options
-    var options = {
-      selectors: "h1,h2,h3",
-      theme: "bootstrap3",
-      context: '.toc-content',
-      hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
-      },
-      ignoreSelector: ".toc-ignore",
-      scrollTo: 0
-    };
-    options.showAndHide = false;
-    options.smoothScroll = false;
-
-    // tocify
-    var toc = $("#TOC").tocify(options).data("toc-tocify");
-});
-</script>
-
-<style type="text/css">
-
-#TOC {
-  margin: 25px 0px 20px 0px;
-}
-@media (max-width: 768px) {
-#TOC {
-  position: relative;
-  width: 100%;
-}
-}
-
-
-.toc-content {
-  padding-left: 30px;
-  padding-right: 40px;
-}
-
-div.main-container {
-  max-width: 1200px;
-}
-
-div.tocify {
-  width: 20%;
-  max-width: 260px;
-  max-height: 85%;
-}
-
-@media (min-width: 768px) and (max-width: 991px) {
-  div.tocify {
-    width: 25%;
-  }
-}
-
-@media (max-width: 767px) {
-  div.tocify {
-    width: 100%;
-    max-width: none;
-  }
-}
-
-.tocify ul, .tocify li {
-  line-height: 20px;
-}
-
-.tocify-subheader .tocify-item {
-  font-size: 0.90em;
-  padding-left: 25px;
-  text-indent: 0;
-}
-
-.tocify .list-group-item {
-  border-radius: 0px;
-}
-
-.tocify-subheader {
-  display: inline;
-}
-.tocify-subheader .tocify-item {
-  font-size: 0.95em;
-}
-
-</style>
-
-<!-- setup 3col/9col grid for toc_float and main content  -->
-<div class="row-fluid">
-<div class="col-xs-12 col-sm-4 col-md-3">
-<div id="TOC" class="tocify">
-</div>
-</div>
-
-<div class="toc-content col-xs-12 col-sm-8 col-md-9">
-
-
 
 
 <div class="navbar navbar-default  navbar-fixed-top" role="navigation">
@@ -291,11 +188,14 @@ div.tocify {
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
     <span class="fa fa-gear"></span>
      
-    Navigation
+    Articles
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Censoring.html">Describing germination curves</a>
+    </li>
     <li>
       <a href="Censoring.html">The problem of censoring</a>
     </li>
@@ -304,6 +204,9 @@ div.tocify {
     </li>
     <li>
       <a href="GermIndices.html">Revisting germination indices</a>
+    </li>
+    <li>
+      <a href="ComparingSeedLots.html">Comparing germination curves</a>
     </li>
     <li>
       <a href="HTnonlin.html">Nonlinear regression analysis</a>
@@ -326,6 +229,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">What’s the role of censoring in germination assays?</h1>
+<h4 class="author"><em>Andrea Onofri</em></h4>
 <h4 class="date"><em>17 December, 2018</em></h4>
 
 </div>
@@ -334,31 +238,24 @@ div.tocify {
 <hr />
 <div id="the-background" class="section level1">
 <h1>The background</h1>
-<p>Seeds in a population do not germinate altogether in the same moment. This is an undisputed fact, resulting from the seed-to-seed variability in germination time (t). We could describe such a variability by using some density function <span class="math inline">\(\phi\)</span>, usually parameterised by way of a location (<span class="math inline">\(\mu\)</span>) and scale (<span class="math inline">\(\sigma\)</span>) parameter:</p>
-<p><span class="math display">\[ t \sim \phi(\mu, \sigma)\]</span></p>
-<p>However, we should also consider that there will often be a fraction of seeds that will not germinate in the given conditions, because it is either dormant or nonviable. Let’s call this fraction <span class="math inline">\(\pi\)</span>; the density distribution of germination times becomes:</p>
-<p><span class="math display">\[ t \sim \pi \, \phi(\mu, \sigma) + (1 - \pi)\]</span></p>
-<p>From there, the proportion of germinated seeds (G) at <span class="math inline">\(t = t_g\)</span> is given by the corresponding cumulative distribution function:</p>
-<p><span class="math display">\[ G = P(t &lt; t_g) = \pi \, \Phi(\mu, \sigma)\]</span></p>
-<p>Usually, <span class="math inline">\(\Phi\)</span> is right-skewed and, therefore, log-normal, log-logistic or Weibull cumulative distribution functions have been succesfully used. The graph below represents the germination time-course for a seed population with lognormal distribution of germination times, <span class="math inline">\(\mu = 4.5\)</span> days, <span class="math inline">\(\sigma = 0.6\)</span> and a maximum germinated proportion <span class="math inline">\(\pi = 0.85\)</span>.</p>
-<p><img src="Censoring_files/figure-html/unnamed-chunk-1-1.png" width="576" /></p>
-<p>With a log-normal distribution, <span class="math inline">\(\mu\)</span> corresponds to the time to 50% germination (for the germinated fraction), while <span class="math inline">\(\sigma\)</span> is the standard deviation on a log-scale.</p>
+<p>We have seen that our main task with germination assays is to determine the germination curve, describing the increase in the cumulative proportion of germinated seeds over time. We have seen (<a href="https://www.statforbiology.com/seedgermination/censoring">see this post here</a>), that the germination curve arises from seed-to-seed variability in germination time, which can be described by using some density function <span class="math inline">\(\phi\)</span> with three parameters, the maximum proportion of germinated seeds (<span class="math inline">\(d\)</span>), a location parameter (<span class="math inline">\(e\)</span>) and a scale parameter (<span class="math inline">\(b\)</span>). Taking this into account, we can easily simulate the results of a germination assay, by using Monte Carlo methods.</p>
 <hr />
 </div>
 <div id="monte-carlo-simulation-of-a-germination-assay" class="section level1">
 <h1>Monte Carlo simulation of a germination assay</h1>
-<p>Considering the above, we can simulate the results of a germination assay. Let’s take a 100 seed sample from the population above. Obviously, this sample will not necessarily reflect the characteristics of the population. We can do this sampling in R, by using a three-steps approach. First, let’s simulate the number of germinated seeds, assuming a binomial distribution with <span class="math inline">\(\pi\)</span> equal to 0.85:</p>
+<p>Let’s consider a population with lognormal distribution of germination times, <span class="math inline">\(e = 4.5\)</span> days, <span class="math inline">\(b = 0.6\)</span> and a maximum germinated proportion <span class="math inline">\(d = 0.85\)</span>. Let’s take a 100 seed sample from the population above. Obviously, this sample will not necessarily reflect the characteristics of the population. We can do this sampling in R, by using a three-steps approach. First, let’s simulate the number of germinated seeds, assuming a binomial distribution with <span class="math inline">\(d\)</span> equal to 0.85:</p>
 <pre class="r"><code>#Monte Carlo simulation - Step 1
+e &lt;- 4.5; b &lt;- 0.6; d = 0.85
 set.seed(1234)
-nGerm &lt;- rbinom(1, 100, pMax)
-nGerm</code></pre>
-<pre><code>## [1] 89</code></pre>
+nGerm &lt;- rbinom(1, 100, d)
+nGerm
+## [1] 89</code></pre>
 <p>We see that in this instance 89 seeds germinated out of 100, which is not the expected 85%. This is a typical random fluctuation. Second, let’s simulate the germination times for these 89 seeds, by drawing from a log-normal distribution with the above parameters:</p>
 <pre class="r"><code>#Monte Carlo simulation - Step 2
-Gtimes &lt;- rlnorm(nGerm, log(mu), sigma)
+Gtimes &lt;- rlnorm(nGerm, log(e), b)
 Gtimes &lt;- c(Gtimes, rep(Inf, 100 - nGerm))
-Gtimes</code></pre>
-<pre><code>##   [1]  5.424863  5.434125  5.582579  2.903142  4.597512  4.815609 10.603760
+Gtimes
+##   [1]  5.424863  5.434125  5.582579  2.903142  4.597512  4.815609 10.603760
 ##   [8]  8.118291  3.097525  2.901291  3.300505  1.574027  7.630397 10.237768
 ##  [15]  1.635063  3.088284  4.549728  6.870408  3.052210  7.576004  5.637602
 ##  [22]  5.420753  4.513539  4.399537  6.948064  3.340211  4.530872  4.526701
@@ -376,8 +273,8 @@ Gtimes</code></pre>
 <p>Now, we pile up the vector hosting 100 germination times (Gtimes). Please, note that we added 11 infinite germination times, to represent non-germinated seeds.</p>
 <p>Unfortunately, the above dataset is not what we would actually observe during a germination assay. Indeed, we cannot observe the exact germination time for each single seed in the lot; we can only count the seeds which have germinated between two assessment times. As the third step, we simulate the observed counts, by assuming daily monitoring for 15 days.</p>
 <pre class="r"><code>obsT &lt;- seq(1, 15, by=1) #Observation schedule
-table( cut(Gtimes, breaks = c(0, obsT)) )</code></pre>
-<pre><code>## 
+table( cut(Gtimes, breaks = c(0, obsT)) )
+## 
 ##   (0,1]   (1,2]   (2,3]   (3,4]   (4,5]   (5,6]   (6,7]   (7,8]   (8,9] 
 ##       0       8       9      11      22      13       6       4       4 
 ##  (9,10] (10,11] (11,12] (12,13] (13,14] (14,15] 
@@ -387,8 +284,8 @@ table( cut(Gtimes, breaks = c(0, obsT)) )</code></pre>
 <p>Let’s re-organise the data, so that they are amenable to further analyses.</p>
 <pre class="r"><code>counts &lt;- as.numeric( table( cut(Gtimes, breaks = c(0, obsT)) ) )
 df &lt;- data.frame(timeBef = c(0, obsT), timeAf = c(obsT, Inf), counts = c(as.numeric(counts), 100 - sum(counts)), propCum = c(cumsum(counts), 100)/100)
-df</code></pre>
-<pre><code>##    timeBef timeAf counts propCum
+df
+##    timeBef timeAf counts propCum
 ## 1        0      1      0    0.00
 ## 2        1      2      8    0.08
 ## 3        2      3      9    0.17
@@ -421,7 +318,7 @@ lines(c(propCum, 0.86) ~ c(timeAf, 17), type=&quot;s&quot;, data = df,
       col=&quot;blue&quot;, subset=is.finite(timeAf)==T)
 lines(c(propCum, 1) ~ c(timeBef, 17), type=&quot;s&quot;, data = df,
       col=&quot;red&quot;)</code></pre>
-<p><img src="Censoring_files/figure-html/unnamed-chunk-6-1.png" width="576" /></p>
+<p><img src="Censoring_files/figure-html/unnamed-chunk-5-1.png" width="576" /></p>
 <p>What is the real germination time-course? The red one? The blue one? Something in between? We cannot say this from our dataset. The first conclusion is that censoring creates a certain amount of uncertainty, that should never be neglected. Such an uncertainty is due to the monitoring schedule, which prevents us from observing the actual germination moment for each seed in the sample. It is peculiar to most time-to-event studies and it is additional to the other sources of uncertainty, for example those relating to sampling variability and possible errors in the manipulation of seeds and Petri dishes.</p>
 <hr />
 </div>
@@ -438,14 +335,14 @@ lines(c(propCum, 1) ~ c(timeBef, 17), type=&quot;s&quot;, data = df,
 <p>that is 5.3874781. We can get an estimate from our sample by using the formula in <span class="citation">Ranal and Santana (2006)</span>, as implemented in the ‘germinationmetrics’ package <span class="citation">(Aravind et al., 2018)</span>:</p>
 <pre class="r"><code>timings &lt;- df$timeAf[is.finite(df$timeAf) == T]
 counts &lt;- df$counts[is.finite(df$timeAf) == T]
-germinationmetrics::MeanGermTime(counts, timings)</code></pre>
-<pre><code>## [1] 5.593023</code></pre>
+germinationmetrics::MeanGermTime(counts, timings)
+## [1] 5.593023</code></pre>
 <p>We see that our estimate is higher than the real value. In itself, this means nothing. However, let’s repeat the sampling 1000 times:</p>
 <pre class="r"><code>GermSampling &lt;- function(nSeeds, timeLast, stepOss, mu, shape, pMax){
     
     #Draw a sample as above
-    germ &lt;- rbinom(1, nSeeds, pMax)
-    Gtimes &lt;- rlnorm(nGerm, log(mu), sigma)
+    germ &lt;- rbinom(1, nSeeds, d)
+    Gtimes &lt;- rlnorm(nGerm, log(e), b)
     Gtimes &lt;- c(Gtimes, rep(Inf, 100 - nGerm))
     
     #Generate the observed data
@@ -464,8 +361,8 @@ for (i in 1:1000) {
   res &lt;- GermSampling(100, 15, 1, 4.5, 0.6, 0.85)
   result &lt;- c(result, res)
 } 
-mean(result)</code></pre>
-<pre><code>## [1] 5.565812</code></pre>
+mean(result)
+## [1] 5.565812</code></pre>
 <p>The bias is approximately 3%. Not much, but if we use a lower number of seeds and a looser monitoring schedule, the bias may increase remarkably (up to 19%):</p>
 <pre class="r"><code>set.seed(1234)
 result &lt;- c()
@@ -473,34 +370,23 @@ for (i in 1:1000) {
   res &lt;- GermSampling(25, 15, 3, 4.5, 0.6, 0.85)
   result &lt;- c(result, res)
 } 
-mean(result)</code></pre>
-<pre><code>## [1] 6.420816</code></pre>
+mean(result)
+## [1] 6.420816</code></pre>
 <p>Clearly, the MGT is not a good estimator of the mean germination time for the germinated fraction.</p>
 </div>
 <div id="estimating-the-time-to-50-germination-t50" class="section level2">
 <h2>Estimating the Time to 50% germination (T50)</h2>
 <p>In other instances, the consequences of ignoring censoring may be less dangerous (but still important). For example, the Time to 50% germination (T50) is used as another measure of germination velocity, which is favoured over MGT when we need to compare seed lots with different germination capability. For a log-normal distribution, the T50 can be obtained by using the quantile function:</p>
-<pre class="r"><code>qlnorm(0.5 / pMax, log(mu), sigma)</code></pre>
-<pre><code>## [1] 5.144263</code></pre>
+<pre class="r"><code>qlnorm(0.5 / d, log(e), b)
+## [1] 5.144263</code></pre>
 <p>This is the real time to 50% germination. In order to get an estimate from our sample, nonlinear regression is often recommended. In this case, the observed counts are transformed into cumulative proportions and used as the response variable, while the observation time is used as the independent variable.</p>
 <p>The following code fits a log-normal cumulative distribution function to the observed data, by using the ‘drm’ function, in the ‘drc’ package <span class="citation">(Ritz et al., 2015)</span>. The T50 is retreived by using the ED function and passing the model object as an argument.</p>
-<pre class="r"><code>library(drc)</code></pre>
-<pre><code>## Loading required package: MASS</code></pre>
-<pre><code>## Loading required package: drcData</code></pre>
-<pre><code>## 
-## &#39;drc&#39; has been loaded.</code></pre>
-<pre><code>## Please cite R and &#39;drc&#39; if used for a publication,</code></pre>
-<pre><code>## for references type &#39;citation()&#39; and &#39;citation(&#39;drc&#39;)&#39;.</code></pre>
-<pre><code>## 
-## Attaching package: &#39;drc&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:stats&#39;:
-## 
-##     gaussian, getInitial</code></pre>
-<pre class="r"><code>mod &lt;- drm(propCum ~ timeAf, data = df, 
+<pre class="r"><code>library(drc)
+mod &lt;- drm(propCum ~ timeAf, data = df, 
            subset = c(is.finite(timeAf) == T),
            fct = LN.3() )
-ED(mod, 0.5, type = &quot;absolute&quot;)</code></pre>
-<pre><code>## 
+ED(mod, 0.5, type = &quot;absolute&quot;)
+## 
 ## Estimated effective doses
 ## 
 ##         Estimate Std. Error
@@ -509,8 +395,8 @@ ED(mod, 0.5, type = &quot;absolute&quot;)</code></pre>
 <pre class="r"><code>GermSampling &lt;- function(nSeeds, timeLast, stepOss, mu, shape, pMax){
     
     #Draw a sample as above
-    nGerm &lt;- rbinom(1, nSeeds, pMax)
-    Gtimes &lt;- rlnorm(nGerm, log(mu), sigma)
+    nGerm &lt;- rbinom(1, nSeeds, d)
+    Gtimes &lt;- rlnorm(nGerm, log(e), b)
     Gtimes &lt;- c(Gtimes, rep(Inf, 100 - nGerm))
     
     #Generate the observed data
@@ -531,19 +417,19 @@ for (i in 1:1000) {
   result &lt;- rbind(result, res)
 } 
 names(result) &lt;- c(&quot;T50&quot;, &quot;ES&quot;)
-head(result)</code></pre>
-<pre><code>##        T50         ES
+head(result)
+##        T50         ES
 ## 1 5.145639 0.12518627
 ## 2 5.113493 0.12240291
 ## 3 6.083023 0.18811890
 ## 4 5.439515 0.13551344
 ## 5 5.138722 0.06643969
-## 6 5.623690 0.18784672</code></pre>
-<pre class="r"><code>apply(result, 2, mean)</code></pre>
-<pre><code>##      T50       ES 
-## 5.160235 0.125364</code></pre>
-<pre class="r"><code>apply(result, 2, sd)</code></pre>
-<pre><code>##        T50         ES 
+## 6 5.623690 0.18784672
+apply(result, 2, mean)
+##      T50       ES 
+## 5.160235 0.125364
+apply(result, 2, sd)
+##        T50         ES 
 ## 0.41979820 0.05778375</code></pre>
 <p>We see that the estimates, on average, are very close to the real value. However, standard errors are, on average, 0.125 days, However, the Monte Carlo standard deviation is approximately 0.420 days, which tells us that standard errors from nonlinear regression are strongly underestimated.</p>
 <hr />
@@ -571,8 +457,6 @@ head(result)</code></pre>
 
 
 
-</div>
-</div>
 
 </div>
 

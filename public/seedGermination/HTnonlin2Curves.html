@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Fitting nonlinear regression models for seed germination</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.0.13/css/fa-svg-with-js.css" rel="stylesheet" />
+<script src="site_libs/font-awesome-5.0.13/js/fontawesome-all.min.js"></script>
+<script src="site_libs/font-awesome-5.0.13/js/fa-v4-shims.min.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Home</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fa fa-gear"></span>
+     
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Censoring.html">Describing germination curves</a>
+    </li>
+    <li>
+      <a href="Censoring.html">The problem of censoring</a>
+    </li>
+    <li>
+      <a href="TimeToEvent.html">Time-to-event methods account for censoring</a>
+    </li>
+    <li>
+      <a href="GermIndices.html">Revisting germination indices</a>
+    </li>
+    <li>
+      <a href="ComparingSeedLots.html">Comparing germination curves</a>
+    </li>
+    <li>
+      <a href="HTnonlin.html">Nonlinear regression analysis</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="http://www.statforbiology.com">Back to blog</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Fitting nonlinear regression models for seed germination</h1>
+<h4 class="date"><em>7 December, 2018</em></h4>
+
+</div>
+
+
+<div id="da-verificare" class="section level1">
+<h1>DA VERIFICARE!!!!!!!!!!</h1>
+</div>
+<div id="an-example" class="section level1">
+<h1>An example</h1>
+<p>The germination of rapeseed (<em>Brassica napus</em> L. var. <em>oleifera</em>, cv. Excalibur and Toccata) was tested at thirteen different water potentials (-0.03, -0.15, -0.3, -0.4, -0.5, -0.6, -0.7, -0.8, -0.9, -1, -1.1, -1.2, -1.5 MPa), which were created by using a polyethylene glycol solution (PEG 6000). For each water potential level, three replicated Petri dishes with 50 seeds were incubated at 20°C. Germinated seeds were counted and removed every 2-3 days for 14 days.</p>
+<p>The dataset is already sorted out for time-to-event analysis and it is available in the ‘drcSeedGermPackage’ as ‘rape2G’. In order to use this dataset for nonlinear regression analyses, we need to remove all rows where ‘timeAf = Inf’.</p>
+<pre class="r"><code>library(drc)
+library(drcSeedGerm)
+data(rape2G)
+head(rape2G)</code></pre>
+<pre><code>##            CV Psi Dish timeBef timeAf nSeeds nCum Prop
+## 295 Excalibur   0   43       0      3     49   49 0.98
+## 296 Excalibur   0   43       3      4      0   49 0.98
+## 297 Excalibur   0   43       4      5      0   49 0.98
+## 298 Excalibur   0   43       5      7      0   49 0.98
+## 299 Excalibur   0   43       7     10      0   49 0.98
+## 300 Excalibur   0   43      10     14      0   49 0.98</code></pre>
+<p>We can now fit all nonlinear HT models, considering all the possible distributions of base water potential. We would like to highlight that starting values are not necessary, as self-starting routines are alreay implemented for all models.</p>
+<pre class="r"><code>library(drc)
+mod1 &lt;- drm(Prop ~ timeAf + Psi, data = rape2G, 
+  fct = HTnorm(), curveid = CV)
+mod2 &lt;- drm(Prop ~ timeAf + Psi, data = rape2G, 
+  fct = HTL(), curveid = CV)
+mod3 &lt;- drm(Prop ~ timeAf + Psi, data = rape2G,
+  fct = HTG(), curveid = CV)
+mod4 &lt;- drm(Prop ~ timeAf + Psi, data = rape2G,
+  fct = HTLL(), curveid = CV)
+mod5 &lt;- drm(Prop ~ timeAf + Psi, data = rape2G,
+  fct = HTW1(), curveid = CV)
+mod6 &lt;- drm(Prop ~ timeAf + Psi, data = rape2G, 
+  fct = HTW2(), curveid = CV)
+
+AIC(mod1, mod2, mod3, mod4, mod5, mod6)</code></pre>
+<pre><code>##      df       AIC
+## mod1  7 -1489.878
+## mod2  7 -1503.292
+## mod3  7 -1558.907
+## mod4  9 -1625.010
+## mod5  9 -1610.043
+## mod6  9 -1538.172</code></pre>
+<p>According to the Akaike’s Information Criterion (AIC; <span class="citation">Akaike (1974)</span>), we note that the gaussian distribution is the worse fitting among all candidate models, while the log-logistic is the best one. Let’s take a look at the value of estimated parameters.</p>
+<pre class="r"><code>summary(mod4)</code></pre>
+<pre><code>## 
+## Model fitted: Hydrotime model with log-logistic distribution of Psib (Mesgaran et al., 2013)
+## 
+## Parameter estimates:
+## 
+##                   Estimate Std. Error  t-value   p-value    
+## thetaH:Excalibur  0.762603   0.022545   33.825 &lt; 2.2e-16 ***
+## thetaH:Toccata    0.670699   0.019027   35.250 &lt; 2.2e-16 ***
+## delta:Excalibur   1.112061   0.013161   84.495 &lt; 2.2e-16 ***
+## delta:Toccata     1.018442   0.009814  103.774 &lt; 2.2e-16 ***
+## Psib50:Excalibur -0.976261   0.004589 -212.737 &lt; 2.2e-16 ***
+## Psib50:Toccata   -0.927622   0.003816 -243.088 &lt; 2.2e-16 ***
+## sigma:Excalibur   0.418134   0.039379   10.618 &lt; 2.2e-16 ***
+## sigma:Toccata     0.458804   0.043633   10.515 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error:
+## 
+##  0.04779142 (496 degrees of freedom)</code></pre>
+<p>Previous papers have shown that standard errors obtained with a nonlinear regression fit may be strongly underestimated <span class="citation">(Ritz et al., 2013)</span>. More accurate standard errors can be obtained by using either a fully iterated delete-a-group jackknike estimator <span class="citation">(Onofri et al., 2014)</span> or a cluster-robust sandwich estimator. Both can be calculated by using either the function ‘jackGroupSE()’ in the ‘drcSeedGerm’ package, or the function ‘coeftest’, together with the facilities provided in the ‘drc’, ‘sandwich’ and ‘lmtest’ packages <span class="citation">(Berger et al., 2017; Ritz et al., 2015; Zeileis and Hothorn, 2002)</span>.</p>
+<pre class="r"><code>#library(devtools)
+#install_github(&quot;OnofriAndreaPG/drcSeedGerm&quot;)
+library(sandwich); library(lmtest)
+jack &lt;- jackGroupSE(mod4, data = rape2G, cluster = rape2G$Dish)</code></pre>
+<pre><code>## [1] &quot;Deleting group 1 and refitting&quot;
+## [1] 1
+## [1] &quot;Deleting group 2 and refitting&quot;
+## [1] 2
+## [1] &quot;Deleting group 3 and refitting&quot;
+## [1] 3
+## [1] &quot;Deleting group 4 and refitting&quot;
+## [1] 4
+## [1] &quot;Deleting group 5 and refitting&quot;
+## [1] 5
+## [1] &quot;Deleting group 6 and refitting&quot;
+## [1] 6
+## [1] &quot;Deleting group 7 and refitting&quot;
+## [1] 7
+## [1] &quot;Deleting group 8 and refitting&quot;
+## [1] 8
+## [1] &quot;Deleting group 9 and refitting&quot;
+## [1] 9
+## [1] &quot;Deleting group 10 and refitting&quot;
+## [1] 10
+## [1] &quot;Deleting group 11 and refitting&quot;
+## [1] 11
+## [1] &quot;Deleting group 12 and refitting&quot;
+## [1] 12
+## [1] &quot;Deleting group 13 and refitting&quot;
+## [1] 13
+## [1] &quot;Deleting group 14 and refitting&quot;
+## [1] 14
+## [1] &quot;Deleting group 15 and refitting&quot;
+## [1] 15
+## [1] &quot;Deleting group 16 and refitting&quot;
+## [1] 16
+## [1] &quot;Deleting group 17 and refitting&quot;
+## [1] 17
+## [1] &quot;Deleting group 18 and refitting&quot;
+## [1] 18
+## [1] &quot;Deleting group 19 and refitting&quot;
+## [1] 19
+## [1] &quot;Deleting group 20 and refitting&quot;
+## [1] 20
+## [1] &quot;Deleting group 21 and refitting&quot;
+## [1] 21
+## [1] &quot;Deleting group 22 and refitting&quot;
+## [1] 22
+## [1] &quot;Deleting group 23 and refitting&quot;
+## [1] 23
+## [1] &quot;Deleting group 24 and refitting&quot;
+## [1] 24
+## [1] &quot;Deleting group 25 and refitting&quot;
+## [1] 25
+## [1] &quot;Deleting group 26 and refitting&quot;
+## [1] 26
+## [1] &quot;Deleting group 27 and refitting&quot;
+## [1] 27
+## [1] &quot;Deleting group 28 and refitting&quot;
+## [1] 28
+## [1] &quot;Deleting group 29 and refitting&quot;
+## [1] 29
+## [1] &quot;Deleting group 30 and refitting&quot;
+## [1] 30
+## [1] &quot;Deleting group 31 and refitting&quot;
+## [1] 31
+## [1] &quot;Deleting group 32 and refitting&quot;
+## [1] 32
+## [1] &quot;Deleting group 33 and refitting&quot;
+## [1] 33
+## [1] &quot;Deleting group 34 and refitting&quot;
+## [1] 34
+## [1] &quot;Deleting group 35 and refitting&quot;
+## [1] 35
+## [1] &quot;Deleting group 36 and refitting&quot;
+## [1] 36
+## [1] &quot;Deleting group 37 and refitting&quot;
+## [1] 37
+## [1] &quot;Deleting group 38 and refitting&quot;
+## [1] 38
+## [1] &quot;Deleting group 39 and refitting&quot;
+## [1] 39
+## [1] &quot;Deleting group 40 and refitting&quot;
+## [1] 40
+## [1] &quot;Deleting group 41 and refitting&quot;
+## [1] 41
+## [1] &quot;Deleting group 42 and refitting&quot;
+## [1] 42
+## [1] &quot;Deleting group 43 and refitting&quot;
+## [1] 43
+## [1] &quot;Deleting group 44 and refitting&quot;
+## [1] 44
+## [1] &quot;Deleting group 45 and refitting&quot;
+## [1] 45
+## [1] &quot;Deleting group 46 and refitting&quot;
+## [1] 46
+## [1] &quot;Deleting group 47 and refitting&quot;
+## [1] 47
+## [1] &quot;Deleting group 48 and refitting&quot;
+## [1] 48
+## [1] &quot;Deleting group 49 and refitting&quot;
+## [1] 49
+## [1] &quot;Deleting group 50 and refitting&quot;
+## [1] 50
+## [1] &quot;Deleting group 51 and refitting&quot;
+## [1] 51
+## [1] &quot;Deleting group 52 and refitting&quot;
+## [1] 52
+## [1] &quot;Deleting group 53 and refitting&quot;
+## [1] 53
+## [1] &quot;Deleting group 54 and refitting&quot;
+## [1] 54
+## [1] &quot;Deleting group 55 and refitting&quot;
+## [1] 55
+## [1] &quot;Deleting group 56 and refitting&quot;
+## [1] 56
+## [1] &quot;Deleting group 57 and refitting&quot;
+## [1] 57
+## [1] &quot;Deleting group 58 and refitting&quot;
+## [1] 58
+## [1] &quot;Deleting group 59 and refitting&quot;
+## [1] 59
+## [1] &quot;Deleting group 60 and refitting&quot;
+## [1] 60
+## [1] &quot;Deleting group 61 and refitting&quot;
+## [1] 61
+## [1] &quot;Deleting group 62 and refitting&quot;
+## [1] 62
+## [1] &quot;Deleting group 63 and refitting&quot;
+## [1] 63
+## [1] &quot;Deleting group 64 and refitting&quot;
+## [1] 64
+## [1] &quot;Deleting group 65 and refitting&quot;
+## [1] 65
+## [1] &quot;Deleting group 66 and refitting&quot;
+## [1] 66
+## [1] &quot;Deleting group 67 and refitting&quot;
+## [1] 67
+## [1] &quot;Deleting group 68 and refitting&quot;
+## [1] 68
+## [1] &quot;Deleting group 69 and refitting&quot;
+## [1] 69
+## [1] &quot;Deleting group 70 and refitting&quot;
+## [1] 70
+## [1] &quot;Deleting group 71 and refitting&quot;
+## [1] 71
+## [1] &quot;Deleting group 72 and refitting&quot;
+## [1] 72
+## [1] &quot;Deleting group 73 and refitting&quot;
+## [1] 73
+## [1] &quot;Deleting group 74 and refitting&quot;
+## [1] 74
+## [1] &quot;Deleting group 75 and refitting&quot;
+## [1] 75
+## [1] &quot;Deleting group 76 and refitting&quot;
+## [1] 76
+## [1] &quot;Deleting group 77 and refitting&quot;
+## [1] 77
+## [1] &quot;Deleting group 78 and refitting&quot;
+## [1] 78
+## [1] &quot;Deleting group 79 and refitting&quot;
+## [1] 79
+## [1] &quot;Deleting group 80 and refitting&quot;
+## [1] 80
+## [1] &quot;Deleting group 81 and refitting&quot;
+## [1] 81
+## [1] &quot;Deleting group 82 and refitting&quot;
+## [1] 82
+## [1] &quot;Deleting group 83 and refitting&quot;
+## [1] 83
+## [1] &quot;Deleting group 84 and refitting&quot;
+## [1] 84</code></pre>
+<pre class="r"><code>#sand &lt;- coeftest(mod4, vcov = vcovCL, cluster = rape2G$Dish)</code></pre>
+<pre class="r"><code>jack</code></pre>
+<pre><code>##                    Estimate          SE  Robust SE
+## thetaH:Excalibur  0.7626032 0.022545447 0.04831737
+## thetaH:Toccata    0.6706991 0.019026939 0.04614376
+## delta:Excalibur   1.1120610 0.013161268 0.02786090
+## delta:Toccata     1.0184423 0.009814002 0.05518996
+## Psib50:Excalibur -0.9762608 0.004589048 0.01112353
+## Psib50:Toccata   -0.9276217 0.003815990 0.01271536
+## sigma:Excalibur   0.4181341 0.039379524 0.09991630
+## sigma:Toccata     0.4588041 0.043632669 0.20336169</code></pre>
+<pre class="r"><code>sand</code></pre>
+<pre><code>## 
+## t test of coefficients:
+## 
+##                      Estimate Std. Error   t value  Pr(&gt;|t|)    
+## thetaH:(Intercept)  0.7626110  0.0292557   26.0671 &lt; 2.2e-16 ***
+## delta:(Intercept)   1.1120616  0.0278818   39.8848 &lt; 2.2e-16 ***
+## Psib50:(Intercept) -0.9762636  0.0068442 -142.6404 &lt; 2.2e-16 ***
+## sigma:(Intercept)   0.4181350  0.0821988    5.0869 7.187e-07 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>Standard errors from nonlinear regression confirm to be smaller than sandwich and jackknife SEs. These latter two are very similar, although jackknife SEs are slightly higher.</p>
+<p>We might be interested in getting the GR values for a certain percentile (e.g. GR50, GR30), which is easily accomplished by using the ‘GR()’ function in ‘drcSeedGerm’. Likewise, if we are interested in the germination times for a certain percentile (e.g. T50, T30), we can use the ‘GTime()’ function in the same package. In the code below, we request the GR30, GR50 and GR70, as well as T30, T50 amd T70, for a water potential level of 0 MPa.</p>
+<pre class="r"><code>ED(mod4, respLev=c(30, 50, 70), type = &quot;absolute&quot;, Psi=0)</code></pre>
+<pre><code>## 
+## Estimated effective doses
+## 
+##                Estimate Std. Error
+## e:Excalibur:30 1.333293   0.034535
+## e:Excalibur:50 1.280169   0.033056
+## e:Excalibur:70 1.204459   0.030671
+## e:Toccata:30   1.426682   0.035741
+## e:Toccata:50   1.383067   0.034501
+## e:Toccata:70   1.318729   0.032693</code></pre>
+<pre class="r"><code>GRate(mod4, respLev=c(30, 50, 70), x2 = 0, vcov. = vcovCL)</code></pre>
+<pre><code>##                 Estimate         SE
+## GR:Excalibur:30 1.333293 0.04107439
+## GR:Excalibur:50 1.280169 0.03948849
+## GR:Excalibur:70 1.204459 0.03653805
+## GR:Toccata:30   1.426682 0.04102203
+## GR:Toccata:50   1.383067 0.04014997
+## GR:Toccata:70   1.318729 0.03861312</code></pre>
+<pre class="r"><code>GTime(mod4, respLev=c(30, 50, 70), x2 = 0, vcov. = vcovCL)</code></pre>
+<pre><code>##                 Estimate         SE
+## T:Excalibur:30 0.7500228 0.02310575
+## T:Excalibur:50 0.7811470 0.02409551
+## T:Excalibur:70 0.8302486 0.02518615
+## T:Toccata:30   0.7009270 0.02015407
+## T:Toccata:50   0.7230308 0.02098934
+## T:Toccata:70   0.7583058 0.02220361</code></pre>
+<p>Both functions are wrappers for the ‘ED()’ function in ‘drc’. These wrappers reverse the behaviour of the ‘ED()’ function, in the sense that they consider the percentiles for the whole population, including the ungerminated fraction. That is, the, e.g., T50 would be the time to 50% germination; if this germination level is not reached at all, the function returns infinity. We believe that, with germination assays, considering the percentiles for the whole population is more meaningful for comparing different populations. Again, the use of cluster-robust standard errors is highly recommended.</p>
+<p>We can also make predictions about the germinated proportion for a certain time and water potential level. The code below returns the maximum germinated proportion at -1.5, -0.75, and 0 MPa.</p>
+<pre class="r"><code>predictSG(mod4, se.fit=T, vcov. = vcovCL,
+        newdata = data.frame(Time=c(1, 2, 3), 
+                             Psi=c(0, 0, 0),
+          CV = c(&quot;Excalibur&quot;, &quot;Excalibur&quot;, &quot;Toccata&quot;))
+        )</code></pre>
+<pre><code>##      Prediction          SE
+## [1,]  0.9055535 0.013298290
+## [2,]  0.9824463 0.004525905
+## [3,]  0.9912348 0.002986073</code></pre>
+<p>Predictions may also be used to plot graphs.</p>
+<p><img src="HTnonlin2Curves_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+</div>
+<div id="detail-on-the-equations" class="section level1">
+<h1>Detail on the equations</h1>
+<p>The equation for the model based on gaussian distribution has already been presented before. Here, we show all other equations, as implemented in our package.</p>
+<div id="logistic-distribution" class="section level2">
+<h2>Logistic distribution</h2>
+<p><span class="math display">\[ G(t, \Psi) = \frac{1}{1 + exp \left[ - \frac{  \Psi  - \left( \theta _H/t \right) - \Psi_{b(50)} } {\sigma}  \right] }\]</span></p>
+</div>
+<div id="gumbel-distribution" class="section level2">
+<h2>Gumbel distribution</h2>
+<p><span class="math display">\[ G(t, \Psi) = \exp \left\{ { - \exp \left[ { - \left( {\frac{{\Psi - (\theta _H / t ) - \mu }}{\sigma }} \right)} \right]} \right\} \]</span></p>
+</div>
+<div id="log-logistic-distribution" class="section level2">
+<h2>Log-logistic distribution</h2>
+<p><span class="math display">\[ G(t, \Psi) = \frac{1}{1 + \exp \left\{ \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b50} + \delta)  }{\sigma}\right\} }\]</span></p>
+</div>
+<div id="weibull-distribution-type-i" class="section level2">
+<h2>Weibull distribution (Type I)</h2>
+<p><span class="math display">\[ G(t, \Psi) = exp \left\{ - \exp \left[ - \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b50} + \delta)  }{\sigma}\right] \right\}\]</span></p>
+</div>
+<div id="weibull-distribution-type-ii" class="section level2">
+<h2>Weibull distribution (Type II)</h2>
+<p><span class="math display">\[ G(t, \Psi) = 1 - exp \left\{ - \exp \left[ \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b50} + \delta)  }{\sigma}\right] \right\}\]</span></p>
+</div>
+<div id="references" class="section level2 unnumbered">
+<h2>References</h2>
+<div id="refs" class="references">
+<div id="ref-akaike_new_1974">
+<p>Akaike, H., 1974. A new look at the statistical model identification. IEEE Transactions on Automatic Control 19, 716–723.</p>
+</div>
+<div id="ref-berger_various_2017">
+<p>Berger, S., Graham, N., Zeileis, A., 2017. Various versatile variances: An object-oriented implementation of clustered covariances in R. Working Paper 2017-12, Working Papers in Economics and Statistics, Research Platform Empirical and Experimental Economics, Universität Innsbruck.</p>
+</div>
+<div id="ref-onofri_experimental_2014">
+<p>Onofri, A., Mesgaran, M., Neve, P., Cousens, R., 2014. Experimental design and parameter estimation for threshold models in seed germination. Weed Research 54, 425–435.</p>
+</div>
+<div id="ref-Ritz:2015aa">
+<p>Ritz, C., Baty, F., Streibig, J.C., Gerhard, D., 2015. Dose-response analysis using r. PLOS ONE 10.</p>
+</div>
+<div id="ref-Ritz2012_CureModel">
+<p>Ritz, C., Pipper, C.B., Streibig, J.C., 2013. Analysis of germination data from agricultural experiments. European Journal of Agronomy 45, 1–6.</p>
+</div>
+<div id="ref-Zeileis2002">
+<p>Zeileis, A., Hothorn, T., 2002. Diagnostic checking in regression relationships. R News 2, 7–10.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
