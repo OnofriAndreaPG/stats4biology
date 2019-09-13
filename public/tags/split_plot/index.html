@@ -12,7 +12,7 @@
   </script>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>The broken bridge between biologists and statisticians  | Drowning in a glass of water: variance-covariance and correlation matrices</title>
+    <title>The broken bridge between biologists and statisticians  | Split_plot</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
@@ -46,7 +46,7 @@
                 <br>
                 <h1 class="title is-size-1">
                     
-                        Drowning in a glass of water: variance-covariance and correlation matrices
+                        #Split_plot
                     
                 </h1>
                 
@@ -60,91 +60,26 @@
     <div class="section">
     
 
+
+
 <div class="columns">
     <div class="column is-9">
         <div class="tile is-child box">
-          <p class="subtitle is-size-6 has-text-grey-light">
-          Andrea Onofri &middot;&nbsp; Added on February 19, 2019 &middot;
-          <i class="far fa-clock"></i>&nbsp;3 min read 
-          </p><hr/>
             <div class="content">
-                
 
-
-<p>One of the easiest tasks in R is to get correlations between each pair of variables in a dataset. As an example, let’s take the first four columns in the ‘mtcars’ dataset, that is available within R. Getting the variances-covariances and the correlations is straightforward.</p>
-<pre class="r"><code>data(mtcars)
-matr &lt;- mtcars[,1:4]
-
-#Covariances
-cov(matr)</code></pre>
-<pre><code>##              mpg        cyl       disp        hp
-## mpg    36.324103  -9.172379  -633.0972 -320.7321
-## cyl    -9.172379   3.189516   199.6603  101.9315
-## disp -633.097208 199.660282 15360.7998 6721.1587
-## hp   -320.732056 101.931452  6721.1587 4700.8669</code></pre>
-<pre class="r"><code>#Correlations
-cor(matr)</code></pre>
-<pre><code>##             mpg        cyl       disp         hp
-## mpg   1.0000000 -0.8521620 -0.8475514 -0.7761684
-## cyl  -0.8521620  1.0000000  0.9020329  0.8324475
-## disp -0.8475514  0.9020329  1.0000000  0.7909486
-## hp   -0.7761684  0.8324475  0.7909486  1.0000000</code></pre>
-<p>It’s really a piece of cake! Unfortunately, a few days ago I had a covariance matrix without the original dataset and I wanted the corresponding correlation matrix. Although this is an easy task as well, at first I was stuck, because I could not find an immediate solution… So I started wondering how I could make it.</p>
-<p>Indeed, having the two variables X and Y, their covariance is:</p>
-<p><span class="math display">\[cov(X, Y) = \sum\limits_{i=1}^{n} {(X_i - \hat{X})(Y_i - \hat{Y})}\]</span></p>
-<p>where <span class="math inline">\(\hat{Y}\)</span> and <span class="math inline">\(\hat{X}\)</span> are the means for each variable. The correlation is:</p>
-<p><span class="math display">\[cor(X, Y) = \frac{cov(X, Y)}{\sigma_x \sigma_y} \]</span></p>
-<p>where <span class="math inline">\(\sigma_x\)</span> and <span class="math inline">\(\sigma_y\)</span> are the standard deviations for X and Y.</p>
-<p>The opposite relationship is clear:</p>
-<p><span class="math display">\[ cov(X, Y) = cor(X, Y) \sigma_x \sigma_y\]</span></p>
-<p>Therefore, converting from covariance to correlation is pretty easy. For example, take the covariance between ‘cyl’ and ‘mpg’ above (-9.172379), the correlation is:</p>
-<pre class="r"><code>-633.097208 / (sqrt(36.324103) * sqrt(15360.7998))</code></pre>
-<pre><code>## [1] -0.8475514</code></pre>
-<p>On the reverse, if we have the correlation (-0.8521620), the covariance is</p>
-<pre class="r"><code>-0.8475514 * sqrt(36.324103) * sqrt(15360.7998)</code></pre>
-<pre><code>## [1] -633.0972</code></pre>
-<p>My covariance matrix was pretty large, so I started wondering how I could perform this task altogether. What I had to do was to take each element in the covariance matrix and divide it by the square root of the diagonal elements in the same column and in the same row (see below).</p>
-<div class="figure">
-<img src="https://lu4yxa.db.files.1drv.com/y4mZ-7ZQc0LCMyDG3kqC_0_bzMZYyEpb37ug_I616tXoPNL_DbILLSOa8HujEZCekvRNeeYsfwtrYP-0T_PfzlOUqUNliHdKU3sDLHwBnr5C4jF-U-u1QkOlWg3ZbQXKJw4TM2VrQIQqjh-Pb-5cOEY49q-3pfnt4ZYJUAYZIBhW4GgJ0svrEEAnKQZfNTs2LW5iZhGyYFYVKFT2Y1O7SjKjA?width=637&amp;height=156&amp;cropmode=none" style="width:95.0%" />
-
-</div>
-<p>This is easily done by matrix multiplication. I need a square matrix where the standard deviations for each variable are repeated along the rows:</p>
-<pre class="r"><code>V &lt;- cov(matr)
-SM1 &lt;- matrix(rep(sqrt(diag(V)), 4), 4, 4)
-SM1</code></pre>
-<pre><code>##            [,1]       [,2]       [,3]       [,4]
-## [1,]   6.026948   6.026948   6.026948   6.026948
-## [2,]   1.785922   1.785922   1.785922   1.785922
-## [3,] 123.938694 123.938694 123.938694 123.938694
-## [4,]  68.562868  68.562868  68.562868  68.562868</code></pre>
-<p>and another one where they are repeated along the columns</p>
-<pre class="r"><code>SM2 &lt;- matrix(rep(sqrt(diag(V)), each = 4), 4, 4)</code></pre>
-<p>Now I can take my covariance matrix (V) and simply multiply these three matrices as follows:</p>
-<pre class="r"><code>V * 1/SM1 * 1/SM2</code></pre>
-<pre><code>##             mpg        cyl       disp         hp
-## mpg   1.0000000 -0.8521620 -0.8475514 -0.7761684
-## cyl  -0.8521620  1.0000000  0.9020329  0.8324475
-## disp -0.8475514  0.9020329  1.0000000  0.7909486
-## hp   -0.7761684  0.8324475  0.7909486  1.0000000</code></pre>
-<p>Indeed, there is not even the need to use ‘rep’ when we create SM1, as R will recycle the elements as needed.</p>
-<p>Going from correlation to covariance can be done similarly:</p>
-<pre class="r"><code>R &lt;- cor(matr)
-R / (1/SM1 * 1/SM2)</code></pre>
-<pre><code>##              mpg        cyl       disp        hp
-## mpg    36.324103  -9.172379  -633.0972 -320.7321
-## cyl    -9.172379   3.189516   199.6603  101.9315
-## disp -633.097208 199.660282 15360.7998 6721.1587
-## hp   -320.732056 101.931452  6721.1587 4700.8669</code></pre>
-<p>This is an easy task, but it got me stuck for a few minutes…</p>
-<p>Lately, I finally discovered that there is (at least) one function in R taking care of the above task; it is the ‘cov2cor()’ function in the ‘nlme’ package.</p>
-<pre class="r"><code>library(nlme)
-cov2cor(V)</code></pre>
-<pre><code>##             mpg        cyl       disp         hp
-## mpg   1.0000000 -0.8521620 -0.8475514 -0.7761684
-## cyl  -0.8521620  1.0000000  0.9020329  0.8324475
-## disp -0.8475514  0.9020329  1.0000000  0.7909486
-## hp   -0.7761684  0.8324475  0.7909486  1.0000000</code></pre>
-<p>It is really easy to get drown in a glass of water!</p>
+                <article class="media">
+                    <div class="media-content">
+                        <div class="content">
+                            <p class="title is-4"><a href="/2019/stat_lmm_2-wayssplitrepeated/">Fitting &#39;complex&#39; mixed models with &#39;nlme&#39;: Example #2</a></p>
+                            <p class="subtitle is-size-6 has-text-grey-light">
+                                Published at September 13, 2019 &middot;
+                                <i class="far fa-clock"></i>&nbsp;9 min read
+                            </p>
+                            <p>A repeated split-plot experiment with heteroscedastic errors Let’s imagine a field experiment, where different genotypes of khorasan wheat are to be compared under different nitrogen (N) fertilisation systems. Genotypes require bigger plots, with respect to fertilisation treatments and, therefore, the most convenient choice would be to lay-out the experiment as a split-plot, in a randomised complete block design. Genotypes would be randomly allocated to main plots, while fertilisation systems would be randomly allocated to sub-plots....</p>
+                        </div>
+                    </div>
+                </article>
+                <br>
 
             </div>
         </div>
