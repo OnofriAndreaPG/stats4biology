@@ -1,0 +1,183 @@
+---
+title: "Fitting 'complex' mixed models with 'nlme': Example #3"
+author: "Andrea Onofri"
+date: 2019-09-13
+slug: 'Mixed models'
+categories:
+  - R
+  - 'Mixed_models'
+tags:
+  - R
+  - 'Mixed_models'
+  - 'Split_plot'
+  - 'nonlinear_regression'
+archives:
+  - 2019
+---
+
+```{r setup, cache = F, echo = F}
+#Put at the beginning
+knitr::knit_hooks$set(document = function(x){ 
+  gsub("```\n*```r*\n*", "", x) 
+})
+```
+
+# Accounting for the experimental design in regression analyses
+
+In this post, I am not going to talk about real complex models. However, I am going to talk about models that are often overlooked by agronomists and biologists, while they may be necessary in several circumstances, especially with field experiments.
+
+The point is that field experiments are very often laid down in blocks, using split-plot designs, strip-plot designs or other types of designs with grouping factors (blocks, main-plots, sub-plots). We know that these grouping factors should be appropriately accounted for in data analyses: 'analyze them as you have randomized them' is a common saying attributed to Ronald Fisher. Indeed, observations in the same group are correlated, as they are more alike than observations in different groups. What happens if we neglect the grouping factors? We break the independence assumption and our inferences are invalid (Onofri et al., 2010).
+
+To my experience, field scientists are totally aware of this issue when they deal with ANOVA-type models (e.g., see Jensen et al., 2018). However, a brief survey of literature shows that there is not the same awareness, when we deal with linear/nonlinear regression models.
+
+Let's take a look at the 'yieldDensity.csv' dataset, that is available on gitHub. It represents an experiment where sunflower was tested with increasing weed densities (0, 14, 19, 28, 32, 38, 54, 82 plants per $m^2$), on a randomised complete block design, with 10 blocks. a swift plot shows that yield is linearly related to weed density, which calls for linear regression analysis.
+
+
+```{r}
+rm(list=ls())
+library(nlme)
+library(lattice)
+dataset <- read.csv("https://raw.githubusercontent.com/OnofriAndreaPG/agroBioData/master/yieldDensityB.csv",
+  header=T)
+dataset$block <- factor(dataset$block)
+head(dataset)
+plot(yield ~ density, data = dataset)
+```
+
+
+# Fitting linear models
+
+We might be tempted to neglect the block effect and run a linear regression analysis of yield against density. This is clearly wrong (I am violating the independence assumption) and inefficient, as any block-to-block variability goes into the residual error term, which is, therefore, inflated.
+
+Some of my collegues would take the means for densities and use those to fit a linear regression model (two-steps analysis). By doing so, block-to-block variability is cancelled out and the analysis becomes more efficient. However, such a solution is not general, as it is not feasible, e.g., when we have unbalanced designs and heteroscedastic data. With the appropriate approach, sound analyses can also be made in two-steps (Damesa et al., 2017). From my point of view, it is reasonable to search for more general solutions to deal with one-step analyses.
+
+Based on our experience with traditional ANOVA models, we might think of taking the block effect as fixed and fit it as and additive term. See the code below.
+
+```{r}
+mod.reg <- lm(yield ~ block + density, data=dataset)
+summary(mod.reg)
+```
+
+With regression, this solution is not convincing. Indeed, the above model assumes that the blocks produce an effect only on the intercept of the regression line, while the slope is unaffected. Is this a reasonable assumption? I vote no.
+
+Let's check this by fitting a different regression model per block (ten different slopes + ten different intercepts):
+
+
+```{r}
+mod.reg2 <- lm(yield ~ block/density + block, data=dataset)
+anova(mod.reg, mod.reg2)
+```
+
+The p-level confirms that the block had a significant effect both on the intercept and on the slope. To describe such an effect we need 20 parameters in the model, which is not very parsimonious. And above all: which regression line do we use for predictions? Taking the block effect as fixed is clearly sub-optimal with regression models.
+
+The question is: can we fit a simpler and clearer model? The answer is: yes. Why don't we take the block effect as random? This is perfectly reasonable. Let's do it.
+
+
+```{r}
+modMix.1 <- lme(yield ~ density, random = ~ density|block, data=dataset)
+summary(modMix.1)
+```
+
+The above fit shows that the random effects (slope and intercept) are sligthly correlated (r = 0.091). We might like to try a simpler model, where random effects are independent. To do so, we need to consider that the above model is equivalent to the following model:
+
+```
+modMix.1 <- lme(yield ~ density, random = list(block = pdSymm(~density)), data=dataset)
+```
+
+It's just two different ways to code the very same model. However, this latter coding, based on a 'pdMat' structure, can be easily modified to remove the correlation. Indeed, 'pdSymm' specifies a totally unstructured variance-covariance matrix for random effects and it can be replaced by 'pdDiag', which specifies a diagonal matrix, where covariances (off-diagonal terms) are constrained to 0. The coding is as follows:
+
+
+```{r}
+modMix.2 <- lme(yield ~ density, random = list(block = pdDiag(~density)), data=dataset)
+summary(modMix.2)
+anova(modMix.1, modMix.2)
+```
+
+The model could be further simplified. For example, the code below shows how we could fit models with either random intercept or random slope.
+
+```{r}
+#Model with only random intercept
+modMix.3 <- lme(yield ~ density, random = list(block = ~1), data=dataset)
+
+#Alternative
+#random = ~ 1|block
+
+#Model with only random slope
+modMix.4 <- lme(yield ~ density, random = list(block = ~ density - 1), data=dataset)
+
+#Alternative
+#random = ~density - 1 | block
+```
+
+# What if the relationship is nonlinear?
+
+The problem may become trickier if we have a nonlinear relationship. Let's have a look at another similar dataset ('YieldLossB.csv'), that is also available on gitHub. It represents another experiment where  sunflower was grown with the same increasing densities of another weed (0, 14, 19, 28, 32, 38, 54, 82 plants per $m^2$), on a randomised complete block design, with 8 blocks. In this case, the yield loss was recorded and analysed.
+  
+
+```{r}
+rm(list=ls())
+dataset <- read.csv("https://raw.githubusercontent.com/OnofriAndreaPG/agroBioData/master/YieldLossB.csv",
+  header=T)
+dataset$block <- factor(dataset$block)
+head(dataset)
+plot(yieldLoss ~ density, data = dataset)
+```
+
+A swift plot shows that the relationship between density and yield loss is not linear. Literature references (Cousens, 1985) show that this could be modelled by using a rectangular hyperbola:
+
+$$YL = \frac{i \, D}{1 + \frac{i \, D}{a}}$$
+
+where $YL$ is the yield loss, $D$ is weed density, $i$ is the slope at the origin of axes and $a$ is the maximum asymptotic yield loss. This function, together with self-starters, is available in the 'NLS.YL()' function in the 'aomisc' package, which is the accompanying package for this blog. If you do not have this package, please refer to [this link](https://www.statforbiology.com/rpackages/) to download it.
+
+The problem is the very same as above: the block effect may produce random fluctuations for both model parameters. The only difference is that we need to use the 'nlme()' function instead of 'lme()'. With nonlinear mixed models, I strongly suggest you use a 'groupedData' object, which permits to avoid several problems. The second line below shows how to turn a data frame into a 'groupedData' object.
+ 
+
+```{r}
+library(aomisc)
+datasetG <- groupedData(yieldLoss ~ 1|block, dataset)
+nlin.mix <- nlme(yieldLoss ~ NLS.YL(density, i, A), data=datasetG, 
+						fixed = list(i ~ 1, A ~ 1),
+            random = i + A ~ 1|block)
+summary(nlin.mix)
+```
+
+Similarly to linear mixed models, the above coding implies correlated random effects (r = 0.194). Alternatively, the above model can be coded by using a 'pdMat construct, as follows:
+
+
+```{r}
+nlin.mix2 <- nlme(yieldLoss ~ NLS.YL(density, i, A), data=datasetG, 
+						      fixed = list(i ~ 1, A ~ 1),
+                  random = pdSymm(list(i ~ 1, A ~ 1)))
+summary(nlin.mix2)
+```
+
+Now we can try to simplify the model, for example by excluding the correlation between random effects.
+
+```{r}
+nlin.mix3 <- nlme(yieldLoss ~ NLS.YL(density, i, A), data=datasetG, 
+						      fixed = list(i ~ 1, A ~ 1),
+                  random = pdDiag(list(i ~ 1, A ~ 1)))
+summary(nlin.mix3)
+```
+
+
+With a little fantasy, we can easily code several alternative models to represent alternative hypotheses about the observed data. Obviously, the very same method can be used (and SHOULD be used) to account for other grouping factors, such as main-plots in split-plot designs or plots in repeated measure designs.
+
+Happy coding!
+
+
+Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences   
+University of Perugia (Italy)    
+Borgo XX Giugno 74    
+I-06121 - PERUGIA    
+
+
+# References
+
+1. Cousens, R., 1985. A simple model relating yield loss to weed density. Annals of Applied Biology 107, 239–252. https://doi.org/10.1111/j.1744-7348.1985.tb01567.x
+2. Jensen, S.M., Schaarschmidt, F., Onofri, A., Ritz, C., 2018. Experimental design matters for statistical analysis: how to handle blocking: Experimental design matters for statistical analysis. Pest Management Science 74, 523–534. https://doi.org/10.1002/ps.4773
+3. Onofri, A., Carbonell, E.A., Piepho, H.-P., Mortimer, A.M., Cousens, R.D., 2010. Current statistical issues in Weed Research. Weed Research 50, 5–24.
+
+
+
