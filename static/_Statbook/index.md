@@ -1,7 +1,7 @@
 ---
 title: "Metodologia statistica per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: 2019-10-12"
+date: "Update: v. 0.51, compil. 2019-10-14"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -323,11 +323,9 @@ Il raggruppamento delle unità sperimentali può tener conto di:
 3. vicinanza temporale
 4. gestione dei compiti (tecnico, valutatore, giudice ...)
 
-Chiaramente, randomizzare all'interno del gruppo invece che randomizzare completamente crea un vincolo. A volte i vincoli sono più di uno. Vediamo un esempio. Una certa operazione industriale richiede un solo operatore per essere portata a termine, ma può essere eseguita in quattro modi diversi. Pianificate un esperimento per stabilire qual è il metodo più veloce, avendo a disposizione solo quattro operatori.
+A volte si possono anche avere situazioni in cui abbiamo soggetti raggruppati per due caratteristiche o più; ad esempio potremmo avere quattro classi di età e quattro di peso: ogni trattamento deve essere applicato ad ogni combinazione pesò ed età (eta1 + peso1, età2 + peso2, età3 + peso3 ed età4 + peso4). In questo modo riusciamo a diminuire ulteriormente la variabilità non spiegata e, pertanto, ad aumentare la precisione dell'esperimento.
 
-L'unità sperimentale è il lavoratore. I metodi sono quattro e, volendo lavorare con quattro repliche, avremmo bisogno di sedici operatori per disegnare un esperimento completamente randomizzato. Possiamo tuttavia considerare che un operatore, in quattro turni successivi, può operare con tutti e quattro i metodi. Quindi possiamo disegnare un esperimento in cui il turno fa da unità sperimentale e l'operatore fa da blocco (blocchi randomizzati). Tuttavia, in ogni blocco (operatore) vi è un gradiente, nel senso che i turni successivi al primo sono via via meno efficienti, perché l'operatore accumula stanchezza. Per tener conto di questo potremmo allora introdurre un vincolo ulteriore, per ogni operatore, randomizzando i quattro metodi tra i turni, in modo che ogni metodo, in operatori diversi, capiti in tutti i turni. In sostanza, l'operatore fa da blocco, perché in esso sono contenuti tutti i metodi. Ma anche il turno (per tutti gli operatori) fa da blocco, in quanto in esso sono ancora contenuti tutti i metodi. Se non vi è chiaro, ci torneremo sopra più tardi.
-
-Posto che non si deve violare l'indipendenza delle repliche, l'inclusione di vincoli alla randomizzazione è consentita, **ma questa deve sempre essere tenuta presente in fase di analisi dei dati**.
+Chiaramente, randomizzare all'interno del gruppo invece che randomizzare completamente crea un vincolo. Posto che non si deve violare l'indipendenza delle repliche, l'inclusione di vincoli alla randomizzazione è consentita, **ma questa deve sempre essere tenuta presente in fase di analisi dei dati**.
 
 Ronald Fisher diceva "*Analyse them as you have randomised them*". Meglio seguire il consiglio.
 
@@ -438,13 +436,12 @@ Disegnare un esperimento valido è un'arte e richiede profonda attenzione; i pri
 Qualunque sia l'ambito scientifico, nella progettazione di un esperimento possiamo individuare alcune fasi fondamentali, che proviamo ad elencare:
 
 1. individuazione del background (ricerca bibliografica)
-2. definizione dell'ipotesi scientifica;
-2. definizione dell'obiettivo;
+2. definizione dell'ipotesi scientifica e dell'obiettivo;
 3. identificazione dei fattore/i sperimentale/i;
-4. identificazione dei soggetti sperimentali  e delle repliche;
+4. identificazione dei soggetti sperimentali e delle repliche;
 5. identificazione delle variabili da rilevare;
-6. allocazione randomizzata dei trattamenti (mappa dell'esperimento);
-7. esecuzione dell'esperimento.
+6. allocazione dei trattamenti;
+7. impianto dell'esperimento.
 
 Nell'analizzare questi aspetti, faremo riferimento ad alcuni esempi pratici, che verranno presentati tra poco.
 
@@ -461,55 +458,12 @@ Trascurando la parte di ricerca bibliografica, che è pur fondamentale, nel meto
 
 Il rischio che si corre con obiettivi mal posti è quello di eseguire una ricerca dispersiva, con raccolta di dati non necessari e/o mancanza di dati fondamentali, con costi più elevati del necessario e un uso poco efficiente delle risorse. In genere, prima si definisce un obiettivo generale, seguito da uno o più obiettivi specifici, in genere proiettati su un più breve spazio temporale e che possono essere visti anche come le fasi necessarie per raggiungere l'obiettivo generale.
 
-## Casi di studio - 1
-
-Per meglio comprendere la situazione, poniamo cinque esempi pratici.
-
-### Esempio 1 - Diserbo chimico
-
-Si suppone che gli erbicidi A, B e C siano più efficaci di D, E ed F verso *Solanum nigrum*, una comune pianta infestante delle colture di pomodoro. L'obiettivo generale della ricerca sarà quello di trovare un'efficace soluzione per l'eliminazione di *Solanum nigrum* dal pomodoro. Gli obiettivi specifici saranno:
-
-1. valutare l'efficacia erbicida di A, B e C, confrontandola con quella di D, E ed F
-2. valutare la selettività degli anzidetti erbicidi verso il pomodoro
-
-### Esempio 2 - Valutazione varietale
-
-L'ipotesi è che le varietà di girasole A, B e C non abbiano la stessa base genetica e quindi non siano tutte ugualmente produttive. L'obiettivo generale è quello di capire quale tra A, B e C sia più adatta alle condizioni pedoclimatiche della collina Umbra.
-
-Gli obiettivi specifici sono quelli di valutare:
-
-1. produttività di A, B e C
-2. stabilità produttiva di A, B e C
-
-### Esempio 3 - Diserbo parziale
-
-Nella barbabietola da zucchero, il diserbo localizzato lungo la fila consente di diminuire l'impiego di erbicidi. Tuttavia, se la coltura precedente ha prodotto semi e se non abbiamo effettuato una lavorazione profonda per interrarli, la coltura sarà più infestata e quindi sarà più difficile ottenere una buona produttività con il diserbo parziale.
-
-Su questa ipotesi costruiamo un esperimento volto a valutare l'interazione tra lavorazione del terreno e diserbo chimico. Per raggiungere questo obiettivo generale, proveremo a valutare se:
-
-1. il diserbo parziale consente di ottenere produzioni comparabili a quelle del diserbo totale
-2. l'effetto erbicida è indipendente dalla lavorazione prescelta
-
-### Esempio 4 - Colture poliennali
-
-L'ipotesi scientifica è affine a quella dell'esempio 2, ma, in questo caso, vogliamo porre a confronto tre varietà di erba medica (A, B e C). La differenza sta nel fatto che l'erba medica è una coltura poliennale e quindi vogliamo capire se il giudizio di merito è indipendente dall'anno di coltivazione.
-
-I nostri obiettivi specifici saranno quindi:
-
-1. valutare la produttività media delle varietà in prova
-2. valutare le oscillazione nei quattro anni di durata del cotico erboso
-
-### Esempio 5 - Inquinamento da micotossine
-
-Secondo le notizie in bibliografia, i datteri confezionati in vendita nei supermercati contengono elevate quantità di micotossine. L'obiettivo generale è quello di verificare il livello di infestazione e vedere se questo cambia con il metodo di confezionamento.
-
-
 ## Identificazione dei fattori sperimentali
 
 Dopo aver definito l'obiettivo di un esperimento, è necessario chiarire esattamente gli stimoli a cui saranno sottoposte le unità sperimentali. Uno 'stimolo' sperimentale prende il nome di **fattore sperimentale**, che può avere più **livelli**. I livelli del fattore sperimentale prendono il nome di **trattamenti (o tesi) sperimentali**.
 
 
-## Esperimenti (multi)fattoriali
+### Esperimenti (multi)fattoriali
 
 In alcuni casi è necessario inserire in prova più di un fattore sperimentale. In questo caso si parla di esperimenti **fattoriali**, che possono essere **incrociati (crossed)** quando sono presenti in prova tutte le possibili combinazioni dei livelli di ogni fattore, oppure di esperimenti **innestati (nested)** quando i livelli di un fattore cambiano al cambiare dei livelli dell'altro.
 
@@ -518,7 +472,7 @@ Ad esempio:
 1. Immaginiamo di voler studiare due fattori sperimentali: la varietà di girasole (tre livelli: A, B e C) e la concimazione (2 livelli: pollino e urea). Abbiamo quindi 6 possibili trattamenti (combinazioni): A-pollina, A-urea, B-pollina, B-urea, C-pollina e C-urea. Il disegno è completamente incrociato.
 2. Immaginiamo di voler confrontare due specie in agricoltura biologica (orzo e triticale), con tre varietà ciascuna (A, B e C per orzo, D, E e F per triticale). Anche in questo caso abbiamo sei trattamenti: orzo-A, orzo-B, orzo-C, triticale-D, triticale-E e triticale-F, ma il disegno è innestato, perché per il fattore sperimentale 'varietà' i livelli cambiano a seconda dei livelli del fattore 'specie'.
 
-## Aggiungere un controllo?
+### Aggiungere un controllo?
 
 In alcuni casi si pone il problema di inserire in prova un trattamento che funga da riferimento per tutti gli altri. In questi casi si parla comunemente di **controllo** o **testimone**, che può essere
 
@@ -526,84 +480,108 @@ In alcuni casi si pone il problema di inserire in prova un trattamento che funga
 2. trattato con placebo
 3. trattato secondo le modalità usuali di riferimento
 
-## Fattori sperimentali di trattamento e di blocco
+Ad esempio, è usuale includere in un confronto varietale, la varietà di riferimento, che ci consente di capire se le prestazione delle nuove varietà sono effettivamente interessanti oppure no.
+
+Per quello che riguarda invece gli studi tossicologici, è evidente l'importanza di includere un controllo non trattato. Il placebo è una preparazione che contiene tutti gli ingredienti della formulazione attiva, meno che il principio attivo. Il placebo si rende necessario in una serie di circostanze, ad esempio:
+
+1. quando il soggetto è influenzabile e può reagire alla semplice idea di essere stato trattato (effetto placebo)
+2. quando i co-formulanti o la soluzione impiegata per veicolare il principio attivo possono mostrare un effetto sul soggetto
+
+### Fattori sperimentali di trattamento e di blocco
 
 Finora abbiamo menzionato quelli che, in lingua inglese, vengono definiti *treatment factor* (trattamenti sperimentali). Tuttavia, possono esserci altri fattori sperimentali non allocati, ma 'innati' e legati alla collocazione spazio-temporale o alle caratteristiche dei soggetti. Questi fattori vengono definiti, sempre in inglese, *blocking factors*. Di questi fanno parte, ad esempio, il blocco, la località ed ogni altro elemento che permette di raggruppare i soggetti. Anche questi *blocking factors* devono essere chiaramente identificati ed elencati.
 
-Su questa base identifichiamo i fattori sperimentali negli esempi precedenti.
+## Identificazione delle unità sperimentali
 
-## Casi di studio - 2
+### Cornice di campionamento
 
-### Esempio 1
+Prima di iniziare un esperimento, deve essere chiaro qual è la popolazione di riferimento (cornice di campionamento). Ad esempio, se vogliamo determinare la produttività delle varietà di tabacco e la loro adattabilità alle condizioni umbre, la cornice di campionamento sarà la media e alta valle del Tevere. Se invece vogliamo individuare la risposta di bovini adulti ad un certo tipo di alimentazione, dovremo campionare soggetti di entrambi i sessi, diverse età (ma comunque adulti) e in buone condizioni di salute. Insomma, la cornice di campionamento deve essere composta da soggetti che presentano tutte le caratteristiche richieste dall'obiettivo dell'esperimento.
 
-Il fattore sperimentale oggetto di studio sarà il diserbo del pomodoro, con 5 livelli inseriti in prova (6 trattamenti sperimentali): A, B, C, D, E ed F. Inoltre, si ritiene opportuno inserire in prova un testimone non trattato (NT), che ci permetterà di quantificare la percentuale di malerbe controllate. Inoltre, sarà anche necessario inserire in prova un testimone scerbato  manualmente (ST), che ci permetterà di quantificare eventuali perdite produttive dovute alla competizione residua o alla fitotossicità del trattamento. In totale, avremo quindi 8 tesi sperimentali. Come usuale in pieno campo, l'esperimento verrà disegnato a blocchi randomizzati e sarà pertanto necessario inserire un fattore di blocco.
+La scelta della cornice di campionamento è fondamentale, perché è ad essa che si riferiscono i risultati ottenuti; ad esempio, se la cornice di campionamento è la media valle del Tevere, i risultati ottenuti non potranno essere rappresentativi della Pianura Padana oppure del Tavoliere delle Puglie.
 
-### Esempio 2
+### Scelta delle unità sperimentali
 
-Il fattore sperimentale in studio sarà la varietà di girasole con 3 livelli inclusi in prova (varietà A, B e C). Come testimone, inseriremo la varietà di riferimento per la zona (D). Dato che eseguiremo questa prova su un terreno nel quale vi sono due chiari gradienti di fertilità, disegneremo l'esperimento considerando due fattori di blocco: trasversale e longitudinale (spiego meglio tra poco...). Poiché dobbiamo valutare la stabilità produttiva, dovremo ripetere l'esperimento più volte (es. in tre anni diversi) e quindi avremo un secondo fattore sperimentale, incrociato con il primo.
+All'interno della cornice di campionamento, adottando criteri rigorosi, andremo a scegliere i soggetti da includere in prova. I soggetti dovranno essere rappresentativi della cornice di campionamento, ma, per il resto, il più possibile omogenei, per minimizzare le fluttuazioni casuali di rispsposta.
 
-### Esempio 3
+Per quanto riguarda la sperimentazione di pieno campo, l'omogeneità dell'ambiente è fondamentale per aumentare la precisione dell'esperimento, cosa che si consegue, innanzitutto, con la scelta dell'appezzamento giusto. Questa scelta è particolarmente delicata ed è guidata soprattutto dall'esperienza, tenendo conto anche di aspetti come la facilità di accesso e la vicinanza di strutture (laboratori, capannoni...), che consentano un'accurata esecuzione degli eventuali prelievi. Oltre a scegliere correttamente l'appezzamento, è importante anche porre in atto alcune operazioni che consentano di incrementare ulteriormente l'omogenità dell'appezzamento prescelto. Ad esempio, talvolta si usa far precedere la prova da una coltura di 'omogeneizzazione', ad esempio avena, che è molto avida di azoto e lascia nel terreno poca fertilità residua. Oppure un prato di erba medica, che, grazie agli sfalci periodici, lascia il terreno libero da piante infestanti.
 
-In questo caso avremo due fattori sperimentali incrociati: il diserbo, con due livelli (totale o parziale, localizzato sulla fila) e la lavorazione, con tre livelli (aratura profonda, aratura superficiale e *minimum tillage*). Non vi è la necessità di un testimone, ma avremo la necessità di un fattore di blocco. In totale, avremo sei tesi sperimentali.
+### Unità sperimentali in campo: le parcelle
 
-### Esempio 4
+Solitamente, nella ricerca biologica, le unità sperimentali sono chiaramente definite: un animale, una persona, un insetto, un'aliquota di terreno. In genere, qualunque esse siano, debbono essere chiaramente identificate prima di procedere all'allocazione dei trattamenti.
 
-Il fattore sperimentale in studio sarà la varietà di erba medica con 3 livelli inclusi in prova (varietà A, B e C) ai quali aggiungiamo il riferimento di zona (D) come testimone. Come nel caso del girasole, dovremo valutare la stabilità produttiva negli anni, ma, dato che abbiamo una coltura poliennale, non avremo bisogno di ripetere la prova, ma potremo ripetere le osservazioni per quattro anni sulla stessa prova.
+Nella sperimentazione di pieno campo, le unità sperimentali sono costituite dalle cosiddette 'parcelle', che, alemno inizialmente, non sono chiaramente identificate. La loro identificazione, dopo aver selezionato l'appezzamento giusto e averlo reso più uniforme possibile, viene usualmente eseguita su carta, redigendo la **mappa dell'esperimento**.
 
-### Esempio 5
-
-Per questo esperimento vengono considerate tre diverse modalità di confezionamento (carta, busta di plastica, scatola di plastica perforata). Non vi è necessità di un testimone, ma, dato che le diverse confezioni verranno acquistate in diversi supermercati e dato che sospettiamo differenze nella conservazione tra un supermercato e l'altro, utilizzeremo il supermercato come fattore di raggruppamento.
-
-
-## Identificazione delle unità sperimentali e delle repliche
-
-### Cornice di campionamento e numero di repliche
-
-Per i primi quattro esempi verranno eseguite prove di pieno campo, nella Media Valle del Tevere, che rappresenta la cornice di campionamento adeguata per l'obiettivo previsto. Sappiamo di dover selezionare appezzamenti di terreno
-
-1. rappresentativi della Media Valle del Tevere,
-2. omogenei.
-
-L'omogeneità dell'ambiente è fondamentale per aumentare la precisione dell'esperimento. La scelta dell'appezzamento è chiaramente fondamentale ed è guidata dall'esperienza, tenendo conto anche di aspetti come la facilità di accesso e la vicinanza di strutture (laboratori, capannoni...) che consentano un'accurata esecuzione degli eventuali prelievi.
-
-Oltre alla scelta dell'appezzamento, si possono anche utilizzare alcune strategie per favorire una buona omogeneità delle parcelle. Spesso si usa far precedere la prova da una coltura di 'omogeneizzazione', ad esempio avena, che è molto avida di azoto e lascia nel terreno poca fertilità residua. Oppure un prato di erba medica, che, grazie agli sfalci periodici, lascia il terreno libero da piante infestanti.
-
-Trattandosi di esperimenti di campo, il numero di repliche sarà quattro, per ogni trattamento e l'unità sperimentale sarà una parcella, della quale dovremo valutare forma e dimensioni.
-
-Per il quinto esempio, la cornice di campionamento sarà data dal territorio del comune di Perugia. L'unità sperimentale sarà la confezione e la scelta del numero di repliche dovrà essere compatibile con la capacità di analisi per la determinazione dell'inquinamento da micotossine. E' ragionevole pensare che 30 repliche (90 confezioni totali) possano essere adeguate per rappresentatività e facilità di gestione.
-
-### Campionamento delle unità sperimentali
-
-Per le quattro prove di pieno campo, una volta scelto l'appezzamento, dovremo campionare le parcelle di terreno. Questa operazione viene usualmente eseguita su carta, redigendo la **mappa dell'esperimento**. In primo luogo, si decide la **dimensione e la forma della parcella**.
-
-L'aspetto fondamentale è che ogni parcella deve contenere un numero di piante sufficientemente alto da essere rappresentativo. Per questo motivo le colture a bassa fittezza hanno sempre bisogno di parcelle più grandi che non quelle ad alta fittezza. La dimensione non deve tuttavia eccedere una certa soglia, in quanto con essa aumenta anche la variabilità del terreno e, di conseguenza, diminuisce l'omogeneità dell'esperimento. Per questo motivo, talvolta si preferisce diminuire la dimensione delle parcelle ed, avendo lo spazio sufficiente, aumentare il numero delle repliche.
+In primo luogo, si decide la **dimensione e la forma della parcella**. L'aspetto fondamentale è che ogni parcella deve contenere un numero di piante sufficientemente alto da essere rappresentativo. Per questo motivo le colture a bassa fittezza (es. mais) hanno sempre bisogno di parcelle più grandi che non quelle ad alta fittezza (es. frumento). La dimensione non deve tuttavia eccedere una certa soglia, in quanto con essa aumenta anche la variabilità del terreno e, di conseguenza, diminuisce l'omogeneità dell'esperimento. Per questo motivo, talvolta si preferisce diminuire la dimensione delle parcelle ed, avendo lo spazio sufficiente, aumentare il numero delle repliche.
 
 Nello stabilire la dimensione delle parcelle, dovremo tener conto del fatto che la parte più delicata è il bordo, in quanto le piante che si trovano lungo il bordo esterno risentono di condizioni diverse dalle altre piante situate al centro della parcella (**effetto bordo**). Questo determina variabilità all'interno della parcella, che possiamo minimizzare raccogliendo solo la parte centrale. Si viene così a distinguere la superficie totale della parcella dalla superficie di raccolta (**superficie utile**), che può essere anche molto minore di quella totale.
 
-In generale si ritiene che le colture ad elevata fittezza (frumento, cereali, erba medica...) dovrebbero avere parcelle di almeno 10-20 m$^2$, mentre a bassa fittezza (mis, girasole...) dovrebbero avere parcelle di almeno 20-40 m$^2$. Queste dimensioni sono riferite alla superficie utile di raccolta, non alla dimensione totale.
+Tenendo conto degli aspetti detti in precedenza, ritieniamo che le colture ad elevata fittezza (frumento, cereali, erba medica...) dovrebbero avere parcelle di almeno 10-20 m^2^, mentre a bassa fittezza (mais, girasole...) dovrebbero avere parcelle di almeno 20-40 m^2^. Queste dimensioni sono riferite alla superficie utile di raccolta, non alla dimensione totale: se si ritiene di dover raccogliere solo una parte della parcella per limitare l'effetto bordo, allora le dimensioni totali dovranno essere opportunamente aumentate, rispetto a quanto indicato sopra.
 
 Per quanto riguarda la forma, le parcelle quadrate minimizzano l'effetto bordo, perché, a parità di superficie, hanno un perimetro più basso. Tuttavia esse sono di più difficile gestione, in quanto, considerando il fronte di lavoro di una seminatrice o una mietitrebbiatrice parcellare, possono richiedere la semina o la raccolta in più passate, il che finisce per essere una fonte di errore. Per questo motivo le parcelle sono usualmente rettangolari, con una larghezza pari a quella della macchina impiegata per la semina.
 
-Di conseguenza, per i quattro esempi in studio potremmo utilizzare una dimensione delle parcelle di 20 m$^2$ per l'erba medica (2 m di larghezza per 10 m di lunghezza) e di 22.5 m$^2$ per pomodoro, mais e barbabietola da zucchero (2.25 m di larghezza per 10 metri di lunghezza).
+Dopo aver stabilito la forma e la dimensione delle parcelle, si può procedere alla redazione della mappa, tenendo conto che il numero delle parcelle risulta dal prodotto tra il numero delle tesi sperimentali e il numero delle repliche.  
 
-A questo punto possiamo redigere la mappa per il primo esempio. Dato che il campo di prova è largo 30 metri e lungo 400 metri, potremmo immaginare di disegnare otto file di parcelle in senso trasversale (8 x 2.25 m = 18 m), di modo che l'esperimento non sia troppo lungo (il che ne aumenterebbe la variabilità), ma rimanga spazio sufficiente ai lati, per evitare di avvicinarsi troppo alle scoline, dove possono manifestarsi ristagni idrici.
+In genere, si cerca di fare in modo che l'esperimento no sia troppo lungo (il che potrebbe aumenterebbe la variabilità), ma neanche troppo largo, per evitare di avvicinarsi troppo alle scoline, dove possono manifestarsi ristagni idrici. Lungo il contorno della prova è possibile sistemare altre parcelle fuori esperimento con funzione di 'bordi'. In questo modo si evita che i bordi esterni delle parcelle esterne siano esposti a condizioni molto diverse dagli altri, cosa che potrebbe accentuare l'effetto 'bordo', di cui abbiamo parlato in precedenza. Queste parcelle di bordo verranno trattate in modo ordinario (semina e diserbo tradizionale del pomodoro).
 
-La mappa dell'esperimento è un elemento fondamentale e deve riportare tutte le informazioni relative al disegno sperimentale. E' anche importante indicare la direzione del Nord, in modo da facilitare l'orientamento della mappa stessa. Notare inoltre che, intorno alla prova, abbiamo sistemato altre parcelle fuori esperimento con funzione di 'bordi'. In questo modo si evita che i bordi esterni delle parcelle esterne siano esposti a condizioni molto diverse dagli altri, cosa che potrebbe accentuare l'effetto 'bordo', di cui abbiamo parlato in precedenza. Queste parcelle di bordo verranno trattate in modo ordinario (semina e diserbo tradizionale del pomodoro).
-
-<div class="figure" style="text-align: center">
-<img src="_images/Mappa1.png" alt="Mappa dell'esperimento relativo all esempio 1" width="90%" />
-<p class="caption">(\#fig:figName31)Mappa dell'esperimento relativo all esempio 1</p>
-</div>
-
-
-Per l'esperimento relativo all'esempio 5, l'unità sperimentale è una singola confezione di datteri, con le tipologie previste dal piano.
+La figura \@ref(fig:figName31) riporta la mappa di un esperimento sistemato su un appezzamento largo 30 metri e lungo 400 metri. In questo caso abbiamo disegnato otto file di parcelle in senso trasversale (8 x 2.25 m = 18 m di larghezza), e quattro parcelle in senso longitudinale. Vediamo in figura che la mappa riporta tutte le informazioni relative al disegno sperimentale, inclusa del Nord, in modo da facilitare l'orientamento della mappa stessa. Un altro fondamentale aspetto è che le parcelle sono tutte chiaramente identificate con un numero.
 
 <div class="figure" style="text-align: center">
-<img src="_images/Datteri.png" alt="Tipologie delle confezioni di datteri" width="90%" />
-<p class="caption">(\#fig:figName32)Tipologie delle confezioni di datteri</p>
+<img src="_images/Mappa1.png" alt="Mappa di campo di un esperimento con 32 parcelle" width="90%" />
+<p class="caption">(\#fig:figName31)Mappa di campo di un esperimento con 32 parcelle</p>
 </div>
 
-Siccome è abbastanza scomodo campionare confezioni di datteri casualmente all'interno del Comune di Perugia, si preferisce un campionamento 'stratificato', selezionando 10 supermercati rappresentativi, nelle zone più densamente popolate della città. All'interno di ogni supermercato, si selezioneranno casualmente tre repliche per ogni tipo di confezione.
+## Allocazione dei trattamenti e disegno sperimentale
+
+Il problema dell'allocazione dei trattamenti non si pone con gli esperimenti osservazionali, in quanto con questi si scelgono unità sperimentali già 'naturalmente' trattate.
+
+Per tutti gli esperimenti disegnati si pone invece il problema di scegliere quali soggetti trattare e con cosa. A seconda di quali vincoli introduciamo nella selezioni dei soggetti possiamo avere diversi schemi sperimentali. Quelli che descriviamo di seguito, sono quelli più comunemente usati nella sperimentazione di pieno campo [@leclerg1962_FieldPlotTechnique], ma, con le opportune modifiche, possono trovare impiego anche in molte altre discipline scientifiche.
+
+
+### Disegni completamente randomizzati
+
+Per queste prove, le più semplici, la seclta dei soggetti da trattare è totalmente casuale, senza vincoli di sorta. Il vantaggio principale è la semplicità; lo svantaggio sta nel fatto che tutte le eventuali differenze e disomogeneità tra unità sperimentali restano non riconosciute ed entrano nella definizione dell'errore sperimentale. Per questo, i disegno completamente randomizzati sono utilizzato soprattutto per le situazioni di buona uniformità ambientale e tra i soggetti.
+
+Come eempio mostriamo un disegno completamente randomizzato utilizzando le parcelle della figura \@ref(fig:figName31), dove abbiamo allocato 8 trattamenti) identificati con le lettere da A ad H) con quattro repliche. Come si può notare, l'allocazione è completamente casuale (figura \@ref(fig:figName33))
+
+<div class="figure" style="text-align: center">
+<img src="_images/Mappa1CRD.png" alt="Esempio di uno schema sperimentale a randomizzazione completa" width="90%" />
+<p class="caption">(\#fig:figName33)Esempio di uno schema sperimentale a randomizzazione completa</p>
+</div>
+
+### Disegni a blocchi randomizzati
+
+Quando le unità sperimentali non sono totalmenete omogenee, ma vi è una certa variabilità per una qualche caratteristiche rilevante, potremo dividere i soggetti in base a questa caratteristica, in tanti gruppi quante sono le repliche.
+
+Ad esempio, nel caso dello schema in figura \@ref(fig:figName31), è lecito aspettarsi un gradiente trasversale, dato che il campo sarà certamente meno fertile vicino alle scoline. Per questo motivo, dato che abbiamo scelto di fare quattro repliche, divideremo l'appezzamento in quattro blocchi perpendicolari al gradiente di fertilità. Ad esempio il blocco 1 conterrà le parcelle 1, 9, 17, 25, 2, 10, 18 e 26, cioè le prime due colonne della mappa, con un numero di parcelle esattamente uguali al numero delle tesi. Il blocco 2 conterrà le colonne 3 e 4 e così via. Dato che il gradiente è trasversale, le parcelle di un stesso blocco saranno più omogenee che non parcelle su blocchi diversi. Dopo aver diviso la mappa in quattro blocchi di otto parcelle, possiamo allocare gli otto trattamenti a random all'interno di ogni blocco (\@ref(fig:figName34))
+
+<div class="figure" style="text-align: center">
+<img src="_images/Mappa1CRBD.png" alt="Esempio di uno schema sperimentale a blocchi randomizzati" width="90%" />
+<p class="caption">(\#fig:figName34)Esempio di uno schema sperimentale a blocchi randomizzati</p>
+</div>
+
+Un disegno a blocchi randomizzati non è solo tipico della sperimentazione di campo. Ad esempio, volendo determinare la contaminazione da micotossine nelle confezioni di datteri, a seconda della modalità di confezionamento (es. carta, busta di plastica, scatola di plastica perforata), si può sospettare che il supermercato nel quale le confezioni vengono vendute potrebbe avere un certo effetto, legato alle modalità di conservazione. Per cui, invece che prelevare trenta confezioni (dieci per metodo) a caso nei supermercati di Perugia, scegliamo dieci supermercati e in ognuno, prendiamo una confezione per tipo. In questo caso, il supermercato fa da blocco.
+
+In generale, potremmo immaginare un esperimento con trattamenti che vengono allocati a caso agli animali di una stalla e ripetuti su stalle diverse, o a soggetti in guppi omogenei di età e così via.
+
+Il vantaggio del disegno a blocchi randomizzati sta nel fatto che le differenze tra gruppi sono spiegabili attraverso l'appartenenza ad un determinato gruppo e possono quindi essere scorporate dal calcolo dell'errore sperimentale.
+
+### Disegni a quadrato latino
+
+In questo caso, le unità sperimentali presentano due 'gradienti', cioè vi sono differenze legate a due elementi importanti, oltre al trattamento sperimentale. Vediamo un esempio.
+
+Una certo oggetto richiede un solo operatore per essere costruito, ma l'operazione può essere eseguita in quattro modi diversi. Vogliamo capire qual è il modo più veloce e, pertanto, pianifichiamo un esperimento. L'unità sperimentale è il lavoratore. I metodi sono quattro e, volendo lavorare con quattro repliche, avremmo bisogno di sedici operatori per disegnare un esperimento completamente randomizzato. Possiamo tuttavia considerare che un operatore, in quattro turni successivi, può operare con tutti e quattro i metodi. Quindi possiamo disegnare un esperimento in cui il turno fa da unità sperimentale e l'operatore fa da blocco (esperimento a blocchi randomizzati).
+
+Tuttavia, in ogni blocco (operatore) vi è un gradiente, nel senso che i turni successivi al primo sono via via meno efficienti, perché l'operatore accumula stanchezza. Per tener conto di questo potremmo lasciare all'operatore un congruo periodo di tempo tra un turno e l'altro. Oppure, potremmo introdurre un vincolo ulteriore, per ogni operatore, randomizzando i quattro metodi tra i turni, in modo che ogni metodo, in operatori diversi, capiti in tutti i turni. In sostanza, l'operatore fa da blocco, perché in esso sono contenuti tutti i metodi. Ma anche il turno (per tutti gli operatori) fa da blocco, in quanto in esso sono ancora contenuti tutti i metodi. Proviamo a schematizzare, nella figura seguente (\@ref(fig:figName391) ).
+
+<div class="figure" style="text-align: center">
+<img src="_images/TurniOperatori.png" alt="Allocazione di quattro metodi di lavoro (A, B, C e D), tra quattro operatori, in quattro turni, seguendo uno schema a quadrato latino" width="90%" />
+<p class="caption">(\#fig:figName391)Allocazione di quattro metodi di lavoro (A, B, C e D), tra quattro operatori, in quattro turni, seguendo uno schema a quadrato latino</p>
+</div>
+
+Questo schema prende il nome di quadrato latino, in quanto il numero delle repliche è uguale al numero dei trattamenti e, schematizzando lo schema su una mappa, otteniamo una griglia quadrata, nella quale ogni trattamento occupa tutte le righe e tutte le colonne. Chi lo conosce, riconosce in questo schema i principi di fondo del Sudoku.
+
+Questo disegno è utile, perché possiamo dar conto sia delle differenza tra righe (turni), che delle differenze tra colonne (operatori), in modo da ridurre al minimo possibile la variabilità inspiegata. Lo svantaggio sta nel fatto che, dovendo avere tante repliche quanti sono i trattamenti, è utilizzabile solo per esperimenti abbastanza piccoli.
+
 
 ## Scelta delle variabili da rilevare
 
@@ -662,290 +640,6 @@ Quando si pianificano i rilievi da eseguire, oppure anche nel corso dell'esecuzi
 Ad esempio, immaginiamo di voler valutare la produttività di una specie arborea in funzione della varietà. Immaginiamo anche di sapere che, per questa specie, la produttività dipende anche dall'età. Se facciamo un esperimento possiamo utilizzare alberi della stessa età per minimizzare la variabilità dei soggetti. Tuttavia, se questo non fosse possibile, per ogni albero dobbiamo rilevare non solo la produttività, ma anche l'età, in modo da poter valutare anche l'effetto di questo fattore aggiuntivo e separarlo dall'effetto della varietà. In questo modo l'esperimento diviene molto più preciso.
 
 
-## Casi di studio - 3
-
-Per gli esempi in studio, immaginiamo per semplicità di dover rilevare la produzione per gli esempi da 1 a 4 e il contenuto di micotossine per l'esempio 5. Inoltre, per l'esempio 2, immaginiamo di dover rilevare anche il peso di mille semi. Per questo, prenderemo dalla produzione di granella di ogni parcella, quattro sub-campioni da mille semi, da sottoporre a successive misure.
-
-
-## Allocazione dei trattamenti
-
-Il problema dell'allocazione dei trattamenti non si pone con l'esempio 5, in quanto, trattandosi di un esperimento osservazionale, le confezione sono già 'naturalmente' trattate, cioè appartengono già, all'atto del campionamento, alla tipologia di confezionamento prescelta.
-
-Per tutti gli esperimenti disegnati si pone invece il problema di scegliere quali soggetti trattare e con cosa. Per i nostri esempi (escluso il 5), abbiamo già redatto la mappa delle parcelle, secondo le necessità. A questo punto dobbiamo assegnare ad ogni parcella il suo trattamento, assicurando il numero di repliche prescelto. Gli schemi sperimentali di seguito descritti sono quelli più comunemente usati nella sperimentazione di pieno campo [@leclerg1962_FieldPlotTechnique], ma, con le opportune modifiche, possono trovare impiego anche in molte altre discipline scientifiche. 
-
-Negli esperimenti più semplici lo schema sperimentale può essere pianificato a mano. Per esperimenti complessi potremo invece utilizzare il computer; in R, potremo utilizzare, ad esempio,  il package *agricolae* [@de-Mendiburu:2019aa], seguento il codice che troverete nei paragrafi seguenti.
-
-## Casi di studio - 4
-
-### Esempio 1
-
-Questo esempio va disegnato a blocchi randomizzati; tuttavia, a titolo di esempio, esamineremo anche la possibilità che venga disegnato a randomizzazione completa. Quest'ultimo disegno è il più semplice e consiste nell'assegnare ogni trattamento a quattro parcelle casualmente scelte. Con R bisognerà prima creare il vettore dei nomi delle tesi e il numero di repliche per tesi
-
-
-```r
-library(agricolae)
-trt <- c("A", "B", "C", "D", "E", "F", "NT", "TS")
-reps <- rep(4, 8)
-design <- design.crd(trt, r=reps, seed=777, serie=0)
-design$book
-##    plots r trt
-## 1      1 1   E
-## 2      2 1   C
-## 3      3 1   B
-## 4      4 2   C
-## 5      5 1   F
-## 6      6 1  TS
-## 7      7 1  NT
-## 8      8 1   D
-## 9      9 2  NT
-## 10    10 1   A
-## 11    11 2  TS
-## 12    12 2   F
-## 13    13 3  NT
-## 14    14 3   C
-## 15    15 3  TS
-## 16    16 2   D
-## 17    17 3   D
-## 18    18 2   E
-## 19    19 3   E
-## 20    20 4  NT
-## 21    21 2   A
-## 22    22 4   D
-## 23    23 4   E
-## 24    24 3   A
-## 25    25 4   C
-## 26    26 2   B
-## 27    27 4   A
-## 28    28 3   F
-## 29    29 3   B
-## 30    30 4  TS
-## 31    31 4   F
-## 32    32 4   B
-```
-
-Possiamo ora riportare la randomizzazione sulla mappa disegnata in precedenza.
-
-<div class="figure" style="text-align: center">
-<img src="_images/Mappa1CRD.png" alt="Schema sperimentale a randomizzazione completa per l'Esempio 1" width="90%" />
-<p class="caption">(\#fig:figName33)Schema sperimentale a randomizzazione completa per l'Esempio 1</p>
-</div>
-
-
-Questo schema è eccellente se l'ambiente è molto uniforme. Tuttavia, nel caso di un esperimento di campo è lecito aspettarsi un gradiente trasversale, dato che il campo sarà certamente meno fertile vicino alle scoline. Per questo motivo disegneremo l'esperimento a blocchi randomizzati, dividendo prima l'appezzamento in quattro blocchi perpendicolari al gradiente di fertilità. Ad esempio il blocco 1 conterrà le parcelle 1, 9, 17, 25, 2, 10, 18 e 26, cioè le prime due colonne della mappa, con un numero di parcelle esattamente uguali al numero delle tesi. Il blocco 2 conterrà le colonne 3 e 4 e così via. Dato che il gradiente è trasversale, le parcelle di un stesso blocco saranno più omogenee che non parcelle su blocchi diversi. Dopo aver diviso la mappa in quattro blocchi di otto parcelle, possiamo allocare gli otto trattamenti a random all'interno di ogni blocco. Con R è possibile utilizzare il codice seguente (notare che la numerazione assegnata da R è diversa dalla nostra, anche se possiamo far riferimento ai valori crescenti all'interno di ogni blocco).
-
-
-```r
-reps <- 4
-designRCBD <- design.rcbd(trt, r=reps, seed=777, serie=2)
-book2 <- designRCBD$book
-book2
-##    plots block trt
-## 1    101     1   E
-## 2    102     1   B
-## 3    103     1  NT
-## 4    104     1   F
-## 5    105     1   D
-## 6    106     1  TS
-## 7    107     1   C
-## 8    108     1   A
-## 9    201     2   F
-## 10   202     2   A
-## 11   203     2   C
-## 12   204     2   E
-## 13   205     2  TS
-## 14   206     2   B
-## 15   207     2  NT
-## 16   208     2   D
-## 17   301     3  TS
-## 18   302     3  NT
-## 19   303     3   F
-## 20   304     3   A
-## 21   305     3   B
-## 22   306     3   E
-## 23   307     3   C
-## 24   308     3   D
-## 25   401     4   D
-## 26   402     4  TS
-## 27   403     4   A
-## 28   404     4   F
-## 29   405     4   E
-## 30   406     4   C
-## 31   407     4   B
-## 32   408     4  NT
-```
-
-Anche in questo caso, riportiamo tutto sulla mappa.
-
-<div class="figure" style="text-align: center">
-<img src="_images/Mappa1CRBD.png" alt="Schema sperimentale a blocchi randomizzati per l'Esempio 1" width="90%" />
-<p class="caption">(\#fig:figName34)Schema sperimentale a blocchi randomizzati per l'Esempio 1</p>
-</div>
-
-
-
-### Esempio 2
-
-In questo caso, per ognuno dei tre anni di prova, la mappa contiene una griglia 4 x 4, analoga a quella dell'esperimento precedente, ma più piccola. Nella mappa potremo quindi identificare, esclusi i bordi, quattro colonne e quattro righe. Dato che abbiamo presupposto l'esistenza di un gradiente trasversale e lungitudinale (tra righe e tra colonne), l'allocazione dei trattamenti dovrà esser fatta in modo che ognuno di essi si trovi su ogni riga e ogni colonna. Questo tipo di disegno prende il nome di **Quadrato latino**.
-
-Anche in questo caso potremo chiedere ad R di aiutarci a trovare la combinazione corretta (anche se questo potrebbe essere comodamente fatto a mano).
-
-
-```r
-trt <- c("A", "B", "C", "D")
-designLS <- design.lsd(trt, seed=543, serie=2)
-designLS$book
-##    plots row col trt
-## 1    101   1   1   C
-## 2    102   1   2   A
-## 3    103   1   3   B
-## 4    104   1   4   D
-## 5    201   2   1   D
-## 6    202   2   2   B
-## 7    203   2   3   C
-## 8    204   2   4   A
-## 9    301   3   1   B
-## 10   302   3   2   D
-## 11   303   3   3   A
-## 12   304   3   4   C
-## 13   401   4   1   A
-## 14   402   4   2   C
-## 15   403   4   3   D
-## 16   404   4   4   B
-```
-
-
-<div class="figure" style="text-align: center">
-<img src="_images/Mappa2LS.png" alt="Schema sperimentale a quadrato latino per l'Esempio 2 (un anno)" width="65%" />
-<p class="caption">(\#fig:figName35)Schema sperimentale a quadrato latino per l'Esempio 2 (un anno)</p>
-</div>
-
-
-A questo punto dobbiamo considerare che questa prova deve essere ripetuta in tre anni. La ripetizione di una prova è sempre fondamentale, in quanto consente di verificare non solo la replicabilità dell'esperimento (che è dimostrata dalle repliche), ma anche la sua riproducibilità (riguardare le definizioni di replicabilità e riproducibilità). In questo caso poi la ripetizione dell'esperimento è indispensabile per misurare la stabilità produttiva, cioè l'oscillazione delle produzioni da un anno all'altro.
-
-Ovviamente è anche importante verificare la stabilità produttiva da una località all'altra, che consente di valutare l'esistenza di macro-areali, nei quali è possibile consigliare le stesse varietà. Un'aspetto fondamentale è comunque quello di **definire una diversa randomizzazione in ogni anno/località**, per evitare che le stesse varietà siano sempre nelle stesse posizioni, che potrebbe dare origine a dubbi di confounding. La definizione delle randomizzazioni per il secondo e terzo anno è lasciata per esercizio.
-
-Un'altro aspetto da considerare è la metodica impiegata per la determinazione del peso di 1000 semi. Abbiamo già visto che, per aumentare la precisione e la rappresentatività, da tutta la granella raccolta da una parcella preleviamo quattro lotti da 1000 semi, di cui determinare il peso. In questo modo, per ogni trattamento avremo 16 valori (quattro repliche x quattro lotti per replica). Ovviamente non possiamo affermare di avere 16 repliche, in quanto solo le parcelle sono da considerare repliche, in quanto ricevono il trattamento (varietà) in modo indipendente. I quattro lotti raccolti da ogni parcella sono unità osservazionali (perché ne viene rilevato il peso), ma non unità sperimentali, perché appartengono alla stessa parcella e non sono indipendenti. I quattro lotti si dicono **sub-repliche**, quindi il disegno ha quattro repliche e quattro sub-repliche per replica (**disegno a quadrato latino con sottocampionamento**). I due strati di errore (variabilità tra repliche e variabilità tra sub-repliche entro replica), devono essere mantenuti separati in fase di analisi, altrimenti l'analisi è invalida, perché è condotta come se avessimo un più alto grado di precisione (16 repliche) rispetto a quello che abbiamo effettivamente (una sorta di millantato credito!).
-
-
-### Esempio 3
-
-In questo caso abbiamo un disegno fattoriale con due livelli a blocchi randomizzati. Nel principio, questo disegno non ha nulla di diverso da quello relativo all'esempio 1, fatto salvo un minor numero di trattamenti (solo 6). Anche in questo caso, ci facciamo aiutare da R.
-
-
-```r
-trt <- c(3,2) # factorial 3x2
-design2way <-design.ab(trt, r=4, serie=2, 
-  design="rcbd", seed=777)
-book <- design2way$book
-levels(book$A) <- c("PROF", "SUP", "MIN")
-levels(book$B) <- c("TOT", "PARZ")
-book
-##    plots block    A    B
-## 1    101     1  SUP PARZ
-## 2    102     1 PROF PARZ
-## 3    103     1 PROF  TOT
-## 4    104     1  MIN  TOT
-## 5    105     1  SUP  TOT
-## 6    106     1  MIN PARZ
-## 7    107     2  MIN  TOT
-## 8    108     2  SUP  TOT
-## 9    109     2  MIN PARZ
-## 10   110     2 PROF  TOT
-## 11   111     2  SUP PARZ
-## 12   112     2 PROF PARZ
-## 13   113     3  MIN  TOT
-## 14   114     3  SUP  TOT
-## 15   115     3 PROF PARZ
-## 16   116     3  MIN PARZ
-## 17   117     3  SUP PARZ
-## 18   118     3 PROF  TOT
-## 19   119     4  MIN PARZ
-## 20   120     4 PROF  TOT
-## 21   121     4 PROF PARZ
-## 22   122     4  MIN  TOT
-## 23   123     4  SUP  TOT
-## 24   124     4  SUP PARZ
-```
-
-La mappa risultante è visibile più sotto.
-
-<div class="figure" style="text-align: center">
-<img src="_images/Mappa3FATT.png" alt="Schema sperimentale fattoriale a blocchi randomizzati per l'Esempio 3" width="65%" />
-<p class="caption">(\#fig:figName36)Schema sperimentale fattoriale a blocchi randomizzati per l'Esempio 3</p>
-</div>
-
-
-Questo disegno è totalmente appropriato, ma ci costringe a lasciare parecchio spazio tra una parcella e l'altra, per poter manovrare con la macchina per la lavorazione del terreno. Sarebbe utile raggruppare le parcelle caratterizzate dalla stessa lavorazione, in modo da poter lavorare su superfici più ampie. Ne guadagnerebbe l'uniformità dell'esperimento e l'accuratezza dei risultati. Possiamo quindi immaginare un disegno a un fattore, con parcelle di dimensione doppia (**main-plots**), sulle quali eseguire, in modo randomizzato le lavorazioni del terreno. Succesivamente, ogni main-plot può essere suddivisa in due e, su ognuna delle due metà, possono essere allocati in modo random i due trattamenti di diserbo. In questo modo ci troviamo ad operare con parcelle di due dimensioni diverse: le main-plots per le lavorazioni e le sub-plots per il diserbo. Questo tipo di schema prende il nome di **parcella suddivisa** (**split-plot**), ed è piuttosto comune nella sperimentazione di pieno campo.
-
-Proviamo ad utilizzare R per redigere il piano sperimentale.
-
-
-```r
-lavorazione <- c("PROF", "SUP", "MIN")
-diserbo <- c("TOT", "PARZ")
-designSPLIT <- design.split(lavorazione, diserbo, 
-  r=4, serie=2, seed=777)
-book <- designSPLIT$book
-book
-##    plots splots block lavorazione diserbo
-## 1    101      1     1         SUP    PARZ
-## 2    101      2     1         SUP     TOT
-## 3    102      1     1        PROF     TOT
-## 4    102      2     1        PROF    PARZ
-## 5    103      1     1         MIN    PARZ
-## 6    103      2     1         MIN     TOT
-## 7    104      1     2         SUP    PARZ
-## 8    104      2     2         SUP     TOT
-## 9    105      1     2         MIN     TOT
-## 10   105      2     2         MIN    PARZ
-## 11   106      1     2        PROF     TOT
-## 12   106      2     2        PROF    PARZ
-## 13   107      1     3         MIN     TOT
-## 14   107      2     3         MIN    PARZ
-## 15   108      1     3         SUP     TOT
-## 16   108      2     3         SUP    PARZ
-## 17   109      1     3        PROF     TOT
-## 18   109      2     3        PROF    PARZ
-## 19   110      1     4        PROF    PARZ
-## 20   110      2     4        PROF     TOT
-## 21   111      1     4         MIN     TOT
-## 22   111      2     4         MIN    PARZ
-## 23   112      1     4         SUP    PARZ
-## 24   112      2     4         SUP     TOT
-```
-
-
-<div class="figure" style="text-align: center">
-<img src="_images/Mappa3SPLIT.png" alt="Schema sperimentale split-plot a blocchi randomizzati per l'Esempio 3" width="65%" />
-<p class="caption">(\#fig:figName37)Schema sperimentale split-plot a blocchi randomizzati per l'Esempio 3</p>
-</div>
-
-
-In alcune circostanze, soprattutto nelle prove di diserbo chimico, potrebbe trovare applicazione un altro tipo di schema sperimentale, nel quale, in ogni blocco, un trattamento viene applicato a tutte le parcelle di una riga e l'altro trattamento a tutte le parcelle di una colonna. Ad esempio, il disegno sottostante mostra una prova nella quale il terreno è stato diserbato in una striscia nel senso della lunghezza e, dopo il diserbo, le colture sono state seminate in striscia, nel senso della larghezza. Questo disegno è detto **strip-plot** ed è molto comodo perché consente di lavorare velocemente.
-
-<div class="figure" style="text-align: center">
-<img src="_images/MappaStrip.png" alt="Schema sperimentale a strip-plot" width="90%" />
-<p class="caption">(\#fig:figName38)Schema sperimentale a strip-plot</p>
-</div>
-
-
-### Esempio 4
-
-La prova di erba medica è fondamentalmente un esperimento a blocchi randomizzati, il cui piano è riportato più sotto. Tuttavia, si tratta di una coltura poiliennale nella quale ripeteremo le misurazioni ogni anno sulle stesse parcelle. le misure ripetute non sono randomizzate (non possono esserlo), ma seguono una metrica temporale. Proprio per questo sviluppo lungo la scala del tempo, i dati che si raccolgono in questi esperimenti a misure ripetute sono detti **dati longitudinali**. Guardando bene il disegno si capisce anche per si parla di **split-plot nel tempo**. Esempi affini sono relativi all'analisi di accrescimento con misure non distruttive (esempio l'altezza) oppure i prelievi di terreno a profondità diverse, anche se, in quest'ultimo caso, la metrica delle misure ripetute è spaziale, non temporale.
-
-Si può notare una certa analogia con il sottocampionamento illustrato più sopra, nel senso che vengono prese più misure per parcella. Tuttavia, bisogna tener presente che nel sottocampionamento le diverse misure sono solo repliche e non vi è nessuna esigenza di distinguere tra quelle prese nella stessa parcella. Invece, nel caso delle misure ripetute ognuna di esse ha interesse individuale, in quanto espressione di un'anno particolare. 
-
-<div class="figure" style="text-align: center">
-<img src="_images/Mappa4.png" alt="Schema sperimentale a blocchi randomizzati con misure ripetute (split-plot in time)" width="55%" />
-<p class="caption">(\#fig:figName39)Schema sperimentale a blocchi randomizzati con misure ripetute (split-plot in time)</p>
-</div>
-
-
-### Esempio 5
-
-Per questo disegno osservazionale, la mappa non è necessaria. Tuttavia, si può notare che, in ogni supermercato, abbiamo un disegno a randomizzazione completa, con tre tipi di confezioni e tre repliche, cioè nove confezioni scelte a random da un lotto più grande. Insomma, si tratta di un esperimento ripetuto 9 volte che, pertanto, ha una certa affinità con l'esperimento ripetuto dell'Esempio 2.
-
-
 ## Impianto delle prove
 
 Da questo punto in poi, subentrano le competenze agronomiche e fitopatologiche necessarie per codurre gli esperimenti, Mi piace solo ricordare alcune pratiche usuali nella sperimentazione di pieno campo, destinate a migliorare l'efficienza della prova.
@@ -955,8 +649,6 @@ Da questo punto in poi, subentrano le competenze agronomiche e fitopatologiche n
 3. Considerare le caratteristiche naturalmente meno variabili (es. la produzione areica e non la produzione per pianta)
 
 Voglio inoltre ricordare che gli esperimenti parcellari configurano una situazione nella quale, per l'elevata cura che si pone nelle tecniche agronomiche, si riesce ad ottenere una produttività almeno del 20% superiore rispetto a quanto avviene nella normale pratica agricola.
-
-
 
 ## Scrivere un progetto/report di ricerca: semplici indicazioni
 
@@ -985,6 +677,12 @@ Alcuni aspetti che divengono elemento di valutazione del progetto e/o del report
 2. Descrizione dettagliata dei materiali e metodi (bisogna che chiunque sia in grado di replicare l'esperimento)
 3. Esposizione dei risultati chiara e convincente
 4. Discussione approfondita e con molti riferimenti alla letteratura.
+
+
+
+
+
+
 
 
 <!--chapter:end:03-ResProject.Rmd-->
@@ -1255,7 +953,7 @@ Qual è la probabilità di ottenere piante con altezza superiore a 110 cm?
 
 ```r
 pnorm(110, mean = 100, sd = 8, lower.tail = F)
-## [1] 0.8943502
+## [1] 0.1056498
 ```
 
 Si utilizza l'argomento lower.tail=FALSE, in quanto stiamo cercando la probabilità di un'a concentrazione pari o superiore ad 1.1, e non pari od inferiore.'altezza pari o superiore a 110 cm (upper-tail) e non quella pari o inferiore a 110 cm (lower-tail), che sarebbe fornita di default. E' totalmente equivalente utilizzare la funzione sottostante.
@@ -1296,7 +994,7 @@ Qual è quella misura che è inferiore al 20% di tutte le piante del campo (80°
 qnorm(0.8, 100, 8)
 ## [1] 106.733
 qnorm(0.2, 100, 8, lower.tail=F)
-## [1] 93.26703
+## [1] 106.733
 ```
 
 ### Esercizio 7
@@ -1802,7 +1500,7 @@ Possiamo definire una distribuzione di frequenze per T? Empiricamente possiamo o
 max(result);min(result)
 ## [1] 195.249
 ## [1] -169.5243
-b <- seq(-200, 200, by=0.25)
+b <- seq(-600, 600, by=0.25)
 hist(result, breaks = b, freq=F, 
   xlab = expression(paste(m)), ylab="Density", 
   xlim=c(-10,10), ylim=c(0,0.45), main="")
@@ -1977,13 +1675,13 @@ Se dovessimo supporre che i due campioni provengono da popolazioni con varianze 
 ```r
 t.test(A, P, var.equal=F)
 ## 
-## 	Two Sample t-test
+## 	Welch Two Sample t-test
 ## 
 ## data:  A and P
-## t = -4.5217, df = 8, p-value = 0.001945
+## t = -4.5217, df = 7.7977, p-value = 0.002076
 ## alternative hypothesis: true difference in means is not equal to 0
 ## 95 percent confidence interval:
-##  -22.951742  -7.448258
+##  -22.986884  -7.413116
 ## sample estimates:
 ## mean of x mean of y 
 ##      70.2      85.4
@@ -2053,7 +1751,7 @@ In appendice mostriamo come si possa arrivare a questo risultato con una simulaz
 
 ```r
 pchisq(9.76801, 1, lower.tail=F)
-## [1] 0.9982243
+## [1] 0.001775746
 ```
 
 Allo stesso risultato, ma in modo più semplice, è possibile pervenire utilizzando la già citata funzione 'summary()', applicata alla tabella di contingenza (vedi sopra), oppure:
@@ -2062,10 +1760,10 @@ Allo stesso risultato, ma in modo più semplice, è possibile pervenire utilizza
 ```r
 chisq.test(tab, correct=F)
 ## 
-## 	Pearson's Chi-squared test with Yates' continuity correction
+## 	Pearson's Chi-squared test
 ## 
 ## data:  tab
-## X-squared = 8.3014, df = 1, p-value = 0.003962
+## X-squared = 9.768, df = 1, p-value = 0.001776
 ```
 
 
@@ -2378,7 +2076,7 @@ plot(counts/1000 ~ I(b + 0.05), type="h")
 curve(df(x, 4, 35), add=T, col="blue")
 ```
 
-![](_main_files/figure-html/unnamed-chunk-59-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-54-1.png)<!-- -->
 
 
 Più formalmente, si può dimostrare che la sampling distribution di F è data dalla distribuzione F di Fisher, con 4 gradi di libertà al numeratore e 35 al denominatore (in blue in figura).
@@ -2473,7 +2171,7 @@ plot(rnorm(100, 0, 2.5) ~ c(1:100), xlab="Valori attesi",
      ylab = "Residui", pch=21, bg="red")
 ```
 
-![](_main_files/figure-html/unnamed-chunk-62-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-57-1.png)<!-- -->
 
 Le osservazioni aberranti (*outliers*) sono chiaramente indicate nel grafico dei residui come punti isolati rispetto agli altri (Figura sottostante).
 
@@ -2484,7 +2182,7 @@ plot(c(rnorm(100, 0,2.5), 16) ~ c(1:100, 60), xlab="Valori attesi",
      ylab = "Residui", pch=21, bg="red")
 ```
 
-![](_main_files/figure-html/unnamed-chunk-63-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-58-1.png)<!-- -->
 
 L’eterogeneità delle varianze è invece indicata da residui che si allargano o si stringono procedendo verso i margini del grafico (Figura sottostante), facendo emergere una sorta di proporzionalità tra media e varianza.
 
@@ -2496,7 +2194,7 @@ plot(rnorm(100, 0, dati/20) ~ dati, xlab="Valori attesi",
      ylab = "Residui", pch=21, bg="red")
 ```
 
-![](_main_files/figure-html/unnamed-chunk-64-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-59-1.png)<!-- -->
 
 A volte la relazione causa effetto non è lineare o, comunque, il modello devia sistematicamente dai dati osservati. Di conseguenza, i residui mostrano un evidente pattern legato al segno. Ad esempio, i residui sono tendenzialmente negativi per bassi valori attesi e positivi per alti valori.
 
@@ -2508,7 +2206,7 @@ plot(rnorm(100, -5 + 0.1*dati, 1.5) ~ dati, xlab="Valori attesi", ylab = "Residu
 abline()
 ```
 
-![](_main_files/figure-html/unnamed-chunk-65-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-60-1.png)<!-- -->
 
 
 ### QQ-plot
@@ -2528,7 +2226,7 @@ qqnorm(res, xlab="Valori attesi",
 qqline(res)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-66-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-61-1.png)<!-- -->
 
 Le deviazioni più diffuse dalla normalità sono relative alla simmetria (skewness) e alla curtosi della popolazione. In particolare, i nostri residui potrebbero avere asimmetria positiva (right-skewed: la media è maggiore della mediana), in modo che abbiamo più residui negativi che positivi, mentre questi ultimi sono mediamente di più elevato valore assoluto. Ad esempio, una distribuzione log-normale centrata è right-skewed. In questa situazione, i residui alti positivi dovrebbero avere una maggior frequenza che nella distribuzione normale corrispondente, al contrario di quelli bassi negativi.
 
@@ -2554,7 +2252,7 @@ qqnorm(res, xlab="Quantili teorici",
 qqline(res)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-67-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-62-1.png)<!-- -->
 
 
 Al contrario, una distribuzione left-skewed (skewness negativo, cioè media minore della mediana; esempio: una distribuzione beta con traslazione, alto $a$ e basso $b$), si comporta come indicato nel grafico seguente:
@@ -2579,7 +2277,7 @@ qqnorm(res, xlab="Quantili teorici",
 qqline(res)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-68-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-63-1.png)<!-- -->
 
 Per quanto riguarda la curtosi, è necessario osservare le code della distribuzione: se queste sono più alte di una distribuzione normale parliamo di distribuzione platicurtica, come, ad esempio, una distribuzione di t di Student con pochi gradi di libertà.
 
@@ -2602,7 +2300,7 @@ qqnorm(res, xlab="Quantili teorici",
 qqline(res)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-69-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-64-1.png)<!-- -->
 
 Analogamente, vediamo come si presenta un QQ-plot per una distribuzione leptocurtica (più bassa sulle code; esempio: distribuzione uniforme).
 
@@ -2623,7 +2321,7 @@ qqnorm(res, xlab="Quantili teorici",
 qqline(res)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-70-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-65-1.png)<!-- -->
 
 
 ## Altri strumenti diagnostici
@@ -2750,7 +2448,7 @@ mod <- lm(Count ~ Insecticide, data = insects)
 plot(mod, which = 1)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-74-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-69-1.png)<!-- -->
 
 Questo dataset mostra una chiara eteroscedasticità. Utilizziamo quindi la funzione 'boxcox()' per individuare la trasformazione più adatta a correggere questa patologia.
 
@@ -2759,7 +2457,7 @@ Questo dataset mostra una chiara eteroscedasticità. Utilizziamo quindi la funzi
 MASS::boxcox(mod)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-75-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-70-1.png)<!-- -->
 
 Dal grafico si individua chiaramente che la trasformazione migliore, scelta tra quelle più semplici e comprensibili, è quella che corrisponde a $\lambda = 0$, cioè la trasformazione logaritmica.
 
@@ -2769,7 +2467,7 @@ mod <- lm(log(Count) ~ Insecticide, data = insects)
 plot(mod, which = 1)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-76-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-71-1.png)<!-- -->
 
 Vediamo che i dati trasformati non mostrano più alcun sintomo di eteroscedasticità e, di conseguenza, l'ANOVA su questa metrica è affidabile.
 
@@ -2893,7 +2591,7 @@ plot(mod3, which = 1)
 plot(mod3, which = 2)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-83-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-78-1.png)<!-- -->
 
 Dopo esserci rassicurati su questo importante aspetto, possiamo vedere che abbiamo due ipotesi nulle da testare (effetto del trattamento non significativo ed effetto del blocco non significativo), che possono essere entrambe rifiutate per P < 0.05.
 
@@ -2951,7 +2649,7 @@ plot(mod, which = 1)
 plot(mod, which = 2)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-86-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-81-1.png)<!-- -->
 
 Non essendovi evidenti problemi, valutiamo la significatività degli effetti nel modello, analogamente a quanto abbiamo fatto nel caso dell'ANOVA a blocchi randomizzati. L'unica differenza sta nel fatto che, nei disegni a quadrato latino, vi sono tre effetti da testare, anche se l'unico ad avere una certa rilevanza è l'effetto del metodo di lavoro.
 
@@ -3509,7 +3207,7 @@ In termini algebrici, l'interazione può essere calcolata come mancanza di addit
 
 In genere, abbiamo due tipi di interazione: quella in cui cambia la graduatoria tra i trattamenti (interazione crossover) e quella in cui vi è solo una modifica dell’entità dell’effetto (interazione semplice o non-crossover). I due tipi di interazione sono esemplificati nel grafico sottostante. 
 
-![](_main_files/figure-html/unnamed-chunk-105-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-100-1.png)<!-- -->
 
 L'entità e il tipo di interazione tra fattori sperimentali possono essere studiati solo con esperimenti combinati a più fattori (esperimenti fattoriali) e mai con esperimenti singoli.
 
@@ -3622,7 +3320,7 @@ plot(mod, which = 1)
 plot(mod, which = 2)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-111-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-106-1.png)<!-- -->
 
 Il grafico dei residui mostra un sospetto outlier (il settimo dato). Tuttavia, non abbiamo memoria di errori durante la sperimentazione e non paiono esserci problemi di omogeneità delle varianze.
 
@@ -3635,7 +3333,7 @@ par(mfrow=c(1,1))
 boxcox(mod)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-112-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-107-1.png)<!-- -->
 
 Decidiamo quindi di ignorare il sospetto dato aberrante e proseguire nell’analisi, in quanto non sussistono particolare elementi che facciano sospettare qualche patologia dei dati più o meno rilevante.
 
@@ -3939,7 +3637,7 @@ par(mfrow=c(2,2))
 plot(model)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-126-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-121-1.png)<!-- -->
 
 Per maggior sicurezza, possiamo anche eseguire test statistici di verifica dell'omogeneità delle varianze (test di Bartlett e test di Levene) o della normalità dei residui (test di Shapiro-Wilks)
 
@@ -4030,7 +3728,7 @@ plot(Yield ~ Dose)
 abline(modelReg, lty=2)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-129-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-124-1.png)<!-- -->
 
 ### Errori standard dei parametri
 
@@ -4186,7 +3884,7 @@ head(degradation, 10)
 ## 10   10  49.20
 ```
 
-![](_main_files/figure-html/unnamed-chunk-139-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-134-1.png)<!-- -->
 
 Il grafico suggerisce che la risposta della concentrazione nel tempo è curvilinea, secondo la seguente equazione generale:
 
@@ -4299,7 +3997,7 @@ coefs <- coef(mod2)
 curve(coefs[1] + coefs[2]*x + coefs[3]*x^2, add=T, col="red")
 ```
 
-![](_main_files/figure-html/unnamed-chunk-141-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-136-1.png)<!-- -->
 
 Vediamo come la funzione inserita, mentre approssima bene i dati nell'intervallo da 0 a 40 giorni, successivamente mostra una ricrescita, che non ha alcun senso biologico.
 
@@ -4402,7 +4100,7 @@ text(20,50, label="i = 3")
 text(300,65, label="A = 60")
 ```
 
-![](_main_files/figure-html/unnamed-chunk-145-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-140-1.png)<!-- -->
 
 Normalmente, in campo non vengono determinate le perdite produttive, bensì le produzioni, come nel caso del nostro dataset. Di conseguenza abbiamo due possibilità:
 
@@ -4464,7 +4162,7 @@ plot(residuals(modNlin2) ~ fitted(modNlin2))
 abline(h=0, lty=2)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-147-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-142-1.png)<!-- -->
 
 Nel caso dell'esempio relativo alla cinetica di degradazione, non si vedono importanti deviazioni rispetto agli assunti di base.
 
@@ -4476,7 +4174,7 @@ plot(residuals(modComp) ~ fitted(modComp))
 abline(h=0, lty=2)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-148-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-143-1.png)<!-- -->
 
 Per quello che riguarda il modello di competizione, osserviamo invece una proporzionalità inversa tra residui e medie, che attesta qualche problema con l'omogeneità delle varianze.
 
@@ -4662,7 +4360,7 @@ Se abbiamo utilizzato la funzione drm() per il fitting, possiamo utilizzare la f
 boxcox(modComp)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-158-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-153-1.png)<!-- -->
 
 Se lo fosse, applicarla sarebbe banale: basterebbe aggiungere alla funzione di fitting l'argomento bcVal, a cui si dovrebbe assegnare il valore da utilizzare per la trasformazione.
 
@@ -4730,7 +4428,7 @@ curve(log(1/2)/(0.067^2)*(x - 0.067) +
         10.35, from=0.067, to=0.1, add=T, lty=1)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-161-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-156-1.png)<!-- -->
 
 Consideriamo il punto $k = 0.067$, dove la funzione vale $t_{1/2} = 10.35$. Immaginiamo di prendere la retta tangente nel punto P(0.067, 10.35), questa retta ha equazione:
 
@@ -4848,7 +4546,7 @@ summary(mod.sun2)
 plot(mod.sun)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-165-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-160-1.png)<!-- -->
 
 I risultati sono analoghi a quelli che avremmo ottenuto parametrizzando separatamente le curve per le due varietà ,ma con chiari vantaggi che illustreremo nel prossimo capitolo.
 
@@ -5152,7 +4850,10 @@ attach(tabella)
 ## The following objects are masked from tabella (pos = 3):
 ## 
 ##     Parc, Produzioni, Tesi
-## The following objects are masked from tabella (pos = 5):
+## The following objects are masked from tabella (pos = 4):
+## 
+##     Parc, Produzioni, Tesi
+## The following objects are masked from tabella (pos = 7):
 ## 
 ##     Parc, Produzioni, Tesi
 Produzioni
@@ -5575,7 +5276,7 @@ y  <-  c(10,11,13,17)
 plot(x, y, "p", col="red", lwd=5,xlab="Ascissa", ylab="Ordinata")
 ```
 
-![](_main_files/figure-html/unnamed-chunk-197-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-192-1.png)<!-- -->
 
 Per sovrapporre un'altra serie di punti alla precedente possiamo utilizzare il comando 'points':
 
@@ -5586,7 +5287,7 @@ plot(x, y, "p", col="red", lwd=5,xlab="Ascissa", ylab="Ordinata")
 points(x, y2, col="blue", lwd=5)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-198-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-193-1.png)<!-- -->
 
 Se avessimo voluto sovrapporre una grafico a linee avremmo invece utilizzato la funzione 'lines':
 
@@ -5597,7 +5298,7 @@ points(x, y2, col="blue", lwd=5)
 lines(x, y2, col="blue", lwd=2)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-199-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-194-1.png)<!-- -->
 
 Per disegnare una curva si può utilizzare la funzione:
 
@@ -5636,7 +5337,7 @@ legend(1,17, legend=c("Punti", "X+10"), pch=c(19,-1),
   col=c("Red", "Blue"), lwd=c(3,3), lty=c(0,1))
 ```
 
-![](_main_files/figure-html/unnamed-chunk-200-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-195-1.png)<!-- -->
 
 
 L'ultima cosa che desideriamo menzionare è la possibilità di disegnare grafici a torta, utilizzando il comando:
@@ -5653,7 +5354,7 @@ pie(c(20,30,50),label=c("B", "C"),
         col=c("blue", "green", "red"))
 ```
 
-![](_main_files/figure-html/unnamed-chunk-201-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-196-1.png)<!-- -->
 
 
 ## Per approfondimenti {-}
@@ -5743,7 +5444,7 @@ text(x=2,y=0.1,"80° percentile", pos=4)
 arrows(2,0.1,qnorm(percentile),0)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-204-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-199-1.png)<!-- -->
 
 
 Per descrivere la variabilità di un collettivo è possibile utilizzare, ad esempio, il 25esimo e il 75esimo percentile: se questi sono molto vicini, significa che il 50 % dei soggetti è compreso in un intervallo piccolo e quindi la variabilità della popolazione è bassa. Per calcolare questi due valori con Excel possiamo utilizzare le funzioni “=PERCENTILE.INC(intervallo, 0.25)” e “=PERCENTILE.INC(intervallo, 0.75)”. Per quanto riguarda R, i comandi sono dati più sotto.
@@ -5769,7 +5470,7 @@ values <- c(A, B, C)
 boxplot(values ~ series)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-206-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-201-1.png)<!-- -->
 
 
 Con Excel, non esiste una funzione in grado di disegnare un boxplot automaticamente e si possono seguire le indicazioni a [questo link](http://www.dummies.com/how-to/content/boxandwhisker-charts-for-excel.html).
@@ -5862,7 +5563,7 @@ arrows(coord, descript$Media - descript$SD,
        length = 0.05, angle = 90, code = 3)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-211-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-206-1.png)<!-- -->
 
 Il grafico non è bellissimo; per ora ci accontenteremo, ma può essere migliorate con un po' di esercizio.
 
@@ -5925,13 +5626,13 @@ Per disegnare i grafici si utilizzano le funzioni `pie()` e `barplot()`.
 pie(table(heights$var))
 ```
 
-![](_main_files/figure-html/unnamed-chunk-214-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-209-1.png)<!-- -->
 
 ```r
 barplot(freq, col="blue") 
 ```
 
-![](_main_files/figure-html/unnamed-chunk-214-2.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-209-2.png)<!-- -->
 
 In Excel, l’operazione di classamento può essere effettuata utilizzando la formula “=FREQUENZA(matriceDati, matriceClassi)”, che tuttavia è una formula di matrice e quindi deve essere immessa in un intervallo e consolidata con la combinazione tasti “SHIFT+CTRL+INVIO”.
 
@@ -6053,6 +5754,215 @@ Caricare il datasets 'students' disponibile nel package 'aomisc'. In questo file
 
 [Intro da fare]
 
+## Capitolo 3: Progettare un esperimento
+
+### Organizzare un esperimento di diserbo chimico
+
+Si suppone che gli erbicidi A, B e C siano più efficaci di D, E ed F verso *Solanum nigrum*, una comune pianta infestante delle colture di pomodoro. L'obiettivo generale della ricerca sarà quello di trovare un'efficace soluzione per l'eliminazione di *Solanum nigrum* dal pomodoro. Gli obiettivi specifici saranno:
+
+1. valutare l'efficacia erbicida di A, B e C, confrontandola con quella di D, E ed F
+2. valutare la selettività degli anzidetti erbicidi verso il pomodoro
+
+Il fattore sperimentale oggetto di studio sarà il diserbo del pomodoro, con 5 livelli inseriti in prova (6 trattamenti sperimentali): A, B, C, D, E ed F. Inoltre, si ritiene opportuno inserire in prova un testimone non trattato (NT), che ci permetterà di quantificare la percentuale di malerbe controllate. In totale, avremo quindi sette tesi sperimentali.
+
+Questo esperimento verrà eseguito in vaso e, di conseguenza, potremo realizzare sei repliche con un disegno sperimentale a randomizzazione completa.
+La variabile rilevata, tre settimane dopo il trattamento, sarà il peso della biomassa presente in ogni vasetto.
+
+
+### Organizzare un esperimento di confronto varietale
+
+L'ipotesi è che le varietà di girasole A, B e C non abbiano la stessa base genetica e quindi non siano tutte ugualmente produttive. L'obiettivo generale è quello di capire quale tra A, B e C sia più adatta alle condizioni pedoclimatiche della collina Umbra. Gli obiettivi specifici sono quelli di valutare:
+
+1. produttività di A, B e C
+2. stabilità produttiva di A, B e C
+
+Il fattore sperimentale in studio sarà la varietà di girasole con 3 livelli inclusi in prova (varietà A, B e C). Come testimone, inseriremo la varietà di riferimento per la zona (D). Dato che eseguiremo questa prova su un terreno nel quale vi sono due chiari gradienti di fertilità, disegneremo l'esperimento considerando due fattori di blocco: trasversale e longitudinale (spiego meglio tra poco...). Poiché dobbiamo valutare la stabilità produttiva, dovremo ripetere l'esperimento più volte (es. in tre anni diversi) e quindi avremo un secondo fattore sperimentale, incrociato con il primo.
+
+Questo esperimento verrà realizzato in pieno campo, su parcelle di dimensioni 2 m x 8 m, seguendo uno schema sperimentale a quadrato latino con quattro repliche. Dovendo misurare la stabilità produttiva, cioè l'oscillazione di produzione da un ambiente all'altro, questa prova dovrà essere ripetuta in più anni (es. tre anni).
+
+Per ognuno degli anni di prova, la mappa contiene una griglia 4 x 4, nella quale possiamo identificare quattro colonne e quattro righe. Dato che abbiamo presupposto l'esistenza di un gradiente trasversale e lungitudinale (tra righe e tra colonne), l'allocazione dei trattamenti dovrà esser fatta in modo che ognuno di essi si trovi su ogni riga e ogni colonna (**Quadrato latino**). Un'aspetto fondamentale è comunque quello di **definire una diversa randomizzazione in ogni anno/località**, per evitare che le stesse varietà siano sempre nelle stesse posizioni, che potrebbe dare origine a dubbi di confounding. La definizione delle randomizzazioni per il secondo e terzo anno è lasciata per esercizio. 
+
+
+Anche in questo caso potremo chiedere ad R di aiutarci a trovare la combinazione corretta (anche se questo potrebbe essere comodamente fatto a mano).
+
+
+```r
+library(agricolae)
+trt <- c("A", "B", "C", "D")
+designLS <- design.lsd(trt, seed=543, serie=2)
+designLS$book
+##    plots row col trt
+## 1    101   1   1   C
+## 2    102   1   2   A
+## 3    103   1   3   B
+## 4    104   1   4   D
+## 5    201   2   1   D
+## 6    202   2   2   B
+## 7    203   2   3   C
+## 8    204   2   4   A
+## 9    301   3   1   B
+## 10   302   3   2   D
+## 11   303   3   3   A
+## 12   304   3   4   C
+## 13   401   4   1   A
+## 14   402   4   2   C
+## 15   403   4   3   D
+## 16   404   4   4   B
+```
+
+
+<div class="figure" style="text-align: center">
+<img src="_images/Mappa2LS.png" alt="Schema sperimentale a quadrato latino per l'Esempio 2 (un anno)" width="65%" />
+<p class="caption">(\#fig:figName35)Schema sperimentale a quadrato latino per l'Esempio 2 (un anno)</p>
+</div>
+
+
+
+
+Un'altro aspetto da considerare è la metodica impiegata per la determinazione del peso di 1000 semi. Abbiamo già visto che, per aumentare la precisione e la rappresentatività, da tutta la granella raccolta da una parcella preleviamo quattro lotti da 1000 semi, di cui determinare il peso. In questo modo, per ogni trattamento avremo 16 valori (quattro repliche x quattro lotti per replica). Ovviamente non possiamo affermare di avere 16 repliche, in quanto solo le parcelle sono da considerare repliche, in quanto ricevono il trattamento (varietà) in modo indipendente. I quattro lotti raccolti da ogni parcella sono unità osservazionali (perché ne viene rilevato il peso), ma non unità sperimentali, perché appartengono alla stessa parcella e non sono indipendenti. I quattro lotti si dicono **sub-repliche**, quindi il disegno ha quattro repliche e quattro sub-repliche per replica (**disegno a quadrato latino con sottocampionamento**). I due strati di errore (variabilità tra repliche e variabilità tra sub-repliche entro replica), devono essere mantenuti separati in fase di analisi, altrimenti l'analisi è invalida, perché è condotta come se avessimo un più alto grado di precisione (16 repliche) rispetto a quello che abbiamo effettivamente (una sorta di millantato credito!).
+
+[Inserire immagine]
+
+Al termine del ciclo colturale, si misurerà il peso di mille semi. Per questo, prenderemo dalla produzione di granella di ogni parcella, quattro sub-campioni da mille semi, da sottoporre a pesate.
+
+### Organizzare un esperimento fattoriale
+
+Nella barbabietola da zucchero, il diserbo localizzato lungo la fila consente di diminuire l'impiego di erbicidi. Tuttavia, se la coltura precedente ha prodotto semi e se non abbiamo effettuato una lavorazione profonda per interrarli, la coltura sarà più infestata e quindi sarà più difficile ottenere una buona produttività con il diserbo parziale. Su questa ipotesi costruiamo un esperimento volto a valutare l'interazione tra lavorazione del terreno e diserbo chimico. Per raggiungere questo obiettivo generale, proveremo a valutare se:
+
+1. il diserbo parziale consente di ottenere produzioni comparabili a quelle del diserbo totale
+2. l'effetto erbicida è indipendente dalla lavorazione prescelta
+
+In questo caso avremo due fattori sperimentali incrociati: il diserbo, con due livelli (totale o parziale, localizzato sulla fila) e la lavorazione, con tre livelli (aratura profonda, aratura superficiale e *minimum tillage*). Non vi è la necessità di un testimone, ma avremo la necessità di un fattore di blocco. In totale, avremo sei tesi sperimentali.
+
+In questo caso abbiamo un disegno fattoriale con due livelli a blocchi randomizzati. Nel principio, questo disegno non ha nulla di diverso da quello relativo all'esempio 1, fatto salvo un minor numero di trattamenti (solo 6). Anche in questo caso, ci facciamo aiutare da R.
+
+
+```r
+trt <- c(3,2) # factorial 3x2
+design2way <-design.ab(trt, r=4, serie=2,
+  design="rcbd", seed=777)
+book <- design2way$book
+levels(book$A) <- c("PROF", "SUP", "MIN")
+levels(book$B) <- c("TOT", "PARZ")
+book
+##    plots block    A    B
+## 1    101     1  SUP PARZ
+## 2    102     1 PROF PARZ
+## 3    103     1 PROF  TOT
+## 4    104     1  MIN  TOT
+## 5    105     1  SUP  TOT
+## 6    106     1  MIN PARZ
+## 7    107     2  MIN  TOT
+## 8    108     2  SUP  TOT
+## 9    109     2  MIN PARZ
+## 10   110     2 PROF  TOT
+## 11   111     2  SUP PARZ
+## 12   112     2 PROF PARZ
+## 13   113     3  MIN  TOT
+## 14   114     3  SUP  TOT
+## 15   115     3 PROF PARZ
+## 16   116     3  MIN PARZ
+## 17   117     3  SUP PARZ
+## 18   118     3 PROF  TOT
+## 19   119     4  MIN PARZ
+## 20   120     4 PROF  TOT
+## 21   121     4 PROF PARZ
+## 22   122     4  MIN  TOT
+## 23   123     4  SUP  TOT
+## 24   124     4  SUP PARZ
+```
+
+La mappa risultante è visibile più sotto.
+
+<div class="figure" style="text-align: center">
+<img src="_images/Mappa3FATT.png" alt="Schema sperimentale fattoriale a blocchi randomizzati per l'Esempio 3" width="65%" />
+<p class="caption">(\#fig:figName36)Schema sperimentale fattoriale a blocchi randomizzati per l'Esempio 3</p>
+</div>
+
+
+Questo disegno è totalmente appropriato, ma ci costringe a lasciare parecchio spazio tra una parcella e l'altra, per poter manovrare con la macchina per la lavorazione del terreno. Sarebbe utile raggruppare le parcelle caratterizzate dalla stessa lavorazione, in modo da poter lavorare su superfici più ampie. Ne guadagnerebbe l'uniformità dell'esperimento e l'accuratezza dei risultati. Possiamo quindi immaginare un disegno a un fattore, con parcelle di dimensione doppia (**main-plots**), sulle quali eseguire, in modo randomizzato le lavorazioni del terreno. Succesivamente, ogni main-plot può essere suddivisa in due e, su ognuna delle due metà, possono essere allocati in modo random i due trattamenti di diserbo. In questo modo ci troviamo ad operare con parcelle di due dimensioni diverse: le main-plots per le lavorazioni e le sub-plots per il diserbo. Questo tipo di schema prende il nome di **parcella suddivisa** (**split-plot**), ed è piuttosto comune nella sperimentazione di pieno campo.
+
+Proviamo ad utilizzare R per redigere il piano sperimentale.
+
+
+```r
+lavorazione <- c("PROF", "SUP", "MIN")
+diserbo <- c("TOT", "PARZ")
+designSPLIT <- design.split(lavorazione, diserbo,
+  r=4, serie=2, seed=777)
+book <- designSPLIT$book
+book
+##    plots splots block lavorazione diserbo
+## 1    101      1     1         SUP    PARZ
+## 2    101      2     1         SUP     TOT
+## 3    102      1     1        PROF     TOT
+## 4    102      2     1        PROF    PARZ
+## 5    103      1     1         MIN    PARZ
+## 6    103      2     1         MIN     TOT
+## 7    104      1     2         SUP    PARZ
+## 8    104      2     2         SUP     TOT
+## 9    105      1     2         MIN     TOT
+## 10   105      2     2         MIN    PARZ
+## 11   106      1     2        PROF     TOT
+## 12   106      2     2        PROF    PARZ
+## 13   107      1     3         MIN     TOT
+## 14   107      2     3         MIN    PARZ
+## 15   108      1     3         SUP     TOT
+## 16   108      2     3         SUP    PARZ
+## 17   109      1     3        PROF     TOT
+## 18   109      2     3        PROF    PARZ
+## 19   110      1     4        PROF    PARZ
+## 20   110      2     4        PROF     TOT
+## 21   111      1     4         MIN     TOT
+## 22   111      2     4         MIN    PARZ
+## 23   112      1     4         SUP    PARZ
+## 24   112      2     4         SUP     TOT
+```
+
+
+<div class="figure" style="text-align: center">
+<img src="_images/Mappa3SPLIT.png" alt="Schema sperimentale split-plot a blocchi randomizzati per l'Esempio 3" width="65%" />
+<p class="caption">(\#fig:figName37)Schema sperimentale split-plot a blocchi randomizzati per l'Esempio 3</p>
+</div>
+
+
+In alcune circostanze, soprattutto nelle prove di diserbo chimico, potrebbe trovare applicazione un altro tipo di schema sperimentale, nel quale, in ogni blocco, un trattamento viene applicato a tutte le parcelle di una riga e l'altro trattamento a tutte le parcelle di una colonna. Ad esempio, il disegno sottostante mostra una prova nella quale il terreno è stato diserbato in una striscia nel senso della lunghezza e, dopo il diserbo, le colture sono state seminate in striscia, nel senso della larghezza. Questo disegno è detto **strip-plot** ed è molto comodo perché consente di lavorare velocemente.
+
+<div class="figure" style="text-align: center">
+<img src="_images/MappaStrip.png" alt="Schema sperimentale a strip-plot" width="90%" />
+<p class="caption">(\#fig:figName38)Schema sperimentale a strip-plot</p>
+</div>
+
+
+
+
+### Organizzare un esperimento con una coltura poliennale
+
+Vogliamo porre a confronto tre varietà di erba medica (A, B e C) e, considerando che l'erba medica è una coltura poliennale, vogliamo capire se il giudizio di merito è indipendente dall'anno di coltivazione. I nostri obiettivi specifici saranno:
+
+1. valutare la produttività media delle varietà in prova
+2. valutare le oscillazione nei quattro anni di durata del cotico erboso
+
+Il fattore sperimentale in studio sarà la varietà di erba medica con 3 livelli inclusi in prova (varietà A, B e C) ai quali aggiungiamo il riferimento di zona (D) come testimone. Come nel caso del girasole, dovremo valutare la stabilità produttiva negli anni, ma, dato che abbiamo una coltura poliennale, non avremo bisogno di ripetere la prova, ma potremo ripetere le osservazioni per quattro anni sulla stessa prova.
+
+La prova di erba medica è fondamentalmente un esperimento a blocchi randomizzati, il cui piano è riportato più sotto. Tuttavia, si tratta di una coltura poiliennale nella quale ripeteremo le misurazioni ogni anno sulle stesse parcelle. le misure ripetute non sono randomizzate (non possono esserlo), ma seguono una metrica temporale. Proprio per questo sviluppo lungo la scala del tempo, i dati che si raccolgono in questi esperimenti a misure ripetute sono detti **dati longitudinali**. Guardando bene il disegno si capisce anche per si parla di **split-plot nel tempo**. Esempi affini sono relativi all'analisi di accrescimento con misure non distruttive (esempio l'altezza) oppure i prelievi di terreno a profondità diverse, anche se, in quest'ultimo caso, la metrica delle misure ripetute è spaziale, non temporale.
+
+Si può notare una certa analogia con il sottocampionamento illustrato più sopra, nel senso che vengono prese più misure per parcella. Tuttavia, bisogna tener presente che nel sottocampionamento le diverse misure sono solo repliche e non vi è nessuna esigenza di distinguere tra quelle prese nella stessa parcella. Invece, nel caso delle misure ripetute ognuna di esse ha interesse individuale, in quanto espressione di un'anno particolare.
+
+<div class="figure" style="text-align: center">
+<img src="_images/Mappa4.png" alt="Schema sperimentale a blocchi randomizzati con misure ripetute (split-plot in time)" width="55%" />
+<p class="caption">(\#fig:figName39)Schema sperimentale a blocchi randomizzati con misure ripetute (split-plot in time)</p>
+</div>
+
+
+### Utilizzare R per disegnare gli esperimenti
+
+Negli esperimenti più semplici lo schema sperimentale può essere pianificato a mano. Per esperimenti complessi potremo invece utilizzare il computer; in R, potremo utilizzare, ad esempio,  il package *agricolae* [@de-Mendiburu:2019aa], seguento il codice che troverete nei paragrafi seguenti.
+
+[Spostare qui gli esempi, lasciando sopra gli schemi]
+
+
+
 ## Capitolo 4: Modelli matematici a 'due facce'
 
 ### La distribuzione t di Student
@@ -6071,7 +5981,7 @@ curve(dt(x,6), add=TRUE, col = "red")
 curve(dt(x,24), add=TRUE, col = "green")
 ```
 
-![](_main_files/figure-html/unnamed-chunk-221-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-219-1.png)<!-- -->
 
 ### La distribuzione F di Fisher
 
@@ -6086,7 +5996,7 @@ curve(df(x, 3, 3), 0, +3,col="Black",
      xlab="", ylab="Densità")
 ```
 
-![](_main_files/figure-html/unnamed-chunk-222-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-220-1.png)<!-- -->
 
 ```r
 pf(5, 3, 3, lower.tail = F)
@@ -6291,7 +6201,7 @@ curve(dnorm(x, 0, 1), add=TRUE, col="blue")
 curve(dt(x, 2), add=TRUE, col="red")
 ```
 
-![](_main_files/figure-html/unnamed-chunk-232-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-230-1.png)<!-- -->
 
 Vediamo che la *sampling distribution* di T calcolato utilizzando $s$ invece che $\sigma$ è solo approssimativamente normale. E' facile vedere che questa approssimazione è sufficientemente buona solo se la numerosità del campione diviene abbastanza grande (es. $n > 30)$, ma non certamente quando $n$ = 3 (ve lo lascio per esercizio). In questo caso, la sampling distribution che osserviamo è più 'dispersa' di quella normale, con un maggior numero di valori sulle code.
 
@@ -6469,7 +6379,7 @@ plot(density ~ p_oss, type = "h",
 curve(dnorm(x, 0.25, 0.0685), add=TRUE, col="red")
 ```
 
-![](_main_files/figure-html/unnamed-chunk-242-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-240-1.png)<!-- -->
 
 Vediamo che *sampling distribution* è approssimativamente normale con media pari a 0.25 e deviazione standard pari a 0.0685. Lo percepiamo chiaramente dal grafico soprastante, ma c'è una spiegazione scientifica per questo, basata sul **TEOREMA DEL LIMITE CENTRALE**:
 
@@ -6521,13 +6431,13 @@ b <- seq(-12, 12, by=0.25)
 hist(result, breaks = b, freq=F, xlab = expression(paste(m)), ylab="Density", xlim=c(-10,10), ylim=c(0,0.45), main="")
 ```
 
-![](_main_files/figure-html/unnamed-chunk-245-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-243-1.png)<!-- -->
 
 ```r
 curve(dnorm(x), add=T, col="blue")
 ```
 
-![](_main_files/figure-html/unnamed-chunk-245-2.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-243-2.png)<!-- -->
 
 ```r
 curve(dt(x, 8), add=T, col="red")
@@ -6537,7 +6447,7 @@ text(5, 0.4, label="4.52", adj=0, col = "red")
 text(-5, 0.4, label="-4.52", adj=1, col = "red")
 ```
 
-![](_main_files/figure-html/unnamed-chunk-245-3.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-243-3.png)<!-- -->
 
 ### Tipologie alternative di test t di Student
 
