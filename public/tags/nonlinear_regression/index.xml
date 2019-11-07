@@ -327,6 +327,168 @@ I-06121 - PERUGIA&lt;/p&gt;
     </item>
     
     <item>
+      <title>Fitting &#39;complex&#39; mixed models with &#39;nlme&#39;: Example #4</title>
+      <link>/2019/stat_nlmm_interaction/</link>
+      <pubDate>Fri, 13 Sep 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/2019/stat_nlmm_interaction/</guid>
+      <description>
+
+
+&lt;div id=&#34;testing-for-interactions-in-nonlinear-regression&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Testing for interactions in nonlinear regression&lt;/h1&gt;
+&lt;p&gt;Factorial experiments are very common in agriculture and they are usually laid down to test for the significance of interactions between experimental factors. For example, genotype assessments may be performed at two different nitrogen fertilisation levels (e.g. high and low) to understand whether the ranking of genotypes depends on nutrient availability. For those of you who are not very much into agriculture, I will only say that such an assessment is relevant, because we need to know whether we can recommend the same genotypes, e.g., both in conventional agriculture (high nitrogen availability) and in organic agriculture (relatively lower nitrogen availability).&lt;/p&gt;
+&lt;p&gt;Let’s consider an experiment where we have tested three genotypes (let’s call them A, B and C, for brevity), at two nitrogen rates (‘high’ an ‘low’) in a complete block factorial design, with four replicates. Biomass subsamples were taken from each of the 24 plots in eight different times (Days After Sowing: DAS), to evaluate the growth of biomass over time.&lt;/p&gt;
+&lt;p&gt;The dataset is available on gitHub and the following code loads it and transforms the ‘Block’ variable into a factor. For this post, we will use several packages, including ‘aomisc’, the accompanying package for this blog. Please refer to &lt;a href=&#34;https://www.statforbiology.com/rpackages/&#34;&gt;this page for downloading and installing&lt;/a&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rm(list=ls())
+library(lattice)
+library(nlme)
+library(aomisc)
+dataset &amp;lt;- read.csv(&amp;quot;https://raw.githubusercontent.com/OnofriAndreaPG/agroBioData/master/growthNGEN.csv&amp;quot;,
+  header=T)
+dataset$Block &amp;lt;- factor(dataset$Block)
+head(dataset)
+##   Id DAS Block Plot GEN   N  Yield
+## 1  1   0     1    1   A Low  2.786
+## 2  2  15     1    1   A Low  5.871
+## 3  3  30     1    1   A Low 13.265
+## 4  4  45     1    1   A Low 16.926
+## 5  5  60     1    1   A Low 22.812
+## 6  6  75     1    1   A Low 25.346&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The dataset is composed by the following variables:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;‘Id’: a numerical code for observations&lt;/li&gt;
+&lt;li&gt;‘DAS’: i.e., Days After Sowing. It is the moment when the sample was collected&lt;/li&gt;
+&lt;li&gt;‘Block’, ‘Plot’, ‘GEN’ and ‘N’ represent respectively the block, plot, genotype and nitrogen level for each observation&lt;/li&gt;
+&lt;li&gt;‘Yield’ represents the harvested biomass.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;It may be useful to take a look at the observed growth data, as displayed on the graph below.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/Stat_nlmm_Interaction_files/figure-html/unnamed-chunk-2-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;We see that the growth is sygmoidal (presumably logistic) and that the variance of observations increases over time, i.e. the variance is proportional to the expected response.&lt;/p&gt;
+&lt;p&gt;The question is: how do we analyse this data? Let’s build a model in a sequential fashion.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;the-model&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;The model&lt;/h1&gt;
+&lt;p&gt;We could empirically assume that the relationship between biomass and time is logistic:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ Y_{ijkl} = \frac{d_{ijkl}}{1 + exp\left[b \left( X_{ijkl} - e_{ijkl}\right)\right]} + \varepsilon_{ijkl}\quad \quad (1)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; is the observed biomass yield at time &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt;, for the i-th genotype, j-th nitrogen level, k-th block and l-th plot, &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; is the maximum asymptotic biomass level when time goes to infinity, &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; is the slope at inflection point, while &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt; is the time when the biomass yield is equal to &lt;span class=&#34;math inline&#34;&gt;\(d/2\)&lt;/span&gt;. We are mostly interested in the parameters &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt;: the first one describes the yield potential of a genotype, while the second one gives a measure of the speed of growth.&lt;/p&gt;
+&lt;p&gt;There are repeated measures in each plot and, therefore, model parameters may show some variability, depending on the genotype, nitrogen level, block and plot. In particular, it may be acceptable to assume that &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; is pretty constant and independent on the above factors, while &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt; may change according to the following equations:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\left\{ {\begin{array}{*{20}{c}}
+d_{ijkl} = \mu_d + g_{di} + N_{dj} + gN_{dij} + \theta_{dk} + \zeta_{dl}\\
+e_{ijkl} = \mu_e + q_{ei} + N_{ej} + gN_{eij} + \theta_{ek} + \zeta_{el}
+\end{array}} \right. \quad \quad (2) \]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where, for each parameter, &lt;span class=&#34;math inline&#34;&gt;\(\mu\)&lt;/span&gt; is the intercept, &lt;span class=&#34;math inline&#34;&gt;\(g\)&lt;/span&gt; is the fixed effect of the i-th genotype, &lt;span class=&#34;math inline&#34;&gt;\(N\)&lt;/span&gt; is the fixed effect of j-th nitrogen level, &lt;span class=&#34;math inline&#34;&gt;\(gN\)&lt;/span&gt; is the fixed interaction effect, &lt;span class=&#34;math inline&#34;&gt;\(\theta\)&lt;/span&gt; is the random effect of blocks, while &lt;span class=&#34;math inline&#34;&gt;\(\zeta\)&lt;/span&gt; is the random effect of plots within blocks. These two equations are totally equivalent to those commonly used for linear mixed models, in the case of a two-factor factorial block design, wherein &lt;span class=&#34;math inline&#34;&gt;\(\zeta\)&lt;/span&gt; would be the residual error term. Indeed, in principle, we could also think about a two-steps fitting procedure, where we:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;fit the logistic model to the data for each plot and obtain estimates for &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;use these estimates to fit a linear mixed model&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;We will not pursue this two-steps technique here and we will concentrate on one-step fitting.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;a-wrong-method&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;A wrong method&lt;/h1&gt;
+&lt;p&gt;If the observations were independent (i.e. no blocks and no repeated measures), this model could be fit by using conventional nonlinear regression. My preference goes to the ‘drm()’ function in the ‘drc’ package (Ritz et al., 2015).&lt;/p&gt;
+&lt;p&gt;The coding is reported below: ‘Yield’ is a function of (&lt;span class=&#34;math inline&#34;&gt;\(\sim\)&lt;/span&gt;) DAS, by way of a three-parameters logistic function (‘fct = L.3()’). Different curves have to be fitted for different combinations of genotype and nitrogen levels (‘curveid = N:GEN’), although these curves should be partly based on common parameter values (‘pmodels = …). The ’pmodels’ argument requires a few additional comments. It must be a vector with as many element as there are parameters in the model (three, in this case: &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt;). Each element represents a linear function of variables and refers to the parameters in alphabetical order, i.e. the first element refers to &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt;, the second refers to &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; and the third to &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt;. The parameter &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; is not dependent on any variable (‘~ 1’) and thus a constant value is fitted across curves; &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt; depend on a fully factorial combination of genotype and nitrogen level (~ N*GEN = ~N + GEN + N:GEN).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;modNaive1 &amp;lt;- drm(Yield ~ DAS, fct = L.3(), data = dataset,
+            curveid = GEN:N,
+            pmodels = c( ~ 1,  ~ N*GEN,  ~ N*GEN))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This model may be useful for other circumstances (no blocks and no repeated measures), but it is wrong in our example. Indeed, observations are clustered within blocks and plots; by neglecting this, we violate the assumption of independence of model residuals. Furthermore, a swift plot of residuals against fitted values shows clear signs of heteroscedasticity.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/Stat_nlmm_Interaction_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;90%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Considering the above, we have to use a different model, here, although I will show that this naive fit may turn out useful.&lt;/p&gt;
+&lt;div id=&#34;nonlinear-mixed-model-fitting&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Nonlinear mixed model fitting&lt;/h2&gt;
+&lt;p&gt;In order to account for the clustering of observations, we switch to a Nonlinear Mixed-Effect model (NLME). A good choice is the ‘nlme()’ function in the ‘nlme’ package (Pinheiro and Bates, 2000), although the syntax may be cumbersome, at times. I will try to help, listing and commenting the most important arguments for this function. We need to specify the following:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;A deterministic function. In this case, we use the ‘nlsL.3()’ function in the ‘aomisc’ package, which provides a logistic growth model with the same parameterisation as the ‘L.3()’ function in the ‘drm’ package.&lt;/li&gt;
+&lt;li&gt;Linear functions for model parameters. The ‘fixed’ argument in the ‘nlme’ function is very similar to the ‘pmodels’ argument in the ‘drm’ function above, in the sense that it requires a list, wherein each element is a linear function of variables. The only difference is that the parameter name needs to be specified on the left side of the function.&lt;/li&gt;
+&lt;li&gt;Random effects for model parameters. These are specified by using the ‘random’ argument. In this case, the parameters &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt; are expected to show random variability from block to block and from plot to plot, within a block. For the sake of simplicity, as the parameter &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; is not affected by the genotype and nitrogen level, we also expect that it does not show any random variability across blocks and plots.&lt;/li&gt;
+&lt;li&gt;A variance function. The ‘weights’ argument is used to specify that the variance of residuals should be proportional to fitted values (‘varPower’ variance function)&lt;/li&gt;
+&lt;li&gt;Starting values for model parameters. Self starting routines are not used by ‘nlme()’ and thus we need to specify a named vector, holding the initial values of model parameters. In this case, I decided to use the output from the ‘naive’ nonlinear regression above, which, therefore, turns out useful.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(aomisc)
+modnlme1 &amp;lt;- nlme(Yield ~ nlsL.3(DAS, b, d, e), data = dataset,
+                    random = d + e ~ 1|Block/Plot,
+                    fixed = list(b ~ 1, d ~ N*GEN, e ~ N*GEN),
+                    weights = varPower(),
+                    start = coef(modNaive1), control = list(msMaxIter = 200))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/Stat_nlmm_Interaction_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;90%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;/post/Stat_nlmm_Interaction_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;90%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;From the plots above, we see that the distribution of residuals has sensibly improved and we also see that the overall fit is good. Fixed effects and variance components for random effects are obtained as follows:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(modnlme1)$tTable
+##                      Value   Std.Error  DF     t-value       p-value
+## b              -0.05776769 0.001366049 228 -42.2881409 6.822156e-110
+## d.(Intercept)  34.03788426 1.727626178 228  19.7021119  3.982765e-51
+## d.NLow         -3.44678488 1.841575492 228  -1.8716501  6.253555e-02
+## d.GENB         18.93059593 2.166359447 228   8.7384372  5.195556e-16
+## d.GENC         -1.33418290 1.906767185 228  -0.6997094  4.848221e-01
+## d.NLow:GENB    -5.91014719 2.881736816 228  -2.0508976  4.142027e-02
+## d.NLow:GENC    -5.52959860 2.551969245 228  -2.1667967  3.128677e-02
+## e.(Intercept)  55.15777109 2.806817741 228  19.6513547  5.772338e-51
+## e.NLow        -10.40726891 3.658304733 228  -2.8448338  4.847734e-03
+## e.GENB         -4.39240147 3.588906465 228  -1.2238830  2.222596e-01
+## e.GENC          2.66159912 3.628877450 228   0.7334497  4.640377e-01
+## e.NLow:GENB    -3.86277932 5.132378567 228  -0.7526295  4.524490e-01
+## e.NLow:GENC     3.99304928 5.182760610 228   0.7704483  4.418316e-01
+VarCorr(modnlme1)
+##               Variance                     StdDev    Corr  
+## Block =       pdLogChol(list(d ~ 1,e ~ 1))                 
+## d.(Intercept)  4.11920429                  2.0295823 d.(In)
+## e.(Intercept)  2.49576526                  1.5797991 0.441 
+## Plot =        pdLogChol(list(d ~ 1,e ~ 1))                 
+## d.(Intercept)  2.74774204                  1.6576315 d.(In)
+## e.(Intercept) 18.17957524                  4.2637513 0.187 
+## Residual       0.07917494                  0.2813804&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now, let’s go back to our initial aim: testing the significance of the ‘genotype x nitrogen’ interaction. Indeed, we have two available tests: on for the parameter &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; and one for the parameter &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt;. First of all, we code two ‘reduced’ models, where the genotype and nitrogen effects are purely addictive. To do so, we change the specification of the fixed effects from ’~ N*GEN’ to ‘~ N + GEN’. Also in this case, we use a ‘naive’ nonlinear regression fit to get starting values for model parameters, to be used in the following NLME model fitting.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;modNaive2 &amp;lt;- drm(Yield ~ DAS, fct = L.3(), data = dataset,
+            curveid = N:GEN,
+            pmodels = c( ~ 1,  ~ N + GEN,  ~ N * GEN))
+
+modnlme2 &amp;lt;- nlme(Yield ~ nlsL.3(DAS, b, d, e), data = dataset,
+                    random = d + e ~ 1|Block/Plot,
+                    fixed = list(b ~ 1, d ~ N + GEN, e ~ N*GEN),
+                    weights = varPower(),
+                    start = coef(modNaive2), control = list(msMaxIter = 200))
+modNaive3 &amp;lt;- drm(Yield ~ DAS, fct = L.3(), data = dataset,
+            curveid = N:GEN,
+            pmodels = c( ~ 1,  ~ N*GEN,  ~ N + GEN))
+
+modnlme3 &amp;lt;- nlme(Yield ~ nlsL.3(DAS, b, d, e), data = dataset,
+                    random = d + e ~ 1|Block/Plot,
+                    fixed = list(b ~ 1, d ~ N*GEN, e ~ N + GEN),
+                    weights = varPower(),
+                    start = coef(modNaive3), control = list(msMaxIter = 200))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Let’s consider the first reduced model ‘modnlme2’. In this model, the ‘genotype x nitrogen’ interaction has been removed for the &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; parameter. We can compare this reduced model with the full model ‘modnlme1’, by using a Likelihood Ratio Test:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;anova(modnlme1, modnlme2)
+##          Model df      AIC      BIC    logLik   Test L.Ratio p-value
+## modnlme1     1 21 1355.006 1430.101 -656.5032                       
+## modnlme2     2 19 1356.277 1424.220 -659.1387 1 vs 2 5.27103  0.0717&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This test is on the borderline of significance, although the AIC value is slightly higher for the reduced model. It should be possible to conclude that the ‘genotype x nitrogen’ interaction is not significant and, therefore, the ranking of genotypes in terms of yield potential, as measured by the &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; parameter should be independent on nitrogen level.&lt;/p&gt;
+&lt;p&gt;Let’s now consider the second reduced model ‘modnlme3’. In this second model, the ‘genotype x nitrogen’ interaction has been removed for the ‘e’ parameter. We can compare also this reduced model with the full model ‘modnlme1’, by using a Likelihood Ratio Test:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;anova(modnlme1, modnlme3)
+##          Model df      AIC      BIC    logLik   Test  L.Ratio p-value
+## modnlme1     1 21 1355.006 1430.101 -656.5032                        
+## modnlme3     2 19 1353.721 1421.664 -657.8604 1 vs 2 2.714405  0.2574&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In this second test, the lack of significance for the ‘genotype x nitrogen’ interaction seems to be less questionable than in the first one.&lt;/p&gt;
+&lt;p&gt;I would like to conclude by drawing your attention to the ‘medrm’ function in the ‘medrc’ package, which can also be used to fit this type of nonlinear mixed-effects models.&lt;/p&gt;
+&lt;p&gt;Happy coding with R!&lt;/p&gt;
+&lt;hr /&gt;
+&lt;p&gt;Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Borgo XX Giugno 74&lt;br /&gt;
+I-06121 - PERUGIA&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Pinheiro, J.C., Bates, D.M., 2000. Mixed-Effects Models in S and S-Plus, Springer-Verlag Inc. ed. Springer-Verlag Inc., New York.&lt;/li&gt;
+&lt;li&gt;Ritz, C., Baty, F., Streibig, J.C., Gerhard, D., 2015. Dose-Response Analysis Using R. PLOS ONE 10, e0146021. &lt;a href=&#34;https://doi.org/10.1371/journal.pone.0146021&#34; class=&#34;uri&#34;&gt;https://doi.org/10.1371/journal.pone.0146021&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Germination data and time-to-event methods: comparing germination curves</title>
       <link>/2019/stat_survival_comparinglots/</link>
       <pubDate>Sat, 20 Jul 2019 00:00:00 +0000</pubDate>
