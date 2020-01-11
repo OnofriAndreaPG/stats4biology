@@ -6,10 +6,203 @@
     <description>Recent content in R on The broken bridge between biologists and statisticians</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2018, @AndreaOnofri</copyright>
-    <lastBuildDate>Fri, 13 Sep 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 09 Jan 2020 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="/tags/r/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Nonlinear combinations of model parameters in regression</title>
+      <link>/2020/stat_nls_gnlht/</link>
+      <pubDate>Thu, 09 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/stat_nls_gnlht/</guid>
+      <description>
+
+
+&lt;p&gt;Nonlinear regression plays an important role in my research and teaching activities. While I often use the ‘drm()’ function in the ‘drc’ package for my research work, I tend to prefer the ‘nls()’ function for teaching purposes, mainly because, in my opinion, the transition from linear models to nonlinear models is smoother, for beginners. One problem with ‘nls()’ is that, in contrast to ‘drm()’, it is not specifically tailored to the needs of biologists or students in biology. Therefore, now and then, I have to build some helper functions, to perform some specific tasks; I usually share these functions within the ‘aomisc’ package, that is available on github (&lt;a href=&#34;https://www.statforbiology.com/rpackages/&#34;&gt;see this link&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;In this post, I would like to describe one of these helper functions, i.e. ‘gnlht()’, which is aimed at helping students (and practitioners; why not?) with one of their tasks, i.e. making some simple manipulations of model parameters, to obtain relevant biological information. Let’s see a typical example.&lt;/p&gt;
+&lt;div id=&#34;motivating-example&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Motivating example&lt;/h1&gt;
+&lt;p&gt;This is a real-life example, taken from a research published by Vischetti et al. in 1996. That research considered three herbicides for weed control in sugar beet, i.e. metamitron (M), phenmedipham (P) and cloridazon (C). Four soil samples were contaminated, respectively with: (i) M alone, (ii) M + P (iii) M + C and (iv) M + P + C. The aim was to assess whether the degradation speed of metamitron in soil depended on the presence of co-applied herbicides. To reach this aim, the soil samples were incubated at 20°C and sub-samples were taken in different times after the beginning of the experiment. The concentration of metamitron in those sub-samples was measured by HPLC analyses, performed in triplicate. The resulting dataset is available within the ‘aomisc’ package; we can load it and use the ‘lattice’ package to visualise the observed means over time.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# library(devtools)
+# install_github(&amp;quot;OnofriAndreaPG/aomisc&amp;quot;)
+library(aomisc)
+library(lattice)
+data(metamitron)
+xyplot(Conc ~ Time|Herbicide, data = metamitron,
+       xlab = &amp;quot;Time (d)&amp;quot;, ylab = &amp;quot;Concentration&amp;quot;,
+       scales = list(alternating = F),
+       panel = function(x, y, ...) { 
+         panel.grid(h = -1, v = -1)
+         fmy &amp;lt;- tapply(y, list(factor(x)), mean)
+         fmx &amp;lt;- tapply(x, list(factor(x)), mean)
+         panel.xyplot(fmx, fmy, col=&amp;quot;red&amp;quot;, type=&amp;quot;b&amp;quot;, cex = 1)
+       })&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/Stat_nls_gnlht_files/figure-html/unnamed-chunk-1-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Considering this exemplary dataset, let’s see how we can answer the following research questions.&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;What is the degradation rate for metamitron, in the four combinations?&lt;/li&gt;
+&lt;li&gt;Is there a significant difference between the degradation rate of metamitron alone and with co-applied herbicides?&lt;/li&gt;
+&lt;li&gt;What is the half-life for metamitron, in the four combinations?&lt;/li&gt;
+&lt;li&gt;What are the times to reach 70 and 30% of the initial concentration, for metamitron in the four combinations?&lt;/li&gt;
+&lt;li&gt;Is there a significant difference between the half-life of metamitron alone and with co-applied herbicides?&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div id=&#34;fitting-a-degradation-model&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Fitting a degradation model&lt;/h1&gt;
+&lt;p&gt;The figure above shows a visible difference in the degradation pattern of metamitron, which could be attributed to the presence of co-applied herbicides. The degradation kinetics can be described by the following (first-order) model:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ C(t, h) = A_h \, \exp \left(-k_h  \, t \right) \]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(C(t, h)\)&lt;/span&gt; is the concentration of metamitron at time &lt;span class=&#34;math inline&#34;&gt;\(t\)&lt;/span&gt; in each of the four combinations &lt;span class=&#34;math inline&#34;&gt;\(h\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(A_h\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(k_h\)&lt;/span&gt; are, respectively, the initial concentration and degradation rate for metamitron in each combination.&lt;/p&gt;
+&lt;p&gt;The model is nonlinear and, therefore, we can use the ‘nls()’ function for nonlinear least squares regression. The code is given below: please, note that the two parameters are followed by the name of the factor variable in square brackets (i.e.: A[Herbicide] and k[Herbicide]). This is necessary to fit a different parameter value for each level of the ‘Herbicide’ factor.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#Fit nls grouped model
+modNlin &amp;lt;- nls(Conc ~ A[Herbicide] * exp(-k[Herbicide] * Time), 
+               start=list(A=rep(100, 4), k=rep(0.06, 4)), 
+               data=metamitron)
+summary(modNlin)
+## 
+## Formula: Conc ~ A[Herbicide] * exp(-k[Herbicide] * Time)
+## 
+## Parameters:
+##     Estimate Std. Error t value Pr(&amp;gt;|t|)    
+## A1 9.483e+01  4.796e+00   19.77   &amp;lt;2e-16 ***
+## A2 1.021e+02  4.316e+00   23.65   &amp;lt;2e-16 ***
+## A3 9.959e+01  4.463e+00   22.31   &amp;lt;2e-16 ***
+## A4 1.116e+02  4.184e+00   26.68   &amp;lt;2e-16 ***
+## k1 4.260e-02  4.128e-03   10.32   &amp;lt;2e-16 ***
+## k2 2.574e-02  2.285e-03   11.26   &amp;lt;2e-16 ***
+## k3 3.034e-02  2.733e-03   11.10   &amp;lt;2e-16 ***
+## k4 2.186e-02  1.822e-03   12.00   &amp;lt;2e-16 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error: 9.701 on 88 degrees of freedom
+## 
+## Number of iterations to convergence: 5 
+## Achieved convergence tolerance: 7.136e-06&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;For the sake of simplicity, I will neglige an accurate model check, although I need to point out that this is highly wrong. I’ll come back to this issue in another post.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;working-with-model-parameters&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Working with model parameters&lt;/h1&gt;
+&lt;p&gt;Considering the research questions, it is clear that the above output answers the first one, as it gives the four degradation rates, &lt;span class=&#34;math inline&#34;&gt;\(k1\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(k2\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(k3\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(k4\)&lt;/span&gt;. All the other questions can be translated into sets of linear/nonlinear functions (combinations) of model parameters. If we use the naming of parameter estimates in the nonlinear regression object, for the second question we can write the following functions: &lt;span class=&#34;math inline&#34;&gt;\(k1 - k2\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(k1 - k3\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(k1 - k4\)&lt;/span&gt;. The third question requires some slightly more complex math: if we invert the equation above for one herbicide, we get to the following inverse:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ t = \frac{- log \left[\frac{C(t)}{A} \right] }{k} \]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;I do not think this is complex enough to scare the biologists, is it? The half-life is the time required for C(t) to drop to half of the initial value, so that &lt;span class=&#34;math inline&#34;&gt;\(C(t)/A\)&lt;/span&gt; is equal to &lt;span class=&#34;math inline&#34;&gt;\(0.5\)&lt;/span&gt;. Thus:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ t_{1/2} = \frac{- \log \left[0.5 \right] }{k} \]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Analogously, we can answer the question 4, by replacing &lt;span class=&#34;math inline&#34;&gt;\(0.5\)&lt;/span&gt; respectively with &lt;span class=&#34;math inline&#34;&gt;\(0.7\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(0.3\)&lt;/span&gt;. The difference between the half-lives of metamitron alone and combined with the second herbicide can be calculated by:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ \frac{- \log \left[0.5 \right] }{k_1} - \frac{- \log \left[0.5 \right] }{k_2} = \frac{k_2 - k_1}{k_1 \, k_2} \, \log(0.5)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;The other differences are obtained analogously.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;inferences-and-hypotheses-testing&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Inferences and hypotheses testing&lt;/h1&gt;
+&lt;p&gt;All parameter estimates are characterised by some uncertainty, which is summarised by way of the standard errors (see the code output above). Clearly, such an uncertainty propagates to their combinations. As for the first question, the combinations are linear, as only subtraction is involved. Therefore, the standard error for the difference can be easily calculated by the usual law of propagation of errors, which I have dealt with in &lt;a href=&#34;https://www.statforbiology.com/2019/stat_general_errorpropagation/&#34;&gt;this post&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;In R, linear combinations of model parameters can be built and tested by using the ‘glht()’ function in the ‘multcomp’ package. However, I wanted to find a general solution, that could handle both linear and nonlinear combinations of model parameters. Such a solution should be based on the ‘delta method’, which I have dealt with in &lt;a href=&#34;https://www.statforbiology.com/2019/stat_general_thedeltamethod/&#34;&gt;this post&lt;/a&gt;. Unfortunately, the function ‘deltaMethod()’ in the ‘car’ package is not flexible enough to the aims of my students and mine.&lt;/p&gt;
+&lt;p&gt;Therefore, I wrote a wrapper for the ‘deltaMethod()’ function, which I named ‘gnlht()’, as it might play for nonlinear combinations the same role as ‘glht()’ for linear combinations. To use this function, apart from loading the ‘aomisc’ package, we need to prepare a list of formulas. Care needs to be taken to make sure that the element in the formulas correspond to the names of the estimated parameters in the model object, as returned by the ‘coef()’ method. In the box below, I show how we can calculate the differences between the degradation rates.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;funList &amp;lt;- list(~k1 - k2, ~k1 - k3, ~k1 - k4)
+gnlht(modNlin, funList)
+##      form   Estimate          SE  t-value      p-value
+## 1 k1 - k2 0.01686533 0.004718465 3.574325 5.727311e-04
+## 2 k1 - k3 0.01226241 0.004951372 2.476568 1.517801e-02
+## 3 k1 - k4 0.02074109 0.004512710 4.596150 1.430392e-05&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The very same code can be used for nonlinear combinations of model parameters. In order to calculate the half-lives, we can use the following code:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;funList &amp;lt;- list(~ -log(0.5)/k1, ~ -log(0.5)/k2,
+                ~ -log(0.5)/k3, ~ -log(0.5)/k4)
+gnlht(modNlin, funList)
+##           form Estimate       SE  t-value      p-value
+## 1 -log(0.5)/k1 16.27089 1.576827 10.31876 7.987827e-17
+## 2 -log(0.5)/k2 26.93390 2.391121 11.26413 9.552915e-19
+## 3 -log(0.5)/k3 22.84747 2.058588 11.09861 2.064093e-18
+## 4 -log(0.5)/k4 31.70942 2.643329 11.99601 3.257067e-20&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Instead of writing ‘0.5’, we can introduce a new model term, e.g. ‘prop’, as a ‘constant’, in the sense that it is not an estimated parameter. We can pass a value for this constant in a data frame, by using the ‘const’ argument:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;funList &amp;lt;- list(~ -log(prop)/k1, ~ -log(prop)/k2,
+                ~ -log(prop)/k3, ~ -log(prop)/k4)
+gnlht(modNlin, funList, const = data.frame(prop = 0.5))
+##            form prop Estimate       SE  t-value      p-value
+## 1 -log(prop)/k1  0.5 16.27089 1.576827 10.31876 7.987827e-17
+## 2 -log(prop)/k2  0.5 26.93390 2.391121 11.26413 9.552915e-19
+## 3 -log(prop)/k3  0.5 22.84747 2.058588 11.09861 2.064093e-18
+## 4 -log(prop)/k4  0.5 31.70942 2.643329 11.99601 3.257067e-20&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This is very flexible, because it lets us to calculate, altogether, the half-life and the times required for the concentration to drop to 70 and 30% of the initial value:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;funList &amp;lt;- list(~ -log(prop)/k1, ~ -log(prop)/k2,
+                ~ -log(prop)/k3, ~ -log(prop)/k4)
+gnlht(modNlin, funList, const = data.frame(prop = c(0.7, 0.5, 0.3)))
+##             form prop  Estimate        SE  t-value      p-value
+## 1  -log(prop)/k1  0.7  8.372564 0.8113927 10.31876 7.987827e-17
+## 2  -log(prop)/k1  0.5 16.270892 1.5768267 10.31876 7.987827e-17
+## 3  -log(prop)/k1  0.3 28.261979 2.7388937 10.31876 7.987827e-17
+## 4  -log(prop)/k2  0.7 13.859465 1.2304069 11.26413 9.552915e-19
+## 5  -log(prop)/k2  0.5 26.933905 2.3911214 11.26413 9.552915e-19
+## 6  -log(prop)/k2  0.3 46.783265 4.1532956 11.26413 9.552915e-19
+## 7  -log(prop)/k3  0.7 11.756694 1.0592942 11.09861 2.064093e-18
+## 8  -log(prop)/k3  0.5 22.847468 2.0585881 11.09861 2.064093e-18
+## 9  -log(prop)/k3  0.3 39.685266 3.5756966 11.09861 2.064093e-18
+## 10 -log(prop)/k4  0.7 16.316814 1.3601864 11.99601 3.257067e-20
+## 11 -log(prop)/k4  0.5 31.709415 2.6433295 11.99601 3.257067e-20
+## 12 -log(prop)/k4  0.3 55.078163 4.5913724 11.99601 3.257067e-20&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The differences between the half-lives (and other degradation times) can be calculated as well:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;funList &amp;lt;- list(~ (k2 - k1)/(k1 * k2) * log(prop),
+                ~ (k3 - k1)/(k1 * k3) * log(prop), 
+                ~ (k4 - k1)/(k1 * k4) * log(prop))
+gnlht(modNlin, funList, const = data.frame(prop = c(0.7, 0.5, 0.3)))
+##                              form prop  Estimate       SE  t-value
+## 1 (k2 - k1)/(k1 * k2) * log(prop)  0.7  5.486900 1.473859 3.722813
+## 2 (k2 - k1)/(k1 * k2) * log(prop)  0.5 10.663013 2.864235 3.722813
+## 3 (k2 - k1)/(k1 * k2) * log(prop)  0.3 18.521287 4.975078 3.722813
+## 4 (k3 - k1)/(k1 * k3) * log(prop)  0.7  3.384130 1.334340 2.536183
+## 5 (k3 - k1)/(k1 * k3) * log(prop)  0.5  6.576577 2.593100 2.536183
+## 6 (k3 - k1)/(k1 * k3) * log(prop)  0.3 11.423287 4.504125 2.536183
+## 7 (k4 - k1)/(k1 * k4) * log(prop)  0.7  7.944250 1.583814 5.015900
+## 8 (k4 - k1)/(k1 * k4) * log(prop)  0.5 15.438524 3.077917 5.015900
+## 9 (k4 - k1)/(k1 * k4) * log(prop)  0.3 26.816185 5.346236 5.015900
+##        p-value
+## 1 3.468973e-04
+## 2 3.468973e-04
+## 3 3.468973e-04
+## 4 1.297111e-02
+## 5 1.297111e-02
+## 6 1.297111e-02
+## 7 2.718445e-06
+## 8 2.718445e-06
+## 9 2.718445e-06&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The possibility of passing constants in a data.frame adds flexibility with respect to the ‘deltaMethod()’ function in the ‘car’ package. For example, we can use this method to make predictions:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;funList &amp;lt;- list(~ A1 * exp (- k1 * Time), ~ A2 * exp (- k2 * Time), 
+                ~ A3 * exp (- k3 * Time), ~ A4 * exp (- k4 * Time))
+pred &amp;lt;- gnlht(modNlin, funList, const = data.frame(Time = seq(0, 67, 1)))
+head(pred)
+##                   form Time Estimate       SE  t-value      p-value
+## 1 A1 * exp(-k1 * Time)    0 94.83198 4.795948 19.77336 3.931107e-34
+## 2 A1 * exp(-k1 * Time)    1 90.87694 4.381511 20.74101 1.223613e-35
+## 3 A1 * exp(-k1 * Time)    2 87.08684 4.015039 21.69016 4.511113e-37
+## 4 A1 * exp(-k1 * Time)    3 83.45482 3.695325 22.58389 2.205772e-38
+## 5 A1 * exp(-k1 * Time)    4 79.97427 3.421034 23.37722 1.623774e-39
+## 6 A1 * exp(-k1 * Time)    5 76.63888 3.190531 24.02072 2.050113e-40
+tail(pred)
+##                     form Time Estimate       SE  t-value      p-value
+## 267 A4 * exp(-k4 * Time)   62 28.78518 2.657182 10.83297 7.138133e-18
+## 268 A4 * exp(-k4 * Time)   63 28.16278 2.648687 10.63273 1.824651e-17
+## 269 A4 * exp(-k4 * Time)   64 27.55384 2.639403 10.43942 4.525865e-17
+## 270 A4 * exp(-k4 * Time)   65 26.95807 2.629361 10.25270 1.090502e-16
+## 271 A4 * exp(-k4 * Time)   66 26.37517 2.618594 10.07227 2.555132e-16
+## 272 A4 * exp(-k4 * Time)   67 25.80489 2.607131  9.89781 5.827812e-16&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Although this is not very fast, in contrast to the ‘predict()’ method for ‘nls’ objects, it has the advantage of reporting standard errors.&lt;/p&gt;
+&lt;p&gt;Hope this is useful. Happy coding!&lt;/p&gt;
+&lt;hr /&gt;
+&lt;p&gt;Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Borgo XX Giugno 74&lt;br /&gt;
+I-06121 - PERUGIA&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;John Fox and Sanford Weisberg (2019). An {R} Companion to Applied Regression, Third Edition. Thousand Oaks CA:Sage. URL: &lt;a href=&#34;https://socialsciences.mcmaster.ca/jfox/Books/Companion/&#34; class=&#34;uri&#34;&gt;https://socialsciences.mcmaster.ca/jfox/Books/Companion/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Torsten Hothorn, Frank Bretz and Peter Westfall (2008). Simultaneous Inference in General Parametric Models. Biometrical Journal 50(3), 346–363.&lt;/li&gt;
+&lt;li&gt;Ritz, C., Baty, F., Streibig, J. C., Gerhard, D. (2015) Dose-Response Analysis Using R PLOS ONE, 10(12), e0146021&lt;/li&gt;
+&lt;li&gt;Vischetti, C., Marini, M., Businelli, M., Onofri, A., 1996. The effect of temperature and co-applied herbicides on the degradation rate of phenmedipham, chloridazon and metamitron in a clay loam soil in the laboratory, in: Re, A.D., Capri, E., Evans, S.P., Trevisan, M. (Eds.), “The Environmental Phate of Xenobiotics”, Proceedings X Symposium on Pesticide Chemistry, Piacenza. La Goliardica Pavese, Piacenza, pp. 287–294.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Fitting &#39;complex&#39; mixed models with &#39;nlme&#39;: Example #2</title>
@@ -1821,7 +2014,6 @@ deltaMethod(object = obj, g=&amp;quot;X * W&amp;quot;, vcov = sigma)&lt;/code&gt
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(reshape2)
 library(plyr)
 library(nlme)
-library(plyr)
 library(asreml)
 dataset &amp;lt;- read.csv(&amp;quot;https://raw.githubusercontent.com/OnofriAndreaPG/aomisc/master/data/WheatQuality.csv&amp;quot;, header=T)
 dataset$Block &amp;lt;- factor(dataset$Block)
@@ -1858,18 +2050,18 @@ head(dataset)&lt;/code&gt;&lt;/pre&gt;
         residual = ~ units:us(trait, init = c(6, 0.16, 4.5)), 
         data=dataset)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Model fitted using the sigma parameterization.
-## ASReml 4.1.0 Fri May 10 17:33:27 2019
+## ASReml 4.1.0 Thu Jan  2 18:20:22 2020
 ##           LogLik        Sigma2     DF     wall    cpu
-##  1      -641.556           1.0    160 17:33:27    0.0 (3 restrained)
-##  2      -548.767           1.0    160 17:33:27    0.0
-##  3      -448.970           1.0    160 17:33:27    0.0
-##  4      -376.952           1.0    160 17:33:27    0.0
-##  5      -334.100           1.0    160 17:33:27    0.0
-##  6      -317.511           1.0    160 17:33:27    0.0
-##  7      -312.242           1.0    160 17:33:27    0.0
-##  8      -311.145           1.0    160 17:33:27    0.0
-##  9      -311.057           1.0    160 17:33:27    0.0
-## 10      -311.056           1.0    160 17:33:27    0.0&lt;/code&gt;&lt;/pre&gt;
+##  1      -641.556           1.0    160 18:20:22    0.0 (3 restrained)
+##  2      -548.767           1.0    160 18:20:22    0.0
+##  3      -448.970           1.0    160 18:20:22    0.0
+##  4      -376.952           1.0    160 18:20:22    0.0
+##  5      -334.100           1.0    160 18:20:22    0.0
+##  6      -317.511           1.0    160 18:20:22    0.0
+##  7      -312.242           1.0    160 18:20:22    0.0
+##  8      -311.145           1.0    160 18:20:22    0.0
+##  9      -311.057           1.0    160 18:20:22    0.0
+## 10      -311.056           1.0    160 18:20:22    0.0&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(mod.asreml)$varcomp[,1:3]&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##                                   component  std.error    z.ratio
 ## Block:trait!trait_Yield:Yield     3.7104778  3.9364268  0.9426005
@@ -1904,16 +2096,16 @@ vpredict(mod.asreml, rb ~ V2 / (sqrt(V1)*sqrt(V3) ) )&lt;/code&gt;&lt;/pre&gt;
         residual = ~ units:idh(trait), 
         data=dataset)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Model fitted using the sigma parameterization.
-## ASReml 4.1.0 Fri May 10 17:33:28 2019
+## ASReml 4.1.0 Thu Jan  2 18:20:23 2020
 ##           LogLik        Sigma2     DF     wall    cpu
-##  1      -398.023           1.0    160 17:33:28    0.0 (2 restrained)
-##  2      -383.859           1.0    160 17:33:28    0.0
-##  3      -344.687           1.0    160 17:33:28    0.0
-##  4      -321.489           1.0    160 17:33:28    0.0
-##  5      -312.488           1.0    160 17:33:28    0.0
-##  6      -311.167           1.0    160 17:33:28    0.0
-##  7      -311.083           1.0    160 17:33:28    0.0
-##  8      -311.082           1.0    160 17:33:28    0.0&lt;/code&gt;&lt;/pre&gt;
+##  1      -398.023           1.0    160 18:20:23    0.0 (2 restrained)
+##  2      -383.859           1.0    160 18:20:23    0.0
+##  3      -344.687           1.0    160 18:20:23    0.0
+##  4      -321.489           1.0    160 18:20:23    0.0
+##  5      -312.488           1.0    160 18:20:23    0.0
+##  6      -311.167           1.0    160 18:20:23    0.0
+##  7      -311.083           1.0    160 18:20:23    0.0
+##  8      -311.082           1.0    160 18:20:23    0.0&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;lrt.asreml(mod.asreml, mod.asreml2)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Likelihood ratio test(s) assuming nested random models.
 ## (See Self &amp;amp; Liang, 1987)
@@ -1926,16 +2118,16 @@ vpredict(mod.asreml, rb ~ V2 / (sqrt(V1)*sqrt(V3) ) )&lt;/code&gt;&lt;/pre&gt;
         residual = ~ units:idh(trait), 
         data=dataset)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Model fitted using the sigma parameterization.
-## ASReml 4.1.0 Fri May 10 17:33:29 2019
+## ASReml 4.1.0 Thu Jan  2 18:20:24 2020
 ##           LogLik        Sigma2     DF     wall    cpu
-##  1      -398.027           1.0    160 17:33:29    0.0 (2 restrained)
-##  2      -383.866           1.0    160 17:33:29    0.0
-##  3      -344.694           1.0    160 17:33:29    0.0
-##  4      -321.497           1.0    160 17:33:29    0.0
-##  5      -312.496           1.0    160 17:33:29    0.0
-##  6      -311.175           1.0    160 17:33:29    0.0
-##  7      -311.090           1.0    160 17:33:29    0.0
-##  8      -311.090           1.0    160 17:33:29    0.0&lt;/code&gt;&lt;/pre&gt;
+##  1      -398.027           1.0    160 18:20:24    0.0 (2 restrained)
+##  2      -383.866           1.0    160 18:20:24    0.0
+##  3      -344.694           1.0    160 18:20:24    0.0
+##  4      -321.497           1.0    160 18:20:24    0.0
+##  5      -312.496           1.0    160 18:20:24    0.0
+##  6      -311.175           1.0    160 18:20:24    0.0
+##  7      -311.090           1.0    160 18:20:24    0.0
+##  8      -311.090           1.0    160 18:20:24    0.0&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;lrt.asreml(mod.asreml, mod.asreml3)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Likelihood ratio test(s) assuming nested random models.
 ## (See Self &amp;amp; Liang, 1987)
@@ -1947,16 +2139,16 @@ vpredict(mod.asreml, rb ~ V2 / (sqrt(V1)*sqrt(V3) ) )&lt;/code&gt;&lt;/pre&gt;
         residual = ~ units:idh(trait), 
         data=dataset)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Model fitted using the sigma parameterization.
-## ASReml 4.1.0 Fri May 10 17:33:30 2019
+## ASReml 4.1.0 Thu Jan  2 18:20:25 2020
 ##           LogLik        Sigma2     DF     wall    cpu
-##  1      -406.458           1.0    160 17:33:30    0.0 (2 restrained)
-##  2      -394.578           1.0    160 17:33:30    0.0
-##  3      -352.769           1.0    160 17:33:30    0.0
-##  4      -327.804           1.0    160 17:33:30    0.0
-##  5      -318.007           1.0    160 17:33:30    0.0
-##  6      -316.616           1.0    160 17:33:30    0.0
-##  7      -316.549           1.0    160 17:33:30    0.0
-##  8      -316.549           1.0    160 17:33:30    0.0&lt;/code&gt;&lt;/pre&gt;
+##  1      -406.458           1.0    160 18:20:25    0.0 (2 restrained)
+##  2      -394.578           1.0    160 18:20:25    0.0
+##  3      -352.769           1.0    160 18:20:25    0.0
+##  4      -327.804           1.0    160 18:20:25    0.0
+##  5      -318.007           1.0    160 18:20:25    0.0
+##  6      -316.616           1.0    160 18:20:25    0.0
+##  7      -316.549           1.0    160 18:20:25    0.0
+##  8      -316.549           1.0    160 18:20:25    0.0&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;lrt.asreml(mod.asreml, mod.asreml4)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Likelihood ratio test(s) assuming nested random models.
 ## (See Self &amp;amp; Liang, 1987)
@@ -1973,19 +2165,19 @@ vpredict(mod.asreml, rb ~ V2 / (sqrt(V1)*sqrt(V3) ) )&lt;/code&gt;&lt;/pre&gt;
         residual = ~ units:corgh(trait, init = c(0.03, 6, 4.5)), 
         data=dataset)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Model fitted using the sigma parameterization.
-## ASReml 4.1.0 Fri May 10 17:33:31 2019
+## ASReml 4.1.0 Thu Jan  2 18:20:26 2020
 ##           LogLik        Sigma2     DF     wall    cpu
-##  1      -632.445           1.0    160 17:33:31    0.0 (3 restrained)
-##  2      -539.383           1.0    160 17:33:31    0.0 (2 restrained)
-##  3      -468.810           1.0    160 17:33:31    0.0 (1 restrained)
-##  4      -422.408           1.0    160 17:33:31    0.0
-##  5      -371.304           1.0    160 17:33:31    0.0
-##  6      -336.191           1.0    160 17:33:31    0.0
-##  7      -317.547           1.0    160 17:33:31    0.0
-##  8      -312.105           1.0    160 17:33:31    0.0
-##  9      -311.118           1.0    160 17:33:31    0.0
-## 10      -311.057           1.0    160 17:33:31    0.0
-## 11      -311.056           1.0    160 17:33:31    0.0&lt;/code&gt;&lt;/pre&gt;
+##  1      -632.445           1.0    160 18:20:26    0.0 (3 restrained)
+##  2      -539.383           1.0    160 18:20:26    0.0 (2 restrained)
+##  3      -468.810           1.0    160 18:20:26    0.0 (1 restrained)
+##  4      -422.408           1.0    160 18:20:26    0.0
+##  5      -371.304           1.0    160 18:20:26    0.0
+##  6      -336.191           1.0    160 18:20:26    0.0
+##  7      -317.547           1.0    160 18:20:26    0.0
+##  8      -312.105           1.0    160 18:20:26    0.0
+##  9      -311.118           1.0    160 18:20:26    0.0
+## 10      -311.057           1.0    160 18:20:26    0.0
+## 11      -311.056           1.0    160 18:20:26    0.0&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(mod.asreml.r)$varcomp[,1:2]&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##                                             component  std.error
 ## Block:trait!trait!TKW:!trait!Yield.cor    -0.09759916  0.7571335
@@ -2029,19 +2221,19 @@ mod.asreml.r2 &amp;lt;- asreml(cbind(Yield, TKW) ~ trait - 1,
         residual = ~ units:corgh(trait), 
         data=dataset, R.param = init2)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Model fitted using the sigma parameterization.
-## ASReml 4.1.0 Fri May 10 17:33:33 2019
+## ASReml 4.1.0 Thu Jan  2 18:20:28 2020
 ##           LogLik        Sigma2     DF     wall    cpu
-##  1     -1136.066           1.0    160 17:33:33    0.0 (1 restrained)
-##  2      -939.365           1.0    160 17:33:33    0.0 (1 restrained)
-##  3      -719.371           1.0    160 17:33:33    0.0 (1 restrained)
-##  4      -550.513           1.0    160 17:33:33    0.0
-##  5      -427.355           1.0    160 17:33:33    0.0
-##  6      -353.105           1.0    160 17:33:33    0.0
-##  7      -323.421           1.0    160 17:33:33    0.0
-##  8      -313.616           1.0    160 17:33:33    0.0
-##  9      -311.338           1.0    160 17:33:33    0.0
-## 10      -311.087           1.0    160 17:33:33    0.0
-## 11      -311.082           1.0    160 17:33:33    0.0&lt;/code&gt;&lt;/pre&gt;
+##  1     -1136.066           1.0    160 18:20:28    0.0 (1 restrained)
+##  2      -939.365           1.0    160 18:20:28    0.0 (1 restrained)
+##  3      -719.371           1.0    160 18:20:28    0.0 (1 restrained)
+##  4      -550.513           1.0    160 18:20:28    0.0
+##  5      -427.355           1.0    160 18:20:28    0.0
+##  6      -353.105           1.0    160 18:20:28    0.0
+##  7      -323.421           1.0    160 18:20:28    0.0
+##  8      -313.616           1.0    160 18:20:28    0.0
+##  9      -311.338           1.0    160 18:20:28    0.0
+## 10      -311.087           1.0    160 18:20:28    0.0
+## 11      -311.082           1.0    160 18:20:28    0.0&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(mod.asreml.r2)$varcomp[,1:2]&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##                                             component  std.error
 ## Block:trait!trait!TKW:!trait!Yield.cor    -0.09516456  0.7572040
@@ -2089,18 +2281,18 @@ M&lt;/code&gt;&lt;/pre&gt;
         residual = ~ units:corgh(trait), 
         data=dataset, R.param = init, vcc = M)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;## Model fitted using the sigma parameterization.
-## ASReml 4.1.0 Fri May 10 17:33:34 2019
+## ASReml 4.1.0 Thu Jan  2 18:20:29 2020
 ##           LogLik        Sigma2     DF     wall    cpu
-##  1     -1122.762           1.0    160 17:33:34    0.0 (1 restrained)
-##  2      -900.308           1.0    160 17:33:34    0.0
-##  3      -665.864           1.0    160 17:33:34    0.0
-##  4      -492.020           1.0    160 17:33:34    0.0
-##  5      -383.085           1.0    160 17:33:34    0.0
-##  6      -336.519           1.0    160 17:33:34    0.0 (1 restrained)
-##  7      -319.561           1.0    160 17:33:34    0.0
-##  8      -315.115           1.0    160 17:33:34    0.0
-##  9      -314.540           1.0    160 17:33:34    0.0
-## 10      -314.523           1.0    160 17:33:34    0.0&lt;/code&gt;&lt;/pre&gt;
+##  1     -1122.762           1.0    160 18:20:29    0.0 (1 restrained)
+##  2      -900.308           1.0    160 18:20:29    0.0
+##  3      -665.864           1.0    160 18:20:29    0.0
+##  4      -492.020           1.0    160 18:20:29    0.0
+##  5      -383.085           1.0    160 18:20:29    0.0
+##  6      -336.519           1.0    160 18:20:29    0.0 (1 restrained)
+##  7      -319.561           1.0    160 18:20:29    0.0
+##  8      -315.115           1.0    160 18:20:29    0.0
+##  9      -314.540           1.0    160 18:20:29    0.0
+## 10      -314.523           1.0    160 18:20:29    0.0&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(mod.asreml.r3)$varcomp[,1:3]&lt;/code&gt;&lt;/pre&gt;
 &lt;pre&gt;&lt;code&gt;##                                            component  std.error    z.ratio
 ## Block:trait!trait!TKW:!trait!Yield.cor    -0.1146908  0.7592678 -0.1510545
@@ -2193,9 +2385,7 @@ cov2cor(Tr)&lt;/code&gt;&lt;/pre&gt;
 ## [1,] 1.0000000 0.5579906
 ## [2,] 0.5579906 1.0000000&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;We see that the results are the same as those obtained by using ‘asreml’. Hope these snippets are useful!&lt;/p&gt;
-&lt;/div&gt;
-&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;References&lt;/h1&gt;
+&lt;p&gt;#References&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Butler, D., Cullis, B.R., Gilmour, A., Gogel, B., Thomson, R., 2018. ASReml-r reference manual - version 4. UK.&lt;/li&gt;
 &lt;li&gt;Piepho, H.-P., 2018. Allowing for the structure of a designed experiment when estimating and testing trait correlations. The Journal of Agricultural Science 156, 59–70.&lt;/li&gt;
@@ -2487,11 +2677,12 @@ summary(lcombs)&lt;/code&gt;&lt;/pre&gt;
 &lt;li&gt;melting&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;Obviously, there is a wide array of possibilities; I’ll just mention a few, which I regularly use.&lt;/p&gt;
-&lt;p&gt;#Subsetting the data&lt;/p&gt;
+&lt;div id=&#34;subsetting-the-data&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Subsetting the data&lt;/h1&gt;
 &lt;p&gt;Subsetting means selecting the records (rows) or the variables (columns) which satisfy certain criteria. Let’s take the ‘students.csv’ dataset, which is available on one of my repositories. It is a database of student’s marks in a series of exams for different subjects.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;students &amp;lt;- read.csv(&amp;quot;https://www.casaonofri.it/_datasets/students.csv&amp;quot;, header=T)
-head(students)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##   Id  Subject       Date Mark Year HighSchool
+head(students)
+##   Id  Subject       Date Mark Year HighSchool
 ## 1  1 AGRONOMY 10/06/2002   30 2001   CLASSICO
 ## 2  2 AGRONOMY 08/07/2002   24 2001    AGRARIO
 ## 3  3 AGRONOMY 24/06/2002   30 2001    AGRARIO
@@ -2500,8 +2691,8 @@ head(students)&lt;/code&gt;&lt;/pre&gt;
 ## 6  6 AGRONOMY 09/09/2002   28 2001    AGRARIO&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Let’s say that we want a new dataset, which contains only the students with marks higher than 28.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;subData &amp;lt;- subset(students, Mark &amp;gt;= 28)
-head(subData)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##    Id  Subject       Date Mark Year  HighSchool
+head(subData)
+##    Id  Subject       Date Mark Year  HighSchool
 ## 1   1 AGRONOMY 10/06/2002   30 2001    CLASSICO
 ## 3   3 AGRONOMY 24/06/2002   30 2001     AGRARIO
 ## 5   5 AGRONOMY 23/01/2003   30 2001    CLASSICO
@@ -2510,8 +2701,8 @@ head(subData)&lt;/code&gt;&lt;/pre&gt;
 ## 17 17 AGRONOMY 10/06/2002   30 2001    CLASSICO&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Let’s make it more difficult and extract the records were mark is ranging from 26 to 28 (margins included. Look at the AND clause):&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;subData &amp;lt;- subset(students, Mark &amp;lt;= 28 &amp;amp; Mark &amp;gt;=26)
-head(subData)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##    Id  Subject       Date Mark Year  HighSchool
+head(subData)
+##    Id  Subject       Date Mark Year  HighSchool
 ## 4   4 AGRONOMY 24/06/2002   26 2001    CLASSICO
 ## 6   6 AGRONOMY 09/09/2002   28 2001     AGRARIO
 ## 7   7 AGRONOMY 24/02/2003   26 2001    CLASSICO
@@ -2521,8 +2712,8 @@ head(subData)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Now we are interested in those students who got a mark ranging from 26 to 28 in MATHS (please note the equality relationship written as ‘==’):&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;subData &amp;lt;- subset(students, Mark &amp;lt;= 28 &amp;amp; Mark &amp;gt;=26 &amp;amp; 
                     Subject == &amp;quot;MATHS&amp;quot;)
-head(subData)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##      Id Subject       Date Mark Year  HighSchool
+head(subData)
+##      Id Subject       Date Mark Year  HighSchool
 ## 115 115   MATHS 15/07/2002   26 2001     AGRARIO
 ## 124 124   MATHS 16/09/2002   26 2001 SCIENTIFICO
 ## 138 138   MATHS 04/02/2002   27 2001    CLASSICO
@@ -2533,8 +2724,8 @@ head(subData)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;subData &amp;lt;- subset(students, Mark &amp;lt;= 28 &amp;amp; Mark &amp;gt;=26 &amp;amp; 
                     Subject == &amp;quot;MATHS&amp;quot; | 
                     Subject == &amp;quot;CHEMISTRY&amp;quot;)
-head(subData)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##    Id   Subject       Date Mark Year HighSchool
+head(subData)
+##    Id   Subject       Date Mark Year HighSchool
 ## 64 64 CHEMISTRY 18/06/2003   20 2002    AGRARIO
 ## 65 65 CHEMISTRY 06/06/2002   21 2001   CLASSICO
 ## 66 66 CHEMISTRY 20/02/2003   21 2002   CLASSICO
@@ -2546,8 +2737,8 @@ head(subData)&lt;/code&gt;&lt;/pre&gt;
                     Subject == &amp;quot;MATHS&amp;quot; | 
                     Subject == &amp;quot;CHEMISTRY&amp;quot;,
                   select = c(Subject, Mark, HighSchool))
-head(subData)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##      Subject Mark HighSchool
+head(subData)
+##      Subject Mark HighSchool
 ## 64 CHEMISTRY   20    AGRARIO
 ## 65 CHEMISTRY   21   CLASSICO
 ## 66 CHEMISTRY   21   CLASSICO
@@ -2561,8 +2752,8 @@ head(subData)&lt;/code&gt;&lt;/pre&gt;
                   select = c(-Id, 
                              -Date,
                              -Year))
-head(subData)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##      Subject Mark HighSchool
+head(subData)
+##      Subject Mark HighSchool
 ## 64 CHEMISTRY   20    AGRARIO
 ## 65 CHEMISTRY   21   CLASSICO
 ## 66 CHEMISTRY   21   CLASSICO
@@ -2571,8 +2762,8 @@ head(subData)&lt;/code&gt;&lt;/pre&gt;
 ## 69 CHEMISTRY   23 RAGIONERIA&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Using the function ‘subset()’ is very easy. However, we might have higher flexibility if we subset by using indices. We already know that the notation ‘dataframe[i,j]’ returns the element in the i-th row and j-th column in a data frame. We can of course replace i and j with some subsetting rules. For example, taking the exams where the mark is comprised between 25 and 29 is done as follows:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;subData &amp;lt;- students[(students$Mark &amp;lt;= 29 &amp;amp; students$Mark &amp;gt;=25),]
-head(subData)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##    Id  Subject       Date Mark Year  HighSchool
+head(subData)
+##    Id  Subject       Date Mark Year  HighSchool
 ## 4   4 AGRONOMY 24/06/2002   26 2001    CLASSICO
 ## 6   6 AGRONOMY 09/09/2002   28 2001     AGRARIO
 ## 7   7 AGRONOMY 24/02/2003   26 2001    CLASSICO
@@ -2582,8 +2773,8 @@ head(subData)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;This is useful to quickly edit the data. For example, if we want to replace all marks from 25 to 29 with NAs (Not Available), we can simply do:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;subData &amp;lt;- students
 subData[(subData$Mark &amp;lt;= 29 &amp;amp; subData$Mark &amp;gt;=25), &amp;quot;Mark&amp;quot;] &amp;lt;- NA
-head(subData)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##   Id  Subject       Date Mark Year HighSchool
+head(subData)
+##   Id  Subject       Date Mark Year HighSchool
 ## 1  1 AGRONOMY 10/06/2002   30 2001   CLASSICO
 ## 2  2 AGRONOMY 08/07/2002   24 2001    AGRARIO
 ## 3  3 AGRONOMY 24/06/2002   30 2001    AGRARIO
@@ -2592,19 +2783,21 @@ head(subData)&lt;/code&gt;&lt;/pre&gt;
 ## 6  6 AGRONOMY 09/09/2002   NA 2001    AGRARIO&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Please note that I created a new dataset to make the replacement, in order not to modify the original dataset. Of course, I can use the ‘is.na()’ function to find the missing data and edit them.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;subData[is.na(subData$Mark) == T, &amp;quot;Mark&amp;quot;] &amp;lt;- 0 
-head(subData)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##   Id  Subject       Date Mark Year HighSchool
+head(subData)
+##   Id  Subject       Date Mark Year HighSchool
 ## 1  1 AGRONOMY 10/06/2002   30 2001   CLASSICO
 ## 2  2 AGRONOMY 08/07/2002   24 2001    AGRARIO
 ## 3  3 AGRONOMY 24/06/2002   30 2001    AGRARIO
 ## 4  4 AGRONOMY 24/06/2002    0 2001   CLASSICO
 ## 5  5 AGRONOMY 23/01/2003   30 2001   CLASSICO
 ## 6  6 AGRONOMY 09/09/2002    0 2001    AGRARIO&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;#Sorting the data&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;sorting-the-data&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Sorting the data&lt;/h1&gt;
 &lt;p&gt;Sorting is very much like subsetting by indexing. I just need to use the ‘order’ function. For example, let’s sort the students dataset by mark:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sortedData &amp;lt;- students[order(students$Mark), ]
-head(sortedData)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##    Id   Subject       Date Mark Year  HighSchool
+head(sortedData)
+##    Id   Subject       Date Mark Year  HighSchool
 ## 51 51   BIOLOGY 01/03/2002   18 2001    CLASSICO
 ## 67 67 CHEMISTRY 20/02/2003   18 2002     AGRARIO
 ## 76 76 CHEMISTRY 24/02/2003   18 2002       ALTRO
@@ -2613,8 +2806,8 @@ head(sortedData)&lt;/code&gt;&lt;/pre&gt;
 ## 83 83 CHEMISTRY 23/01/2003   18 2001 SCIENTIFICO&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;We can also sort by decreasing order:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sortedData &amp;lt;- students[order(-students$Mark), ]
-head(sortedData)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##    Id  Subject       Date Mark Year HighSchool
+head(sortedData)
+##    Id  Subject       Date Mark Year HighSchool
 ## 1   1 AGRONOMY 10/06/2002   30 2001   CLASSICO
 ## 3   3 AGRONOMY 24/06/2002   30 2001    AGRARIO
 ## 5   5 AGRONOMY 23/01/2003   30 2001   CLASSICO
@@ -2623,8 +2816,8 @@ head(sortedData)&lt;/code&gt;&lt;/pre&gt;
 ## 19 19 AGRONOMY 09/09/2002   30 2001    AGRARIO&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;We can obviously use multiple keys. For example, let’s sort by subject within marks:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sortedData &amp;lt;- students[order(-students$Mark, students$Subject), ]
-head(sortedData)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##    Id  Subject       Date Mark Year HighSchool
+head(sortedData)
+##    Id  Subject       Date Mark Year HighSchool
 ## 1   1 AGRONOMY 10/06/2002   30 2001   CLASSICO
 ## 3   3 AGRONOMY 24/06/2002   30 2001    AGRARIO
 ## 5   5 AGRONOMY 23/01/2003   30 2001   CLASSICO
@@ -2633,19 +2826,21 @@ head(sortedData)&lt;/code&gt;&lt;/pre&gt;
 ## 19 19 AGRONOMY 09/09/2002   30 2001    AGRARIO&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;If I want to sort in decreasing order on a character variable (such as Subject), I need to use the helper function ‘xtfrm()’:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sortedData &amp;lt;- students[order(-students$Mark, -xtfrm(students$Subject)), ]
-head(sortedData)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##      Id Subject       Date Mark Year  HighSchool
+head(sortedData)
+##      Id Subject       Date Mark Year  HighSchool
 ## 116 116   MATHS 01/07/2002   30 2001       ALTRO
 ## 117 117   MATHS 18/06/2002   30 2001  RAGIONERIA
 ## 118 118   MATHS 09/07/2002   30 2001     AGRARIO
 ## 121 121   MATHS 18/06/2002   30 2001  RAGIONERIA
 ## 123 123   MATHS 09/07/2002   30 2001    CLASSICO
 ## 130 130   MATHS 07/02/2002   30 2001 SCIENTIFICO&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;#Casting the data&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;casting-the-data&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Casting the data&lt;/h1&gt;
 &lt;p&gt;When we have a dataset in the LONG format, we might be interested in reshaping it in the WIDE format. This is the same as what the ‘pivot table’ function in Excel does. For example, take the ‘rimsulfuron.csv’ dataset in my repository. This contains the results of a randomised block experiment, where we have 16 herbicides in four blocks. The dataset is in the LONG format, with one row per plot.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rimsulfuron &amp;lt;- read.csv(&amp;quot;https://www.casaonofri.it/_datasets/rimsulfuron.csv&amp;quot;, header=T)
-head(rimsulfuron)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##   Herbicide Block Height     Yield
+head(rimsulfuron)
+##   Herbicide Block Height     Yield
 ## 1         A    B1  183.4  93.86601
 ## 2         B    B1  187.0 103.14767
 ## 3         C    B1  188.4  92.70994
@@ -2656,8 +2851,8 @@ head(rimsulfuron)&lt;/code&gt;&lt;/pre&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(reshape)
 castData &amp;lt;- cast(Herbicide ~ Block, data = rimsulfuron,
      value = &amp;quot;Yield&amp;quot;)
-head(castData)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##   Herbicide        B1        B2        B3        B4
+head(castData)
+##   Herbicide        B1        B2        B3        B4
 ## 1         A  93.86601 105.38976  94.13755 111.19865
 ## 2         B 103.14767  98.48589 106.13508 128.31921
 ## 3         C  92.70994 106.73288  97.11650 117.76346
@@ -2665,7 +2860,9 @@ head(castData)&lt;/code&gt;&lt;/pre&gt;
 ## 5         E  90.96575 113.00256 104.39530 113.00646
 ## 6         F  98.40900  99.89433 101.68348  93.90775&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Other similar functions are available within the ‘reshape2’ and ‘tidyr’ packages.&lt;/p&gt;
-&lt;p&gt;#Melting the data&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;melting-the-data&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Melting the data&lt;/h1&gt;
 &lt;p&gt;In this case we do the reverse: we transform the dataset from WIDE to LONG format. For this task, I like the ‘melt()’ function in the ‘reshape2’ package, which requires a data frame as input. I would like to use the ‘castData’ object which we have just created by using the ‘cast()’ function above. Unfortunately, this object has a ‘cast_df’ class. Therefore, in order to avoid weird results, I need to change ‘castData’ into a data frame, by using the ‘as.data.frame()’ function.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(reshape2)
 castData &amp;lt;- as.data.frame(castData)
@@ -2674,8 +2871,8 @@ mdati &amp;lt;- melt(castData,
               value.name = &amp;quot;Yield&amp;quot;,
               id=c(&amp;quot;Herbicide&amp;quot;))
 
-head(mdati)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##   Herbicide Block     Yield
+head(mdati)
+##   Herbicide Block     Yield
 ## 1         A    B1  93.86601
 ## 2         B    B1 103.14767
 ## 3         C    B1  92.70994
@@ -2683,6 +2880,13 @@ head(mdati)&lt;/code&gt;&lt;/pre&gt;
 ## 5         E    B1  90.96575
 ## 6         F    B1  98.40900&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Have a nice work with these functions!&lt;/p&gt;
+&lt;hr /&gt;
+&lt;p&gt;Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Borgo XX Giugno 74&lt;br /&gt;
+I-06121 - PERUGIA&lt;/p&gt;
+&lt;/div&gt;
 </description>
     </item>
     
