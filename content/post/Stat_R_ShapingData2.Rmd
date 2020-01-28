@@ -1,0 +1,194 @@
+---
+title: 'Some everyday data tasks: a few hints with R (revisited)'
+author: "Andrea Onofri"
+date: 2020-01-28
+tags: R
+categories: R
+archives: ["2019"]
+---
+
+```{r setup, cache = F, echo = F}
+#Put at the beginning
+knitr::opts_chunk$set(echo = TRUE)
+knitr::knit_hooks$set(document = function(x){ 
+  gsub("```\n*```r*\n*", "", x) 
+})
+```
+
+
+One year ago, I published a post titled 'Some everyday data tasks: a few hints with R'. In that post, I considered four data tasks, that we all need to accomplish daily, i.e.
+
+1. subsetting
+2. sorting
+3. casting
+4. melting
+
+In that post, I used the methods I was more familiar with. And, as a long-time R user, I have mainly incorporated in my workflow all the functions from the base R implementation.
+
+But now, the tidyverse is with us! Well, as far as I know, the tidyverse has been around long before my post. However, for a long time, I did not want to surrender to such a new paradygm. I am no longer a young scientist and, therefore, picking up new techniques is becoming more difficult: why should I abandon my effective workflow in favour of new techniques, which I am not familiar with? Yes I know, the young scientists are thinking that I am just an old dinosaur, who is trying to resist to progress by all means... It is a good point! I see that reading the code produced by my younger collegues is becoming difficult, due to the massive use of the tidyverse and the pipes. I still have a few years to go, before retirement and I do not yet fell like being set aside. Therefore, a few weeks ago I finally surrendered and 'embraced' the tidyverse. Here is how I revisited my previous post.
+
+# Subsetting the data
+
+Subsetting means selecting the records (rows) or the variables (columns) which satisfy certain criteria. Let's take the 'students.csv' dataset, which is available on one of my repositories. It is a database of student's marks in a series of exams for different subjects and, obviously, I will use the 'readr' package to read it.
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+library(readr)
+library(dplyr)
+library(tidyr)
+students <- read_csv("https://www.casaonofri.it/_datasets/students.csv")
+students
+```
+
+With respect to the usual `read.csv` function I saved some typing, as I did not need to specify the 'header = T' argument. Furthermore, printing the tibble only shows the first ten rows, which makes the 'head()' function no longer needed.
+
+Let's go ahead and try to subset this tibble: we want to extract the good students, with marks higher than 28. In my previous post, I used the 'subset()' function. Now, I will use the 'filter()' function in the 'dplyr' package:
+
+```{r}
+# subData <- subset(students, Mark >= 28)
+subData <- filter(students, Mark >= 28)
+subData
+```
+
+I have noted that all other subsetting examples in my previous post can be solved by simply replacing 'subset()' with 'filter()', with no other changes. However, differences appear when I try to select the columns. Indeed, 'dplyr' has a specific function 'select()', which should be used for this purpose. Therefore, in the case that I want to select the students with marks ranging from 26 to 28 in Maths or Chemistry and, at the same time, I want to report only the three columns 'Subject', 'Mark' and 'Date', I need to split the process in two steps (filter and, then, select): 
+
+
+```{r}
+# subData <- subset(students, Mark <= 28 & Mark >=26 & 
+#                     Subject == "MATHS" | 
+#                     Subject == "CHEMISTRY",
+#                   select = c(Subject, Mark, HighSchool))
+subData1 <- filter(students, Mark <= 28 & Mark >=26 & 
+                    Subject == "MATHS" | 
+                    Subject == "CHEMISTRY")
+subData <- select(subData1, c(Subject, Mark, HighSchool))
+```
+
+Looking at the above two-steps process I could easily understand the meaning of the pipe operator: it simply replaces the word 'then' between the two steps (`filter` and then `select` is translated into `filter %>% select`). Here is the resulting code:
+
+```{r}
+subData <- students %>%
+  filter(Mark <= 28 & Mark >=26 & 
+                    Subject == "MATHS" | 
+                    Subject == "CHEMISTRY") %>%
+  select(c(Subject, Mark, HighSchool))
+subData
+```
+
+In the end: there is not much difference between 'subset()' and 'filter()'. However, I must admit I am seduced by the 'pipe' operator... my younger collegues may be right: it should be possible to chain several useful data management steps, producing highly readable code. But... how about debugging?
+
+# Sorting the data
+
+In my previous post I showed how to sort a data frame by using the 'order()' function. Now, I can use the 'arrange()' function:
+
+
+```{r}
+# sortedData <- students[order(-students$Mark, students$Subject), ]
+# head(sortedData)
+sortedData <- arrange(students, desc(Mark), Subject)
+sortedData
+
+# sortedData <- students[order(-students$Mark, -xtfrm(students$Subject)), ]
+# head(sortedData)
+sortedData <- arrange(students, desc(Mark), desc(Subject))
+sortedData
+```
+
+As for sorting, there is no competition! The 'arrange()' function, together with the 'desc()' function for descending order, represents a much clearer way to sort the data, with respect to the traditional 'order()' function.
+
+
+# Casting the data
+
+When we have a dataset in the LONG format, we might be interested in reshaping it into the WIDE format. This is the same as what the 'pivot table' function in Excel does. For example, take the 'rimsulfuron.csv' dataset in my repository. This contains the results of a randomised block experiment, where we have 16 herbicides in four blocks. The dataset is in the LONG format, with one row per plot.
+
+```{r}
+rimsulfuron <- read_csv("https://www.casaonofri.it/_datasets/rimsulfuron.csv")
+rimsulfuron
+```
+
+Let's put this data frame in the WIDE format, with one row per herbicide and one column per block. In my previous post, I used to the 'cast()' function in the 'reshape' package. Now I can use the 'pivot_wider()' function in the 'tidyr' package: the herbicide goes in the first column, the blocks (B1, B2, B3, B4) should go in the next four columns, and each unique level of yield should go in each cell, at the crossing of the correct herbicide row and block column. The 'Height' variable is not needed and it should be removed. Again, a two steps process, that is made easier by using the pipe:
+
+```{r}
+# library(reshape)
+# castData <- cast(Herbicide ~ Block, data = rimsulfuron,
+#      value = "Yield")
+# head(castData)
+
+castData <- rimsulfuron %>%
+  select(-Height) %>%
+  pivot_wider(names_from = Block, values_from = Yield)
+castData
+```
+
+Here, I am not clear with which it is more advantageous than which. Simply, I do not see much difference: none of the two methods is as clear as I would expect it to be!
+
+# Melting the data
+
+In this case we do the reverse: we transform the dataset from WIDE to LONG format. In my previous post I used the 'melt()' function in the 'reshape2' package; now, I will use the 'pivot_longer()' function in 'tidyr'.
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+# library(reshape2)
+# castData <- as.data.frame(castData)
+# mdati <- melt(castData,
+#               variable.name = "Block",
+#               value.name = "Yield",
+#               id=c("Herbicide"))
+# 
+# head(mdati)
+# 
+pivot_longer(castData, names_to = "Block", values_to = "Yield",
+             cols = c(2:5))
+```
+
+As before with casting, neither 'melt()', nor 'pivot_longer()' let me completely satisfied.
+
+# Tidyverse or not tidyverse?
+
+This post is the result of using some functions coming from the 'tidyverse' and related packages, to replace other functions from more traditional packages, which I was more accustomed to, as a long-time R user. What's my feeling about this change? Let me try to figure it out.
+
+1. First of all, it didn't take much time to adjust. I need to thank the authors of 'tidyverse' for being very respectful of tradition.
+2. In one case (ordering), adjusting to the new paradigm brought to a easier coding. In all other cases, the ease of coding was not affected.
+
+Will I stick to the new paradigm or will I go back to my familiar approaches? Should I only consider the simple tasks above, my answer would be: "I'll go back!". However, this would be an unfair answer. Indeed, my data tasks are not as simple as those above. More frequently, my data tasks are made of several different steps. For example: 
+
+1. Take the 'students' dataset 
+2. Filter the marks included between 26 and 28
+3. Remove the 'Id', 'date' and 'high-school' columns
+4. Calculate the mean mark for each subject in each year
+5. Spread those means along Years
+6. Get the overall mean for each subject across years
+
+Let's try to accomplish this task by using both a 'base' approach and a 'tidyverse' approach. 
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+# Traditional approach
+library(reshape)
+students2 <- subset(students, Mark >= 26 | Mark <= 28, 
+                    select = c(-Id, -Date, -HighSchool))
+mstudents2 <- cast(Subject ~ Year, data = students2,
+      value = "Mark", fun.aggregate = mean)
+mstudents2$Mean <- apply(mstudents2[,2:3], 1, mean)
+mstudents2
+
+# Tidyverse approach
+students %>%
+  filter(Mark >= 26 | Mark <= 28) %>%
+  select(c(-Id,-Date,-HighSchool)) %>%
+  group_by(Subject, Year) %>%
+  summarise(Mark = mean(Mark)) %>%
+  pivot_wider(names_from = Year, values_from = Mark) %>%
+  mutate(Mean = (`2001` + `2002`)/2)
+```
+
+I must admit the second piece of code flows much more smooothly and it is much closer to my natural way of thinking. A collegue of mine said that, when it comes to operating on big tables and making really complex operations, the tidyverse is currently considered 'the most powerful tool in the world'. I will have to dedicate another post to such situations. So far, I have started to reconsider my attitute towards the tidyverse.
+
+Thanks for reading!
+
+---
+
+Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences   
+University of Perugia (Italy)   
+Borgo XX Giugno 74   
+I-06121 - PERUGIA   
+
+

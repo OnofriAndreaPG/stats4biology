@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-131792052-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  
+    gtag('config', 'UA-131792052-1');
+  </script>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>The broken bridge between biologists and statisticians  | Some everyday data tasks: a few hints with R (revisited)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="/css/blog.css" />
+    <script type="text/javascript"
+      src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>    
+</head>
+<body>
+
+    
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="/">Home</a>
+            <a class="navbar-item" href="/aboutThis">About this site</a>
+            <a class="navbar-item" href="/Tutorials">Tutorials</a>
+            <a class="navbar-item" href="/_statbook">Book</a>
+            <a class="navbar-item" href="/Rpackages">R packages</a>
+            <a class="navbar-item" href="/links">Links</a>
+            <a class="navbar-item" href="/about">About me</a>
+        </div>
+    </nav>
+    
+
+    
+    <section class="hero is-info is-medium">
+        <div class="hero-body" style="background-image: url(/img/bg-blog.jpg);">
+            <div class="container has-text-centered">
+                <br>
+                <h1 class="title is-size-1">
+                    
+                        Some everyday data tasks: a few hints with R (revisited)
+                    
+                </h1>
+                
+            </div>
+        </div>
+    </section>
+
+
+
+<div class="container">
+    <div class="section">
+    
+
+<div class="columns">
+    <div class="column is-9">
+        <div class="tile is-child box">
+          <p class="subtitle is-size-6 has-text-grey-light">
+          Andrea Onofri &middot;&nbsp; Added on January 28, 2020 &middot;
+          <i class="far fa-clock"></i>&nbsp;12 min read 
+          </p><hr/>
+            <div class="content">
+                
+
+
+<p>One year ago, I published a post titled ‘Some everyday data tasks: a few hints with R’. In that post, I considered four data tasks, that we all need to accomplish daily, i.e.</p>
+<ol style="list-style-type: decimal">
+<li>subsetting</li>
+<li>sorting</li>
+<li>casting</li>
+<li>melting</li>
+</ol>
+<p>In that post, I used the methods I was more familiar with. And, as a long-time R user, I have mainly incorporated in my workflow all the functions from the base R implementation.</p>
+<p>But now, the tidyverse is with us! Well, as far as I know, the tidyverse has been around long before my post. However, for a long time, I did not want to surrender to such a new paradygm. I am no longer a young scientist and, therefore, picking up new techniques is becoming more difficult: why should I abandon my effective workflow in favour of new techniques, which I am not familiar with? Yes I know, the young scientists are thinking that I am just an old dinosaur, who is trying to resist to progress by all means… It is a good point! I see that reading the code produced by my younger collegues is becoming difficult, due to the massive use of the tidyverse and the pipes. I still have a few years to go, before retirement and I do not yet fell like being set aside. Therefore, a few weeks ago I finally surrendered and ‘embraced’ the tidyverse. Here is how I revisited my previous post.</p>
+<div id="subsetting-the-data" class="section level1">
+<h1>Subsetting the data</h1>
+<p>Subsetting means selecting the records (rows) or the variables (columns) which satisfy certain criteria. Let’s take the ‘students.csv’ dataset, which is available on one of my repositories. It is a database of student’s marks in a series of exams for different subjects and, obviously, I will use the ‘readr’ package to read it.</p>
+<pre class="r"><code>library(readr)
+library(dplyr)
+library(tidyr)
+students &lt;- read_csv(&quot;https://www.casaonofri.it/_datasets/students.csv&quot;)
+students
+## # A tibble: 232 x 6
+##       Id Subject  Date        Mark  Year HighSchool 
+##    &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;      
+##  1     1 AGRONOMY 10/06/2002    30  2001 CLASSICO   
+##  2     2 AGRONOMY 08/07/2002    24  2001 AGRARIO    
+##  3     3 AGRONOMY 24/06/2002    30  2001 AGRARIO    
+##  4     4 AGRONOMY 24/06/2002    26  2001 CLASSICO   
+##  5     5 AGRONOMY 23/01/2003    30  2001 CLASSICO   
+##  6     6 AGRONOMY 09/09/2002    28  2001 AGRARIO    
+##  7     7 AGRONOMY 24/02/2003    26  2001 CLASSICO   
+##  8     8 AGRONOMY 09/09/2002    26  2001 SCIENTIFICO
+##  9     9 AGRONOMY 09/09/2002    23  2001 RAGIONERIA 
+## 10    10 AGRONOMY 08/07/2002    27  2001 CLASSICO   
+## # … with 222 more rows</code></pre>
+<p>With respect to the usual <code>read.csv</code> function I saved some typing, as I did not need to specify the ‘header = T’ argument. Furthermore, printing the tibble only shows the first ten rows, which makes the ‘head()’ function no longer needed.</p>
+<p>Let’s go ahead and try to subset this tibble: we want to extract the good students, with marks higher than 28. In my previous post, I used the ‘subset()’ function. Now, I will use the ‘filter()’ function in the ‘dplyr’ package:</p>
+<pre class="r"><code># subData &lt;- subset(students, Mark &gt;= 28)
+subData &lt;- filter(students, Mark &gt;= 28)
+subData
+## # A tibble: 87 x 6
+##       Id Subject  Date        Mark  Year HighSchool 
+##    &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;      
+##  1     1 AGRONOMY 10/06/2002    30  2001 CLASSICO   
+##  2     3 AGRONOMY 24/06/2002    30  2001 AGRARIO    
+##  3     5 AGRONOMY 23/01/2003    30  2001 CLASSICO   
+##  4     6 AGRONOMY 09/09/2002    28  2001 AGRARIO    
+##  5    11 AGRONOMY 09/09/2002    28  2001 SCIENTIFICO
+##  6    17 AGRONOMY 10/06/2002    30  2001 CLASSICO   
+##  7    18 AGRONOMY 10/06/2002    30  2001 AGRARIO    
+##  8    19 AGRONOMY 09/09/2002    30  2001 AGRARIO    
+##  9    20 AGRONOMY 09/09/2002    30  2001 ALTRO      
+## 10    22 AGRONOMY 23/01/2003    30  2001 RAGIONERIA 
+## # … with 77 more rows</code></pre>
+<p>I have noted that all other subsetting examples in my previous post can be solved by simply replacing ‘subset()’ with ‘filter()’, with no other changes. However, differences appear when I try to select the columns. Indeed, ‘dplyr’ has a specific function ‘select()’, which should be used for this purpose. Therefore, in the case that I want to select the students with marks ranging from 26 to 28 in Maths or Chemistry and, at the same time, I want to report only the three columns ‘Subject’, ‘Mark’ and ‘Date’, I need to split the process in two steps (filter and, then, select):</p>
+<pre class="r"><code># subData &lt;- subset(students, Mark &lt;= 28 &amp; Mark &gt;=26 &amp; 
+#                     Subject == &quot;MATHS&quot; | 
+#                     Subject == &quot;CHEMISTRY&quot;,
+#                   select = c(Subject, Mark, HighSchool))
+subData1 &lt;- filter(students, Mark &lt;= 28 &amp; Mark &gt;=26 &amp; 
+                    Subject == &quot;MATHS&quot; | 
+                    Subject == &quot;CHEMISTRY&quot;)
+subData &lt;- select(subData1, c(Subject, Mark, HighSchool))</code></pre>
+<p>Looking at the above two-steps process I could easily understand the meaning of the pipe operator: it simply replaces the word ‘then’ between the two steps (<code>filter</code> and then <code>select</code> is translated into <code>filter %&gt;% select</code>). Here is the resulting code:</p>
+<pre class="r"><code>subData &lt;- students %&gt;%
+  filter(Mark &lt;= 28 &amp; Mark &gt;=26 &amp; 
+                    Subject == &quot;MATHS&quot; | 
+                    Subject == &quot;CHEMISTRY&quot;) %&gt;%
+  select(c(Subject, Mark, HighSchool))
+subData
+## # A tibble: 50 x 3
+##    Subject    Mark HighSchool 
+##    &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;      
+##  1 CHEMISTRY    20 AGRARIO    
+##  2 CHEMISTRY    21 CLASSICO   
+##  3 CHEMISTRY    21 CLASSICO   
+##  4 CHEMISTRY    18 AGRARIO    
+##  5 CHEMISTRY    28 ALTRO      
+##  6 CHEMISTRY    23 RAGIONERIA 
+##  7 CHEMISTRY    26 RAGIONERIA 
+##  8 CHEMISTRY    27 AGRARIO    
+##  9 CHEMISTRY    27 SCIENTIFICO
+## 10 CHEMISTRY    23 RAGIONERIA 
+## # … with 40 more rows</code></pre>
+<p>In the end: there is not much difference between ‘subset()’ and ‘filter()’. However, I must admit I am seduced by the ‘pipe’ operator… my younger collegues may be right: it should be possible to chain several useful data management steps, producing highly readable code. But… how about debugging?</p>
+</div>
+<div id="sorting-the-data" class="section level1">
+<h1>Sorting the data</h1>
+<p>In my previous post I showed how to sort a data frame by using the ‘order()’ function. Now, I can use the ‘arrange()’ function:</p>
+<pre class="r"><code># sortedData &lt;- students[order(-students$Mark, students$Subject), ]
+# head(sortedData)
+sortedData &lt;- arrange(students, desc(Mark), Subject)
+sortedData
+## # A tibble: 232 x 6
+##       Id Subject  Date        Mark  Year HighSchool
+##    &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;     
+##  1     1 AGRONOMY 10/06/2002    30  2001 CLASSICO  
+##  2     3 AGRONOMY 24/06/2002    30  2001 AGRARIO   
+##  3     5 AGRONOMY 23/01/2003    30  2001 CLASSICO  
+##  4    17 AGRONOMY 10/06/2002    30  2001 CLASSICO  
+##  5    18 AGRONOMY 10/06/2002    30  2001 AGRARIO   
+##  6    19 AGRONOMY 09/09/2002    30  2001 AGRARIO   
+##  7    20 AGRONOMY 09/09/2002    30  2001 ALTRO     
+##  8    22 AGRONOMY 23/01/2003    30  2001 RAGIONERIA
+##  9    38 BIOLOGY  28/02/2002    30  2001 AGRARIO   
+## 10    42 BIOLOGY  28/02/2002    30  2001 RAGIONERIA
+## # … with 222 more rows
+# sortedData &lt;- students[order(-students$Mark, -xtfrm(students$Subject)), ]
+# head(sortedData)
+sortedData &lt;- arrange(students, desc(Mark), desc(Subject))
+sortedData
+## # A tibble: 232 x 6
+##       Id Subject Date        Mark  Year HighSchool 
+##    &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;      
+##  1   116 MATHS   01/07/2002    30  2001 ALTRO      
+##  2   117 MATHS   18/06/2002    30  2001 RAGIONERIA 
+##  3   118 MATHS   09/07/2002    30  2001 AGRARIO    
+##  4   121 MATHS   18/06/2002    30  2001 RAGIONERIA 
+##  5   123 MATHS   09/07/2002    30  2001 CLASSICO   
+##  6   130 MATHS   07/02/2002    30  2001 SCIENTIFICO
+##  7   131 MATHS   09/07/2002    30  2001 AGRARIO    
+##  8   134 MATHS   26/02/2002    30  2001 AGRARIO    
+##  9   135 MATHS   11/02/2002    30  2001 AGRARIO    
+## 10   143 MATHS   04/02/2002    30  2001 RAGIONERIA 
+## # … with 222 more rows</code></pre>
+<p>As for sorting, there is no competition! The ‘arrange()’ function, together with the ‘desc()’ function for descending order, represents a much clearer way to sort the data, with respect to the traditional ‘order()’ function.</p>
+</div>
+<div id="casting-the-data" class="section level1">
+<h1>Casting the data</h1>
+<p>When we have a dataset in the LONG format, we might be interested in reshaping it into the WIDE format. This is the same as what the ‘pivot table’ function in Excel does. For example, take the ‘rimsulfuron.csv’ dataset in my repository. This contains the results of a randomised block experiment, where we have 16 herbicides in four blocks. The dataset is in the LONG format, with one row per plot.</p>
+<pre class="r"><code>rimsulfuron &lt;- read_csv(&quot;https://www.casaonofri.it/_datasets/rimsulfuron.csv&quot;)
+## Parsed with column specification:
+## cols(
+##   Herbicide = col_character(),
+##   Block = col_character(),
+##   Height = col_double(),
+##   Yield = col_double()
+## )
+rimsulfuron
+## # A tibble: 60 x 4
+##    Herbicide Block Height Yield
+##    &lt;chr&gt;     &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;
+##  1 A         B1      183.  93.9
+##  2 B         B1      187  103. 
+##  3 C         B1      188.  92.7
+##  4 D         B1      183.  88.7
+##  5 E         B1      184.  91.0
+##  6 F         B1      179.  98.4
+##  7 G         B1      192. 105. 
+##  8 H         B1      191  121. 
+##  9 I         B1      209. 111. 
+## 10 J         B1      210   82.7
+## # … with 50 more rows</code></pre>
+<p>Let’s put this data frame in the WIDE format, with one row per herbicide and one column per block. In my previous post, I used to the ‘cast()’ function in the ‘reshape’ package. Now I can use the ‘pivot_wider()’ function in the ‘tidyr’ package: the herbicide goes in the first column, the blocks (B1, B2, B3, B4) should go in the next four columns, and each unique level of yield should go in each cell, at the crossing of the correct herbicide row and block column. The ‘Height’ variable is not needed and it should be removed. Again, a two steps process, that is made easier by using the pipe:</p>
+<pre class="r"><code># library(reshape)
+# castData &lt;- cast(Herbicide ~ Block, data = rimsulfuron,
+#      value = &quot;Yield&quot;)
+# head(castData)
+
+castData &lt;- rimsulfuron %&gt;%
+  select(-Height) %&gt;%
+  pivot_wider(names_from = Block, values_from = Yield)
+castData
+## # A tibble: 15 x 5
+##    Herbicide    B1    B2    B3    B4
+##    &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1 A          93.9 105.   94.1 111. 
+##  2 B         103.   98.5 106.  128. 
+##  3 C          92.7 107.   97.1 118. 
+##  4 D          88.7 114.  105.  127. 
+##  5 E          91.0 113.  104.  113. 
+##  6 F          98.4  99.9 102.   93.9
+##  7 G         105.  115.  101.  122. 
+##  8 H         121.  113.  111.  107. 
+##  9 I         111.  101.  119.  118. 
+## 10 J          82.7  67.7  65.9  78.5
+## 11 K          41.5  44.1  46.1  11.3
+## 12 L         137.  113.  114.  138. 
+## 13 M         138.  122.  109.  118. 
+## 14 N         130.  119.  127.  123. 
+## 15 O          66.1  33.2  58.4  11.8</code></pre>
+<p>Here, I am not clear with which it is more advantageous than which. Simply, I do not see much difference: none of the two methods is as clear as I would expect it to be!</p>
+</div>
+<div id="melting-the-data" class="section level1">
+<h1>Melting the data</h1>
+<p>In this case we do the reverse: we transform the dataset from WIDE to LONG format. In my previous post I used the ‘melt()’ function in the ‘reshape2’ package; now, I will use the ‘pivot_longer()’ function in ‘tidyr’.</p>
+<pre class="r"><code># library(reshape2)
+# castData &lt;- as.data.frame(castData)
+# mdati &lt;- melt(castData,
+#               variable.name = &quot;Block&quot;,
+#               value.name = &quot;Yield&quot;,
+#               id=c(&quot;Herbicide&quot;))
+# 
+# head(mdati)
+# 
+pivot_longer(castData, names_to = &quot;Block&quot;, values_to = &quot;Yield&quot;,
+             cols = c(2:5))
+## # A tibble: 60 x 3
+##    Herbicide Block Yield
+##    &lt;chr&gt;     &lt;chr&gt; &lt;dbl&gt;
+##  1 A         B1     93.9
+##  2 A         B2    105. 
+##  3 A         B3     94.1
+##  4 A         B4    111. 
+##  5 B         B1    103. 
+##  6 B         B2     98.5
+##  7 B         B3    106. 
+##  8 B         B4    128. 
+##  9 C         B1     92.7
+## 10 C         B2    107. 
+## # … with 50 more rows</code></pre>
+<p>As before with casting, neither ‘melt()’, nor ‘pivot_longer()’ let me completely satisfied.</p>
+</div>
+<div id="tidyverse-or-not-tidyverse" class="section level1">
+<h1>Tidyverse or not tidyverse?</h1>
+<p>This post is the result of using some functions coming from the ‘tidyverse’ and related packages, to replace other functions from more traditional packages, which I was more accustomed to, as a long-time R user. What’s my feeling about this change? Let me try to figure it out.</p>
+<ol style="list-style-type: decimal">
+<li>First of all, it didn’t take much time to adjust. I need to thank the authors of ‘tidyverse’ for being very respectful of tradition.</li>
+<li>In one case (ordering), adjusting to the new paradigm brought to a easier coding. In all other cases, the ease of coding was not affected.</li>
+</ol>
+<p>Will I stick to the new paradigm or will I go back to my familiar approaches? Should I only consider the simple tasks above, my answer would be: “I’ll go back!”. However, this would be an unfair answer. Indeed, my data tasks are not as simple as those above. More frequently, my data tasks are made of several different steps. For example:</p>
+<ol style="list-style-type: decimal">
+<li>Take the ‘students’ dataset</li>
+<li>Filter the marks included between 26 and 28</li>
+<li>Remove the ‘Id’, ‘date’ and ‘high-school’ columns</li>
+<li>Calculate the mean mark for each subject in each year</li>
+<li>Spread those means along Years</li>
+<li>Get the overall mean for each subject across years</li>
+</ol>
+<p>Let’s try to accomplish this task by using both a ‘base’ approach and a ‘tidyverse’ approach.</p>
+<pre class="r"><code># Traditional approach
+library(reshape)
+students2 &lt;- subset(students, Mark &gt;= 26 | Mark &lt;= 28, 
+                    select = c(-Id, -Date, -HighSchool))
+mstudents2 &lt;- cast(Subject ~ Year, data = students2,
+      value = &quot;Mark&quot;, fun.aggregate = mean)
+mstudents2$Mean &lt;- apply(mstudents2[,2:3], 1, mean)
+mstudents2
+##       Subject     2001     2002     Mean
+## 1    AGRONOMY 26.69565 26.25000 26.47283
+## 2     BIOLOGY 26.48000 26.41379 26.44690
+## 3   CHEMISTRY 24.21429 22.19048 23.20238
+## 4   ECONOMICS 27.73077 27.11111 27.42094
+## 5 FRUIT TREES      NaN 26.92857      NaN
+## 6       MATHS 26.59259 25.00000 25.79630
+# Tidyverse approach
+students %&gt;%
+  filter(Mark &gt;= 26 | Mark &lt;= 28) %&gt;%
+  select(c(-Id,-Date,-HighSchool)) %&gt;%
+  group_by(Subject, Year) %&gt;%
+  summarise(Mark = mean(Mark)) %&gt;%
+  pivot_wider(names_from = Year, values_from = Mark) %&gt;%
+  mutate(Mean = (`2001` + `2002`)/2)
+## # A tibble: 6 x 4
+## # Groups:   Subject [6]
+##   Subject     `2001` `2002`  Mean
+##   &lt;chr&gt;        &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;
+## 1 AGRONOMY      26.7   26.2  26.5
+## 2 BIOLOGY       26.5   26.4  26.4
+## 3 CHEMISTRY     24.2   22.2  23.2
+## 4 ECONOMICS     27.7   27.1  27.4
+## 5 FRUIT TREES   NA     26.9  NA  
+## 6 MATHS         26.6   25    25.8</code></pre>
+<p>I must admit the second piece of code flows much more smooothly and it is much closer to my natural way of thinking. A collegue of mine said that, when it comes to operating on big tables and making really complex operations, the tidyverse is currently considered ‘the most powerful tool in the world’. I will have to dedicate another post to such situations. So far, I have started to reconsider my attitute towards the tidyverse.</p>
+<p>Thanks for reading!</p>
+<hr />
+<p>Andrea Onofri<br />
+Department of Agricultural, Food and Environmental Sciences<br />
+University of Perugia (Italy)<br />
+Borgo XX Giugno 74<br />
+I-06121 - PERUGIA</p>
+</div>
+
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Tags</h1>
+        <div class="tags">
+        
+            <span class="tag"><a href="/tags/agricensdata">agricensdata</a></span>
+        
+            <span class="tag"><a href="/tags/aomisc">aomisc</a></span>
+        
+            <span class="tag"><a href="/tags/asreml">asreml</a></span>
+        
+            <span class="tag"><a href="/tags/blogdown">blogdown</a></span>
+        
+            <span class="tag"><a href="/tags/correlation">correlation</a></span>
+        
+            <span class="tag"><a href="/tags/delta_method">delta_method</a></span>
+        
+            <span class="tag"><a href="/tags/drcseedgerm">drcseedgerm</a></span>
+        
+            <span class="tag"><a href="/tags/drm">drm</a></span>
+        
+            <span class="tag"><a href="/tags/error_propagation">error_propagation</a></span>
+        
+            <span class="tag"><a href="/tags/linear_models">linear_models</a></span>
+        
+            <span class="tag"><a href="/tags/mixed_models">mixed_models</a></span>
+        
+            <span class="tag"><a href="/tags/multi_environment_studies">multi_environment_studies</a></span>
+        
+            <span class="tag"><a href="/tags/nlme">nlme</a></span>
+        
+            <span class="tag"><a href="/tags/nls">nls</a></span>
+        
+            <span class="tag"><a href="/tags/nonlinear_regression">nonlinear_regression</a></span>
+        
+            <span class="tag"><a href="/tags/r">r</a></span>
+        
+            <span class="tag"><a href="/tags/seed_germination">seed_germination</a></span>
+        
+            <span class="tag"><a href="/tags/split_plot">split_plot</a></span>
+        
+            <span class="tag"><a href="/tags/time_to_event_models">time_to_event_models</a></span>
+        
+            <span class="tag"><a href="/tags/variance">variance</a></span>
+        
+        </div>          
+    </div>
+</div><br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Recent posts</h1>
+        
+            <h1><a href="/2020/stat_r_shapingdata2/">Some everyday data tasks: a few hints with R (revisited)</a></h1>
+            <time class="has-text-grey-light is-size-7">28 January 2020</time>
+        
+            <h1><a href="/2020/stat_nls_gnlht/">Nonlinear combinations of model parameters in regression</a></h1>
+            <time class="has-text-grey-light is-size-7">9 January 2020</time>
+        
+            <h1><a href="/2019/stat_nlmm_interaction/">Fitting &#39;complex&#39; mixed models with &#39;nlme&#39;: Example #4</a></h1>
+            <time class="has-text-grey-light is-size-7">13 September 2019</time>
+        
+            <h1><a href="/2019/stat_nlmm_designconstraints/">Fitting &#39;complex&#39; mixed models with &#39;nlme&#39;: Example #3</a></h1>
+            <time class="has-text-grey-light is-size-7">13 September 2019</time>
+        
+            <h1><a href="/2019/stat_lmm_2-wayssplitrepeated/">Fitting &#39;complex&#39; mixed models with &#39;nlme&#39;: Example #2</a></h1>
+            <time class="has-text-grey-light is-size-7">13 September 2019</time>
+        
+    </div>
+</div>
+    <br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Archives</h1>
+        
+            <a href="/archives/2020">2020</a> (2)<br>
+        
+            <a href="/archives/2019">2019</a> (15)<br>
+        
+            <a href="/archives/2018">2018</a> (2)<br>
+        
+            <a href="/archives/2014">2014</a> (1)<br>
+        
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+    </div>
+</div>
+<footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+        <p>
+             <span class="icon is-large"><a href="mailto:andrea.onofri@unipg.it" class="mysocial"><i class="far fa-envelope-open fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://github.com/OnofriAndreaPG/" class="mysocial"><i class="fab fa-github fa-3x"></i></a></span>&nbsp;&nbsp;
+                       <span class="icon is-large"><a href="https://www.r.project.org/" class="mysocial"><i class="fab fa-r-project fa-3x"></i></a></span>&nbsp;&nbsp;
+
+            <br><br>
+            Copyright &copy; The broken bridge between biologists and statisticians, 2020 - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a>
+            - <a class="mysocial" href="/aboutThis">About this site</a>
+        </p>
+    </div>
+</footer>
+
+<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+</body>
+</html>
