@@ -65,7 +65,7 @@
         <div class="tile is-child box">
           <p class="subtitle is-size-6 has-text-grey-light">
           Andrea Onofri &middot;&nbsp; Added on January 8, 2019 &middot;
-          <i class="far fa-clock"></i>&nbsp;21 min read 
+          <i class="far fa-clock"></i>&nbsp;22 min read 
           </p><hr/>
             <div class="content">
                 
@@ -83,7 +83,7 @@ library(aomisc)</code></pre>
 </div>
 <div id="curve-shapes" class="section level1">
 <h1>Curve shapes</h1>
-<p>Curves can be easily classified by their shape, which is very helpful to select the correct one, according to the trend of the process under study. We have:</p>
+<p>Functions can be easily classified by the shape they show when they are plotted in a graph. This is helpful to select the correct one, according to the trend of the process under study. We have:</p>
 <ul>
 <li>Polynomials
 <ol style="list-style-type: decimal">
@@ -92,21 +92,26 @@ library(aomisc)</code></pre>
 </ol></li>
 <li>Concave/Convex curves (no inflection)
 <ol style="list-style-type: decimal">
-<li>Exponential curve</li>
-<li>Asymptotic regression</li>
+<li>Exponential function</li>
+<li>Asymptotic function</li>
 <li>Negative exponential function</li>
-<li>Power curve</li>
-<li>Logarithmic equation</li>
+<li>Power curve function</li>
+<li>Logarithmic function</li>
 <li>Rectangular hyperbola</li>
 </ol></li>
-<li>Sygmoidal curves
+<li>Sigmoidal curves
 <ol style="list-style-type: decimal">
-<li>Logistic curve</li>
-<li>Gompertz curve</li>
-<li>Extreme value equation</li>
-<li>Log-logistic curve (Hill equation)</li>
-<li>Weibull-type 1</li>
-<li>Weibull-type 2</li>
+<li>Logistic function</li>
+<li>Gompertz function</li>
+<li>Modified Gompertz function</li>
+<li>Log-logistic function</li>
+<li>Weibull (type 1) function</li>
+<li>Weibull (type 2) function</li>
+</ol></li>
+<li>Curves with maxima/minima
+<ol style="list-style-type: decimal">
+<li>Bragg function</li>
+<li>Lorentz function</li>
 </ol></li>
 </ul>
 </div>
@@ -197,8 +202,8 @@ summary(model)</code></pre>
 ## Residual standard error:
 ## 
 ##  2.621386 (22 degrees of freedom)</code></pre>
-<pre class="r"><code>plot(model, log=&quot;&quot;)</code></pre>
-<p><img src="/articles/usefulEquations_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<pre class="r"><code>plot(model, log = &quot;&quot;)</code></pre>
+<p><img src="/Articles/usefulEquations_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 </div>
 <div id="asymptotic-regression-model" class="section level2">
 <h2>Asymptotic regression model</h2>
@@ -209,7 +214,7 @@ where <span class="math inline">\(a\)</span> is the maximum attainable <span cla
 <pre class="r"><code>D(expression(a - (a - b) * exp (- c * X)), &quot;X&quot;)</code></pre>
 <pre><code>## (a - b) * (exp(-c * X) * c)</code></pre>
 <p>that is:</p>
-<p><span class="math display">\[ Y&#39; = c \, (a - Y)\]</span></p>
+<p><span class="math display">\[ Y’ = c \, (a - Y)\]</span></p>
 <p>This model can be fit with R by using the self starter functions ‘NLS.asymReg()’ and DRC.asymReg(), in the ‘aomisc’ package. The ‘drc’ package contains the function AR.3(), that is a similar parameterisation where <span class="math inline">\(c\)</span> is replaced by <span class="math inline">\(e = 1/c\)</span>. The ‘nlme’ package also contains an alternative parameterisation named ‘SSasymp()’, where <span class="math inline">\(c\)</span> is replaced by <span class="math inline">\(\phi_3 = \log(c)\)</span>.</p>
 <p>We simulate an example.</p>
 <pre class="r"><code>set.seed(1234)
@@ -219,8 +224,8 @@ Ye &lt;- asymReg.fun(X, a, b, c)
 epsilon &lt;- rnorm(8, 0, 0.5)
 Y &lt;- Ye + epsilon
 model &lt;- drm(Y ~ X, fct = DRC.asymReg())
-plot(model, log=&quot;&quot;)</code></pre>
-<p><img src="/articles/usefulEquations_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+plot(model, log = &quot;&quot;)</code></pre>
+<p><img src="/Articles/usefulEquations_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 <p>If we take the above equation and add the constraint that <span class="math inline">\(b = 0\)</span>, we get the following equation, that is often known as negative exponential equation:</p>
 <p><span class="math display">\[Y = a [1 -  \exp (- c  X) ]\]</span></p>
 <p>This equation has a similar shape to the asymptotic regression, but Y is 0 when X is 0 (the curve passes through the origin). It is often used to model the absorbed Photosintetically Active Radiation (<span class="math inline">\(Y = PAR_a\)</span>) as a function of incident PAR (<span class="math inline">\(a = PAR_i\)</span>), Leaf Area Index (X = LAI) and the extinction coefficient (c = k).</p>
@@ -267,15 +272,15 @@ summary(model)</code></pre>
 ## 
 ##  0.9588598 (7 degrees of freedom)</code></pre>
 <pre class="r"><code>plot(model, log=&quot;&quot;)</code></pre>
-<p><img src="/articles/usefulEquations_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p><img src="/Articles/usefulEquations_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 <p>If <span class="math inline">\(b &lt; 0\)</span>, the curve is concave up and <span class="math inline">\(Y\)</span> decreases as <span class="math inline">\(X\)</span> increases.</p>
 <pre class="r"><code>curve(powerCurve.fun(x, coef(model)[1], -coef(model)[2]),
       xlab = &quot;X&quot;, ylab = &quot;Y&quot;)</code></pre>
-<p><img src="/articles/usefulEquations_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p><img src="/Articles/usefulEquations_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 <p>If <span class="math inline">\(b &gt; 1\)</span> is negative, the curve is concave up and <span class="math inline">\(Y\)</span> increases as <span class="math inline">\(X\)</span> increases.</p>
 <pre class="r"><code>curve(powerCurve.fun(x, coef(model)[1], 2),
       xlab = &quot;X&quot;, ylab = &quot;Y&quot;)</code></pre>
-<p><img src="/articles/usefulEquations_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p><img src="/Articles/usefulEquations_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
 </div>
 <div id="logarithmic-equation" class="section level2">
 <h2>Logarithmic equation</h2>
@@ -327,7 +332,7 @@ summary(model)</code></pre>
 ## 
 ##  0.03145785 (4 degrees of freedom)</code></pre>
 <pre class="r"><code>plot(model, log=&quot;&quot;)</code></pre>
-<p><img src="/articles/usefulEquations_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p><img src="/Articles/usefulEquations_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
 <pre class="r"><code>#b is negative
 X &lt;- c(1,2,4,5,7,12)
 a &lt;- 2; b &lt;- -0.5
@@ -351,7 +356,7 @@ summary(model)</code></pre>
 ## 
 ##  0.1310851 (4 degrees of freedom)</code></pre>
 <pre class="r"><code>plot(model, log=&quot;&quot;)</code></pre>
-<p><img src="/articles/usefulEquations_files/figure-html/unnamed-chunk-10-2.png" width="672" /></p>
+<p><img src="/Articles/usefulEquations_files/figure-html/unnamed-chunk-10-2.png" width="672" /></p>
 </div>
 <div id="michaelis-menten-equation" class="section level2">
 <h2>Michaelis-Menten equation</h2>
@@ -407,7 +412,7 @@ summary(model)</code></pre>
 ## 
 ##  0.1195748 (6 degrees of freedom)</code></pre>
 <pre class="r"><code>plot(model, log=&quot;&quot;)</code></pre>
-<p><img src="/articles/usefulEquations_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p><img src="/Articles/usefulEquations_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 <p>The ‘drc’ package also contains the self starting function ‘MM.3()’, where <span class="math inline">\(Y\)</span> is allowed to be equal to <span class="math inline">\(c \neq 0\)</span>, when <span class="math inline">\(X = 0\)</span>.</p>
 </div>
 <div id="yield-loss-curve" class="section level2">
@@ -456,7 +461,7 @@ summary(model)</code></pre>
 ## 
 ##  6.060578 (42 degrees of freedom)</code></pre>
 <pre class="r"><code>plot(model, log=&quot;&quot;)</code></pre>
-<p><img src="/articles/usefulEquations_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p><img src="/Articles/usefulEquations_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 <p>The above fit constrains the yield loss to be 0 when weed density is 0. This is logical, but, it has the important consequence that the weed-free yield is constrained to be equal to the observed weed-free yield, which is not realistic. Therefore, we can reparameterise the yield-loss function, in order to use the observed yield as the dependent variable.</p>
 <p>Indeed, from the above equation we derive:</p>
 <p><span class="math display">\[Y_W  = Y_{WF}  - \frac{Y_L }{100}Y_{WF}  = Y_{WF} \left( {1 - \frac{Y_L }{100}} \right)\]</span></p>
@@ -482,7 +487,7 @@ summary(model)</code></pre>
 ## 
 ##  1.866311 (41 degrees of freedom)</code></pre>
 <pre class="r"><code>plot(model, log=&quot;&quot;)</code></pre>
-<p><img src="/articles/usefulEquations_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p><img src="/Articles/usefulEquations_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
 </div>
 </div>
 <div id="sygmoidal-curves" class="section level1">
@@ -536,7 +541,7 @@ summary(model)</code></pre>
 ## 
 ##  2.970191 (15 degrees of freedom)</code></pre>
 <pre class="r"><code>plot(model, log=&quot;&quot;)</code></pre>
-<p><img src="/articles/usefulEquations_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p><img src="/Articles/usefulEquations_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
 </div>
 <div id="gompertz-curve" class="section level2">
 <h2>Gompertz Curve</h2>
@@ -551,10 +556,10 @@ summary(model)</code></pre>
 <p><span class="math display">\[ Y = c + (d - c) \left\{ 1 - \exp \left\{- \exp \left[ b \, (X - e) \right] \right\} \right\} \]</span></p>
 <p>We add to the previous graph this function (in blue), to show how it differs from the logistic and Gompertz.</p>
 <pre class="r"><code>d &lt;- 10; c &lt;- 2; e &lt;- 7; b &lt;- - 0.5
-curve( G.fun(x, b, c, d, e), xlim = c(0, 20) , xlab=&quot;X&quot;, ylab = &quot;Y&quot;)
-curve( L.fun(x, b, c, d, e), add = T, col = &quot;red&quot; )
-curve( E.fun(x, b, c, d, e), add = T, col = &quot;blue&quot; )</code></pre>
-<p><img src="/articles/usefulEquations_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+curve( G.4.fun(x, b, c, d, e), xlim = c(0, 20) , xlab=&quot;X&quot;, ylab = &quot;Y&quot;)
+curve( L.4.fun(x, b, c, d, e), add = T, col = &quot;red&quot; )
+curve( E.4.fun(x, b, c, d, e), add = T, col = &quot;blue&quot; )</code></pre>
+<p><img src="/Articles/usefulEquations_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
 <p>The self-starters for this function are not yet available, at least to the best of my knowledge.</p>
 </div>
 <div id="log-logistic-curve" class="section level2">
@@ -589,7 +594,7 @@ summary(model)</code></pre>
 ## 
 ##  0.4067837 (28 degrees of freedom)</code></pre>
 <pre class="r"><code>plot(model)</code></pre>
-<p><img src="/articles/usefulEquations_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<p><img src="/Articles/usefulEquations_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
 </div>
 <div id="weibull-curve-type-2" class="section level2">
 <h2>Weibull curve (type 2)</h2>
@@ -606,7 +611,7 @@ summary(model)</code></pre>
 model2 &lt;- drm(FW ~ Dose, fct = W1.4(), data = brassica)
 plot(model)
 plot(model2, add=T, col = &quot;red&quot;)</code></pre>
-<p><img src="/articles/usefulEquations_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p><img src="/Articles/usefulEquations_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
 </div>
 </div>
 
@@ -666,6 +671,9 @@ plot(model2, add=T, col = &quot;red&quot;)</code></pre>
     <div class="card-content">
         <h1 class="title is-5">Recent posts</h1>
         
+            <h1><a href="/2020/stat_nls_selfstarting/">Self-starting routines for nonlinear regression models</a></h1>
+            <time class="has-text-grey-light is-size-7">14 February 2020</time>
+        
             <h1><a href="/2020/stat_r_shapingdata2/">Some everyday data tasks: a few hints with R (revisited)</a></h1>
             <time class="has-text-grey-light is-size-7">28 January 2020</time>
         
@@ -678,9 +686,6 @@ plot(model2, add=T, col = &quot;red&quot;)</code></pre>
             <h1><a href="/2019/stat_nlmm_designconstraints/">Fitting &#39;complex&#39; mixed models with &#39;nlme&#39;: Example #3</a></h1>
             <time class="has-text-grey-light is-size-7">13 September 2019</time>
         
-            <h1><a href="/2019/stat_lmm_2-wayssplitrepeated/">Fitting &#39;complex&#39; mixed models with &#39;nlme&#39;: Example #2</a></h1>
-            <time class="has-text-grey-light is-size-7">13 September 2019</time>
-        
     </div>
 </div>
     <br>
@@ -688,7 +693,7 @@ plot(model2, add=T, col = &quot;red&quot;)</code></pre>
     <div class="card-content">
         <h1 class="title is-5">Archives</h1>
         
-            <a href="/archives/2020">2020</a> (2)<br>
+            <a href="/archives/2020">2020</a> (3)<br>
         
             <a href="/archives/2019">2019</a> (15)<br>
         

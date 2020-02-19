@@ -6,10 +6,197 @@
     <description>Recent content in R on The broken bridge between biologists and statisticians</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2018, @AndreaOnofri</copyright>
-    <lastBuildDate>Tue, 28 Jan 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 14 Feb 2020 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="/tags/r/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Self-starting routines for nonlinear regression models</title>
+      <link>/2020/stat_nls_selfstarting/</link>
+      <pubDate>Fri, 14 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/stat_nls_selfstarting/</guid>
+      <description>
+
+
+&lt;p&gt;In R, the &lt;code&gt;drc&lt;/code&gt; package represents one of the main solutions for nonlinear regression and dose-response analyses (Ritz et al., 2015). It comes with a lot of nonlinear models, which are useful to describe several biological processes, from plant growth to bioassays, from herbicide degradation to seed germination. These models are provided with self-starting functions, which free the user from the hassle of providing initial guesses for model parameters. Indeed, getting these guesses may be a tricky task, both for students and for practitioners.&lt;/p&gt;
+&lt;p&gt;Obviously, we should not expect that all possible models and parameterisations are included in the ‘drc’ package; therefore, sooner or later, we may all find ourselves in the need of building a user-defined function, for some peculiar tasks of nonlinear regression analysis. I found myself in that position several times in the past and it took me awhile to figure out a solution.&lt;/p&gt;
+&lt;p&gt;In this post, I’ll describe how we can simply build self-starters for our nonlinear regression analyses, to be used in connection with the ‘drm()’ function in the ‘drc’ package. In the end, I will also extend the approach to work with the ‘nls()’ function in the ‘stats’ package.&lt;/p&gt;
+&lt;p&gt;Let’s consider the following dataset, depicting the relationship between temperature and growth rate. We may note that the response reaches a maximum value around 30°C, while it is lower below and above such an optimal value.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(drc)
+Temp &amp;lt;- c(5, 10, 15, 20, 25, 30, 35, 40, 45, 50)
+RGR &amp;lt;- c(0.1, 2, 5.7, 9.3, 19.7, 28.4, 20.3, 6.6, 1.3, 0.1)
+plot(RGR ~ Temp, xlim = c(5, 50), 
+     xlab = &amp;quot;Temperature&amp;quot;, ylab = &amp;quot;Growth rate&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/Stat_nls_selfStarting_files/figure-html/unnamed-chunk-1-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;The Bragg equation can be a good candidate model for such a situation. It is characterized by a bell-like shape:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ Y = d \, \exp \left[- b \, (X - e)^2 \right] \]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; is the observed growth rate, &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt; is the temperature, &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; is the maximum level for the expected response, &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt; is the abscissa at which such maximum occurs and &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; is the slope around the inflection points (the curve is bell-shaped and shows two inflection points around the maximum value). Unfortunately, such an equation is not already available within the &lt;code&gt;drc&lt;/code&gt; package. What should we do, then?&lt;/p&gt;
+&lt;p&gt;First of all, let’s write this function in the usual R code. In my opinion, this is more convenient than writing it directly within the &lt;code&gt;drc&lt;/code&gt; framework; indeed, the usual R coding is not specific to any packages and can be used with all other nonlinear regression and plotting facilities, such as &lt;code&gt;nls()&lt;/code&gt;, or &lt;code&gt;nlme()&lt;/code&gt;. Let’s call this new function &lt;code&gt;bragg.3.fun()&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Definition of Bragg function
+bragg.3.fun &amp;lt;- function(X, b, d, e){
+  d * exp(- b * (X - e)^2)
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In order to transport ‘bragg.3.fun()’ into the &lt;code&gt;drc&lt;/code&gt; platform, we need to code a function returning a list of (at least) three components:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;a response function (fct)&lt;/li&gt;
+&lt;li&gt;a self-starting routine (ssfct)&lt;/li&gt;
+&lt;li&gt;a vector with the names of parameters (names)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Optionally, we can also include a descriptive text, the derivatives and other useful information. This is the skeleton code, which I use as the template.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;MyNewDRCfun &amp;lt;- function(){
+
+  fct &amp;lt;- function(x, parm) {
+      # function code here
+  }
+  ssfct &amp;lt;- function(data){
+     # Self-starting code here
+  }
+  names &amp;lt;- c()
+  text &amp;lt;- &amp;quot;Descriptive text&amp;quot;
+    
+  ## Returning the function with self starter and names
+  returnList &amp;lt;- list(fct = fct, ssfct = ssfct, names = names, text = text)
+  class(returnList) &amp;lt;- &amp;quot;drcMean&amp;quot;
+  invisible(returnList)
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The two functions &lt;code&gt;fct()&lt;/code&gt; and &lt;code&gt;ssfct()&lt;/code&gt; are called internally by the &lt;code&gt;drm()&lt;/code&gt; function and, therefore, the list of arguments must be defined exactly as shown above. In detail, &lt;code&gt;fct()&lt;/code&gt; receives two arguments as inputs: the predictor &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt; and the dataframe of parameters, with one row and as many columns as there are parameters in the model. The predictor and parameters are used to return the vector of responses; in the code below, I am calling the function &lt;code&gt;bragg.3.fun()&lt;/code&gt; from within the function &lt;code&gt;fct()&lt;/code&gt;. Alternatively, the Bragg function can be directly coded within &lt;code&gt;fct()&lt;/code&gt;.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;fct &amp;lt;- function(x, parm) {
+  bragg.3.fun(x, parm[,1], parm[,2], parm[,3])
+  }&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The function &lt;code&gt;ssfct()&lt;/code&gt; receives one argument as input, that is a dataframe with the predictor in the first column and the observed response in the second. These two variables can be used to calculate the starting values for model parameters. In order to get a starting value for &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt;, we could take the maximum value for the observed response, by using the function &lt;code&gt;max()&lt;/code&gt;. Likewise, to get a starting value for &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt;, we could take the positioning of the maximum value in the observed response and use it to index the predictor. Once we have obtained a starting value for &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt;, we can note that, from the Bragg equation, with simple math, we can derive the following equation:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ \log \left( \frac{Y}{d} \right) = - b \left( X - e\right)^2\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Therefore, if we transform the observed response and the predictor as above, we can use polynomial regression to estimate a starting value for &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt;. In the end, this self starting routine can be coded as follows:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ssftc &amp;lt;- function(data){
+  # Get the data     
+  x &amp;lt;- data[, 1]
+  y &amp;lt;- data[, 2]
+  
+  d &amp;lt;- max(y)
+  e &amp;lt;- x[which.max(y)]
+  
+  ## Linear regression on pseudo-y and pseudo-x
+  pseudoY &amp;lt;- log( y / d )
+  pseudoX &amp;lt;- (x - e)^2
+  coefs &amp;lt;- coef( lm(pseudoY ~ pseudoX - 1) )
+  b &amp;lt;- coefs[1]
+  return( c(b, d, e) )
+  }&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It may be worth to state that the self-starting function may be simply skipped by specifying starting values for model parameters, right inside &lt;code&gt;ssfct()&lt;/code&gt; (see Kniss et al., 2011).&lt;/p&gt;
+&lt;p&gt;Now, let’s ‘encapsulate’ all components within the skeleton function given above:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;DRC.bragg.3 &amp;lt;- function(){
+  fct &amp;lt;- function(x, parm) {
+    bragg.3.fun(x, parm[,1], parm[,2], parm[,3])
+  }
+  ssfct &amp;lt;- function(data){
+    # Get the data     
+    x &amp;lt;- data[, 1]
+    y &amp;lt;- data[, 2]
+    
+    d &amp;lt;- max(y)
+    e &amp;lt;- x[which.max(y)]
+    
+    ## Linear regression on pseudo-y and pseudo-x
+    pseudoY &amp;lt;- log( y / d )
+    pseudoX &amp;lt;- (x - e)^2
+    coefs &amp;lt;- coef( lm(pseudoY ~ pseudoX - 1) )
+    b &amp;lt;- - coefs[1]
+    start &amp;lt;- c(b, d, e)
+    return( start )
+  }
+  names &amp;lt;- c(&amp;quot;b&amp;quot;, &amp;quot;d&amp;quot;, &amp;quot;e&amp;quot;)
+  text &amp;lt;- &amp;quot;Bragg equation&amp;quot;
+    
+  ## Returning the function with self starter and names
+  returnList &amp;lt;- list(fct = fct, ssfct = ssfct, names = names, text = text)
+  class(returnList) &amp;lt;- &amp;quot;drcMean&amp;quot;
+  invisible(returnList)
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Once the &lt;code&gt;DRC.bragg.3()&lt;/code&gt; function is ready, it can be used as the value for the argument &lt;code&gt;fct&lt;/code&gt; in the &lt;code&gt;drm()&lt;/code&gt; function call.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod &amp;lt;- drm(RGR ~ Temp, fct = DRC.bragg.3())
+summary(mod)
+## 
+## Model fitted: Bragg equation
+## 
+## Parameter estimates:
+## 
+##                 Estimate Std. Error t-value   p-value    
+## b:(Intercept)  0.0115272  0.0014506  7.9466 9.513e-05 ***
+## d:(Intercept) 27.4122086  1.4192874 19.3141 2.486e-07 ***
+## e:(Intercept) 29.6392304  0.3872418 76.5393 1.710e-11 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error:
+## 
+##  1.71838 (7 degrees of freedom)
+plot(mod, log = &amp;quot;&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/Stat_nls_selfStarting_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;div id=&#34;and-what-about-nls&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;And… what about nls()?&lt;/h1&gt;
+&lt;p&gt;Yes, I know, some of you may prefer using the function &lt;code&gt;nls()&lt;/code&gt;, within the &lt;code&gt;stats&lt;/code&gt; package. In that platform, we can directly use &lt;code&gt;bragg.3.fun()&lt;/code&gt; as the response model:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod.nls &amp;lt;- nls(RGR ~ bragg.3.fun(Temp, b, d, e),
+               start = list (b = 0.01, d = 27, e = 30))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;However, we are forced to provide starting values for all estimands, which might be a tricky task, unless we build a self-starting routine, as we did before for the &lt;code&gt;drc&lt;/code&gt; platform. This is not an impossible task and we can also re-use part of the code we have already written above. We have to:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;build a self-starting function by using the appropriate coding (see below). In this step we should be careful to the command &lt;code&gt;sortedXyData(mCall[[&amp;quot;X&amp;quot;]], LHS, data)&lt;/code&gt;. The part in quotation marks (“X”) should correspond to the name of the predictor in the &lt;code&gt;bragg.3.fun()&lt;/code&gt; function definition.&lt;/li&gt;
+&lt;li&gt;Use the &lt;code&gt;selfStart()&lt;/code&gt; function to combine the function with its self-starting routine.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;bragg.3.init &amp;lt;- function(mCall, LHS, data) {
+    xy &amp;lt;- sortedXyData(mCall[[&amp;quot;X&amp;quot;]], LHS, data)
+    x &amp;lt;-  xy[, &amp;quot;x&amp;quot;]; y &amp;lt;- xy[, &amp;quot;y&amp;quot;]
+    
+    d &amp;lt;- max(y)
+    e &amp;lt;- x[which.max(y)]
+
+    ## Linear regression on pseudo-y and pseudo-x
+    pseudoY &amp;lt;- log( y / d )
+    pseudoX &amp;lt;- (x - e)^2
+    coefs &amp;lt;- coef( lm(pseudoY ~ pseudoX - 1) )
+    b &amp;lt;- - coefs[1]
+    start &amp;lt;- c(b, d, e)
+    names(start) &amp;lt;- mCall[c(&amp;quot;b&amp;quot;, &amp;quot;d&amp;quot;, &amp;quot;e&amp;quot;)]
+    start
+}
+
+NLS.bragg.3 &amp;lt;- selfStart(bragg.3.fun, bragg.3.init, parameters=c(&amp;quot;b&amp;quot;, &amp;quot;d&amp;quot;, &amp;quot;e&amp;quot;))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now, we can use the &lt;code&gt;NLS.bragg.3()&lt;/code&gt; function in the &lt;code&gt;nls()&lt;/code&gt; call:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod.nls &amp;lt;- nls(RGR ~ NLS.bragg.3(Temp, b, d, e) )
+summary(mod.nls)
+## 
+## Formula: RGR ~ NLS.bragg.3(Temp, b, d, e)
+## 
+## Parameters:
+##    Estimate Std. Error t value Pr(&amp;gt;|t|)    
+## b  0.011527   0.001338   8.618 5.65e-05 ***
+## d 27.411715   1.377361  19.902 2.02e-07 ***
+## e 29.638976   0.382131  77.562 1.56e-11 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error: 1.718 on 7 degrees of freedom
+## 
+## Number of iterations to convergence: 8 
+## Achieved convergence tolerance: 5.203e-06&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I have been building a lot of self-starters, both for &lt;code&gt;drm()&lt;/code&gt; and for &lt;code&gt;nls()&lt;/code&gt; and I have shared them within my &lt;code&gt;aomisc&lt;/code&gt; package. Therefore, should you need to fit some unusual nonlinear regression model, it may be worth to take a look at that package, to see whether you find something suitable.&lt;/p&gt;
+&lt;p&gt;That’s it, thanks for reading!&lt;/p&gt;
+&lt;hr /&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Borgo XX Giugno 74&lt;br /&gt;
+I-06121 - PERUGIA&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Kniss, A.R., Vassios, J.D., Nissen, S.J., Ritz, C., 2011. Nonlinear Regression Analysis of Herbicide Absorption Studies. Weed Science 59, 601–610. &lt;a href=&#34;https://doi.org/10.1614/WS-D-11-00034.1&#34; class=&#34;uri&#34;&gt;https://doi.org/10.1614/WS-D-11-00034.1&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Ritz, C., Baty, F., Streibig, J. C., Gerhard, D. (2015) Dose-Response Analysis Using R PLOS ONE, 10(12), e0146021&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Some everyday data tasks: a few hints with R (revisited)</title>

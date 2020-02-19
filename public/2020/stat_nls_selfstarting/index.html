@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-131792052-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  
+    gtag('config', 'UA-131792052-1');
+  </script>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>The broken bridge between biologists and statisticians  | Self-starting routines for nonlinear regression models</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="/css/blog.css" />
+    <script type="text/javascript"
+      src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>    
+</head>
+<body>
+
+    
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="/">Home</a>
+            <a class="navbar-item" href="/aboutThis">About this site</a>
+            <a class="navbar-item" href="/Tutorials">Tutorials</a>
+            <a class="navbar-item" href="/_statbook">Book</a>
+            <a class="navbar-item" href="/Rpackages">R packages</a>
+            <a class="navbar-item" href="/links">Links</a>
+            <a class="navbar-item" href="/about">About me</a>
+        </div>
+    </nav>
+    
+
+    
+    <section class="hero is-info is-medium">
+        <div class="hero-body" style="background-image: url(/img/bg-blog.jpg);">
+            <div class="container has-text-centered">
+                <br>
+                <h1 class="title is-size-1">
+                    
+                        Self-starting routines for nonlinear regression models
+                    
+                </h1>
+                
+            </div>
+        </div>
+    </section>
+
+
+
+<div class="container">
+    <div class="section">
+    
+
+<div class="columns">
+    <div class="column is-9">
+        <div class="tile is-child box">
+          <p class="subtitle is-size-6 has-text-grey-light">
+          Andrea Onofri &middot;&nbsp; Added on February 14, 2020 &middot;
+          <i class="far fa-clock"></i>&nbsp;8 min read 
+          </p><hr/>
+            <div class="content">
+                
+
+
+<p>In R, the <code>drc</code> package represents one of the main solutions for nonlinear regression and dose-response analyses (Ritz et al., 2015). It comes with a lot of nonlinear models, which are useful to describe several biological processes, from plant growth to bioassays, from herbicide degradation to seed germination. These models are provided with self-starting functions, which free the user from the hassle of providing initial guesses for model parameters. Indeed, getting these guesses may be a tricky task, both for students and for practitioners.</p>
+<p>Obviously, we should not expect that all possible models and parameterisations are included in the ‘drc’ package; therefore, sooner or later, we may all find ourselves in the need of building a user-defined function, for some peculiar tasks of nonlinear regression analysis. I found myself in that position several times in the past and it took me awhile to figure out a solution.</p>
+<p>In this post, I’ll describe how we can simply build self-starters for our nonlinear regression analyses, to be used in connection with the ‘drm()’ function in the ‘drc’ package. In the end, I will also extend the approach to work with the ‘nls()’ function in the ‘stats’ package.</p>
+<p>Let’s consider the following dataset, depicting the relationship between temperature and growth rate. We may note that the response reaches a maximum value around 30°C, while it is lower below and above such an optimal value.</p>
+<pre class="r"><code>library(drc)
+Temp &lt;- c(5, 10, 15, 20, 25, 30, 35, 40, 45, 50)
+RGR &lt;- c(0.1, 2, 5.7, 9.3, 19.7, 28.4, 20.3, 6.6, 1.3, 0.1)
+plot(RGR ~ Temp, xlim = c(5, 50), 
+     xlab = &quot;Temperature&quot;, ylab = &quot;Growth rate&quot;)</code></pre>
+<p><img src="/post/Stat_nls_selfStarting_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p>The Bragg equation can be a good candidate model for such a situation. It is characterized by a bell-like shape:</p>
+<p><span class="math display">\[ Y = d \, \exp \left[- b \, (X - e)^2 \right] \]</span></p>
+<p>where <span class="math inline">\(Y\)</span> is the observed growth rate, <span class="math inline">\(X\)</span> is the temperature, <span class="math inline">\(d\)</span> is the maximum level for the expected response, <span class="math inline">\(e\)</span> is the abscissa at which such maximum occurs and <span class="math inline">\(b\)</span> is the slope around the inflection points (the curve is bell-shaped and shows two inflection points around the maximum value). Unfortunately, such an equation is not already available within the <code>drc</code> package. What should we do, then?</p>
+<p>First of all, let’s write this function in the usual R code. In my opinion, this is more convenient than writing it directly within the <code>drc</code> framework; indeed, the usual R coding is not specific to any packages and can be used with all other nonlinear regression and plotting facilities, such as <code>nls()</code>, or <code>nlme()</code>. Let’s call this new function <code>bragg.3.fun()</code>.</p>
+<pre class="r"><code># Definition of Bragg function
+bragg.3.fun &lt;- function(X, b, d, e){
+  d * exp(- b * (X - e)^2)
+}</code></pre>
+<p>In order to transport ‘bragg.3.fun()’ into the <code>drc</code> platform, we need to code a function returning a list of (at least) three components:</p>
+<ol style="list-style-type: decimal">
+<li>a response function (fct)</li>
+<li>a self-starting routine (ssfct)</li>
+<li>a vector with the names of parameters (names)</li>
+</ol>
+<p>Optionally, we can also include a descriptive text, the derivatives and other useful information. This is the skeleton code, which I use as the template.</p>
+<pre class="r"><code>MyNewDRCfun &lt;- function(){
+
+  fct &lt;- function(x, parm) {
+      # function code here
+  }
+  ssfct &lt;- function(data){
+     # Self-starting code here
+  }
+  names &lt;- c()
+  text &lt;- &quot;Descriptive text&quot;
+    
+  ## Returning the function with self starter and names
+  returnList &lt;- list(fct = fct, ssfct = ssfct, names = names, text = text)
+  class(returnList) &lt;- &quot;drcMean&quot;
+  invisible(returnList)
+}</code></pre>
+<p>The two functions <code>fct()</code> and <code>ssfct()</code> are called internally by the <code>drm()</code> function and, therefore, the list of arguments must be defined exactly as shown above. In detail, <code>fct()</code> receives two arguments as inputs: the predictor <span class="math inline">\(X\)</span> and the dataframe of parameters, with one row and as many columns as there are parameters in the model. The predictor and parameters are used to return the vector of responses; in the code below, I am calling the function <code>bragg.3.fun()</code> from within the function <code>fct()</code>. Alternatively, the Bragg function can be directly coded within <code>fct()</code>.</p>
+<pre><code>fct &lt;- function(x, parm) {
+  bragg.3.fun(x, parm[,1], parm[,2], parm[,3])
+  }</code></pre>
+<p>The function <code>ssfct()</code> receives one argument as input, that is a dataframe with the predictor in the first column and the observed response in the second. These two variables can be used to calculate the starting values for model parameters. In order to get a starting value for <span class="math inline">\(d\)</span>, we could take the maximum value for the observed response, by using the function <code>max()</code>. Likewise, to get a starting value for <span class="math inline">\(e\)</span>, we could take the positioning of the maximum value in the observed response and use it to index the predictor. Once we have obtained a starting value for <span class="math inline">\(d\)</span> and <span class="math inline">\(e\)</span>, we can note that, from the Bragg equation, with simple math, we can derive the following equation:</p>
+<p><span class="math display">\[ \log \left( \frac{Y}{d} \right) = - b \left( X - e\right)^2\]</span></p>
+<p>Therefore, if we transform the observed response and the predictor as above, we can use polynomial regression to estimate a starting value for <span class="math inline">\(b\)</span>. In the end, this self starting routine can be coded as follows:</p>
+<pre class="r"><code>ssftc &lt;- function(data){
+  # Get the data     
+  x &lt;- data[, 1]
+  y &lt;- data[, 2]
+  
+  d &lt;- max(y)
+  e &lt;- x[which.max(y)]
+  
+  ## Linear regression on pseudo-y and pseudo-x
+  pseudoY &lt;- log( y / d )
+  pseudoX &lt;- (x - e)^2
+  coefs &lt;- coef( lm(pseudoY ~ pseudoX - 1) )
+  b &lt;- coefs[1]
+  return( c(b, d, e) )
+  }</code></pre>
+<p>It may be worth to state that the self-starting function may be simply skipped by specifying starting values for model parameters, right inside <code>ssfct()</code> (see Kniss et al., 2011).</p>
+<p>Now, let’s ‘encapsulate’ all components within the skeleton function given above:</p>
+<pre class="r"><code>DRC.bragg.3 &lt;- function(){
+  fct &lt;- function(x, parm) {
+    bragg.3.fun(x, parm[,1], parm[,2], parm[,3])
+  }
+  ssfct &lt;- function(data){
+    # Get the data     
+    x &lt;- data[, 1]
+    y &lt;- data[, 2]
+    
+    d &lt;- max(y)
+    e &lt;- x[which.max(y)]
+    
+    ## Linear regression on pseudo-y and pseudo-x
+    pseudoY &lt;- log( y / d )
+    pseudoX &lt;- (x - e)^2
+    coefs &lt;- coef( lm(pseudoY ~ pseudoX - 1) )
+    b &lt;- - coefs[1]
+    start &lt;- c(b, d, e)
+    return( start )
+  }
+  names &lt;- c(&quot;b&quot;, &quot;d&quot;, &quot;e&quot;)
+  text &lt;- &quot;Bragg equation&quot;
+    
+  ## Returning the function with self starter and names
+  returnList &lt;- list(fct = fct, ssfct = ssfct, names = names, text = text)
+  class(returnList) &lt;- &quot;drcMean&quot;
+  invisible(returnList)
+}</code></pre>
+<p>Once the <code>DRC.bragg.3()</code> function is ready, it can be used as the value for the argument <code>fct</code> in the <code>drm()</code> function call.</p>
+<pre class="r"><code>mod &lt;- drm(RGR ~ Temp, fct = DRC.bragg.3())
+summary(mod)
+## 
+## Model fitted: Bragg equation
+## 
+## Parameter estimates:
+## 
+##                 Estimate Std. Error t-value   p-value    
+## b:(Intercept)  0.0115272  0.0014506  7.9466 9.513e-05 ***
+## d:(Intercept) 27.4122086  1.4192874 19.3141 2.486e-07 ***
+## e:(Intercept) 29.6392304  0.3872418 76.5393 1.710e-11 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error:
+## 
+##  1.71838 (7 degrees of freedom)
+plot(mod, log = &quot;&quot;)</code></pre>
+<p><img src="/post/Stat_nls_selfStarting_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<div id="and-what-about-nls" class="section level1">
+<h1>And… what about nls()?</h1>
+<p>Yes, I know, some of you may prefer using the function <code>nls()</code>, within the <code>stats</code> package. In that platform, we can directly use <code>bragg.3.fun()</code> as the response model:</p>
+<pre class="r"><code>mod.nls &lt;- nls(RGR ~ bragg.3.fun(Temp, b, d, e),
+               start = list (b = 0.01, d = 27, e = 30))</code></pre>
+<p>However, we are forced to provide starting values for all estimands, which might be a tricky task, unless we build a self-starting routine, as we did before for the <code>drc</code> platform. This is not an impossible task and we can also re-use part of the code we have already written above. We have to:</p>
+<ol style="list-style-type: decimal">
+<li>build a self-starting function by using the appropriate coding (see below). In this step we should be careful to the command <code>sortedXyData(mCall[[&quot;X&quot;]], LHS, data)</code>. The part in quotation marks (“X”) should correspond to the name of the predictor in the <code>bragg.3.fun()</code> function definition.</li>
+<li>Use the <code>selfStart()</code> function to combine the function with its self-starting routine.</li>
+</ol>
+<pre class="r"><code>bragg.3.init &lt;- function(mCall, LHS, data) {
+    xy &lt;- sortedXyData(mCall[[&quot;X&quot;]], LHS, data)
+    x &lt;-  xy[, &quot;x&quot;]; y &lt;- xy[, &quot;y&quot;]
+    
+    d &lt;- max(y)
+    e &lt;- x[which.max(y)]
+
+    ## Linear regression on pseudo-y and pseudo-x
+    pseudoY &lt;- log( y / d )
+    pseudoX &lt;- (x - e)^2
+    coefs &lt;- coef( lm(pseudoY ~ pseudoX - 1) )
+    b &lt;- - coefs[1]
+    start &lt;- c(b, d, e)
+    names(start) &lt;- mCall[c(&quot;b&quot;, &quot;d&quot;, &quot;e&quot;)]
+    start
+}
+
+NLS.bragg.3 &lt;- selfStart(bragg.3.fun, bragg.3.init, parameters=c(&quot;b&quot;, &quot;d&quot;, &quot;e&quot;))</code></pre>
+<p>Now, we can use the <code>NLS.bragg.3()</code> function in the <code>nls()</code> call:</p>
+<pre class="r"><code>mod.nls &lt;- nls(RGR ~ NLS.bragg.3(Temp, b, d, e) )
+summary(mod.nls)
+## 
+## Formula: RGR ~ NLS.bragg.3(Temp, b, d, e)
+## 
+## Parameters:
+##    Estimate Std. Error t value Pr(&gt;|t|)    
+## b  0.011527   0.001338   8.618 5.65e-05 ***
+## d 27.411715   1.377361  19.902 2.02e-07 ***
+## e 29.638976   0.382131  77.562 1.56e-11 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.718 on 7 degrees of freedom
+## 
+## Number of iterations to convergence: 8 
+## Achieved convergence tolerance: 5.203e-06</code></pre>
+<p>I have been building a lot of self-starters, both for <code>drm()</code> and for <code>nls()</code> and I have shared them within my <code>aomisc</code> package. Therefore, should you need to fit some unusual nonlinear regression model, it may be worth to take a look at that package, to see whether you find something suitable.</p>
+<p>That’s it, thanks for reading!</p>
+<hr />
+<p>Prof. Andrea Onofri<br />
+Department of Agricultural, Food and Environmental Sciences<br />
+University of Perugia (Italy)<br />
+Borgo XX Giugno 74<br />
+I-06121 - PERUGIA</p>
+</div>
+<div id="references" class="section level1">
+<h1>References</h1>
+<ol style="list-style-type: decimal">
+<li>Kniss, A.R., Vassios, J.D., Nissen, S.J., Ritz, C., 2011. Nonlinear Regression Analysis of Herbicide Absorption Studies. Weed Science 59, 601–610. <a href="https://doi.org/10.1614/WS-D-11-00034.1" class="uri">https://doi.org/10.1614/WS-D-11-00034.1</a></li>
+<li>Ritz, C., Baty, F., Streibig, J. C., Gerhard, D. (2015) Dose-Response Analysis Using R PLOS ONE, 10(12), e0146021</li>
+</ol>
+</div>
+
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Tags</h1>
+        <div class="tags">
+        
+            <span class="tag"><a href="/tags/agricensdata">agricensdata</a></span>
+        
+            <span class="tag"><a href="/tags/aomisc">aomisc</a></span>
+        
+            <span class="tag"><a href="/tags/asreml">asreml</a></span>
+        
+            <span class="tag"><a href="/tags/blogdown">blogdown</a></span>
+        
+            <span class="tag"><a href="/tags/correlation">correlation</a></span>
+        
+            <span class="tag"><a href="/tags/delta_method">delta_method</a></span>
+        
+            <span class="tag"><a href="/tags/drcseedgerm">drcseedgerm</a></span>
+        
+            <span class="tag"><a href="/tags/drm">drm</a></span>
+        
+            <span class="tag"><a href="/tags/error_propagation">error_propagation</a></span>
+        
+            <span class="tag"><a href="/tags/linear_models">linear_models</a></span>
+        
+            <span class="tag"><a href="/tags/mixed_models">mixed_models</a></span>
+        
+            <span class="tag"><a href="/tags/multi_environment_studies">multi_environment_studies</a></span>
+        
+            <span class="tag"><a href="/tags/nlme">nlme</a></span>
+        
+            <span class="tag"><a href="/tags/nls">nls</a></span>
+        
+            <span class="tag"><a href="/tags/nonlinear_regression">nonlinear_regression</a></span>
+        
+            <span class="tag"><a href="/tags/r">r</a></span>
+        
+            <span class="tag"><a href="/tags/seed_germination">seed_germination</a></span>
+        
+            <span class="tag"><a href="/tags/split_plot">split_plot</a></span>
+        
+            <span class="tag"><a href="/tags/time_to_event_models">time_to_event_models</a></span>
+        
+            <span class="tag"><a href="/tags/variance">variance</a></span>
+        
+        </div>          
+    </div>
+</div><br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Recent posts</h1>
+        
+            <h1><a href="/2020/stat_nls_selfstarting/">Self-starting routines for nonlinear regression models</a></h1>
+            <time class="has-text-grey-light is-size-7">14 February 2020</time>
+        
+            <h1><a href="/2020/stat_r_shapingdata2/">Some everyday data tasks: a few hints with R (revisited)</a></h1>
+            <time class="has-text-grey-light is-size-7">28 January 2020</time>
+        
+            <h1><a href="/2020/stat_nls_gnlht/">Nonlinear combinations of model parameters in regression</a></h1>
+            <time class="has-text-grey-light is-size-7">9 January 2020</time>
+        
+            <h1><a href="/2019/stat_nlmm_interaction/">Fitting &#39;complex&#39; mixed models with &#39;nlme&#39;: Example #4</a></h1>
+            <time class="has-text-grey-light is-size-7">13 September 2019</time>
+        
+            <h1><a href="/2019/stat_nlmm_designconstraints/">Fitting &#39;complex&#39; mixed models with &#39;nlme&#39;: Example #3</a></h1>
+            <time class="has-text-grey-light is-size-7">13 September 2019</time>
+        
+    </div>
+</div>
+    <br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Archives</h1>
+        
+            <a href="/archives/2020">2020</a> (3)<br>
+        
+            <a href="/archives/2019">2019</a> (15)<br>
+        
+            <a href="/archives/2018">2018</a> (2)<br>
+        
+            <a href="/archives/2014">2014</a> (1)<br>
+        
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+    </div>
+</div>
+<footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+        <p>
+             <span class="icon is-large"><a href="mailto:andrea.onofri@unipg.it" class="mysocial"><i class="far fa-envelope-open fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://github.com/OnofriAndreaPG/" class="mysocial"><i class="fab fa-github fa-3x"></i></a></span>&nbsp;&nbsp;
+                       <span class="icon is-large"><a href="https://www.r.project.org/" class="mysocial"><i class="fab fa-r-project fa-3x"></i></a></span>&nbsp;&nbsp;
+
+            <br><br>
+            Copyright &copy; The broken bridge between biologists and statisticians, 2020 - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a>
+            - <a class="mysocial" href="/aboutThis">About this site</a>
+        </p>
+    </div>
+</footer>
+
+<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+</body>
+</html>
