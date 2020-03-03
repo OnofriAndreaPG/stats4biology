@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-131792052-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  
+    gtag('config', 'UA-131792052-1');
+  </script>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>The broken bridge between biologists and statisticians  | A collection of self-starters for nonlinear regression in R</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="/css/blog.css" />
+    <script type="text/javascript"
+      src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>    
+</head>
+<body>
+
+    
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="/">Home</a>
+            <a class="navbar-item" href="/aboutThis">About this site</a>
+            <a class="navbar-item" href="/Tutorials">Tutorials</a>
+            <a class="navbar-item" href="/_statbook">Book</a>
+            <a class="navbar-item" href="/Rpackages">R packages</a>
+            <a class="navbar-item" href="/links">Links</a>
+            <a class="navbar-item" href="/about">About me</a>
+        </div>
+    </nav>
+    
+
+    
+    <section class="hero is-info is-medium">
+        <div class="hero-body" style="background-image: url(/img/bg-blog.jpg);">
+            <div class="container has-text-centered">
+                <br>
+                <h1 class="title is-size-1">
+                    
+                        A collection of self-starters for nonlinear regression in R
+                    
+                </h1>
+                
+            </div>
+        </div>
+    </section>
+
+
+
+<div class="container">
+    <div class="section">
+    
+
+<div class="columns">
+    <div class="column is-9">
+        <div class="tile is-child box">
+          <p class="subtitle is-size-6 has-text-grey-light">
+          Andrea Onofri &middot;&nbsp; Added on February 26, 2020 &middot;
+          <i class="far fa-clock"></i>&nbsp;29 min read 
+          </p><hr/>
+            <div class="content">
+                
+
+
+<p>Usually, the first step of every nonlinear regression analysis is to select the function <span class="math inline">\(f\)</span>, which best describes the phenomenon under study. The next step is to fit this function to the observed data, possibly by using some sort of nonlinear least squares algorithms. These algorithms are iterative, in the sense that they start from some initial values of model parameters and repeat a sequence of operations, which continuously improve the initial guesses, until the least squares solution is approximately reached.</p>
+<p>This is the main problem: we need to provide initial values for all model parameters! It is not irrelevant; indeed, if our guesses are not close enough to least squares estimates, the algorithm may freeze during the estimation process and may not reach convergence. Unfortunately, guessing good initial values for model parameters is not always easy, especially for students and practitioners. This is where self-starters come in handy.</p>
+<p>Self-starter functions can automatically calculate initial values for any given dataset and, therefore, they can make nonlinear regression analysis as smooth as linear regression analysis. From a teaching perspective, this means that the transition from linear to nonlinear models is immediate and hassle-free!</p>
+<p>In a recent post (<a href="https://www.statforbiology.com/2020/stat_nls_selfstarting/">see here</a>) I gave detail on how self-starters can be built, both for the ‘nls()’ function in the ‘stats’ package and for the ‘drm()’ function in the ‘drc’ package (Ritz et al., 2019). Both ‘nls()’ and ‘drm()’ can be used to fit nonlinear regression models in R and the respective packages already contain several robust self-starting functions. I am a long-time user of both ‘nls()’ and ‘drm()’ and I have little-by-little built a rather wide knowledge base of self-starters for both. I’ll describe them in this post; they are available within the package ‘aomisc’, that is the accompanying package for this blog.</p>
+<p>First of all, we need to install this package (if necessary) and load it, by using the code below.</p>
+<pre class="r"><code>#installing package, if not yet available
+# library(devtools)
+# install_github(&quot;onofriandreapg/aomisc&quot;)
+
+# loading package
+library(aomisc)</code></pre>
+<hr />
+<div id="functions-and-curve-shapes" class="section level1">
+<h1>Functions and curve shapes</h1>
+<p>Nonlinear regression functions are usually classified according to the shape they show when they are plotted in a XY-graph. Such an approach is taken, e.g., in the great book of Ratkowsky (1990). The following classification is heavily based on that book:</p>
+<ul>
+<li>Polynomials
+<ol style="list-style-type: decimal">
+<li><a href="#straight-line-function">Straight line function</a></li>
+<li><a href="#quadratic-polynomial-function">Quadratic polynomial function</a></li>
+</ol></li>
+<li>Concave/Convex curves (no inflection)
+<ol style="list-style-type: decimal">
+<li><a href="#exponential-function">Exponential function</a></li>
+<li><a href="#asymptotic-function">Asymptotic function / Negative exponential function</a></li>
+<li><a href="#power-function">Power curve function</a></li>
+<li><a href="#logarithmic-function">Logarithmic function</a></li>
+<li><a href="#rectangular-hyperbola">Rectangular hyperbola</a></li>
+</ol></li>
+<li>Sigmoidal curves
+<ol style="list-style-type: decimal">
+<li><a href="#logistic-function">Logistic function</a></li>
+<li><a href="#gompertz-function">Gompertz function</a></li>
+<li><a href="#modified-gompertz-function">Modified Gompertz function</a></li>
+<li><a href="#log-logistic-function">Log-logistic function</a></li>
+<li><a href="#weibull-function-type-1">Weibull (type 1) function</a></li>
+<li><a href="#weibull-function-type-2">Weibull (type 2) function</a></li>
+</ol></li>
+<li>Curves with maxima/minima
+<ol style="list-style-type: decimal">
+<li><a href="#bragg-function">Bragg function</a></li>
+<li><a href="#lorentz-function">Lorentz function</a></li>
+<li><a href="#beta-function">Beta function</a></li>
+</ol></li>
+</ul>
+<p>Let’s go through these functions and see how we can fit them both with ‘nls()’ and ‘drm()’, by using the appropriate self-starters. There are many functions and, therefore, the post is rather long… however, you can look at the graph below to spot the function you are interested in and use the link above to reach the relevant part in this web page.</p>
+<div class="figure"><span id="fig:unnamed-chunk-2"></span>
+<img src="/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-2-1.png" alt="The shapes of the most important functions" width="95%" />
+<p class="caption">
+Figure 1: The shapes of the most important functions
+</p>
+</div>
+<hr />
+</div>
+<div id="polynomials" class="section level1">
+<h1>Polynomials</h1>
+<p>Polynomials are a group on their own, as they are characterized by very flexible shapes, which can be used to describe several different biological processes. They are simple and, although they may be curvilinear, they are always linear in the parameters and can be fitted by using least squares methods. One disadvantage is that they cannot describe asymptotic processes, which are very common in biology. Furthermore, polynomials are prone to overfitting, as we may be tempted to add terms to improve the fit, with little care for biological realism.</p>
+<p>Nowadays, thanks to the wide availability of nonlinear regression algorithms, the use of polynomials has sensibly decreased; linear or quadratic polynomials are mainly used when we want to approximate the observed response within a narrow range of a quantitative predictor. On the other hand, higher order polynomials are very rarely seen, in practice.</p>
+<div id="straight-line-function" class="section level2">
+<h2>Straight line function</h2>
+<p>Among the polynomials, we should cite the straight line. Obviously, this is not a curve, although it deserves to be mentioned here. The equation is:</p>
+<p><span class="math display">\[Y = b_0 + b_1 \, X \quad \quad \quad (1)\]</span></p>
+<p>where <span class="math inline">\(b_0\)</span> is the value of <span class="math inline">\(Y\)</span> when <span class="math inline">\(X = 0\)</span>, <span class="math inline">\(b_1\)</span> is the slope, i.e. the increase/decrease in <span class="math inline">\(Y\)</span> for a unit-increase in <span class="math inline">\(X\)</span>. The Y increases as X increases when <span class="math inline">\(b_1 &gt; 0\)</span>, otherwise it decreases. Straight lines are the most common functions for regression and they are most often used to approximate biological phenomena within a small range for the predictor.</p>
+</div>
+<div id="quadratic-polynomial-function" class="section level2">
+<h2>Quadratic polynomial function</h2>
+<p>The quadratic polynomial is:</p>
+<p><span class="math display">\[Y = b_0 + b_1\, X + b_2 \, X^2 \quad \quad \quad (2)\]</span></p>
+<p>where <span class="math inline">\(b_0\)</span> is the value of <span class="math inline">\(Y\)</span> when <span class="math inline">\(X = 0\)</span>, while <span class="math inline">\(b_1\)</span> and <span class="math inline">\(b_2\)</span>, taken separately, lack a clear biological meaning. However, it is interesting to consider the first derivative, which measures the rate at which the value <span class="math inline">\(Y\)</span> changes with respect to the change of <span class="math inline">\(X\)</span>. Calculating a derivative may be tricky for biologists; however, we can make use of the available facilities in R, represented by the D() function, which requires an expression as the argument:</p>
+<pre class="r"><code>D(expression(a + b*X + c*X^2), &quot;X&quot;)
+## b + c * (2 * X)</code></pre>
+<p>We see that the first derivative is not constant, but it changes according to the level of <span class="math inline">\(X\)</span>. The stationary point, i.e. the point at which the derivative is zero, is <span class="math inline">\(X_m = - b_1 / 2 b_2\)</span>; this point is a maximum when <span class="math inline">\(b_2 &gt; 0\)</span>, otherwise it is a minimum.</p>
+<p>The maximum/minimum value is:</p>
+<p><span class="math display">\[Y_m = \frac{4\,b_0\,b_2 - b_1^2}{4\,b_2}\]</span></p>
+</div>
+<div id="polynomial-fitting-in-r" class="section level2">
+<h2>Polynomial fitting in R</h2>
+<p>In R, polynomials are fitted by using ‘lm()’. In a couple of cases, I found myself in the need of fitting a polynomial by using nonlinear regression with ‘nls()’ o ‘drm()’. I know, this is not efficient…, but some methods for ‘drc’ objects are rather handy. For these unusual cases, we can use the <code>NLS.linear()</code>, <code>NLS.poly2()</code>, <code>DRC.linear()</code> and <code>DRC.poly2()</code> self-starting functions, as available in the ‘aomisc’ package. An example of usage is given below: in this case, the polynomial has been used to describe a concave increasing trend.</p>
+<pre class="r"><code>X &lt;- seq(5, 50, 5)
+Y &lt;- c(12.6, 74.1, 157.6, 225.5, 303.4, 462.8, 
+       669.9, 805.3, 964.2, 1169)
+
+# nls fit
+model &lt;- nls(Y ~ NLS.poly2(X, a, b, c))
+
+#drc fit
+model &lt;- drm(Y ~ X, fct = DRC.poly2())
+summary(model)
+## 
+## Model fitted: Second Order Polynomial (3 parms)
+## 
+## Parameter estimates:
+## 
+##                 Estimate Std. Error t-value  p-value    
+## a:(Intercept) -23.515000  31.175139 -0.7543  0.47528    
+## b:(Intercept)   5.466470   2.604011  2.0993  0.07395 .  
+## c:(Intercept)   0.371561   0.046141  8.0527 8.74e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error:
+## 
+##  26.50605 (7 degrees of freedom)
+plot(model, log = &quot;&quot;, main = &quot;2nd order polynomial&quot;)</code></pre>
+<p><img src="/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<hr />
+</div>
+</div>
+<div id="concaveconvex-curves" class="section level1">
+<h1>Concave/Convex curves</h1>
+<div id="exponential-function" class="section level2">
+<h2>Exponential function</h2>
+<p>The exponential function describes an increasing/decreasing trend, with constant relative rate. The most common equation is:</p>
+<p><span class="math display">\[ Y = a  e^{k X} \quad \quad \quad (3) \]</span></p>
+<p>Two additional and equivalent parameterisations are:</p>
+<p><span class="math display">\[ Y = a  b^X  =  e^{d + k X} \quad \quad \quad (4)\]</span></p>
+<p>The Equations 3 and the two equations 4 are equivalent, as proved by setting <span class="math inline">\(b = e^k\)</span> e <span class="math inline">\(a = e^d\)</span>:</p>
+<p><span class="math display">\[a  b^X  = a  (e^k)^{X} =  a  e^{kX}\]</span></p>
+<p>and:</p>
+<p><span class="math display">\[a  e^{kX} = e^d \cdot e^{kX} =  e^{d + kX}\]</span></p>
+<p>The meaning of <span class="math inline">\(a\)</span> is clear: this is the value of <span class="math inline">\(Y\)</span> when <span class="math inline">\(X = 0\)</span>. In order to understand the meaning of <span class="math inline">\(k\)</span>, we can calculate the first derivative of the exponential function:</p>
+<pre class="r"><code>D(expression(a * exp(k * X)), &quot;X&quot;)
+## a * (exp(k * X) * k)</code></pre>
+<p>From there, we see that the ratio of increase/decrease of <span class="math inline">\(Y\)</span> is:</p>
+<p><span class="math display">\[ \frac{dY}{dX} = k \, a \, e^{k \, X} = k \, Y\]</span></p>
+<p>That is, the relative ratio of increase/decrease is constant and equal to <span class="math inline">\(k\)</span>:</p>
+<p><span class="math display">\[ \frac{dY}{dX} \frac{1}{Y} = k\]</span></p>
+<p><span class="math inline">\(Y\)</span> increases as <span class="math inline">\(X\)</span> increases if <span class="math inline">\(k &gt; 0\)</span> (exponential growth), while it decreases when <span class="math inline">\(k &lt; 0\)</span> (exponential decay). This curve is used to describe the growth of populations in non-limiting environmental conditions, or to describe the degradation of xenobiotics in the environment (first-order degradation kinetic).</p>
+<p>Another slightly different parameterisation exists, which is common in bioassay work and it is mainly used as an exponential decay model:</p>
+<p><span class="math display">\[ Y = d \exp(-x/e) \quad \quad \quad (5)\]</span></p>
+<p>where <span class="math inline">\(d\)</span> is the same as <span class="math inline">\(a\)</span> in the model above and <span class="math inline">\(e = - 1/k\)</span>. For all the aforementioned exponential decay equations <span class="math inline">\(Y \rightarrow 0\)</span> as <span class="math inline">\(X \rightarrow \infty\)</span>. In the above curve, a lower asymptote <span class="math inline">\(c \neq 0\)</span> can also be included, for those situations where the phenomenon under study does not approach 0 when the independent variable approaches infinity:</p>
+<p><span class="math display">\[ Y = c + (d -c) \exp(-x/e) \quad \quad \quad (6)\]</span>
+The exponential function is nonlinear in <span class="math inline">\(k\)</span> and needs to be fitted by using ‘nls()’ or ‘drm()’. Several self-starting functions are available: in the package <code>aomisc</code> you can find <code>NLS.expoGrowth()</code>, <code>NLS.expoDecay()</code>, <code>DRC.expoGrowth()</code> and <code>DRC.expoDecay()</code>, which can be used to fit the Equation 3, respectively with ‘nls()’ and ‘drm()’. The ‘drc’ package also contains the functions <code>EXD.2()</code> and <code>EXD.3()</code>, which can be used to fit, respectively, the Equations 5 and 6. Examples of usage are given below.</p>
+<pre class="r"><code>data(degradation)
+
+# nls fit
+model &lt;- nls(Conc ~ NLS.expoDecay(Time, a, k),
+             data = degradation)
+
+# drm fit
+model &lt;- drm(Conc ~ Time, fct = DRC.expoDecay(),
+             data = degradation)
+summary(model)
+## 
+## Model fitted: Exponential Decay Model (2 parms)
+## 
+## Parameter estimates:
+## 
+##                    Estimate Std. Error t-value   p-value    
+## init:(Intercept) 99.6349312  1.4646680  68.026 &lt; 2.2e-16 ***
+## k:(Intercept)     0.0670391  0.0019089  35.120 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error:
+## 
+##  2.621386 (22 degrees of freedom)
+plot(model, log = &quot;&quot;, main = &quot;Exponential decay&quot;, ylim = c(0, 110))</code></pre>
+<p><img src="/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<hr />
+</div>
+<div id="asymptotic-function" class="section level2">
+<h2>Asymptotic function</h2>
+<p>The asymptotic function can be used to model the growth of a population/individual, where <span class="math inline">\(Y\)</span> approaches an horizontal asymptote as <span class="math inline">\(X\)</span> tends to infinity. This function is used in several different parameterisations and it is also known as the monomolecular growth function, the Mitscherlich law or the von Bertalanffy law. Due to its biological meaning, the most widespread parameterisation is:</p>
+<p><span class="math display">\[Y = a - (a - b) \, \exp (- c  X) \quad \quad \quad (7)\]</span></p>
+<p>where <span class="math inline">\(a\)</span> is the maximum attainable value for <span class="math inline">\(Y\)</span> (plateau), <span class="math inline">\(b\)</span> is the initial <span class="math inline">\(Y\)</span> value (at <span class="math inline">\(X = 0\)</span>) and <span class="math inline">\(c\)</span> is proportional to the relative rate of increase for <span class="math inline">\(Y\)</span> when <span class="math inline">\(X\)</span> increases. Indeed, we can see that the first derivative is:</p>
+<pre class="r"><code>D(expression(a - (a - b) * exp (- c * X)), &quot;X&quot;)
+## (a - b) * (exp(-c * X) * c)</code></pre>
+<p>that is, the absolute ratio of increase of <span class="math inline">\(Y\)</span> at a given <span class="math inline">\(X\)</span> is not constant, but depends on the attained value of <span class="math inline">\(Y\)</span>:</p>
+<p><span class="math display">\[ \frac{dY}{dX} = c \, (a - Y)\]</span></p>
+<p>If we consider the relative rate of increase of <span class="math inline">\(Y\)</span>, we see that:</p>
+<p><span class="math display">\[\frac{dY}{dX} \frac{1}{Y} = c \, \frac{(a - Y)}{Y}\]</span></p>
+<p>It means that the relative rate of increase of <span class="math inline">\(Y\)</span> is maximum at the beginning and approaches 0 when <span class="math inline">\(Y\)</span> approaches the plateau <span class="math inline">\(a\)</span>.</p>
+<p>In order to fit the asymptotic function, the ‘aomisc’ package contains the self-starting routines <code>NLS.asymReg()</code> and <code>DRC.asymReg()</code>, which can be used, respectively, with ‘nls()’ and ‘drm()’. The ‘drc’ package contains the function <code>AR.3()</code>, that is a similar parameterisation where <span class="math inline">\(c\)</span> is replaced by <span class="math inline">\(e = 1/c\)</span>. The ‘nlme’ package also contains an alternative parameterisation, named <code>SSasymp()</code>, where <span class="math inline">\(c\)</span> is replaced by <span class="math inline">\(\phi_3 = \log(c)\)</span>.</p>
+<p>Let’s see an example.</p>
+<pre class="r"><code>X &lt;- c(1, 3, 5, 7, 9, 11, 13, 20)
+Y &lt;- c(8.22, 14.0, 17.2, 16.9, 19.2, 19.6, 19.4, 19.6)
+
+# nls fit
+model &lt;- nls(Y ~ NLS.asymReg(X, init, m, plateau) )
+
+# drm fit
+model &lt;- drm(Y ~ X, fct = DRC.asymReg())
+plot(model, log=&quot;&quot;, main = &quot;Asymptotic regression&quot;, 
+     ylim = c(0,25), xlim = c(0,20))</code></pre>
+<p><img src="/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<hr />
+<p>If we take the asymptotic function and set <span class="math inline">\(b = 0\)</span>, we get the negative exponential function:</p>
+<p><span class="math display">\[Y = a [1 -  \exp (- c  X) ] \quad \quad \quad (8)\]</span></p>
+<p>This function shows a similar shape as the asymptotic function, but <span class="math inline">\(Y\)</span> is 0 when <span class="math inline">\(X\)</span> is 0 (the curve passes through the origin). It is often used to model the absorbed Photosintetically Active Radiation (<span class="math inline">\(Y = PAR_a\)</span>) as a function of Leaf Area Index (X = LAI). In this case, <span class="math inline">\(a\)</span> represents the incident PAR (<span class="math inline">\(a = PAR_i\)</span>), and <span class="math inline">\(c\)</span> represents the extinction coefficient.</p>
+<p>In order to fit the Equation 8, we can use the self-starters <code>NLS.negExp()</code> with ‘nls()’ and <code>DRC.negExp()</code> with ‘drm()’; both self-starters are available within the ‘aomisc’ package. The ‘drc’ package contains the function <code>AR.2()</code>, where <span class="math inline">\(c\)</span> is replaced by <span class="math inline">\(e = 1/c\)</span>. The ‘nlme’ package also contains an alternative parameterisation, named <code>SSasympOrig()</code>, where <span class="math inline">\(c\)</span> is replaced by <span class="math inline">\(\phi_3 = \log(c)\)</span>.</p>
+<hr />
+</div>
+<div id="power-function" class="section level2">
+<h2>Power function</h2>
+<p>The power function is also known as Freundlich function or allometric function and the most common parameterisation is:</p>
+<p><span class="math display">\[Y = a \, X^b \quad \quad \quad (9)\]</span></p>
+<p>This curve is perfectly equivalent to an exponential curve on the logarithm of <span class="math inline">\(X\)</span>. Indeed:</p>
+<p><span class="math display">\[a\,X^b  = a\, e^{\log( X^b )}  = a\,e^{b \, \log(x)}\]</span></p>
+<p>This curve does not have an asymptote for <span class="math inline">\(X \rightarrow \infty\)</span>. The slope (first derivative) of the curve is:</p>
+<pre class="r"><code>D(expression(a * X^b), &quot;X&quot;)
+## a * (X^(b - 1) * b)</code></pre>
+<p>We see that both parameters relate to the ‘slope’ of the curve and <span class="math inline">\(b\)</span> dictates its shape. If <span class="math inline">\(0 &lt; b &lt; 1\)</span>, the response <span class="math inline">\(Y\)</span> increases as <span class="math inline">\(X\)</span> increases and the curve is convex up. If <span class="math inline">\(b &lt; 0\)</span>, the curve is concave up and <span class="math inline">\(Y\)</span> decreases as <span class="math inline">\(X\)</span> increases. Otherwise, if <span class="math inline">\(b &gt; 1\)</span>, the curve is concave up and <span class="math inline">\(Y\)</span> increases as <span class="math inline">\(X\)</span> increases. The three curve types are shown in Figure 1, above.</p>
+<p>The power function (Freundlich equation) is often used in agricultural chemistry, e.g. to model the sorption of xenobiotics in soil. It is also used to model the number of plant species as a function of sampling area (Muller-Dumbois method). The following example uses the <code>DRC.powerCurve()</code> and <code>NLS.powerCurve()</code> self starters in the ‘aomisc’ package to fit a species-area curve.</p>
+<pre class="r"><code>data(speciesArea)
+
+#nls fit
+model &lt;- nls(numSpecies ~ NLS.powerCurve(Area, a, b),
+             data = speciesArea)
+
+# drm fit
+model &lt;- drm(numSpecies ~ Area, fct = DRC.powerCurve(),
+             data = speciesArea)
+summary(model)
+## 
+## Model fitted: Power curve (Freundlich equation) (2 parms)
+## 
+## Parameter estimates:
+## 
+##               Estimate Std. Error t-value   p-value    
+## a:(Intercept) 4.348404   0.337197  12.896 3.917e-06 ***
+## b:(Intercept) 0.329770   0.016723  19.719 2.155e-07 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error:
+## 
+##  0.9588598 (7 degrees of freedom)</code></pre>
+<hr />
+</div>
+<div id="logarithmic-function" class="section level2">
+<h2>Logarithmic function</h2>
+<p>This is indeed a linear model on log-transformed <span class="math inline">\(X\)</span>:</p>
+<p><span class="math display">\[y = a + b \, \log(X) \quad \quad \quad (10)\]</span></p>
+<p>Due to the logarithmic function, it must be <span class="math inline">\(X &gt; 0\)</span>. The parameter <span class="math inline">\(b\)</span> dictates the shape: if <span class="math inline">\(b &gt; 0\)</span>, the curve is convex up and <span class="math inline">\(Y\)</span> increases as <span class="math inline">\(X\)</span> increases. If <span class="math inline">\(b &lt; 0\)</span>, the curve is concave up and <span class="math inline">\(Y\)</span> decreases as <span class="math inline">\(X\)</span> increases, as shown in Figure 1 above.</p>
+<p>The logarithmic equation can be fit by using ‘lm()’. If necessary, it can also be fit by using ‘nls()’ and ‘drm()’: the self-starting functions <code>NLS.logCurve()</code> and <code>DRC.logCurve()</code> are available within the ‘aomisc’ package. We show an example of their usage in the box below.</p>
+<pre class="r"><code>X &lt;- c(1,2,4,5,7,12)
+Y &lt;- c(1.97, 2.32, 2.67, 2.71, 2.86, 3.09)
+
+# lm fit
+model &lt;- lm(Y ~ log(X) )
+
+# nls fit
+model &lt;- nls(Y ~ NLS.logCurve(X, a, b) )
+
+# drm fit
+model &lt;- drm(Y ~ X, fct = DRC.logCurve() )</code></pre>
+<hr />
+</div>
+<div id="rectangular-hyperbola" class="section level2">
+<h2>Rectangular hyperbola</h2>
+<p>This function is also known as the Michaelis-Menten function and it is often parameterised as:</p>
+<p><span class="math display">\[Y = \frac{a \, X} {b + X} \quad \quad \quad (11)\]</span></p>
+<p>The curve is convex up and <span class="math inline">\(Y\)</span> increases as <span class="math inline">\(X\)</span> increases, up to a plateau level. The parameter <span class="math inline">\(a\)</span> represents the higher asymptote (for <span class="math inline">\(X \rightarrow \infty\)</span>), while <span class="math inline">\(b\)</span> is the X value giving a response equal to <span class="math inline">\(a/2\)</span>. Indeed, it is easily shown that:</p>
+<p><span class="math display">\[\frac{a}{2} = \frac{a\,X_{50} } {b + X_{50} } \]</span></p>
+<p>which leads to <span class="math inline">\(b = x_{50}\)</span>.</p>
+<p>The slope (first derivative) is:</p>
+<pre class="r"><code>D(expression( (a*X) / (b + X) ), &quot;X&quot;)
+## a/(b + X) - (a * X)/(b + X)^2</code></pre>
+<p>From there, we can see that the initial slope (at <span class="math inline">\(X = 0\)</span>) is $i = a/b $. The equation 11 is not defined for <span class="math inline">\(X = b\)</span> and it makes no biological sense for <span class="math inline">\(X &lt; b\)</span>.</p>
+<p>An alternative parameterisation is obtained considering that:</p>
+<p><span class="math display">\[Y = \frac{a \, X} {b + X} = \frac{a}{ \frac{b}{X} + \frac{X}{X}} = \frac{a}{1 + \frac{b}{X}} \quad \quad \quad (12)\]</span></p>
+<p>This parameterisation is sometimes used in bioassays and it is parameterised with <span class="math inline">\(d = a\)</span> and <span class="math inline">\(e = b\)</span>. From a strict mathematical point of view, the equation 12 is not defined for <span class="math inline">\(X = 0\)</span>, although it approaches 0 when <span class="math inline">\(X \rightarrow 0\)</span>.</p>
+<p>The Michaelis-Menten function is used in pesticide chemistry, enzyme kinetics and in weed competition studies, to model yield losses as a function of weed density. In R, this model can be fit by using ‘nls()’ and the self-starting functions <code>SSmicmen()</code>, within the package ‘nlme’. If you prefer a ‘drm()’ fit, you can use the <code>MM.2()</code> function in the ‘drc’ package, which uses the parameterisation in Equation 12.</p>
+<pre class="r"><code>X &lt;- c(0, 5, 7, 22, 28, 39, 46, 200)
+Y &lt;- c(12.74, 13.66, 14.11, 14.43, 14.78, 14.86, 14.78, 14.91)
+
+#drm fit
+model &lt;- drm(Y ~ X, fct = MM.2())
+summary(model)
+## 
+## Model fitted: Michaelis-Menten (2 parms)
+## 
+## Parameter estimates:
+## 
+##               Estimate Std. Error t-value  p-value   
+## d:(Intercept) 14.93974    2.86695  5.2110 0.001993 **
+## e:(Intercept)  0.45439    2.24339  0.2025 0.846183   
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error:
+## 
+##  5.202137 (6 degrees of freedom)
+plot(model, log = &quot;&quot;, main = &quot;Michaelis-Menten function&quot;, 
+     ylim = c(12, 15))</code></pre>
+<p><img src="/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<hr />
+</div>
+</div>
+<div id="sigmoidal-curves" class="section level1">
+<h1>Sigmoidal curves</h1>
+<p>Sigmoidal curves are S-shaped and they may be increasing, decreasing, symmetric or non-symmetric around the inflection point. They are parameterised in countless ways, which may often be confusing. I will show some widespread parameterisations, that are very useful for bioassays or growth studies. All curves can be turned from increasing to decreasing (and vice-versa) by reversing the sign of the <span class="math inline">\(b\)</span> parameter.</p>
+<div id="logistic-function" class="section level2">
+<h2>Logistic function</h2>
+<p>The logistic curve derives from the cumulative logistic distribution function; the curve is symmetric around the inflection point and it may be parameterised as:</p>
+<p><span class="math display">\[Y = c + \frac{d - c}{1 + exp(- b (X - e))} \quad \quad \quad (13)\]</span></p>
+<p>where <span class="math inline">\(d\)</span> is the higher asymptote, <span class="math inline">\(c\)</span> is the lower asymptote, <span class="math inline">\(e\)</span> is <span class="math inline">\(X\)</span> value at the inflection point, while <span class="math inline">\(b\)</span> is the slope at the inflection point. As the curve is symmetric, <span class="math inline">\(e\)</span> represents also the <span class="math inline">\(X\)</span> value producing a response half-way between <span class="math inline">\(d\)</span> and <span class="math inline">\(c\)</span> (usually known as the ED50, in biological assay). The parameter <span class="math inline">\(b\)</span> can be positive or negative and, consequently, <span class="math inline">\(Y\)</span> may increase or decrease as <span class="math inline">\(X\)</span> increases.</p>
+<p>The above function is known as the four-parameter logistic. If necessary, constraints can be put on parameter values, i.e. <span class="math inline">\(c\)</span> can be constrained to 0 (three-parameter logistic) and, additionally, <span class="math inline">\(d\)</span> can be constrained to 1 (two-parameter logistic).</p>
+<p>In the ‘aomisc’ package, the three logistic curves (four-, three- and two-parameters) are available as <code>NLS.L4()</code>, <code>NLS.L3()</code> and <code>NLS.L2()</code>, respectively. With ‘drm()’, we can use the self-starting functions <code>L.4()</code> and <code>L.3()</code> in the package ‘drc’, while the <code>L.2()</code> function for the two-parameter logistic has been included in the ‘aomisc’ package. The only difference between the self-starters for ‘drm()’ and the self-starters for ‘nls()’ is that, in the former, the sign for the <span class="math inline">\(b\)</span> parameter is reversed, i.e. it is negative for increasing curves and positive for decreasing curves.</p>
+<p>The four- and three-parameter logistic curves can also be fit with ‘nls()’, respectively with the self-starting functions <code>SSfpl()</code> and <code>SSlogis()</code>, in the ‘nlme’ package. In these functions, <span class="math inline">\(b\)</span> is replaced by <span class="math inline">\(scal = -1/b\)</span>.</p>
+<p>In the box below, I show an example, regarding the growth of a sugar-beet crop.</p>
+<pre class="r"><code>data(beetGrowth)
+
+# nls fit
+model &lt;- nls(weightInf ~ NLS.L3(DAE, b, d, e), data = beetGrowth)
+model.2 &lt;- nls(weightInf ~ NLS.L4(DAE, b, c, d, e), data = beetGrowth)
+model.3 &lt;- nls(weightInf/max(weightInf) ~ NLS.L2(DAE, b, e), data = beetGrowth)
+
+# drm fit
+model &lt;- drm(weightInf ~ DAE, fct = L.3(), data = beetGrowth)
+model.2 &lt;- drm(weightInf ~ DAE, fct = L.4(), data = beetGrowth)
+model.3 &lt;- drm(weightInf/max(weightInf) ~ DAE, fct = L.2(), data = beetGrowth)
+summary(model)
+## 
+## Model fitted: Logistic (ED50 as parameter) with lower limit fixed at 0 (3 parms)
+## 
+## Parameter estimates:
+## 
+##                Estimate Std. Error t-value   p-value    
+## b:(Intercept) -0.118771   0.018319 -6.4835 1.032e-05 ***
+## d:(Intercept) 25.118357   1.279417 19.6327 4.127e-12 ***
+## e:(Intercept) 58.029764   1.834414 31.6340 3.786e-15 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error:
+## 
+##  2.219389 (15 degrees of freedom)
+plot(model, log=&quot;&quot;, main = &quot;Logistic function&quot;)</code></pre>
+<p><img src="/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<hr />
+</div>
+<div id="gompertz-function" class="section level2">
+<h2>Gompertz function</h2>
+<p>The Gompertz curve is parameterised in very many ways. I tend to prefer a parameterisation that resembles the one used for the logistic function:</p>
+<p><span class="math display">\[ Y = c + (d - c) \exp \left\{- \exp \left[ - b \, (X - e) \right] \right\} \quad \quad \quad (14)\]</span></p>
+<p>The difference between the logistic and Gompertz functions is that this latter is not symmetric around the inflection point: it shows a longer lag at the beginning, but raises steadily afterwards. The parameters have the same meaning as those in the logistic function, apart from the fact that <span class="math inline">\(e\)</span>, i.e. the abscissa of the inflection point, does not give a response half-way between <span class="math inline">\(c\)</span> and <span class="math inline">\(d\)</span>. As for the logistic, we can have four-, three- and two-parameter Gompertz functions, which can be used to describe plant growth or several other biological processes.</p>
+<p>In R, the Gompertz equation can be fit by using ‘drm()’ and, respectively the <code>G.4()</code>, <code>G.3()</code> and <code>G.2()</code> self-starters. With ‘nls’, the ‘aomisc’ package contains the corresponding functions <code>NLS.G4()</code>, <code>NLS.G3()</code> and <code>NLS.G2()</code>. As for the logistic, the only difference between the self starters for ‘drm()’ and the self starters for ‘nls()’ is that, in the former, the sign for the <span class="math inline">\(b\)</span> parameter is reversed, i.e. it is negative for increasing curves and positive for decreasing curves.</p>
+<p>The three-parameter Gompertz can also be fit with ‘nls()’, by using the <code>SSGompertz()</code> self-starter in the ‘nlme’ package, although this is a different parameterisation.</p>
+<pre class="r"><code># nls fit
+model &lt;- nls(weightFree ~ NLS.G3(DAE, b, d, e), data = beetGrowth)
+model.2 &lt;- nls(weightFree ~ NLS.G4(DAE, b, c, d, e), data = beetGrowth)
+model.3 &lt;- nls(weightFree/max(weightFree) ~ NLS.G2(DAE, b, e), data = beetGrowth)
+
+# drm fit
+model &lt;- drm(weightFree ~ DAE, fct = G.3(), data = beetGrowth)
+model.2 &lt;- drm(weightFree ~ DAE, fct = G.4(), data = beetGrowth)
+model.3 &lt;- drm(weightFree/max(weightFree) ~ DAE, fct = G.2(), data = beetGrowth)
+summary(model)
+## 
+## Model fitted: Gompertz with lower limit at 0 (3 parms)
+## 
+## Parameter estimates:
+## 
+##                Estimate Std. Error t-value   p-value    
+## b:(Intercept) -0.122255   0.029938 -4.0836 0.0009783 ***
+## d:(Intercept) 35.078529   1.668665 21.0219 1.531e-12 ***
+## e:(Intercept) 49.008075   1.165191 42.0601 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error:
+## 
+##  2.995873 (15 degrees of freedom)
+plot(model, log=&quot;&quot;, main = &quot;Gompertz function&quot;)</code></pre>
+<p><img src="/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<hr />
+</div>
+<div id="modified-gompertz-function" class="section level2">
+<h2>Modified Gompertz function</h2>
+<p>We have seen that the logistic curve is symmetric around the inflection point, while the Gompertz shows a longer lag at the beginning and raises steadily afterwards. We can describe a different pattern by modifying the Gompertz function as follows:</p>
+<p><span class="math display">\[ Y = c + (d - c) \left\{ 1 - \exp \left\{- \exp \left[ b \, (X - e) \right] \right\} \right\} \quad \quad \quad (15)\]</span></p>
+<p>The resulting curve increases steadily at the beginning, but slows down later on. Also for this function, we can put constraints on <span class="math inline">\(d = 1\)</span> and/or <span class="math inline">\(c = 0\)</span>, so that we have four-parameter, three-parameter and two-parameter modified Gompertz equations; these models can be fit by using ‘nls()’ and the self starters <code>NLS.E4()</code>, <code>NLS.E3()</code> and <code>NLS.E2()</code> in the ‘aomisc’ package. Likewise, the modified Gompertz equations can be fit with ‘drm()’ and the self starters <code>E.4()</code>, <code>E.3()</code> and <code>E.2()</code>, also available in the ‘aomisc’ package</p>
+<pre class="r"><code># nls fit
+model &lt;- nls(weightInf ~ NLS.E3(DAE, b, d, e), data = beetGrowth)
+model.2 &lt;- nls(weightFree ~ NLS.E4(DAE, b, c, d, e), data = beetGrowth)
+model.3 &lt;- nls(I(weightFree/max(weightFree)) ~ NLS.E2(DAE, b, e), data = beetGrowth)
+
+
+# drm fit
+model &lt;- drm(weightInf ~ DAE, fct = E.3(), data = beetGrowth)
+model.2 &lt;- drm(weightFree ~ DAE, fct = E.4(), data = beetGrowth)
+model.3 &lt;- drm(weightFree/max(weightFree) ~ DAE, fct = E.2(), data = beetGrowth)
+summary(model)
+## 
+## Model fitted: Modified Gompertz equation (3 parameters) (3 parms)
+## 
+## Parameter estimates:
+## 
+##                Estimate Std. Error t-value   p-value    
+## b:(Intercept)  0.092508   0.013231  6.9917 4.340e-06 ***
+## d:(Intercept) 25.107004   1.304379 19.2482 5.493e-12 ***
+## e:(Intercept) 63.004111   1.747087 36.0624 4.945e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error:
+## 
+##  2.253878 (15 degrees of freedom)
+plot(model, log=&quot;&quot;, main = &quot;Modified Gompertz&quot;)</code></pre>
+<p><img src="/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<hr />
+</div>
+<div id="log-logistic-function" class="section level2">
+<h2>Log-logistic function</h2>
+<p>The log-logistic curve is symmetric on the logarithm of <span class="math inline">\(X\)</span> (a log-normal curve would be practically equivalent, but it is used far less often). For example, in biologic assays (but also in germination assays), the log-logistic curve is defined as follows:</p>
+<p><span class="math display">\[Y = c + \frac{d - c}{1 + \exp \left\{ - b \left[ \log(X) - \log(e) \right] \right\} } \quad \quad \quad (16)\]</span></p>
+<p>The parameters have the same meaning as the logistic equation given above. In particular, <span class="math inline">\(e\)</span> represents the X-level which gives a response half-way between <span class="math inline">\(c\)</span> and <span class="math inline">\(d\)</span> (ED50). It is easy to see that the above equation is equivalent to:</p>
+<p><span class="math display">\[Y = c + \frac{d - c}{1 + \left( \frac{X}{e} \right)^{-b}}\]</span></p>
+<p>Log-logistic functions are used for crop growth, seed germination and bioassay work and they can have the same constraints as the logistic function (four- three- and two-parameter log-logistic). They can be fit by ‘drm()’ and the self starters <code>LL.4()</code> (four-parameter log-logistic), <code>LL.3()</code> (three-parameter log-logistic, with <span class="math inline">\(c = 0\)</span>) and <code>LL.2()</code> (two-parameter log-logistic, with <span class="math inline">\(d = 1\)</span> and <span class="math inline">\(c = 0\)</span>), as available in the ‘drc’ package. With respect to Equation 16, in these self-starters the sign for <span class="math inline">\(b\)</span> is reversed, i.e. it is negative for the increasing log-logistic curve and positive for the decreasing curve. In the package ‘aomisc’, the corresponding self starters for ‘nls()’ are <code>NLS.LL4()</code>, <code>NLS.LL3()</code> and <code>NLS.LL2()</code>, which are all derived from Equation 15 (i.e. the sign of <span class="math inline">\(b\)</span> is positive for increasing curves and negative for decreasing curves).</p>
+<p>We show an example of a log-logistic fit, relating to a bioassay with <em>Brassica rapa</em> treated at increasing dosages of an herbicide.</p>
+<pre class="r"><code>data(brassica)
+
+model &lt;- nls(FW ~ NLS.LL4(Dose, b, c, d, e), data = brassica)
+model &lt;- nls(FW ~ NLS.LL3(Dose, b, d, e), data = brassica)
+model &lt;- nls(FW/max(FW) ~ NLS.LL2(Dose, b, e), data = brassica)
+
+model &lt;- drm(FW ~ Dose, fct = LL.4(), data = brassica)
+summary(model)
+## 
+## Model fitted: Log-logistic (ED50 as parameter) (4 parms)
+## 
+## Parameter estimates:
+## 
+##               Estimate Std. Error t-value   p-value    
+## b:(Intercept)  1.45113    0.24113  6.0181 1.743e-06 ***
+## c:(Intercept)  0.34948    0.18580  1.8810   0.07041 .  
+## d:(Intercept)  4.53636    0.20514 22.1140 &lt; 2.2e-16 ***
+## e:(Intercept)  2.46557    0.35111  7.0221 1.228e-07 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error:
+## 
+##  0.4067837 (28 degrees of freedom)
+plot(model, ylim = c(0,6), main = &quot;Log-logistic function&quot;)</code></pre>
+<p><img src="/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<hr />
+</div>
+<div id="weibull-function-type-1" class="section level2">
+<h2>Weibull function (type 1)</h2>
+<p>The type 1 Weibull function corresponds to the Gompertz, but it is based on the logarithm of <span class="math inline">\(X\)</span>. The equation is as follows:</p>
+<p><span class="math display">\[ Y = c + (d - c) \exp \left\{- \exp \left[ - b \, (\log(X) - \log(e)) \right] \right\} \quad \quad \quad (17)\]</span></p>
+<p>The parameters have the same meaning as the other sigmoidal curves given above, apart from the fact that <span class="math inline">\(e\)</span> is the abscissa of the inflection point, but it is not the ED50.</p>
+<p>The four-parameters, three-parameters and two-parameters Weibull functions can be fit by using ‘drm()’ and the self-starters available within the ‘drc’ package, i.e. <code>W1.4()</code>, <code>W1.3()</code> and <code>W1.2()</code>. The ‘aomisc’ package contains the corresponding self-starters <code>NLS.W1.4()</code>, <code>NLS.W1.3()</code> and <code>NLS.W1.2()</code>, which can be used with ‘nls()’.</p>
+<pre class="r"><code>data(brassica)
+
+model &lt;- nls(FW ~ NLS.W1.4(Dose, b, c, d, e), data = brassica)
+model.2 &lt;- nls(FW ~ NLS.W1.3(Dose, b, d, e), data = brassica)
+model.3 &lt;- nls(FW/max(FW) ~ NLS.W1.2(Dose, b, e), data = brassica)
+
+model &lt;- drm(FW ~ Dose, fct = W1.4(), data = brassica)
+model.2 &lt;- drm(FW ~ Dose, fct = W1.3(), data = brassica)
+model.3 &lt;- drm(FW/max(FW) ~ Dose, fct = W1.2(), data = brassica)
+summary(model)
+## 
+## Model fitted: Weibull (type 1) (4 parms)
+## 
+## Parameter estimates:
+## 
+##               Estimate Std. Error t-value   p-value    
+## b:(Intercept)  1.01252    0.15080  6.7143 2.740e-07 ***
+## c:(Intercept)  0.50418    0.14199  3.5507  0.001381 ** 
+## d:(Intercept)  4.56137    0.19846 22.9841 &lt; 2.2e-16 ***
+## e:(Intercept)  3.55327    0.45039  7.8894 1.359e-08 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error:
+## 
+##  0.3986775 (28 degrees of freedom)
+plot(model, ylim = c(0,6), main = &quot;Weibull type 1&quot;)</code></pre>
+<p><img src="/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<hr />
+</div>
+<div id="weibull-function-type-2" class="section level2">
+<h2>Weibull function (type 2)</h2>
+<p>The type 2 Weibull is similar to the type 1 Weibull, but describes a different type of asymmetry, corresponding to the modified Gompertz function above:</p>
+<p><span class="math display">\[ Y = c + (d - c) \left\{ 1 - \exp \left\{- \exp \left[ b \, (\log(X) - \log(e)) \right] \right\} \right\} \quad \quad \quad (18)\]</span></p>
+<p>As for fitting, the ‘drc’ package contains the self-starting functions <code>W2.4()</code>, <code>W2.3()</code> and <code>W2.2()</code>, which can be used with ‘drm()’ (be careful: the sign for <span class="math inline">\(b\)</span> is reversed, with respect to Equation 18). The ‘aomisc’ package contains the corresponding self-starters <code>NLS.W2.4()</code>, <code>NLS.W2.3()</code> and <code>NLS.W2.2()</code>, which can be used with ‘nls()’.</p>
+<pre class="r"><code>data(brassica)
+
+model &lt;- nls(FW ~ NLS.W2.4(Dose, b, c, d, e), data = brassica)
+model.1 &lt;- nls(FW ~ NLS.W2.3(Dose, b, d, e), data = brassica)
+model.2 &lt;- nls(FW/max(FW) ~ NLS.W2.2(Dose, b, e), data = brassica)
+
+model &lt;- drm(FW ~ Dose, fct = W2.4(), data = brassica)
+summary(model)
+## 
+## Model fitted: Weibull (type 2) (4 parms)
+## 
+## Parameter estimates:
+## 
+##               Estimate Std. Error t-value   p-value    
+## b:(Intercept) -0.96191    0.17684 -5.4395 8.353e-06 ***
+## c:(Intercept)  0.18068    0.25191  0.7173    0.4792    
+## d:(Intercept)  4.53804    0.21576 21.0328 &lt; 2.2e-16 ***
+## e:(Intercept)  1.66342    0.25240  6.5906 3.793e-07 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error:
+## 
+##  0.4215551 (28 degrees of freedom)
+plot(model, ylim = c(0,6), main = &quot;Weibull type 2&quot;)</code></pre>
+<p><img src="/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<hr />
+</div>
+</div>
+<div id="curves-with-maximaminima" class="section level1">
+<h1>Curves with maxima/minima</h1>
+<p>It is sometimes necessary to describe phenomena where the <span class="math inline">\(Y\)</span> variable reaches a maximum value at a certain level of the <span class="math inline">\(X\)</span> variable, and drops afterwords. For example, growth or germination rates are higher at optimal temperature levels and lower at supra-optimal or sub-optimal temperature levels. Another example relates to bioassays: in some cases, low doses of toxic substances induce a stimulation of growth (hormesis), which needs to be described by an appropriate model. Let’s see some functions which may turn out useful in these circumstances.</p>
+<div id="bragg-function" class="section level2">
+<h2>Bragg function</h2>
+<p>This function is connected to the normal (Gaussian) distribution and has a symmetric shape with a maximum equal to <span class="math inline">\(d\)</span>, that is reached when <span class="math inline">\(X = e\)</span> and two inflection points. In this model, <span class="math inline">\(b\)</span> relates to the slope at the inflection points; the response <span class="math inline">\(Y\)</span> approaches 0 when <span class="math inline">\(X\)</span> approaches <span class="math inline">\(\pm \infty\)</span>:</p>
+<p><span class="math display">\[ Y = d \, \exp \left[ - b (X - e)^2 \right] \quad \quad \quad (19)\]</span></p>
+<p>If we would like to have lower asymptotes different from 0, we should add the parameter <span class="math inline">\(c\)</span>, as follows:</p>
+<p><span class="math display">\[ Y = c + (d - c) \, \exp \left[ - b (X - e)^2 \right] \quad \quad \quad (20)\]</span></p>
+<p>The two Bragg curves have been used in applications relating to the science of carbon materials. We can fit them with ‘drm()’, by using the self starters <code>DRC.bragg.3()</code> (Equation 19) and <code>DRC.bragg.4</code> (Equation 20), in the ‘aomisc’ package. With ‘nls()’, you can use the corresponding self-starters <code>NLS.bragg.3()</code> and <code>NLS.bragg.4</code>, also in the ‘aomisc’ package.</p>
+<pre class="r"><code>X &lt;- c(5, 10, 15, 20, 25, 30, 35, 40, 45, 50)
+Y1 &lt;- c(0.1, 2, 5.7, 9.3, 19.7, 28.4, 20.3, 6.6, 1.3, 0.1)
+Y2 &lt;- Y1 + 2
+
+# nls fit
+mod.nls &lt;- nls(Y1 ~ NLS.bragg.3(X, b, d, e) )
+mod.nls2 &lt;- nls(Y2 ~ NLS.bragg.4(X, b, c, d, e) )
+
+# drm fit
+mod.drc &lt;- drm(Y1 ~ X, fct = DRC.bragg.3() )
+mod.drc2 &lt;- drm(Y2 ~ X, fct = DRC.bragg.4() )
+plot(mod.drc, ylim = c(0, 30), log = &quot;&quot;) 
+plot(mod.drc2, add = T, col = &quot;red&quot;)</code></pre>
+<p><img src="/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+</div>
+<div id="lorentz-function" class="section level2">
+<h2>Lorentz function</h2>
+<p>The Lorentz function is similar to the Bragg function, although it has worse statistical properties (Ratkowsky, 1990). The equation is:</p>
+<p><span class="math display">\[ Y = \frac{d} { 1 + b (X - e)^2 } \quad \quad \quad (21)\]</span></p>
+<p>We can also allow for lower asymptotes different from 0, by adding a further parameter:</p>
+<p><span class="math display">\[ Y = c + \frac{d - c} { 1 + b (X - e)^2 } \quad \quad \quad (22)\]</span></p>
+<p>The two Lorentz functions can be fit with ‘drm()’, by using the self-starters <code>DRC.lorentz.3()</code> (Equation 21) and <code>DRC.lorentz.4</code> (Equation 22), in the ‘aomisc’ package. With ‘nls()’, you can use the corresponding self-starters <code>NLS.lorentz.3()</code> and <code>NLS.lorentz.4</code>, also in the ‘aomisc’ package.</p>
+<pre class="r"><code>X &lt;- c(5, 10, 15, 20, 25, 30, 35, 40, 45, 50)
+Y1 &lt;- c(0.1, 2, 5.7, 9.3, 19.7, 28.4, 20.3, 6.6, 1.3, 0.1)
+Y2 &lt;- Y1 + 2
+
+# nls fit
+mod.nls &lt;- nls(Y1 ~ NLS.lorentz.3(X, b, d, e) )
+mod.nls2 &lt;- nls(Y2 ~ NLS.lorentz.4(X, b, c, d, e) )
+
+# drm fit
+mod.drc &lt;- drm(Y1 ~ X, fct = DRC.lorentz.3() )
+mod.drc2 &lt;- drm(Y2 ~ X, fct = DRC.lorentz.4() )
+plot(mod.drc, ylim = c(0, 30), log = &quot;&quot;) 
+plot(mod.drc2, add = T, col = &quot;red&quot;)</code></pre>
+<p><img src="/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+</div>
+<div id="beta-function" class="section level2">
+<h2>Beta function</h2>
+<p>The beta function derives from the beta density function and it has been adapted to describe phenomena taking place only within a minimum and a maximum threshold value (threshold model). One typical example is seed germination, where the germination rate (GR, i.e. the inverse of germination time) is 0 below the base temperature level and above the cutoff temperature level. Between these two extremes, the GR increases with temperature up to a maximum level, that is reached at the optimal temperature level.</p>
+<p>The equation is:</p>
+<p><span class="math display">\[ Y = d \,\left\{  \left( \frac{X - X_b}{X_o - X_b} \right) \left( \frac{X_c - X}{X_c - X_o} \right) ^ {\frac{X_c - X_o}{X_o - X_b}} \right\}^b \quad \quad \quad (23)\]</span></p>
+<p>where <span class="math inline">\(d\)</span> is the maximum level for the expected response <span class="math inline">\(Y\)</span>, <span class="math inline">\(X_b\)</span> and <span class="math inline">\(X_c\)</span> are, respectively, the minumum and maximum threshold levels, <span class="math inline">\(X_o\)</span> is the abscissa at the maximum expected response level and <span class="math inline">\(b\)</span> is a shape parameter. The above function is only defined for <span class="math inline">\(X_b &lt; X &lt; X_c\)</span> and it returns 0 elsewhere.</p>
+<p>In R, the beta function can be fitted either with ‘drm()’ and the self-starter <code>DRC.beta()</code>, or with ‘nls()’ and the self-starter <code>NLS.beta()</code>. Both the self-starters are available within the ‘aomisc’ package.</p>
+<pre class="r"><code>X &lt;- c(1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50)
+Y &lt;- c(0, 0, 0, 7.7, 12.3, 19.7, 22.4, 20.3, 6.6, 0, 0)
+
+model &lt;- nls(Y ~ NLS.beta(X, b, d, Xb, Xo, Xc))
+model &lt;- drm(Y ~ X, fct = DRC.beta())
+summary(model)
+## 
+## Model fitted: Beta function
+## 
+## Parameter estimates:
+## 
+##                Estimate Std. Error  t-value   p-value    
+## b:(Intercept)   1.29834    0.26171   4.9609 0.0025498 ** 
+## d:(Intercept)  22.30117    0.53645  41.5715 1.296e-08 ***
+## Xb:(Intercept)  9.41770    1.15826   8.1309 0.0001859 ***
+## Xo:(Intercept) 31.14068    0.58044  53.6504 2.815e-09 ***
+## Xc:(Intercept) 40.47294    0.33000 122.6455 1.981e-11 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error:
+## 
+##  0.7251948 (6 degrees of freedom)
+plot(model, log=&quot;&quot;, main = &quot;Beta function&quot;)</code></pre>
+<p><img src="/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+<p>Here we are; I have discussed more than 20 models, which are commonly used for nonlinear regression. These models can be found in several different parameterisations and flavours; they can also be modified and combined to suit the needs of several disciplines in biology, chemistry and so on. However, this will require another post.</p>
+<p>Thanks for reading</p>
+<hr />
+<p>Andrea Onofri<br />
+Department of Agricultural, Food and Environmental Sciences<br />
+University of Perugia (Italy)<br />
+Borgo XX Giugno 74<br />
+I-06121 - PERUGIA</p>
+</div>
+</div>
+<div id="further-readings" class="section level1">
+<h1>Further readings</h1>
+<ol style="list-style-type: decimal">
+<li>Miguez, F., Archontoulis, S., Dokoohaki, H., Glaz, B., Yeater, K.M., 2018. Chapter 15: Nonlinear Regression Models and Applications, in: ACSESS Publications. American Society of Agronomy, Crop Science Society of America, and Soil Science Society of America, Inc.</li>
+<li>Ratkowsky, D.A., 1990. Handbook of nonlinear regression models. Marcel Dekker Inc., New York, USA.</li>
+<li>Ritz, C., Jensen, S. M., Gerhard, D., Streibig, J. C.</li>
+</ol>
+<ol start="2019" style="list-style-type: decimal">
+<li>Dose-Response Analysis Using R. CRC Press</li>
+</ol>
+</div>
+
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Tags</h1>
+        <div class="tags">
+        
+            <span class="tag"><a href="/tags/agricensdata">agricensdata</a></span>
+        
+            <span class="tag"><a href="/tags/aomisc">aomisc</a></span>
+        
+            <span class="tag"><a href="/tags/asreml">asreml</a></span>
+        
+            <span class="tag"><a href="/tags/blogdown">blogdown</a></span>
+        
+            <span class="tag"><a href="/tags/correlation">correlation</a></span>
+        
+            <span class="tag"><a href="/tags/delta_method">delta_method</a></span>
+        
+            <span class="tag"><a href="/tags/drcseedgerm">drcseedgerm</a></span>
+        
+            <span class="tag"><a href="/tags/drm">drm</a></span>
+        
+            <span class="tag"><a href="/tags/error_propagation">error_propagation</a></span>
+        
+            <span class="tag"><a href="/tags/linear_models">linear_models</a></span>
+        
+            <span class="tag"><a href="/tags/mixed_models">mixed_models</a></span>
+        
+            <span class="tag"><a href="/tags/multi_environment_studies">multi_environment_studies</a></span>
+        
+            <span class="tag"><a href="/tags/nlme">nlme</a></span>
+        
+            <span class="tag"><a href="/tags/nls">nls</a></span>
+        
+            <span class="tag"><a href="/tags/nonlinear_regression">nonlinear_regression</a></span>
+        
+            <span class="tag"><a href="/tags/r">r</a></span>
+        
+            <span class="tag"><a href="/tags/seed_germination">seed_germination</a></span>
+        
+            <span class="tag"><a href="/tags/split_plot">split_plot</a></span>
+        
+            <span class="tag"><a href="/tags/time_to_event_models">time_to_event_models</a></span>
+        
+            <span class="tag"><a href="/tags/variance">variance</a></span>
+        
+        </div>          
+    </div>
+</div><br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Recent posts</h1>
+        
+            <h1><a href="/2020/stat_nls_usefulfunctions/">A collection of self-starters for nonlinear regression in R</a></h1>
+            <time class="has-text-grey-light is-size-7">26 February 2020</time>
+        
+            <h1><a href="/2020/stat_nls_selfstarting/">Self-starting routines for nonlinear regression models</a></h1>
+            <time class="has-text-grey-light is-size-7">14 February 2020</time>
+        
+            <h1><a href="/2020/stat_r_shapingdata2/">Some everyday data tasks: a few hints with R (revisited)</a></h1>
+            <time class="has-text-grey-light is-size-7">28 January 2020</time>
+        
+            <h1><a href="/2020/stat_nls_gnlht/">Nonlinear combinations of model parameters in regression</a></h1>
+            <time class="has-text-grey-light is-size-7">9 January 2020</time>
+        
+            <h1><a href="/2019/stat_nlmm_interaction/">Fitting &#39;complex&#39; mixed models with &#39;nlme&#39;: Example #4</a></h1>
+            <time class="has-text-grey-light is-size-7">13 September 2019</time>
+        
+    </div>
+</div>
+    <br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Archives</h1>
+        
+            <a href="/archives/2020">2020</a> (4)<br>
+        
+            <a href="/archives/2019">2019</a> (15)<br>
+        
+            <a href="/archives/2018">2018</a> (2)<br>
+        
+            <a href="/archives/2014">2014</a> (1)<br>
+        
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+    </div>
+</div>
+<footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+        <p>
+             <span class="icon is-large"><a href="mailto:andrea.onofri@unipg.it" class="mysocial"><i class="far fa-envelope-open fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://github.com/OnofriAndreaPG/" class="mysocial"><i class="fab fa-github fa-3x"></i></a></span>&nbsp;&nbsp;
+                       <span class="icon is-large"><a href="https://www.r.project.org/" class="mysocial"><i class="fab fa-r-project fa-3x"></i></a></span>&nbsp;&nbsp;
+
+            <br><br>
+            Copyright &copy; The broken bridge between biologists and statisticians, 2020 - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a>
+            - <a class="mysocial" href="/aboutThis">About this site</a>
+        </p>
+    </div>
+</footer>
+
+<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+</body>
+</html>
