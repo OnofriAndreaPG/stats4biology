@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-131792052-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  
+    gtag('config', 'UA-131792052-1');
+  </script>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>The broken bridge between biologists and statisticians  | Fitting complex mixed models with nlme. Example #5</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="/css/blog.css" />
+    <script type="text/javascript"
+      src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>    
+</head>
+<body>
+
+    
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="/">Home</a>
+            <a class="navbar-item" href="/aboutThis">About this site</a>
+            <a class="navbar-item" href="/Tutorials">Tutorials</a>
+            <a class="navbar-item" href="/_statbook">Book</a>
+            <a class="navbar-item" href="/Rpackages">R packages</a>
+            <a class="navbar-item" href="/links">Links</a>
+            <a class="navbar-item" href="/about">About me</a>
+        </div>
+    </nav>
+    
+
+    
+    <section class="hero is-info is-medium">
+        <div class="hero-body" style="background-image: url(/img/bg-blog.jpg);">
+            <div class="container has-text-centered">
+                <br>
+                <h1 class="title is-size-1">
+                    
+                        Fitting complex mixed models with nlme. Example #5
+                    
+                </h1>
+                
+            </div>
+        </div>
+    </section>
+
+
+
+<div class="container">
+    <div class="section">
+    
+
+<div class="columns">
+    <div class="column is-9">
+        <div class="tile is-child box">
+          <p class="subtitle is-size-6 has-text-grey-light">
+          Andrea Onofri &middot;&nbsp; Added on June 5, 2020 &middot;
+          <i class="far fa-clock"></i>&nbsp;14 min read 
+          </p><hr/>
+            <div class="content">
+                
+
+
+<div id="a-joint-regression-model" class="section level1">
+<h1>A Joint Regression model</h1>
+<p>Let’s talk about a very old, but, nonetheless, useful technique. It is widely known that the yield of a genotype in different environments depends on environmental covariates, such as the amount of rainfall in some critical periods of time. Apart from rain, also temperature, wind, solar radiation, air humidity and soil characteristics may concur to characterise a certain environment as good or bad and, ultimately, to determine yield potential.</p>
+<p>Early in the 60s, several authors proposed that the yield of genotypes is expressed as a function of an environmental index <span class="math inline">\(e_j\)</span>, measuring the yield potential of each environment <span class="math inline">\(j\)</span> (Finlay and Wilkinson, 1963; Eberhart and Russel, 1966; Perkins and Jinks, 1968). For example, for a genotype <span class="math inline">\(i\)</span>, we could write:</p>
+<p><span class="math display">\[y_{ij} = \mu_i + \beta_i e_j\]</span></p>
+<p>where the yield <span class="math inline">\(y_i\)</span> in a certain environment <span class="math inline">\(j\)</span> is expressed as a linear function of the environmental index <span class="math inline">\(e_j\)</span>; <span class="math inline">\(\mu_i\)</span> is the intercept and <span class="math inline">\(\beta_i\)</span> is the slope, which expresses how the genotype <span class="math inline">\(i\)</span> responds to the environment.</p>
+<p>A graphical example may be useful; in the figure below we have two genotypes tested in 10 environments. The yield of the first genotype (red) increases as the environmental index increases, with slope <span class="math inline">\(\beta_1 = 0.81\)</span>. On the other hand, the yield of the second genotype (blue) does not change much with the environment (<span class="math inline">\(\beta_2 = -0.08)\)</span>. Clearly, a high value of <span class="math inline">\(\beta\)</span> demonstrates that the genotype is responsive to the environment and makes profit of favorable conditions. Otherwise, a low <span class="math inline">\(\beta\)</span> value (close to 0) demonstrates that the genotype is not responsive and tends to give more or less the same yield in all environments (static stability; Wood, 1976).</p>
+<p><img src="/post/Stat_met_JointReg_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p>By now, it should be clear that <span class="math inline">\(\beta\)</span> is a relevant measure of stability. Now, the problem is: how do we determine such value from a multi-environment genotype experiment? As usual, let’s start from a meaningful example.</p>
+</div>
+<div id="a-multi-environment-experiment" class="section level1">
+<h1>A multi-environment experiment</h1>
+<p>Let’s take the data in Sharma (2006; Statistical And Biometrical Techniques In Plant Breeding, New Age International ltd. New Delhi, India). They refer to a multi-environment experiment with 7 genotypes, 6 environments and 3 blocks; let’s load the data in the dataframe ‘dataFull’.</p>
+<pre class="r"><code>rm(list=ls())
+library(nlme)
+library(emmeans)
+## Welcome to emmeans.
+## NOTE -- Important change from versions &lt;= 1.41:
+##     Indicator predictors are now treated as 2-level factors by default.
+##     To revert to old behavior, use emm_options(cov.keep = character(0))
+Block &lt;- factor(rep(c(1:3), 42))
+Var &lt;- factor(rep(LETTERS[1:7],each=18))
+Loc &lt;- factor(rep(rep(letters[1:6], each=3), 7))
+P1 &lt;- factor(Loc:Block)
+Yield &lt;- c(60,65,60,80,65,75,70,75,70,72,82,90,48,45,50,50,40,40,
+           80,90,83,70,60,60,85,90,90,70,85,80,40,40,40,38,40,50,
+           25,28,30,40,35,35,35,30,30,40,35,35,35,25,20,35,30,30,
+           50,65,50,40,40,40,48,50,52,45,45,50,50,50,45,40,48,40,
+           52,50,55,55,54,50,40,40,60,48,38,45,38,30,40,35,40,35,
+           22,25,25,30,28,32,28,25,30,26,28,28,45,50,45,50,50,50,
+           30,30,25,28,34,35,40,45,35,30,32,35,45,35,38,44,45,40)
+dataFull &lt;- data.frame(Block, Var, Loc, Yield)
+rm(Block, Var, Loc, P1, Yield)
+head(dataFull)
+##   Block Var Loc Yield
+## 1     1   A   a    60
+## 2     2   A   a    65
+## 3     3   A   a    60
+## 4     1   A   b    80
+## 5     2   A   b    65
+## 6     3   A   b    75</code></pre>
+</div>
+<div id="what-is-an-environmental-index" class="section level1">
+<h1>What is an environmental index?</h1>
+<p>First of all, we need to define an environmental index, which can describe the yield potential in each of the seven environments. Yates and Cochran (1937) proposed that we use the mean of all observations in each environment, expressed as the difference between the environmental mean yield <span class="math inline">\(\mu_j\)</span> and the overall mean <span class="math inline">\(\mu\)</span> (i.e. <span class="math inline">\(e_j = \mu_j - \mu\)</span>). Let’s do it; in the box below we use the package ‘dplyr’ to augment the dataset with a new variable, representing the environmental indices.</p>
+<pre class="r"><code>library(dplyr)
+dataFull &lt;- dataFull %&gt;%
+  group_by(Loc) %&gt;% 
+  mutate(ej = mean(Yield) - mean(dataFull$Yield))
+head(dataFull)
+## # A tibble: 6 x 5
+## # Groups:   Loc [2]
+##   Block Var   Loc   Yield    ej
+##   &lt;fct&gt; &lt;fct&gt; &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1 1     A     a        60 1.45 
+## 2 2     A     a        65 1.45 
+## 3 3     A     a        60 1.45 
+## 4 1     A     b        80 0.786
+## 5 2     A     b        65 0.786
+## 6 3     A     b        75 0.786</code></pre>
+<p>This step is ok with balanced data and it is clear that a high environmental index identifies the favorable environments, while a low (negative) environmental index identifies unfavorable environments. It is necessary to keep in mind that we have unwillingly put a constraint on <span class="math inline">\(e_j\)</span> values, that have to sum up to zero.</p>
+</div>
+<div id="full-model-definition-equation-1" class="section level1">
+<h1>Full model definition (Equation 1)</h1>
+<p>Now, it is possible to regress the yield data for each genotype against the environmental indices, according to the following joint regression model:</p>
+<p><span class="math display">\[y_{ijk} = \gamma_{jk} + \mu_i + \beta_i e_j + d_{ij} + \varepsilon_{ijk} \quad\quad\quad \textrm{(Equation 1)}\]</span></p>
+<p>where: <span class="math inline">\(y_{ijk}\)</span> is the yield for the genotype <span class="math inline">\(i\)</span> in the environment <span class="math inline">\(j\)</span> and block <span class="math inline">\(k\)</span>, <span class="math inline">\(\gamma\)</span> is the effect of blocks within environments and <span class="math inline">\(\mu_i\)</span> is the average yield for the genotype <span class="math inline">\(i\)</span>. As we have seen in the figure above, the average yield of a genotype in each environment cannot be exactly described by the regression against the environmental indices (in other words: the observed means do not lie along the regression line). As the consequence, we need the random term <span class="math inline">\(d_{ij}\)</span> to represent the deviation from the regression line for the genotype <span class="math inline">\(i\)</span> in the environment <span class="math inline">\(j\)</span>. Finally, the random elements <span class="math inline">\(\varepsilon_{ijk}\)</span> represent the deviations between the replicates for the genotype <span class="math inline">\(i\)</span> in the environment <span class="math inline">\(j\)</span> (within-trial errors). As I said, <span class="math inline">\(d_{ij}\)</span> and <span class="math inline">\(\varepsilon_{ijk}\)</span> are random, with variances equal to <span class="math inline">\(\sigma^2_d\)</span> and <span class="math inline">\(\sigma^2\)</span>, respectively.</p>
+<p>According to Finlay-Wilkinson, <span class="math inline">\(\sigma^2_d\)</span> is assumed to be equal for all genotypes. Otherwise, according to Eberarth-Russel, <span class="math inline">\(\sigma^2_{d}\)</span> may assume a different value for each genotype (<span class="math inline">\(\sigma^2_{d(i)}\)</span>) and may become a further measure of stability: if this is small, a genotype does not show relevant variability of yield, apart from that due to the regression against the environmental indices.</p>
+</div>
+<div id="model-fitting" class="section level1">
+<h1>Model fitting</h1>
+<p>We can start the analyses by fitting a traditional ANOVA model, to keep as a reference.</p>
+<pre class="r"><code>mod.aov &lt;- lm(Yield ~ Loc/Block + Var*Loc, data = dataFull)
+anova(mod.aov)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##           Df  Sum Sq Mean Sq  F value    Pr(&gt;F)    
+## Loc        5  1856.0   371.2  17.9749 1.575e-11 ***
+## Var        6 20599.2  3433.2 166.2504 &lt; 2.2e-16 ***
+## Loc:Block 12   309.8    25.8   1.2502    0.2673    
+## Loc:Var   30 12063.6   402.1  19.4724 &lt; 2.2e-16 ***
+## Residuals 72  1486.9    20.7                       
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>As we said, Equation 1 is a mixed model, which calls for the use of the ‘lme()’ function. For better understanding, it is useful to start by augmenting the previous ANOVA model with the regression term (‘Var/ej’). We use the nesting operator, to have different regression lines for each level of ‘Var’.</p>
+<pre class="r"><code># Augmented ANOVA model
+mod.aov2 &lt;- lm(Yield ~ Loc/Block + Var/ej + Loc:Var, data=dataFull)
+anova(mod.aov2)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##           Df  Sum Sq Mean Sq  F value    Pr(&gt;F)    
+## Loc        5  1856.0   371.2  17.9749 1.575e-11 ***
+## Var        6 20599.2  3433.2 166.2504 &lt; 2.2e-16 ***
+## Loc:Block 12   309.8    25.8   1.2502    0.2673    
+## Var:ej     6  9181.2  1530.2  74.0985 &lt; 2.2e-16 ***
+## Loc:Var   24  2882.5   120.1   5.8159 2.960e-09 ***
+## Residuals 72  1486.9    20.7                       
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>We see that the GE interaction in the ANOVA model has been decomposed into two parts: the regression term (‘Var/ej’) and the deviation from regression (‘Loc:Var’), with 6 and 24 degrees of freedom, respectively. This second term corresponds to <span class="math inline">\(d_{ij}\)</span> in Equation 1 (please, note that the two terms ‘Var/ej’ and ‘Loc:Var’ are partly confounded).</p>
+<p>The above analysis is only useful for teaching purposes, but it is unsatisfactory, because the <span class="math inline">\(d_{ij}\)</span> terms have been regarded as fixed, which is pretty illogical. Therefore, we change the fixed effect model into a mixed model, where we include the random ‘genotype by environment’ interaction. We also change the fixed block effect into a random effect and remove the intercept, to more strictly adhere to the parameterisation of Equation 1. The two random effects ‘Loc:Block’ and ‘Loc:Var’ are not nested into each other and we need to code them by using ‘pdMat’ constructs, which are not straightforward. You can use the code in the box below as a guidance to fit a Finlay-Wilkinson model.</p>
+<pre class="r"><code># Finlay-Wilkinson model
+modFull1 &lt;- lme(Yield ~ Var/ej - 1, 
+                random = list(Loc = pdIdent(~ Var - 1),
+                              Loc = pdIdent(~ Block - 1)), 
+                data=dataFull)
+summary(modFull1)$tTable
+##              Value Std.Error  DF    t-value      p-value
+## VarA    63.1666667 2.4017164 107 26.3006350 1.624334e-48
+## VarB    66.1666667 2.4017164 107 27.5497417 2.135264e-50
+## VarC    31.8333333 2.4017164 107 13.2544097 2.599693e-24
+## VarD    47.1111111 2.4017164 107 19.6156012 3.170228e-37
+## VarE    44.7222222 2.4017164 107 18.6209421 2.378452e-35
+## VarF    34.2777778 2.4017164 107 14.2722004 1.614127e-26
+## VarG    35.8888889 2.4017164 107 14.9430169 6.028635e-28
+## VarA:ej  3.2249875 0.6257787 107  5.1535588 1.176645e-06
+## VarB:ej  4.7936139 0.6257787 107  7.6602379 8.827229e-12
+## VarC:ej  0.4771074 0.6257787 107  0.7624219 4.474857e-01
+## VarD:ej  0.3653064 0.6257787 107  0.5837629 5.606084e-01
+## VarE:ej  1.2369950 0.6257787 107  1.9767291 5.064533e-02
+## VarF:ej -2.4316943 0.6257787 107 -3.8858692 1.770611e-04
+## VarG:ej -0.6663160 0.6257787 107 -1.0647790 2.893729e-01
+VarCorr(modFull1)
+##          Variance           StdDev   
+## Loc =    pdIdent(Var - 1)            
+## VarA     27.5007919         5.2441197
+## VarB     27.5007919         5.2441197
+## VarC     27.5007919         5.2441197
+## VarD     27.5007919         5.2441197
+## VarE     27.5007919         5.2441197
+## VarF     27.5007919         5.2441197
+## VarG     27.5007919         5.2441197
+## Loc =    pdIdent(Block - 1)          
+## Block1    0.4478291         0.6692003
+## Block2    0.4478291         0.6692003
+## Block3    0.4478291         0.6692003
+## Residual 20.8781458         4.5692610</code></pre>
+<p>From the output, we see that the variance component <span class="math inline">\(\sigma_d\)</span> (27.50) is the same for all genotypes; if we want to let a different value for each genotype (Eberarth-Russel model), we need to change the ‘pdMat’ construct for the ‘Loc:Var’ effect, turning from ‘pdIdent’ to ‘pdDiag’, as shown in the box below.</p>
+<pre class="r"><code># Eberhart-Russel model
+modFull2 &lt;- lme(Yield ~ Var/ej - 1, 
+                random = list(Loc = pdDiag(~ Var - 1),
+                              Loc = pdIdent(~ Block - 1)), 
+                data=dataFull)
+summary(modFull2)$tTable
+##              Value Std.Error  DF    t-value      p-value
+## VarA    63.1666667 3.0507629 107 20.7052032 3.221930e-39
+## VarB    66.1666667 2.7818326 107 23.7852798 1.604422e-44
+## VarC    31.8333333 1.7240721 107 18.4640387 4.753742e-35
+## VarD    47.1111111 2.3526521 107 20.0246824 5.564350e-38
+## VarE    44.7222222 2.4054296 107 18.5921974 2.699536e-35
+## VarF    34.2777778 1.9814442 107 17.2993906 8.947485e-33
+## VarG    35.8888889 2.2617501 107 15.8677515 7.076551e-30
+## VarA:ej  3.2249875 0.7948909 107  4.0571447 9.466174e-05
+## VarB:ej  4.7936139 0.7248198 107  6.6135249 1.522848e-09
+## VarC:ej  0.4771074 0.4492152 107  1.0620909 2.905857e-01
+## VarD:ej  0.3653064 0.6129948 107  0.5959372 5.524757e-01
+## VarE:ej  1.2369950 0.6267462 107  1.9736777 5.099652e-02
+## VarF:ej -2.4316943 0.5162748 107 -4.7100774 7.473942e-06
+## VarG:ej -0.6663160 0.5893098 107 -1.1306718 2.607213e-01
+VarCorr(modFull2)
+##          Variance           StdDev   
+## Loc =    pdDiag(Var - 1)             
+## VarA     48.7341240         6.9809830
+## VarB     39.3227526         6.2707856
+## VarC     10.7257438         3.2750181
+## VarD     26.1010286         5.1089166
+## VarE     27.6077467         5.2543074
+## VarF     16.4479246         4.0556041
+## VarG     23.5842788         4.8563648
+## Loc =    pdIdent(Block - 1)          
+## Block1    0.4520678         0.6723599
+## Block2    0.4520678         0.6723599
+## Block3    0.4520678         0.6723599
+## Residual 20.8743411         4.5688446</code></pre>
+<p>From the regression slopes we see that the genotypes A and B are the most responsive to the environment (<span class="math inline">\(\beta_A = 3.22\)</span> and <span class="math inline">\(\beta_B = 4.79\)</span>, respectively), while the genotypes C and D are stable in a static sense, although their average yield is pretty low.</p>
+</div>
+<div id="fitting-a-joint-regression-model-in-two-steps-equation-2" class="section level1">
+<h1>Fitting a joint regression model in two-steps (Equation 2)</h1>
+<p>In the previous analyses we used the plot data to fit a joint regression model. In order to reduce the computational burden, it may be useful to split the analyses in two-steps:</p>
+<ol style="list-style-type: decimal">
+<li>we analyse the plot data, to retrieve the means for the ‘genotype by environment’ combinations;</li>
+<li>we fit the joint regression model to those means.</li>
+</ol>
+<p>The results of the two approaches are not necessarily the same, as some information in the first step is lost in the second. Several weighing schemes have been proposed to make two-steps fitting more reliable (Möhring and Piepho, 2009); in this example, I will show an unweighted two-steps analyses, which is simple, but not necessarily the best way to go.</p>
+<p>A model for the second step is:</p>
+<p><span class="math display">\[y_{ij} = \mu_i + \beta_i e_j + f_{ij} \quad\quad\quad \textrm{(Equation 2)}\]</span></p>
+<p>where the residual random component <span class="math inline">\(f_{ij}\)</span> is assumed as normally distributed, with mean equal to zero and variance equal to <span class="math inline">\(\sigma^2_f\)</span>. In general, <span class="math inline">\(\sigma^2_f &gt; \sigma^2_d\)</span>, as the residual sum of squares from Model 2 also contains a component for within trial errors. Indeed, for a balanced experiment, it is:</p>
+<p><span class="math display">\[\sigma^2_{f} = \sigma^2_d + \frac{\sigma^2}{k}\]</span></p>
+<p>where <span class="math inline">\(\sigma^2\)</span> is the within-trial error, which needs to be obtained from the first step. In the previous analyses we have already fitted an anova model to the whole dataset (‘mod.aov’). In the box below, we make use of the ‘emmeans’ package to retrieve the least squares means for the seven genotypes in all locations. Subsequently, the environmental means are calculated and centered, by subtracting the overall mean.</p>
+<pre class="r"><code>library(emmeans)
+muGE &lt;- as.data.frame( emmeans(mod.aov, ~Var:Loc) )[,1:3]
+names(muGE) &lt;- c(&quot;Var&quot;, &quot;Loc&quot;, &quot;Yield&quot;)
+muGE &lt;- muGE %&gt;% 
+  group_by(Loc) %&gt;% 
+  mutate(ej = mean(Yield) - mean(muGE$Yield))</code></pre>
+<p>Now, we fit Equation 2 to the means. In the code below we assume homoscedasticity and, thus, we are fitting the Finlay-Wilkinson model. The variance component <span class="math inline">\(\sigma^2_d\)</span> is obtained by subtracting a fraction of the residual variance from the first step.</p>
+<pre class="r"><code># Finlay-Wilkinson model
+modFinlay &lt;- lm(Yield ~ Var/ej - 1, data=muGE)
+summary(modFinlay)
+## 
+## Call:
+## lm(formula = Yield ~ Var/ej - 1, data = muGE)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -7.3981 -3.5314 -0.8864  3.7791 11.2045 
+## 
+## Coefficients:
+##         Estimate Std. Error t value Pr(&gt;|t|)    
+## VarA     63.1667     2.3915  26.413  &lt; 2e-16 ***
+## VarB     66.1667     2.3915  27.668  &lt; 2e-16 ***
+## VarC     31.8333     2.3915  13.311 1.24e-13 ***
+## VarD     47.1111     2.3915  19.699  &lt; 2e-16 ***
+## VarE     44.7222     2.3915  18.701  &lt; 2e-16 ***
+## VarF     34.2778     2.3915  14.333 2.02e-14 ***
+## VarG     35.8889     2.3915  15.007 6.45e-15 ***
+## VarA:ej   3.2250     0.6231   5.176 1.72e-05 ***
+## VarB:ej   4.7936     0.6231   7.693 2.22e-08 ***
+## VarC:ej   0.4771     0.6231   0.766 0.450272    
+## VarD:ej   0.3653     0.6231   0.586 0.562398    
+## VarE:ej   1.2370     0.6231   1.985 0.056998 .  
+## VarF:ej  -2.4317     0.6231  -3.902 0.000545 ***
+## VarG:ej  -0.6663     0.6231  -1.069 0.294052    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 5.858 on 28 degrees of freedom
+## Multiple R-squared:  0.9905, Adjusted R-squared:  0.9857 
+## F-statistic: 208.3 on 14 and 28 DF,  p-value: &lt; 2.2e-16
+sigmaf &lt;- summary(modFinlay)$sigma^2 
+sigma2 &lt;- summary(mod.aov)$sigma^2 
+sigmaf - sigma2/3 #sigma2_d
+## [1] 27.43169</code></pre>
+<p>In the box below, we allow for different variances for each genotype and, therefore, we fit the Eberarth-Russel model. As before, we can retrieve the variance components <span class="math inline">\(\sigma^2_{d(i)}\)</span> from the fitted model object, by subtracting the within-trial error obtained in the first step.</p>
+<pre class="r"><code># Eberarth-Russel model
+modEberarth &lt;- gls(Yield ~ Var/ej - 1, 
+              weights=varIdent(form=~1|Var), data=muGE)
+coefs &lt;- summary(modEberarth)$tTable
+coefs
+##              Value Std.Error    t-value      p-value
+## VarA    63.1666667 3.0434527 20.7549360 1.531581e-18
+## VarB    66.1666667 2.7653537 23.9270177 3.508778e-20
+## VarC    31.8333333 1.7165377 18.5450822 2.912238e-17
+## VarD    47.1111111 2.3344802 20.1805574 3.204306e-18
+## VarE    44.7222222 2.3899219 18.7128381 2.304763e-17
+## VarF    34.2777778 1.9783684 17.3262868 1.685683e-16
+## VarG    35.8888889 2.2589244 15.8876005 1.537133e-15
+## VarA:ej  3.2249875 0.7929862  4.0668898 3.511248e-04
+## VarB:ej  4.7936139 0.7205262  6.6529352 3.218756e-07
+## VarC:ej  0.4771074 0.4472521  1.0667527 2.951955e-01
+## VarD:ej  0.3653064 0.6082600  0.6005761 5.529531e-01
+## VarE:ej  1.2369950 0.6227056  1.9864844 5.684599e-02
+## VarF:ej -2.4316943 0.5154734 -4.7174004 6.004832e-05
+## VarG:ej -0.6663160 0.5885736 -1.1320862 2.672006e-01
+sigma &lt;- summary(modEberarth)$sigma
+sigma2fi &lt;- (c(1, coef(modEberarth$modelStruct$varStruct, uncons = FALSE)) * sigma)^2
+names(sigma2fi)[1] &lt;- &quot;A&quot;
+sigma2fi - sigma2/3 #sigma2_di
+##        A        B        C        D        E        F        G 
+## 48.69203 38.99949 10.79541 25.81519 27.38676 16.60005 23.73284</code></pre>
+<p>Fitting in two steps we obtain the very same result as with fitting in one step, but it ain’t necessarily so.</p>
+<p>I would like to conclude by saying that a joint regression model, the way I have fitted it here, is simple and intuitively appealing, although it has been criticized for a number of reasons. In particular, it has been noted that the environmental indices <span class="math inline">\(e_j\)</span> are estimated from the observed data and, therefore, they are not precisely known. On the contrary, linear regression makes the assumption that the levels of explanatory variables are precisely known and not sampled. As the consequence, our estimates of the slopes <span class="math inline">\(\beta\)</span> may be biased. Furthermore, in our construction we have put some arbitrary constraints on the environmental indices (<span class="math inline">\(\sum{e_j} = 0\)</span>) and on the regression slopes (<span class="math inline">\(\sum({\beta_i})/G = 1\)</span>; where G is the number of genotypes), which are not necessarily reasonable.</p>
+<p>Alternative methods of fitting joint regression models have been proposed (see Piepho, 1998), but they are slightly more complex and I will deal with them in a future post.</p>
+<p>Happy coding!</p>
+<hr />
+<p>Prof. Andrea Onofri<br />
+Department of Agricultural, Food and Environmental Sciences<br />
+University of Perugia (Italy)<br />
+Borgo XX Giugno 74<br />
+I-06121 - PERUGIA</p>
+</div>
+<div id="references" class="section level1">
+<h1>References</h1>
+<ol style="list-style-type: decimal">
+<li>Eberhart, S.A., Russel, W.A., 1966. Stability parameters for comparing verieties. Crop Science 6, 36–40.</li>
+<li>Finlay, K.W., Wilkinson, G.N., 1963. The analysis of adaptation in a plant-breeding programme. Australian Journal of Agricultural Research 14, 742–754.</li>
+<li>Möhring, J., Piepho, H.-P., 2009. Comparison of Weighting in Two-Stage Analysis of Plant Breeding Trials. Crop Science 49, 1977–1988.</li>
+<li>Perkins, J.M., Jinks, J.L., 1968. Environmental gentype-environmental components of variability. III. Multiple lines and crosses. Heredity 23, 339–356.</li>
+<li>Piepho, H.-P., 1998. Methods for comparing the yield stability of cropping systems - A review. Journal of Agronomy and Crop Science 180, 193–213.</li>
+<li>Wood, J., 1976. The use of environmental variables in the interpretation of genotype-environment interaction. Heredity 37, 1–7.</li>
+<li>Yates, F., and Cochran G., 1938. The analysis of groups of experiments. Journal of Agricultural Sciences, 28, 556—580.</li>
+</ol>
+</div>
+
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Tags</h1>
+        <div class="tags">
+        
+            <span class="tag"><a href="/tags/agricensdata">agricensdata</a></span>
+        
+            <span class="tag"><a href="/tags/ammi_analysis">ammi_analysis</a></span>
+        
+            <span class="tag"><a href="/tags/aomisc">aomisc</a></span>
+        
+            <span class="tag"><a href="/tags/asreml">asreml</a></span>
+        
+            <span class="tag"><a href="/tags/blogdown">blogdown</a></span>
+        
+            <span class="tag"><a href="/tags/correlation">correlation</a></span>
+        
+            <span class="tag"><a href="/tags/delta_method">delta_method</a></span>
+        
+            <span class="tag"><a href="/tags/drcseedgerm">drcseedgerm</a></span>
+        
+            <span class="tag"><a href="/tags/drm">drm</a></span>
+        
+            <span class="tag"><a href="/tags/error_propagation">error_propagation</a></span>
+        
+            <span class="tag"><a href="/tags/linear_models">linear_models</a></span>
+        
+            <span class="tag"><a href="/tags/lme">lme</a></span>
+        
+            <span class="tag"><a href="/tags/mixed_models">mixed_models</a></span>
+        
+            <span class="tag"><a href="/tags/multi_environment_studies">multi_environment_studies</a></span>
+        
+            <span class="tag"><a href="/tags/nlme">nlme</a></span>
+        
+            <span class="tag"><a href="/tags/nls">nls</a></span>
+        
+            <span class="tag"><a href="/tags/nonlinear_regression">nonlinear_regression</a></span>
+        
+            <span class="tag"><a href="/tags/r">r</a></span>
+        
+            <span class="tag"><a href="/tags/seed_germination">seed_germination</a></span>
+        
+            <span class="tag"><a href="/tags/split_plot">split_plot</a></span>
+        
+            <span class="tag"><a href="/tags/time_to_event_models">time_to_event_models</a></span>
+        
+            <span class="tag"><a href="/tags/variance">variance</a></span>
+        
+        </div>          
+    </div>
+</div><br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Recent posts</h1>
+        
+            <h1><a href="/2020/stat_met_jointreg/">Fitting complex mixed models with nlme. Example #5</a></h1>
+            <time class="has-text-grey-light is-size-7">5 June 2020</time>
+        
+            <h1><a href="/2020/stat_met_ammi/">AMMI analyses for GE interactions</a></h1>
+            <time class="has-text-grey-light is-size-7">12 May 2020</time>
+        
+            <h1><a href="/2020/stat_survival_ht1step/">Seed germination: fitting hydro-time models with R</a></h1>
+            <time class="has-text-grey-light is-size-7">23 March 2020</time>
+        
+            <h1><a href="/2020/stat_nls_usefulfunctions/">A collection of self-starters for nonlinear regression in R</a></h1>
+            <time class="has-text-grey-light is-size-7">26 February 2020</time>
+        
+            <h1><a href="/2020/stat_nls_selfstarting/">Self-starting routines for nonlinear regression models</a></h1>
+            <time class="has-text-grey-light is-size-7">14 February 2020</time>
+        
+    </div>
+</div>
+    <br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Archives</h1>
+        
+            <a href="/archives/2020">2020</a> (7)<br>
+        
+            <a href="/archives/2019">2019</a> (15)<br>
+        
+            <a href="/archives/2018">2018</a> (2)<br>
+        
+            <a href="/archives/2014">2014</a> (1)<br>
+        
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+    </div>
+</div>
+<footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+        <p>
+             <span class="icon is-large"><a href="mailto:andrea.onofri@unipg.it" class="mysocial"><i class="far fa-envelope-open fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://github.com/OnofriAndreaPG/" class="mysocial"><i class="fab fa-github fa-3x"></i></a></span>&nbsp;&nbsp;
+                       <span class="icon is-large"><a href="https://www.r.project.org/" class="mysocial"><i class="fab fa-r-project fa-3x"></i></a></span>&nbsp;&nbsp;
+
+            <br><br>
+            Copyright &copy; The broken bridge between biologists and statisticians, 2020 - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a>
+            - <a class="mysocial" href="/aboutThis">About this site</a>
+        </p>
+    </div>
+</footer>
+
+<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+</body>
+</html>

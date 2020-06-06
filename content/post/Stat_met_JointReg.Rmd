@@ -1,0 +1,311 @@
+---
+title: 'Fitting complex mixed models with nlme. Example #5'
+author: "Andrea Onofri"
+date: 2020-06-05
+slug: 'Multi_environment_studies'
+categories:
+  - R
+  - 'Multi_environment_studies'
+tags:
+  - R
+  - 'AMMI_analysis'
+  - 'Multi_environment_studies'
+  - lme
+  - 'Mixed_models'
+archives:
+  - 2020
+---
+
+```{r setup, cache = F, echo = F}
+#Put at the beginning
+knitr::knit_hooks$set(document = function(x){ 
+  gsub("```\n*```r*\n*", "", x) 
+})
+```
+
+
+# A Joint Regression model
+
+Let's talk about a very old, but, nonetheless, useful technique. It is widely known that the yield of a genotype in different environments depends on environmental covariates, such as the amount of rainfall in some critical periods of time. Apart from rain, also temperature, wind, solar radiation, air humidity and soil characteristics may concur to characterise a certain environment as good or bad and, ultimately, to determine yield potential.
+
+Early in the 60s, several authors proposed that the yield of genotypes is expressed as a function of an environmental index $e_j$, measuring the yield potential of each environment $j$ (Finlay and Wilkinson, 1963; Eberhart and Russel, 1966; Perkins and Jinks, 1968). For example, for a genotype $i$, we could write:
+
+$$y_{ij} = \mu_i + \beta_i e_j$$
+
+where the yield $y_i$ in a certain environment $j$ is expressed as a linear function of the environmental index $e_j$; $\mu_i$ is the intercept and $\beta_i$ is the slope, which expresses how the genotype $i$ responds to the environment. 
+
+A graphical example may be useful; in the figure below we have two genotypes tested in 10 environments. The yield of the first genotype (red) increases as the environmental index increases, with slope $\beta_1 = 0.81$. On the other hand, the yield of the second genotype (blue) does not change much with the environment ($\beta_2 = -0.08)$. Clearly, a high value of $\beta$ demonstrates that the genotype is responsive to the environment and makes profit of favorable conditions. Otherwise, a low $\beta$ value (close to 0) demonstrates that the genotype is not responsive and tends to give more or less the same yield in all environments (static stability; Wood, 1976).
+
+
+```{r echo=FALSE}
+set.seed(1234)
+MedEnv <- rnorm(10, 0, 1)
+MedGen1 <- 6.5 + 0.9*MedEnv + rnorm(10, 0, 0.5)
+MedGen2 <- 6.5 + 0.1 *MedEnv + rnorm(10, 0, 0.5)
+
+library(ggplot2)
+dataset <- data.frame(MedEnv, MedGen1, MedGen2)
+ggplot(dataset) +
+  geom_point(aes(x = MedEnv, y = MedGen1), col = "red", size = 2) +
+  geom_point(aes(x = MedEnv, y = MedGen2), col = "blue", size = 2) +
+  stat_smooth(aes(x = MedEnv, y = MedGen1), 
+              method = "lm", se = F, col = "red", lwd = 0.4) +
+  stat_smooth(aes(x = MedEnv, y = MedGen2), 
+              method = "lm", se = F, col = "blue", lwd = 0.4) +
+  labs(x = "Environmental index", y = "Genotype yield")
+
+```
+
+
+By now, it should be clear that $\beta$ is a relevant measure of stability. Now, the problem is: how do we determine such value from a multi-environment genotype experiment? As usual, let's start from a meaningful example.
+
+# A multi-environment experiment
+
+Let's take the data in Sharma (2006; Statistical And Biometrical Techniques In Plant Breeding, New Age International ltd. New Delhi, India). They refer to a multi-environment experiment with 7 genotypes, 6 environments and 3 blocks; let's load the data in the dataframe 'dataFull'.
+
+```{r}
+rm(list=ls())
+library(nlme)
+library(emmeans)
+Block <- factor(rep(c(1:3), 42))
+Var <- factor(rep(LETTERS[1:7],each=18))
+Loc <- factor(rep(rep(letters[1:6], each=3), 7))
+P1 <- factor(Loc:Block)
+Yield <- c(60,65,60,80,65,75,70,75,70,72,82,90,48,45,50,50,40,40,
+           80,90,83,70,60,60,85,90,90,70,85,80,40,40,40,38,40,50,
+           25,28,30,40,35,35,35,30,30,40,35,35,35,25,20,35,30,30,
+           50,65,50,40,40,40,48,50,52,45,45,50,50,50,45,40,48,40,
+           52,50,55,55,54,50,40,40,60,48,38,45,38,30,40,35,40,35,
+           22,25,25,30,28,32,28,25,30,26,28,28,45,50,45,50,50,50,
+           30,30,25,28,34,35,40,45,35,30,32,35,45,35,38,44,45,40)
+dataFull <- data.frame(Block, Var, Loc, Yield)
+rm(Block, Var, Loc, P1, Yield)
+head(dataFull)
+```
+
+
+# What is an environmental index? 
+
+First of all, we need to define an environmental index, which can describe the yield potential in each of the seven environments. Yates and Cochran (1937) proposed that we use the mean of all observations in each environment, expressed as the difference between the environmental mean yield $\mu_j$ and the overall mean $\mu$ (i.e. $e_j = \mu_j - \mu$). Let's do it; in the box below we use the package 'dplyr' to augment the dataset with a new variable, representing the environmental  indices.
+
+```{r message=FALSE, warning=FALSE}
+library(dplyr)
+dataFull <- dataFull %>%
+  group_by(Loc) %>% 
+  mutate(ej = mean(Yield) - mean(dataFull$Yield))
+head(dataFull)
+```
+
+This step is ok with balanced data and it is clear that a high environmental index identifies the favorable environments, while a low (negative) environmental index identifies unfavorable environments. It is necessary to keep in mind that we have unwillingly put a constraint on $e_j$ values, that have to sum up to zero.
+
+# Full model definition (Equation 1)
+
+Now, it is possible to regress the yield data for each genotype against the environmental indices, according to the following joint regression model:
+
+$$y_{ijk} = \gamma_{jk} + \mu_i + \beta_i e_j + d_{ij} + \varepsilon_{ijk} \quad\quad\quad \textrm{(Equation 1)}$$
+
+where: $y_{ijk}$ is the yield for the genotype $i$ in the environment $j$ and block $k$, $\gamma$ is the effect of blocks within environments and $\mu_i$ is the average yield for the genotype $i$. As we have seen in the figure above, the average yield of a genotype in each environment cannot be exactly described by the regression against the environmental indices (in other words: the observed means do not lie along the regression line). As the consequence, we need the random term $d_{ij}$ to represent the deviation from the regression line for the genotype $i$ in the environment $j$. Finally, the random elements $\varepsilon_{ijk}$ represent the deviations between the replicates for the genotype $i$ in the environment $j$ (within-trial errors). As I said, $d_{ij}$ and $\varepsilon_{ijk}$ are random, with variances equal to $\sigma^2_d$ and $\sigma^2$, respectively.
+
+According to Finlay-Wilkinson, $\sigma^2_d$ is assumed to be equal for all genotypes. Otherwise, according to Eberarth-Russel, $\sigma^2_{d}$ may assume a different value for each genotype ($\sigma^2_{d(i)}$) and may become a further measure of stability: if this is small, a genotype does not show relevant variability of yield, apart from that due to the regression against the environmental indices.
+
+
+```{r eval=FALSE, message=F, warning=F, include=FALSE}
+# Naive analyses ###############################
+library(emmeans)
+modFull <- lm(Yield ~ Loc/Block + Var*Loc, data = dataFull)
+anova(modFull)
+sigma2e <- summary(modFull)$sigma^2
+muGE <- as.data.frame( emmeans(modFull, ~Var:Loc) )[,1:3]
+names(muGE) <- c("Var", "Loc", "Yield")
+
+# Centering the environmental means
+muGE$muj <- fitted(lm(Yield ~ Loc - 1, data = muGE))
+muGE$ej <- muGE$muj - mean(muGE$Yield)
+
+
+# Analisi a mano with plyr
+#Indice ambientale
+medie <- muGE
+tapply(muGE$Yield, muGE$Var, mean)
+#       A        B        C        D        E        F        G 
+# 63.16667 66.16667 31.83333 47.11111 44.72222 34.27778 35.88889 
+
+#Regressioni lineari
+library(plyr)
+regLin <- dlply(medie, c("Var"), function(df) lm(Yield ~ ej, data = df))
+Result <- t( sapply(regLin, function(x) summary(x)$coef[,1:2]) )
+colnames(Result) <- c("Means", "Beta", "SE1", "SE2")
+Result
+
+# Inoltre, sempre per ogni varietà, possiamo ricavare la varianza del residuo ed il test F per la significatività della regressione, che può essere utilizzato per testare l'ipotesi nulla $\beta_i = 0$ (stabilità statica). 
+
+b <- Result[,2] - 1
+MSdev <- sapply(regLin, function(x) summary(x)$sigma^2)
+Fobs <- sapply(regLin, function(x) anova(x)[1,4])
+pVal <- sapply(regLin, function(x) anova(x)[1,5])
+
+# Dato che abbiamo lavorato sulle medie dei blocchi, la varianza del residuo della regressione (MSdev, cioè $s^2_f$) contiene anche la componente di varianza del residuo entro-esperimenti. Questa può essere individuata tramite l'ANOVA del dataset completo (datiFull) e successivamente rimossa da MSdev, previa divisione per il numero dei blocchi. A questo punto l'analisi in due step è completa.
+
+MSres <- summary(modFull)$sigma^2
+S2di <- MSdev - MSres/3
+Result <- cbind(Result, b, MSdev, Fobs, pVal, S2di)
+Result
+
+#      Means       Beta      SE1       SE2          b    MSdev
+# A 63.16667  3.2249875 3.043448 0.7929849  2.2249875 55.57544
+# B 66.16667  4.7936139 2.765355 0.7205265  3.7936139 45.88312
+# C 31.83333  0.4771074 1.716529 0.4472498 -0.5228926 17.67883
+# D 47.11111  0.3653064 2.334509 0.6082676 -0.6346936 32.69960
+# E 44.72222  1.2369950 2.389908 0.6227020  0.2369950 34.26996
+# F 34.27778 -2.4316943 1.978373 0.5154746 -3.4316943 23.48376
+# G 35.88889 -0.6663160 2.258918 0.5885720 -1.6663160 30.61627
+#         Fobs        pVal     S2di
+# A 16.5396467 0.015261846 48.69185
+# B 44.2615110 0.002650703 38.99953
+# C  1.1379731 0.346187572 10.79523
+# D  0.3606826 0.580497444 25.81601
+# E  3.9461666 0.117922106 27.38636
+# F 22.2537561 0.009189308 16.60017
+# G  1.2816259 0.320862754 23.73268
+
+# Lo stesso tipo di analisi è stata implementata in due funzioni:
+# 'JointReg()' e 'JointRegM()', disponibili nel package 'aomisc'. La prima
+# lavora sui dati degli esperimenti, la seconda lavora sulle medie delle
+# repliche e richiede come argomento in input una stima della varianza del
+# residuo entro-esperimento (sigma.e).
+
+#Unload package
+library(aomisc)
+JointRM <- JointRegrM(medie$Var, medie$Loc,  medie$Yield, sigma.e=MSres/3) 
+JointRM
+
+JointR <- JointRegr(datiFull$Block, datiFull$Var, datiFull$Loc,  datiFull$Yield)
+JointR
+```
+
+# Model fitting
+
+We can start the analyses by fitting a traditional ANOVA model, to keep as a reference.
+
+```{r}
+mod.aov <- lm(Yield ~ Loc/Block + Var*Loc, data = dataFull)
+anova(mod.aov)
+```
+
+
+As we said, Equation 1 is a mixed model, which calls for the use of the 'lme()' function. For better understanding, it is useful to start by augmenting the previous ANOVA model with the regression term ('Var/ej'). We use the nesting operator, to have different regression lines for each level of 'Var'.
+
+```{r}
+# Augmented ANOVA model
+mod.aov2 <- lm(Yield ~ Loc/Block + Var/ej + Loc:Var, data=dataFull)
+anova(mod.aov2)
+```
+
+We see that the GE interaction in the ANOVA model has been decomposed into two parts: the regression term ('Var/ej') and the deviation from regression ('Loc:Var'), with 6 and 24 degrees of freedom, respectively. This second term corresponds to $d_{ij}$ in Equation 1 (please, note that the two terms 'Var/ej' and 'Loc:Var' are partly confounded).
+
+The above analysis is only useful for teaching purposes, but it is unsatisfactory, because the $d_{ij}$ terms have been regarded as fixed, which is pretty illogical. Therefore, we change the fixed effect model into a mixed model, where we include the random 'genotype by environment' interaction. We also change the fixed block effect into a random effect and remove the intercept, to more strictly adhere to the parameterisation of Equation 1. The two random effects 'Loc:Block' and 'Loc:Var' are not nested into each other and we need to code them by using 'pdMat' constructs, which are not straightforward. You can use the code in the box below as a guidance to fit a Finlay-Wilkinson model. 
+
+```{r}
+# Finlay-Wilkinson model
+modFull1 <- lme(Yield ~ Var/ej - 1, 
+                random = list(Loc = pdIdent(~ Var - 1),
+                              Loc = pdIdent(~ Block - 1)), 
+                data=dataFull)
+summary(modFull1)$tTable
+VarCorr(modFull1)
+```
+
+From the output, we see that the variance component $\sigma_d$ (27.50) is the same for all genotypes; if we want to let a different value for each genotype (Eberarth-Russel model), we need to change the 'pdMat' construct for the 'Loc:Var' effect, turning from 'pdIdent' to 'pdDiag', as shown in the box below.
+
+```{r}
+# Eberhart-Russel model
+modFull2 <- lme(Yield ~ Var/ej - 1, 
+                random = list(Loc = pdDiag(~ Var - 1),
+                              Loc = pdIdent(~ Block - 1)), 
+                data=dataFull)
+summary(modFull2)$tTable
+VarCorr(modFull2)
+```
+
+From the regression slopes we see that the genotypes A and B are the most responsive to the environment ($\beta_A = 3.22$ and $\beta_B = 4.79$, respectively), while the genotypes C and D are stable in a static sense, although their average yield is pretty low.
+
+# Fitting a joint regression model in two-steps (Equation 2)
+
+In the previous analyses we used the plot data to fit a joint regression model. In order to reduce the computational burden, it may be useful to split the analyses in two-steps:
+
+1. we analyse the plot data, to retrieve the means for the 'genotype by environment' combinations;
+2. we fit the joint regression model to those means.
+
+The results of the two approaches are not necessarily the same, as some information in the first step is lost in the second. Several weighing schemes have been proposed to make two-steps fitting more reliable (Möhring and Piepho, 2009); in this example, I will show an unweighted two-steps analyses, which is simple, but not necessarily the best way to go.
+
+A model for the second step is:
+
+$$y_{ij} = \mu_i + \beta_i e_j + f_{ij} \quad\quad\quad \textrm{(Equation 2)}$$
+
+where the residual random component $f_{ij}$ is assumed as normally distributed, with mean equal to zero and variance equal to $\sigma^2_f$. In general,  $\sigma^2_f > \sigma^2_d$, as the residual sum of squares from Model 2 also contains a component for within trial errors. Indeed, for a balanced experiment, it is:
+
+$$\sigma^2_{f} = \sigma^2_d + \frac{\sigma^2}{k}$$
+
+where $\sigma^2$ is the within-trial error, which needs to be obtained from the first step. In the previous analyses we have already fitted an anova model to the whole dataset ('mod.aov'). In the box below, we make use of the 'emmeans' package to retrieve the least squares means for the seven genotypes in all locations. Subsequently, the environmental means are calculated and centered, by subtracting the overall mean.
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+library(emmeans)
+muGE <- as.data.frame( emmeans(mod.aov, ~Var:Loc) )[,1:3]
+names(muGE) <- c("Var", "Loc", "Yield")
+muGE <- muGE %>% 
+  group_by(Loc) %>% 
+  mutate(ej = mean(Yield) - mean(muGE$Yield))
+```
+
+Now, we fit Equation 2 to the means. In the code below we assume homoscedasticity and, thus, we are fitting the Finlay-Wilkinson model. The variance component $\sigma^2_d$ is obtained by subtracting a fraction of the residual variance from the first step.
+
+```{r}
+# Finlay-Wilkinson model
+modFinlay <- lm(Yield ~ Var/ej - 1, data=muGE)
+summary(modFinlay)
+sigmaf <- summary(modFinlay)$sigma^2 
+sigma2 <- summary(mod.aov)$sigma^2 
+sigmaf - sigma2/3 #sigma2_d
+```
+
+In the box below, we allow for different variances for each genotype and, therefore, we fit the Eberarth-Russel model. As before, we can retrieve the variance components $\sigma^2_{d(i)}$ from the fitted model object, by subtracting the within-trial error obtained in the first step. 
+
+```{r}
+# Eberarth-Russel model
+modEberarth <- gls(Yield ~ Var/ej - 1, 
+              weights=varIdent(form=~1|Var), data=muGE)
+coefs <- summary(modEberarth)$tTable
+coefs
+sigma <- summary(modEberarth)$sigma
+sigma2fi <- (c(1, coef(modEberarth$modelStruct$varStruct, uncons = FALSE)) * sigma)^2
+names(sigma2fi)[1] <- "A"
+sigma2fi - sigma2/3 #sigma2_di
+```
+
+Fitting in two steps we obtain the very same result as with fitting in one step, but it ain't necessarily so.
+
+I would like to conclude by saying that a joint regression model, the way I have fitted it here, is simple and intuitively appealing, although it has been criticized for a number of reasons. In particular, it has been noted that the environmental indices $e_j$ are estimated from the observed data and, therefore, they are not precisely known. On the contrary, linear regression makes the assumption that the levels of explanatory variables are precisely known and not sampled. As the consequence, our estimates of the slopes $\beta$ may be biased. Furthermore, in our construction we have put some arbitrary constraints on the environmental indices ($\sum{e_j} = 0$) and on the regression slopes ($\sum({\beta_i})/G = 1$; where G is the number of genotypes), which are not necessarily reasonable.
+
+Alternative methods of fitting joint regression models have been proposed (see Piepho, 1998), but they are slightly more complex and I will deal with them in a future post.
+
+Happy coding!
+
+
+---
+Prof. Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences   
+University of Perugia (Italy)   
+Borgo XX Giugno 74   
+I-06121 - PERUGIA   
+
+
+# References
+
+1. Eberhart, S.A., Russel, W.A., 1966. Stability parameters for comparing verieties. Crop Science 6, 36–40.
+2. Finlay, K.W., Wilkinson, G.N., 1963. The analysis of adaptation in a plant-breeding programme. Australian Journal of Agricultural Research 14, 742–754.
+3. Möhring, J., Piepho, H.-P., 2009. Comparison of Weighting in Two-Stage Analysis of Plant Breeding Trials. Crop Science 49, 1977–1988.
+4. Perkins, J.M., Jinks, J.L., 1968. Environmental gentype-environmental components of variability. III. Multiple lines and crosses. Heredity 23, 339–356.
+5. Piepho, H.-P., 1998. Methods for comparing the yield stability of cropping systems - A review. Journal of Agronomy and Crop Science 180, 193–213.
+6. Wood, J., 1976. The use of environmental variables in the interpretation of genotype-environment interaction. Heredity 37, 1–7.
+7. Yates, F., and Cochran G., 1938. The analysis of groups of experiments. Journal of Agricultural Sciences, 28, 556—580.
+
