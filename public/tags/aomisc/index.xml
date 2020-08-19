@@ -6,10 +6,1382 @@
     <description>Recent content in Aomisc on The broken bridge between biologists and statisticians</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2018, @AndreaOnofri</copyright>
-    <lastBuildDate>Thu, 30 May 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 12 May 2020 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="/tags/aomisc/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>AMMI analyses for GE interactions</title>
+      <link>/2020/stat_met_ammi/</link>
+      <pubDate>Tue, 12 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/stat_met_ammi/</guid>
+      <description>
+
+
+&lt;p&gt;The CoViD-19 situation in Italy is little by little improving and I feel a bit more optimistic. It’s time for a new post! I will go back to a subject that is rather important for most agronomists, i.e. the selection of crop varieties.&lt;/p&gt;
+&lt;p&gt;All farmers are perfectly aware that crop performances are affected both by the genotype and by the environment. These two effects are not purely additive and they often show a significant interaction. By this word, we mean that a genotype can give particularly good/bad performances in some specific environmental situations, which we may not expect, considering its average behaviour in other environmental conditions. The Genotype by Environment (GE) interaction may cause changes in the ranking of genotypes, depending on the environment and may play a key role in varietal recommendation, for a given mega-environment.&lt;/p&gt;
+&lt;p&gt;GE interactions are usually studied by way of Multi-Environment Trials (MET), where experiments are repeated across several years, locations or any combinations of those. Traditional techniques of data analyses, such as two-way ANOVA, give very little insight on the stability/reliability of genotypes across environments and, thus, other specialised techniques are necessary to shed light on interaction effects. I have already talked about stability analyses in other posts, such as &lt;a href=&#34;https://www.statforbiology.com/2019/stat_lmm_stabilityvariance/&#34;&gt;in this post about the stability variance&lt;/a&gt; or in this &lt;a href=&#34;https://www.statforbiology.com/2019/stat_lmm_environmentalvariance/&#34;&gt;other post about the environmental variance&lt;/a&gt;. Now, I would like to propose some simple explanations about AMMI analysis. AMMI stands for: &lt;strong&gt;Additive Main effect Multiplicative Interaction&lt;/strong&gt; and it has become very much in fashion in the last 20-25 years.&lt;/p&gt;
+&lt;p&gt;Let’s start with a real MET example.&lt;/p&gt;
+&lt;div id=&#34;a-met-with-faba-bean&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;A MET with faba bean&lt;/h1&gt;
+&lt;p&gt;This experiment consists of 12 faba bean genotypes (well, it was, indeed, 6 genotypes in two sowing dates; but, let’s disregard this detail from now on) in four blocks, two locations and three years (six environments, in all). The dataset is online available as ‘fabaBean.csv’. It has been published by Stagnari et al. (2007).&lt;/p&gt;
+&lt;p&gt;First of all, let’s load the dataset and transform the block variable into a factor. Let’s also inspect the two-way table of means, together with the marginal means for genotypes and environments, which will be useful later. In this post, we will make use of the packages ‘dplyr’ (Wickham &lt;em&gt;et al&lt;/em&gt;., 2020), ‘emmeans’ (Lenth, 2020) and ‘aomisc’; this latter is the companion package for this website and must have been installed as detailed in this &lt;a href=&#34;https://www.statforbiology.com/rpackages/&#34;&gt;page here&lt;/a&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# options(width = 70)
+
+rm(list=ls())
+# library(devtools)
+# install_github(&amp;quot;OnofriAndreaPG/aomisc&amp;quot;)
+library(reshape)
+library(emmeans)
+library(aomisc)
+
+fileName &amp;lt;- &amp;quot;https://www.casaonofri.it/_datasets/fabaBean.csv&amp;quot;
+dataset &amp;lt;- read.csv(fileName, header=T)
+dataset &amp;lt;- transform(dataset, Block = factor(Block),
+                     Genotype = factor(Genotype),
+                     Environment = factor(Environment))
+head(dataset)
+##      Genotype Block Environment Yield
+## 1    Chiaro_A     1       bad_1  4.36
+## 2    Chiaro_P     1       bad_1  2.76
+## 3 Collameno_A     1       bad_1  3.01
+## 4 Collameno_P     1       bad_1  2.50
+## 5    Palomb_A     1       bad_1  3.85
+## 6    Palomb_P     1       bad_1  2.21
+#
+# Two-ways table of means
+GEmedie &amp;lt;- cast(Genotype ~ Environment, data = dataset,
+                value = &amp;quot;Yield&amp;quot;, fun=mean)
+GEmedie
+##       Genotype  bad_1  bad_2  bad_3  pap_1  pap_2  pap_3
+## 1     Chiaro_A 4.1050 2.3400 4.1250 4.6325 2.4100 3.8500
+## 2     Chiaro_P 2.5075 1.3325 4.2025 3.3225 1.4050 4.3175
+## 3  Collameno_A 3.2500 2.1150 4.3825 3.8475 2.2325 4.0700
+## 4  Collameno_P 1.9075 0.8475 3.8650 2.5200 0.9850 4.0525
+## 5     Palomb_A 3.8400 2.0750 4.2050 5.0525 2.6850 4.6675
+## 6     Palomb_P 2.2500 0.9725 3.2575 3.2700 0.8825 4.0125
+## 7      Scuro_A 4.3700 2.1050 4.1525 4.8625 2.1275 4.2050
+## 8      Scuro_P 3.0500 1.6375 3.9300 3.7200 1.7475 4.5125
+## 9    Sicania_A 3.8300 1.9450 4.5050 3.9550 2.2350 4.2350
+## 10   Sicania_P 3.2700 0.9900 3.7300 4.0475 0.8225 3.8950
+## 11   Vesuvio_A 4.1375 2.0175 4.0275 4.5025 2.2650 4.3225
+## 12   Vesuvio_P 2.1225 1.1800 3.5250 3.0950 0.9375 3.6275
+#
+# Marginal means for genotypes
+apply(GEmedie, 1, mean)
+##    Chiaro_A    Chiaro_P Collameno_A Collameno_P    Palomb_A 
+##    3.577083    2.847917    3.316250    2.362917    3.754167 
+##    Palomb_P     Scuro_A     Scuro_P   Sicania_A   Sicania_P 
+##    2.440833    3.637083    3.099583    3.450833    2.792500 
+##   Vesuvio_A   Vesuvio_P 
+##    3.545417    2.414583
+#
+# Marginal means for environments
+apply(GEmedie, 2, mean)
+##    bad_1    bad_2    bad_3    pap_1    pap_2    pap_3 
+## 3.220000 1.629792 3.992292 3.902292 1.727917 4.147292
+#
+# Overall mean
+mean(as.matrix(GEmedie))
+## [1] 3.103264&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;What model could we possibly fit to the above data? The basic two-way ANOVA model is:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[Y_{ijk} = \mu + \gamma_{jk} + g_i + e_j + ge_{ij} + \varepsilon_{ijk} \quad \quad (1)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where the yield &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; for given block &lt;span class=&#34;math inline&#34;&gt;\(k\)&lt;/span&gt;, environment &lt;span class=&#34;math inline&#34;&gt;\(j\)&lt;/span&gt; and genotype &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt; is described as a function of the effects of blocks within environments (&lt;span class=&#34;math inline&#34;&gt;\(\gamma\)&lt;/span&gt;), genotypes (&lt;span class=&#34;math inline&#34;&gt;\(g\)&lt;/span&gt;), environments (&lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt;) and GE interaction (&lt;span class=&#34;math inline&#34;&gt;\(ge\)&lt;/span&gt;). The residual error term &lt;span class=&#34;math inline&#34;&gt;\(\varepsilon\)&lt;/span&gt; is assumed to be normal and homoscedastic, with standard deviation equal to &lt;span class=&#34;math inline&#34;&gt;\(\sigma\)&lt;/span&gt;. Let’s also assume that both the genotype and environment effects are fixed: this is useful for teaching purposes and it is reasonable, as we intend to study the behaviour of specific genotypes in several specific environments.&lt;/p&gt;
+&lt;p&gt;The interaction effect &lt;span class=&#34;math inline&#34;&gt;\(ge\)&lt;/span&gt;, under some important assumptions (i.e. balanced data, no missing cells and homoscedastic errors), is given by:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ge_{ij} = Y_{ij.} - \left( \mu + g_i + e_j \right) = Y_{ij.} - Y_{i..} - Y_{.j.} + \mu \quad \quad (2)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(Y_{ij.}\)&lt;/span&gt; is the mean of the combination between the genotype &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt; and the environment &lt;span class=&#34;math inline&#34;&gt;\(j\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(Y_{i..}\)&lt;/span&gt; is the mean for the genotype &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(Y_{.j.}\)&lt;/span&gt; is the mean for the environment &lt;span class=&#34;math inline&#34;&gt;\(j\)&lt;/span&gt;. For example, for the genotype ‘Chiaro_A’ in the environment ‘bad_1’, the interaction effect was:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;4.1050 - 3.577 - 3.22 + 3.103
+## [1] 0.411&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We see that the interaction was positive, in the sense that ‘Chiaro_A’, gave 0.411 tons per hectare more than we could have expected, considering its average performances across environments and the average performances of all genotypes in ‘bad_1’.&lt;/p&gt;
+&lt;p&gt;More generally, the two-way table of interaction effects can be obtained by doubly centring the matrix of means, as shown in the following box.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;GE &amp;lt;- as.data.frame(t(scale( t(scale(GEmedie, center=T,
+ scale=F)), center=T, scale=F)))
+print(round(GE, 3))
+##              bad_1  bad_2  bad_3  pap_1  pap_2  pap_3
+## Chiaro_A     0.411  0.236 -0.341  0.256  0.208 -0.771
+## Chiaro_P    -0.457 -0.042  0.466 -0.324 -0.068  0.426
+## Collameno_A -0.183  0.272  0.177 -0.268  0.292 -0.290
+## Collameno_P -0.572 -0.042  0.613 -0.642 -0.003  0.646
+## Palomb_A    -0.031 -0.206 -0.438  0.499  0.306 -0.131
+## Palomb_P    -0.308  0.005 -0.072  0.030 -0.183  0.528
+## Scuro_A      0.616 -0.059 -0.374  0.426 -0.134 -0.476
+## Scuro_P     -0.166  0.011 -0.059 -0.179  0.023  0.369
+## Sicania_A    0.262 -0.032  0.165 -0.295  0.160 -0.260
+## Sicania_P    0.361 -0.329  0.048  0.456 -0.595  0.058
+## Vesuvio_A    0.475 -0.054 -0.407  0.158  0.095 -0.267
+## Vesuvio_P   -0.409  0.239  0.221 -0.119 -0.102  0.169&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Please, note that the overall mean for all elements in ‘GE’ is zero and the sum of squares is equal to a fraction of the interaction sum of squares in ANOVA (that is &lt;span class=&#34;math inline&#34;&gt;\(RMSE/r\)&lt;/span&gt;; where &lt;span class=&#34;math inline&#34;&gt;\(r\)&lt;/span&gt; is the number of blocks).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mean(unlist(GE))
+## [1] 6.914424e-18
+sum(GE^2)
+## [1] 7.742996
+mod &amp;lt;- lm(Yield ~ Environment/Block + Genotype*Environment, data = dataset)
+anova(mod)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##                       Df Sum Sq Mean Sq  F value    Pr(&amp;gt;F)    
+## Environment            5 316.57  63.313 580.9181 &amp;lt; 2.2e-16 ***
+## Genotype              11  70.03   6.366  58.4111 &amp;lt; 2.2e-16 ***
+## Environment:Block     18   6.76   0.375   3.4450 8.724e-06 ***
+## Environment:Genotype  55  30.97   0.563   5.1669 &amp;lt; 2.2e-16 ***
+## Residuals            198  21.58   0.109                       
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+30.97/4
+## [1] 7.7425&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;decomposing-the-ge-matrix&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Decomposing the GE matrix&lt;/h1&gt;
+&lt;p&gt;It would be nice to be able to give a graphical summary of the GE matrix; in this regard, we could think of using Principal Component Analysis (PCA) via Singular Value Decomposition (SVD). This has been shown by Zobel &lt;em&gt;et al&lt;/em&gt;. (1988) and, formerly, by Gollob (1968). May I just remind you a few things about PCA and SVD? No overwhelming math detail, I promise!&lt;/p&gt;
+&lt;p&gt;Most matrices (and our GE matrix) can be decomposed as the product of three matrices, according to:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[X = U D V^T \quad \quad (3)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt; is the matrix to be decomposed, &lt;span class=&#34;math inline&#34;&gt;\(U\)&lt;/span&gt; is the matrix of the first &lt;span class=&#34;math inline&#34;&gt;\(n\)&lt;/span&gt; eigenvectors of &lt;span class=&#34;math inline&#34;&gt;\(XX^T\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(V\)&lt;/span&gt; is the matrix of the first &lt;span class=&#34;math inline&#34;&gt;\(n\)&lt;/span&gt; eigenvectors of &lt;span class=&#34;math inline&#34;&gt;\(X^T X\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(D\)&lt;/span&gt; is the diagonal matrix of the first &lt;span class=&#34;math inline&#34;&gt;\(n\)&lt;/span&gt; singular values of &lt;span class=&#34;math inline&#34;&gt;\(XX^T\)&lt;/span&gt; (or &lt;span class=&#34;math inline&#34;&gt;\(X^T X\)&lt;/span&gt;; it does not matter, they are the same).&lt;/p&gt;
+&lt;p&gt;Indeed, if we want to decompose our GE matrix, it is more clever (and more useful to our purposes), to write the following matrices:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[S_g = U D^{1/2} \quad \quad (4)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;and:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[S_e = V D^{1/2} \quad \quad (5)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;so that&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[GE = S_g \, S_e^T \quad \quad (6)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math inline&#34;&gt;\(S_g\)&lt;/span&gt; is the matrix of row-scores (genotype scores) and &lt;span class=&#34;math inline&#34;&gt;\(S_e\)&lt;/span&gt; is the matrix of column scores (environment scores). Let me give you an empirical proof, in the box below. In order to find &lt;span class=&#34;math inline&#34;&gt;\(S_g\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(S_e\)&lt;/span&gt;, I will use a mathematical operation that is known as Singular Value Decomposition (SVD):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;U &amp;lt;- svd(GE)$u
+V &amp;lt;- svd(GE)$v
+D &amp;lt;- diag(svd(GE)$d)
+Sg &amp;lt;- U %*% sqrt(D)
+Se &amp;lt;- V %*% sqrt(D)
+row.names(Sg) &amp;lt;- levels(dataset$Genotype)
+row.names(Se) &amp;lt;- levels(dataset$Environment)
+colnames(Sg) &amp;lt;- colnames(Se) &amp;lt;- paste(&amp;quot;PC&amp;quot;, 1:6, sep =&amp;quot;&amp;quot;)
+round(Sg %*% t(Se), 3)
+##              bad_1  bad_2  bad_3  pap_1  pap_2  pap_3
+## Chiaro_A     0.411  0.236 -0.341  0.256  0.208 -0.771
+## Chiaro_P    -0.457 -0.042  0.466 -0.324 -0.068  0.426
+## Collameno_A -0.183  0.272  0.177 -0.268  0.292 -0.290
+## Collameno_P -0.572 -0.042  0.613 -0.642 -0.003  0.646
+## Palomb_A    -0.031 -0.206 -0.438  0.499  0.306 -0.131
+## Palomb_P    -0.308  0.005 -0.072  0.030 -0.183  0.528
+## Scuro_A      0.616 -0.059 -0.374  0.426 -0.134 -0.476
+## Scuro_P     -0.166  0.011 -0.059 -0.179  0.023  0.369
+## Sicania_A    0.262 -0.032  0.165 -0.295  0.160 -0.260
+## Sicania_P    0.361 -0.329  0.048  0.456 -0.595  0.058
+## Vesuvio_A    0.475 -0.054 -0.407  0.158  0.095 -0.267
+## Vesuvio_P   -0.409  0.239  0.221 -0.119 -0.102  0.169&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Let’s have a look at &lt;span class=&#34;math inline&#34;&gt;\(S_g\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(S_e\)&lt;/span&gt;: they are two interesting entities. I will round up a little to make them smaller, and less scaring.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;round(Sg, 3)
+##                PC1    PC2    PC3    PC4    PC5 PC6
+## Chiaro_A    -0.607 -0.384  0.001  0.208 -0.063   0
+## Chiaro_P     0.552  0.027 -0.081  0.045  0.164   0
+## Collameno_A  0.084 -0.542 -0.006  0.176  0.057   0
+## Collameno_P  0.807 -0.066 -0.132 -0.172  0.079   0
+## Palomb_A    -0.321  0.110  0.591 -0.083  0.389   0
+## Palomb_P     0.281  0.346  0.282  0.042 -0.253   0
+## Scuro_A     -0.626  0.139 -0.163  0.017 -0.080   0
+## Scuro_P      0.230  0.077  0.182 -0.207 -0.242   0
+## Sicania_A   -0.063 -0.324 -0.355 -0.280  0.090   0
+## Sicania_P   -0.214  0.683 -0.402  0.148  0.151   0
+## Vesuvio_A   -0.438 -0.008  0.020 -0.300 -0.177   0
+## Vesuvio_P    0.316 -0.058  0.063  0.405 -0.114   0
+round(Se, 3)
+##          PC1    PC2    PC3    PC4    PC5 PC6
+## bad_1 -0.831  0.095 -0.467 -0.317 -0.151   0
+## bad_2  0.044 -0.418  0.070  0.371 -0.403   0
+## bad_3  0.670 -0.130 -0.525  0.171  0.298   0
+## pap_1 -0.661  0.513  0.289  0.314  0.221   0
+## pap_2 -0.069 -0.627  0.420 -0.294  0.208   0
+## pap_3  0.846  0.567  0.213 -0.244 -0.173   0&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Both matrices have 6 columns. Why six, are you asking? I promised I would not go into math detail; it’s enough to know that the number of columns is always equal to the minimum value between the number of genotypes and the number of environments. The final column is irrelevant (all elements are 0). &lt;span class=&#34;math inline&#34;&gt;\(S_g\)&lt;/span&gt; has 12 rows, one per genotype; these are the so called genotype scores: each genotype has six scores. &lt;span class=&#34;math inline&#34;&gt;\(S_e\)&lt;/span&gt; has six rows, one per environment (environment scores).&lt;/p&gt;
+&lt;p&gt;You may have some ‘rusty’ memories about matrix multiplication; however, what we have discovered in the code box above is that the GE interaction for the &lt;span class=&#34;math inline&#34;&gt;\(i^{th}\)&lt;/span&gt; genotype and the &lt;span class=&#34;math inline&#34;&gt;\(j^{th}\)&lt;/span&gt; environment can be obtained as the product of genotype scores and environments scores. Indeed:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ge_{ij} = \sum_{z = 1}^n \left[ S_g(iz) \cdot S_e(jz) \right] \quad \quad (7)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(n\)&lt;/span&gt; is the number of columns (number of principal components). An example is in order, at this point; again, let’s consider the first genotype and the first environment. The genotype and environments scores are in the first columns of &lt;span class=&#34;math inline&#34;&gt;\(S_g\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(S_e\)&lt;/span&gt;; if we multiply the elements in the same positioning (1st with 1st, 2nd with 2nd, and so on) and sum up, we get:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;-0.607 * -0.831 +
+-0.384 *  0.095 +
+ 0.001 * -0.467 +
+ 0.208 * -0.317 + 
+-0.063 * -0.151 +
+     0 * 0
+## [1] 0.411047&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It’s done: we have transformed the interaction effect into the sum of multiplicative terms. If we replace Equation 7 into the ANOVA model above (Equation 1), we obtain an &lt;em&gt;Additive Main effects Multiplicative Interaction&lt;/em&gt; model, i.e. an AMMI model.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;reducing-the-rank&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Reducing the rank&lt;/h1&gt;
+&lt;p&gt;In this case we took all available columns in &lt;span class=&#34;math inline&#34;&gt;\(S_g\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(S_e\)&lt;/span&gt;. For the sake of simplicity, we could have taken only a subset of those columns. The Eckart-Young (1936) theorem says that, if we take &lt;span class=&#34;math inline&#34;&gt;\(m &amp;lt; 6\)&lt;/span&gt; columns, we obtain the best possible approximation of GE in reduced rank space. For example, let’s use the first two columns of &lt;span class=&#34;math inline&#34;&gt;\(S_g\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(S_e\)&lt;/span&gt; (the first two principal component scores):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;PC &amp;lt;- 2
+Sg2 &amp;lt;- Sg[,1:PC]
+Se2 &amp;lt;- Se[,1:PC]
+GE2 &amp;lt;- Sg2 %*% t(Se2)
+print ( round(GE2, 3) )
+##              bad_1  bad_2  bad_3  pap_1  pap_2  pap_3
+## Chiaro_A     0.468  0.134 -0.357  0.205  0.282 -0.732
+## Chiaro_P    -0.456  0.013  0.367 -0.351 -0.055  0.482
+## Collameno_A -0.122  0.230  0.127 -0.334  0.334 -0.236
+## Collameno_P -0.676  0.063  0.549 -0.567 -0.014  0.645
+## Palomb_A     0.277 -0.060 -0.230  0.269 -0.047 -0.209
+## Palomb_P    -0.201 -0.132  0.144 -0.009 -0.236  0.434
+## Scuro_A      0.534 -0.086 -0.438  0.486 -0.044 -0.451
+## Scuro_P     -0.184 -0.022  0.144 -0.113 -0.064  0.238
+## Sicania_A    0.022  0.133  0.000 -0.124  0.207 -0.237
+## Sicania_P    0.243 -0.295 -0.232  0.492 -0.414  0.206
+## Vesuvio_A    0.363 -0.016 -0.293  0.286  0.035 -0.375
+## Vesuvio_P   -0.268  0.038  0.219 -0.239  0.015  0.234&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;GE2 is not equal to GE, but it is a close approximation. A close approximation in what sense?… you may wonder. Well, the sum of squared elements in GE2 is as close as possible (with &lt;span class=&#34;math inline&#34;&gt;\(n = 2\)&lt;/span&gt;) to the sum of squared elements in GE:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sum(GE2^2)
+## [1] 6.678985&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We see that the sum of squares in GE2 is 86% of the sum of squares in GE. A very good approximation, isn’t it? It means that the variability of yield across environments is described well enough by using a relatively low number of parameters (scores). However, the multiplicative part of our AMMI model needs to be modified:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ge_{ij} = \sum_{z = 1}^m \left[ s_{g(iz)} \cdot s_{e(jz)} \right] + \xi_{ij}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Indeed, a residual term &lt;span class=&#34;math inline&#34;&gt;\(\xi_{ij}\)&lt;/span&gt; is necessary, to account for the fact that the sum of multiplicative terms is not able to fully recover the original matrix GE. Another example? For the first genotype and the first environment the multiplicative interaction is:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;-0.607 * -0.831 + -0.384 * 0.095
+## [1] 0.467937&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;and the residual term &lt;span class=&#34;math inline&#34;&gt;\(\xi_{11}\)&lt;/span&gt; is&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;0.41118056 -0.607 * -0.831 + -0.384 * 0.095
+## [1] 0.8791176&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Clearly, the residual terms need to be small enough to be negligible, otherwise the approximation in reduced rank space is not good enough.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;why-is-this-useful&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Why is this useful?&lt;/h1&gt;
+&lt;p&gt;Did you get lost? Hope you didn’t, but let’s make a stop and see where we are standing now. We started from the interaction matrix GE and found a way to decompose it as the product of two matrices, i.e. &lt;span class=&#34;math inline&#34;&gt;\(S_g\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(S_e\)&lt;/span&gt;, a matrix of genotype scores and a matrix of environment scores. We discovered that we could obtain a good approximation of GE by working in reduced rank space and we only used two genotypic scores and two environment scores, in place of the available six.&lt;/p&gt;
+&lt;p&gt;This is great! Now we have the ability of drawing a biplot, i.e. we can plot both genotypic scores and environmental scores in a dispersion graph (biplot: two plots in one), as we see below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;biplot(Sg[,1:2], Se[,1:2], xlim = c(-1, 1), ylim = c(-1, 1),
+       xlab = &amp;quot;PC 1&amp;quot;, ylab = &amp;quot;PC 2&amp;quot;)
+abline(h = 0, lty = 2)
+abline(v = 0, lty = 2)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/Stat_met_AMMI_files/figure-html/unnamed-chunk-12-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;This graph provides a very effective description of GE interaction effects. I will not go into detail, here. Just a few simple comments:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;genotypes and environments lying close to the origin of the axes do not interact with each other (the product of scores would be close to 0)&lt;/li&gt;
+&lt;li&gt;genotype and environments lying far away from the origin of axes show very big interaction and, therefore, high yield instability. Someone says that the euclidean distance from the origin should be taken as a measure of instability&lt;/li&gt;
+&lt;li&gt;the interaction is positive, when genotypes and environments are close to each other. If two objects are close, their scores (co-ordinates) will have the same signs and thus their product will be positive.&lt;/li&gt;
+&lt;li&gt;the interaction is negative, when genotypes and environments are far away from each other. If two objects are distant, their scores (co-ordinates) will have opposte signs and thus their product will be negative.&lt;/li&gt;
+&lt;li&gt;For instance, ‘Palomb_P’, ‘Scuro_P’, ‘Chiaro_P’ and ‘Collameno_P’ gave particularly good yields in the environments ‘pap_3’ and ‘bad_3’, while ‘Scuro_A’, ‘Palomb_A’ and ‘Vesuvio_A’ gave particularly good yields (compared to their average) in the environments ‘pap_1’ and ‘bad_1’. ‘Sicania_A’ and ‘Collameno_A’ gave good yields in ‘bad_2’ and ‘pap_2’.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div id=&#34;how-many-components&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;How many components?&lt;/h2&gt;
+&lt;p&gt;In my opinion, AMMI analysis is mainly a visualisation method. Therefore, we should select as many components (columns in &lt;span class=&#34;math inline&#34;&gt;\(S_g\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(S_e\)&lt;/span&gt;) as necessary to describe a main part of the interaction sum of squares. In our example, two components are enough, as they represent 86% of the interaction sum of squares.&lt;/p&gt;
+&lt;p&gt;However, many people (and reviewers) are still very concerned with formal hypothesis testing. Therefore, we could proceed in a sequential fashion, and introduce the components one by one.&lt;/p&gt;
+&lt;p&gt;The first component has a sum of squares equal to:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;PC &amp;lt;- 1
+Sg2 &amp;lt;- Sg[,1:PC]
+Se2 &amp;lt;- Se[,1:PC]
+GE2 &amp;lt;- Sg2 %*% t(Se2)
+sum(GE2^2)
+## [1] 5.290174&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We have seen that the second component has an additional sum of squares equal to:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;6.678985 - 5.290174
+## [1] 1.388811&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We can go further ahead and get the sum of squares for all components. According to Zobel (1988), the degrees of freedom for each component are equal to:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ df_n = i + j - 1 - 2m \]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt; is the number of genotypes, &lt;span class=&#34;math inline&#34;&gt;\(j\)&lt;/span&gt; is the number of environments, and &lt;span class=&#34;math inline&#34;&gt;\(m\)&lt;/span&gt; is the number of the selected components. In our case, the first PC has 15 DF, the second one has 13 DF and so on.&lt;/p&gt;
+&lt;p&gt;If we can have a reliable estimate of the pure error variance &lt;span class=&#34;math inline&#34;&gt;\(\sigma^2\)&lt;/span&gt; (see above), we can test the significance of each component by using F tests (although some authors argue that this is too a liberal approach; see Cornelius, 1993).&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;simple-ammi-analysis-with-r&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Simple AMMI analysis with R&lt;/h1&gt;
+&lt;p&gt;We have seen that AMMI analysis, under the hood, is a sort of PCA. Therefore, it could be performed, in R by using one of the available packages for PCA. For the sake of simplicity, I have coded a couple of functions, i.e. ‘AMMI()’ and ‘AMMImeans()’ and they are both available in the ‘aomisc’ package. I have described the first one a few years ago in an R news paper (&lt;a href=&#34;https://www.researchgate.net/publication/289419258_Using_R_to_perform_the_AMMI_analysis_on_agriculture_variety_trials&#34;&gt;Onofri and Ciriciofolo, 2007&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;Here, I will describe the second one, which permits to handle a small degree of unbalance (a few plots, missing at random). The analysis proceeds in two steps.&lt;/p&gt;
+&lt;div id=&#34;first-step-on-raw-data&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;First step on raw data&lt;/h2&gt;
+&lt;p&gt;During the first step we need to obtain a reliable matrix of means for the ‘genotype x environment’ combinations. If the environment is fixed, we can use least squares means, which are unbiased, also when some observations are missing. If the environment effect is random, we could use the BLUPs, but we will not consider such an option here.&lt;/p&gt;
+&lt;p&gt;In the box below we take the ‘mod’ object from a two way ANOVA fit and derive the residual mean square (RMSE), which we divide by the number of blocks. This will be our error term to test the significance of components. Later, we pass the ‘mod’ object to the ‘emmeans()’ function, to retrieve the expected marginal means for the ‘genotype by environment’ combinations and proceed to the second step.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;RMSE &amp;lt;- summary(mod)$sigma^2 / 4
+dfr &amp;lt;- mod$df.residual
+ge.lsm &amp;lt;- emmeans(mod, ~Genotype:Environment)
+ge.lsm &amp;lt;- data.frame(ge.lsm)[,1:3]&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;second-step-on-least-square-means&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Second step on least square means&lt;/h2&gt;
+&lt;p&gt;This second step assumes that the residual variances for all environments are homogeneous. If so (we’d better check this), we can take the expected marginal means (‘ge.lsm’) and submit them to AMMI analysis, by using the ‘AMMImeans()’ function. The syntax is fairly obvious; we also pass to it the RMSE and its degrees of freedom. The resulting object can be explored, by using the appropriate slots.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;AMMIobj &amp;lt;- AMMImeans(yield = ge.lsm$emmean, 
+                     genotype = ge.lsm$Genotype, 
+                     environment = ge.lsm$Environment, 
+                     MSE = RMSE, dfr = dfr)
+#
+AMMIobj$genotype_scores
+##                     PC1          PC2
+## Chiaro_A    -0.60710888 -0.383732821
+## Chiaro_P     0.55192742  0.026531045
+## Collameno_A  0.08444877 -0.542185666
+## Collameno_P  0.80677055 -0.065752971
+## Palomb_A    -0.32130513  0.110117240
+## Palomb_P     0.28104959  0.345909298
+## Scuro_A     -0.62638795  0.139185954
+## Scuro_P      0.22961347  0.076555540
+## Sicania_A   -0.06286803 -0.323857285
+## Sicania_P   -0.21433211  0.683296898
+## Vesuvio_A   -0.43786742 -0.007914342
+## Vesuvio_P    0.31605973 -0.058152890
+#
+AMMIobj$environment_scores
+##               PC1         PC2
+## bad_1 -0.83078550  0.09477362
+## bad_2  0.04401963 -0.41801637
+## bad_3  0.67043214 -0.12977423
+## pap_1 -0.66137357  0.51268429
+## pap_2 -0.06863235 -0.62703224
+## pap_3  0.84633965  0.56736492
+#
+round(AMMIobj$summary, 4)
+##   PC Singular_value  PC_SS Perc_of_Total_SS cum_perc
+## 1  1         2.3000 5.2902          68.3220  68.3220
+## 2  2         1.1785 1.3888          17.9364  86.2584
+## 3  3         0.8035 0.6456           8.3375  94.5959
+## 4  4         0.5119 0.2621           3.3846  97.9806
+## 5  5         0.3954 0.1564           2.0194 100.0000
+## 6  6         0.0000 0.0000           0.0000 100.0000
+#
+round(AMMIobj$anova, 4)
+##   PC     SS DF     MS       F P.value
+## 1  1 5.2902 15 0.3527 12.9437  0.0000
+## 2  2 1.3888 13 0.1068  3.9208  0.0000
+## 3  3 0.6456 11 0.0587  2.1539  0.0184
+## 4  4 0.2621  9 0.0291  1.0687  0.3876
+## 5  5 0.1564  7 0.0223  0.8198  0.5718
+## 6  6 0.0000  5 0.0000  0.0000  1.0000&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In detail, we can retrieve the genotype and environment scores, the proportion of the GE variance explained by each component and the significance of PCs.&lt;/p&gt;
+&lt;p&gt;Just to show you, the box below reports the code for AMMI analysis on raw data. Please, note that this only works with balanced data.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;AMMIobj2 &amp;lt;- AMMI(yield = dataset$Yield, 
+                 genotype = dataset$Genotype,
+                 environment = dataset$Environment, 
+                 block = dataset$Block)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I agree, these functions are not very ambitious. However, they are simple enough to be usable and give reliable results, as long as the basic assumptions for the method are respected. You may also consider to explore other more comprehensive R packages, such as ‘agricolae’ (de Mendiburu, 2020).&lt;/p&gt;
+&lt;p&gt;Thank you for reading, so far, and… happy coding!&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Borgo XX Giugno 74&lt;br /&gt;
+I-06121 - PERUGIA&lt;/p&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;literature-references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Literature references&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Annichiarico, P. (1997). Additive main effects and multiplicative interaction (AMMI) analysis of genotype-location interaction in variety trials repeated over years. Theoretical applied genetics, 94, 1072-1077.&lt;/li&gt;
+&lt;li&gt;Ariyo, O. J. (1998). Use of additive main effects and multiplicative interaction model to analyse multilocation soybean varietal trials. J. Genet. and Breed, 129-134.&lt;/li&gt;
+&lt;li&gt;Cornelius, P. L. (1993). Statistical tests and retention of terms in the Additive Main Effects and Multiplicative interaction model for cultivar trials. Crop Science, 33,1186-1193.&lt;/li&gt;
+&lt;li&gt;Crossa, J. (1990). Statistical Analyses of multilocation trials. Advances in Agronomy, 44, 55-85.&lt;/li&gt;
+&lt;li&gt;Gollob, H. F. (1968). A statistical model which combines features of factor analytic and analysis of variance techniques. Psychometrika, 33, 73-114.&lt;/li&gt;
+&lt;li&gt;Lenth R., 2020. emmeans: Estimated Marginal Means, aka Least-Squares Means. R package version 1.4.6. &lt;a href=&#34;https://github.com/rvlenth/emmeans&#34; class=&#34;uri&#34;&gt;https://github.com/rvlenth/emmeans&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;de Mendiburu F., 2020. agricolae: Statistical Procedures for Agricultural Research. R package version 1.3-2. &lt;a href=&#34;https://CRAN.R-project.org/package=agricolae&#34; class=&#34;uri&#34;&gt;https://CRAN.R-project.org/package=agricolae&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Onofri, A., Ciriciofolo, E., 2007. Using R to perform the AMMI analysis on agriculture variety trials. R NEWS 7, 14–19.&lt;/li&gt;
+&lt;li&gt;Stagnari F., Onofri A., Jemison J., Monotti M. (2006). Multivariate analyses to discriminate the behaviour of faba bean (Vicia faba L. var. minor) varieties as affected by sowing time in cool, low rainfall Mediterranean environments. Agronomy For Sustainable Development, 27, 387–397.&lt;/li&gt;
+&lt;li&gt;Hadley Wickham, Romain François, Lionel Henry and Kirill Müller, 2020. dplyr: A Grammar of Data Manipulation. R package version 0.8.5. &lt;a href=&#34;https://CRAN.R-project.org/package=dplyr&#34; class=&#34;uri&#34;&gt;https://CRAN.R-project.org/package=dplyr&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Zobel, R. W., Wright, M.J., and Gauch, H. G. (1988). Statistical analysis of a yield trial. Agronomy Journal, 388-393.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>A collection of self-starters for nonlinear regression in R</title>
+      <link>/2020/stat_nls_usefulfunctions/</link>
+      <pubDate>Wed, 26 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/stat_nls_usefulfunctions/</guid>
+      <description>
+
+
+&lt;p&gt;Usually, the first step of every nonlinear regression analysis is to select the function &lt;span class=&#34;math inline&#34;&gt;\(f\)&lt;/span&gt;, which best describes the phenomenon under study. The next step is to fit this function to the observed data, possibly by using some sort of nonlinear least squares algorithms. These algorithms are iterative, in the sense that they start from some initial values of model parameters and repeat a sequence of operations, which continuously improve the initial guesses, until the least squares solution is approximately reached.&lt;/p&gt;
+&lt;p&gt;This is the main problem: we need to provide initial values for all model parameters! It is not irrelevant; indeed, if our guesses are not close enough to least squares estimates, the algorithm may freeze during the estimation process and may not reach convergence. Unfortunately, guessing good initial values for model parameters is not always easy, especially for students and practitioners. This is where self-starters come in handy.&lt;/p&gt;
+&lt;p&gt;Self-starter functions can automatically calculate initial values for any given dataset and, therefore, they can make nonlinear regression analysis as smooth as linear regression analysis. From a teaching perspective, this means that the transition from linear to nonlinear models is immediate and hassle-free!&lt;/p&gt;
+&lt;p&gt;In a recent post (&lt;a href=&#34;https://www.statforbiology.com/2020/stat_nls_selfstarting/&#34;&gt;see here&lt;/a&gt;) I gave detail on how self-starters can be built, both for the ‘nls()’ function in the ‘stats’ package and for the ‘drm()’ function in the ‘drc’ package (Ritz et al., 2019). Both ‘nls()’ and ‘drm()’ can be used to fit nonlinear regression models in R and the respective packages already contain several robust self-starting functions. I am a long-time user of both ‘nls()’ and ‘drm()’ and I have little-by-little built a rather wide knowledge base of self-starters for both. I’ll describe them in this post; they are available within the package ‘aomisc’, that is the accompanying package for this blog.&lt;/p&gt;
+&lt;p&gt;First of all, we need to install this package (if necessary) and load it, by using the code below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#installing package, if not yet available
+# library(devtools)
+# install_github(&amp;quot;onofriandreapg/aomisc&amp;quot;)
+
+# loading package
+library(aomisc)&lt;/code&gt;&lt;/pre&gt;
+&lt;hr /&gt;
+&lt;div id=&#34;functions-and-curve-shapes&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Functions and curve shapes&lt;/h1&gt;
+&lt;p&gt;Nonlinear regression functions are usually classified according to the shape they show when they are plotted in a XY-graph. Such an approach is taken, e.g., in the great book of Ratkowsky (1990). The following classification is heavily based on that book:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Polynomials
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;&lt;a href=&#34;#straight-line-function&#34;&gt;Straight line function&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#quadratic-polynomial-function&#34;&gt;Quadratic polynomial function&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;&lt;/li&gt;
+&lt;li&gt;Concave/Convex curves (no inflection)
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;&lt;a href=&#34;#exponential-function&#34;&gt;Exponential function&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#asymptotic-function&#34;&gt;Asymptotic function / Negative exponential function&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#power-function&#34;&gt;Power curve function&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#logarithmic-function&#34;&gt;Logarithmic function&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#rectangular-hyperbola&#34;&gt;Rectangular hyperbola&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;&lt;/li&gt;
+&lt;li&gt;Sigmoidal curves
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;&lt;a href=&#34;#logistic-function&#34;&gt;Logistic function&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#gompertz-function&#34;&gt;Gompertz function&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#modified-gompertz-function&#34;&gt;Modified Gompertz function&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#log-logistic-function&#34;&gt;Log-logistic function&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#weibull-function-type-1&#34;&gt;Weibull (type 1) function&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#weibull-function-type-2&#34;&gt;Weibull (type 2) function&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;&lt;/li&gt;
+&lt;li&gt;Curves with maxima/minima
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;&lt;a href=&#34;#bragg-function&#34;&gt;Bragg function&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#lorentz-function&#34;&gt;Lorentz function&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#beta-function&#34;&gt;Beta function&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Let’s go through these functions and see how we can fit them both with ‘nls()’ and ‘drm()’, by using the appropriate self-starters. There are many functions and, therefore, the post is rather long… however, you can look at the graph below to spot the function you are interested in and use the link above to reach the relevant part in this web page.&lt;/p&gt;
+&lt;div class=&#34;figure&#34;&gt;&lt;span id=&#34;fig:unnamed-chunk-2&#34;&gt;&lt;/span&gt;
+&lt;img src=&#34;/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-2-1.png&#34; alt=&#34;The shapes of the most important functions&#34; width=&#34;95%&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;
+Figure 1: The shapes of the most important functions
+&lt;/p&gt;
+&lt;/div&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;polynomials&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Polynomials&lt;/h1&gt;
+&lt;p&gt;Polynomials are a group on their own, as they are characterized by very flexible shapes, which can be used to describe several different biological processes. They are simple and, although they may be curvilinear, they are always linear in the parameters and can be fitted by using least squares methods. One disadvantage is that they cannot describe asymptotic processes, which are very common in biology. Furthermore, polynomials are prone to overfitting, as we may be tempted to add terms to improve the fit, with little care for biological realism.&lt;/p&gt;
+&lt;p&gt;Nowadays, thanks to the wide availability of nonlinear regression algorithms, the use of polynomials has sensibly decreased; linear or quadratic polynomials are mainly used when we want to approximate the observed response within a narrow range of a quantitative predictor. On the other hand, higher order polynomials are very rarely seen, in practice.&lt;/p&gt;
+&lt;div id=&#34;straight-line-function&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Straight line function&lt;/h2&gt;
+&lt;p&gt;Among the polynomials, we should cite the straight line. Obviously, this is not a curve, although it deserves to be mentioned here. The equation is:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[Y = b_0 + b_1 \, X \quad \quad \quad (1)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(b_0\)&lt;/span&gt; is the value of &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; when &lt;span class=&#34;math inline&#34;&gt;\(X = 0\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(b_1\)&lt;/span&gt; is the slope, i.e. the increase/decrease in &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; for a unit-increase in &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt;. The Y increases as X increases when &lt;span class=&#34;math inline&#34;&gt;\(b_1 &amp;gt; 0\)&lt;/span&gt;, otherwise it decreases. Straight lines are the most common functions for regression and they are most often used to approximate biological phenomena within a small range for the predictor.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;quadratic-polynomial-function&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Quadratic polynomial function&lt;/h2&gt;
+&lt;p&gt;The quadratic polynomial is:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[Y = b_0 + b_1\, X + b_2 \, X^2 \quad \quad \quad (2)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(b_0\)&lt;/span&gt; is the value of &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; when &lt;span class=&#34;math inline&#34;&gt;\(X = 0\)&lt;/span&gt;, while &lt;span class=&#34;math inline&#34;&gt;\(b_1\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(b_2\)&lt;/span&gt;, taken separately, lack a clear biological meaning. However, it is interesting to consider the first derivative, which measures the rate at which the value &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; changes with respect to the change of &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt;. Calculating a derivative may be tricky for biologists; however, we can make use of the available facilities in R, represented by the D() function, which requires an expression as the argument:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;D(expression(a + b*X + c*X^2), &amp;quot;X&amp;quot;)
+## b + c * (2 * X)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We see that the first derivative is not constant, but it changes according to the level of &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt;. The stationary point, i.e. the point at which the derivative is zero, is &lt;span class=&#34;math inline&#34;&gt;\(X_m = - b_1 / 2 b_2\)&lt;/span&gt;; this point is a maximum when &lt;span class=&#34;math inline&#34;&gt;\(b_2 &amp;gt; 0\)&lt;/span&gt;, otherwise it is a minimum.&lt;/p&gt;
+&lt;p&gt;The maximum/minimum value is:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[Y_m = \frac{4\,b_0\,b_2 - b_1^2}{4\,b_2}\]&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;polynomial-fitting-in-r&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Polynomial fitting in R&lt;/h2&gt;
+&lt;p&gt;In R, polynomials are fitted by using ‘lm()’. In a couple of cases, I found myself in the need of fitting a polynomial by using nonlinear regression with ‘nls()’ o ‘drm()’. I know, this is not efficient…, but some methods for ‘drc’ objects are rather handy. For these unusual cases, we can use the &lt;code&gt;NLS.linear()&lt;/code&gt;, &lt;code&gt;NLS.poly2()&lt;/code&gt;, &lt;code&gt;DRC.linear()&lt;/code&gt; and &lt;code&gt;DRC.poly2()&lt;/code&gt; self-starting functions, as available in the ‘aomisc’ package. An example of usage is given below: in this case, the polynomial has been used to describe a concave increasing trend.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;X &amp;lt;- seq(5, 50, 5)
+Y &amp;lt;- c(12.6, 74.1, 157.6, 225.5, 303.4, 462.8, 
+       669.9, 805.3, 964.2, 1169)
+
+# nls fit
+model &amp;lt;- nls(Y ~ NLS.poly2(X, a, b, c))
+
+#drc fit
+model &amp;lt;- drm(Y ~ X, fct = DRC.poly2())
+summary(model)
+## 
+## Model fitted: Second Order Polynomial (3 parms)
+## 
+## Parameter estimates:
+## 
+##                 Estimate Std. Error t-value  p-value    
+## a:(Intercept) -23.515000  31.175139 -0.7543  0.47528    
+## b:(Intercept)   5.466470   2.604011  2.0993  0.07395 .  
+## c:(Intercept)   0.371561   0.046141  8.0527 8.74e-05 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error:
+## 
+##  26.50605 (7 degrees of freedom)
+plot(model, log = &amp;quot;&amp;quot;, main = &amp;quot;2nd order polynomial&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;concaveconvex-curves&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Concave/Convex curves&lt;/h1&gt;
+&lt;div id=&#34;exponential-function&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Exponential function&lt;/h2&gt;
+&lt;p&gt;The exponential function describes an increasing/decreasing trend, with constant relative rate. The most common equation is:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ Y = a  e^{k X} \quad \quad \quad (3) \]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Two additional and equivalent parameterisations are:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ Y = a  b^X  =  e^{d + k X} \quad \quad \quad (4)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;The Equations 3 and the two equations 4 are equivalent, as proved by setting &lt;span class=&#34;math inline&#34;&gt;\(b = e^k\)&lt;/span&gt; e &lt;span class=&#34;math inline&#34;&gt;\(a = e^d\)&lt;/span&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[a  b^X  = a  (e^k)^{X} =  a  e^{kX}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;and:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[a  e^{kX} = e^d \cdot e^{kX} =  e^{d + kX}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;The meaning of &lt;span class=&#34;math inline&#34;&gt;\(a\)&lt;/span&gt; is clear: this is the value of &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; when &lt;span class=&#34;math inline&#34;&gt;\(X = 0\)&lt;/span&gt;. In order to understand the meaning of &lt;span class=&#34;math inline&#34;&gt;\(k\)&lt;/span&gt;, we can calculate the first derivative of the exponential function:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;D(expression(a * exp(k * X)), &amp;quot;X&amp;quot;)
+## a * (exp(k * X) * k)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;From there, we see that the ratio of increase/decrease of &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; is:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ \frac{dY}{dX} = k \, a \, e^{k \, X} = k \, Y\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;That is, the relative ratio of increase/decrease is constant and equal to &lt;span class=&#34;math inline&#34;&gt;\(k\)&lt;/span&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ \frac{dY}{dX} \frac{1}{Y} = k\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; increases as &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt; increases if &lt;span class=&#34;math inline&#34;&gt;\(k &amp;gt; 0\)&lt;/span&gt; (exponential growth), while it decreases when &lt;span class=&#34;math inline&#34;&gt;\(k &amp;lt; 0\)&lt;/span&gt; (exponential decay). This curve is used to describe the growth of populations in non-limiting environmental conditions, or to describe the degradation of xenobiotics in the environment (first-order degradation kinetic).&lt;/p&gt;
+&lt;p&gt;Another slightly different parameterisation exists, which is common in bioassay work and it is mainly used as an exponential decay model:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ Y = d \exp(-x/e) \quad \quad \quad (5)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; is the same as &lt;span class=&#34;math inline&#34;&gt;\(a\)&lt;/span&gt; in the model above and &lt;span class=&#34;math inline&#34;&gt;\(e = - 1/k\)&lt;/span&gt;. For all the aforementioned exponential decay equations &lt;span class=&#34;math inline&#34;&gt;\(Y \rightarrow 0\)&lt;/span&gt; as &lt;span class=&#34;math inline&#34;&gt;\(X \rightarrow \infty\)&lt;/span&gt;. In the above curve, a lower asymptote &lt;span class=&#34;math inline&#34;&gt;\(c \neq 0\)&lt;/span&gt; can also be included, for those situations where the phenomenon under study does not approach 0 when the independent variable approaches infinity:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ Y = c + (d -c) \exp(-x/e) \quad \quad \quad (6)\]&lt;/span&gt;
+The exponential function is nonlinear in &lt;span class=&#34;math inline&#34;&gt;\(k\)&lt;/span&gt; and needs to be fitted by using ‘nls()’ or ‘drm()’. Several self-starting functions are available: in the package &lt;code&gt;aomisc&lt;/code&gt; you can find &lt;code&gt;NLS.expoGrowth()&lt;/code&gt;, &lt;code&gt;NLS.expoDecay()&lt;/code&gt;, &lt;code&gt;DRC.expoGrowth()&lt;/code&gt; and &lt;code&gt;DRC.expoDecay()&lt;/code&gt;, which can be used to fit the Equation 3, respectively with ‘nls()’ and ‘drm()’. The ‘drc’ package also contains the functions &lt;code&gt;EXD.2()&lt;/code&gt; and &lt;code&gt;EXD.3()&lt;/code&gt;, which can be used to fit, respectively, the Equations 5 and 6. Examples of usage are given below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;data(degradation)
+
+# nls fit
+model &amp;lt;- nls(Conc ~ NLS.expoDecay(Time, a, k),
+             data = degradation)
+
+# drm fit
+model &amp;lt;- drm(Conc ~ Time, fct = DRC.expoDecay(),
+             data = degradation)
+summary(model)
+## 
+## Model fitted: Exponential Decay Model (2 parms)
+## 
+## Parameter estimates:
+## 
+##                    Estimate Std. Error t-value   p-value    
+## init:(Intercept) 99.6349312  1.4646680  68.026 &amp;lt; 2.2e-16 ***
+## k:(Intercept)     0.0670391  0.0019089  35.120 &amp;lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error:
+## 
+##  2.621386 (22 degrees of freedom)
+plot(model, log = &amp;quot;&amp;quot;, main = &amp;quot;Exponential decay&amp;quot;, ylim = c(0, 110))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;asymptotic-function&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Asymptotic function&lt;/h2&gt;
+&lt;p&gt;The asymptotic function can be used to model the growth of a population/individual, where &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; approaches an horizontal asymptote as &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt; tends to infinity. This function is used in several different parameterisations and it is also known as the monomolecular growth function, the Mitscherlich law or the von Bertalanffy law. Due to its biological meaning, the most widespread parameterisation is:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[Y = a - (a - b) \, \exp (- c  X) \quad \quad \quad (7)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(a\)&lt;/span&gt; is the maximum attainable value for &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; (plateau), &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; is the initial &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; value (at &lt;span class=&#34;math inline&#34;&gt;\(X = 0\)&lt;/span&gt;) and &lt;span class=&#34;math inline&#34;&gt;\(c\)&lt;/span&gt; is proportional to the relative rate of increase for &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; when &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt; increases. Indeed, we can see that the first derivative is:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;D(expression(a - (a - b) * exp (- c * X)), &amp;quot;X&amp;quot;)
+## (a - b) * (exp(-c * X) * c)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;that is, the absolute ratio of increase of &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; at a given &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt; is not constant, but depends on the attained value of &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ \frac{dY}{dX} = c \, (a - Y)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;If we consider the relative rate of increase of &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt;, we see that:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\frac{dY}{dX} \frac{1}{Y} = c \, \frac{(a - Y)}{Y}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;It means that the relative rate of increase of &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; is maximum at the beginning and approaches 0 when &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; approaches the plateau &lt;span class=&#34;math inline&#34;&gt;\(a\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;In order to fit the asymptotic function, the ‘aomisc’ package contains the self-starting routines &lt;code&gt;NLS.asymReg()&lt;/code&gt; and &lt;code&gt;DRC.asymReg()&lt;/code&gt;, which can be used, respectively, with ‘nls()’ and ‘drm()’. The ‘drc’ package contains the function &lt;code&gt;AR.3()&lt;/code&gt;, that is a similar parameterisation where &lt;span class=&#34;math inline&#34;&gt;\(c\)&lt;/span&gt; is replaced by &lt;span class=&#34;math inline&#34;&gt;\(e = 1/c\)&lt;/span&gt;. The ‘nlme’ package also contains an alternative parameterisation, named &lt;code&gt;SSasymp()&lt;/code&gt;, where &lt;span class=&#34;math inline&#34;&gt;\(c\)&lt;/span&gt; is replaced by &lt;span class=&#34;math inline&#34;&gt;\(\phi_3 = \log(c)\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;Let’s see an example.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;X &amp;lt;- c(1, 3, 5, 7, 9, 11, 13, 20)
+Y &amp;lt;- c(8.22, 14.0, 17.2, 16.9, 19.2, 19.6, 19.4, 19.6)
+
+# nls fit
+model &amp;lt;- nls(Y ~ NLS.asymReg(X, init, m, plateau) )
+
+# drm fit
+model &amp;lt;- drm(Y ~ X, fct = DRC.asymReg())
+plot(model, log=&amp;quot;&amp;quot;, main = &amp;quot;Asymptotic regression&amp;quot;, 
+     ylim = c(0,25), xlim = c(0,20))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;p&gt;If we take the asymptotic function and set &lt;span class=&#34;math inline&#34;&gt;\(b = 0\)&lt;/span&gt;, we get the negative exponential function:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[Y = a [1 -  \exp (- c  X) ] \quad \quad \quad (8)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;This function shows a similar shape as the asymptotic function, but &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; is 0 when &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt; is 0 (the curve passes through the origin). It is often used to model the absorbed Photosintetically Active Radiation (&lt;span class=&#34;math inline&#34;&gt;\(Y = PAR_a\)&lt;/span&gt;) as a function of Leaf Area Index (X = LAI). In this case, &lt;span class=&#34;math inline&#34;&gt;\(a\)&lt;/span&gt; represents the incident PAR (&lt;span class=&#34;math inline&#34;&gt;\(a = PAR_i\)&lt;/span&gt;), and &lt;span class=&#34;math inline&#34;&gt;\(c\)&lt;/span&gt; represents the extinction coefficient.&lt;/p&gt;
+&lt;p&gt;In order to fit the Equation 8, we can use the self-starters &lt;code&gt;NLS.negExp()&lt;/code&gt; with ‘nls()’ and &lt;code&gt;DRC.negExp()&lt;/code&gt; with ‘drm()’; both self-starters are available within the ‘aomisc’ package. The ‘drc’ package contains the function &lt;code&gt;AR.2()&lt;/code&gt;, where &lt;span class=&#34;math inline&#34;&gt;\(c\)&lt;/span&gt; is replaced by &lt;span class=&#34;math inline&#34;&gt;\(e = 1/c\)&lt;/span&gt;. The ‘nlme’ package also contains an alternative parameterisation, named &lt;code&gt;SSasympOrig()&lt;/code&gt;, where &lt;span class=&#34;math inline&#34;&gt;\(c\)&lt;/span&gt; is replaced by &lt;span class=&#34;math inline&#34;&gt;\(\phi_3 = \log(c)\)&lt;/span&gt;.&lt;/p&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;power-function&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Power function&lt;/h2&gt;
+&lt;p&gt;The power function is also known as Freundlich function or allometric function and the most common parameterisation is:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[Y = a \, X^b \quad \quad \quad (9)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;This curve is perfectly equivalent to an exponential curve on the logarithm of &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt;. Indeed:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[a\,X^b  = a\, e^{\log( X^b )}  = a\,e^{b \, \log(x)}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;This curve does not have an asymptote for &lt;span class=&#34;math inline&#34;&gt;\(X \rightarrow \infty\)&lt;/span&gt;. The slope (first derivative) of the curve is:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;D(expression(a * X^b), &amp;quot;X&amp;quot;)
+## a * (X^(b - 1) * b)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We see that both parameters relate to the ‘slope’ of the curve and &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; dictates its shape. If &lt;span class=&#34;math inline&#34;&gt;\(0 &amp;lt; b &amp;lt; 1\)&lt;/span&gt;, the response &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; increases as &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt; increases and the curve is convex up. If &lt;span class=&#34;math inline&#34;&gt;\(b &amp;lt; 0\)&lt;/span&gt;, the curve is concave up and &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; decreases as &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt; increases. Otherwise, if &lt;span class=&#34;math inline&#34;&gt;\(b &amp;gt; 1\)&lt;/span&gt;, the curve is concave up and &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; increases as &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt; increases. The three curve types are shown in Figure 1, above.&lt;/p&gt;
+&lt;p&gt;The power function (Freundlich equation) is often used in agricultural chemistry, e.g. to model the sorption of xenobiotics in soil. It is also used to model the number of plant species as a function of sampling area (Muller-Dumbois method). The following example uses the &lt;code&gt;DRC.powerCurve()&lt;/code&gt; and &lt;code&gt;NLS.powerCurve()&lt;/code&gt; self starters in the ‘aomisc’ package to fit a species-area curve.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;data(speciesArea)
+
+#nls fit
+model &amp;lt;- nls(numSpecies ~ NLS.powerCurve(Area, a, b),
+             data = speciesArea)
+
+# drm fit
+model &amp;lt;- drm(numSpecies ~ Area, fct = DRC.powerCurve(),
+             data = speciesArea)
+summary(model)
+## 
+## Model fitted: Power curve (Freundlich equation) (2 parms)
+## 
+## Parameter estimates:
+## 
+##               Estimate Std. Error t-value   p-value    
+## a:(Intercept) 4.348404   0.337197  12.896 3.917e-06 ***
+## b:(Intercept) 0.329770   0.016723  19.719 2.155e-07 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error:
+## 
+##  0.9588598 (7 degrees of freedom)&lt;/code&gt;&lt;/pre&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;logarithmic-function&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Logarithmic function&lt;/h2&gt;
+&lt;p&gt;This is indeed a linear model on log-transformed &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[y = a + b \, \log(X) \quad \quad \quad (10)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Due to the logarithmic function, it must be &lt;span class=&#34;math inline&#34;&gt;\(X &amp;gt; 0\)&lt;/span&gt;. The parameter &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; dictates the shape: if &lt;span class=&#34;math inline&#34;&gt;\(b &amp;gt; 0\)&lt;/span&gt;, the curve is convex up and &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; increases as &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt; increases. If &lt;span class=&#34;math inline&#34;&gt;\(b &amp;lt; 0\)&lt;/span&gt;, the curve is concave up and &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; decreases as &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt; increases, as shown in Figure 1 above.&lt;/p&gt;
+&lt;p&gt;The logarithmic equation can be fit by using ‘lm()’. If necessary, it can also be fit by using ‘nls()’ and ‘drm()’: the self-starting functions &lt;code&gt;NLS.logCurve()&lt;/code&gt; and &lt;code&gt;DRC.logCurve()&lt;/code&gt; are available within the ‘aomisc’ package. We show an example of their usage in the box below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;X &amp;lt;- c(1,2,4,5,7,12)
+Y &amp;lt;- c(1.97, 2.32, 2.67, 2.71, 2.86, 3.09)
+
+# lm fit
+model &amp;lt;- lm(Y ~ log(X) )
+
+# nls fit
+model &amp;lt;- nls(Y ~ NLS.logCurve(X, a, b) )
+
+# drm fit
+model &amp;lt;- drm(Y ~ X, fct = DRC.logCurve() )&lt;/code&gt;&lt;/pre&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;rectangular-hyperbola&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Rectangular hyperbola&lt;/h2&gt;
+&lt;p&gt;This function is also known as the Michaelis-Menten function and it is often parameterised as:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[Y = \frac{a \, X} {b + X} \quad \quad \quad (11)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;The curve is convex up and &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; increases as &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt; increases, up to a plateau level. The parameter &lt;span class=&#34;math inline&#34;&gt;\(a\)&lt;/span&gt; represents the higher asymptote (for &lt;span class=&#34;math inline&#34;&gt;\(X \rightarrow \infty\)&lt;/span&gt;), while &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; is the X value giving a response equal to &lt;span class=&#34;math inline&#34;&gt;\(a/2\)&lt;/span&gt;. Indeed, it is easily shown that:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\frac{a}{2} = \frac{a\,X_{50} } {b + X_{50} } \]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;which leads to &lt;span class=&#34;math inline&#34;&gt;\(b = x_{50}\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;The slope (first derivative) is:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;D(expression( (a*X) / (b + X) ), &amp;quot;X&amp;quot;)
+## a/(b + X) - (a * X)/(b + X)^2&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;From there, we can see that the initial slope (at &lt;span class=&#34;math inline&#34;&gt;\(X = 0\)&lt;/span&gt;) is $i = a/b $. The equation 11 is not defined for &lt;span class=&#34;math inline&#34;&gt;\(X = b\)&lt;/span&gt; and it makes no biological sense for &lt;span class=&#34;math inline&#34;&gt;\(X &amp;lt; b\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;An alternative parameterisation is obtained considering that:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[Y = \frac{a \, X} {b + X} = \frac{a}{ \frac{b}{X} + \frac{X}{X}} = \frac{a}{1 + \frac{b}{X}} \quad \quad \quad (12)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;This parameterisation is sometimes used in bioassays and it is parameterised with &lt;span class=&#34;math inline&#34;&gt;\(d = a\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(e = b\)&lt;/span&gt;. From a strict mathematical point of view, the equation 12 is not defined for &lt;span class=&#34;math inline&#34;&gt;\(X = 0\)&lt;/span&gt;, although it approaches 0 when &lt;span class=&#34;math inline&#34;&gt;\(X \rightarrow 0\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;The Michaelis-Menten function is used in pesticide chemistry, enzyme kinetics and in weed competition studies, to model yield losses as a function of weed density. In R, this model can be fit by using ‘nls()’ and the self-starting functions &lt;code&gt;SSmicmen()&lt;/code&gt;, within the package ‘nlme’. If you prefer a ‘drm()’ fit, you can use the &lt;code&gt;MM.2()&lt;/code&gt; function in the ‘drc’ package, which uses the parameterisation in Equation 12.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;X &amp;lt;- c(0, 5, 7, 22, 28, 39, 46, 200)
+Y &amp;lt;- c(12.74, 13.66, 14.11, 14.43, 14.78, 14.86, 14.78, 14.91)
+
+#drm fit
+model &amp;lt;- drm(Y ~ X, fct = MM.2())
+summary(model)
+## 
+## Model fitted: Michaelis-Menten (2 parms)
+## 
+## Parameter estimates:
+## 
+##               Estimate Std. Error t-value  p-value   
+## d:(Intercept) 14.93974    2.86695  5.2110 0.001993 **
+## e:(Intercept)  0.45439    2.24339  0.2025 0.846183   
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error:
+## 
+##  5.202137 (6 degrees of freedom)
+plot(model, log = &amp;quot;&amp;quot;, main = &amp;quot;Michaelis-Menten function&amp;quot;, 
+     ylim = c(12, 15))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-14-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;sigmoidal-curves&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Sigmoidal curves&lt;/h1&gt;
+&lt;p&gt;Sigmoidal curves are S-shaped and they may be increasing, decreasing, symmetric or non-symmetric around the inflection point. They are parameterised in countless ways, which may often be confusing. I will show some widespread parameterisations, that are very useful for bioassays or growth studies. All curves can be turned from increasing to decreasing (and vice-versa) by reversing the sign of the &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; parameter.&lt;/p&gt;
+&lt;div id=&#34;logistic-function&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Logistic function&lt;/h2&gt;
+&lt;p&gt;The logistic curve derives from the cumulative logistic distribution function; the curve is symmetric around the inflection point and it may be parameterised as:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[Y = c + \frac{d - c}{1 + exp(- b (X - e))} \quad \quad \quad (13)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; is the higher asymptote, &lt;span class=&#34;math inline&#34;&gt;\(c\)&lt;/span&gt; is the lower asymptote, &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt; is &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt; value at the inflection point, while &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; is the slope at the inflection point. As the curve is symmetric, &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt; represents also the &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt; value producing a response half-way between &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(c\)&lt;/span&gt; (usually known as the ED50, in biological assay). The parameter &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; can be positive or negative and, consequently, &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; may increase or decrease as &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt; increases.&lt;/p&gt;
+&lt;p&gt;The above function is known as the four-parameter logistic. If necessary, constraints can be put on parameter values, i.e. &lt;span class=&#34;math inline&#34;&gt;\(c\)&lt;/span&gt; can be constrained to 0 (three-parameter logistic) and, additionally, &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; can be constrained to 1 (two-parameter logistic).&lt;/p&gt;
+&lt;p&gt;In the ‘aomisc’ package, the three logistic curves (four-, three- and two-parameters) are available as &lt;code&gt;NLS.L4()&lt;/code&gt;, &lt;code&gt;NLS.L3()&lt;/code&gt; and &lt;code&gt;NLS.L2()&lt;/code&gt;, respectively. With ‘drm()’, we can use the self-starting functions &lt;code&gt;L.4()&lt;/code&gt; and &lt;code&gt;L.3()&lt;/code&gt; in the package ‘drc’, while the &lt;code&gt;L.2()&lt;/code&gt; function for the two-parameter logistic has been included in the ‘aomisc’ package. The only difference between the self-starters for ‘drm()’ and the self-starters for ‘nls()’ is that, in the former, the sign for the &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; parameter is reversed, i.e. it is negative for increasing curves and positive for decreasing curves.&lt;/p&gt;
+&lt;p&gt;The four- and three-parameter logistic curves can also be fit with ‘nls()’, respectively with the self-starting functions &lt;code&gt;SSfpl()&lt;/code&gt; and &lt;code&gt;SSlogis()&lt;/code&gt;, in the ‘nlme’ package. In these functions, &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; is replaced by &lt;span class=&#34;math inline&#34;&gt;\(scal = -1/b\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;In the box below, I show an example, regarding the growth of a sugar-beet crop.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;data(beetGrowth)
+
+# nls fit
+model &amp;lt;- nls(weightInf ~ NLS.L3(DAE, b, d, e), data = beetGrowth)
+model.2 &amp;lt;- nls(weightInf ~ NLS.L4(DAE, b, c, d, e), data = beetGrowth)
+model.3 &amp;lt;- nls(weightInf/max(weightInf) ~ NLS.L2(DAE, b, e), data = beetGrowth)
+
+# drm fit
+model &amp;lt;- drm(weightInf ~ DAE, fct = L.3(), data = beetGrowth)
+model.2 &amp;lt;- drm(weightInf ~ DAE, fct = L.4(), data = beetGrowth)
+model.3 &amp;lt;- drm(weightInf/max(weightInf) ~ DAE, fct = L.2(), data = beetGrowth)
+summary(model)
+## 
+## Model fitted: Logistic (ED50 as parameter) with lower limit fixed at 0 (3 parms)
+## 
+## Parameter estimates:
+## 
+##                Estimate Std. Error t-value   p-value    
+## b:(Intercept) -0.118771   0.018319 -6.4835 1.032e-05 ***
+## d:(Intercept) 25.118357   1.279417 19.6327 4.127e-12 ***
+## e:(Intercept) 58.029764   1.834414 31.6340 3.786e-15 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error:
+## 
+##  2.219389 (15 degrees of freedom)
+plot(model, log=&amp;quot;&amp;quot;, main = &amp;quot;Logistic function&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-15-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;gompertz-function&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Gompertz function&lt;/h2&gt;
+&lt;p&gt;The Gompertz curve is parameterised in very many ways. I tend to prefer a parameterisation that resembles the one used for the logistic function:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ Y = c + (d - c) \exp \left\{- \exp \left[ - b \, (X - e) \right] \right\} \quad \quad \quad (14)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;The difference between the logistic and Gompertz functions is that this latter is not symmetric around the inflection point: it shows a longer lag at the beginning, but raises steadily afterwards. The parameters have the same meaning as those in the logistic function, apart from the fact that &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt;, i.e. the abscissa of the inflection point, does not give a response half-way between &lt;span class=&#34;math inline&#34;&gt;\(c\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt;. As for the logistic, we can have four-, three- and two-parameter Gompertz functions, which can be used to describe plant growth or several other biological processes.&lt;/p&gt;
+&lt;p&gt;In R, the Gompertz equation can be fit by using ‘drm()’ and, respectively the &lt;code&gt;G.4()&lt;/code&gt;, &lt;code&gt;G.3()&lt;/code&gt; and &lt;code&gt;G.2()&lt;/code&gt; self-starters. With ‘nls’, the ‘aomisc’ package contains the corresponding functions &lt;code&gt;NLS.G4()&lt;/code&gt;, &lt;code&gt;NLS.G3()&lt;/code&gt; and &lt;code&gt;NLS.G2()&lt;/code&gt;. As for the logistic, the only difference between the self starters for ‘drm()’ and the self starters for ‘nls()’ is that, in the former, the sign for the &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; parameter is reversed, i.e. it is negative for increasing curves and positive for decreasing curves.&lt;/p&gt;
+&lt;p&gt;The three-parameter Gompertz can also be fit with ‘nls()’, by using the &lt;code&gt;SSGompertz()&lt;/code&gt; self-starter in the ‘nlme’ package, although this is a different parameterisation.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# nls fit
+model &amp;lt;- nls(weightFree ~ NLS.G3(DAE, b, d, e), data = beetGrowth)
+model.2 &amp;lt;- nls(weightFree ~ NLS.G4(DAE, b, c, d, e), data = beetGrowth)
+model.3 &amp;lt;- nls(weightFree/max(weightFree) ~ NLS.G2(DAE, b, e), data = beetGrowth)
+
+# drm fit
+model &amp;lt;- drm(weightFree ~ DAE, fct = G.3(), data = beetGrowth)
+model.2 &amp;lt;- drm(weightFree ~ DAE, fct = G.4(), data = beetGrowth)
+model.3 &amp;lt;- drm(weightFree/max(weightFree) ~ DAE, fct = G.2(), data = beetGrowth)
+summary(model)
+## 
+## Model fitted: Gompertz with lower limit at 0 (3 parms)
+## 
+## Parameter estimates:
+## 
+##                Estimate Std. Error t-value   p-value    
+## b:(Intercept) -0.122255   0.029938 -4.0836 0.0009783 ***
+## d:(Intercept) 35.078529   1.668665 21.0219 1.531e-12 ***
+## e:(Intercept) 49.008075   1.165191 42.0601 &amp;lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error:
+## 
+##  2.995873 (15 degrees of freedom)
+plot(model, log=&amp;quot;&amp;quot;, main = &amp;quot;Gompertz function&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-16-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;modified-gompertz-function&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Modified Gompertz function&lt;/h2&gt;
+&lt;p&gt;We have seen that the logistic curve is symmetric around the inflection point, while the Gompertz shows a longer lag at the beginning and raises steadily afterwards. We can describe a different pattern by modifying the Gompertz function as follows:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ Y = c + (d - c) \left\{ 1 - \exp \left\{- \exp \left[ b \, (X - e) \right] \right\} \right\} \quad \quad \quad (15)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;The resulting curve increases steadily at the beginning, but slows down later on. Also for this function, we can put constraints on &lt;span class=&#34;math inline&#34;&gt;\(d = 1\)&lt;/span&gt; and/or &lt;span class=&#34;math inline&#34;&gt;\(c = 0\)&lt;/span&gt;, so that we have four-parameter, three-parameter and two-parameter modified Gompertz equations; these models can be fit by using ‘nls()’ and the self starters &lt;code&gt;NLS.E4()&lt;/code&gt;, &lt;code&gt;NLS.E3()&lt;/code&gt; and &lt;code&gt;NLS.E2()&lt;/code&gt; in the ‘aomisc’ package. Likewise, the modified Gompertz equations can be fit with ‘drm()’ and the self starters &lt;code&gt;E.4()&lt;/code&gt;, &lt;code&gt;E.3()&lt;/code&gt; and &lt;code&gt;E.2()&lt;/code&gt;, also available in the ‘aomisc’ package&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# nls fit
+model &amp;lt;- nls(weightInf ~ NLS.E3(DAE, b, d, e), data = beetGrowth)
+model.2 &amp;lt;- nls(weightFree ~ NLS.E4(DAE, b, c, d, e), data = beetGrowth)
+model.3 &amp;lt;- nls(I(weightFree/max(weightFree)) ~ NLS.E2(DAE, b, e), data = beetGrowth)
+
+
+# drm fit
+model &amp;lt;- drm(weightInf ~ DAE, fct = E.3(), data = beetGrowth)
+model.2 &amp;lt;- drm(weightFree ~ DAE, fct = E.4(), data = beetGrowth)
+model.3 &amp;lt;- drm(weightFree/max(weightFree) ~ DAE, fct = E.2(), data = beetGrowth)
+summary(model)
+## 
+## Model fitted: Modified Gompertz equation (3 parameters) (3 parms)
+## 
+## Parameter estimates:
+## 
+##                Estimate Std. Error t-value   p-value    
+## b:(Intercept)  0.092508   0.013231  6.9917 4.340e-06 ***
+## d:(Intercept) 25.107004   1.304379 19.2482 5.493e-12 ***
+## e:(Intercept) 63.004111   1.747087 36.0624 4.945e-16 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error:
+## 
+##  2.253878 (15 degrees of freedom)
+plot(model, log=&amp;quot;&amp;quot;, main = &amp;quot;Modified Gompertz&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-17-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;log-logistic-function&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Log-logistic function&lt;/h2&gt;
+&lt;p&gt;The log-logistic curve is symmetric on the logarithm of &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt; (a log-normal curve would be practically equivalent, but it is used far less often). For example, in biologic assays (but also in germination assays), the log-logistic curve is defined as follows:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[Y = c + \frac{d - c}{1 + \exp \left\{ - b \left[ \log(X) - \log(e) \right] \right\} } \quad \quad \quad (16)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;The parameters have the same meaning as the logistic equation given above. In particular, &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt; represents the X-level which gives a response half-way between &lt;span class=&#34;math inline&#34;&gt;\(c\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; (ED50). It is easy to see that the above equation is equivalent to:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[Y = c + \frac{d - c}{1 + \left( \frac{X}{e} \right)^{-b}}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Log-logistic functions are used for crop growth, seed germination and bioassay work and they can have the same constraints as the logistic function (four- three- and two-parameter log-logistic). They can be fit by ‘drm()’ and the self starters &lt;code&gt;LL.4()&lt;/code&gt; (four-parameter log-logistic), &lt;code&gt;LL.3()&lt;/code&gt; (three-parameter log-logistic, with &lt;span class=&#34;math inline&#34;&gt;\(c = 0\)&lt;/span&gt;) and &lt;code&gt;LL.2()&lt;/code&gt; (two-parameter log-logistic, with &lt;span class=&#34;math inline&#34;&gt;\(d = 1\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(c = 0\)&lt;/span&gt;), as available in the ‘drc’ package. With respect to Equation 16, in these self-starters the sign for &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; is reversed, i.e. it is negative for the increasing log-logistic curve and positive for the decreasing curve. In the package ‘aomisc’, the corresponding self starters for ‘nls()’ are &lt;code&gt;NLS.LL4()&lt;/code&gt;, &lt;code&gt;NLS.LL3()&lt;/code&gt; and &lt;code&gt;NLS.LL2()&lt;/code&gt;, which are all derived from Equation 15 (i.e. the sign of &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; is positive for increasing curves and negative for decreasing curves).&lt;/p&gt;
+&lt;p&gt;We show an example of a log-logistic fit, relating to a bioassay with &lt;em&gt;Brassica rapa&lt;/em&gt; treated at increasing dosages of an herbicide.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;data(brassica)
+
+model &amp;lt;- nls(FW ~ NLS.LL4(Dose, b, c, d, e), data = brassica)
+model &amp;lt;- nls(FW ~ NLS.LL3(Dose, b, d, e), data = brassica)
+model &amp;lt;- nls(FW/max(FW) ~ NLS.LL2(Dose, b, e), data = brassica)
+
+model &amp;lt;- drm(FW ~ Dose, fct = LL.4(), data = brassica)
+summary(model)
+## 
+## Model fitted: Log-logistic (ED50 as parameter) (4 parms)
+## 
+## Parameter estimates:
+## 
+##               Estimate Std. Error t-value   p-value    
+## b:(Intercept)  1.45113    0.24113  6.0181 1.743e-06 ***
+## c:(Intercept)  0.34948    0.18580  1.8810   0.07041 .  
+## d:(Intercept)  4.53636    0.20514 22.1140 &amp;lt; 2.2e-16 ***
+## e:(Intercept)  2.46557    0.35111  7.0221 1.228e-07 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error:
+## 
+##  0.4067837 (28 degrees of freedom)
+plot(model, ylim = c(0,6), main = &amp;quot;Log-logistic function&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-18-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;weibull-function-type-1&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Weibull function (type 1)&lt;/h2&gt;
+&lt;p&gt;The type 1 Weibull function corresponds to the Gompertz, but it is based on the logarithm of &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt;. The equation is as follows:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ Y = c + (d - c) \exp \left\{- \exp \left[ - b \, (\log(X) - \log(e)) \right] \right\} \quad \quad \quad (17)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;The parameters have the same meaning as the other sigmoidal curves given above, apart from the fact that &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt; is the abscissa of the inflection point, but it is not the ED50.&lt;/p&gt;
+&lt;p&gt;The four-parameters, three-parameters and two-parameters Weibull functions can be fit by using ‘drm()’ and the self-starters available within the ‘drc’ package, i.e. &lt;code&gt;W1.4()&lt;/code&gt;, &lt;code&gt;W1.3()&lt;/code&gt; and &lt;code&gt;W1.2()&lt;/code&gt;. The ‘aomisc’ package contains the corresponding self-starters &lt;code&gt;NLS.W1.4()&lt;/code&gt;, &lt;code&gt;NLS.W1.3()&lt;/code&gt; and &lt;code&gt;NLS.W1.2()&lt;/code&gt;, which can be used with ‘nls()’.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;data(brassica)
+
+model &amp;lt;- nls(FW ~ NLS.W1.4(Dose, b, c, d, e), data = brassica)
+model.2 &amp;lt;- nls(FW ~ NLS.W1.3(Dose, b, d, e), data = brassica)
+model.3 &amp;lt;- nls(FW/max(FW) ~ NLS.W1.2(Dose, b, e), data = brassica)
+
+model &amp;lt;- drm(FW ~ Dose, fct = W1.4(), data = brassica)
+model.2 &amp;lt;- drm(FW ~ Dose, fct = W1.3(), data = brassica)
+model.3 &amp;lt;- drm(FW/max(FW) ~ Dose, fct = W1.2(), data = brassica)
+summary(model)
+## 
+## Model fitted: Weibull (type 1) (4 parms)
+## 
+## Parameter estimates:
+## 
+##               Estimate Std. Error t-value   p-value    
+## b:(Intercept)  1.01252    0.15080  6.7143 2.740e-07 ***
+## c:(Intercept)  0.50418    0.14199  3.5507  0.001381 ** 
+## d:(Intercept)  4.56137    0.19846 22.9841 &amp;lt; 2.2e-16 ***
+## e:(Intercept)  3.55327    0.45039  7.8894 1.359e-08 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error:
+## 
+##  0.3986775 (28 degrees of freedom)
+plot(model, ylim = c(0,6), main = &amp;quot;Weibull type 1&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-19-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;weibull-function-type-2&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Weibull function (type 2)&lt;/h2&gt;
+&lt;p&gt;The type 2 Weibull is similar to the type 1 Weibull, but describes a different type of asymmetry, corresponding to the modified Gompertz function above:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ Y = c + (d - c) \left\{ 1 - \exp \left\{- \exp \left[ b \, (\log(X) - \log(e)) \right] \right\} \right\} \quad \quad \quad (18)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;As for fitting, the ‘drc’ package contains the self-starting functions &lt;code&gt;W2.4()&lt;/code&gt;, &lt;code&gt;W2.3()&lt;/code&gt; and &lt;code&gt;W2.2()&lt;/code&gt;, which can be used with ‘drm()’ (be careful: the sign for &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; is reversed, with respect to Equation 18). The ‘aomisc’ package contains the corresponding self-starters &lt;code&gt;NLS.W2.4()&lt;/code&gt;, &lt;code&gt;NLS.W2.3()&lt;/code&gt; and &lt;code&gt;NLS.W2.2()&lt;/code&gt;, which can be used with ‘nls()’.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;data(brassica)
+
+model &amp;lt;- nls(FW ~ NLS.W2.4(Dose, b, c, d, e), data = brassica)
+model.1 &amp;lt;- nls(FW ~ NLS.W2.3(Dose, b, d, e), data = brassica)
+model.2 &amp;lt;- nls(FW/max(FW) ~ NLS.W2.2(Dose, b, e), data = brassica)
+
+model &amp;lt;- drm(FW ~ Dose, fct = W2.4(), data = brassica)
+summary(model)
+## 
+## Model fitted: Weibull (type 2) (4 parms)
+## 
+## Parameter estimates:
+## 
+##               Estimate Std. Error t-value   p-value    
+## b:(Intercept) -0.96191    0.17684 -5.4395 8.353e-06 ***
+## c:(Intercept)  0.18068    0.25191  0.7173    0.4792    
+## d:(Intercept)  4.53804    0.21576 21.0328 &amp;lt; 2.2e-16 ***
+## e:(Intercept)  1.66342    0.25240  6.5906 3.793e-07 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error:
+## 
+##  0.4215551 (28 degrees of freedom)
+plot(model, ylim = c(0,6), main = &amp;quot;Weibull type 2&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-20-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;curves-with-maximaminima&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Curves with maxima/minima&lt;/h1&gt;
+&lt;p&gt;It is sometimes necessary to describe phenomena where the &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; variable reaches a maximum value at a certain level of the &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt; variable, and drops afterwords. For example, growth or germination rates are higher at optimal temperature levels and lower at supra-optimal or sub-optimal temperature levels. Another example relates to bioassays: in some cases, low doses of toxic substances induce a stimulation of growth (hormesis), which needs to be described by an appropriate model. Let’s see some functions which may turn out useful in these circumstances.&lt;/p&gt;
+&lt;div id=&#34;bragg-function&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Bragg function&lt;/h2&gt;
+&lt;p&gt;This function is connected to the normal (Gaussian) distribution and has a symmetric shape with a maximum equal to &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt;, that is reached when &lt;span class=&#34;math inline&#34;&gt;\(X = e\)&lt;/span&gt; and two inflection points. In this model, &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; relates to the slope at the inflection points; the response &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; approaches 0 when &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt; approaches &lt;span class=&#34;math inline&#34;&gt;\(\pm \infty\)&lt;/span&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ Y = d \, \exp \left[ - b (X - e)^2 \right] \quad \quad \quad (19)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;If we would like to have lower asymptotes different from 0, we should add the parameter &lt;span class=&#34;math inline&#34;&gt;\(c\)&lt;/span&gt;, as follows:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ Y = c + (d - c) \, \exp \left[ - b (X - e)^2 \right] \quad \quad \quad (20)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;The two Bragg curves have been used in applications relating to the science of carbon materials. We can fit them with ‘drm()’, by using the self starters &lt;code&gt;DRC.bragg.3()&lt;/code&gt; (Equation 19) and &lt;code&gt;DRC.bragg.4&lt;/code&gt; (Equation 20), in the ‘aomisc’ package. With ‘nls()’, you can use the corresponding self-starters &lt;code&gt;NLS.bragg.3()&lt;/code&gt; and &lt;code&gt;NLS.bragg.4&lt;/code&gt;, also in the ‘aomisc’ package.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;X &amp;lt;- c(5, 10, 15, 20, 25, 30, 35, 40, 45, 50)
+Y1 &amp;lt;- c(0.1, 2, 5.7, 9.3, 19.7, 28.4, 20.3, 6.6, 1.3, 0.1)
+Y2 &amp;lt;- Y1 + 2
+
+# nls fit
+mod.nls &amp;lt;- nls(Y1 ~ NLS.bragg.3(X, b, d, e) )
+mod.nls2 &amp;lt;- nls(Y2 ~ NLS.bragg.4(X, b, c, d, e) )
+
+# drm fit
+mod.drc &amp;lt;- drm(Y1 ~ X, fct = DRC.bragg.3() )
+mod.drc2 &amp;lt;- drm(Y2 ~ X, fct = DRC.bragg.4() )
+plot(mod.drc, ylim = c(0, 30), log = &amp;quot;&amp;quot;) 
+plot(mod.drc2, add = T, col = &amp;quot;red&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-21-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;lorentz-function&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Lorentz function&lt;/h2&gt;
+&lt;p&gt;The Lorentz function is similar to the Bragg function, although it has worse statistical properties (Ratkowsky, 1990). The equation is:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ Y = \frac{d} { 1 + b (X - e)^2 } \quad \quad \quad (21)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;We can also allow for lower asymptotes different from 0, by adding a further parameter:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ Y = c + \frac{d - c} { 1 + b (X - e)^2 } \quad \quad \quad (22)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;The two Lorentz functions can be fit with ‘drm()’, by using the self-starters &lt;code&gt;DRC.lorentz.3()&lt;/code&gt; (Equation 21) and &lt;code&gt;DRC.lorentz.4&lt;/code&gt; (Equation 22), in the ‘aomisc’ package. With ‘nls()’, you can use the corresponding self-starters &lt;code&gt;NLS.lorentz.3()&lt;/code&gt; and &lt;code&gt;NLS.lorentz.4&lt;/code&gt;, also in the ‘aomisc’ package.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;X &amp;lt;- c(5, 10, 15, 20, 25, 30, 35, 40, 45, 50)
+Y1 &amp;lt;- c(0.1, 2, 5.7, 9.3, 19.7, 28.4, 20.3, 6.6, 1.3, 0.1)
+Y2 &amp;lt;- Y1 + 2
+
+# nls fit
+mod.nls &amp;lt;- nls(Y1 ~ NLS.lorentz.3(X, b, d, e) )
+mod.nls2 &amp;lt;- nls(Y2 ~ NLS.lorentz.4(X, b, c, d, e) )
+
+# drm fit
+mod.drc &amp;lt;- drm(Y1 ~ X, fct = DRC.lorentz.3() )
+mod.drc2 &amp;lt;- drm(Y2 ~ X, fct = DRC.lorentz.4() )
+plot(mod.drc, ylim = c(0, 30), log = &amp;quot;&amp;quot;) 
+plot(mod.drc2, add = T, col = &amp;quot;red&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-22-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;beta-function&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Beta function&lt;/h2&gt;
+&lt;p&gt;The beta function derives from the beta density function and it has been adapted to describe phenomena taking place only within a minimum and a maximum threshold value (threshold model). One typical example is seed germination, where the germination rate (GR, i.e. the inverse of germination time) is 0 below the base temperature level and above the cutoff temperature level. Between these two extremes, the GR increases with temperature up to a maximum level, that is reached at the optimal temperature level.&lt;/p&gt;
+&lt;p&gt;The equation is:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ Y = d \,\left\{  \left( \frac{X - X_b}{X_o - X_b} \right) \left( \frac{X_c - X}{X_c - X_o} \right) ^ {\frac{X_c - X_o}{X_o - X_b}} \right\}^b \quad \quad \quad (23)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; is the maximum level for the expected response &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(X_b\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(X_c\)&lt;/span&gt; are, respectively, the minumum and maximum threshold levels, &lt;span class=&#34;math inline&#34;&gt;\(X_o\)&lt;/span&gt; is the abscissa at the maximum expected response level and &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; is a shape parameter. The above function is only defined for &lt;span class=&#34;math inline&#34;&gt;\(X_b &amp;lt; X &amp;lt; X_c\)&lt;/span&gt; and it returns 0 elsewhere.&lt;/p&gt;
+&lt;p&gt;In R, the beta function can be fitted either with ‘drm()’ and the self-starter &lt;code&gt;DRC.beta()&lt;/code&gt;, or with ‘nls()’ and the self-starter &lt;code&gt;NLS.beta()&lt;/code&gt;. Both the self-starters are available within the ‘aomisc’ package.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;X &amp;lt;- c(1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50)
+Y &amp;lt;- c(0, 0, 0, 7.7, 12.3, 19.7, 22.4, 20.3, 6.6, 0, 0)
+
+model &amp;lt;- nls(Y ~ NLS.beta(X, b, d, Xb, Xo, Xc))
+model &amp;lt;- drm(Y ~ X, fct = DRC.beta())
+summary(model)
+## 
+## Model fitted: Beta function
+## 
+## Parameter estimates:
+## 
+##                Estimate Std. Error  t-value   p-value    
+## b:(Intercept)   1.29834    0.26171   4.9609 0.0025498 ** 
+## d:(Intercept)  22.30117    0.53645  41.5715 1.296e-08 ***
+## Xb:(Intercept)  9.41770    1.15826   8.1309 0.0001859 ***
+## Xo:(Intercept) 31.14068    0.58044  53.6504 2.815e-09 ***
+## Xc:(Intercept) 40.47294    0.33000 122.6455 1.981e-11 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error:
+## 
+##  0.7251948 (6 degrees of freedom)
+plot(model, log=&amp;quot;&amp;quot;, main = &amp;quot;Beta function&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/Stat_nls_usefulFunctions_files/figure-html/unnamed-chunk-23-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Here we are; I have discussed more than 20 models, which are commonly used for nonlinear regression. These models can be found in several different parameterisations and flavours; they can also be modified and combined to suit the needs of several disciplines in biology, chemistry and so on. However, this will require another post.&lt;/p&gt;
+&lt;p&gt;Thanks for reading&lt;/p&gt;
+&lt;hr /&gt;
+&lt;p&gt;Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Borgo XX Giugno 74&lt;br /&gt;
+I-06121 - PERUGIA&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;further-readings&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Further readings&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Miguez, F., Archontoulis, S., Dokoohaki, H., Glaz, B., Yeater, K.M., 2018. Chapter 15: Nonlinear Regression Models and Applications, in: ACSESS Publications. American Society of Agronomy, Crop Science Society of America, and Soil Science Society of America, Inc.&lt;/li&gt;
+&lt;li&gt;Ratkowsky, D.A., 1990. Handbook of nonlinear regression models. Marcel Dekker Inc., New York, USA.&lt;/li&gt;
+&lt;li&gt;Ritz, C., Jensen, S. M., Gerhard, D., Streibig, J. C.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ol start=&#34;2019&#34; style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Dose-Response Analysis Using R. CRC Press&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Self-starting routines for nonlinear regression models</title>
+      <link>/2020/stat_nls_selfstarting/</link>
+      <pubDate>Fri, 14 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/stat_nls_selfstarting/</guid>
+      <description>
+
+
+&lt;p&gt;In R, the &lt;code&gt;drc&lt;/code&gt; package represents one of the main solutions for nonlinear regression and dose-response analyses (Ritz et al., 2015). It comes with a lot of nonlinear models, which are useful to describe several biological processes, from plant growth to bioassays, from herbicide degradation to seed germination. These models are provided with self-starting functions, which free the user from the hassle of providing initial guesses for model parameters. Indeed, getting these guesses may be a tricky task, both for students and for practitioners.&lt;/p&gt;
+&lt;p&gt;Obviously, we should not expect that all possible models and parameterisations are included in the ‘drc’ package; therefore, sooner or later, we may all find ourselves in the need of building a user-defined function, for some peculiar tasks of nonlinear regression analysis. I found myself in that position several times in the past and it took me awhile to figure out a solution.&lt;/p&gt;
+&lt;p&gt;In this post, I’ll describe how we can simply build self-starters for our nonlinear regression analyses, to be used in connection with the ‘drm()’ function in the ‘drc’ package. In the end, I will also extend the approach to work with the ‘nls()’ function in the ‘stats’ package.&lt;/p&gt;
+&lt;p&gt;Let’s consider the following dataset, depicting the relationship between temperature and growth rate. We may note that the response reaches a maximum value around 30°C, while it is lower below and above such an optimal value.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(drc)
+Temp &amp;lt;- c(5, 10, 15, 20, 25, 30, 35, 40, 45, 50)
+RGR &amp;lt;- c(0.1, 2, 5.7, 9.3, 19.7, 28.4, 20.3, 6.6, 1.3, 0.1)
+plot(RGR ~ Temp, xlim = c(5, 50), 
+     xlab = &amp;quot;Temperature&amp;quot;, ylab = &amp;quot;Growth rate&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/Stat_nls_selfStarting_files/figure-html/unnamed-chunk-1-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;The Bragg equation can be a good candidate model for such a situation. It is characterized by a bell-like shape:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ Y = d \, \exp \left[- b \, (X - e)^2 \right] \]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; is the observed growth rate, &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt; is the temperature, &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; is the maximum level for the expected response, &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt; is the abscissa at which such maximum occurs and &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; is the slope around the inflection points (the curve is bell-shaped and shows two inflection points around the maximum value). Unfortunately, such an equation is not already available within the &lt;code&gt;drc&lt;/code&gt; package. What should we do, then?&lt;/p&gt;
+&lt;p&gt;First of all, let’s write this function in the usual R code. In my opinion, this is more convenient than writing it directly within the &lt;code&gt;drc&lt;/code&gt; framework; indeed, the usual R coding is not specific to any packages and can be used with all other nonlinear regression and plotting facilities, such as &lt;code&gt;nls()&lt;/code&gt;, or &lt;code&gt;nlme()&lt;/code&gt;. Let’s call this new function &lt;code&gt;bragg.3.fun()&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Definition of Bragg function
+bragg.3.fun &amp;lt;- function(X, b, d, e){
+  d * exp(- b * (X - e)^2)
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In order to transport ‘bragg.3.fun()’ into the &lt;code&gt;drc&lt;/code&gt; platform, we need to code a function returning a list of (at least) three components:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;a response function (fct)&lt;/li&gt;
+&lt;li&gt;a self-starting routine (ssfct)&lt;/li&gt;
+&lt;li&gt;a vector with the names of parameters (names)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Optionally, we can also include a descriptive text, the derivatives and other useful information. This is the skeleton code, which I use as the template.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;MyNewDRCfun &amp;lt;- function(){
+
+  fct &amp;lt;- function(x, parm) {
+      # function code here
+  }
+  ssfct &amp;lt;- function(data){
+     # Self-starting code here
+  }
+  names &amp;lt;- c()
+  text &amp;lt;- &amp;quot;Descriptive text&amp;quot;
+    
+  ## Returning the function with self starter and names
+  returnList &amp;lt;- list(fct = fct, ssfct = ssfct, names = names, text = text)
+  class(returnList) &amp;lt;- &amp;quot;drcMean&amp;quot;
+  invisible(returnList)
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The two functions &lt;code&gt;fct()&lt;/code&gt; and &lt;code&gt;ssfct()&lt;/code&gt; are called internally by the &lt;code&gt;drm()&lt;/code&gt; function and, therefore, the list of arguments must be defined exactly as shown above. In detail, &lt;code&gt;fct()&lt;/code&gt; receives two arguments as inputs: the predictor &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt; and the dataframe of parameters, with one row and as many columns as there are parameters in the model. The predictor and parameters are used to return the vector of responses; in the code below, I am calling the function &lt;code&gt;bragg.3.fun()&lt;/code&gt; from within the function &lt;code&gt;fct()&lt;/code&gt;. Alternatively, the Bragg function can be directly coded within &lt;code&gt;fct()&lt;/code&gt;.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;fct &amp;lt;- function(x, parm) {
+  bragg.3.fun(x, parm[,1], parm[,2], parm[,3])
+  }&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The function &lt;code&gt;ssfct()&lt;/code&gt; receives one argument as input, that is a dataframe with the predictor in the first column and the observed response in the second. These two variables can be used to calculate the starting values for model parameters. In order to get a starting value for &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt;, we could take the maximum value for the observed response, by using the function &lt;code&gt;max()&lt;/code&gt;. Likewise, to get a starting value for &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt;, we could take the positioning of the maximum value in the observed response and use it to index the predictor. Once we have obtained a starting value for &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt;, we can note that, from the Bragg equation, with simple math, we can derive the following equation:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ \log \left( \frac{Y}{d} \right) = - b \left( X - e\right)^2\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Therefore, if we transform the observed response and the predictor as above, we can use polynomial regression to estimate a starting value for &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt;. In the end, this self starting routine can be coded as follows:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ssftc &amp;lt;- function(data){
+  # Get the data     
+  x &amp;lt;- data[, 1]
+  y &amp;lt;- data[, 2]
+  
+  d &amp;lt;- max(y)
+  e &amp;lt;- x[which.max(y)]
+  
+  ## Linear regression on pseudo-y and pseudo-x
+  pseudoY &amp;lt;- log( y / d )
+  pseudoX &amp;lt;- (x - e)^2
+  coefs &amp;lt;- coef( lm(pseudoY ~ pseudoX - 1) )
+  b &amp;lt;- coefs[1]
+  return( c(b, d, e) )
+  }&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It may be worth to state that the self-starting function may be simply skipped by specifying starting values for model parameters, right inside &lt;code&gt;ssfct()&lt;/code&gt; (see Kniss et al., 2011).&lt;/p&gt;
+&lt;p&gt;Now, let’s ‘encapsulate’ all components within the skeleton function given above:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;DRC.bragg.3 &amp;lt;- function(){
+  fct &amp;lt;- function(x, parm) {
+    bragg.3.fun(x, parm[,1], parm[,2], parm[,3])
+  }
+  ssfct &amp;lt;- function(data){
+    # Get the data     
+    x &amp;lt;- data[, 1]
+    y &amp;lt;- data[, 2]
+    
+    d &amp;lt;- max(y)
+    e &amp;lt;- x[which.max(y)]
+    
+    ## Linear regression on pseudo-y and pseudo-x
+    pseudoY &amp;lt;- log( y / d )
+    pseudoX &amp;lt;- (x - e)^2
+    coefs &amp;lt;- coef( lm(pseudoY ~ pseudoX - 1) )
+    b &amp;lt;- - coefs[1]
+    start &amp;lt;- c(b, d, e)
+    return( start )
+  }
+  names &amp;lt;- c(&amp;quot;b&amp;quot;, &amp;quot;d&amp;quot;, &amp;quot;e&amp;quot;)
+  text &amp;lt;- &amp;quot;Bragg equation&amp;quot;
+    
+  ## Returning the function with self starter and names
+  returnList &amp;lt;- list(fct = fct, ssfct = ssfct, names = names, text = text)
+  class(returnList) &amp;lt;- &amp;quot;drcMean&amp;quot;
+  invisible(returnList)
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Once the &lt;code&gt;DRC.bragg.3()&lt;/code&gt; function is ready, it can be used as the value for the argument &lt;code&gt;fct&lt;/code&gt; in the &lt;code&gt;drm()&lt;/code&gt; function call.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod &amp;lt;- drm(RGR ~ Temp, fct = DRC.bragg.3())
+summary(mod)
+## 
+## Model fitted: Bragg equation
+## 
+## Parameter estimates:
+## 
+##                 Estimate Std. Error t-value   p-value    
+## b:(Intercept)  0.0115272  0.0014506  7.9466 9.513e-05 ***
+## d:(Intercept) 27.4122086  1.4192874 19.3141 2.486e-07 ***
+## e:(Intercept) 29.6392304  0.3872418 76.5393 1.710e-11 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error:
+## 
+##  1.71838 (7 degrees of freedom)
+plot(mod, log = &amp;quot;&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/Stat_nls_selfStarting_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;div id=&#34;and-what-about-nls&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;And… what about nls()?&lt;/h1&gt;
+&lt;p&gt;Yes, I know, some of you may prefer using the function &lt;code&gt;nls()&lt;/code&gt;, within the &lt;code&gt;stats&lt;/code&gt; package. In that platform, we can directly use &lt;code&gt;bragg.3.fun()&lt;/code&gt; as the response model:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod.nls &amp;lt;- nls(RGR ~ bragg.3.fun(Temp, b, d, e),
+               start = list (b = 0.01, d = 27, e = 30))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;However, we are forced to provide starting values for all estimands, which might be a tricky task, unless we build a self-starting routine, as we did before for the &lt;code&gt;drc&lt;/code&gt; platform. This is not an impossible task and we can also re-use part of the code we have already written above. We have to:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;build a self-starting function by using the appropriate coding (see below). In this step we should be careful to the command &lt;code&gt;sortedXyData(mCall[[&amp;quot;X&amp;quot;]], LHS, data)&lt;/code&gt;. The part in quotation marks (“X”) should correspond to the name of the predictor in the &lt;code&gt;bragg.3.fun()&lt;/code&gt; function definition.&lt;/li&gt;
+&lt;li&gt;Use the &lt;code&gt;selfStart()&lt;/code&gt; function to combine the function with its self-starting routine.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;bragg.3.init &amp;lt;- function(mCall, LHS, data) {
+    xy &amp;lt;- sortedXyData(mCall[[&amp;quot;X&amp;quot;]], LHS, data)
+    x &amp;lt;-  xy[, &amp;quot;x&amp;quot;]; y &amp;lt;- xy[, &amp;quot;y&amp;quot;]
+    
+    d &amp;lt;- max(y)
+    e &amp;lt;- x[which.max(y)]
+
+    ## Linear regression on pseudo-y and pseudo-x
+    pseudoY &amp;lt;- log( y / d )
+    pseudoX &amp;lt;- (x - e)^2
+    coefs &amp;lt;- coef( lm(pseudoY ~ pseudoX - 1) )
+    b &amp;lt;- - coefs[1]
+    start &amp;lt;- c(b, d, e)
+    names(start) &amp;lt;- mCall[c(&amp;quot;b&amp;quot;, &amp;quot;d&amp;quot;, &amp;quot;e&amp;quot;)]
+    start
+}
+
+NLS.bragg.3 &amp;lt;- selfStart(bragg.3.fun, bragg.3.init, parameters=c(&amp;quot;b&amp;quot;, &amp;quot;d&amp;quot;, &amp;quot;e&amp;quot;))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now, we can use the &lt;code&gt;NLS.bragg.3()&lt;/code&gt; function in the &lt;code&gt;nls()&lt;/code&gt; call:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod.nls &amp;lt;- nls(RGR ~ NLS.bragg.3(Temp, b, d, e) )
+summary(mod.nls)
+## 
+## Formula: RGR ~ NLS.bragg.3(Temp, b, d, e)
+## 
+## Parameters:
+##    Estimate Std. Error t value Pr(&amp;gt;|t|)    
+## b  0.011527   0.001338   8.618 5.65e-05 ***
+## d 27.411715   1.377361  19.902 2.02e-07 ***
+## e 29.638976   0.382131  77.562 1.56e-11 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error: 1.718 on 7 degrees of freedom
+## 
+## Number of iterations to convergence: 8 
+## Achieved convergence tolerance: 5.203e-06&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I have been building a lot of self-starters, both for &lt;code&gt;drm()&lt;/code&gt; and for &lt;code&gt;nls()&lt;/code&gt; and I have shared them within my &lt;code&gt;aomisc&lt;/code&gt; package. Therefore, should you need to fit some unusual nonlinear regression model, it may be worth to take a look at that package, to see whether you find something suitable.&lt;/p&gt;
+&lt;p&gt;That’s it, thanks for reading!&lt;/p&gt;
+&lt;hr /&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Borgo XX Giugno 74&lt;br /&gt;
+I-06121 - PERUGIA&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Kniss, A.R., Vassios, J.D., Nissen, S.J., Ritz, C., 2011. Nonlinear Regression Analysis of Herbicide Absorption Studies. Weed Science 59, 601–610. &lt;a href=&#34;https://doi.org/10.1614/WS-D-11-00034.1&#34; class=&#34;uri&#34;&gt;https://doi.org/10.1614/WS-D-11-00034.1&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Ritz, C., Baty, F., Streibig, J. C., Gerhard, D. (2015) Dose-Response Analysis Using R PLOS ONE, 10(12), e0146021&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Nonlinear combinations of model parameters in regression</title>
+      <link>/2020/stat_nls_gnlht/</link>
+      <pubDate>Thu, 09 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/stat_nls_gnlht/</guid>
+      <description>
+
+
+&lt;p&gt;Nonlinear regression plays an important role in my research and teaching activities. While I often use the ‘drm()’ function in the ‘drc’ package for my research work, I tend to prefer the ‘nls()’ function for teaching purposes, mainly because, in my opinion, the transition from linear models to nonlinear models is smoother, for beginners. One problem with ‘nls()’ is that, in contrast to ‘drm()’, it is not specifically tailored to the needs of biologists or students in biology. Therefore, now and then, I have to build some helper functions, to perform some specific tasks; I usually share these functions within the ‘aomisc’ package, that is available on github (&lt;a href=&#34;https://www.statforbiology.com/rpackages/&#34;&gt;see this link&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;In this post, I would like to describe one of these helper functions, i.e. ‘gnlht()’, which is aimed at helping students (and practitioners; why not?) with one of their tasks, i.e. making some simple manipulations of model parameters, to obtain relevant biological information. Let’s see a typical example.&lt;/p&gt;
+&lt;div id=&#34;motivating-example&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Motivating example&lt;/h1&gt;
+&lt;p&gt;This is a real-life example, taken from a research published by Vischetti et al. in 1996. That research considered three herbicides for weed control in sugar beet, i.e. metamitron (M), phenmedipham (P) and cloridazon (C). Four soil samples were contaminated, respectively with: (i) M alone, (ii) M + P (iii) M + C and (iv) M + P + C. The aim was to assess whether the degradation speed of metamitron in soil depended on the presence of co-applied herbicides. To reach this aim, the soil samples were incubated at 20°C and sub-samples were taken in different times after the beginning of the experiment. The concentration of metamitron in those sub-samples was measured by HPLC analyses, performed in triplicate. The resulting dataset is available within the ‘aomisc’ package; we can load it and use the ‘lattice’ package to visualise the observed means over time.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# library(devtools)
+# install_github(&amp;quot;OnofriAndreaPG/aomisc&amp;quot;)
+library(aomisc)
+library(lattice)
+data(metamitron)
+xyplot(Conc ~ Time|Herbicide, data = metamitron,
+       xlab = &amp;quot;Time (d)&amp;quot;, ylab = &amp;quot;Concentration&amp;quot;,
+       scales = list(alternating = F),
+       panel = function(x, y, ...) { 
+         panel.grid(h = -1, v = -1)
+         fmy &amp;lt;- tapply(y, list(factor(x)), mean)
+         fmx &amp;lt;- tapply(x, list(factor(x)), mean)
+         panel.xyplot(fmx, fmy, col=&amp;quot;red&amp;quot;, type=&amp;quot;b&amp;quot;, cex = 1)
+       })&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/Stat_nls_gnlht_files/figure-html/unnamed-chunk-1-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Considering this exemplary dataset, let’s see how we can answer the following research questions.&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;What is the degradation rate for metamitron, in the four combinations?&lt;/li&gt;
+&lt;li&gt;Is there a significant difference between the degradation rate of metamitron alone and with co-applied herbicides?&lt;/li&gt;
+&lt;li&gt;What is the half-life for metamitron, in the four combinations?&lt;/li&gt;
+&lt;li&gt;What are the times to reach 70 and 30% of the initial concentration, for metamitron in the four combinations?&lt;/li&gt;
+&lt;li&gt;Is there a significant difference between the half-life of metamitron alone and with co-applied herbicides?&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div id=&#34;fitting-a-degradation-model&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Fitting a degradation model&lt;/h1&gt;
+&lt;p&gt;The figure above shows a visible difference in the degradation pattern of metamitron, which could be attributed to the presence of co-applied herbicides. The degradation kinetics can be described by the following (first-order) model:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ C(t, h) = A_h \, \exp \left(-k_h  \, t \right) \]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(C(t, h)\)&lt;/span&gt; is the concentration of metamitron at time &lt;span class=&#34;math inline&#34;&gt;\(t\)&lt;/span&gt; in each of the four combinations &lt;span class=&#34;math inline&#34;&gt;\(h\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(A_h\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(k_h\)&lt;/span&gt; are, respectively, the initial concentration and degradation rate for metamitron in each combination.&lt;/p&gt;
+&lt;p&gt;The model is nonlinear and, therefore, we can use the ‘nls()’ function for nonlinear least squares regression. The code is given below: please, note that the two parameters are followed by the name of the factor variable in square brackets (i.e.: A[Herbicide] and k[Herbicide]). This is necessary to fit a different parameter value for each level of the ‘Herbicide’ factor.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#Fit nls grouped model
+modNlin &amp;lt;- nls(Conc ~ A[Herbicide] * exp(-k[Herbicide] * Time), 
+               start=list(A=rep(100, 4), k=rep(0.06, 4)), 
+               data=metamitron)
+summary(modNlin)
+## 
+## Formula: Conc ~ A[Herbicide] * exp(-k[Herbicide] * Time)
+## 
+## Parameters:
+##     Estimate Std. Error t value Pr(&amp;gt;|t|)    
+## A1 9.483e+01  4.796e+00   19.77   &amp;lt;2e-16 ***
+## A2 1.021e+02  4.316e+00   23.65   &amp;lt;2e-16 ***
+## A3 9.959e+01  4.463e+00   22.31   &amp;lt;2e-16 ***
+## A4 1.116e+02  4.184e+00   26.68   &amp;lt;2e-16 ***
+## k1 4.260e-02  4.128e-03   10.32   &amp;lt;2e-16 ***
+## k2 2.574e-02  2.285e-03   11.26   &amp;lt;2e-16 ***
+## k3 3.034e-02  2.733e-03   11.10   &amp;lt;2e-16 ***
+## k4 2.186e-02  1.822e-03   12.00   &amp;lt;2e-16 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error: 9.701 on 88 degrees of freedom
+## 
+## Number of iterations to convergence: 5 
+## Achieved convergence tolerance: 7.136e-06&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;For the sake of simplicity, I will neglige an accurate model check, although I need to point out that this is highly wrong. I’ll come back to this issue in another post.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;working-with-model-parameters&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Working with model parameters&lt;/h1&gt;
+&lt;p&gt;Considering the research questions, it is clear that the above output answers the first one, as it gives the four degradation rates, &lt;span class=&#34;math inline&#34;&gt;\(k1\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(k2\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(k3\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(k4\)&lt;/span&gt;. All the other questions can be translated into sets of linear/nonlinear functions (combinations) of model parameters. If we use the naming of parameter estimates in the nonlinear regression object, for the second question we can write the following functions: &lt;span class=&#34;math inline&#34;&gt;\(k1 - k2\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(k1 - k3\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(k1 - k4\)&lt;/span&gt;. The third question requires some slightly more complex math: if we invert the equation above for one herbicide, we get to the following inverse:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ t = \frac{- log \left[\frac{C(t)}{A} \right] }{k} \]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;I do not think this is complex enough to scare the biologists, is it? The half-life is the time required for C(t) to drop to half of the initial value, so that &lt;span class=&#34;math inline&#34;&gt;\(C(t)/A\)&lt;/span&gt; is equal to &lt;span class=&#34;math inline&#34;&gt;\(0.5\)&lt;/span&gt;. Thus:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ t_{1/2} = \frac{- \log \left[0.5 \right] }{k} \]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Analogously, we can answer the question 4, by replacing &lt;span class=&#34;math inline&#34;&gt;\(0.5\)&lt;/span&gt; respectively with &lt;span class=&#34;math inline&#34;&gt;\(0.7\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(0.3\)&lt;/span&gt;. The difference between the half-lives of metamitron alone and combined with the second herbicide can be calculated by:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ \frac{- \log \left[0.5 \right] }{k_1} - \frac{- \log \left[0.5 \right] }{k_2} = \frac{k_2 - k_1}{k_1 \, k_2} \, \log(0.5)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;The other differences are obtained analogously.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;inferences-and-hypotheses-testing&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Inferences and hypotheses testing&lt;/h1&gt;
+&lt;p&gt;All parameter estimates are characterised by some uncertainty, which is summarised by way of the standard errors (see the code output above). Clearly, such an uncertainty propagates to their combinations. As for the first question, the combinations are linear, as only subtraction is involved. Therefore, the standard error for the difference can be easily calculated by the usual law of propagation of errors, which I have dealt with in &lt;a href=&#34;https://www.statforbiology.com/2019/stat_general_errorpropagation/&#34;&gt;this post&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;In R, linear combinations of model parameters can be built and tested by using the ‘glht()’ function in the ‘multcomp’ package. However, I wanted to find a general solution, that could handle both linear and nonlinear combinations of model parameters. Such a solution should be based on the ‘delta method’, which I have dealt with in &lt;a href=&#34;https://www.statforbiology.com/2019/stat_general_thedeltamethod/&#34;&gt;this post&lt;/a&gt;. Unfortunately, the function ‘deltaMethod()’ in the ‘car’ package is not flexible enough to the aims of my students and mine.&lt;/p&gt;
+&lt;p&gt;Therefore, I wrote a wrapper for the ‘deltaMethod()’ function, which I named ‘gnlht()’, as it might play for nonlinear combinations the same role as ‘glht()’ for linear combinations. To use this function, apart from loading the ‘aomisc’ package, we need to prepare a list of formulas. Care needs to be taken to make sure that the element in the formulas correspond to the names of the estimated parameters in the model object, as returned by the ‘coef()’ method. In the box below, I show how we can calculate the differences between the degradation rates.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;funList &amp;lt;- list(~k1 - k2, ~k1 - k3, ~k1 - k4)
+gnlht(modNlin, funList)
+## Loading required package: dplyr
+## 
+## Attaching package: &amp;#39;dplyr&amp;#39;
+## The following object is masked from &amp;#39;package:car&amp;#39;:
+## 
+##     recode
+## The following objects are masked from &amp;#39;package:plyr&amp;#39;:
+## 
+##     arrange, count, desc, failwith, id, mutate, rename, summarise,
+##     summarize
+## The following object is masked from &amp;#39;package:MASS&amp;#39;:
+## 
+##     select
+## The following objects are masked from &amp;#39;package:stats&amp;#39;:
+## 
+##     filter, lag
+## The following objects are masked from &amp;#39;package:base&amp;#39;:
+## 
+##     intersect, setdiff, setequal, union
+##      form   Estimate          SE  t-value      p-value
+## 1 k1 - k2 0.01686533 0.004718465 3.574325 5.727311e-04
+## 2 k1 - k3 0.01226241 0.004951372 2.476568 1.517801e-02
+## 3 k1 - k4 0.02074109 0.004512710 4.596150 1.430392e-05&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The very same code can be used for nonlinear combinations of model parameters. In order to calculate the half-lives, we can use the following code:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;funList &amp;lt;- list(~ -log(0.5)/k1, ~ -log(0.5)/k2,
+                ~ -log(0.5)/k3, ~ -log(0.5)/k4)
+gnlht(modNlin, funList)
+##           form Estimate       SE  t-value      p-value
+## 1 -log(0.5)/k1 16.27089 1.576827 10.31876 7.987827e-17
+## 2 -log(0.5)/k2 26.93390 2.391121 11.26413 9.552915e-19
+## 3 -log(0.5)/k3 22.84747 2.058588 11.09861 2.064093e-18
+## 4 -log(0.5)/k4 31.70942 2.643329 11.99601 3.257067e-20&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Instead of writing ‘0.5’, we can introduce a new model term, e.g. ‘prop’, as a ‘constant’, in the sense that it is not an estimated parameter. We can pass a value for this constant in a data frame, by using the ‘const’ argument:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;funList &amp;lt;- list(~ -log(prop)/k1, ~ -log(prop)/k2,
+                ~ -log(prop)/k3, ~ -log(prop)/k4)
+gnlht(modNlin, funList, const = data.frame(prop = 0.5))
+##            form prop Estimate       SE  t-value      p-value
+## 1 -log(prop)/k1  0.5 16.27089 1.576827 10.31876 7.987827e-17
+## 2 -log(prop)/k2  0.5 26.93390 2.391121 11.26413 9.552915e-19
+## 3 -log(prop)/k3  0.5 22.84747 2.058588 11.09861 2.064093e-18
+## 4 -log(prop)/k4  0.5 31.70942 2.643329 11.99601 3.257067e-20&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This is very flexible, because it lets us to calculate, altogether, the half-life and the times required for the concentration to drop to 70 and 30% of the initial value:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;funList &amp;lt;- list(~ -log(prop)/k1, ~ -log(prop)/k2,
+                ~ -log(prop)/k3, ~ -log(prop)/k4)
+gnlht(modNlin, funList, const = data.frame(prop = c(0.7, 0.5, 0.3)))
+##             form prop  Estimate        SE  t-value      p-value
+## 1  -log(prop)/k1  0.7  8.372564 0.8113927 10.31876 7.987827e-17
+## 2  -log(prop)/k1  0.5 16.270892 1.5768267 10.31876 7.987827e-17
+## 3  -log(prop)/k1  0.3 28.261979 2.7388937 10.31876 7.987827e-17
+## 4  -log(prop)/k2  0.7 13.859465 1.2304069 11.26413 9.552915e-19
+## 5  -log(prop)/k2  0.5 26.933905 2.3911214 11.26413 9.552915e-19
+## 6  -log(prop)/k2  0.3 46.783265 4.1532956 11.26413 9.552915e-19
+## 7  -log(prop)/k3  0.7 11.756694 1.0592942 11.09861 2.064093e-18
+## 8  -log(prop)/k3  0.5 22.847468 2.0585881 11.09861 2.064093e-18
+## 9  -log(prop)/k3  0.3 39.685266 3.5756966 11.09861 2.064093e-18
+## 10 -log(prop)/k4  0.7 16.316814 1.3601864 11.99601 3.257067e-20
+## 11 -log(prop)/k4  0.5 31.709415 2.6433295 11.99601 3.257067e-20
+## 12 -log(prop)/k4  0.3 55.078163 4.5913724 11.99601 3.257067e-20&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The differences between the half-lives (and other degradation times) can be calculated as well:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;funList &amp;lt;- list(~ (k2 - k1)/(k1 * k2) * log(prop),
+                ~ (k3 - k1)/(k1 * k3) * log(prop), 
+                ~ (k4 - k1)/(k1 * k4) * log(prop))
+gnlht(modNlin, funList, const = data.frame(prop = c(0.7, 0.5, 0.3)))
+##                              form prop  Estimate       SE  t-value      p-value
+## 1 (k2 - k1)/(k1 * k2) * log(prop)  0.7  5.486900 1.473859 3.722813 3.468973e-04
+## 2 (k2 - k1)/(k1 * k2) * log(prop)  0.5 10.663013 2.864235 3.722813 3.468973e-04
+## 3 (k2 - k1)/(k1 * k2) * log(prop)  0.3 18.521287 4.975078 3.722813 3.468973e-04
+## 4 (k3 - k1)/(k1 * k3) * log(prop)  0.7  3.384130 1.334340 2.536183 1.297111e-02
+## 5 (k3 - k1)/(k1 * k3) * log(prop)  0.5  6.576577 2.593100 2.536183 1.297111e-02
+## 6 (k3 - k1)/(k1 * k3) * log(prop)  0.3 11.423287 4.504125 2.536183 1.297111e-02
+## 7 (k4 - k1)/(k1 * k4) * log(prop)  0.7  7.944250 1.583814 5.015900 2.718445e-06
+## 8 (k4 - k1)/(k1 * k4) * log(prop)  0.5 15.438524 3.077917 5.015900 2.718445e-06
+## 9 (k4 - k1)/(k1 * k4) * log(prop)  0.3 26.816185 5.346236 5.015900 2.718445e-06&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The possibility of passing constants in a data.frame adds flexibility with respect to the ‘deltaMethod()’ function in the ‘car’ package. For example, we can use this method to make predictions:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;funList &amp;lt;- list(~ A1 * exp (- k1 * Time), ~ A2 * exp (- k2 * Time), 
+                ~ A3 * exp (- k3 * Time), ~ A4 * exp (- k4 * Time))
+pred &amp;lt;- gnlht(modNlin, funList, const = data.frame(Time = seq(0, 67, 1)))
+head(pred)
+##                   form Time Estimate       SE  t-value      p-value
+## 1 A1 * exp(-k1 * Time)    0 94.83198 4.795948 19.77336 3.931107e-34
+## 2 A1 * exp(-k1 * Time)    1 90.87694 4.381511 20.74101 1.223613e-35
+## 3 A1 * exp(-k1 * Time)    2 87.08684 4.015039 21.69016 4.511113e-37
+## 4 A1 * exp(-k1 * Time)    3 83.45482 3.695325 22.58389 2.205772e-38
+## 5 A1 * exp(-k1 * Time)    4 79.97427 3.421034 23.37722 1.623774e-39
+## 6 A1 * exp(-k1 * Time)    5 76.63888 3.190531 24.02072 2.050113e-40
+tail(pred)
+##                     form Time Estimate       SE  t-value      p-value
+## 267 A4 * exp(-k4 * Time)   62 28.78518 2.657182 10.83297 7.138133e-18
+## 268 A4 * exp(-k4 * Time)   63 28.16278 2.648687 10.63273 1.824651e-17
+## 269 A4 * exp(-k4 * Time)   64 27.55384 2.639403 10.43942 4.525865e-17
+## 270 A4 * exp(-k4 * Time)   65 26.95807 2.629361 10.25270 1.090502e-16
+## 271 A4 * exp(-k4 * Time)   66 26.37517 2.618594 10.07227 2.555132e-16
+## 272 A4 * exp(-k4 * Time)   67 25.80489 2.607131  9.89781 5.827812e-16&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Although this is not very fast, in contrast to the ‘predict()’ method for ‘nls’ objects, it has the advantage of reporting standard errors.&lt;/p&gt;
+&lt;p&gt;Hope this is useful. Happy coding!&lt;/p&gt;
+&lt;hr /&gt;
+&lt;p&gt;Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Borgo XX Giugno 74&lt;br /&gt;
+I-06121 - PERUGIA&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;John Fox and Sanford Weisberg (2019). An {R} Companion to Applied Regression, Third Edition. Thousand Oaks CA:Sage. URL: &lt;a href=&#34;https://socialsciences.mcmaster.ca/jfox/Books/Companion/&#34; class=&#34;uri&#34;&gt;https://socialsciences.mcmaster.ca/jfox/Books/Companion/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Torsten Hothorn, Frank Bretz and Peter Westfall (2008). Simultaneous Inference in General Parametric Models. Biometrical Journal 50(3), 346–363.&lt;/li&gt;
+&lt;li&gt;Ritz, C., Baty, F., Streibig, J. C., Gerhard, D. (2015) Dose-Response Analysis Using R PLOS ONE, 10(12), e0146021&lt;/li&gt;
+&lt;li&gt;Vischetti, C., Marini, M., Businelli, M., Onofri, A., 1996. The effect of temperature and co-applied herbicides on the degradation rate of phenmedipham, chloridazon and metamitron in a clay loam soil in the laboratory, in: Re, A.D., Capri, E., Evans, S.P., Trevisan, M. (Eds.), “The Environmental Phate of Xenobiotics”, Proceedings X Symposium on Pesticide Chemistry, Piacenza. La Goliardica Pavese, Piacenza, pp. 287–294.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Companion R Packages</title>

@@ -11,6 +11,7 @@ tags:
   - 'Time_to_event_models'
   - 'Nonlinear_regression'
   - 'Seed_germination'
+  - 'drcSeedGerm'
 archives:
   - 2019
 ---
@@ -57,8 +58,11 @@ It is necessary to re-organise the dataset in a more useful way. A good format c
 
 ```{r message=FALSE, warning=FALSE, paged.print=FALSE}
 library(drcSeedGerm)
+library(dplyr)
 datasetR <- makeDrm(dataset[,4:18], dataset[,2:3], rep(25, 16), 1:15)
 head(datasetR, 16)
+datasetR <- datasetR %>% 
+  mutate(across(c(Storage, Temp, Dish), .fns = factor))
 ```
 
 The snippet above shows the first dish. Roughly speaking, we have gone from a WIDE format to a LONG format. The column 'timeAf' contains the time when the inspection was made and the column 'count' contains the number of germinated seeds (e.g. 9 seeds were counted at day 9). These seeds did not germinate exactly at day 9; they germinated within the interval between two inspections, that is between day 8 and day 9. The beginning of the interval is given in the variable 'timeBef'. Apart from these columns, we have additional columns, which we are not going to use for our analyses. The cumulative counts of germinated seeds are in the column 'nCum'; these cumulative counts have been converted into cumulative proportions by dividing by 25 (i.e., the total number of seeds in a dish; see the column 'propCum').

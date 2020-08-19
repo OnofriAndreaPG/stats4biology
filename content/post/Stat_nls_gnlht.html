@@ -12,6 +12,7 @@ tags:
   - 'delta_method'
   - 'error_propagation'
   - 'nls'
+  - 'aomisc'
 archives:
   - 2020
 ---
@@ -97,6 +98,25 @@ summary(modNlin)
 <p>Therefore, I wrote a wrapper for the ‘deltaMethod()’ function, which I named ‘gnlht()’, as it might play for nonlinear combinations the same role as ‘glht()’ for linear combinations. To use this function, apart from loading the ‘aomisc’ package, we need to prepare a list of formulas. Care needs to be taken to make sure that the element in the formulas correspond to the names of the estimated parameters in the model object, as returned by the ‘coef()’ method. In the box below, I show how we can calculate the differences between the degradation rates.</p>
 <pre class="r"><code>funList &lt;- list(~k1 - k2, ~k1 - k3, ~k1 - k4)
 gnlht(modNlin, funList)
+## Loading required package: dplyr
+## 
+## Attaching package: &#39;dplyr&#39;
+## The following object is masked from &#39;package:car&#39;:
+## 
+##     recode
+## The following objects are masked from &#39;package:plyr&#39;:
+## 
+##     arrange, count, desc, failwith, id, mutate, rename, summarise,
+##     summarize
+## The following object is masked from &#39;package:MASS&#39;:
+## 
+##     select
+## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag
+## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union
 ##      form   Estimate          SE  t-value      p-value
 ## 1 k1 - k2 0.01686533 0.004718465 3.574325 5.727311e-04
 ## 2 k1 - k3 0.01226241 0.004951372 2.476568 1.517801e-02
@@ -141,26 +161,16 @@ gnlht(modNlin, funList, const = data.frame(prop = c(0.7, 0.5, 0.3)))
                 ~ (k3 - k1)/(k1 * k3) * log(prop), 
                 ~ (k4 - k1)/(k1 * k4) * log(prop))
 gnlht(modNlin, funList, const = data.frame(prop = c(0.7, 0.5, 0.3)))
-##                              form prop  Estimate       SE  t-value
-## 1 (k2 - k1)/(k1 * k2) * log(prop)  0.7  5.486900 1.473859 3.722813
-## 2 (k2 - k1)/(k1 * k2) * log(prop)  0.5 10.663013 2.864235 3.722813
-## 3 (k2 - k1)/(k1 * k2) * log(prop)  0.3 18.521287 4.975078 3.722813
-## 4 (k3 - k1)/(k1 * k3) * log(prop)  0.7  3.384130 1.334340 2.536183
-## 5 (k3 - k1)/(k1 * k3) * log(prop)  0.5  6.576577 2.593100 2.536183
-## 6 (k3 - k1)/(k1 * k3) * log(prop)  0.3 11.423287 4.504125 2.536183
-## 7 (k4 - k1)/(k1 * k4) * log(prop)  0.7  7.944250 1.583814 5.015900
-## 8 (k4 - k1)/(k1 * k4) * log(prop)  0.5 15.438524 3.077917 5.015900
-## 9 (k4 - k1)/(k1 * k4) * log(prop)  0.3 26.816185 5.346236 5.015900
-##        p-value
-## 1 3.468973e-04
-## 2 3.468973e-04
-## 3 3.468973e-04
-## 4 1.297111e-02
-## 5 1.297111e-02
-## 6 1.297111e-02
-## 7 2.718445e-06
-## 8 2.718445e-06
-## 9 2.718445e-06</code></pre>
+##                              form prop  Estimate       SE  t-value      p-value
+## 1 (k2 - k1)/(k1 * k2) * log(prop)  0.7  5.486900 1.473859 3.722813 3.468973e-04
+## 2 (k2 - k1)/(k1 * k2) * log(prop)  0.5 10.663013 2.864235 3.722813 3.468973e-04
+## 3 (k2 - k1)/(k1 * k2) * log(prop)  0.3 18.521287 4.975078 3.722813 3.468973e-04
+## 4 (k3 - k1)/(k1 * k3) * log(prop)  0.7  3.384130 1.334340 2.536183 1.297111e-02
+## 5 (k3 - k1)/(k1 * k3) * log(prop)  0.5  6.576577 2.593100 2.536183 1.297111e-02
+## 6 (k3 - k1)/(k1 * k3) * log(prop)  0.3 11.423287 4.504125 2.536183 1.297111e-02
+## 7 (k4 - k1)/(k1 * k4) * log(prop)  0.7  7.944250 1.583814 5.015900 2.718445e-06
+## 8 (k4 - k1)/(k1 * k4) * log(prop)  0.5 15.438524 3.077917 5.015900 2.718445e-06
+## 9 (k4 - k1)/(k1 * k4) * log(prop)  0.3 26.816185 5.346236 5.015900 2.718445e-06</code></pre>
 <p>The possibility of passing constants in a data.frame adds flexibility with respect to the ‘deltaMethod()’ function in the ‘car’ package. For example, we can use this method to make predictions:</p>
 <pre class="r"><code>funList &lt;- list(~ A1 * exp (- k1 * Time), ~ A2 * exp (- k2 * Time), 
                 ~ A3 * exp (- k3 * Time), ~ A4 * exp (- k4 * Time))

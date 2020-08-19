@@ -313,6 +313,7 @@ head(dataset)
 &lt;h1&gt;The germination time-course&lt;/h1&gt;
 &lt;p&gt;It is necessary to re-organise the dataset in a more useful way. A good format can be obtained by using the ‘makeDrm()’ function in the ‘drcSeedGerm’ package, which can be installed from gitHub (see the code at: &lt;a href=&#34;https://www.statforbiology.com/seedgermination/index.html&#34;&gt;this link&lt;/a&gt;). The function needs to receive a dataframe storing the counts (dataset[,4:18]), a dataframe storing the factor variables (dataset[,2:3]), a vector with the number of seeds in each Petri dish (rep(25, 16)) and a vector of monitoring times.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(drcSeedGerm)
+library(dplyr)
 datasetR &amp;lt;- makeDrm(dataset[,4:18], dataset[,2:3], rep(25, 16), 1:15)
 head(datasetR, 16)
 ##      Storage Temp Dish timeBef timeAf count nCum propCum
@@ -331,7 +332,9 @@ head(datasetR, 16)
 ## 1.12     Low  Fix    1      12     13     1   14    0.56
 ## 1.13     Low  Fix    1      13     14     0   14    0.56
 ## 1.14     Low  Fix    1      14     15     3   17    0.68
-## 1.15     Low  Fix    1      15    Inf     8   NA      NA&lt;/code&gt;&lt;/pre&gt;
+## 1.15     Low  Fix    1      15    Inf     8   NA      NA
+datasetR &amp;lt;- datasetR %&amp;gt;% 
+  mutate(across(c(Storage, Temp, Dish), .fns = factor))&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The snippet above shows the first dish. Roughly speaking, we have gone from a WIDE format to a LONG format. The column ‘timeAf’ contains the time when the inspection was made and the column ‘count’ contains the number of germinated seeds (e.g. 9 seeds were counted at day 9). These seeds did not germinate exactly at day 9; they germinated within the interval between two inspections, that is between day 8 and day 9. The beginning of the interval is given in the variable ‘timeBef’. Apart from these columns, we have additional columns, which we are not going to use for our analyses. The cumulative counts of germinated seeds are in the column ‘nCum’; these cumulative counts have been converted into cumulative proportions by dividing by 25 (i.e., the total number of seeds in a dish; see the column ‘propCum’).&lt;/p&gt;
 &lt;p&gt;We can use a time-to-event model to parameterise the germination time-course for this dish. This is easily done by using the ‘drm()’ function in the ‘drc’ package (Ritz et al., 2013):&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;modPre &amp;lt;- drm(count ~ timeBef + timeAf, fct = LL.3(), 
