@@ -6,10 +6,108 @@
     <description>Recent content in Models are wrong on The broken bridge between biologists and statisticians</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2018, @AndreaOnofri</copyright>
-    <lastBuildDate>Thu, 20 Aug 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 15 Oct 2020 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>QQ-plots and Box-Whisker plots: where do they come from?</title>
+      <link>/2020/stat_general_percentiles/</link>
+      <pubDate>Thu, 15 Oct 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/stat_general_percentiles/</guid>
+      <description>
+
+
+&lt;div id=&#34;for-the-most-curious-students&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;For the most curious students&lt;/h1&gt;
+&lt;p&gt;QQ-plots and Box-Whisker plots usually become part of the statistical toolbox for the students attending my course of ‘Experimental methods in agriculture’. Most of them learn that the QQ-plot can be used to check for the basic assumption of gaussian residuals in linear models and that the Box-Whisker plot can be used to describe the experimental groups, when their size is big enough and we do not want to assume a gaussian distribution. Furthermore, most students learn to use the &lt;code&gt;plot()&lt;/code&gt; method on an ‘lm’ object and the &lt;code&gt;boxplot()&lt;/code&gt; function in the base ‘graphic’ package and concentrate on the interpretation of the R output. To me, in practical terms, this is enough; however, there is at least a couple of students per year who think that this is not enough and they want to know more. What is the math behind those useful plots? Can we draw them by hand?&lt;/p&gt;
+&lt;p&gt;If I were to give further detail about these two types of graphs, I should give a more detailed explanation of percentiles, at the very beginning of my course. I usually present the concept, which is rather easy to grasp, for students and I also give an example of how to calculate the 50th percentile (i.e. the median). So far, so good. But, what about the 25th and 75th percentiles, which are needed to build the Box-Whisker plot? As a teacher, I must admit I usually skip this aspect; I resort to showing the use of the &lt;code&gt;quantile()&lt;/code&gt; function and the students are happy, apart the same couple per year, who asks: “what is this function doing in the background?”.&lt;/p&gt;
+&lt;p&gt;Usually, there is no time to satisfy the above thirst for knowledge. First of all, I need time to introduce other important concepts for agricultural student; second, giving more detail would imply a high risk of being ‘beaten’ by all the other, less eager, students. Therefore, I decided to put my explanation here, to the benefit of the most curious of my students.&lt;/p&gt;
+&lt;p&gt;As an example, we will use 11 observations, randomly selected from a uniform distribution. First of all, we sort them out in increasing order.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(1234)
+y &amp;lt;- sort( runif(11))
+y
+##  [1] 0.009495756 0.113703411 0.232550506 0.514251141 0.609274733 0.622299405
+##  [7] 0.623379442 0.640310605 0.666083758 0.693591292 0.860915384&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;the-p-values-of-observations&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;The P-values of observations&lt;/h1&gt;
+&lt;p&gt;Let’s try to imagine that our eleven observations are percentiles, although we do not know what their percentage point is. Well, we know something, at least; we have an odd number of observations and we know that the central value (0.622299405) is the median, i.e. the 50th percentile. But, what about the other values? In other words, we are looking for the P-values associated to each observation (probability points).&lt;/p&gt;
+&lt;p&gt;In order to determine the P-values, we divide the whole scale from 0 to 100% into as many intervals as there are values in our sample, that is eleven intervals. Each interval contains &lt;span class=&#34;math inline&#34;&gt;\(1 / 11 \times 100 = 9.09\%\)&lt;/span&gt; of the whole scale: the first interval goes from 0% to 9.09%, the second goes from 9.09% to 18.18% and so on, until the 11th interval, that goes from 90.91% to 100%.&lt;/p&gt;
+&lt;p&gt;Now, each value in the ordered sample is associated to one probability interval. The problem is: where do we put the value, within each interval? A possible line of attack, that is the default in R with &lt;span class=&#34;math inline&#34;&gt;\(n &amp;gt; 10\)&lt;/span&gt;, is to put the value in the middle of the interval, as shown in the Figure below.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.casaonofri.it/_Figures/PercentagePoints.png&#34; style=&#34;width:95.0%&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Consequently, each point corresponds to the following P-values:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;(1:11 - 0.5)/11
+##  [1] 0.04545455 0.13636364 0.22727273 0.31818182 0.40909091 0.50000000
+##  [7] 0.59090909 0.68181818 0.77272727 0.86363636 0.95454545&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In general:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[p_i = \frac{i - 0.5}{n} \]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(n\)&lt;/span&gt; is the number of values and &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt; is the index of each value in the sorted vector. In other words, the first value is the 4.5th percentile, the second value is the 13.64th percentile and so on, until the 11th value that is the 95.45th percentile.&lt;/p&gt;
+&lt;p&gt;Unfortunately, the calculation of P-values is not unique and there are other ways to locate the values within each interval. A second possibility, is to put the value close to the beginning of each interval. In this case, the corresponding P-values can be calculated as:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;(1:11 - 1)/(11 - 1)
+##  [1] 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In general:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[p_i = \frac{i - 1}{n - 1} \]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;According to this definition, the first value is the 0th percentile, the second is the 10th percentile and so on.&lt;/p&gt;
+&lt;p&gt;A third possibility, is to put the value at the end of each interval. In this case, each point corresponds to the following P-values:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;1:11/11
+##  [1] 0.09090909 0.18181818 0.27272727 0.36363636 0.45454545 0.54545455
+##  [7] 0.63636364 0.72727273 0.81818182 0.90909091 1.00000000&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In general, it is:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[p_i = \frac{i}{n} \]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Although it is not the default in R, this third approach is, perhaps, the most understandable, as it is more closely related to the definition of percentiles. It is clear that there is 9.09% subjects equal to or lower than the first one and that there is 18.18% of subjects equal to or lower than the second one.&lt;/p&gt;
+&lt;p&gt;Several other possibilities exist, but we will not explore them here. However, the most common function in R to calculate probability points is the &lt;code&gt;ppoints()&lt;/code&gt; function, which gives different results, according to the selection of the ‘a’ argument. In detail, if &lt;span class=&#34;math inline&#34;&gt;\(a = 0.5\)&lt;/span&gt; (the default) we obtain the first series of P-values (where each of the original values is put in the middle of each interval) while, if &lt;span class=&#34;math inline&#34;&gt;\(a = 1\)&lt;/span&gt;, we obtain the second series of P-values (where each of the original values is put near to the beginning of each interval).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ppoints(y)
+##  [1] 0.04545455 0.13636364 0.22727273 0.31818182 0.40909091 0.50000000
+##  [7] 0.59090909 0.68181818 0.77272727 0.86363636 0.95454545
+ppoints(y, a = 1)
+##  [1] 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;from-ppoints-to-the-qq-plot&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;From &lt;code&gt;ppoints()&lt;/code&gt; to the QQ-plot&lt;/h1&gt;
+&lt;p&gt;P-values are used to draw quantile-quantile plots. Let’s imagine that we want to know whether the eleven values in the vector ‘y’ can be regarded as a sample from a gaussian distribution. To this aim, we can standardise them and plot them against the corresponding percentiles of a gaussian distribution, which we derive from the above determined P-values, by the &lt;code&gt;pnorm()&lt;/code&gt; function. The output is exactly the same as that produced by a call to the &lt;code&gt;qqnorm()&lt;/code&gt; function.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;x.coord &amp;lt;- qnorm(ppoints(y))
+y.coord &amp;lt;- scale(y, scale = T) 
+plot(y.coord ~ x.coord, main = &amp;quot;Manual QQ-plot&amp;quot;,
+     xlab = &amp;quot;Theoretical quantiles&amp;quot;, ylab = &amp;quot;Standardised values&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/Stat_General_percentiles_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;percentiles&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Percentiles&lt;/h1&gt;
+&lt;p&gt;Percentiles can be calculated by solving the three equations above for &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt;. For example, from the first equation, with simple math, we derive:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[i = n p_i + 0.5\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;which gives the index for the required percentile. If we look for the 30th percentile, the index is &lt;span class=&#34;math inline&#34;&gt;\(11 \times 0.30 + 0.5 = 3.8\)&lt;/span&gt;, i.e. this percentile is between the 3rd and the 4th value, that are, respectively, 0.232550506 and 0.514251141. We can find the exact percentile by a sort of ‘weighted average’ of these two values, considering the decimal part of the index (0.8):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;(1 - 0.8) * y[3] + 0.8 * y[4]
+## [1] 0.457911&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We can get the same result, by using the &lt;code&gt;quantile()&lt;/code&gt; function in R and setting the ‘type = 5’ argument.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;quantile(y, 0.3, type = 5)
+##      30% 
+## 0.457911&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If we start from the second equation, we derive:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[i = p \times (n - 1) + 1\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;For the 30th percentile, the index is &lt;span class=&#34;math inline&#34;&gt;\(0.3 \times (11 - 1) + 1 = 4\)&lt;/span&gt;. Thus, the required percentile is exactly in 4th position (0.5142511). With R, we can use the same &lt;code&gt;quantile()&lt;/code&gt; function, but we have to set the ‘type = 7’ argument, that is the default.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;quantile(y, 0.3)
+##       30% 
+## 0.5142511&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If we take the third equation above, we derive:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[i = n \times p\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;and thus the index for the 30th percentile is: &lt;span class=&#34;math inline&#34;&gt;\(11 \times 0.3 = 3.3\)&lt;/span&gt;. We use the same kind of ‘weighted average’ to retrieve the exact percentile:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;(1 - 0.3) * y[3] + 0.3 * y[4]
+## [1] 0.3170607&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;With R:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;quantile(y, 0.3, type = 4)
+##       30% 
+## 0.3170607&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If we use the above math to derive the 25th, the 50th and the 75th percentile, we are ready to draw our boxplot by hand. Please, consider that the &lt;code&gt;boxplot()&lt;/code&gt; function in R uses the default quantiles (‘type = 7’).&lt;/p&gt;
+&lt;p&gt;It’s all, for today. If you have any comments, please, drop me a note at &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;. Best wishes,&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Building ANOVA-models for long-term experiments in agriculture</title>
