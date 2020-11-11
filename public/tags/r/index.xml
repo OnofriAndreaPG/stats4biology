@@ -6,10 +6,64 @@
     <description>Recent content in R on The broken bridge between biologists and statisticians</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2018, @AndreaOnofri</copyright>
-    <lastBuildDate>Thu, 15 Oct 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 11 Nov 2020 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="/tags/r/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>lmDiallel: a new R package to fit diallel models. Introduction</title>
+      <link>/2020/stat_met_diallel1/</link>
+      <pubDate>Wed, 11 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/stat_met_diallel1/</guid>
+      <description>
+
+
+&lt;p&gt;Together with some colleagues from the plant breeding group, we have just published a new paper, where we presented a bunch of R functions to analyse the data from diallel experiments. The paper is titled ‘&lt;em&gt;Linear models for diallel crosses: a review with R functions&lt;/em&gt;’ and it is published in the ‘&lt;em&gt;Theoretical and Applied Genetics&lt;/em&gt;’ Journal. If you are interested, you can take a look &lt;a href=&#34;https://rdcu.be/caxZh&#34;&gt;here at this link&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Diallel experiments are based on a set of possible crosses between some homozygous (inbred) lines. For example, if we have the male lines A, B and C and the female lines A, B and C (same lines used, alternatively, as male and female), we would have the following selfed parents: AA, BB and CC and the following crosses: AB, AC, BC. In some instances, we might also have the reciprocals BA, CA and CB. Selfed parents and crosses are compared on a Randomised Complete Block Design, usually replicated across seasons and/or locations.&lt;/p&gt;
+&lt;p&gt;For these diallel experiments, six main diallel models are available in literature, to quantify genetic effects, such as general combining ability (GCA), specific combining ability (SCA), reciprocal (maternal) effects and heterosis. If you are an expert in plant breeding, you do not need any other explanation; if you are not an expert, well… you are like me: we only need to know that these effects are determined as linear combinations of means for crosses, means for selfed parents and reciprocals. However, as I recently discovered, fitting diallel models to experimental data from diallel experiments is a relevant task for plant breeders.&lt;/p&gt;
+&lt;p&gt;When I started dealing with diallel models, I was very surprised by the fact that they are often presented as separate entities, to be fitted by using specialised software; indeed, to the eyes of a biostatistician, it would appear that all diallel models are only different parameterisations of the same general linear model (Mohring et al., 2011). Therefore, it seemed to me very strange that we could not fit diallel models by simply using the &lt;code&gt;lm()&lt;/code&gt; function in R and related platform.&lt;/p&gt;
+&lt;p&gt;A deeper diving in this subject showed me that the main implementation problem was that certain effects, such as the GCA effect, require the definition of unconventional design matrices, which were not yet available in R. Indeed, the packages ‘asreml-R’ and ‘sommer’ permit, e.g., the overlay of design matrices (function &lt;code&gt;and()&lt;/code&gt; in ‘asreml’ and &lt;code&gt;overlay()&lt;/code&gt; in ‘sommer’), which is useful to code GCA effects, but none of the two packages played well with the &lt;code&gt;lm()&lt;/code&gt; function in R. Therefore, together with Niccolò and Luigi, we decided to enhance the &lt;code&gt;model.matrix()&lt;/code&gt; function in R, building a handful of new R functions, aimed at producing the correct design matrices for all types of diallel models. All these functions are available within the ‘lmDiallel’ package, which is available on gitHub; it can be installed by using the ‘install_github()’ function, as available in the ‘devtools’ package. Therefore, if necessary, install this package first. The code is as follows:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;install.packages(&amp;quot;devtools&amp;quot;) # Only at first instance
+library(devtools)
+install_github(&amp;quot;OnofriAndreaPG/lmDiallel&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The core functions for ‘lmDiallel’ are named after the corresponding genetic effects, i.e.: &lt;code&gt;GCA()&lt;/code&gt; (general combining ability), &lt;code&gt;tSCA()&lt;/code&gt; (total Specific Combining Ability), &lt;code&gt;RGCA()&lt;/code&gt; (reciprocal general combining ability), &lt;code&gt;RSCA()&lt;/code&gt; (reciprocal specific combining ability), &lt;code&gt;REC()&lt;/code&gt; (RECiprocal effects = RGCA + RSCA), &lt;code&gt;DD()&lt;/code&gt; (Dominance Deviation), &lt;code&gt;MDD()&lt;/code&gt; (Mean Dominance Deviation), &lt;code&gt;H.BAR()&lt;/code&gt; (Average Heterosis), &lt;code&gt;Hi()&lt;/code&gt; (Average hetorosis for one parent), &lt;code&gt;VEi()&lt;/code&gt; (Variety Effect), &lt;code&gt;SP()&lt;/code&gt; (effect of Selfed Parents) and &lt;code&gt;GCAC()&lt;/code&gt; (GCA for parents in their crosses). The usage of these functions is very simple. For example, let’s assume that we have the two variables ‘Par1’ and ‘Par2’ in a dataset, to represent the two parental lines (father and mother); the GCA effect is coded as:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;GCA(Par1, Par2)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;while the SCA effect is coded as:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;SCA(Par1, Par2)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;By using these R functions as building blocks, we can fit all diallel models inside the &lt;code&gt;lm()&lt;/code&gt; and &lt;code&gt;lme()&lt;/code&gt; functions. For example, the following line of code fits a diallel model containing the GCA and SCA effects, to the data contained in the ‘df’ dataframe:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;lm(yield ~ GCA(Par1, Par2) + SCA(Par1, Par2), data = df)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Similarly, the effect of reciprocals and random blocks can be introduced by the following code:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;lme(yield ~ GCA(Par1, Par2) + SCA(Par1, Par2) +
+            REC(Par1, Par2),
+            random = ~1|Block, data = df)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The model building process outlined above is clearly rooted in the frame of general linear models, although we recognise that plant breeders usually refer to certain relevant parameterisations of diallel models by using the name of the authors. In this respect, it is very common to use the terms “HAYMAN1”, “GRIFFING1”, “GRIFFING2”, “HAYMAN2”, “GE2” and “GE3” to refer to the main six diallel models available in literature (see Hayman, 1954; Griffing, 1956; Gardner and Eberhart, 1966). Although these models can be built and fit by using the above method, we thought it might be useful to simplify the whole process. For this reason, we also built a wrapper function named &lt;code&gt;lm.diallel()&lt;/code&gt;, which can be used in the very same fashion as &lt;code&gt;lm()&lt;/code&gt;. The syntax is:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;lm.diallel(formula, Block, Env, data, fct)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;where ‘formula’ uses the regular R syntax to specify the response variable and the two variables for parentals (e.g., Yield ~ Par1 + Par2). The two arguments ‘Block’ and ‘Env’ are used to specify optional variables, coding for blocks and environments, respectively. The argument ‘data’ is a ‘dataframe’ where to look for explanatory variables. Finally, ‘fct’ is a string variable coding for the selected model, i.e. “HAYMAN1”, “GRIFFING1”, “GRIFFING2”, “HAYMAN2”, “GE2”, “GE3”, according to the existing literature.&lt;/p&gt;
+&lt;p&gt;We have also built the &lt;code&gt;summary()&lt;/code&gt;, &lt;code&gt;vcov(),&lt;/code&gt; &lt;code&gt;anova()&lt;/code&gt; and &lt;code&gt;predict()&lt;/code&gt; methods for ‘lm.diallel’ objects, in order to obey to some peculiar aspects of diallel models.&lt;/p&gt;
+&lt;p&gt;In our paper (&lt;a href=&#34;https://rdcu.be/caxZh&#34;&gt;‘Linear models for diallel crosses: a review with R functions’&lt;/a&gt;) we have reviewed diallel models and gave examples on how they can be fitted with our new package ‘lmDiallel’. We have also shown how the facilities we provide can be used to fit random effects diallel models with ‘jags’. We intend to provide a more lengthy documentation for our package in a coming series of posts; thus, if you are interested, please, stay tuned.&lt;/p&gt;
+&lt;p&gt;I believe that increasing the usability of existing packages that have gained a wide popularity may be an advantageous programming strategy, compared to the usual strategy of building brand new platforms. From the point of view of the developer, it is efficient, as it requires a minor programming effort. From the point of view of the users (professionals, technicians and students), it is handy to be put in the conditions of making statistical analyses, without the need of learning new softwares and/or languages and/or syntaxes. Due to its open-source nature, the R environment is often overwhelming for users, that are confused by the extremely wide availability of alternative methods to perform the same task. In this regard, a programming strategy aimed at supporting some existing reference platforms might help build a more comfortable environment for statistical analyses.&lt;/p&gt;
+&lt;p&gt;Thanks for reading and, please, stay tuned! If you have comments, please, drop me a line at the email address below. Best wishes,&lt;/p&gt;
+&lt;p&gt;Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Borgo XX Giugno 74&lt;br /&gt;
+I-06121 - PERUGIA
+&lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Covarrubias-Pazaran G (2016) Genome-assisted prediction of quantitative traits using the R package sommer. PLoS ONE 11:e0156744.&lt;/li&gt;
+&lt;li&gt;Gardner CO, Eberhart SA (1966) Analysis and interpretation of the variety cross diallel and related populations. Biometrics 22:439–452.&lt;/li&gt;
+&lt;li&gt;Gilmoure A, Gogel BJ, Cullis BR, Whelam SJ, Thompson R (2015) ASReml user guide release 4.1 structural specification. VSN International Ltd, Hemel Hempstead, HP1 1ES, UK&lt;/li&gt;
+&lt;li&gt;Griffing B (1956) Concept of general and specific combining ability in relation to diallel crossing systems. Aust J Biol Sci 9:463–493&lt;/li&gt;
+&lt;li&gt;Möhring J, Melchinger AE, Piepho HP (2011) REML-based diallel analysis. Crop Sci 51:470–478.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>QQ-plots and Box-Whisker plots: where do they come from?</title>
@@ -2248,16 +2302,16 @@ students
 ## # A tibble: 232 x 6
 ##       Id Subject  Date        Mark  Year HighSchool 
 ##    &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt;    &amp;lt;chr&amp;gt;      &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt;      
-##  1     1 AGRONOMY 10/06/2002    30  2001 CLASSICO   
-##  2     2 AGRONOMY 08/07/2002    24  2001 AGRARIO    
-##  3     3 AGRONOMY 24/06/2002    30  2001 AGRARIO    
-##  4     4 AGRONOMY 24/06/2002    26  2001 CLASSICO   
-##  5     5 AGRONOMY 23/01/2003    30  2001 CLASSICO   
-##  6     6 AGRONOMY 09/09/2002    28  2001 AGRARIO    
-##  7     7 AGRONOMY 24/02/2003    26  2001 CLASSICO   
-##  8     8 AGRONOMY 09/09/2002    26  2001 SCIENTIFICO
-##  9     9 AGRONOMY 09/09/2002    23  2001 RAGIONERIA 
-## 10    10 AGRONOMY 08/07/2002    27  2001 CLASSICO   
+##  1     1 AGRONOMY 10/06/2002    30  2001 HUMANITIES 
+##  2     2 AGRONOMY 08/07/2002    24  2001 AGRICULTURE
+##  3     3 AGRONOMY 24/06/2002    30  2001 AGRICULTURE
+##  4     4 AGRONOMY 24/06/2002    26  2001 HUMANITIES 
+##  5     5 AGRONOMY 23/01/2003    30  2001 HUMANITIES 
+##  6     6 AGRONOMY 09/09/2002    28  2001 AGRICULTURE
+##  7     7 AGRONOMY 24/02/2003    26  2001 HUMANITIES 
+##  8     8 AGRONOMY 09/09/2002    26  2001 SCIENTIFIC 
+##  9     9 AGRONOMY 09/09/2002    23  2001 ACCOUNTING 
+## 10    10 AGRONOMY 08/07/2002    27  2001 HUMANITIES 
 ## # … with 222 more rows&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;With respect to the usual &lt;code&gt;read.csv&lt;/code&gt; function I saved some typing, as I did not need to specify the ‘header = T’ argument. Furthermore, printing the tibble only shows the first ten rows, which makes the ‘head()’ function no longer needed.&lt;/p&gt;
 &lt;p&gt;Let’s go ahead and try to subset this tibble: we want to extract the good students, with marks higher than 28. In my previous post, I used the ‘subset()’ function. Now, I will use the ‘filter()’ function in the ‘dplyr’ package:&lt;/p&gt;
@@ -2265,18 +2319,18 @@ students
 subData &amp;lt;- filter(students, Mark &amp;gt;= 28)
 subData
 ## # A tibble: 87 x 6
-##       Id Subject  Date        Mark  Year HighSchool 
-##    &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt;    &amp;lt;chr&amp;gt;      &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt;      
-##  1     1 AGRONOMY 10/06/2002    30  2001 CLASSICO   
-##  2     3 AGRONOMY 24/06/2002    30  2001 AGRARIO    
-##  3     5 AGRONOMY 23/01/2003    30  2001 CLASSICO   
-##  4     6 AGRONOMY 09/09/2002    28  2001 AGRARIO    
-##  5    11 AGRONOMY 09/09/2002    28  2001 SCIENTIFICO
-##  6    17 AGRONOMY 10/06/2002    30  2001 CLASSICO   
-##  7    18 AGRONOMY 10/06/2002    30  2001 AGRARIO    
-##  8    19 AGRONOMY 09/09/2002    30  2001 AGRARIO    
-##  9    20 AGRONOMY 09/09/2002    30  2001 ALTRO      
-## 10    22 AGRONOMY 23/01/2003    30  2001 RAGIONERIA 
+##       Id Subject  Date        Mark  Year HighSchool  
+##    &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt;    &amp;lt;chr&amp;gt;      &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt;       
+##  1     1 AGRONOMY 10/06/2002    30  2001 HUMANITIES  
+##  2     3 AGRONOMY 24/06/2002    30  2001 AGRICULTURE 
+##  3     5 AGRONOMY 23/01/2003    30  2001 HUMANITIES  
+##  4     6 AGRONOMY 09/09/2002    28  2001 AGRICULTURE 
+##  5    11 AGRONOMY 09/09/2002    28  2001 SCIENTIFIC  
+##  6    17 AGRONOMY 10/06/2002    30  2001 HUMANITIES  
+##  7    18 AGRONOMY 10/06/2002    30  2001 AGRICULTURE 
+##  8    19 AGRONOMY 09/09/2002    30  2001 AGRICULTURE 
+##  9    20 AGRONOMY 09/09/2002    30  2001 OTHER SCHOOL
+## 10    22 AGRONOMY 23/01/2003    30  2001 ACCOUNTING  
 ## # … with 77 more rows&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;I have noted that all other subsetting examples in my previous post can be solved by simply replacing ‘subset()’ with ‘filter()’, with no other changes. However, differences appear when I try to select the columns. Indeed, ‘dplyr’ has a specific function ‘select()’, which should be used for this purpose. Therefore, in the case that I want to select the students with marks ranging from 26 to 28 in Maths or Chemistry and, at the same time, I want to report only the three columns ‘Subject’, ‘Mark’ and ‘Date’, I need to split the process in two steps (filter and, then, select):&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# subData &amp;lt;- subset(students, Mark &amp;lt;= 28 &amp;amp; Mark &amp;gt;=26 &amp;amp; 
@@ -2295,18 +2349,18 @@ subData &amp;lt;- select(subData1, c(Subject, Mark, HighSchool))&lt;/code&gt;&lt
   select(c(Subject, Mark, HighSchool))
 subData
 ## # A tibble: 50 x 3
-##    Subject    Mark HighSchool 
-##    &amp;lt;chr&amp;gt;     &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt;      
-##  1 CHEMISTRY    20 AGRARIO    
-##  2 CHEMISTRY    21 CLASSICO   
-##  3 CHEMISTRY    21 CLASSICO   
-##  4 CHEMISTRY    18 AGRARIO    
-##  5 CHEMISTRY    28 ALTRO      
-##  6 CHEMISTRY    23 RAGIONERIA 
-##  7 CHEMISTRY    26 RAGIONERIA 
-##  8 CHEMISTRY    27 AGRARIO    
-##  9 CHEMISTRY    27 SCIENTIFICO
-## 10 CHEMISTRY    23 RAGIONERIA 
+##    Subject    Mark HighSchool  
+##    &amp;lt;chr&amp;gt;     &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt;       
+##  1 CHEMISTRY    20 AGRICULTURE 
+##  2 CHEMISTRY    21 HUMANITIES  
+##  3 CHEMISTRY    21 HUMANITIES  
+##  4 CHEMISTRY    18 AGRICULTURE 
+##  5 CHEMISTRY    28 OTHER SCHOOL
+##  6 CHEMISTRY    23 ACCOUNTING  
+##  7 CHEMISTRY    26 ACCOUNTING  
+##  8 CHEMISTRY    27 AGRICULTURE 
+##  9 CHEMISTRY    27 SCIENTIFIC  
+## 10 CHEMISTRY    23 ACCOUNTING  
 ## # … with 40 more rows&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;In the end: there is not much difference between ‘subset()’ and ‘filter()’. However, I must admit I am seduced by the ‘pipe’ operator… my younger collegues may be right: it should be possible to chain several useful data management steps, producing highly readable code. But… how about debugging?&lt;/p&gt;
 &lt;/div&gt;
@@ -2318,36 +2372,36 @@ subData
 sortedData &amp;lt;- arrange(students, desc(Mark), Subject)
 sortedData
 ## # A tibble: 232 x 6
-##       Id Subject  Date        Mark  Year HighSchool
-##    &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt;    &amp;lt;chr&amp;gt;      &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt;     
-##  1     1 AGRONOMY 10/06/2002    30  2001 CLASSICO  
-##  2     3 AGRONOMY 24/06/2002    30  2001 AGRARIO   
-##  3     5 AGRONOMY 23/01/2003    30  2001 CLASSICO  
-##  4    17 AGRONOMY 10/06/2002    30  2001 CLASSICO  
-##  5    18 AGRONOMY 10/06/2002    30  2001 AGRARIO   
-##  6    19 AGRONOMY 09/09/2002    30  2001 AGRARIO   
-##  7    20 AGRONOMY 09/09/2002    30  2001 ALTRO     
-##  8    22 AGRONOMY 23/01/2003    30  2001 RAGIONERIA
-##  9    38 BIOLOGY  28/02/2002    30  2001 AGRARIO   
-## 10    42 BIOLOGY  28/02/2002    30  2001 RAGIONERIA
+##       Id Subject  Date        Mark  Year HighSchool  
+##    &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt;    &amp;lt;chr&amp;gt;      &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt;       
+##  1     1 AGRONOMY 10/06/2002    30  2001 HUMANITIES  
+##  2     3 AGRONOMY 24/06/2002    30  2001 AGRICULTURE 
+##  3     5 AGRONOMY 23/01/2003    30  2001 HUMANITIES  
+##  4    17 AGRONOMY 10/06/2002    30  2001 HUMANITIES  
+##  5    18 AGRONOMY 10/06/2002    30  2001 AGRICULTURE 
+##  6    19 AGRONOMY 09/09/2002    30  2001 AGRICULTURE 
+##  7    20 AGRONOMY 09/09/2002    30  2001 OTHER SCHOOL
+##  8    22 AGRONOMY 23/01/2003    30  2001 ACCOUNTING  
+##  9    38 BIOLOGY  28/02/2002    30  2001 AGRICULTURE 
+## 10    42 BIOLOGY  28/02/2002    30  2001 ACCOUNTING  
 ## # … with 222 more rows
 # sortedData &amp;lt;- students[order(-students$Mark, -xtfrm(students$Subject)), ]
 # head(sortedData)
 sortedData &amp;lt;- arrange(students, desc(Mark), desc(Subject))
 sortedData
 ## # A tibble: 232 x 6
-##       Id Subject Date        Mark  Year HighSchool 
-##    &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt;   &amp;lt;chr&amp;gt;      &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt;      
-##  1   116 MATHS   01/07/2002    30  2001 ALTRO      
-##  2   117 MATHS   18/06/2002    30  2001 RAGIONERIA 
-##  3   118 MATHS   09/07/2002    30  2001 AGRARIO    
-##  4   121 MATHS   18/06/2002    30  2001 RAGIONERIA 
-##  5   123 MATHS   09/07/2002    30  2001 CLASSICO   
-##  6   130 MATHS   07/02/2002    30  2001 SCIENTIFICO
-##  7   131 MATHS   09/07/2002    30  2001 AGRARIO    
-##  8   134 MATHS   26/02/2002    30  2001 AGRARIO    
-##  9   135 MATHS   11/02/2002    30  2001 AGRARIO    
-## 10   143 MATHS   04/02/2002    30  2001 RAGIONERIA 
+##       Id Subject Date        Mark  Year HighSchool  
+##    &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt;   &amp;lt;chr&amp;gt;      &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt;       
+##  1   116 MATHS   01/07/2002    30  2001 OTHER SCHOOL
+##  2   117 MATHS   18/06/2002    30  2001 ACCOUNTING  
+##  3   118 MATHS   09/07/2002    30  2001 AGRICULTURE 
+##  4   121 MATHS   18/06/2002    30  2001 ACCOUNTING  
+##  5   123 MATHS   09/07/2002    30  2001 HUMANITIES  
+##  6   130 MATHS   07/02/2002    30  2001 SCIENTIFIC  
+##  7   131 MATHS   09/07/2002    30  2001 AGRICULTURE 
+##  8   134 MATHS   26/02/2002    30  2001 AGRICULTURE 
+##  9   135 MATHS   11/02/2002    30  2001 AGRICULTURE 
+## 10   143 MATHS   04/02/2002    30  2001 ACCOUNTING  
 ## # … with 222 more rows&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;As for sorting, there is no competition! The ‘arrange()’ function, together with the ‘desc()’ function for descending order, represents a much clearer way to sort the data, with respect to the traditional ‘order()’ function.&lt;/p&gt;
 &lt;/div&gt;
@@ -2355,28 +2409,32 @@ sortedData
 &lt;h1&gt;Casting the data&lt;/h1&gt;
 &lt;p&gt;When we have a dataset in the LONG format, we might be interested in reshaping it into the WIDE format. This is the same as what the ‘pivot table’ function in Excel does. For example, take the ‘rimsulfuron.csv’ dataset in my repository. This contains the results of a randomised block experiment, where we have 16 herbicides in four blocks. The dataset is in the LONG format, with one row per plot.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rimsulfuron &amp;lt;- read_csv(&amp;quot;https://www.casaonofri.it/_datasets/rimsulfuron.csv&amp;quot;)
-## Parsed with column specification:
+## 
+## ── Column specification ────────────────────────────────────────────────────────
 ## cols(
 ##   Herbicide = col_character(),
-##   Block = col_character(),
-##   Height = col_double(),
+##   Plot = col_double(),
+##   Code = col_double(),
+##   Block = col_double(),
+##   Box = col_double(),
+##   WeedCover = col_double(),
 ##   Yield = col_double()
 ## )
 rimsulfuron
-## # A tibble: 60 x 4
-##    Herbicide Block Height Yield
-##    &amp;lt;chr&amp;gt;     &amp;lt;chr&amp;gt;  &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt;
-##  1 A         B1      183.  93.9
-##  2 B         B1      187  103. 
-##  3 C         B1      188.  92.7
-##  4 D         B1      183.  88.7
-##  5 E         B1      184.  91.0
-##  6 F         B1      179.  98.4
-##  7 G         B1      192. 105. 
-##  8 H         B1      191  121. 
-##  9 I         B1      209. 111. 
-## 10 J         B1      210   82.7
-## # … with 50 more rows&lt;/code&gt;&lt;/pre&gt;
+## # A tibble: 64 x 7
+##    Herbicide                              Plot  Code Block   Box WeedCover Yield
+##    &amp;lt;chr&amp;gt;                                 &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt;     &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt;
+##  1 Rimsulfuron (40)                          1     1     1     1      27.8  85.9
+##  2 Rimsulfuron (45)                          2     2     1     1      27.8  93.0
+##  3 Rimsulfuron (50)                          3     3     1     1      23    86.9
+##  4 Rimsulfuron (60)                          4     4     1     1      42.8  53.0
+##  5 Rimsulfuron (50+30 split)                 5     5     1     2      15.1  71.4
+##  6 Rimsulfuron + thyfensulfuron              6     6     1     2      22.9  75.3
+##  7 Rimsulfuron + hoeing                      7     7     1     2      17.7  73.2
+##  8 Pendimethalin (pre) + rimsulfuron (p…     8     8     1     2      10.2  65.5
+##  9 Pendimethalin (post) + rimsuulfuron …     9     9     1     1       5.4  94.8
+## 10 Rimsulfuron + Atred                      10    10     1     1      40.3  94.1
+## # … with 54 more rows&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Let’s put this data frame in the WIDE format, with one row per herbicide and one column per block. In my previous post, I used to the ‘cast()’ function in the ‘reshape’ package. Now I can use the ‘pivot_wider()’ function in the ‘tidyr’ package: the herbicide goes in the first column, the blocks (B1, B2, B3, B4) should go in the next four columns, and each unique level of yield should go in each cell, at the crossing of the correct herbicide row and block column. The ‘Height’ variable is not needed and it should be removed. Again, a two steps process, that is made easier by using the pipe:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# library(reshape)
 # castData &amp;lt;- cast(Herbicide ~ Block, data = rimsulfuron,
@@ -2384,27 +2442,28 @@ rimsulfuron
 # head(castData)
 
 castData &amp;lt;- rimsulfuron %&amp;gt;%
-  select(-Height) %&amp;gt;%
+  select(-Plot, - Code, -Box, - WeedCover) %&amp;gt;%
   pivot_wider(names_from = Block, values_from = Yield)
 castData
-## # A tibble: 15 x 5
-##    Herbicide    B1    B2    B3    B4
-##    &amp;lt;chr&amp;gt;     &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt;
-##  1 A          93.9 105.   94.1 111. 
-##  2 B         103.   98.5 106.  128. 
-##  3 C          92.7 107.   97.1 118. 
-##  4 D          88.7 114.  105.  127. 
-##  5 E          91.0 113.  104.  113. 
-##  6 F          98.4  99.9 102.   93.9
-##  7 G         105.  115.  101.  122. 
-##  8 H         121.  113.  111.  107. 
-##  9 I         111.  101.  119.  118. 
-## 10 J          82.7  67.7  65.9  78.5
-## 11 K          41.5  44.1  46.1  11.3
-## 12 L         137.  113.  114.  138. 
-## 13 M         138.  122.  109.  118. 
-## 14 N         130.  119.  127.  123. 
-## 15 O          66.1  33.2  58.4  11.8&lt;/code&gt;&lt;/pre&gt;
+## # A tibble: 16 x 5
+##    Herbicide                                    `1`   `2`   `3`   `4`
+##    &amp;lt;chr&amp;gt;                                      &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt;
+##  1 Rimsulfuron (40)                            85.9  91.1 111.   93.2
+##  2 Rimsulfuron (45)                            93.0 105    89.2  79.0
+##  3 Rimsulfuron (50)                            86.9 106.  110.   89.1
+##  4 Rimsulfuron (60)                            53.0 103.  101.   97.0
+##  5 Rimsulfuron (50+30 split)                   71.4  77.6 116.   92.2
+##  6 Rimsulfuron + thyfensulfuron                75.3  82.6  95.0  85.8
+##  7 Rimsulfuron + hoeing                        73.2  86.1 118.   98.3
+##  8 Pendimethalin (pre) + rimsulfuron (post)    65.5  88.7  95.5  82.4
+##  9 Pendimethalin (post) + rimsuulfuron (post)  94.8  87.7 102.  102. 
+## 10 Rimsulfuron + Atred                         94.1  89.9 104.   99.6
+## 11 Thifensulfuron                              78.5  42.3  62.5  24.3
+## 12 Metolachlor + terbuthylazine (pre)          51.8  52.1  49.5  34.7
+## 13 Alachlor + terbuthylazine                   12.1  49.6  41.3  16.4
+## 14 Hand-Weeded                                 77.6  92.1  86.6  99.6
+## 15 Unweeded 1                                  10.9  31.8  23.9  20.8
+## 16 Unweeded 2                                  27.6  51.6  25.1  38.6&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Here, I am not clear with which it is more advantageous than which. Simply, I do not see much difference: none of the two methods is as clear as I would expect it to be!&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;melting-the-data&#34; class=&#34;section level1&#34;&gt;
@@ -2421,20 +2480,20 @@ castData
 # 
 pivot_longer(castData, names_to = &amp;quot;Block&amp;quot;, values_to = &amp;quot;Yield&amp;quot;,
              cols = c(2:5))
-## # A tibble: 60 x 3
-##    Herbicide Block Yield
-##    &amp;lt;chr&amp;gt;     &amp;lt;chr&amp;gt; &amp;lt;dbl&amp;gt;
-##  1 A         B1     93.9
-##  2 A         B2    105. 
-##  3 A         B3     94.1
-##  4 A         B4    111. 
-##  5 B         B1    103. 
-##  6 B         B2     98.5
-##  7 B         B3    106. 
-##  8 B         B4    128. 
-##  9 C         B1     92.7
-## 10 C         B2    107. 
-## # … with 50 more rows&lt;/code&gt;&lt;/pre&gt;
+## # A tibble: 64 x 3
+##    Herbicide        Block Yield
+##    &amp;lt;chr&amp;gt;            &amp;lt;chr&amp;gt; &amp;lt;dbl&amp;gt;
+##  1 Rimsulfuron (40) 1      85.9
+##  2 Rimsulfuron (40) 2      91.1
+##  3 Rimsulfuron (40) 3     111. 
+##  4 Rimsulfuron (40) 4      93.2
+##  5 Rimsulfuron (45) 1      93.0
+##  6 Rimsulfuron (45) 2     105  
+##  7 Rimsulfuron (45) 3      89.2
+##  8 Rimsulfuron (45) 4      79.0
+##  9 Rimsulfuron (50) 1      86.9
+## 10 Rimsulfuron (50) 2     106. 
+## # … with 54 more rows&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;As before with casting, neither ‘melt()’, nor ‘pivot_longer()’ let me completely satisfied.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;tidyverse-or-not-tidyverse&#34; class=&#34;section level1&#34;&gt;

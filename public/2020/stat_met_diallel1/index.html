@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-131792052-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  
+    gtag('config', 'UA-131792052-1');
+  </script>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>The broken bridge between biologists and statisticians  | lmDiallel: a new R package to fit diallel models. Introduction</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="/css/blog.css" />
+    <script type="text/javascript"
+      src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>    
+</head>
+<body>
+
+    
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="/">Home</a>
+            <a class="navbar-item" href="/aboutThis">About this site</a>
+            <a class="navbar-item" href="/Tutorials">Tutorials</a>
+            <a class="navbar-item" href="/_statbook">Book</a>
+            <a class="navbar-item" href="/Rpackages">R packages</a>
+            <a class="navbar-item" href="/links">Links</a>
+            <a class="navbar-item" href="/about">About me</a>
+        </div>
+    </nav>
+    
+
+    
+    <section class="hero is-info is-medium">
+        <div class="hero-body" style="background-image: url(/img/bg-blog.jpg);">
+            <div class="container has-text-centered">
+                <br>
+                <h1 class="title is-size-1">
+                    
+                        lmDiallel: a new R package to fit diallel models. Introduction
+                    
+                </h1>
+                
+            </div>
+        </div>
+    </section>
+
+
+
+<div class="container">
+    <div class="section">
+    
+
+<div class="columns">
+    <div class="column is-9">
+        <div class="tile is-child box">
+          <p class="subtitle is-size-6 has-text-grey-light">
+          Andrea Onofri, Niccolò Terzaroli and Luigi Russi &middot;&nbsp; Added on November 11, 2020 &middot;
+          <i class="far fa-clock"></i>&nbsp;7 min read 
+          </p><hr/>
+            <div class="content">
+                
+
+
+<p>Together with some colleagues from the plant breeding group, we have just published a new paper, where we presented a bunch of R functions to analyse the data from diallel experiments. The paper is titled ‘<em>Linear models for diallel crosses: a review with R functions</em>’ and it is published in the ‘<em>Theoretical and Applied Genetics</em>’ Journal. If you are interested, you can take a look <a href="https://rdcu.be/caxZh">here at this link</a>.</p>
+<p>Diallel experiments are based on a set of possible crosses between some homozygous (inbred) lines. For example, if we have the male lines A, B and C and the female lines A, B and C (same lines used, alternatively, as male and female), we would have the following selfed parents: AA, BB and CC and the following crosses: AB, AC, BC. In some instances, we might also have the reciprocals BA, CA and CB. Selfed parents and crosses are compared on a Randomised Complete Block Design, usually replicated across seasons and/or locations.</p>
+<p>For these diallel experiments, six main diallel models are available in literature, to quantify genetic effects, such as general combining ability (GCA), specific combining ability (SCA), reciprocal (maternal) effects and heterosis. If you are an expert in plant breeding, you do not need any other explanation; if you are not an expert, well… you are like me: we only need to know that these effects are determined as linear combinations of means for crosses, means for selfed parents and reciprocals. However, as I recently discovered, fitting diallel models to experimental data from diallel experiments is a relevant task for plant breeders.</p>
+<p>When I started dealing with diallel models, I was very surprised by the fact that they are often presented as separate entities, to be fitted by using specialised software; indeed, to the eyes of a biostatistician, it would appear that all diallel models are only different parameterisations of the same general linear model (Mohring et al., 2011). Therefore, it seemed to me very strange that we could not fit diallel models by simply using the <code>lm()</code> function in R and related platform.</p>
+<p>A deeper diving in this subject showed me that the main implementation problem was that certain effects, such as the GCA effect, require the definition of unconventional design matrices, which were not yet available in R. Indeed, the packages ‘asreml-R’ and ‘sommer’ permit, e.g., the overlay of design matrices (function <code>and()</code> in ‘asreml’ and <code>overlay()</code> in ‘sommer’), which is useful to code GCA effects, but none of the two packages played well with the <code>lm()</code> function in R. Therefore, together with Niccolò and Luigi, we decided to enhance the <code>model.matrix()</code> function in R, building a handful of new R functions, aimed at producing the correct design matrices for all types of diallel models. All these functions are available within the ‘lmDiallel’ package, which is available on gitHub; it can be installed by using the ‘install_github()’ function, as available in the ‘devtools’ package. Therefore, if necessary, install this package first. The code is as follows:</p>
+<pre><code>install.packages(&quot;devtools&quot;) # Only at first instance
+library(devtools)
+install_github(&quot;OnofriAndreaPG/lmDiallel&quot;)</code></pre>
+<p>The core functions for ‘lmDiallel’ are named after the corresponding genetic effects, i.e.: <code>GCA()</code> (general combining ability), <code>tSCA()</code> (total Specific Combining Ability), <code>RGCA()</code> (reciprocal general combining ability), <code>RSCA()</code> (reciprocal specific combining ability), <code>REC()</code> (RECiprocal effects = RGCA + RSCA), <code>DD()</code> (Dominance Deviation), <code>MDD()</code> (Mean Dominance Deviation), <code>H.BAR()</code> (Average Heterosis), <code>Hi()</code> (Average hetorosis for one parent), <code>VEi()</code> (Variety Effect), <code>SP()</code> (effect of Selfed Parents) and <code>GCAC()</code> (GCA for parents in their crosses). The usage of these functions is very simple. For example, let’s assume that we have the two variables ‘Par1’ and ‘Par2’ in a dataset, to represent the two parental lines (father and mother); the GCA effect is coded as:</p>
+<pre><code>GCA(Par1, Par2)</code></pre>
+<p>while the SCA effect is coded as:</p>
+<pre><code>SCA(Par1, Par2)</code></pre>
+<p>By using these R functions as building blocks, we can fit all diallel models inside the <code>lm()</code> and <code>lme()</code> functions. For example, the following line of code fits a diallel model containing the GCA and SCA effects, to the data contained in the ‘df’ dataframe:</p>
+<pre><code>lm(yield ~ GCA(Par1, Par2) + SCA(Par1, Par2), data = df)</code></pre>
+<p>Similarly, the effect of reciprocals and random blocks can be introduced by the following code:</p>
+<pre><code>lme(yield ~ GCA(Par1, Par2) + SCA(Par1, Par2) +
+            REC(Par1, Par2),
+            random = ~1|Block, data = df)</code></pre>
+<p>The model building process outlined above is clearly rooted in the frame of general linear models, although we recognise that plant breeders usually refer to certain relevant parameterisations of diallel models by using the name of the authors. In this respect, it is very common to use the terms “HAYMAN1”, “GRIFFING1”, “GRIFFING2”, “HAYMAN2”, “GE2” and “GE3” to refer to the main six diallel models available in literature (see Hayman, 1954; Griffing, 1956; Gardner and Eberhart, 1966). Although these models can be built and fit by using the above method, we thought it might be useful to simplify the whole process. For this reason, we also built a wrapper function named <code>lm.diallel()</code>, which can be used in the very same fashion as <code>lm()</code>. The syntax is:</p>
+<pre><code>lm.diallel(formula, Block, Env, data, fct)</code></pre>
+<p>where ‘formula’ uses the regular R syntax to specify the response variable and the two variables for parentals (e.g., Yield ~ Par1 + Par2). The two arguments ‘Block’ and ‘Env’ are used to specify optional variables, coding for blocks and environments, respectively. The argument ‘data’ is a ‘dataframe’ where to look for explanatory variables. Finally, ‘fct’ is a string variable coding for the selected model, i.e. “HAYMAN1”, “GRIFFING1”, “GRIFFING2”, “HAYMAN2”, “GE2”, “GE3”, according to the existing literature.</p>
+<p>We have also built the <code>summary()</code>, <code>vcov(),</code> <code>anova()</code> and <code>predict()</code> methods for ‘lm.diallel’ objects, in order to obey to some peculiar aspects of diallel models.</p>
+<p>In our paper (<a href="https://rdcu.be/caxZh">‘Linear models for diallel crosses: a review with R functions’</a>) we have reviewed diallel models and gave examples on how they can be fitted with our new package ‘lmDiallel’. We have also shown how the facilities we provide can be used to fit random effects diallel models with ‘jags’. We intend to provide a more lengthy documentation for our package in a coming series of posts; thus, if you are interested, please, stay tuned.</p>
+<p>I believe that increasing the usability of existing packages that have gained a wide popularity may be an advantageous programming strategy, compared to the usual strategy of building brand new platforms. From the point of view of the developer, it is efficient, as it requires a minor programming effort. From the point of view of the users (professionals, technicians and students), it is handy to be put in the conditions of making statistical analyses, without the need of learning new softwares and/or languages and/or syntaxes. Due to its open-source nature, the R environment is often overwhelming for users, that are confused by the extremely wide availability of alternative methods to perform the same task. In this regard, a programming strategy aimed at supporting some existing reference platforms might help build a more comfortable environment for statistical analyses.</p>
+<p>Thanks for reading and, please, stay tuned! If you have comments, please, drop me a line at the email address below. Best wishes,</p>
+<p>Andrea Onofri<br />
+Department of Agricultural, Food and Environmental Sciences<br />
+University of Perugia (Italy)<br />
+Borgo XX Giugno 74<br />
+I-06121 - PERUGIA
+<a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<hr />
+<div id="references" class="section level1">
+<h1>References</h1>
+<ol style="list-style-type: decimal">
+<li>Covarrubias-Pazaran G (2016) Genome-assisted prediction of quantitative traits using the R package sommer. PLoS ONE 11:e0156744.</li>
+<li>Gardner CO, Eberhart SA (1966) Analysis and interpretation of the variety cross diallel and related populations. Biometrics 22:439–452.</li>
+<li>Gilmoure A, Gogel BJ, Cullis BR, Whelam SJ, Thompson R (2015) ASReml user guide release 4.1 structural specification. VSN International Ltd, Hemel Hempstead, HP1 1ES, UK</li>
+<li>Griffing B (1956) Concept of general and specific combining ability in relation to diallel crossing systems. Aust J Biol Sci 9:463–493</li>
+<li>Möhring J, Melchinger AE, Piepho HP (2011) REML-based diallel analysis. Crop Sci 51:470–478.</li>
+</ol>
+</div>
+
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Tags</h1>
+        <div class="tags">
+        
+            <span class="tag"><a href="/tags/agricensdata">agricensdata</a></span>
+        
+            <span class="tag"><a href="/tags/ammi_analysis">ammi_analysis</a></span>
+        
+            <span class="tag"><a href="/tags/aomisc">aomisc</a></span>
+        
+            <span class="tag"><a href="/tags/asreml">asreml</a></span>
+        
+            <span class="tag"><a href="/tags/blogdown">blogdown</a></span>
+        
+            <span class="tag"><a href="/tags/boxplot">boxplot</a></span>
+        
+            <span class="tag"><a href="/tags/correlation">correlation</a></span>
+        
+            <span class="tag"><a href="/tags/delta_method">delta_method</a></span>
+        
+            <span class="tag"><a href="/tags/descriptive_statistics">descriptive_statistics</a></span>
+        
+            <span class="tag"><a href="/tags/diallel_models">diallel_models</a></span>
+        
+            <span class="tag"><a href="/tags/drcseedgerm">drcseedgerm</a></span>
+        
+            <span class="tag"><a href="/tags/drm">drm</a></span>
+        
+            <span class="tag"><a href="/tags/error_propagation">error_propagation</a></span>
+        
+            <span class="tag"><a href="/tags/linear_models">linear_models</a></span>
+        
+            <span class="tag"><a href="/tags/lmdiallel">lmdiallel</a></span>
+        
+            <span class="tag"><a href="/tags/lme">lme</a></span>
+        
+            <span class="tag"><a href="/tags/long_term_experiments">long_term_experiments</a></span>
+        
+            <span class="tag"><a href="/tags/mixed_models">mixed_models</a></span>
+        
+            <span class="tag"><a href="/tags/multi_environment_studies">multi_environment_studies</a></span>
+        
+            <span class="tag"><a href="/tags/nlme">nlme</a></span>
+        
+            <span class="tag"><a href="/tags/nls">nls</a></span>
+        
+            <span class="tag"><a href="/tags/nonlinear_regression">nonlinear_regression</a></span>
+        
+            <span class="tag"><a href="/tags/percentiles">percentiles</a></span>
+        
+            <span class="tag"><a href="/tags/qq_plot">qq_plot</a></span>
+        
+            <span class="tag"><a href="/tags/r">r</a></span>
+        
+            <span class="tag"><a href="/tags/seed_germination">seed_germination</a></span>
+        
+            <span class="tag"><a href="/tags/split_plot">split_plot</a></span>
+        
+            <span class="tag"><a href="/tags/time_to_event_models">time_to_event_models</a></span>
+        
+            <span class="tag"><a href="/tags/variance">variance</a></span>
+        
+        </div>          
+    </div>
+</div><br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Recent posts</h1>
+        
+            <h1><a href="/2020/stat_met_diallel1/">lmDiallel: a new R package to fit diallel models. Introduction</a></h1>
+            <time class="has-text-grey-light is-size-7">11 November 2020</time>
+        
+            <h1><a href="/2020/stat_general_percentiles/">QQ-plots and Box-Whisker plots: where do they come from?</a></h1>
+            <time class="has-text-grey-light is-size-7">15 October 2020</time>
+        
+            <h1><a href="/2020/stat_lte_modelbuilding/">Building ANOVA-models for long-term experiments in agriculture</a></h1>
+            <time class="has-text-grey-light is-size-7">20 August 2020</time>
+        
+            <h1><a href="/2020/stat_met_jointreg/">Fitting complex mixed models with nlme. Example #5</a></h1>
+            <time class="has-text-grey-light is-size-7">5 June 2020</time>
+        
+            <h1><a href="/2020/stat_met_ammi/">AMMI analyses for GE interactions</a></h1>
+            <time class="has-text-grey-light is-size-7">12 May 2020</time>
+        
+    </div>
+</div>
+    <br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Archives</h1>
+        
+            <a href="/archives/2020">2020</a> (10)<br>
+        
+            <a href="/archives/2019">2019</a> (15)<br>
+        
+            <a href="/archives/2018">2018</a> (2)<br>
+        
+            <a href="/archives/2014">2014</a> (1)<br>
+        
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+    </div>
+</div>
+<footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+        <p>
+             <span class="icon is-large"><a href="mailto:andrea.onofri@unipg.it" class="mysocial"><i class="far fa-envelope-open fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://github.com/OnofriAndreaPG/" class="mysocial"><i class="fab fa-github fa-3x"></i></a></span>&nbsp;&nbsp;
+                       <span class="icon is-large"><a href="https://www.r.project.org/" class="mysocial"><i class="fab fa-r-project fa-3x"></i></a></span>&nbsp;&nbsp;
+
+            <br><br>
+            Copyright &copy; The broken bridge between biologists and statisticians, 2020 - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a>
+            - <a class="mysocial" href="/aboutThis">About this site</a>
+        </p>
+    </div>
+</footer>
+
+<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+</body>
+</html>

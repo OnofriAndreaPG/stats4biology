@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Lmdiallel on The broken bridge between biologists and statisticians</title>
+    <link>/tags/lmdiallel/</link>
+    <description>Recent content in Lmdiallel on The broken bridge between biologists and statisticians</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <copyright>Copyright © 2018, @AndreaOnofri</copyright>
+    <lastBuildDate>Wed, 11 Nov 2020 00:00:00 +0000</lastBuildDate>
+    
+        <atom:link href="/tags/lmdiallel/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>lmDiallel: a new R package to fit diallel models. Introduction</title>
+      <link>/2020/stat_met_diallel1/</link>
+      <pubDate>Wed, 11 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/stat_met_diallel1/</guid>
+      <description>
+
+
+&lt;p&gt;Together with some colleagues from the plant breeding group, we have just published a new paper, where we presented a bunch of R functions to analyse the data from diallel experiments. The paper is titled ‘&lt;em&gt;Linear models for diallel crosses: a review with R functions&lt;/em&gt;’ and it is published in the ‘&lt;em&gt;Theoretical and Applied Genetics&lt;/em&gt;’ Journal. If you are interested, you can take a look &lt;a href=&#34;https://rdcu.be/caxZh&#34;&gt;here at this link&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Diallel experiments are based on a set of possible crosses between some homozygous (inbred) lines. For example, if we have the male lines A, B and C and the female lines A, B and C (same lines used, alternatively, as male and female), we would have the following selfed parents: AA, BB and CC and the following crosses: AB, AC, BC. In some instances, we might also have the reciprocals BA, CA and CB. Selfed parents and crosses are compared on a Randomised Complete Block Design, usually replicated across seasons and/or locations.&lt;/p&gt;
+&lt;p&gt;For these diallel experiments, six main diallel models are available in literature, to quantify genetic effects, such as general combining ability (GCA), specific combining ability (SCA), reciprocal (maternal) effects and heterosis. If you are an expert in plant breeding, you do not need any other explanation; if you are not an expert, well… you are like me: we only need to know that these effects are determined as linear combinations of means for crosses, means for selfed parents and reciprocals. However, as I recently discovered, fitting diallel models to experimental data from diallel experiments is a relevant task for plant breeders.&lt;/p&gt;
+&lt;p&gt;When I started dealing with diallel models, I was very surprised by the fact that they are often presented as separate entities, to be fitted by using specialised software; indeed, to the eyes of a biostatistician, it would appear that all diallel models are only different parameterisations of the same general linear model (Mohring et al., 2011). Therefore, it seemed to me very strange that we could not fit diallel models by simply using the &lt;code&gt;lm()&lt;/code&gt; function in R and related platform.&lt;/p&gt;
+&lt;p&gt;A deeper diving in this subject showed me that the main implementation problem was that certain effects, such as the GCA effect, require the definition of unconventional design matrices, which were not yet available in R. Indeed, the packages ‘asreml-R’ and ‘sommer’ permit, e.g., the overlay of design matrices (function &lt;code&gt;and()&lt;/code&gt; in ‘asreml’ and &lt;code&gt;overlay()&lt;/code&gt; in ‘sommer’), which is useful to code GCA effects, but none of the two packages played well with the &lt;code&gt;lm()&lt;/code&gt; function in R. Therefore, together with Niccolò and Luigi, we decided to enhance the &lt;code&gt;model.matrix()&lt;/code&gt; function in R, building a handful of new R functions, aimed at producing the correct design matrices for all types of diallel models. All these functions are available within the ‘lmDiallel’ package, which is available on gitHub; it can be installed by using the ‘install_github()’ function, as available in the ‘devtools’ package. Therefore, if necessary, install this package first. The code is as follows:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;install.packages(&amp;quot;devtools&amp;quot;) # Only at first instance
+library(devtools)
+install_github(&amp;quot;OnofriAndreaPG/lmDiallel&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The core functions for ‘lmDiallel’ are named after the corresponding genetic effects, i.e.: &lt;code&gt;GCA()&lt;/code&gt; (general combining ability), &lt;code&gt;tSCA()&lt;/code&gt; (total Specific Combining Ability), &lt;code&gt;RGCA()&lt;/code&gt; (reciprocal general combining ability), &lt;code&gt;RSCA()&lt;/code&gt; (reciprocal specific combining ability), &lt;code&gt;REC()&lt;/code&gt; (RECiprocal effects = RGCA + RSCA), &lt;code&gt;DD()&lt;/code&gt; (Dominance Deviation), &lt;code&gt;MDD()&lt;/code&gt; (Mean Dominance Deviation), &lt;code&gt;H.BAR()&lt;/code&gt; (Average Heterosis), &lt;code&gt;Hi()&lt;/code&gt; (Average hetorosis for one parent), &lt;code&gt;VEi()&lt;/code&gt; (Variety Effect), &lt;code&gt;SP()&lt;/code&gt; (effect of Selfed Parents) and &lt;code&gt;GCAC()&lt;/code&gt; (GCA for parents in their crosses). The usage of these functions is very simple. For example, let’s assume that we have the two variables ‘Par1’ and ‘Par2’ in a dataset, to represent the two parental lines (father and mother); the GCA effect is coded as:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;GCA(Par1, Par2)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;while the SCA effect is coded as:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;SCA(Par1, Par2)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;By using these R functions as building blocks, we can fit all diallel models inside the &lt;code&gt;lm()&lt;/code&gt; and &lt;code&gt;lme()&lt;/code&gt; functions. For example, the following line of code fits a diallel model containing the GCA and SCA effects, to the data contained in the ‘df’ dataframe:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;lm(yield ~ GCA(Par1, Par2) + SCA(Par1, Par2), data = df)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Similarly, the effect of reciprocals and random blocks can be introduced by the following code:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;lme(yield ~ GCA(Par1, Par2) + SCA(Par1, Par2) +
+            REC(Par1, Par2),
+            random = ~1|Block, data = df)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The model building process outlined above is clearly rooted in the frame of general linear models, although we recognise that plant breeders usually refer to certain relevant parameterisations of diallel models by using the name of the authors. In this respect, it is very common to use the terms “HAYMAN1”, “GRIFFING1”, “GRIFFING2”, “HAYMAN2”, “GE2” and “GE3” to refer to the main six diallel models available in literature (see Hayman, 1954; Griffing, 1956; Gardner and Eberhart, 1966). Although these models can be built and fit by using the above method, we thought it might be useful to simplify the whole process. For this reason, we also built a wrapper function named &lt;code&gt;lm.diallel()&lt;/code&gt;, which can be used in the very same fashion as &lt;code&gt;lm()&lt;/code&gt;. The syntax is:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;lm.diallel(formula, Block, Env, data, fct)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;where ‘formula’ uses the regular R syntax to specify the response variable and the two variables for parentals (e.g., Yield ~ Par1 + Par2). The two arguments ‘Block’ and ‘Env’ are used to specify optional variables, coding for blocks and environments, respectively. The argument ‘data’ is a ‘dataframe’ where to look for explanatory variables. Finally, ‘fct’ is a string variable coding for the selected model, i.e. “HAYMAN1”, “GRIFFING1”, “GRIFFING2”, “HAYMAN2”, “GE2”, “GE3”, according to the existing literature.&lt;/p&gt;
+&lt;p&gt;We have also built the &lt;code&gt;summary()&lt;/code&gt;, &lt;code&gt;vcov(),&lt;/code&gt; &lt;code&gt;anova()&lt;/code&gt; and &lt;code&gt;predict()&lt;/code&gt; methods for ‘lm.diallel’ objects, in order to obey to some peculiar aspects of diallel models.&lt;/p&gt;
+&lt;p&gt;In our paper (&lt;a href=&#34;https://rdcu.be/caxZh&#34;&gt;‘Linear models for diallel crosses: a review with R functions’&lt;/a&gt;) we have reviewed diallel models and gave examples on how they can be fitted with our new package ‘lmDiallel’. We have also shown how the facilities we provide can be used to fit random effects diallel models with ‘jags’. We intend to provide a more lengthy documentation for our package in a coming series of posts; thus, if you are interested, please, stay tuned.&lt;/p&gt;
+&lt;p&gt;I believe that increasing the usability of existing packages that have gained a wide popularity may be an advantageous programming strategy, compared to the usual strategy of building brand new platforms. From the point of view of the developer, it is efficient, as it requires a minor programming effort. From the point of view of the users (professionals, technicians and students), it is handy to be put in the conditions of making statistical analyses, without the need of learning new softwares and/or languages and/or syntaxes. Due to its open-source nature, the R environment is often overwhelming for users, that are confused by the extremely wide availability of alternative methods to perform the same task. In this regard, a programming strategy aimed at supporting some existing reference platforms might help build a more comfortable environment for statistical analyses.&lt;/p&gt;
+&lt;p&gt;Thanks for reading and, please, stay tuned! If you have comments, please, drop me a line at the email address below. Best wishes,&lt;/p&gt;
+&lt;p&gt;Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Borgo XX Giugno 74&lt;br /&gt;
+I-06121 - PERUGIA
+&lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Covarrubias-Pazaran G (2016) Genome-assisted prediction of quantitative traits using the R package sommer. PLoS ONE 11:e0156744.&lt;/li&gt;
+&lt;li&gt;Gardner CO, Eberhart SA (1966) Analysis and interpretation of the variety cross diallel and related populations. Biometrics 22:439–452.&lt;/li&gt;
+&lt;li&gt;Gilmoure A, Gogel BJ, Cullis BR, Whelam SJ, Thompson R (2015) ASReml user guide release 4.1 structural specification. VSN International Ltd, Hemel Hempstead, HP1 1ES, UK&lt;/li&gt;
+&lt;li&gt;Griffing B (1956) Concept of general and specific combining ability in relation to diallel crossing systems. Aust J Biol Sci 9:463–493&lt;/li&gt;
+&lt;li&gt;Möhring J, Melchinger AE, Piepho HP (2011) REML-based diallel analysis. Crop Sci 51:470–478.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
