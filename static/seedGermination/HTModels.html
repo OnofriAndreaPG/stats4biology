@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Andrea Onofri" />
+
+
+<title>Fitting hydro-time models with R</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+      </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Home</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fa fa-book"></span>
+     
+    Navigation menu
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="GerminationTimeCourse.html">Describing germination curves</a>
+    </li>
+    <li>
+      <a href="Censoring.html">The problem of censoring</a>
+    </li>
+    <li>
+      <a href="TimeToEvent.html">Time-to-event methods account for censoring</a>
+    </li>
+    <li>
+      <a href="ReshapingTheData.html">Preliminary steps: shaping the data</a>
+    </li>
+    <li>
+      <a href="GerminationModels.html">Germination models and data analyses</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+        <span class="fa fa-book"></span>
+         
+        Analysing the data in two-steps
+      </a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="toBeDone.html">Introduction</a>
+        </li>
+        <li>
+          <a href="GermIndices.html">Step 1 - Germination indices</a>
+        </li>
+        <li>
+          <a href="toBeDone.html">Step 2 - Fitting linear models</a>
+        </li>
+        <li>
+          <a href="HTModels.html">Step 2 - Fitting hydro-time models</a>
+        </li>
+        <li>
+          <a href="toBeDone.html">Step 2 - Fitting hydrothermal-time models</a>
+        </li>
+      </ul>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+        <span class="fa fa-book"></span>
+         
+        Fitting germination models in one-step
+      </a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="toBeDone.html">Linear models to compare germination curves</a>
+        </li>
+        <li>
+          <a href="toBeDone.html">Fitting hydro-time models</a>
+        </li>
+        <li>
+          <a href="toBeDone.html">Nonlinear regression analysis</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="toBeDone.html">Conclusions</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="http://www.statforbiology.com">Back to blog</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Fitting hydro-time models with R</h1>
+<h4 class="author">Andrea Onofri</h4>
+<h4 class="date">17 Marzo, 2020</h4>
+
+</div>
+
+
+<hr />
+<div id="effect-of-humidity-on-germination" class="section level1">
+<h1>Effect of humidity on germination</h1>
+<p>In a previous page we have seen that the median germination rate (GR50) of a seed sample is a very useful measure of germination speed. I would just like to remind that the germination rate for one seed is the fraction of germination that is accomplished in one day; at the population level, a GR50 of, e.g., 0.5 means that, at the end of first day, 50% of seeds were, at least, half-way in their germination process and, therefore, they germinated within the second day. A GR50 of 0 means that the final germination capability of the seed lot was less than 50%; for thir reason, the GR can also be ragarded as a measure of germination extent. Of course, we are not constrained to use the GR50, we can also use the germination rate for any other percentile, within the population.</p>
+<p>The GR value for the selected percentile can be modeled as a function of environmental conditions, such as the humidity content in the germination substrate. In this latter case, the resulting models are known as hydro-time models. If we consider the GR50, the effect of water potential (<span class="math inline">\(\Psi\)</span>) in the substrate is linear <span class="citation">(Bradford, 2002)</span>, for any <span class="math inline">\(\Psi\)</span> above the base water potential level (<span class="math inline">\(\Psi_{b,50}\)</span>):</p>
+<p><span class="math display">\[ GR50 = \frac{\Psi - \Psi_{b(50)}}{\theta_H} \quad \quad \quad \quad (1)\]</span></p>
+<p><span class="math inline">\(\Psi &lt; \Psi_{b(50)}\)</span>, the GR50 is always 0. If we consider another germination percentile (e.g. GR10 or GR30), the relationship is similar, although the base water potential changes (e.g. <span class="math inline">\(\Psi_{b(10)}\)</span> or <span class="math inline">\(\Psi_{b(30)}\)</span>), while <span class="math inline">\(\theta_H\)</span> is common for the whole population. This latter parameter represents the <strong>hydro-time constant</strong> and it is expressed as <em>MPa day or MPa hour</em>. Why is called the hydro-time constant. First of all, it is constant for all seeds in the population and, second, it expresses the hydro-time to germination, i.e. the time-to-germination adjusted for the humidity content in the substrate. Indeed, considering that the GR50 is the inverse of the T50 (i.e. the median germination time), we have:</p>
+<p><span class="math display">\[ \theta_H = t_{50} \, \left( \Psi - \Psi_{b(50)} \right)\]</span></p>
+<p>The above equation shows that the median germination time for the different sub-populations within the lot, changes because the <span class="math inline">\(\Psi_b\)</span> levels change. In other words, seeds posses a different ability of absorbing water from the substrate, which explains their different germination times.</p>
+<p>In our experience, we have found that the relationship between GR and water potential in the substrate may, sometimes, be curvilinear. For these situations, we have successfully used the two equations below; similarly to Equation 1, Equations 2 and 3 are valid for <span class="math inline">\(\Psi_b \leq \Psi \leq 0\)</span>, while the GR value is always 0 when <span class="math inline">\(\Psi &lt; \Psi_b\)</span>:</p>
+<p><span class="math display">\[ GR50 = \frac{\Psi^2 - \Psi^2_{b(50)}}{\theta_H} \quad \quad \quad \quad (2)\]</span></p>
+<p><span class="math display">\[GR50 = \frac{\left[\Psi - \Psi_{b(50)}\right]^2}{\theta_H} \quad \quad \quad \quad (3) \]</span></p>
+</div>
+<div id="fitting-hydro-time-model" class="section level1">
+<h1>Fitting hydro-time model</h1>
+<p>The code below makes use of a number of packages, which should be preliminary loaded in R. The first package is <code>drcSeedGerm</code>, which should be installed from gitHub, if necessary. This package depends on a number of other packages (including ‘drc’) that are automatically loaded, as well. Furthermore, the observed GR values do not easily conform to the basic assumptions of nonlinear regression analysis, regarding normality and/or homoscedasticity. Therefore, we will try to use more robust variance-covariance estimators (sandwich estimators), whenever possible. To this aim, we should also load the <code>sandwich</code> and the <code>lmtest</code> packages <span class="citation">(Zeileis and Hothorn, 2002, <span class="citation">@zeileis2006_Objectorientedcomputationsandwich</span>)</span>.</p>
+<pre class="r"><code># To instoll the drcSeedGerm package, use the code below
+# library(devtools)
+# install_github(&quot;OnofriAndreaPG/drcSeedGerm&quot;)
+
+# Load the packages
+library(drcSeedGerm)
+library(lmtest)
+library(sandwich)</code></pre>
+<div id="example-1" class="section level2">
+<h2>Example 1</h2>
+<p>A germination assay was performed with <em>Festuca arundinacea</em> at different water potential levels in the substrate. The GR10, GR30 and GR50 values were retrieved for the different water potential levels. The observed values are in the dataset ‘FestArGR.csv’, which can be downloaded from gitHub.</p>
+<pre class="r"><code>path &lt;- &quot;https://raw.githubusercontent.com/OnofriAndreaPG/agroBioData/master/&quot;
+fileName &lt;- &quot;FestArGR.csv&quot;
+FestArGR &lt;- read.csv(paste(path, fileName, sep = &quot;&quot;), header = T)
+head(FestArGR)</code></pre>
+<pre><code>##    g  Psi         GR
+## 1 10 -2.0 0.00000000
+## 2 10 -1.5 0.00000000
+## 3 10 -1.2 0.00000000
+## 4 10 -1.0 0.00000000
+## 5 10 -0.8 0.07365003
+## 6 10 -0.6 0.11545448</code></pre>
+<pre class="r"><code>FestArGR$g &lt;- factor(FestArGR$g)</code></pre>
+<p>First of all, we fit Equation 1 to the observed data, by using the ‘drm’ function in the ‘drc’ package. Equation 1 is coded as <code>GRPsiLin()</code> and the percentile <span class="math inline">\(g\)</span> is included as a factor, to specify that we want one curve for each percentile. The argument ‘pmodels’ is used to specify that the percentiles need to have a different value for first parameter (‘~g - 1’) and a common value for the second parameter (‘~1’). Please, note the use of the ‘coeftest()’ function to get robust (sandwich) standard errors.</p>
+<pre class="r"><code>modHT1 &lt;- drm(GR ~ Psi, fct = GRPsiLin(), curveid=g,
+  pmodels = list(~g - 1, ~ 1), data = FestArGR)
+summary(modHT1)</code></pre>
+<pre><code>## 
+## Model fitted: Linear hydrotime model (Bradford, 2002)
+## 
+## Parameter estimates:
+## 
+##                     Estimate Std. Error t-value   p-value    
+## Psib:g10           -1.258252   0.049877 -25.227 &lt; 2.2e-16 ***
+## Psib:g30           -1.159532   0.050313 -23.046 &lt; 2.2e-16 ***
+## Psib:g50           -1.098381   0.048035 -22.866 &lt; 2.2e-16 ***
+## thetaH:(Intercept)  6.695575   0.327307  20.457 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error:
+## 
+##  0.01425529 (32 degrees of freedom)</code></pre>
+<pre class="r"><code>plot(modHT1, log=&quot;&quot;, legendPos = c(-1.5, 0.15), ylim = c(0, 0.20))</code></pre>
+<p><img src="HTModels_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>The graph above shows that there is some lack of fit, in the sense that the observed data seem to depict a curvilinear trend. Therefore, we fitted Equation 2, which is coded as ‘GRPsiPol()’.</p>
+<pre class="r"><code>modHT2 &lt;- drm(GR ~ Psi, fct = GRPsiPol(), curveid=g,
+  pmodels = list(~g - 1, ~ 1), data = FestArGR)
+coeftest(modHT2, vcov = sandwich)</code></pre>
+<pre><code>## 
+## t test of coefficients:
+## 
+##                       Estimate  Std. Error  t value  Pr(&gt;|t|)    
+## Psib:g10           -1.0448e+00  2.7958e-07 -3737101 &lt; 2.2e-16 ***
+## Psib:g30           -9.9631e-01  2.7107e-07 -3675428 &lt; 2.2e-16 ***
+## Psib:g50           -9.6354e-01  2.8117e-07 -3426823 &lt; 2.2e-16 ***
+## thetaH:(Intercept)  6.2515e+00  3.8109e-06  1640441 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>plot(modHT2, log=&quot;&quot;, legendPos = c(-1.5, 0.15), ylim = c(0, 0.20))</code></pre>
+<pre><code>## Warning in min(dose[dose &gt; 0]): no non-missing arguments to min; returning Inf</code></pre>
+<p><img src="HTModels_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>Comparing the two curves by way of the Akaike Information Criterion <span class="citation">(Akaike, 1974)</span>, shows that Equation 2 fits sensibly better than Equation 1.</p>
+<pre class="r"><code>AIC(modHT1, modHT2)</code></pre>
+<pre><code>##        df       AIC
+## modHT1  5 -198.1218
+## modHT2  5 -285.8075</code></pre>
+</div>
+<div id="example-2" class="section level2">
+<h2>Example 2</h2>
+<p>A germination assay was performed with oilseed rape (cv. Excalibur) at different water potential levels in the substrate. The GR10, GR30 and GR50 values were retrieved for the different water potential levels. The observed values are in the dataset ‘ExcaliburGR.csv’, which can be downloaded from gitHub. At first, we fitted the Equation 1:</p>
+<pre class="r"><code>fileName2 &lt;- &quot;ExcaliburGR.csv&quot;
+ExcaliburGR &lt;- read.csv(paste(path, fileName2, sep = &quot;&quot;), header = T)
+head(ExcaliburGR)</code></pre>
+<pre><code>##    g  Psi      T   SE_T     GR
+## 1 10 -0.5 0.7134 0.1260 1.4018
+## 2 30 -0.5 0.9098 0.1532 1.0991
+## 3 50 -0.5 1.1250 0.1824 0.8889
+## 4 10 -0.6 0.9930 0.1185 1.0071
+## 5 30 -0.6 1.2597 0.1388 0.7938
+## 6 50 -0.6 1.5446 0.1602 0.6474</code></pre>
+<pre class="r"><code>ExcaliburGR$g &lt;- factor(ExcaliburGR$g)
+
+modHT3 &lt;- drm(GR ~ Psi, fct = GRPsiLin(), data = ExcaliburGR,
+              curveid = g,
+              pmodel=list(~g - 1, ~1))
+coeftest(modHT3, vcov = sandwich)</code></pre>
+<pre><code>## 
+## t test of coefficients:
+## 
+##                       Estimate  Std. Error t value  Pr(&gt;|t|)    
+## Psib:g10           -0.97152506  0.00024684 -3935.9 &lt; 2.2e-16 ***
+## Psib:g30           -0.91147818  0.00016845 -5411.0 &lt; 2.2e-16 ***
+## Psib:g50           -0.85135007  0.00013971 -6093.6 &lt; 2.2e-16 ***
+## thetaH:(Intercept)  0.38197770  0.00022882  1669.3 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>plot(modHT3, log=&quot;&quot;, legendPos=c(-1.3, 1))</code></pre>
+<p><img src="HTModels_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>Also in this case, the observed responses seem to be curvilinear, with a different shape with respect to the previous example. Therefore, we fitted Equation 3, which is coded as <code>GRPsiPol2()</code>. Also in this case, the fit clearly improved.</p>
+<pre class="r"><code>modHT4 &lt;- drm(GR ~ Psi, fct = GRPsiPol2(),
+              data = ExcaliburGR, curveid = g, 
+              pmodels=list(~g - 1, ~ 1))
+coeftest(modHT4, vcov = sandwich)</code></pre>
+<pre><code>## 
+## t test of coefficients:
+## 
+##                       Estimate  Std. Error  t value  Pr(&gt;|t|)    
+## Psib:g10           -1.1378e+00  1.1407e-04  -9975.2 &lt; 2.2e-16 ***
+## Psib:g30           -1.0778e+00  1.0182e-04 -10585.4 &lt; 2.2e-16 ***
+## Psib:g50           -1.0288e+00  9.6414e-05 -10670.2 &lt; 2.2e-16 ***
+## thetaH:(Intercept)  2.9832e-01  1.2355e-04   2414.6 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>plot(modHT4, log=&quot;&quot;, legendPos=c(-1.3, 1))</code></pre>
+<p><img src="HTModels_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<pre class="r"><code>AIC(modHT3, modHT4)</code></pre>
+<pre><code>##        df       AIC
+## modHT3  5 -61.29028
+## modHT4  5 -97.78789</code></pre>
+<hr />
+</div>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
+<div id="refs" class="references">
+<div id="ref-akaike_new_1974">
+<p>Akaike, H., 1974. A new look at the statistical model identification. IEEE Transactions on Automatic Control 19, 716–723.</p>
+</div>
+<div id="ref-Bradford2002_HydroTime">
+<p>Bradford, K., 2002. Applications of hydrothermal time to quantifying and modeling seed germination and dormancy. Weed Science 50, 248–260.</p>
+</div>
+<div id="ref-Zeileis2002">
+<p>Zeileis, A., Hothorn, T., 2002. Diagnostic checking in regression relationships. R News 2, 7–10.</p>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = false;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

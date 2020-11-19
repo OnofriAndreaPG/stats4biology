@@ -9,10 +9,9 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Andrea Onofri" />
 
 
-<title>Models to describe the germination curves</title>
+<title>Modelling in one-step or two-steps: what does this mean?</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -20,6 +19,9 @@
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
@@ -260,6 +262,75 @@ $(document).ready(function () {
 
 
 
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
 
 </head>
 
@@ -267,6 +338,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -370,27 +451,38 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Models to describe the germination curves</h1>
-<h4 class="author">Andrea Onofri</h4>
-<h4 class="date">17 December, 2018</h4>
+<h1 class="title toc-ignore">Modelling in one-step or two-steps: what does this mean?</h1>
+<h4 class="date">5 March, 2020</h4>
 
 </div>
 
 
-<hr />
-<p>Seeds in a population do not germinate altogether in the same moment. This is an undisputed fact, resulting from the seed-to-seed variability in germination time (t). We could describe such a variability by using some density function <span class="math inline">\(\phi\)</span>, usually parameterised by way of a location (<span class="math inline">\(e\)</span>) and scale (<span class="math inline">\(b\)</span>) parameter:</p>
-<p><span class="math display">\[ t \sim \phi(e, b)\]</span></p>
-<p>However, we should also consider that there will often be a fraction of seeds that will not germinate in the given conditions, because it is either dormant or nonviable. Let’s call this fraction <span class="math inline">\(d\)</span>; the density distribution of germination times becomes:</p>
-<p><span class="math display">\[ t \sim d \,\, \phi(e, b) + (1 - d)\]</span></p>
-<p>From there, the proportion of germinated seeds (G) at <span class="math inline">\(t = t_g\)</span> is given by the corresponding cumulative distribution function:</p>
-<p><span class="math display">\[ G = P(t &lt; t_g) = d \,\, \Phi(e, b)\]</span></p>
-<p>Usually, <span class="math inline">\(\Phi\)</span> is right-skewed and, therefore, log-normal, log-logistic or Weibull cumulative distribution functions have been succesfully used. The graph below represents the germination time-course for a seed population with lognormal distribution of germination times, <span class="math inline">\(e = 4.5\)</span> days, <span class="math inline">\(b = 0.6\)</span> and a maximum germinated proportion <span class="math inline">\(d = 0.85\)</span>.</p>
-<p><img src="GerminationTimeCourse_files/figure-html/unnamed-chunk-1-1.png" width="576" /></p>
-<p>With log-normal or log-logistic distribution, <span class="math inline">\(e\)</span> corresponds to the time to 50% germination (for the germinated fraction), while <span class="math inline">\(b\)</span> relates to the standard deviation of germination times on a log-scale. Therefore, the three parameters of the germination curve have a clear biological meaning and they can be related to the three main features of seed germination, that is capability (<span class="math inline">\(d\)</span>), uniformity (<span class="math inline">\(b\)</span>) and speed (<span class="math inline">\(e\)</span>)</p>
-<p>Germination assays are most often organised to be able to determine the germination curve for a given seed lot. In this tutorial, we will see that this may not be an easy task, as several statistical problems may arise during the process of model fitting. In particular, we have to deal with the problem of censoring, or else known as ‘grouped data’. If you would like to know more about this, please go to <a href="Censoring.html">the following page</a>.</p>
+<div id="one-step-approach" class="section level1">
+<h1>One-step approach</h1>
+<p>In the previous pages we have seen that the germination curve gives us the proportion of germinated seeds over time. Such curve is based on a few (basically three) parameters describing the population, such as the germination velocity, capacity and uniformity. A very general model is:</p>
+<p><span class="math display">\[ G = P(t &lt; t_g) = d \,\, \Phi(t, \beta )\]</span></p>
+<p>where <span class="math inline">\(t\)</span> is the time, <span class="math inline">\(d\)</span> is the maximum germinated proportion (when <span class="math inline">\(t \rightarrow \infty\)</span>), <span class="math inline">\(\Phi\)</span> is a cumulative distribution function based on a certain set of a parameters, most frequently a location and a shape parameters (e.g. <span class="math inline">\(e\)</span> and <span class="math inline">\(b\)</span>). One possible line of attack for modelling is to select <span class="math inline">\(\Phi\)</span>, <span class="math inline">\(d\)</span> and <span class="math inline">\(\beta\)</span> and express them as functions of the variables under study. If we have the set of variables <span class="math inline">\(X\)</span>, the model is:</p>
+<p><span class="math display">\[ G(X) = d(X) \Phi \left[ t, \beta, X\right]\]</span></p>
+<p>Such modelling approach is basically a one-step approach: we input the germination time, the values of parameters and covariates and we get the proportion of germinated seeds.</p>
+</div>
+<div id="two-steps-approach" class="section level1">
+<h1>Two-steps approach</h1>
+<p>Another possible line of attack is to proceed in a two-steps fashion:</p>
+<ol style="list-style-type: decimal">
+<li>determine the germination curve for each seed lot (e.g. Petri dish, tray or container) in each experimental conditions and derive some relevant population based parameter (e.g. the maximum germinated fraction or the median germination time);</li>
+<li>model the effect of experimental variables on the selected population parameter.</li>
+</ol>
+<p>At the second step, the general model is:</p>
+<p><span class="math display">\[ \beta_i = f\left(X\right]\]</span></p>
+<p>We see that the time is no longer included as the independent variable in the second step and the model is fundamentally static.</p>
+<p>Both approaches are widely used; the second one is simpler, but the first one is more elegant. The selection is mainly a matter of aims and personal taste. Both approaches pose problems and limitations; I will try to describe all possibilities, so that you can make a more informed selection.</p>
+<p>Please, go ahead with reading.</p>
+</div>
 
 
 
+</div>
+</div>
 
 </div>
 
@@ -423,6 +515,32 @@ $(document).ready(function () {
 
 <!-- code folding -->
 
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = false;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
