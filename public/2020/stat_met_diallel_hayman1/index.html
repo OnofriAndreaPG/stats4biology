@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-131792052-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  
+    gtag('config', 'UA-131792052-1');
+  </script>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>The broken bridge between biologists and statisticians  | lmDiallel: a new R package to fit diallel models. The Hayman&#39;s model (type 1)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="/css/blog.css" />
+    <script type="text/javascript"
+      src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>    
+</head>
+<body>
+
+    
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="/">Home</a>
+            <a class="navbar-item" href="/aboutThis">About this site</a>
+            <a class="navbar-item" href="/Tutorials">Tutorials</a>
+            <a class="navbar-item" href="/_statbook">Book</a>
+            <a class="navbar-item" href="/Rpackages">R packages</a>
+            <a class="navbar-item" href="/links">Links</a>
+            <a class="navbar-item" href="/about">About me</a>
+        </div>
+    </nav>
+    
+
+    
+    <section class="hero is-info is-medium">
+        <div class="hero-body" style="background-image: url(/img/bg-blog.jpg);">
+            <div class="container has-text-centered">
+                <br>
+                <h1 class="title is-size-1">
+                    
+                        lmDiallel: a new R package to fit diallel models. The Hayman&#39;s model (type 1)
+                    
+                </h1>
+                
+            </div>
+        </div>
+    </section>
+
+
+
+<div class="container">
+    <div class="section">
+    
+
+<div class="columns">
+    <div class="column is-9">
+        <div class="tile is-child box">
+          <p class="subtitle is-size-6 has-text-grey-light">
+          Andrea Onofri, Niccolò Terzaroli and Luigi Russi &middot;&nbsp; Added on November 26, 2020 &middot;
+          <i class="far fa-clock"></i>&nbsp;16 min read 
+          </p><hr/>
+            <div class="content">
+                
+
+
+<p>In a previous post we have presented our new ‘lmDiallel’ package (<a href="https://www.statforbiology.com/2020/stat_met_diallel1/">see this link here</a> and see also the original paper in <a href="https://rdcu.be/caxZh">Theoretical and Applied Genetics</a>). It provides several extensions to the <code>lm()</code> function in R, to fit a class of linear models of interest for plant breeders or geneticists, the so-called diallel models. For those who are interested in this topic, we would like to present some examples of diallel models and how to fit them in R. Please, sit back and relax and, if you have comments, let us know, using the email link at the bottom of this post.</p>
+<div id="but-what-is-a-diallel" class="section level1">
+<h1>But… what is a ‘diallel’?</h1>
+<p>If you are not a plant breeder or a geneticist in general, you may be asking this question. From the ancient Greek language, the ‘diallel’ word means ‘reciprocating’ and a diallel cross is a set of several possible crosses and selfs between some parental lines. For example, if we take the male lines A, B and C together with the same female lines A, B and C and we imagine to cross those lines with one another, we obtain the selfs A<span class="math inline">\(\times\)</span>A, B<span class="math inline">\(\times\)</span>B and C<span class="math inline">\(\times\)</span>C, the crosses A<span class="math inline">\(\times\)</span>B, A<span class="math inline">\(\times\)</span>C and B<span class="math inline">\(\times\)</span>C and, in some instances, the reciprocals B<span class="math inline">\(\times\)</span>A, C<span class="math inline">\(\times\)</span>A and C<span class="math inline">\(\times\)</span>B (where the father and mother are swapped). The performances of crosses and/or selfs and/or reciprocals can be compared by planning field experiments, usually known as <strong>diallel experiments</strong> and designed as randomised complete blocks with 3-4 replicates.</p>
+</div>
+<div id="the-example" class="section level1">
+<h1>The example</h1>
+<p>Depending on how the experiment is planned, we can have four experimental methods:</p>
+<ol style="list-style-type: decimal">
+<li>Crosses + reciprocals + selfs (complete diallel)</li>
+<li>Crosses and reciprocals (no selfs)</li>
+<li>Crosses and selfs (no reciprocals)</li>
+<li>Only crosses (no selfs, no reciprocals)</li>
+</ol>
+<p>In this post we will concentrate on the first design (complete diallel) and we will use a simple example with three parental lines (A, B and C). The csv file (‘diallel1.csv’) is available in an external repository; in the box below we load the data and we use the <code>group_by()</code> function in the ‘dplyr’ package to obtain the means for all crosses and selfs.</p>
+<pre class="r"><code>library(tidyverse)
+rm(list = ls())
+df &lt;- read_csv(&quot;https://www.casaonofri.it/_datasets/diallel1.csv&quot;)
+df$Block &lt;- factor(df$Block)
+dfM &lt;- df %&gt;% 
+  group_by(Par1, Par2) %&gt;% 
+  summarise(YieldM = mean(Yield), SEs = sd(Yield/sqrt(4)))
+dfM
+## # A tibble: 9 x 4
+## # Groups:   Par1 [3]
+##   Par1  Par2  YieldM   SEs
+##   &lt;chr&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;
+## 1 A     A         12 0.740
+## 2 A     B         13 0.600
+## 3 A     C         14 0.498
+## 4 B     A         11 1.00 
+## 5 B     B         15 0.332
+## 6 B     C         21 0.273
+## 7 C     A         17 0.295
+## 8 C     B         16 0.166
+## 9 C     C         19 1.90</code></pre>
+</div>
+<div id="what-model-do-we-use" class="section level1">
+<h1>What model do we use?</h1>
+<p>In order to describe the above dataset, we might think of a two-way ANOVA model, where the ‘father’ and ‘mother’ lines (the ‘Par1’ and ‘Par2’ variables, respectively) are used as the explanatory factors.</p>
+<p>This is a very tempting solution, but we should resist: a two way ANOVA model regards the ‘father’ and ‘mother’ effects as two completely different series of treatments, neglecting the fact that they are, indeed, the same genotypes in different combinations. That is exactly why we need specific <strong>diallel models</strong> to describe the results of diallel experiments!</p>
+</div>
+<div id="the-hayman-model-type-1" class="section level1">
+<h1>The “Hayman” model (type 1)</h1>
+<p>The first diallel model was proposed by Hayman (1954) and it was devised for complete diallel experiments, where reciprocals are available. Neglecting the design effects (blocks and/or environments), the Hayman’s model is defined as:</p>
+<p><span class="math display">\[y _{ijk} = \mu + \textrm{g}_i + \textrm{g}_j + \textrm{ts}_{ij} + \textrm{rg}^a_{i} + \textrm{rg}^b_{j} + rs_{ij} + \varepsilon_{ijk} \quad\quad\quad (Eq. 1)\]</span></p>
+<p>where <span class="math inline">\(\mu\)</span> is expected value (the overall mean, in the balanced case) and <span class="math inline">\(\varepsilon_{ijk}\)</span> is the residual random error terms for the observation in the <span class="math inline">\(k^{th}\)</span> block and with the parentals <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span>. All the other terms correspond to genetic effects, namely:</p>
+<ol style="list-style-type: decimal">
+<li>the <span class="math inline">\(\textrm{g}_i\)</span> and <span class="math inline">\(\textrm{g}_j\)</span> terms are the <strong>general combining abilities</strong> (GCAs) of the <span class="math inline">\(i^{th}\)</span> and <span class="math inline">\(j^{th}\)</span> parents. Each term relates to the average performances of a parental line in all its hybrid combination, under the sum-to-zero constraint (i.e. the sum of <span class="math inline">\(g\)</span> values for all parentals must be zero). For example, with our balanced experiment, the overall mean is <span class="math inline">\(\mu = 15.33\)</span>, while the mean for the A parent when used as the ‘father’ is <span class="math inline">\(\mu_{A.} = 13\)</span> and the mean for the same parent A when used as the ‘mother’ is <span class="math inline">\(\mu_{.A} = 13.33\)</span>. Consequently:
+<span class="math display">\[g_A = \left(13 + 13.33 \right)/2 - 15.33 = -2.167\]</span> Analogously, it is <span class="math inline">\(g_B = -0.167\)</span>.</li>
+<li>The <span class="math inline">\(rg^a_i\)</span> and <span class="math inline">\(rg^b_j\)</span> terms are the <strong>reciprocal general combining abilities</strong> (RGCAs) for the <span class="math inline">\(i^{th}\)</span> and <span class="math inline">\(j^{th}\)</span> parents. Each term relates to the discrepancy between the effect of a parent when it is used as father/mother and its average effect in all its combinations. For example, considering the parent A, the term <span class="math inline">\(rg^a_A\)</span> is: <span class="math display">\[rg^a_A = \mu_{A.} - \frac{\mu_{A.} + \mu_{.A}}{2} = 13 - 13.167 = -0.167\]</span> Obviously, it must be <span class="math inline">\(rg^a_A = - rg^b_B\)</span> and it must also be that the sum of all <span class="math inline">\(rg^a\)</span> terms is zero (sum-to-zero constraint).</li>
+<li>The <span class="math inline">\(\textrm{ts}_{ij}\)</span> term is the total <strong>specific combining ability</strong> (tSCA) for the combination between the <span class="math inline">\(i^{th}\)</span> and <span class="math inline">\(j^{th}\)</span> parents. It relates to the discrepancy from additivity for a specific combination of two parentals. For example, considering the ‘A <span class="math inline">\(\times\)</span> B’ cross, the expected yield under additivity would be: <span class="math display">\[\mu_{A:B} = \mu + \textrm{g}_A + \textrm{g}_B +\textrm{rg}^a_{A} + \textrm{rg}^b_{B} =\]</span> <span class="math display">\[ = 15.33 - 2.167 - 0.167 - 0.167 - 0.5 = 12.333\]</span> while the observed yield is 13, with a with a difference of <span class="math inline">\(-0.667\)</span>. On the other hand, considering the ‘B <span class="math inline">\(\times\)</span> A’ reciprocal cross, the expected yield under additivity would be: <span class="math display">\[\mu_{A:B} = \mu + \textrm{g}_A + \textrm{g}_B +\textrm{rg}^a_{B} + \textrm{rg}^b_{A} =\]</span> <span class="math display">\[= 15.33 - 2.167 - 0.167 + 0.167 + 0.5 = 13.667\]</span> while the observed yield is 11, with a difference of <span class="math inline">\(2.667\)</span>. The tSCA for the cross between A and B (regardless of the reciprocal) is the average difference, that is <span class="math inline">\(\textrm{ts}_{AB} = (-0.667 + 2.667)/2 = 1\)</span>.</li>
+<li>The <span class="math inline">\(rs_{ij}\)</span> term is the <strong>reciprocal specific combining ability</strong> (RSCA) for a specific <span class="math inline">\(ij\)</span> combination, that is the discrepancy between the performances of the two reciprocals (e.g, A <span class="math inline">\(\times\)</span> B vs. B <span class="math inline">\(\times\)</span> A). For example, the <span class="math inline">\(\textrm{rs}_{AB}\)</span> term is equal to <span class="math inline">\(-0.667 - 1 = -1.667\)</span>, that is the opposite of <span class="math inline">\(\textrm{rs}_{BA}\)</span>.</li>
+</ol>
+</div>
+<div id="model-fitting-with-r" class="section level1">
+<h1>Model fitting with R</h1>
+<p>Hands-calculations based on means may be useful to understand the meaning of genetical effects, although they are biased with unbalanced designs and, above all, they are totally uninteresting from a practical point of view: we’d rather fit the model by using a statistical software.</p>
+<p>Let’s assume that all effects are fixed, apart from the residual standard error. This is a reasonable assumption, as we have a very low number of parentals, which would make the estimation of variance components totally unreliable. We clearly see that the Hayman’s model above is a specific parameterisation of a general linear model and we should be able to fit it by the usual <code>lm()</code> function and related methods. We can, indeed, do so by using our ‘lmDiallel’ extension package, that provides the facilities to generate the correct design matrices for the Hayman’s model (and for other diallel models, as we will show in future posts).</p>
+<p>At the beginning, we have to install (if necessary) and load the ‘lmDiallel’ package (see box below). Model fitting can be performed by using the <code>GCA()</code>, <code>tSCA()</code>, <code>RGCA()</code> and <code>RSCA()</code> functions as shown in the box below: the resulting <code>lm</code> object can be explored by the usual R methods, such as <code>summary()</code> and <code>anova()</code>.</p>
+<pre class="r"><code># library(devtools) # Install if necessary
+# install_github(&quot;OnofriAndreaPG/lmDiallel&quot;)
+library(lmDiallel)
+dMod &lt;- lm(Yield ~ Block + GCA(Par1, Par2) + tSCA(Par1, Par2) +
+              RGCA(Par1, Par2) + RSCA(Par1, Par2), data = df)
+summary(dMod)
+## 
+## Call:
+## lm(formula = Yield ~ Block + GCA(Par1, Par2) + tSCA(Par1, Par2) + 
+##     RGCA(Par1, Par2) + RSCA(Par1, Par2), data = df)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -5.3500 -0.5644  0.0606  0.4722  2.7911 
+## 
+## Coefficients:
+##                          Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)             1.558e+01  5.780e-01  26.962  &lt; 2e-16 ***
+## Block2                 -3.772e-01  8.174e-01  -0.461   0.6486    
+## Block3                 -3.011e-01  8.174e-01  -0.368   0.7158    
+## Block4                 -3.261e-01  8.174e-01  -0.399   0.6935    
+## GCA(Par1, Par2)g_A     -2.167e+00  2.890e-01  -7.497 9.77e-08 ***
+## GCA(Par1, Par2)g_B     -1.667e-01  2.890e-01  -0.577   0.5695    
+## tSCA(Par1, Par2)ts_A:A  1.000e+00  5.780e-01   1.730   0.0965 .  
+## tSCA(Par1, Par2)ts_A:B -1.000e+00  4.570e-01  -2.188   0.0386 *  
+## tSCA(Par1, Par2)ts_B:B  1.230e-16  5.780e-01   0.000   1.0000    
+## RGCA(Par1, Par2)rg_A   -1.667e-01  2.890e-01  -0.577   0.5695    
+## RGCA(Par1, Par2)rg_B    5.000e-01  2.890e-01   1.730   0.0965 .  
+## RSCA(Par1, Par2)        1.667e+00  3.540e-01   4.709 8.71e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.734 on 24 degrees of freedom
+## Multiple R-squared:  0.8269, Adjusted R-squared:  0.7476 
+## F-statistic: 10.42 on 11 and 24 DF,  p-value: 1.129e-06
+anova(dMod)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##                  Df  Sum Sq Mean Sq F value    Pr(&gt;F)    
+## Block             3   0.784   0.261  0.0869    0.9665    
+## GCA(Par1, Par2)   2 244.000 122.000 40.5743 1.999e-08 ***
+## tSCA(Par1, Par2)  3  24.000   8.000  2.6606    0.0710 .  
+## RGCA(Par1, Par2)  2   9.333   4.667  1.5520    0.2323    
+## RSCA(Par1, Par2)  1  66.667  66.667 22.1717 8.710e-05 ***
+## Residuals        24  72.164   3.007                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>For the sake of simplicity, we also built a wrapper function named <code>lm.diallel()</code>, which can be used in the very same fashion as <code>lm()</code>. The syntax is:</p>
+<pre><code>lm.diallel(formula, Block, Env, data, fct)</code></pre>
+<p>where ‘formula’ specifies the response variable and the two variables for parentals (e.g., Yield ~ Par1 + Par2) and the two arguments ‘Block’ and ‘Env’ are used to specify optional variables, coding for blocks and environments, respectively. The argument ‘data’ is a ‘dataframe’ where to look for the explanatory variables and, finally, ‘fct’ is a string variable coding for the selected model (“HAYMAN1”, for this example; see below).</p>
+<pre class="r"><code>dMod2 &lt;- lm.diallel(Yield ~ Par1 + Par2, Block = Block,
+                    data = df, fct = &quot;HAYMAN1&quot;)
+summary(dMod2)
+## 
+## Call:
+## lm.diallel(formula = Yield ~ Par1 + Par2, Block = Block, fct = &quot;HAYMAN1&quot;, 
+##     data = df)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -5.3500 -0.5644  0.0606  0.4722  2.7911 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## Intercept  1.533e+01  2.890e-01  53.056  &lt; 2e-16 ***
+## Block1     2.511e-01  5.006e-01   0.502   0.6205    
+## Block2    -1.261e-01  5.006e-01  -0.252   0.8032    
+## Block3    -5.000e-02  5.006e-01  -0.100   0.9213    
+## g_A       -2.167e+00  2.890e-01  -7.497 9.77e-08 ***
+## g_B       -1.667e-01  2.890e-01  -0.577   0.5695    
+## ts_A:A     1.000e+00  5.780e-01   1.730   0.0965 .  
+## ts_A:B    -1.000e+00  4.570e-01  -2.188   0.0386 *  
+## ts_B:B     6.152e-16  5.780e-01   0.000   1.0000    
+## rg_A      -1.667e-01  2.890e-01  -0.577   0.5695    
+## rg_B       5.000e-01  2.890e-01   1.730   0.0965 .  
+## rs_A:B     1.667e+00  3.540e-01   4.709 8.71e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.734 on 24 degrees of freedom
+## Multiple R-squared:  0.8269, Adjusted R-squared:  0.7476 
+## F-statistic: 10.42 on 11 and 24 DF,  p-value: 1.129e-06
+anova(dMod2)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##           Df  Sum Sq Mean Sq F value    Pr(&gt;F)    
+## Block      3   0.784   0.261  0.0869    0.9665    
+## GCA        2 244.000 122.000 40.5743 1.999e-08 ***
+## tSCA       3  24.000   8.000  2.6606    0.0710 .  
+## RGCA       2   9.333   4.667  1.5520    0.2323    
+## RSCA       1  66.667  66.667 22.1717 8.710e-05 ***
+## Residuals 24  72.164                              
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>The above function works very much like the <code>lm()</code> function and makes use of the general purpose linear model solver <code>lm.fit()</code>. Apart from simplicity, another advantage is that the call to <code>lm.diallel()</code> returns an object of both ‘lm’ and ‘diallel’ classes. For this latter class, we built several specific S3 methods, such as the usual <code>anova()</code>, <code>summary()</code> and <code>model.matrix()</code> methods, partly shown in the box above.</p>
+<p>Considering that diallel models are usually fitted to determine genetical parameters, we also built the <code>glht.diallelMod()</code> method and the <code>diallel.eff()</code> function, which can be used with the ‘multcomp’ package, to retrieve the complete list of genetical parameters, as shown in the box below.</p>
+<pre class="r"><code>library(multcomp)
+gh &lt;- glht(linfct = diallel.eff(dMod2))
+summary(gh, test = adjusted(type = &quot;none&quot;)) 
+## 
+##   Simultaneous Tests for General Linear Hypotheses
+## 
+## Linear Hypotheses:
+##                  Estimate Std. Error t value Pr(&gt;|t|)    
+## Intercept == 0  1.533e+01  2.890e-01  53.056  &lt; 2e-16 ***
+## g_A == 0       -2.167e+00  2.890e-01  -7.497 5.85e-08 ***
+## g_B == 0       -1.667e-01  2.890e-01  -0.577   0.5691    
+## g_C == 0        2.333e+00  2.890e-01   8.074 1.49e-08 ***
+## ts_A:A == 0     1.000e+00  5.780e-01   1.730   0.0955 .  
+## ts_A:B == 0    -1.000e+00  4.570e-01  -2.188   0.0378 *  
+## ts_A:C == 0     1.443e-15  4.570e-01   0.000   1.0000    
+## ts_B:A == 0    -1.000e+00  4.570e-01  -2.188   0.0378 *  
+## ts_B:B == 0     6.152e-16  5.780e-01   0.000   1.0000    
+## ts_B:C == 0     1.000e+00  4.570e-01   2.188   0.0378 *  
+## ts_C:A == 0     1.443e-15  4.570e-01   0.000   1.0000    
+## ts_C:B == 0     1.000e+00  4.570e-01   2.188   0.0378 *  
+## ts_C:C == 0    -1.000e+00  5.780e-01  -1.730   0.0955 .  
+## j_A == 0       -1.667e-01  2.890e-01  -0.577   0.5691    
+## j_B == 0        5.000e-01  2.890e-01   1.730   0.0955 .  
+## j_C == 0       -3.333e-01  2.890e-01  -1.153   0.2592    
+## rs_A:B == 0     1.667e+00  3.540e-01   4.709 7.25e-05 ***
+## rs_A:C == 0    -1.667e+00  3.540e-01  -4.709 7.25e-05 ***
+## rs_B:A == 0    -1.667e+00  3.540e-01  -4.709 7.25e-05 ***
+## rs_B:C == 0     1.667e+00  3.540e-01   4.709 7.25e-05 ***
+## rs_C:A == 0     1.667e+00  3.540e-01   4.709 7.25e-05 ***
+## rs_C:B == 0    -1.667e+00  3.540e-01  -4.709 7.25e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## (Adjusted p values reported -- none method)</code></pre>
+</div>
+<div id="model-fitting-in-two-steps" class="section level1">
+<h1>Model fitting in two steps</h1>
+<p>In some cases, the analysis is performed in two steps and a diallel model is fitted to the means of selfs and crosses, which are calculated in the first step. Under the assumption of variance homogeneity and equal number of replicates, we can fit the Hayman’s model by using the <code>lm.diallel()</code> function without the ‘Block’ argument.</p>
+<pre class="r"><code>dMod3 &lt;- lm.diallel(YieldM ~ Par1 + Par2, 
+                    data = dfM, fct = &quot;HAYMAN1&quot;)</code></pre>
+<p>In this case, we have no reliable estimate of residual error, but the <code>summary()</code> and <code>anova()</code> methods have been enhanced to give us the possibility of passing some information from the first step, i.e. an appropriate estimate of the residual mean square and degrees of freedom; the residual mean square from the first step needs to be appropriately weighted for the number of replicates (i.e., for this example, MSE = 3.007/4 with 24 degrees of freedom).</p>
+<pre class="r"><code>anova(dMod3, MSE = 3.007/4, dfr = 24)
+## Analysis of Variance Table
+## 
+## Response: YieldM
+##           Df Sum Sq Mean Sq F value    Pr(&gt;F)    
+## GCA        2 61.000 30.5000 40.5720 2.000e-08 ***
+## tSCA       3  6.000  2.0000  2.6605   0.07101 .  
+## RGCA       2  2.333  1.1667  1.5519   0.23236    
+## RSCA       1 16.667 16.6667 22.1705 8.713e-05 ***
+## Residuals 24         0.7518                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+summary(dMod3, MSE = 3.007/4, dfr = 24)
+##                Estimate        SE       t value     Pr(&gt;|t|)
+## Intercept  1.533333e+01 0.2890117  5.305436e+01 2.157713e-26
+## g_A       -2.166667e+00 0.2890117 -7.496812e+00 9.771159e-08
+## g_B       -1.666667e-01 0.2890117 -5.766779e-01 5.695269e-01
+## ts_A:A     1.000000e+00 0.5780235  1.730034e+00 9.646589e-02
+## ts_A:B    -1.000000e+00 0.4569677 -2.188339e+00 3.861373e-02
+## ts_B:B     2.417819e-15 0.5780235  4.182908e-15 1.000000e+00
+## rg_A      -1.666667e-01 0.2890117 -5.766779e-01 5.695269e-01
+## rg_B       5.000000e-01 0.2890117  1.730034e+00 9.646589e-02
+## rs_A:B     1.666667e+00 0.3539656  4.708555e+00 8.712864e-05</code></pre>
+<p>The genetical parameters can be obtained by using the <code>glht()</code> function and passing the information from the first step within the call to the <code>diallel.eff()</code> function.</p>
+<pre class="r"><code>gh2 &lt;- glht(linfct = diallel.eff(dMod3, MSE = 3.007/4, dfr = 24))
+summary(gh2, test = adjusted(type = &quot;none&quot;)) 
+## 
+##   Simultaneous Tests for General Linear Hypotheses
+## 
+## Linear Hypotheses:
+##                  Estimate Std. Error t value Pr(&gt;|t|)    
+## Intercept == 0  1.533e+01  2.890e-01  53.054  &lt; 2e-16 ***
+## g_A == 0       -2.167e+00  2.890e-01  -7.497 5.85e-08 ***
+## g_B == 0       -1.667e-01  2.890e-01  -0.577   0.5691    
+## g_C == 0        2.333e+00  2.890e-01   8.073 1.49e-08 ***
+## ts_A:A == 0     1.000e+00  5.780e-01   1.730   0.0955 .  
+## ts_A:B == 0    -1.000e+00  4.570e-01  -2.188   0.0378 *  
+## ts_A:C == 0    -8.882e-16  4.570e-01   0.000   1.0000    
+## ts_B:A == 0    -1.000e+00  4.570e-01  -2.188   0.0378 *  
+## ts_B:B == 0     2.418e-15  5.780e-01   0.000   1.0000    
+## ts_B:C == 0     1.000e+00  4.570e-01   2.188   0.0378 *  
+## ts_C:A == 0    -8.882e-16  4.570e-01   0.000   1.0000    
+## ts_C:B == 0     1.000e+00  4.570e-01   2.188   0.0378 *  
+## ts_C:C == 0    -1.000e+00  5.780e-01  -1.730   0.0955 .  
+## j_A == 0       -1.667e-01  2.890e-01  -0.577   0.5691    
+## j_B == 0        5.000e-01  2.890e-01   1.730   0.0955 .  
+## j_C == 0       -3.333e-01  2.890e-01  -1.153   0.2593    
+## rs_A:B == 0     1.667e+00  3.540e-01   4.709 7.25e-05 ***
+## rs_A:C == 0    -1.667e+00  3.540e-01  -4.709 7.25e-05 ***
+## rs_B:A == 0    -1.667e+00  3.540e-01  -4.709 7.25e-05 ***
+## rs_B:C == 0     1.667e+00  3.540e-01   4.709 7.25e-05 ***
+## rs_C:A == 0     1.667e+00  3.540e-01   4.709 7.25e-05 ***
+## rs_C:B == 0    -1.667e+00  3.540e-01  -4.709 7.25e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## (Adjusted p values reported -- none method)</code></pre>
+</div>
+<div id="estimation-of-variance-components-random-genetic-effects" class="section level1">
+<h1>Estimation of variance components (random genetic effects)</h1>
+<p>In some cases, genetic effects are regarded as random and the aim is to estimate variance components. For this, we can use the <code>mmer()</code> function in the ‘sommer’ package (Covarrubias-Pazaran, 2019), although we need to code two dummy variables:</p>
+<ol style="list-style-type: decimal">
+<li>‘dr’: assuming a value of zero for selfs, a value of -1 for crosses and 1 for the respective reciprocals;</li>
+<li>‘combination’: which gives the reciprocals the same label (i.e. BA is given the same label as AB), so that any difference is erased.</li>
+</ol>
+<p>By using the <code>overlay()</code> function in the ‘sommer’ package and the above dummy variables, we can code the following effects:</p>
+<ol style="list-style-type: decimal">
+<li>GCA effect: <code>~overlay(Par1, Par2)</code></li>
+<li>RGCA effect: <code>~overlay(Par1, Par2):dr</code> (please, note that the interaction with ‘dr’ excludes the selfs, which are coded as 0s, and distinguish the reciprocals, as they are coded with opposite signs)</li>
+<li>SCA effect : <code>~combination</code> (reciprocals are not considered)</li>
+<li>RSCA effect: <code>~combination:dr</code> (same note as above for RGCA)</li>
+</ol>
+<p>It would make no sense to estimate the variance components for genetic effects with a diallel experiment based on three parentals. Therefore, we give an example based on the ‘hayman54’ dataset, as available in the ‘lmDiallel’ package and relating to a complete diallel experiment with eight parentals (Hayman, 1954).</p>
+<pre class="r"><code>rm(list=ls())
+library(sommer)
+library(lmDiallel)
+data(hayman54)
+
+# Dummy variables
+hayman54$dr &lt;- ifelse(as.character(hayman54$Par1) &lt; as.character(hayman54$Par2), -1,
+                ifelse(as.character(hayman54$Par1) == as.character(hayman54$Par2), 0, 1))
+hayman54$combination &lt;- factor( ifelse(as.character(hayman54$Par1) &lt;=
+                                         as.character(hayman54$Par2),
+                                 paste(hayman54$Par1, hayman54$Par2, sep =&quot;&quot;),
+                                 paste(hayman54$Par2, hayman54$Par1, sep =&quot;&quot;)) )
+mod1h &lt;- mmer(Ftime ~ Block, data = hayman54, 
+              random = ~ overlay(Par1, Par2)
+              + overlay(Par1, Par2):dr
+              + combination
+              + combination:dr, verbose = F)
+summary(mod1h)$varcomp
+##                                       VarComp VarCompSE    Zratio Constraint
+## overlay(Par1, Par2).Ftime-Ftime    1276.49877 750.02253 1.7019472   Positive
+## overlay(Par1, Par2):dr.Ftime-Ftime   17.97648  19.91001 0.9028864   Positive
+## combination.Ftime-Ftime            1108.86771 329.97440 3.3604659   Positive
+## combination:dr.Ftime-Ftime           29.41085  46.54826 0.6318356   Positive
+## units.Ftime-Ftime                   422.99303  75.36714 5.6124330   Positive</code></pre>
+<p>We do hope that you enjoyed this post; if you are interested in diallel models, please, stay tuned: we have other examples on the way.</p>
+<p>Thanks for reading</p>
+<p>Prof. Andrea Onofri<br />
+Department of Agricultural, Food and Environmental Sciences<br />
+University of Perugia (Italy)<br />
+<a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<hr />
+</div>
+<div id="references" class="section level1">
+<h1>References</h1>
+<ul>
+<li>Covarrubias-Pazaran, G., 2019. Quantitative genetics using the sommer package.</li>
+<li>Hayman, B.I., 1954. The Analysis of Variance of Diallel Tables. Biometrics 10, 235. <a href="https://doi.org/10.2307/3001877" class="uri">https://doi.org/10.2307/3001877</a></li>
+<li>Möhring, J., Melchinger, A.E., Piepho, H.P., 2011b. REML-Based Diallel Analysis. Crop Science 51, 470–478. <a href="https://doi.org/10.2135/cropsci2010.05.0272" class="uri">https://doi.org/10.2135/cropsci2010.05.0272</a></li>
+<li>Onofri, A., Terzaroli, N., Russi, L., 2020. Linear models for diallel crosses: a review with R functions. Theor Appl Genet. <a href="https://doi.org/10.1007/s00122-020-03716-8" class="uri">https://doi.org/10.1007/s00122-020-03716-8</a></li>
+</ul>
+</div>
+
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Tags</h1>
+        <div class="tags">
+        
+            <span class="tag"><a href="/tags/agricensdata">agricensdata</a></span>
+        
+            <span class="tag"><a href="/tags/ammi_analysis">ammi_analysis</a></span>
+        
+            <span class="tag"><a href="/tags/aomisc">aomisc</a></span>
+        
+            <span class="tag"><a href="/tags/asreml">asreml</a></span>
+        
+            <span class="tag"><a href="/tags/blogdown">blogdown</a></span>
+        
+            <span class="tag"><a href="/tags/boxplot">boxplot</a></span>
+        
+            <span class="tag"><a href="/tags/correlation">correlation</a></span>
+        
+            <span class="tag"><a href="/tags/delta_method">delta_method</a></span>
+        
+            <span class="tag"><a href="/tags/descriptive_statistics">descriptive_statistics</a></span>
+        
+            <span class="tag"><a href="/tags/diallel_models">diallel_models</a></span>
+        
+            <span class="tag"><a href="/tags/drcseedgerm">drcseedgerm</a></span>
+        
+            <span class="tag"><a href="/tags/drm">drm</a></span>
+        
+            <span class="tag"><a href="/tags/error_propagation">error_propagation</a></span>
+        
+            <span class="tag"><a href="/tags/linear_models">linear_models</a></span>
+        
+            <span class="tag"><a href="/tags/lmdiallel">lmdiallel</a></span>
+        
+            <span class="tag"><a href="/tags/lme">lme</a></span>
+        
+            <span class="tag"><a href="/tags/long_term_experiments">long_term_experiments</a></span>
+        
+            <span class="tag"><a href="/tags/mixed_models">mixed_models</a></span>
+        
+            <span class="tag"><a href="/tags/multi_environment_studies">multi_environment_studies</a></span>
+        
+            <span class="tag"><a href="/tags/nlme">nlme</a></span>
+        
+            <span class="tag"><a href="/tags/nls">nls</a></span>
+        
+            <span class="tag"><a href="/tags/nonlinear_regression">nonlinear_regression</a></span>
+        
+            <span class="tag"><a href="/tags/percentiles">percentiles</a></span>
+        
+            <span class="tag"><a href="/tags/qq_plot">qq_plot</a></span>
+        
+            <span class="tag"><a href="/tags/r">r</a></span>
+        
+            <span class="tag"><a href="/tags/seed_germination">seed_germination</a></span>
+        
+            <span class="tag"><a href="/tags/split_plot">split_plot</a></span>
+        
+            <span class="tag"><a href="/tags/time_to_event_models">time_to_event_models</a></span>
+        
+            <span class="tag"><a href="/tags/variance">variance</a></span>
+        
+        </div>          
+    </div>
+</div><br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Recent posts</h1>
+        
+            <h1><a href="/2020/stat_met_diallel_hayman1/">lmDiallel: a new R package to fit diallel models. The Hayman&#39;s model (type 1)</a></h1>
+            <time class="has-text-grey-light is-size-7">26 November 2020</time>
+        
+            <h1><a href="/2020/stat_met_diallel1/">lmDiallel: a new R package to fit diallel models. Introduction</a></h1>
+            <time class="has-text-grey-light is-size-7">11 November 2020</time>
+        
+            <h1><a href="/2020/stat_general_percentiles/">QQ-plots and Box-Whisker plots: where do they come from?</a></h1>
+            <time class="has-text-grey-light is-size-7">15 October 2020</time>
+        
+            <h1><a href="/2020/stat_lte_modelbuilding/">Building ANOVA-models for long-term experiments in agriculture</a></h1>
+            <time class="has-text-grey-light is-size-7">20 August 2020</time>
+        
+            <h1><a href="/2020/stat_met_jointreg/">Fitting complex mixed models with nlme. Example #5</a></h1>
+            <time class="has-text-grey-light is-size-7">5 June 2020</time>
+        
+    </div>
+</div>
+    <br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Archives</h1>
+        
+            <a href="/archives/2020">2020</a> (11)<br>
+        
+            <a href="/archives/2019">2019</a> (15)<br>
+        
+            <a href="/archives/2018">2018</a> (2)<br>
+        
+            <a href="/archives/2014">2014</a> (1)<br>
+        
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+    </div>
+</div>
+<footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+        <p>
+             <span class="icon is-large"><a href="mailto:andrea.onofri@unipg.it" class="mysocial"><i class="far fa-envelope-open fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://github.com/OnofriAndreaPG/" class="mysocial"><i class="fab fa-github fa-3x"></i></a></span>&nbsp;&nbsp;
+                       <span class="icon is-large"><a href="https://www.r.project.org/" class="mysocial"><i class="fab fa-r-project fa-3x"></i></a></span>&nbsp;&nbsp;
+
+            <br><br>
+            Copyright &copy; The broken bridge between biologists and statisticians, 2020 - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a>
+            - <a class="mysocial" href="/aboutThis">About this site</a>
+        </p>
+    </div>
+</footer>
+
+<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+</body>
+</html>

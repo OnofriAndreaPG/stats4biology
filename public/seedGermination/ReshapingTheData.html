@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Preliminary steps: shaping the data</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+      </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Home</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fa fa-book"></span>
+     
+    Navigation menu
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="GerminationTimeCourse.html">Describing germination curves</a>
+    </li>
+    <li>
+      <a href="Censoring.html">The problem of censoring</a>
+    </li>
+    <li>
+      <a href="TimeToEvent.html">Time-to-event methods account for censoring</a>
+    </li>
+    <li>
+      <a href="ReshapingTheData.html">Preliminary steps: shaping the data</a>
+    </li>
+    <li>
+      <a href="GerminationModels.html">Germination models and data analyses</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+        <span class="fa fa-book"></span>
+         
+        Analysing the data in two-steps
+      </a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="toBeDone.html">Introduction</a>
+        </li>
+        <li>
+          <a href="GermIndices.html">Step 1 - Germination indices</a>
+        </li>
+        <li>
+          <a href="toBeDone.html">Step 2 - Fitting linear models</a>
+        </li>
+        <li>
+          <a href="HTModels.html">Step 2 - Fitting hydro-time models</a>
+        </li>
+        <li>
+          <a href="toBeDone.html">Step 2 - Fitting hydrothermal-time models</a>
+        </li>
+      </ul>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+        <span class="fa fa-book"></span>
+         
+        Fitting germination models in one-step
+      </a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="toBeDone.html">Linear models to compare germination curves</a>
+        </li>
+        <li>
+          <a href="toBeDone.html">Fitting hydro-time models</a>
+        </li>
+        <li>
+          <a href="toBeDone.html">Nonlinear regression analysis</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="toBeDone.html">Conclusions</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="http://www.statforbiology.com">Back to blog</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Preliminary steps: shaping the data</h1>
+<h4 class="date">29 April, 2020</h4>
+
+</div>
+
+
+<p>Now, it should be clear that this tutorial is about the use of time-to-event methods in seed germination. It should be clear that we recommend these methods, as they are intrinsically correct and fully respectful of the characteristics of seed germination data. Furthermore, we will make use of the time-to-event platform within the ‘drc’ package, that has proven useful for seed germination and other types of agricultural data.</p>
+<p>The very first problem we need to tackle is the appropriate shaping for our dataset. I will show this by using a simple dataset. As usual for this tutorial, we need to have installed and loaded the ‘drcSeedGerm’ package (see <a href="https://www.statforbiology.com/seedgermination/">at this link</a>)</p>
+<div id="example" class="section level1">
+<h1>Example</h1>
+<p>Seeds of <em>L. ornithopodioides</em> were collected from natural populations, at three different maturation stages, i.e. at 27 Days After Anthesis (DAA), when seeds were still green (Stage A), at 35 DAA, when seeds were brown and soft (Stage B) and at 41 DAA, when seeds were brown and moderately hard (Stage C). Germination assays were performed by placing four replicates of 25 seeds on filter paper (Whatman no. 3) in 9-cm diameter Petri dishes, in the dark and at a constant temperature of 20°C. The filter paper was initially moistened with 5 mL of distilled water and replenished as needed during the assay. Germinated seeds were counted daily over 15 d and removed from the Petri dishes. This dataset is a subset of a bigger dataset, aimed at assessing the time when the hard coat imposes dormancy in seeds of different legume species (Gresta et al., 2011).</p>
+<p>Very frequently the ‘field-book’ is compiled in ‘wide’ form, that is we have one Petri dish per row and one inspection time per column. The table below shows the ‘field-book’ for our example, as available in the ‘lotusOr’ dataset in the ‘drcSeedGerm’ package.</p>
+<table>
+<caption>Table 1. Example of a common field-book for germination assays: the data is organised with one Petri dish per row and the number of germinated seeds at each inspection time along the columns.</caption>
+<thead>
+<tr class="header">
+<th align="center">Dish</th>
+<th align="center">Stage</th>
+<th align="center">1</th>
+<th align="center">2</th>
+<th align="center">3</th>
+<th align="center">4</th>
+<th align="center">5</th>
+<th align="center">6</th>
+<th align="center">7</th>
+<th align="center">8</th>
+<th align="center">9</th>
+<th align="center">10</th>
+<th align="center">11</th>
+<th align="center">12</th>
+<th align="center">13</th>
+<th align="center">14</th>
+<th align="center">15</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center">A</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">3</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">4</td>
+<td align="center">2</td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="center">A</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">3</td>
+<td align="center">1</td>
+<td align="center">1</td>
+</tr>
+<tr class="odd">
+<td align="center">3</td>
+<td align="center">A</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">3</td>
+<td align="center">4</td>
+<td align="center">4</td>
+<td align="center">3</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">1</td>
+</tr>
+<tr class="even">
+<td align="center">4</td>
+<td align="center">A</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">3</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">1</td>
+<td align="center">3</td>
+<td align="center">1</td>
+<td align="center">1</td>
+</tr>
+<tr class="odd">
+<td align="center">5</td>
+<td align="center">B</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">4</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">2</td>
+<td align="center">3</td>
+<td align="center">2</td>
+<td align="center">1</td>
+</tr>
+<tr class="even">
+<td align="center">6</td>
+<td align="center">B</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">4</td>
+<td align="center">2</td>
+<td align="center">2</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">3</td>
+<td align="center">4</td>
+<td align="center">3</td>
+<td align="center">4</td>
+<td align="center">0</td>
+</tr>
+<tr class="odd">
+<td align="center">7</td>
+<td align="center">B</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">4</td>
+<td align="center">0</td>
+<td align="center">4</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">3</td>
+<td align="center">3</td>
+<td align="center">2</td>
+<td align="center">2</td>
+<td align="center">0</td>
+</tr>
+<tr class="even">
+<td align="center">8</td>
+<td align="center">B</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">4</td>
+<td align="center">3</td>
+<td align="center">2</td>
+<td align="center">2</td>
+<td align="center">3</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr class="odd">
+<td align="center">9</td>
+<td align="center">C</td>
+<td align="center">1</td>
+<td align="center">10</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">3</td>
+<td align="center">2</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr class="even">
+<td align="center">10</td>
+<td align="center">C</td>
+<td align="center">1</td>
+<td align="center">10</td>
+<td align="center">4</td>
+<td align="center">1</td>
+<td align="center">4</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">1</td>
+</tr>
+<tr class="odd">
+<td align="center">11</td>
+<td align="center">C</td>
+<td align="center">1</td>
+<td align="center">11</td>
+<td align="center">5</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">2</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr class="even">
+<td align="center">12</td>
+<td align="center">C</td>
+<td align="center">0</td>
+<td align="center">16</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">2</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+</tr>
+</tbody>
+</table>
+<p>That format is not ok for time-to-event methods. The ‘drm()’ function within the ‘drc’ package expects to recive the data in ‘long’ form, that is one inspection time per row and, at least, three columns: (1) the time at which the observation was made (e.g., ‘timeAf’); (2) the time at which the previous observation was made (e.g., ‘timeBef) and (3) the number of seeds that germinated between ’timeBef’ and ‘timeAf’. An extra row needs to be added for the ungerminated seeds at the end of the assay, with ‘timeBef’ equal to the final assessment time and ‘timeAf’ equal to <span class="math inline">\(\infty\)</span>.</p>
+<p>Such a reshaping may not be immediate for big datasets. Therefore, we have coded the function ‘makeDrm()’, that reshapes the dataset from the format shown in Table 1 to the correct format for time-to-event methods in ‘drc’. An example is given in the following box.</p>
+<pre class="r"><code>counts &lt;- lotusOr[,3:length(lotusOr[1,])]
+treat &lt;- data.frame(tratt=lotusOr[,1])
+nViable &lt;- rep(25,12)
+moniTimes &lt;- c(1:15)
+dataset &lt;- makeDrm(counts=counts, treat=treat, nViable=nViable, moniTimes)
+head(dataset, 16)
+##    group Dish timeBef timeAf count nCum propCum
+## 1      A    1       0      1     0    0    0.00
+## 2      A    1       1      2     0    0    0.00
+## 3      A    1       2      3     0    0    0.00
+## 4      A    1       3      4     0    0    0.00
+## 5      A    1       4      5     0    0    0.00
+## 6      A    1       5      6     1    1    0.04
+## 7      A    1       6      7     2    3    0.12
+## 8      A    1       7      8     1    4    0.16
+## 9      A    1       8      9     1    5    0.20
+## 10     A    1       9     10     1    6    0.24
+## 11     A    1      10     11     3    9    0.36
+## 12     A    1      11     12     1   10    0.40
+## 13     A    1      12     13     1   11    0.44
+## 14     A    1      13     14     4   15    0.60
+## 15     A    1      14     15     2   17    0.68
+## 16     A    1      15    Inf     8   NA      NA</code></pre>
+<p>The ‘makeDrm()’ function requires the following arguments:</p>
+<ol style="list-style-type: decimal">
+<li>a dataframe listing the counts of germinated seeds in each Petri dish (rows) at each assessment time (columns)</li>
+<li>a dataframe listing, for each dish, the levels of each treatment</li>
+<li>a vector with the number of viable seeds per dish, at the beginning of the assay</li>
+<li>a vector of monitoring times that needs to be of the same length as the number of columns in the count dataframe.</li>
+</ol>
+<p>In other instances, we may have prepared our dataset as required by non-linear regression analysis, i.e. listing the cumulative number of germinated seeds for each inspection time. For instance, Table 2 shows an example for the first Petri dish, as available in the ‘lotusCum’ dataframe in the ‘drcSeedGerm’ package.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Stage</th>
+<th align="right">Dish</th>
+<th align="right">Time</th>
+<th align="right">nCum</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">A</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">A</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">A</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">A</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">A</td>
+<td align="right">1</td>
+<td align="right">5</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">A</td>
+<td align="right">1</td>
+<td align="right">6</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">A</td>
+<td align="right">1</td>
+<td align="right">7</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">A</td>
+<td align="right">1</td>
+<td align="right">8</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="left">A</td>
+<td align="right">1</td>
+<td align="right">9</td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">A</td>
+<td align="right">1</td>
+<td align="right">10</td>
+<td align="right">6</td>
+</tr>
+<tr class="odd">
+<td align="left">A</td>
+<td align="right">1</td>
+<td align="right">11</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="left">A</td>
+<td align="right">1</td>
+<td align="right">12</td>
+<td align="right">10</td>
+</tr>
+<tr class="odd">
+<td align="left">A</td>
+<td align="right">1</td>
+<td align="right">13</td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="left">A</td>
+<td align="right">1</td>
+<td align="right">14</td>
+<td align="right">15</td>
+</tr>
+<tr class="odd">
+<td align="left">A</td>
+<td align="right">1</td>
+<td align="right">15</td>
+<td align="right">17</td>
+</tr>
+</tbody>
+</table>
+<p>In this situation, we need to ‘decumulate’ the counts and add the beginning of each inspection interval (e.g., ‘timeBef’). We can easily do this by using the ‘makeDrm2()’ function in ‘drcSeedGerm’. An example is given in the box below.</p>
+<pre class="r"><code>moniTime &lt;- lotusCum$Time
+count &lt;- lotusCum$nCum
+nViable &lt;- rep(25, length(lotusCum[,1]))
+Dish &lt;- as.factor(lotusCum$Dish)
+treatGroups &lt;- lotusCum[,1]
+dataset_sd &lt;- makeDrm2(count, treatGroups, nViable, moniTime, Dish)
+head(dataset_sd, 10)
+##    GroupT Dish timeBef timeAf nViable nSeeds nCum
+## 1       A    1       0      1      25      0    0
+## 2       A    1       1      2      25      0    0
+## 3       A    1       2      3      25      0    0
+## 4       A    1       3      4      25      0    0
+## 5       A    1       4      5      25      0    0
+## 6       A    1       5      6      25      1    1
+## 7       A    1       6      7      25      2    3
+## 8       A    1       7      8      25      1    4
+## 9       A    1       8      9      25      1    5
+## 10      A    1       9     10      25      1    6</code></pre>
+<p>The ‘makeDrm()’ function requires the following arguments:</p>
+<ol style="list-style-type: decimal">
+<li>a vector listing the counts of germinated seeds in each Petri dish and at each assessment time</li>
+<li>a dataframe listing, for each row of data, the corresponding level of experimental factors (one factor per column)</li>
+<li>a vector listing the number of viable seeds, at the beginning of the assay. This number is the same for all observations belonging to the same dish</li>
+<li>a vector of monitoring times</li>
+<li>a vector of codes for Petri dishes</li>
+</ol>
+<p>These two functions are meant to ease your transition from traditional methods of data analysis to time-to-event methods. I do hope you find the useful!</p>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = false;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

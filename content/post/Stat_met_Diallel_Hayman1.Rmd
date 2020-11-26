@@ -1,0 +1,255 @@
+---
+title: "lmDiallel: a new R package to fit diallel models. The Hayman's model (type 1)"
+author: "Andrea Onofri, Niccolò Terzaroli and Luigi Russi"
+date: 2020-11-26
+slug: 'Multi_environment_studies'
+categories:
+  - R
+  - 'Multi_environment_studies'
+tags:
+  - R
+  - 'Multi_environment_studies'
+  - 'lmDiallel'
+  - 'diallel_models'
+archives:
+  - 2020
+---
+
+```{r setup, cache = F, echo = F}
+#Put at the beginning
+knitr::knit_hooks$set(document = function(x){ 
+  gsub("```\n*```r*\n*", "", x) 
+})
+```
+
+In a previous post we have presented our new ‘lmDiallel’ package ([see this link here](https://www.statforbiology.com/2020/stat_met_diallel1/) and see also the original paper in [Theoretical and Applied Genetics](https://rdcu.be/caxZh)). It provides several extensions to the `lm()` function in R, to fit a class of linear models of interest for plant breeders or geneticists, the so-called diallel models. For those who are interested in this topic, we would like to present some examples of diallel models and how to fit them in R. Please, sit back and relax and, if you have comments, let us know, using the email link at the bottom of this post.
+
+# But... what is a 'diallel'?
+
+If you are not a plant breeder or a geneticist in general, you may be asking this question. From the ancient Greek language, the 'diallel' word means 'reciprocating' and a diallel cross is a set of several possible crosses and selfs between some parental lines. For example, if we take the male lines A, B and C together with the same female lines A, B and C and we imagine to cross those lines with one another, we obtain the selfs A$\times$A, B$\times$B and C$\times$C, the crosses A$\times$B, A$\times$C and B$\times$C and, in some instances, the reciprocals B$\times$A, C$\times$A and C$\times$B (where the father and mother are swapped). The performances of crosses and/or selfs and/or reciprocals can be compared by planning field experiments, usually known as **diallel experiments** and designed as randomised complete blocks with 3-4 replicates.
+
+# The example
+
+Depending on how the experiment is planned, we can have four experimental methods:
+
+1. Crosses + reciprocals + selfs (complete diallel)
+2. Crosses and reciprocals (no selfs)
+3. Crosses and selfs (no reciprocals)
+4. Only crosses (no selfs, no reciprocals)
+
+In this post we will concentrate on the first design (complete diallel) and we will use a simple example with three parental lines (A, B and C). The csv file ('diallel1.csv') is available in an external repository; in the box below we load the data and we use the `group_by()` function in the 'dplyr' package to obtain the means for all crosses and selfs.
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+rm(list = ls())
+df <- read_csv("https://www.casaonofri.it/_datasets/diallel1.csv")
+df$Block <- factor(df$Block)
+dfM <- df %>% 
+  group_by(Par1, Par2) %>% 
+  summarise(YieldM = mean(Yield), SEs = sd(Yield/sqrt(4)))
+dfM
+```
+
+# What model do we use?
+
+In order to describe the above dataset, we might think of a two-way ANOVA model, where the 'father' and 'mother' lines (the 'Par1' and 'Par2' variables, respectively) are used as the explanatory factors.
+
+This is a very tempting solution, but we should resist: a two way ANOVA model regards the 'father' and 'mother' effects as two completely different series of treatments, neglecting the fact that they are, indeed, the same genotypes in different combinations. That is exactly why we need specific **diallel models** to describe the results of diallel experiments!
+
+# The "Hayman" model (type 1)
+
+The first diallel model was proposed by Hayman (1954) and it was devised for complete diallel experiments, where reciprocals are available. Neglecting the design effects (blocks and/or environments), the Hayman's model is defined as:
+
+$$y _{ijk} = \mu + \textrm{g}_i + \textrm{g}_j + \textrm{ts}_{ij} + \textrm{rg}^a_{i} + \textrm{rg}^b_{j} + rs_{ij} + \varepsilon_{ijk} \quad\quad\quad (Eq. 1)$$
+
+where $\mu$ is expected value (the overall mean, in the balanced case) and $\varepsilon_{ijk}$ is the residual random error terms for the observation in the $k^{th}$ block and with the parentals $i$ and $j$. All the other terms correspond to genetic effects, namely:
+
+1. the $\textrm{g}_i$ and $\textrm{g}_j$ terms are the **general combining abilities** (GCAs) of the $i^{th}$ and $j^{th}$ parents. Each term relates to the average performances of a parental line in all its hybrid combination, under the sum-to-zero constraint (i.e. the sum of $g$ values for all parentals must be zero). For example, with our balanced experiment, the overall mean is $\mu = 15.33$, while the mean for the A parent when used as the 'father' is $\mu_{A.} = 13$ and the mean for the same parent A when used as the 'mother' is $\mu_{.A} = 13.33$. Consequently:
+$$g_A = \left(13 + 13.33 \right)/2 - 15.33 = -2.167$$ Analogously, it is $g_B = -0.167$.
+2. The $rg^a_i$ and $rg^b_j$ terms are the **reciprocal general combining abilities** (RGCAs) for the $i^{th}$ and $j^{th}$ parents. Each term relates to the discrepancy between the effect of a parent when it is used as father/mother and its average effect in all its combinations. For example, considering the parent A, the term $rg^a_A$ is: $$rg^a_A = \mu_{A.} - \frac{\mu_{A.} + \mu_{.A}}{2} = 13 - 13.167 = -0.167$$ Obviously, it must be $rg^a_A = - rg^b_B$ and it must also be that the sum of all $rg^a$ terms is zero (sum-to-zero constraint).
+3. The $\textrm{ts}_{ij}$ term is the total **specific combining ability** (tSCA) for the combination between the $i^{th}$ and $j^{th}$ parents. It relates to the discrepancy from additivity for a specific combination of two parentals. For example, considering the 'A $\times$ B' cross, the expected yield under additivity would be: $$\mu_{A:B} = \mu + \textrm{g}_A + \textrm{g}_B +\textrm{rg}^a_{A} + \textrm{rg}^b_{B} =$$ $$ = 15.33 - 2.167 - 0.167 - 0.167 - 0.5 = 12.333$$ while the observed yield is 13, with a with a difference of $-0.667$. On the other hand, considering the 'B $\times$ A' reciprocal cross, the expected yield under additivity would be:  $$\mu_{A:B} = \mu + \textrm{g}_A + \textrm{g}_B +\textrm{rg}^a_{B} + \textrm{rg}^b_{A} =$$ $$= 15.33 - 2.167 - 0.167 + 0.167 + 0.5 = 13.667$$ while the observed yield is 11, with a difference of $2.667$. The tSCA for the cross between A and B (regardless of the reciprocal) is the average difference, that is $\textrm{ts}_{AB} = (-0.667 + 2.667)/2 = 1$.
+4. The $rs_{ij}$ term is the **reciprocal specific combining ability** (RSCA) for a specific $ij$ combination, that is the discrepancy between the performances of the two reciprocals (e.g, A $\times$ B vs. B $\times$ A). For example, the $\textrm{rs}_{AB}$ term is equal to $-0.667 - 1 = -1.667$, that is the opposite of $\textrm{rs}_{BA}$. 
+
+
+```{r eval=FALSE, include=FALSE}
+
+#Father on the columns, mother on the rows
+library(knitr)
+
+Yield <- c(12, 13, 14, 11, 15, 21, 17, 16, 19)
+Par1 <- c("A", "A", "A", "B", "B", "B", "C", "C", "C") #father
+Par2 <- c("A", "B", "C", "A", "B", "C","A", "B", "C") #mother
+df <- data.frame(Par1, Par2, Yield)
+rm(Yield, Par1, Par2)
+df
+dMod2 <- lm.diallel(Yield ~ Par1 + Par2, data = df, fct = "HAYMAN1")
+summary(dMod2)
+mean(df$Yield)
+tapply(df$Yield, df$Par1, mean)
+tapply(df$Yield, df$Par2, mean)
+mean(c(13, 13.333333)) - 15.33333
+15.33 - 2.167 - 0.167 - 0.167 - 0.5 - 13
+15.33 - 2.167 - 0.167 + 0.167 + 0.5 - 11
+mean(c(-0.6667, 2.66667))
+
+# Dati di cui la media è sopra
+set.seed(1234)
+y1 <- rnorm(8, 0, 1)
+y2 <- rnorm(8, 0, 1)
+y3 <- rnorm(8, 0, 1)
+y1 <- c(y1, -sum(y1))
+y2 <- c(y2, -sum(y2))
+y3 <- c(y3, -sum(y3))
+y4 <- - (y1 + y2 + y3)
+epsilon <- c(y1, y2, y3, y4)
+df2 <- rbind(df, df, df, df)
+df2$Yield2 <- df2$Yield + epsilon
+df2
+write.csv(df2, file = "diallel1.csv")
+library(tidyverse)
+df2 %>% 
+  group_by(Par1, Par2) %>% 
+  summarise(mean(Yield2))
+```
+
+
+# Model fitting with R
+
+Hands-calculations based on means may be useful to understand the meaning of genetical effects, although they are biased with unbalanced designs and, above all, they are totally uninteresting from a practical point of view: we'd rather fit the model by using a statistical software.
+
+Let's assume that all effects are fixed, apart from the residual standard error. This is a reasonable assumption, as we have a very low number of parentals, which would make the estimation of variance components totally unreliable. We clearly see that the Hayman's model above is a specific parameterisation of a general linear model and we should be able to fit it by the usual `lm()` function and related methods. We can, indeed, do so by using our 'lmDiallel' extension package, that provides the facilities to generate the correct design matrices for the Hayman's model (and for other diallel models, as we will show in future posts).
+
+At the beginning, we have to install (if necessary) and load the 'lmDiallel' package (see box below). Model fitting can be performed by using the `GCA()`, `tSCA()`, `RGCA()` and `RSCA()` functions as shown in the box below: the resulting `lm` object can be explored by the usual R methods, such as `summary()` and `anova()`.
+
+
+```{r}
+# library(devtools) # Install if necessary
+# install_github("OnofriAndreaPG/lmDiallel")
+library(lmDiallel)
+dMod <- lm(Yield ~ Block + GCA(Par1, Par2) + tSCA(Par1, Par2) +
+              RGCA(Par1, Par2) + RSCA(Par1, Par2), data = df)
+summary(dMod)
+anova(dMod)
+```
+
+For the sake of simplicity, we also built a wrapper function named `lm.diallel()`, which can be used in the very same fashion as `lm()`. The syntax is: 
+
+```
+lm.diallel(formula, Block, Env, data, fct)
+```
+
+where ‘formula’ specifies the response variable and the two variables for parentals (e.g., Yield ~ Par1 + Par2) and the two arguments ‘Block’ and ‘Env’ are used to specify optional variables, coding for blocks and environments, respectively. The argument ‘data’ is a ‘dataframe’ where to look for the explanatory variables and, finally, ‘fct’ is a string variable coding for the selected model ("HAYMAN1", for this example; see below).
+
+
+```{r}
+dMod2 <- lm.diallel(Yield ~ Par1 + Par2, Block = Block,
+                    data = df, fct = "HAYMAN1")
+summary(dMod2)
+anova(dMod2)
+```
+
+The above function works very much like the `lm()` function and makes use of the general purpose linear model solver `lm.fit()`. Apart from simplicity, another advantage is that the call to `lm.diallel()` returns an object of both 'lm' and 'diallel' classes. For this latter class, we built several specific S3 methods, such as the usual `anova()`, `summary()` and `model.matrix()` methods, partly shown in the box above.
+
+Considering that diallel models are usually fitted to determine genetical parameters, we also built the `glht.diallelMod()` method and the `diallel.eff()` function, which can be used with the 'multcomp' package, to retrieve the complete list of genetical parameters, as shown in the box below. 
+
+```{r message=FALSE, warning=FALSE}
+library(multcomp)
+gh <- glht(linfct = diallel.eff(dMod2))
+summary(gh, test = adjusted(type = "none")) 
+```
+
+# Model fitting in two steps
+
+In some cases, the analysis is performed in two steps and a diallel model is fitted to the means of selfs and crosses, which are calculated in the first step. Under the assumption of variance homogeneity and equal number of replicates, we can fit the Hayman's model by using the `lm.diallel()` function without the 'Block' argument.
+
+```{r}
+dMod3 <- lm.diallel(YieldM ~ Par1 + Par2, 
+                    data = dfM, fct = "HAYMAN1")
+```
+
+
+In this case, we have no reliable estimate of residual error, but the `summary()` and `anova()` methods have been enhanced to give us the possibility of passing some information from the first step, i.e. an appropriate estimate of the residual mean square and degrees of freedom; the residual mean square from the first step needs to be appropriately weighted for the number of replicates (i.e., for this example, MSE = 3.007/4 with 24 degrees of freedom). 
+
+```{r}
+anova(dMod3, MSE = 3.007/4, dfr = 24)
+summary(dMod3, MSE = 3.007/4, dfr = 24)
+
+```
+
+```{r eval=FALSE, include=FALSE}
+# Calcolo errori standard
+X1 <- model.matrix(dMod2)
+X2 <- model.matrix(dMod3)
+sqrt(diag(solve( t(X1) %*% X1 )))
+sqrt(diag(solve( t(X2) %*% X2 )))
+```
+
+The genetical parameters can be obtained by using the `glht()` function and passing the information from the first step within the call to the `diallel.eff()` function.
+
+```{r}
+gh2 <- glht(linfct = diallel.eff(dMod3, MSE = 3.007/4, dfr = 24))
+summary(gh2, test = adjusted(type = "none")) 
+```
+
+
+# Estimation of variance components (random genetic effects)
+
+In some cases, genetic effects are regarded as random and the aim is to estimate variance components. For this, we can use the `mmer()` function in the 'sommer' package (Covarrubias-Pazaran, 2019), although we need to code two dummy variables:
+
+1. 'dr': assuming a value of zero for selfs, a value of -1 for crosses and 1 for the respective reciprocals;
+2. 'combination': which gives the reciprocals the same label (i.e. BA is given the same label as AB), so that any difference is erased.
+
+By using the `overlay()` function in the 'sommer' package and the above dummy variables, we can code the following effects:
+
+1. GCA effect: `~overlay(Par1, Par2)`
+2. RGCA effect: `~overlay(Par1, Par2):dr` (please, note that the interaction with 'dr' excludes the selfs, which are coded as 0s, and distinguish the reciprocals, as they are coded with opposite signs)
+3. SCA effect : `~combination` (reciprocals are not considered)
+4. RSCA effect: `~combination:dr` (same note as above for RGCA)
+
+It would make no sense to estimate the variance components for genetic effects with a diallel experiment based on three parentals. Therefore, we give an example based on the 'hayman54' dataset, as available in the 'lmDiallel' package and relating to a complete diallel experiment with eight parentals (Hayman, 1954).
+
+
+```{r message=FALSE, warning=FALSE}
+rm(list=ls())
+library(sommer)
+library(lmDiallel)
+data(hayman54)
+
+# Dummy variables
+hayman54$dr <- ifelse(as.character(hayman54$Par1) < as.character(hayman54$Par2), -1,
+                ifelse(as.character(hayman54$Par1) == as.character(hayman54$Par2), 0, 1))
+hayman54$combination <- factor( ifelse(as.character(hayman54$Par1) <=
+                                         as.character(hayman54$Par2),
+                                 paste(hayman54$Par1, hayman54$Par2, sep =""),
+                                 paste(hayman54$Par2, hayman54$Par1, sep ="")) )
+mod1h <- mmer(Ftime ~ Block, data = hayman54, 
+              random = ~ overlay(Par1, Par2)
+              + overlay(Par1, Par2):dr
+              + combination
+              + combination:dr, verbose = F)
+summary(mod1h)$varcomp
+```
+
+We do hope that you enjoyed this post; if you are interested in diallel models, please, stay tuned: we have other examples on the way.
+
+Thanks for reading
+
+
+Prof. Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences    
+University of Perugia (Italy)    
+[andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)
+
+ 
+---
+
+# References
+
+* Covarrubias-Pazaran, G., 2019. Quantitative genetics using the sommer package.
+* Hayman, B.I., 1954. The Analysis of Variance of Diallel Tables. Biometrics 10, 235. https://doi.org/10.2307/3001877
+* Möhring, J., Melchinger, A.E., Piepho, H.P., 2011b. REML-Based Diallel Analysis. Crop Science 51, 470–478. https://doi.org/10.2135/cropsci2010.05.0272
+* Onofri, A., Terzaroli, N., Russi, L., 2020. Linear models for diallel crosses: a review with R functions. Theor Appl Genet. https://doi.org/10.1007/s00122-020-03716-8
+
+
+
+
