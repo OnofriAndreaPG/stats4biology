@@ -1,7 +1,7 @@
 ---
-title: "Fitting 'complex' mixed models with 'nlme': Example #3"
+title: "Accounting for the experimental design in linear/nonlinear regression analyses"
 author: "Andrea Onofri"
-date: 2019-09-13
+date: 2020-12-04
 slug: 'Mixed models'
 categories:
   - R
@@ -11,8 +11,9 @@ tags:
   - 'Mixed_models'
   - 'Split_plot'
   - 'nonlinear_regression'
+  - nmle
 archives:
-  - 2019
+  - 2020
 ---
 
 ```{r setup, cache = F, echo = F}
@@ -22,13 +23,12 @@ knitr::knit_hooks$set(document = function(x){
 })
 ```
 
-# Accounting for the experimental design in regression analyses
 
-In this post, I am not going to talk about real complex models. However, I am going to talk about models that are often overlooked by agronomists and biologists, while they may be necessary in several circumstances, especially with field experiments.
+In this post, I am going to talk about an issue that is often overlooked by agronomists and biologists. The point is that field experiments are very often laid down in blocks, using split-plot designs, strip-plot designs or other types of designs with grouping factors (blocks, main-plots, sub-plots). We know that these grouping factors should be appropriately accounted for in data analyses: 'analyze them as you have randomized them' is a common saying attributed to Ronald Fisher. Indeed, observations in the same group are correlated, as they are more alike than observations in different groups. What happens if we neglect the grouping factors? We break the independence assumption and our inferences are invalid (Onofri et al., 2010).
 
-The point is that field experiments are very often laid down in blocks, using split-plot designs, strip-plot designs or other types of designs with grouping factors (blocks, main-plots, sub-plots). We know that these grouping factors should be appropriately accounted for in data analyses: 'analyze them as you have randomized them' is a common saying attributed to Ronald Fisher. Indeed, observations in the same group are correlated, as they are more alike than observations in different groups. What happens if we neglect the grouping factors? We break the independence assumption and our inferences are invalid (Onofri et al., 2010).
+To my experience, field scientists are totally aware of this issue when they deal with ANOVA-type models (e.g., see Jensen et al., 2018). However, a brief survey of literature shows that there is not the same awareness, when field scientists deal with linear/nonlinear regression models. Therefore, I decided to sit down and write this post, in the hope that it may be useful to obtain more reliable data analyses.
 
-To my experience, field scientists are totally aware of this issue when they deal with ANOVA-type models (e.g., see Jensen et al., 2018). However, a brief survey of literature shows that there is not the same awareness, when we deal with linear/nonlinear regression models.
+# An example with linear regression
 
 Let's take a look at the 'yieldDensity.csv' dataset, that is available on gitHub. It represents an experiment where sunflower was tested with increasing weed densities (0, 14, 19, 28, 32, 38, 54, 82 plants per $m^2$), on a randomised complete block design, with 10 blocks. a swift plot shows that yield is linearly related to weed density, which calls for linear regression analysis.
 
@@ -44,8 +44,6 @@ head(dataset)
 plot(yield ~ density, data = dataset)
 ```
 
-
-# Fitting linear models
 
 We might be tempted to neglect the block effect and run a linear regression analysis of yield against density. This is clearly wrong (I am violating the independence assumption) and inefficient, as any block-to-block variability goes into the residual error term, which is, therefore, inflated.
 
@@ -109,7 +107,7 @@ modMix.4 <- lme(yield ~ density, random = list(block = ~ density - 1), data=data
 #random = ~density - 1 | block
 ```
 
-# What if the relationship is nonlinear?
+# An example with nonlinear regression
 
 The problem may become trickier if we have a nonlinear relationship. Let's have a look at another similar dataset ('YieldLossB.csv'), that is also available on gitHub. It represents another experiment where  sunflower was grown with the same increasing densities of another weed (0, 14, 19, 28, 32, 38, 54, 82 plants per $m^2$), on a randomised complete block design, with 8 blocks. In this case, the yield loss was recorded and analysed.
   
@@ -132,7 +130,7 @@ where $YL$ is the yield loss, $D$ is weed density, $i$ is the slope at the origi
 The problem is the very same as above: the block effect may produce random fluctuations for both model parameters. The only difference is that we need to use the 'nlme()' function instead of 'lme()'. With nonlinear mixed models, I strongly suggest you use a 'groupedData' object, which permits to avoid several problems. The second line below shows how to turn a data frame into a 'groupedData' object.
  
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 library(aomisc)
 datasetG <- groupedData(yieldLoss ~ 1|block, dataset)
 nlin.mix <- nlme(yieldLoss ~ NLS.YL(density, i, A), data=datasetG, 
@@ -172,6 +170,7 @@ University of Perugia (Italy)
 Borgo XX Giugno 74    
 I-06121 - PERUGIA    
 
+---
 
 # References
 
