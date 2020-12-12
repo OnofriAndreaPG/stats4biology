@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-131792052-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  
+    gtag('config', 'UA-131792052-1');
+  </script>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>The broken bridge between biologists and statisticians  | From &#39;&#39;for()&#39;&#39; loops to the &#39;&#39;split-apply-combine&#39;&#39; paradigm for column-wise tasks: the transition for a dinosaur</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="/css/blog.css" />
+    <script type="text/javascript"
+      src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>    
+</head>
+<body>
+
+    
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="/">Home</a>
+            <a class="navbar-item" href="/aboutThis">About this site</a>
+            <a class="navbar-item" href="/Tutorials">Tutorials</a>
+            <a class="navbar-item" href="/_statbook">Book</a>
+            <a class="navbar-item" href="/Rpackages">R packages</a>
+            <a class="navbar-item" href="/links">Links</a>
+            <a class="navbar-item" href="/about">About me</a>
+        </div>
+    </nav>
+    
+
+    
+    <section class="hero is-info is-medium">
+        <div class="hero-body" style="background-image: url(/img/bg-blog.jpg);">
+            <div class="container has-text-centered">
+                <br>
+                <h1 class="title is-size-1">
+                    
+                        From &#39;&#39;for()&#39;&#39; loops to the &#39;&#39;split-apply-combine&#39;&#39; paradigm for column-wise tasks: the transition for a dinosaur
+                    
+                </h1>
+                
+            </div>
+        </div>
+    </section>
+
+
+
+<div class="container">
+    <div class="section">
+    
+
+<div class="columns">
+    <div class="column is-9">
+        <div class="tile is-child box">
+          <p class="subtitle is-size-6 has-text-grey-light">
+          Andrea Onofri &middot;&nbsp; Added on December 11, 2020 &middot;
+          <i class="far fa-clock"></i>&nbsp;8 min read 
+          </p><hr/>
+            <div class="content">
+                
+
+
+<p>I have been involved with data crunching for 30 years, and, due to my age, I see myself as a dinosaur within the R-users community. I must admit, I’m rather slow to incorporate new paradigms in my programming workflow … I’m pretty busy and the time I save today is often more important than the time I could save in the future, by picking up new techniques. However, resisting to progress is not necessarily a good idea and, from time to time, also a dinosaur feels like living more dangerously and exploring new ideas and views.</p>
+<p>Today, I want to talk about column-wise tasks in relatively big datasets. These tasks are rather common with agricultural and biological experiments, where we have several subjects in different treatment groups and we record, for each subject, a high number of traits. In these conditions, the very first step to data analyses is to calculate several descriptive stats for each group of subjects and each variable. What is the best method to write simple and reusable code? As I will show later, the most natural approach to me may not necessarily be the most fashionable one.</p>
+<div id="the-example" class="section level1">
+<h1>The example</h1>
+<p>A few days ago, I met a colleague from the plant pathology group, who asked my co-operation for an experiment where he studied the content in 62 mycotoxins in wheat caryopses, as recorded in 70 samples coming from different Italian regions. The dataset was structured as 70 x 64 table, as shown in the scheme below: there is one row for each wheat sample, while the first column represents the sample id, the second column represents the region from where that sample was collected and the other columns represent the concentrations of the 62 toxins (one column per toxin).</p>
+<p><img src="/_Figures/Stat_general_tidyverse.png" width="75%" style="display: block; margin: auto;" /></p>
+<p>That colleague wanted me to calculate, for each toxin and for each region, the following stats:</p>
+<ol style="list-style-type: decimal">
+<li>number of collected samples</li>
+<li>mean concentration value</li>
+<li>maximum concentration value</li>
+<li>standard error</li>
+<li>number of contaminated samples (concentration higher than 0)</li>
+<li>percentage of contaminated samples</li>
+<li>mean value for contaminated samples</li>
+<li>standard error for contaminated samples</li>
+</ol>
+<p>He also wanted me to return to him a list of 62 tables (one per toxin), with all the regions along with their descriptive stats.</p>
+</div>
+<div id="i-have-already-done-something-like-this" class="section level1">
+<h1>I have already done something like this!</h1>
+<p>When facing this task, my first reaction was to search in my ‘computer’s attic’, looking for previously written codes to accomplish the very same task. As I said, this is a fairly common task in my everyday work and I could find several examples of old codes. Looking at those, I realised that, when the number of variables is high, I have so far made an extensive use of <code>for</code> loops to repeat the same task across columns. This is indeed no wonder, as I came across R in 2000, after an extensive usage of general purpose languages, such as Quick Basic and Visual Basic.</p>
+<p>In practise, most of my earliest R codes were based on the <code>tapply()</code> function to calculate statistics for grouped data and <code>for</code> loops to iterate over columns. In the box below I show an example of such an approach, by using a factitious dataset, with the very same structure as my colleague’s dataset.</p>
+<pre class="r"><code>rm(list = ls())
+dataset &lt;- read.csv(&quot;https://casaonofri.it/_datasets/Mycotoxins.csv&quot;, header = T)
+# str(dataset)
+# &#39;data.frame&#39;: 70 obs. of  64 variables:
+#  $ Sample : int  1 2 3 4 5 6 7 8 9 10 ...
+#  $ Region : chr  &quot;Lombardy&quot; &quot;Lombardy&quot; &quot;Lombardy&quot; &quot;Lombardy&quot; ...
+#  $ DON    : num  8.62 16.2 18.19 27.08 10.97 ...
+#  $ DON3G  : num  21.7 28.4 34.7 26.9 26.4 ...
+#  $ NIV    : num  23.5 25.3 22.6 27.8 29.4 ...
+#  $ NIVG   : num  38.6 26.2 13.5 21.4 15.4 ...
+#  $ T2     : num  23.9 23.6 19.7 25.7 21.7 ...
+#  $ HT2    : num  19 37.6 32.1 22.3 25.6 ...
+#  $ HT2G   : num  13.7 25.7 25.8 33.4 32.7 ...
+#  $ NEO    : num  29.06 7.56 27.52 32.91 24.49 ...
+
+returnList &lt;- list()
+for(i in 1:(length(dataset[1,]) - 3)){
+  y &lt;- as.numeric( unlist(dataset[, i + 3]) )
+  Count &lt;- tapply(y, dataset$Region, length)
+  Mean &lt;- tapply(y, dataset$Region, mean)
+  Max &lt;- tapply(y, dataset$Region, max)
+  SE &lt;- tapply(y, dataset$Region, sd)/sqrt(Count)
+  nPos &lt;- tapply(y != 0, dataset$Region, sum)
+  PercPos &lt;- tapply(y != 0, dataset$Region, mean)*100
+  muPos &lt;- tapply(ifelse(y &gt; 0, y, NA), dataset$Region, mean, na.rm = T)
+  muPos[is.na(muPos)] &lt;- 0
+  sdPos &lt;- tapply(ifelse(y &gt; 0, y, NA), dataset$Region, sd, na.rm = T)
+  SEpos &lt;- sdPos/sqrt(nPos)
+  returnList[[i]] &lt;- data.frame(cbind(Count, Mean, Max, SE, nPos, PercPos, muPos, SEpos))
+  names(returnList)[[i]] &lt;- colnames(dataset)[i + 3]
+}
+print(returnList$CRV, digits = 2)
+##                 Count Mean Max   SE nPos PercPos muPos SEpos
+## Abruzzo             4   28  30 0.85    4     100    28  0.85
+## Apulia              9   25  40 2.67    9     100    25  2.67
+## Campania            2   20  21 0.74    2     100    20  0.74
+## Emilia Romagna      8   23  33 2.80    8     100    23  2.80
+## Latium              7   20  33 2.76    7     100    20  2.76
+## Lombardy            4   25  32 5.12    4     100    25  5.12
+## Molise              1   18  18   NA    1     100    18    NA
+## Sardinia            6   25  38 3.32    6     100    25  3.32
+## Sicily              6   21  30 2.94    6     100    21  2.94
+## The Marche          5   19  23 1.58    5     100    19  1.58
+## Tuscany             5   30  34 1.22    5     100    30  1.22
+## Umbria              9   21  32 2.83    9     100    21  2.83
+## Veneto              4   23  28 1.99    4     100    23  1.99</code></pre>
+<p>I must admit that the above code is ugly: first, <code>for</code> loops in R are not very efficient and, second, reusing that code requires quite a bit of editing and it is prone to errors. Therefore, I asked myself how I could write more efficient code …</p>
+<p>First of all, I thought I should use <code>apply()</code> instead of the <code>for</code> loop. Thus I wrote a function to calculate the required stats for each column and <code>apply()-ed</code> that function to all columns of my data-frame.</p>
+<pre class="r"><code>funBec &lt;- function(y, group){
+  # y &lt;- as.numeric( unlist(dataset[, i + 3]) )
+  Count &lt;- tapply(y, group, length)
+  Mean &lt;- tapply(y, group, mean)
+  Max &lt;- tapply(y, group, max)
+  SE &lt;- tapply(y, group, sd)/sqrt(Count)
+  nPos &lt;- tapply(y != 0, group, sum)
+  PercPos &lt;- tapply(y != 0, group, mean)*100
+  muPos &lt;- tapply(ifelse(y &gt; 0, y, NA),group, mean, na.rm = T)
+  muPos[is.na(muPos)] &lt;- 0
+  sdPos &lt;- tapply(ifelse(y &gt; 0, y, NA), group, sd, na.rm = T)
+  SEpos &lt;- sdPos/sqrt(nPos)
+  data.frame(cbind(Count, Mean, Max, SE, nPos, PercPos, muPos, SEpos))
+}
+returnList2 &lt;- apply(dataset[3:length(dataset[1,])], 2,
+                     function(col) funBec(col, dataset$Region))
+# kable(returnList2$CRV, digits = 2)</code></pre>
+<p>I am pretty happy with the above approach; it feels ‘natural’, to me and the coding appears to be pretty clear and easily reusable. However, it makes only use of the <code>base</code> R implementation and, therefore, it looks a bit out-fashioned… a dinosaur’s code…</p>
+<p>What could I possibly do to write more ‘modern’ code? A brief survey of posts from the R world suggested the ultimate solution: “I must use the ‘tidyverse’!”. Therefore, I tried to perform my column-wise task by using <code>dplyr</code> and related packages and I must admit that I could not immediately find an acceptable solution. After some careful thinking, it was clear that the tidyverse requires a strong change in programming habits, which is not always simple for those who are over a certain age. Or, at least, that is not simple for me…</p>
+<p>Eventually, I thought I should switch from a <code>for</code> attitude to a <code>split-apply-combine</code> attitude; indeed, I discovered that, if I ‘melted’ the dataset so that the variables were stacked one above the other, I could, consequently:</p>
+<ol style="list-style-type: decimal">
+<li>split the dataset in several groups, consisting of one toxin and one region,</li>
+<li>calculate the stats for each group, and</li>
+<li>combine the results for all groups.</li>
+</ol>
+<p>I’d like to share the final code: I used the <code>pivot_longer()</code> function to melt the dataset, the <code>group_by()</code> function to create an ‘internal’ grouping structure by regions and toxins, the <code>summarise()</code> and <code>across()</code> functions to calculate the required stats for each group. In the end, I obtained a tibble, that I split into a list of tibbles, by using the <code>group_split()</code> function. The code is shown in the box below.</p>
+<pre class="r"><code>library(tidyverse)
+returnList6 &lt;- dataset %&gt;%
+  select(-Sample) %&gt;% 
+  pivot_longer(names_to = &quot;Toxin&quot;, values_to = &quot;Conc&quot;,
+               cols = c(3:length(dataset[1,]) - 1)) %&gt;% 
+  group_by(Toxin, Region) %&gt;% 
+  summarise(across(&quot;Conc&quot;, .fns =
+               list(Mean = mean,
+                    Max = max,
+                    SE = function(df) sd(df)/sqrt(length(df)),
+                    nPos = function(df) length(df[df &gt; 0]),
+                    percPos = function(df) length(df[df &gt; 0])/length(df)*100,
+                    muPos =  function(df) mean(df[df &gt; 0]),
+                    SEpos =  function(df) sd(df[df &gt; 0])/sqrt(length(df[df &gt; 0]))
+                    ))) %&gt;% 
+  ungroup() %&gt;%
+  group_split(Toxin, .keep = F)
+names(returnList6) &lt;- names(dataset)[3:64]
+# returnList6$CRV</code></pre>
+<p>Well, I can say that with the above code I have, at least, tried not to be a dinosaur… but, I am sure that many young scientists out there can suggest better solutions. If so, please drop me a line at the email address below. Thanks for reading!</p>
+<p>Andrea Onofri<br />
+Department of Agricultural, Food and Environmental Sciences<br />
+University of Perugia (Italy)<br />
+email: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+</div>
+
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Tags</h1>
+        <div class="tags">
+        
+            <span class="tag"><a href="/tags/agricensdata">agricensdata</a></span>
+        
+            <span class="tag"><a href="/tags/ammi_analysis">ammi_analysis</a></span>
+        
+            <span class="tag"><a href="/tags/aomisc">aomisc</a></span>
+        
+            <span class="tag"><a href="/tags/asreml">asreml</a></span>
+        
+            <span class="tag"><a href="/tags/blogdown">blogdown</a></span>
+        
+            <span class="tag"><a href="/tags/boxplot">boxplot</a></span>
+        
+            <span class="tag"><a href="/tags/correlation">correlation</a></span>
+        
+            <span class="tag"><a href="/tags/data_management">data_management</a></span>
+        
+            <span class="tag"><a href="/tags/delta_method">delta_method</a></span>
+        
+            <span class="tag"><a href="/tags/descriptive_statistics">descriptive_statistics</a></span>
+        
+            <span class="tag"><a href="/tags/diallel_models">diallel_models</a></span>
+        
+            <span class="tag"><a href="/tags/dplyr">dplyr</a></span>
+        
+            <span class="tag"><a href="/tags/drcseedgerm">drcseedgerm</a></span>
+        
+            <span class="tag"><a href="/tags/drm">drm</a></span>
+        
+            <span class="tag"><a href="/tags/error_propagation">error_propagation</a></span>
+        
+            <span class="tag"><a href="/tags/gnlht">gnlht</a></span>
+        
+            <span class="tag"><a href="/tags/linear_models">linear_models</a></span>
+        
+            <span class="tag"><a href="/tags/lmdiallel">lmdiallel</a></span>
+        
+            <span class="tag"><a href="/tags/lme">lme</a></span>
+        
+            <span class="tag"><a href="/tags/long_term_experiments">long_term_experiments</a></span>
+        
+            <span class="tag"><a href="/tags/mixed_models">mixed_models</a></span>
+        
+            <span class="tag"><a href="/tags/multi_environment_studies">multi_environment_studies</a></span>
+        
+            <span class="tag"><a href="/tags/nlme">nlme</a></span>
+        
+            <span class="tag"><a href="/tags/nls">nls</a></span>
+        
+            <span class="tag"><a href="/tags/nmle">nmle</a></span>
+        
+            <span class="tag"><a href="/tags/nonlinear_regression">nonlinear_regression</a></span>
+        
+            <span class="tag"><a href="/tags/percentiles">percentiles</a></span>
+        
+            <span class="tag"><a href="/tags/qq_plot">qq_plot</a></span>
+        
+            <span class="tag"><a href="/tags/r">r</a></span>
+        
+            <span class="tag"><a href="/tags/seed_germination">seed_germination</a></span>
+        
+            <span class="tag"><a href="/tags/split_plot">split_plot</a></span>
+        
+            <span class="tag"><a href="/tags/tidyverse">tidyverse</a></span>
+        
+            <span class="tag"><a href="/tags/time_to_event_models">time_to_event_models</a></span>
+        
+            <span class="tag"><a href="/tags/variance">variance</a></span>
+        
+        </div>          
+    </div>
+</div><br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Recent posts</h1>
+        
+            <h1><a href="/2020/stat_r_tidyverse_columnwise/">From &#39;&#39;for()&#39;&#39; loops to the &#39;&#39;split-apply-combine&#39;&#39; paradigm for column-wise tasks: the transition for a dinosaur</a></h1>
+            <time class="has-text-grey-light is-size-7">11 December 2020</time>
+        
+            <h1><a href="/2020/stat_nlmm_designconstraints/">Accounting for the experimental design in linear/nonlinear regression analyses</a></h1>
+            <time class="has-text-grey-light is-size-7">4 December 2020</time>
+        
+            <h1><a href="/2020/stat_met_diallel_hayman1/">lmDiallel: a new R package to fit diallel models. The Hayman&#39;s model (type 1)</a></h1>
+            <time class="has-text-grey-light is-size-7">26 November 2020</time>
+        
+            <h1><a href="/2020/stat_met_diallel1/">lmDiallel: a new R package to fit diallel models. Introduction</a></h1>
+            <time class="has-text-grey-light is-size-7">11 November 2020</time>
+        
+            <h1><a href="/2020/stat_general_percentiles/">QQ-plots and Box-Whisker plots: where do they come from?</a></h1>
+            <time class="has-text-grey-light is-size-7">15 October 2020</time>
+        
+    </div>
+</div>
+    <br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Archives</h1>
+        
+            <a href="/archives/2020">2020</a> (13)<br>
+        
+            <a href="/archives/2019">2019</a> (14)<br>
+        
+            <a href="/archives/2018">2018</a> (2)<br>
+        
+            <a href="/archives/2014">2014</a> (1)<br>
+        
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+    </div>
+</div>
+<footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+        <p>
+             <span class="icon is-large"><a href="mailto:andrea.onofri@unipg.it" class="mysocial"><i class="far fa-envelope-open fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://github.com/OnofriAndreaPG/" class="mysocial"><i class="fab fa-github fa-3x"></i></a></span>&nbsp;&nbsp;
+           <span class="icon is-large"><a href="https://twitter.com/onofriandreapg" class="mysocial"><i class="fab fa-twitter fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://www.r-project.org/" class="mysocial"><i class="fab fa-r-project fa-3x"></i></a></span>&nbsp;&nbsp;
+ 
+            <br><br>
+            Copyright &copy; The broken bridge between biologists and statisticians, 2020 - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a>
+            - <a class="mysocial" href="/aboutThis">About this site</a>
+        </p>
+    </div>
+</footer>
+
+<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+</body>
+</html>

@@ -110,4 +110,6 @@ I wanted my RSS feed to contain the whole post and not only a description. I did
 2. Replaced '{{ .Summary | html }}' with '{{ .Content | html }}'
 3. Saved the file as 'RSS.xml'under the 'layouts' directory.
 
+# Step 11 - Further info on Google Analytics (10/12/2020)
 
+A very kind reader (Emma) emailed me that there have been some relevant updates for Google analytics (v4). She pointed me to the following guide: [https://www.websiteplanet.com/blog/ultimate-beginners-guide-google-analytics/](https://www.websiteplanet.com/blog/ultimate-beginners-guide-google-analytics/). This is useful, to have a better comprehension of the whole Google Analytics platform, just in case someone is interested.
