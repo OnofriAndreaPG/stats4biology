@@ -138,4 +138,58 @@ names(returnList6) &lt;- names(dataset)[3:64]
 Department of Agricultural, Food and Environmental Sciences<br />
 University of Perugia (Italy)<br />
 email: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<hr />
+<p>[UPDATE: 13/12/2020]</p>
+<p>Bryan Hutchinson from the UK proposed an alternative solution based on the ‘data.table’ and ‘DescTools’ libraries. I have never used these libraries before, but the code looks very efficient and elegant. At the end, some examples of how the dataset can be filtered are given. Thanks, Bryan!</p>
+<pre class="r"><code>library(data.table)
+library(DescTools)
+ 
+dataset &lt;- fread(&quot;https://casaonofri.it/_datasets/Mycotoxins.csv&quot;, header = T)
+tnames &lt;- names(dataset[,-c(1:2)])
+ 
+sum_stats &lt;- function(var) {
+  # convert integer to double
+  var &lt;- as.numeric(var)
+  list(
+    mean = mean(var, na.rm = TRUE),
+    max = max(var, na.rm = TRUE),
+    se = sd(var, na.rm = TRUE) / sqrt(length(var)),
+    nPos = length(var &gt;0),
+    percPos = length(var &gt;0)/length(var)*100,
+    muPos =  mean(var &gt; 0),
+    SEpos =  sd(var &gt; 0)/sqrt(length(var &gt; 0))
+  )
+}
+ 
+df_long &lt;- melt(dataset,
+                measure.vars = list(tnames),
+                variable.name = &quot;Toxin&quot;,
+                value.name = &quot;Conc&quot;)
+ 
+ 
+# df_long[, sum_stats(Conc), .(Toxin, Region)]
+# df_long[Toxin == &quot;FLAG&quot;, sum_stats(Conc), .(Toxin, Region)]
+# df_long[Region == &quot;Lombardy&quot;, sum_stats(Conc), .(Region, Toxin)]</code></pre>
+<hr />
+<p>[UPDATE: 14/12/2020]</p>
+<p>A younger collegue (Renzo Bonifazi) suggested some changes to the code, which I am happy to share here. Setting the range of columns at the beginning seems to be wise and removing the ‘ungroup()’ function is correct. I did not know about the ‘setNames()’ function, which was used at the end. Thanks, Renzo!</p>
+<pre class="r"><code># define here the range of cols to apply upon the code
+range_cols &lt;- c(3:length(dataset[1,]))
+
+results &lt;- dataset %&gt;%
+  select(-Sample) %&gt;% 
+  pivot_longer(names_to = &quot;Toxin&quot;, values_to = &quot;Conc&quot;,
+               cols = range_cols - 1) %&gt;% # use user defined range of cols
+  group_by(Toxin, Region) %&gt;% 
+  summarise(across(&quot;Conc&quot;, .fns =
+                     list(Mean = mean,
+                          Max = max,
+                          SE = function(df) sd(df)/sqrt(length(df)),
+                          nPos = function(df) length(df[df &gt; 0]),
+                          percPos = function(df) length(df[df &gt; 0])/length(df)*100,
+                          muPos =  function(df) mean(df[df &gt; 0]),
+                          SEpos =  function(df) sd(df[df &gt; 0])/sqrt(length(df[df &gt; 0]))
+                     ))) %&gt;%
+   group_split(.keep = F) %&gt;% # This fun by default seems to split based on the first defined group var, i.e. &quot;Toxin&quot; in this case
+setNames(names(dataset)[range_cols]) # define the names internally</code></pre>
 </div>

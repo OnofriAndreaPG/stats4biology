@@ -1,0 +1,287 @@
+---
+title: "General code to fit ANOVA models with JAGS and 'rjags'"
+author: "Andrea Onofri"
+date: 2020-12-23
+slug: 'Bayesian_stat'
+categories:
+  - R
+  - JAGS
+  - 'Bayesian_stat'
+tags:
+  - R
+  - JAGS
+  - 'Bayesian_stat'
+archives:
+  - 2020
+---
+
+```{r setup, cache = F, echo = F}
+#Put at the beginning
+knitr::opts_chunk$set(echo = TRUE, message = F, warning = F)
+knitr::knit_hooks$set(document = function(x){ 
+  gsub("```\n*```r*\n*", "", x) 
+})
+```
+
+
+One of the reasons why I like BUGS and all related dialects has been put nicely in a very good book, i.e. "Introduction to WinBUGS for ecologists" (Kery, 2010); at page 11, the author says: *"WinBUGS helps free the modeler in you"*. Ultimately, that statement is true: when I have fully understood a model with all its components (and thus I have become a modeler), I can very logically translate it to BUGS code. The drawback is that, very often, the final coding appears to be rather ‘problem-specific’ and difficult to be reused in other  situations, without an extensive editing work. 
+
+For example, consider the ‘ANOVA models’ with all their ‘flavors’: one-way, two-ways with interactions, nested, and so on. These models are rather common in agricultural research and they are relatively easy to code in BUGS, following the suggestions provided in Kery’s book. However, passing from one model to the others requires some editing, which is often prone to errors. And errors in BUGS are difficult to spot in short time... Therefore, I have been wondering: “*Can I write general BUGS code, which can be used for all ANOVA models with no substantial editing?*”.
+
+Finally, I have found a solution and, as it took me awhile to sort things out, I thought I might share it, for the benefit of those who would like to fit ANOVA models in the Bayesian framework.  It works with JAGS (JUST ANOTHER GIBBS SAMPLER), a BUGS dialect running also in Mac OS and developed by Marty Plummer. JAGS can be used from R, thanks to the 'rjags' package (Plummer, 2019), which I will use in this post.
+
+Let’s start from a working example.
+
+# A genotype experiment
+
+The yields of seven wheat genotypes were compared in one experiment laid down in three randomised complete blocks. The data is available in an external repository as a 'csv' file and it can be loaded by using the code below.
+
+```{r}
+fileName <- "https://www.casaonofri.it/_datasets/WinterWheat2002.csv"
+dataset <- read.csv(fileName, header = T)
+head(dataset)
+```
+
+This is the typical situation were we might be interested in fitting an ANOVA model, with the yield as the response variable and the blocks and genotypes as the explanatory factors. The ultimate aim is to estimate genotype means and credible intervals, which calls for the Bayesian approach.
+
+For the sake of simplicity, let's take both the block and genotype effects as fixed; in matrix notation, a general linear fixed effects model can be written as:
+
+$$ Y = X \, \beta + \varepsilon$$
+
+where $Y$ is the vector of the observed response, $\beta$ is the vector of estimated parameters, $X$ is the design matrix and $\varepsilon$ is the vector of residuals, which we assume as gaussian and homoscedastic ($\varepsilon \sim N(0, \sigma^2 I)$; N is the multivariate gaussian distribution). The same model can also be written as:
+
+$$ Y \sim N \left( X \, \beta, \sigma^2 I \right)$$
+
+In JAGS (and maybe also in other BUGS dialects), we can code every linear model using the above specification, as long as we can provide the correct design matrix $X$. Luckily, we will see that this is a rather simple task; but... let's do it one step at a time!
+
+# Specification of a JAGS model
+
+First of all, we open R and code a general linear JAGS model, as shown in the box below.
+
+```{r}
+# Coding a JAGS model
+modelSpec <- "
+data {
+n <- length(Y)
+np <- dim(X)
+nk <- dim(K)
+}
+
+model {
+# Model 
+for (i in 1:n) {
+   expected[i] <- inprod(X[i,], beta)
+   Y[i] ~ dnorm(expected[i], tau)
+  }
+
+# Priors
+beta[1] ~ dunif(0, 1000000)
+for (i in 2:np[2]){
+  beta[i] ~ dnorm(0, 0.000001)
+  }
+sigma ~ dunif(0, 100)
+
+# Derived quantities (model specific)
+tau <- 1 / ( sigma * sigma)
+
+# Contrasts of interest
+for (i in 1:nk[1]) {
+   mu[i] <- inprod(K[i,], beta)
+  }
+}"
+writeLines(modelSpec, con="ModelAOV.txt")
+```
+
+Let's see some more detail; you may notice that the code above consists of two fundamental parts, surrounded by curly brackets:
+
+1. a 'data' part
+2. a 'model' part
+
+In the data part, we create three variables, i.e. the number of data ($n$), the number of estimated parameters ($np$) and the number of contrasts (see later). All variables are used in successive model steps and they are obtained, respectively, by counting the number of observations in the vector $Y$, the number of columns in the design matrix $X$ and the number of rows in the contrast matrix $K$.
+
+In the model part we have three further components:
+
+1. the model specification
+2. the priors
+3. the derived quantities
+
+The model specification contains 'deterministic' and 'stochastic' statements (nodes). The 'deterministic' node returns the expected values for all observations, based on multiplying the design matrix $X$ by the vector of estimated parameters $\beta$. In practice, we use a 'for()' loop and, for each i^th^ observation, we sum the products of all element in the i^th^ row of $X$ by the corresponding elements in the vector of estimated parameters $\beta$. This sum of products is accomplished by using the function `inprod(X[i,], beta)`.
+
+In the 'stochastic' node we specify that the observed values in $Y$ are sampled from a gaussian distribution ('dnorm'), with mean equal to the expected value and precision equal to 'tau'. In JAGS, WinBUGS and all related software, the normal distribution is parameterised by using the precision $\tau = 1/\sigma^2$, instead of standard deviation.
+
+Next, we have to define the priors for all the estimands. For those who are not very much into Bayesian inference, I will only say that priors represent our expectations about model parameters before looking at the data; in this example, we use very vague priors, meaning that, before looking at the data, we have no idea about the values of these unknown quantities. In detail, for the intercept we specify a uniform distribution from 0 to 10000 (`beta[1] ~ dunif(0, 1000000)`), meaning that the overall mean might be included between 0 and 10000 and we have no preference for any values within that range (a very vague prior, indeed). For all other effects in the vector $\beta$, our prior expectation is that they are normally distributed with a mean of 0 and very low precision (`beta[i] ~ dnorm(0, 0.000001)`). For the residual standard deviation, we expect that it is uniformly distributed from 0 to 100. The selection of priors is central to Bayesian inference and, in other circumstances, you may like to adopt more informative priors. We do not discuss this important item here.
+
+In the end, we also specify some quantities that should be derived from estimated parameters. As we have put a prior on standard deviation, we need to derive the precision (`tau <- 1 / ( sigma * sigma)`), that is necessary for the stochastic node in the specification of our linear model. Afterwards, we add a set of contrasts, which are specified by way of a matrix of contrast coefficients ($K$; one row per each contrast). This is useful to calculate, e.g., the means of treatment levels or pairwise differences between means as linear combinations of model parameters.
+
+The model definition in the box above is assigned to a text string (`modelSpec`) and it is finally written to an external text file ('modelAOV.txt'), using the function `writeLines()`.
+
+I conclude this part by saying that, based on our model specification, JAGS requires three input ingredients: the $Y$ vector of responses, the $X$ matrix and the $K$ contrast matrix. Furthermore, JAGS requires initial values for all estimands, i.e. for all quantities for which we have specified our prior expectations (the 'beta' vector and the 'sigma' scalar). 
+
+# Fitting the JAGS model from within R
+
+JAGS models can be fitted from R by using the `rjags` package (Plummer, 2019). However, we have some preliminary steps to accomplish:
+
+1. loading the dataset (see the first box above);
+2. creating the $Y$ vector of responses
+3. creating the $X$ matrix
+4. creating the $K$ matrix
+
+The first two steps are obvious. The third step can be accomplished by using the `model.matrix()` function: the call is very similar to an 'lm()' call, although we do not need to explicitly indicate the response variable (see the box below). In order to create the $K$ matrix of contrasts, we might prefer to work with the sum-to-zero parameterisation (`options(contrasts=c("contr.sum", "contr.poly"))`), so that the intercept represents the overall mean (for balanced designs) and the effects of blocks and genotypes represent differences with respect to the overall mean. In the box below we specify a set of eight contrasts returning the means for all genotypes.
+
+
+```{r}
+options(contrasts=c("contr.sum", "contr.poly"))
+Y <- dataset$Yield  
+X <- model.matrix( ~ Block + Genotype, data = dataset)
+
+k1 <- c(1, 0, 0, 1, 0, 0, 0, 0, 0, 0)
+k2 <- c(1, 0, 0, 0, 1, 0, 0, 0, 0, 0)
+k3 <- c(1, 0, 0, 0, 0, 1, 0, 0, 0, 0)
+k4 <- c(1, 0, 0, 0, 0, 0, 1, 0, 0, 0)
+k5 <- c(1, 0, 0, 0, 0, 0, 0, 1, 0, 0)
+k6 <- c(1, 0, 0, 0, 0, 0, 0, 0, 1, 0)
+k7 <- c(1, 0, 0, 0, 0, 0, 0, 0, 0, 1)
+k8 <- c(1, 0, 0,-1,-1,-1,-1,-1,-1,-1)
+K <- rbind(k1, k2, k3, k4, k5, k6, k7, k8)
+```
+
+If you need further explanation about the $X$ and $K$ matrices and their role in the analysis, I have added an appendix below. Otherwise, we are ready to fit the model. To this aim, we:
+
+1. load the `rjags` library;
+2. create two lists: a list of all the data needed for the analysis (`dataList`) and a list of the initial values for the parameters to be estimated (`initList`). Initial values need not be particularly precise;
+3. send the model specification and the other data to JAGS, using the function `jags.model()` from the `rjags` package;
+4. start the sampler, using the `coda.samples()` function. In this step, we specify which parameters we want to obtain estimates for and the number of samples we want to draw (`n.iter`).
+5. obtain the number of required samples, using the `window()` function. In this step, we specify how many samples should be discarded as `burn.in`. These samples might have been produced before reaching the convergence, so they might not come from the correct posterior distribution and we need to get rid of them.
+
+From the posterior, we obtain the mean and median as measures of central tendency, the standard deviation as a measure of uncertainty and credible intervals, which are the Bayesian analog to confidence intervals. Due to our vague priors, the results are very similar to those obtained with a traditional frequentist analysis (see the appendix below).
+
+```{r message=F}
+library(rjags)
+
+# Create lists
+dataList <- list(Y = Y, X = X, K = K)
+initList <- list(beta = c(4.3, rep(0, 9)), sigma = 0.33)
+
+# Start sampler
+mcmc <- jags.model("modelAOV.txt", 
+                   data = dataList, inits = initList, 
+                   n.chains = 4, n.adapt = 100)
+
+# Get samples
+res <- coda.samples(mcmc, variable.names = c("beta", "sigma", "mu"),
+                    n.iter = 1000)
+
+out <- summary(window(res, start = 110))
+res <- cbind(out$statistics[,1:2], out$quantiles[,c(1,5)])
+res
+```
+
+# Reusing the code for a multi-environment experiment
+
+The JAGS model above is very general and can be easily reused for other situations. For example, if the above genotype experiment is replicated across years, we might like to fit an ANOVA model by considering the blocks (within years), the genotypes, the years and the 'year by genotype' interaction. The dataset is available in the same external repository, as the 'WinterWheat.csv' file.
+
+The JAGS specification for this multienvironment model does not change, we only need to update the $Y$, $X$ and $K$ matrices, as shown in the box below. In order to obtain the contrast matrix for the means of the 'genotype x environment' combinations we need to write some cumbersome code, as shown below (but, perhaps, some of you could suggest better alternatives...).
+
+```{r}
+library(tidyverse)
+
+# Loading the data
+fileName <- "https://www.casaonofri.it/_datasets/WinterWheat.csv"
+dataset <- read_csv(fileName)
+dataset <- dataset %>% 
+  mutate(across(c(Block, Year, Genotype), .fns = factor))
+dataset
+
+# Create input matrices
+Y <- dataset$Yield 
+X <- model.matrix(~ Genotype*Year +  Block:Year, data = dataset)
+
+# Workaround to get K matrix
+asgn <- attr(X, "assign")
+tmp1 <- expand.grid(Genotype = unique(dataset$Genotype),
+                    Year = unique(dataset$Year))
+K1 <- model.matrix(~ Genotype*Year, data = tmp1)
+K2 <- matrix(0, nrow = nrow(K1), ncol = length(asgn[asgn==4]))
+colnames(K2) <- colnames(X)[asgn==4]
+K <- cbind(K1, K2)
+row.names(K) <- with(tmp1, interaction(Genotype:Year))
+# K
+
+# Create lists
+dataList <- list(Y = Y, X = X, K = K)
+initList <- list(beta = c(4.3, rep(0, length(X[1,])-1)), sigma = 0.33)
+
+# Start sampler
+mcmc <- jags.model("modelAOV.txt", 
+                   data = dataList, inits = initList, 
+                   n.chains = 4, n.adapt = 100)
+
+# Get samples
+res <- coda.samples(mcmc, variable.names = c("beta", "sigma", "mu"),
+                    n.iter = 1000)
+
+out <- summary(window(res, start = 110))
+res <- cbind(out$statistics[,1:2], '50%'=out$quantiles[,3],
+             out$quantiles[,c(1, 5)])
+head(res)
+#....
+tail(res)
+```
+
+The discovery of the `inprod()` function was a very big hit for me: the above approach is very flexible and lend itself to a lot of potential uses, including fitting mixed models. I will show some examples in future posts.
+
+Thanks for reading and happy 2021! Let's hope we finally get back to normality!
+
+
+Prof. Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences   
+University of Perugia (Italy)   
+email: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)
+
+
+---
+
+# References
+
+1. Kery, M., 2010. Introduction to WinBUGS for ecologists. A Bayesian approach to regression, ANOVA, mixed models and related analyses. Academic Press, Burlington, MA (USA).
+2. Plummer M. (2019). rjags: Bayesian Graphical Models using MCMC. R package version 4-10. https://CRAN.R-project.org/package=rjags
+
+# Appendix
+
+I feel that it may be useful to take a look at the results of traditional model fitting with the `lm()` function and to explore the role of the matrices $X$ and $K$. Let's go back to the first example:
+
+```{r}
+fileName <- "https://www.casaonofri.it/_datasets/WinterWheat2002.csv"
+dataset <- read.csv(fileName, header = T)
+mod.aov <- lm(Yield ~ Block + Genotype, data = dataset)
+summary(mod.aov)
+```
+
+Let's also look at the first row of the $X$ matrix, which I can also retrieve from the fitted model object:
+
+```{r}
+model.matrix(mod.aov)[1,]
+```
+
+We see that the vector of estimated parameters and the first row in $X$ have 10 elements: if we multiply them and sum, we obtain:
+
+$$ 1 \cdot 4.425 + 1 \cdot -0.218 + 0 \cdot -0.0096 + 1 \cdot 0.469 + 0 \cdot ... = 4.675$$
+
+that is exactly the first fitted value (first genotype in first block):
+
+```{r}
+fitted(mod.aov)[1]
+```
+
+If we do this for all rows in $X$, we obtain all fitted values and such an operation is most quickly done by using matrix multiplication.
+
+Likewise, if we multiply the elements in 'beta' for the corresponding elements in the first row of the 'K' matrix and sum, we get the mean for the first genotype (COLOSSEO) and if we do so for all rows in $K$ we get all the genotype means.
+
+$$ 1 \cdot 4.425 + 0 \cdot -0.218 + 0 \cdot -0.0096 + 1 \cdot 0.469 + 0 \cdot ... = 4.893$$
+
+
+```{r}
+emmeans::emmeans(mod.aov, ~Genotype) 
+```
+
+Hope this is useful!

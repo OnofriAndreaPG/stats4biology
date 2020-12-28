@@ -181,3 +181,75 @@ Department of Agricultural, Food and Environmental Sciences
 University of Perugia (Italy)    
 email: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)
 
+---
+
+[UPDATE: 13/12/2020]
+
+Bryan Hutchinson from the UK proposed an alternative solution based on the 'data.table' and 'DescTools' libraries. I have never used these libraries before, but the code looks very efficient and elegant. At the end, some examples of how the dataset can be filtered are given. Thanks, Bryan!
+
+```{r}
+library(data.table)
+library(DescTools)
+ 
+dataset <- fread("https://casaonofri.it/_datasets/Mycotoxins.csv", header = T)
+tnames <- names(dataset[,-c(1:2)])
+ 
+sum_stats <- function(var) {
+  # convert integer to double
+  var <- as.numeric(var)
+  list(
+    mean = mean(var, na.rm = TRUE),
+    max = max(var, na.rm = TRUE),
+    se = sd(var, na.rm = TRUE) / sqrt(length(var)),
+    nPos = length(var >0),
+    percPos = length(var >0)/length(var)*100,
+    muPos =  mean(var > 0),
+    SEpos =  sd(var > 0)/sqrt(length(var > 0))
+  )
+}
+ 
+df_long <- melt(dataset,
+                measure.vars = list(tnames),
+                variable.name = "Toxin",
+                value.name = "Conc")
+ 
+ 
+# df_long[, sum_stats(Conc), .(Toxin, Region)]
+# df_long[Toxin == "FLAG", sum_stats(Conc), .(Toxin, Region)]
+# df_long[Region == "Lombardy", sum_stats(Conc), .(Region, Toxin)]
+```
+
+
+
+---
+
+[UPDATE: 14/12/2020]
+
+A younger collegue (Renzo Bonifazi) suggested some changes to the code, which I am happy to share here. Setting the range of columns at the beginning seems to be wise and removing the 'ungroup()' function is correct. I did not know about the 'setNames()' function, which was used at the end. Thanks, Renzo!
+
+```{r}
+# define here the range of cols to apply upon the code
+range_cols <- c(3:length(dataset[1,]))
+
+results <- dataset %>%
+  select(-Sample) %>% 
+  pivot_longer(names_to = "Toxin", values_to = "Conc",
+               cols = range_cols - 1) %>% # use user defined range of cols
+  group_by(Toxin, Region) %>% 
+  summarise(across("Conc", .fns =
+                     list(Mean = mean,
+                          Max = max,
+                          SE = function(df) sd(df)/sqrt(length(df)),
+                          nPos = function(df) length(df[df > 0]),
+                          percPos = function(df) length(df[df > 0])/length(df)*100,
+                          muPos =  function(df) mean(df[df > 0]),
+                          SEpos =  function(df) sd(df[df > 0])/sqrt(length(df[df > 0]))
+                     ))) %>%
+   group_split(.keep = F) %>% # This fun by default seems to split based on the first defined group var, i.e. "Toxin" in this case
+setNames(names(dataset)[range_cols]) # define the names internally
+
+```
+
+
+
+

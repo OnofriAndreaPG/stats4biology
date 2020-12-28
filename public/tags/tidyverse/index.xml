@@ -141,6 +141,60 @@ names(returnList6) &amp;lt;- names(dataset)[3:64]
 Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
 University of Perugia (Italy)&lt;br /&gt;
 email: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;p&gt;[UPDATE: 13/12/2020]&lt;/p&gt;
+&lt;p&gt;Bryan Hutchinson from the UK proposed an alternative solution based on the ‘data.table’ and ‘DescTools’ libraries. I have never used these libraries before, but the code looks very efficient and elegant. At the end, some examples of how the dataset can be filtered are given. Thanks, Bryan!&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(data.table)
+library(DescTools)
+ 
+dataset &amp;lt;- fread(&amp;quot;https://casaonofri.it/_datasets/Mycotoxins.csv&amp;quot;, header = T)
+tnames &amp;lt;- names(dataset[,-c(1:2)])
+ 
+sum_stats &amp;lt;- function(var) {
+  # convert integer to double
+  var &amp;lt;- as.numeric(var)
+  list(
+    mean = mean(var, na.rm = TRUE),
+    max = max(var, na.rm = TRUE),
+    se = sd(var, na.rm = TRUE) / sqrt(length(var)),
+    nPos = length(var &amp;gt;0),
+    percPos = length(var &amp;gt;0)/length(var)*100,
+    muPos =  mean(var &amp;gt; 0),
+    SEpos =  sd(var &amp;gt; 0)/sqrt(length(var &amp;gt; 0))
+  )
+}
+ 
+df_long &amp;lt;- melt(dataset,
+                measure.vars = list(tnames),
+                variable.name = &amp;quot;Toxin&amp;quot;,
+                value.name = &amp;quot;Conc&amp;quot;)
+ 
+ 
+# df_long[, sum_stats(Conc), .(Toxin, Region)]
+# df_long[Toxin == &amp;quot;FLAG&amp;quot;, sum_stats(Conc), .(Toxin, Region)]
+# df_long[Region == &amp;quot;Lombardy&amp;quot;, sum_stats(Conc), .(Region, Toxin)]&lt;/code&gt;&lt;/pre&gt;
+&lt;hr /&gt;
+&lt;p&gt;[UPDATE: 14/12/2020]&lt;/p&gt;
+&lt;p&gt;A younger collegue (Renzo Bonifazi) suggested some changes to the code, which I am happy to share here. Setting the range of columns at the beginning seems to be wise and removing the ‘ungroup()’ function is correct. I did not know about the ‘setNames()’ function, which was used at the end. Thanks, Renzo!&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# define here the range of cols to apply upon the code
+range_cols &amp;lt;- c(3:length(dataset[1,]))
+
+results &amp;lt;- dataset %&amp;gt;%
+  select(-Sample) %&amp;gt;% 
+  pivot_longer(names_to = &amp;quot;Toxin&amp;quot;, values_to = &amp;quot;Conc&amp;quot;,
+               cols = range_cols - 1) %&amp;gt;% # use user defined range of cols
+  group_by(Toxin, Region) %&amp;gt;% 
+  summarise(across(&amp;quot;Conc&amp;quot;, .fns =
+                     list(Mean = mean,
+                          Max = max,
+                          SE = function(df) sd(df)/sqrt(length(df)),
+                          nPos = function(df) length(df[df &amp;gt; 0]),
+                          percPos = function(df) length(df[df &amp;gt; 0])/length(df)*100,
+                          muPos =  function(df) mean(df[df &amp;gt; 0]),
+                          SEpos =  function(df) sd(df[df &amp;gt; 0])/sqrt(length(df[df &amp;gt; 0]))
+                     ))) %&amp;gt;%
+   group_split(.keep = F) %&amp;gt;% # This fun by default seems to split based on the first defined group var, i.e. &amp;quot;Toxin&amp;quot; in this case
+setNames(names(dataset)[range_cols]) # define the names internally&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 </description>
     </item>
