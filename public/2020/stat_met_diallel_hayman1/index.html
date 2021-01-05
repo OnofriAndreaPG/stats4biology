@@ -71,10 +71,16 @@
                 
 
 
-<p>In a previous post we have presented our new ‘lmDiallel’ package (<a href="https://www.statforbiology.com/2020/stat_met_diallel1/">see this link here</a> and see also the original paper in <a href="https://rdcu.be/caxZh">Theoretical and Applied Genetics</a>). It provides several extensions to the <code>lm()</code> function in R, to fit a class of linear models of interest for plant breeders or geneticists, the so-called diallel models. For those who are interested in this topic, we would like to present some examples of diallel models and how to fit them in R. Please, sit back and relax and, if you have comments, let us know, using the email link at the bottom of this post.</p>
+<p>In a previous post we have presented our new ‘lmDiallel’ package (<a href="https://www.statforbiology.com/2020/stat_met_diallel1/">see this link here</a> and see also the original paper in <a href="https://rdcu.be/caxZh">Theoretical and Applied Genetics</a>). This package provides an extensions to fit a class of linear models of interest for plant breeders or geneticists, the so-called diallel models. In this post and other future posts we would like to present some examples of how to use this package: please, sit back and relax and, if you have comments, let us know, using the email link at the bottom of this post.</p>
 <div id="but-what-is-a-diallel" class="section level1">
 <h1>But… what is a ‘diallel’?</h1>
-<p>If you are not a plant breeder or a geneticist in general, you may be asking this question. From the ancient Greek language, the ‘diallel’ word means ‘reciprocating’ and a diallel cross is a set of several possible crosses and selfs between some parental lines. For example, if we take the male lines A, B and C together with the same female lines A, B and C and we imagine to cross those lines with one another, we obtain the selfs A<span class="math inline">\(\times\)</span>A, B<span class="math inline">\(\times\)</span>B and C<span class="math inline">\(\times\)</span>C, the crosses A<span class="math inline">\(\times\)</span>B, A<span class="math inline">\(\times\)</span>C and B<span class="math inline">\(\times\)</span>C and, in some instances, the reciprocals B<span class="math inline">\(\times\)</span>A, C<span class="math inline">\(\times\)</span>A and C<span class="math inline">\(\times\)</span>B (where the father and mother are swapped). The performances of crosses and/or selfs and/or reciprocals can be compared by planning field experiments, usually known as <strong>diallel experiments</strong> and designed as randomised complete blocks with 3-4 replicates.</p>
+<p>If you are not a plant breeder or a geneticist in general, you may be asking this question. From the ancient Greek language, the ‘diallel’ word means ‘reciprocating’ and a diallel cross is a set of several possible crosses and selfs between some parental lines. For example, if we take the male lines A, B and C together with the same female lines A, B and C and we imagine to cross those lines with one another, we obtain:</p>
+<ol style="list-style-type: decimal">
+<li>the selfs A<span class="math inline">\(\times\)</span>A, B<span class="math inline">\(\times\)</span>B and C<span class="math inline">\(\times\)</span>C,</li>
+<li>the crosses A<span class="math inline">\(\times\)</span>B, A<span class="math inline">\(\times\)</span>C and B<span class="math inline">\(\times\)</span>C,</li>
+<li>and, in some instances, the reciprocals B<span class="math inline">\(\times\)</span>A, C<span class="math inline">\(\times\)</span>A and C<span class="math inline">\(\times\)</span>B (where the father and mother are swapped).</li>
+</ol>
+<p>The performances of crosses and/or selfs and/or reciprocals can be compared by planning field experiments, usually known as <strong>diallel experiments</strong> and designed as randomised complete blocks with 3-4 replicates.</p>
 </div>
 <div id="the-example" class="section level1">
 <h1>The example</h1>
@@ -113,8 +119,8 @@ dfM
 <p>In order to describe the above dataset, we might think of a two-way ANOVA model, where the ‘father’ and ‘mother’ lines (the ‘Par1’ and ‘Par2’ variables, respectively) are used as the explanatory factors.</p>
 <p>This is a very tempting solution, but we should resist: a two way ANOVA model regards the ‘father’ and ‘mother’ effects as two completely different series of treatments, neglecting the fact that they are, indeed, the same genotypes in different combinations. That is exactly why we need specific <strong>diallel models</strong> to describe the results of diallel experiments!</p>
 </div>
-<div id="the-hayman-model-type-1" class="section level1">
-<h1>The “Hayman” model (type 1)</h1>
+<div id="the-haymans-model-type-1" class="section level1">
+<h1>The Hayman’s model type 1</h1>
 <p>The first diallel model was proposed by Hayman (1954) and it was devised for complete diallel experiments, where reciprocals are available. Neglecting the design effects (blocks and/or environments), the Hayman’s model is defined as:</p>
 <p><span class="math display">\[y _{ijk} = \mu + \textrm{g}_i + \textrm{g}_j + \textrm{ts}_{ij} + \textrm{rg}^a_{i} + \textrm{rg}^b_{j} + rs_{ij} + \varepsilon_{ijk} \quad\quad\quad (Eq. 1)\]</span></p>
 <p>where <span class="math inline">\(\mu\)</span> is expected value (the overall mean, in the balanced case) and <span class="math inline">\(\varepsilon_{ijk}\)</span> is the residual random error terms for the observation in the <span class="math inline">\(k^{th}\)</span> block and with the parentals <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span>. All the other terms correspond to genetic effects, namely:</p>
@@ -134,6 +140,50 @@ dfM
 <pre class="r"><code># library(devtools) # Install if necessary
 # install_github(&quot;OnofriAndreaPG/lmDiallel&quot;)
 library(lmDiallel)
+## Loading required package: multcomp
+## Loading required package: mvtnorm
+## Loading required package: survival
+## Loading required package: TH.data
+## Loading required package: MASS
+## 
+## Attaching package: &#39;MASS&#39;
+## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     select
+## 
+## Attaching package: &#39;TH.data&#39;
+## The following object is masked from &#39;package:MASS&#39;:
+## 
+##     geyser
+## Loading required package: plyr
+## ------------------------------------------------------------------------------
+## You have loaded plyr after dplyr - this is likely to cause problems.
+## If you need functions from both plyr and dplyr, please load plyr first, then dplyr:
+## library(plyr); library(dplyr)
+## ------------------------------------------------------------------------------
+## 
+## Attaching package: &#39;plyr&#39;
+## The following objects are masked from &#39;package:dplyr&#39;:
+## 
+##     arrange, count, desc, failwith, id, mutate, rename, summarise,
+##     summarize
+## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     compact
+## Loading required package: sommer
+## Loading required package: Matrix
+## 
+## Attaching package: &#39;Matrix&#39;
+## The following objects are masked from &#39;package:tidyr&#39;:
+## 
+##     expand, pack, unpack
+## Loading required package: lattice
+## Loading required package: crayon
+## 
+## Attaching package: &#39;crayon&#39;
+## The following object is masked from &#39;package:ggplot2&#39;:
+## 
+##     %+%
 dMod &lt;- lm(Yield ~ Block + GCA(Par1, Par2) + tSCA(Par1, Par2) +
               RGCA(Par1, Par2) + RSCA(Par1, Par2), data = df)
 summary(dMod)
@@ -328,58 +378,37 @@ summary(gh2, test = adjusted(type = &quot;none&quot;))
 </div>
 <div id="estimation-of-variance-components-random-genetic-effects" class="section level1">
 <h1>Estimation of variance components (random genetic effects)</h1>
-<p>In some cases, genetic effects are regarded as random and the aim is to estimate variance components. For this, we can use the <code>mmer()</code> function in the ‘sommer’ package (Covarrubias-Pazaran, 2019), although we need to code two dummy variables:</p>
-<ol style="list-style-type: decimal">
-<li>‘dr’: assuming a value of zero for selfs, a value of -1 for crosses and 1 for the respective reciprocals;</li>
-<li>‘combination’: which gives the reciprocals the same label (i.e. BA is given the same label as AB), so that any difference is erased.</li>
-</ol>
-<p>By using the <code>overlay()</code> function in the ‘sommer’ package and the above dummy variables, we can code the following effects:</p>
-<ol style="list-style-type: decimal">
-<li>GCA effect: <code>~overlay(Par1, Par2)</code></li>
-<li>RGCA effect: <code>~overlay(Par1, Par2):dr</code> (please, note that the interaction with ‘dr’ excludes the selfs, which are coded as 0s, and distinguish the reciprocals, as they are coded with opposite signs)</li>
-<li>SCA effect : <code>~combination</code> (reciprocals are not considered)</li>
-<li>RSCA effect: <code>~combination:dr</code> (same note as above for RGCA)</li>
-</ol>
-<p>It would make no sense to estimate the variance components for genetic effects with a diallel experiment based on three parentals. Therefore, we give an example based on the ‘hayman54’ dataset, as available in the ‘lmDiallel’ package and relating to a complete diallel experiment with eight parentals (Hayman, 1954).</p>
+<p>In some cases, genetic effects are regarded as random and the aim is to estimate variance components. For this, we can use the <code>mmer()</code> function in the ‘sommer’ package (Covarrubias-Pazaran, 2016), although we need to code a few dummy variables, which may make the task difficult for practitioners. Therefore, we coded a wrapper for the <code>mmer()</code> function (<code>mmer.diallel()</code>)that uses the same syntax as <code>lm.diallel()</code>.</p>
+<p>It would make no sense to estimate the variance components for genetic effects with a diallel experiment based on three parentals and, therefore, we give an example based on the ‘hayman54’ dataset, as available in the ‘lmDiallel’ package and relating to a complete diallel experiment with eight parentals (Hayman, 1954).</p>
 <pre class="r"><code>rm(list=ls())
-library(sommer)
-library(lmDiallel)
 data(hayman54)
-
-# Dummy variables
-hayman54$dr &lt;- ifelse(as.character(hayman54$Par1) &lt; as.character(hayman54$Par2), -1,
-                ifelse(as.character(hayman54$Par1) == as.character(hayman54$Par2), 0, 1))
-hayman54$combination &lt;- factor( ifelse(as.character(hayman54$Par1) &lt;=
-                                         as.character(hayman54$Par2),
-                                 paste(hayman54$Par1, hayman54$Par2, sep =&quot;&quot;),
-                                 paste(hayman54$Par2, hayman54$Par1, sep =&quot;&quot;)) )
-mod1h &lt;- mmer(Ftime ~ Block, data = hayman54, 
-              random = ~ overlay(Par1, Par2)
-              + overlay(Par1, Par2):dr
-              + combination
-              + combination:dr, verbose = F)
-summary(mod1h)$varcomp
-##                                       VarComp VarCompSE    Zratio Constraint
-## overlay(Par1, Par2).Ftime-Ftime    1276.49877 750.02253 1.7019472   Positive
-## overlay(Par1, Par2):dr.Ftime-Ftime   17.97648  19.91001 0.9028864   Positive
-## combination.Ftime-Ftime            1108.86771 329.97440 3.3604659   Positive
-## combination:dr.Ftime-Ftime           29.41085  46.54826 0.6318356   Positive
-## units.Ftime-Ftime                   422.99303  75.36714 5.6124330   Positive</code></pre>
+mod.ran &lt;- mmer.diallel(Ftime ~ Par1 + Par2, Block = Block,
+                        data = hayman54, fct = &quot;HAYMAN1&quot;)
+mod.ran
+##              VarComp  VarCompSE
+## Block        0.00000   9.321698
+## GCA       1276.73142 750.174164
+## RGCA        17.97647  19.909911
+## tSCA      1110.99398 330.172943
+## RSCA        30.53937  46.467163
+## Residuals  418.47875  74.563526</code></pre>
 <p>We do hope that you enjoyed this post; if you are interested in diallel models, please, stay tuned: we have other examples on the way.</p>
 <p>Thanks for reading</p>
 <p>Prof. Andrea Onofri<br />
+Prof. Luigi Russi<br />
+Dr. Niccolò Terzaroli<br />
 Department of Agricultural, Food and Environmental Sciences<br />
 University of Perugia (Italy)<br />
-<a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
 <hr />
 </div>
 <div id="references" class="section level1">
 <h1>References</h1>
 <ul>
-<li>Covarrubias-Pazaran, G., 2019. Quantitative genetics using the sommer package.</li>
+<li>Covarrubias-Pazaran, G., 2016. Genome-Assisted Prediction of Quantitative Traits Using the R Package sommer. PLOS ONE 11, e0156744. <a href="https://doi.org/10.1371/journal.pone.0156744" class="uri">https://doi.org/10.1371/journal.pone.0156744</a></li>
 <li>Hayman, B.I., 1954. The Analysis of Variance of Diallel Tables. Biometrics 10, 235. <a href="https://doi.org/10.2307/3001877" class="uri">https://doi.org/10.2307/3001877</a></li>
 <li>Möhring, J., Melchinger, A.E., Piepho, H.P., 2011b. REML-Based Diallel Analysis. Crop Science 51, 470–478. <a href="https://doi.org/10.2135/cropsci2010.05.0272" class="uri">https://doi.org/10.2135/cropsci2010.05.0272</a></li>
-<li>Onofri, A., Terzaroli, N., Russi, L., 2020. Linear models for diallel crosses: a review with R functions. Theor Appl Genet. <a href="https://doi.org/10.1007/s00122-020-03716-8" class="uri">https://doi.org/10.1007/s00122-020-03716-8</a></li>
+<li>Onofri, A., Terzaroli, N., Russi, L., 2020. Linear models for diallel crosses: a review with R functions. Theoretical Applied Genetics, <a href="https://doi.org/10.1007/s00122-020-03716-8" class="uri">https://doi.org/10.1007/s00122-020-03716-8</a></li>
 </ul>
 </div>
 
@@ -471,6 +500,9 @@ University of Perugia (Italy)<br />
     <div class="card-content">
         <h1 class="title is-5">Recent posts</h1>
         
+            <h1><a href="/2021/stat_met_diallel_hayman2/">lmDiallel: a new R package to fit diallel models. The Hayman&#39;s model (type 2)</a></h1>
+            <time class="has-text-grey-light is-size-7">5 January 2021</time>
+        
             <h1><a href="/2020/stat_bayesian_anovamodels/">General code to fit ANOVA models with JAGS and &#39;rjags&#39;</a></h1>
             <time class="has-text-grey-light is-size-7">23 December 2020</time>
         
@@ -483,15 +515,14 @@ University of Perugia (Italy)<br />
             <h1><a href="/2020/stat_met_diallel_hayman1/">lmDiallel: a new R package to fit diallel models. The Hayman&#39;s model (type 1)</a></h1>
             <time class="has-text-grey-light is-size-7">26 November 2020</time>
         
-            <h1><a href="/2020/stat_met_diallel1/">lmDiallel: a new R package to fit diallel models. Introduction</a></h1>
-            <time class="has-text-grey-light is-size-7">11 November 2020</time>
-        
     </div>
 </div>
     <br>
         <div class="card">
     <div class="card-content">
         <h1 class="title is-5">Archives</h1>
+        
+            <a href="/archives/2021">2021</a> (1)<br>
         
             <a href="/archives/2020">2020</a> (14)<br>
         
@@ -519,7 +550,7 @@ University of Perugia (Italy)<br />
             <span class="icon is-large"><a href="https://www.r-project.org/" class="mysocial"><i class="fab fa-r-project fa-3x"></i></a></span>&nbsp;&nbsp;
  
             <br><br>
-            Copyright &copy; The broken bridge between biologists and statisticians, 2020 - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a>
+            Copyright &copy; The broken bridge between biologists and statisticians, 2021 - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a>
             - <a class="mysocial" href="/aboutThis">About this site</a>
         </p>
     </div>

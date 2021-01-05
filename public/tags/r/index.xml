@@ -6,10 +6,171 @@
     <description>Recent content in R on The broken bridge between biologists and statisticians</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2018, @AndreaOnofri</copyright>
-    <lastBuildDate>Wed, 23 Dec 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 05 Jan 2021 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="/tags/r/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>lmDiallel: a new R package to fit diallel models. The Hayman&#39;s model (type 2)</title>
+      <link>/2021/stat_met_diallel_hayman2/</link>
+      <pubDate>Tue, 05 Jan 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/2021/stat_met_diallel_hayman2/</guid>
+      <description>
+
+
+&lt;p&gt;This posts follows two other previously published posts, where we presented our new ‘lmDiallel’ package (&lt;a href=&#34;https://www.statforbiology.com/2020/stat_met_diallel1/&#34;&gt;see here&lt;/a&gt;) and showed how we can use it to fit the Hayman’s model type 1, as proposed in Hayman (1954) (&lt;a href=&#34;https://www.statforbiology.com/2020/stat_met_diallel_hayman1/&#34;&gt;see here&lt;/a&gt;). In this post, we will give a further example relating to another very widespread model from the same author, the Hayman’s model type 2. We apologise for some overlapping with previous posts: we think this is necessary so that each post can be read on its own.&lt;/p&gt;
+&lt;p&gt;The model we are going to talk about is used to describe the results of full (complete) diallel experiments, where we have crosses + reciprocals + selfs. If you are not sure what a diallel experiment is, we suggest you go back to one of our previous posts on this sequence, where we give some preliminary information for beginners. Otherwise, we can proceed to the motivating example.&lt;/p&gt;
+&lt;div id=&#34;the-example&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;The example&lt;/h1&gt;
+&lt;p&gt;In this post we will use the same example as provided in the original Hayman’s paper (Hayman, 1954), relating to a complete diallel experiment with eight parental lines. The R dataset is included in the ‘lmDiallel’ package; in the box below we load the data, after installing (if necessary) and loading the ‘lmDiallel’ package (see box below).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# library(devtools) # Install if necessary
+# install_github(&amp;quot;OnofriAndreaPG/lmDiallel&amp;quot;)
+library(lmDiallel)
+data(&amp;quot;hayman54&amp;quot;)
+head(hayman54)
+##   Block Par1 Par2 Ftime
+## 1     1    A    A   276
+## 2     1    A    B   156
+## 3     1    A    C   322
+## 4     1    A    D   250
+## 5     1    A    E   162
+## 6     1    A    F   193&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;the-haymans-model-type-2&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;The Hayman’s model type 2&lt;/h1&gt;
+&lt;p&gt;The Hayman’s model type 2 is derived from type 1 (see our previous post), by partitioning the tSCA effect in three additive components. The equation is:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[y_{ijk} = \left\{ {\begin{array}{ll}
+\mu + \gamma_k + \textrm{g}_i + \textrm{g}_j + m + d_i + d_j + s_{ij} + rg^a_i + rg^b_j + rs_{ij} + \varepsilon_{ijk} &amp;amp; \textrm{for} \quad i \neq j\\
+\mu + \gamma_k + 2\, \textrm{g}_i - (n - 1)m - (n - 2)d_i + \varepsilon_{ijk} &amp;amp; \textrm{for} \quad i = j \end{array}} \right.\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(\mu\)&lt;/span&gt; is the expected value (the overall mean, in the case of fully orthogonal designs), &lt;span class=&#34;math inline&#34;&gt;\(n\)&lt;/span&gt; is the number of parentals and &lt;span class=&#34;math inline&#34;&gt;\(\varepsilon_{ijk}\)&lt;/span&gt; is the residual random error term. All the other terms correspond to genetic effects, namely:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;the &lt;span class=&#34;math inline&#34;&gt;\(\textrm{g}_i\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(\textrm{g}_j\)&lt;/span&gt; terms are the &lt;strong&gt;general combining abilities&lt;/strong&gt; (GCAs) of the &lt;span class=&#34;math inline&#34;&gt;\(i^{th}\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(j^{th}\)&lt;/span&gt; parents (&lt;a href=&#34;https://www.statforbiology.com/2020/stat_met_diallel_hayman1/&#34;&gt;see here&lt;/a&gt;).&lt;/li&gt;
+&lt;li&gt;The &lt;span class=&#34;math inline&#34;&gt;\(rg^a_i\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(rg^b_j\)&lt;/span&gt; terms are the &lt;strong&gt;reciprocal general combining abilities&lt;/strong&gt; (RGCAs) for the &lt;span class=&#34;math inline&#34;&gt;\(i^{th}\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(j^{th}\)&lt;/span&gt; parents (&lt;a href=&#34;https://www.statforbiology.com/2020/stat_met_diallel_hayman1/&#34;&gt;see here&lt;/a&gt;).&lt;/li&gt;
+&lt;li&gt;The &lt;span class=&#34;math inline&#34;&gt;\(m\)&lt;/span&gt; term relates to the difference between the average value of all observations and the average values of crosses (&lt;strong&gt;Mean Dominance Deviation&lt;/strong&gt;; MDD).&lt;/li&gt;
+&lt;li&gt;The &lt;span class=&#34;math inline&#34;&gt;\(d_i\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(df_j\)&lt;/span&gt; terms relate to the differences between the yield of each selfed parent (&lt;span class=&#34;math inline&#34;&gt;\(Y_{ij}\)&lt;/span&gt;, with &lt;span class=&#34;math inline&#34;&gt;\(i = j\)&lt;/span&gt;) and the average yield of all selfed parents (&lt;strong&gt;dominance deviation&lt;/strong&gt; for the &lt;span class=&#34;math inline&#34;&gt;\(i^{th}\)&lt;/span&gt; parent; DD).&lt;/li&gt;
+&lt;li&gt;The term &lt;span class=&#34;math inline&#34;&gt;\(s_{ij}\)&lt;/span&gt; is the SCA effect for the combination &lt;span class=&#34;math inline&#34;&gt;\(ij\)&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;The &lt;span class=&#34;math inline&#34;&gt;\(rs_{ij}\)&lt;/span&gt; term is the &lt;strong&gt;reciprocal specific combining ability&lt;/strong&gt; (RSCA) for a specific &lt;span class=&#34;math inline&#34;&gt;\(ij\)&lt;/span&gt; combination, that is the discrepancy between the performances of the two reciprocals (e.g, A &lt;span class=&#34;math inline&#34;&gt;\(\times\)&lt;/span&gt; B vs. B &lt;span class=&#34;math inline&#34;&gt;\(\times\)&lt;/span&gt; A)(&lt;a href=&#34;https://www.statforbiology.com/2020/stat_met_diallel_hayman1/&#34;&gt;see here&lt;/a&gt;).&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Similarly to type 1, the Hayman’s model type 2 considers the genetical effects as differences with respect to the intercept &lt;span class=&#34;math inline&#34;&gt;\(\mu\)&lt;/span&gt;, that is the mean of all observations (when the design is orthogonal). However, with respect to type 1, this latter model permits the estimation of a higher number of genetic effects (GCAs, RGCAs, MDD, DDs, SCAs and RSCAs) and provides an approach to quantify heterotic effects. We should consider that, due to unbalance (the number of crosses is never equal to the number of selfs), it is necessary to introduce some coefficients (i.e. &lt;span class=&#34;math inline&#34;&gt;\(n - 1\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(n - 2\)&lt;/span&gt; in Equation 1), which do not have an obvious meaning. In future posts we will see that other diallel models were proposed, which account for heterotic effects in a different manner (Gardner and Eberhart, 1966).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;model-fitting-with-r&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Model fitting with R&lt;/h1&gt;
+&lt;p&gt;Let’s assume that all effects are fixed, apart from the residual error effect. Consequently, Equation 1 is a specific parameterisation of a general linear model, which we can fit by the usual &lt;code&gt;lm()&lt;/code&gt; function and related methods. However, we need to exploit some of the facilities in our new ‘lmDiallel’ extension package, which consist of the &lt;code&gt;GCA()&lt;/code&gt;, &lt;code&gt;MDD()&lt;/code&gt;, &lt;code&gt;DD()&lt;/code&gt;, &lt;code&gt;SCA()&lt;/code&gt;, &lt;code&gt;RGCA()&lt;/code&gt; and &lt;code&gt;RSCA()&lt;/code&gt; functions (see the box below). The resulting &lt;code&gt;lm&lt;/code&gt; object can be explored by the usual R methods, such as &lt;code&gt;summary()&lt;/code&gt; and &lt;code&gt;anova()&lt;/code&gt; (the output of the &lt;code&gt;summary()&lt;/code&gt; method is partly hidden, for brevity)&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;contrasts(hayman54$Block) &amp;lt;- &amp;quot;contr.sum&amp;quot;
+dMod &amp;lt;- lm(Ftime ~ Block + GCA(Par1, Par2) + MDD(Par1, Par2) +
+             DD(Par1, Par2) + SCA(Par1, Par2) +
+             RGCA(Par1, Par2) + RSCA(Par1, Par2), data = hayman54)
+summary(dMod)$coef[1:6,]
+##                      Estimate Std. Error    t value     Pr(&amp;gt;|t|)
+## (Intercept)        162.898437   1.804567 90.2700843 2.381071e-68
+## Block1              -1.054688   1.804567 -0.5844545 5.610017e-01
+## GCA(Par1, Par2)g_A  46.195312   3.376036 13.6832990 1.558468e-20
+## GCA(Par1, Par2)g_B -24.585938   3.376036 -7.2824864 6.421946e-10
+## GCA(Par1, Par2)g_C  49.632812   3.376036 14.7015049 4.900927e-22
+## GCA(Par1, Par2)g_D  18.351563   3.376036  5.4358311 9.415231e-07
+# ...
+# ...
+anova(dMod)
+## Analysis of Variance Table
+## 
+## Response: Ftime
+##                  Df Sum Sq Mean Sq F value    Pr(&amp;gt;F)    
+## Block             1    142     142  0.3416   0.56100    
+## GCA(Par1, Par2)   7 277717   39674 95.1805 &amp;lt; 2.2e-16 ***
+## MDD(Par1, Par2)   1  30797   30797 73.8840 3.259e-12 ***
+## DD(Par1, Par2)    7  34153    4879 11.7050 1.957e-09 ***
+## SCA(Par1, Par2)  20  37289    1864  4.4729 2.560e-06 ***
+## RGCA(Par1, Par2)  7   6739     963  2.3097   0.03671 *  
+## RSCA(Par1, Par2) 21  12373     589  1.4135   0.14668    
+## Residuals        63  26260     417                      
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;For the sake of simplicity, we also built a wrapper function named &lt;code&gt;lm.diallel()&lt;/code&gt;, which can be used in the very same fashion as &lt;code&gt;lm()&lt;/code&gt;. The syntax is:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;lm.diallel(formula, Block, Env, data, fct)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;where ‘formula’ specifies the response variable and the two variables for parentals (e.g., Yield ~ Par1 + Par2) and the two arguments ‘Block’ and ‘Env’ are used to specify optional variables, coding for blocks and environments, respectively. The argument ‘data’ is a ‘dataframe’ where to look for the explanatory variables and, finally, ‘fct’ is a string variable coding for the selected model (“HAYMAN2”, for this example; see below).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dMod2 &amp;lt;- lm.diallel(Ftime ~ Par1 + Par2, Block = Block,
+                    data = hayman54, fct = &amp;quot;HAYMAN2&amp;quot;)
+# summary(dMod2)
+anova(dMod2)
+## Analysis of Variance Table
+## 
+## Response: Ftime
+##           Df Sum Sq Mean Sq F value    Pr(&amp;gt;F)    
+## Block      1    142     142  0.3416   0.56100    
+## MDD        1  30797   30797 73.8840 3.259e-12 ***
+## GCA        7 277717   39674 95.1805 &amp;lt; 2.2e-16 ***
+## DD         7  34153    4879 11.7050 1.957e-09 ***
+## SCA       20  37289    1864  4.4729 2.560e-06 ***
+## RGCA       7   6739     963  2.3097   0.03671 *  
+## RSCA      21  12373     589  1.4135   0.14668    
+## Residuals 63  26260                              
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The above function works very much like the &lt;code&gt;lm()&lt;/code&gt; function and makes use of the general purpose linear model solver &lt;code&gt;lm.fit()&lt;/code&gt;. Apart from simplicity, another advantage is that the call to &lt;code&gt;lm.diallel()&lt;/code&gt; returns an object of both ‘lm’ and ‘diallel’ classes. For this latter class, we built several specific S3 methods, such as the usual &lt;code&gt;anova()&lt;/code&gt;, &lt;code&gt;summary()&lt;/code&gt; and &lt;code&gt;model.matrix()&lt;/code&gt; methods, partly shown in the box above.&lt;/p&gt;
+&lt;p&gt;Considering that diallel models are usually fitted to determine genetical parameters, we also built the &lt;code&gt;glht.diallelMod()&lt;/code&gt; method and the &lt;code&gt;diallel.eff()&lt;/code&gt; function, which can be used with the ‘multcomp’ package, to retrieve the complete list of genetical parameters. An excerpt is shown in the box below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(multcomp)
+gh &amp;lt;- glht(linfct = diallel.eff(dMod2))
+# summary(gh, test = adjusted(type = &amp;quot;none&amp;quot;))
+#    Simultaneous Tests for General Linear Hypotheses
+# 
+# Linear Hypotheses:
+#                Estimate Std. Error t value Pr(&amp;gt;|t|)    
+# Intercept == 0 162.8984     1.8046  90.270  &amp;lt; 2e-16 ***
+# m == 0          -5.8627     0.6821  -8.596 4.48e-09 ***
+# g_A == 0        46.1953     3.3760  13.683 2.17e-13 ***
+# g_B == 0       -24.5859     3.3760  -7.282 9.83e-08 ***
+# g_C == 0        49.6328     3.3760  14.702 4.13e-14 ***
+# g_D == 0        18.3516     3.3760   5.436 1.07e-05 ***
+# g_E == 0       -20.9297     3.3760  -6.199 1.47e-06 ***
+# g_F == 0         2.4453     3.3760   0.724 0.475340    
+# g_G == 0       -44.7109     3.3760 -13.244 4.57e-13 ***
+# g_H == 0       -26.3984     3.3760  -7.819 2.71e-08 ***
+# d_A == 0         1.2213     1.9492   0.627 0.536380    
+# d_B == 0        -2.6224     1.9492  -1.345 0.190113    
+# ...
+# ...&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In a previous post (&lt;a href=&#34;https://www.statforbiology.com/2020/stat_met_diallel_hayman1/&#34;&gt;see here&lt;/a&gt;) we have shown that, when diallel models are fitted to the genotype means (and thus we have no replicates), an appropriate estimate of residual mean square and degrees of freedom can be passed as arguments to the &lt;code&gt;summary()&lt;/code&gt;, &lt;code&gt;anova()&lt;/code&gt; and &lt;code&gt;diallel.eff()&lt;/code&gt; methods.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;estimation-of-variance-components-random-genetic-effects&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Estimation of variance components (random genetic effects)&lt;/h1&gt;
+&lt;p&gt;If we intend to regard the genetic effects as random and to estimate variance components, we can use the &lt;code&gt;mmer()&lt;/code&gt; function in the ‘sommer’ package (Covarrubias-Pazaran, 2016), although we need to code a bunch of dummy variables. In order to make things simpler for routine experiments, we have coded the &lt;code&gt;mmer.diallel()&lt;/code&gt; wrapper using the same syntax as the &lt;code&gt;lm.diallel()&lt;/code&gt; function. The exemplary code is given in the box below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Random genetic effects
+mod1m &amp;lt;- mmer.diallel(Ftime ~ Par1 + Par2, Block = Block, 
+                      data = hayman54,
+                      fct = &amp;quot;HAYMAN2&amp;quot;)
+mod1m
+##              VarComp   VarCompSE
+## Block        0.00000    9.188298
+## MDD       1783.96081 3118.893561
+## GCA       1005.92052  574.893353
+## RGCA        17.97898   19.920016
+## DD         659.53567  468.205470
+## SCA        351.74035  144.688653
+## RSCA        32.02325   46.361581
+## Residuals  412.54051   73.506382&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;That’s all about the Hayman’s models; you may have noted that both models (type 1 and 2) were devised for full diallel experiments, which are not so widespread in ‘genetical’ literature. A few years later, in 1956, the Australian scientist B. Griffing made the relevant effort of creating a comprehensive set of models which can be fitted to all types of diallel experiments. We will talk about these models in a future post.&lt;/p&gt;
+&lt;p&gt;Thanks for reading (and happy 2021!)&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Prof. Luigi Russi&lt;br /&gt;
+Dr. Niccolò Terzaroli&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;Covarrubias-Pazaran, G., 2016. Genome-Assisted Prediction of Quantitative Traits Using the R Package sommer. PLOS ONE 11, e0156744. &lt;a href=&#34;https://doi.org/10.1371/journal.pone.0156744&#34; class=&#34;uri&#34;&gt;https://doi.org/10.1371/journal.pone.0156744&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Hayman, B.I., 1954. The Analysis of Variance of Diallel Tables. Biometrics 10, 235. &lt;a href=&#34;https://doi.org/10.2307/3001877&#34; class=&#34;uri&#34;&gt;https://doi.org/10.2307/3001877&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Möhring, J., Melchinger, A.E., Piepho, H.P., 2011b. REML-Based Diallel Analysis. Crop Science 51, 470–478. &lt;a href=&#34;https://doi.org/10.2135/cropsci2010.05.0272&#34; class=&#34;uri&#34;&gt;https://doi.org/10.2135/cropsci2010.05.0272&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Onofri, A., Terzaroli, N., Russi, L., 2020. Linear models for diallel crosses: a review with R functions. Theor Appl Genet. &lt;a href=&#34;https://doi.org/10.1007/s00122-020-03716-8&#34; class=&#34;uri&#34;&gt;https://doi.org/10.1007/s00122-020-03716-8&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>General code to fit ANOVA models with JAGS and &#39;rjags&#39;</title>
@@ -841,10 +1002,16 @@ I-06121 - PERUGIA&lt;/p&gt;
       <description>
 
 
-&lt;p&gt;In a previous post we have presented our new ‘lmDiallel’ package (&lt;a href=&#34;https://www.statforbiology.com/2020/stat_met_diallel1/&#34;&gt;see this link here&lt;/a&gt; and see also the original paper in &lt;a href=&#34;https://rdcu.be/caxZh&#34;&gt;Theoretical and Applied Genetics&lt;/a&gt;). It provides several extensions to the &lt;code&gt;lm()&lt;/code&gt; function in R, to fit a class of linear models of interest for plant breeders or geneticists, the so-called diallel models. For those who are interested in this topic, we would like to present some examples of diallel models and how to fit them in R. Please, sit back and relax and, if you have comments, let us know, using the email link at the bottom of this post.&lt;/p&gt;
+&lt;p&gt;In a previous post we have presented our new ‘lmDiallel’ package (&lt;a href=&#34;https://www.statforbiology.com/2020/stat_met_diallel1/&#34;&gt;see this link here&lt;/a&gt; and see also the original paper in &lt;a href=&#34;https://rdcu.be/caxZh&#34;&gt;Theoretical and Applied Genetics&lt;/a&gt;). This package provides an extensions to fit a class of linear models of interest for plant breeders or geneticists, the so-called diallel models. In this post and other future posts we would like to present some examples of how to use this package: please, sit back and relax and, if you have comments, let us know, using the email link at the bottom of this post.&lt;/p&gt;
 &lt;div id=&#34;but-what-is-a-diallel&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;But… what is a ‘diallel’?&lt;/h1&gt;
-&lt;p&gt;If you are not a plant breeder or a geneticist in general, you may be asking this question. From the ancient Greek language, the ‘diallel’ word means ‘reciprocating’ and a diallel cross is a set of several possible crosses and selfs between some parental lines. For example, if we take the male lines A, B and C together with the same female lines A, B and C and we imagine to cross those lines with one another, we obtain the selfs A&lt;span class=&#34;math inline&#34;&gt;\(\times\)&lt;/span&gt;A, B&lt;span class=&#34;math inline&#34;&gt;\(\times\)&lt;/span&gt;B and C&lt;span class=&#34;math inline&#34;&gt;\(\times\)&lt;/span&gt;C, the crosses A&lt;span class=&#34;math inline&#34;&gt;\(\times\)&lt;/span&gt;B, A&lt;span class=&#34;math inline&#34;&gt;\(\times\)&lt;/span&gt;C and B&lt;span class=&#34;math inline&#34;&gt;\(\times\)&lt;/span&gt;C and, in some instances, the reciprocals B&lt;span class=&#34;math inline&#34;&gt;\(\times\)&lt;/span&gt;A, C&lt;span class=&#34;math inline&#34;&gt;\(\times\)&lt;/span&gt;A and C&lt;span class=&#34;math inline&#34;&gt;\(\times\)&lt;/span&gt;B (where the father and mother are swapped). The performances of crosses and/or selfs and/or reciprocals can be compared by planning field experiments, usually known as &lt;strong&gt;diallel experiments&lt;/strong&gt; and designed as randomised complete blocks with 3-4 replicates.&lt;/p&gt;
+&lt;p&gt;If you are not a plant breeder or a geneticist in general, you may be asking this question. From the ancient Greek language, the ‘diallel’ word means ‘reciprocating’ and a diallel cross is a set of several possible crosses and selfs between some parental lines. For example, if we take the male lines A, B and C together with the same female lines A, B and C and we imagine to cross those lines with one another, we obtain:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;the selfs A&lt;span class=&#34;math inline&#34;&gt;\(\times\)&lt;/span&gt;A, B&lt;span class=&#34;math inline&#34;&gt;\(\times\)&lt;/span&gt;B and C&lt;span class=&#34;math inline&#34;&gt;\(\times\)&lt;/span&gt;C,&lt;/li&gt;
+&lt;li&gt;the crosses A&lt;span class=&#34;math inline&#34;&gt;\(\times\)&lt;/span&gt;B, A&lt;span class=&#34;math inline&#34;&gt;\(\times\)&lt;/span&gt;C and B&lt;span class=&#34;math inline&#34;&gt;\(\times\)&lt;/span&gt;C,&lt;/li&gt;
+&lt;li&gt;and, in some instances, the reciprocals B&lt;span class=&#34;math inline&#34;&gt;\(\times\)&lt;/span&gt;A, C&lt;span class=&#34;math inline&#34;&gt;\(\times\)&lt;/span&gt;A and C&lt;span class=&#34;math inline&#34;&gt;\(\times\)&lt;/span&gt;B (where the father and mother are swapped).&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The performances of crosses and/or selfs and/or reciprocals can be compared by planning field experiments, usually known as &lt;strong&gt;diallel experiments&lt;/strong&gt; and designed as randomised complete blocks with 3-4 replicates.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;the-example&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;The example&lt;/h1&gt;
@@ -883,8 +1050,8 @@ dfM
 &lt;p&gt;In order to describe the above dataset, we might think of a two-way ANOVA model, where the ‘father’ and ‘mother’ lines (the ‘Par1’ and ‘Par2’ variables, respectively) are used as the explanatory factors.&lt;/p&gt;
 &lt;p&gt;This is a very tempting solution, but we should resist: a two way ANOVA model regards the ‘father’ and ‘mother’ effects as two completely different series of treatments, neglecting the fact that they are, indeed, the same genotypes in different combinations. That is exactly why we need specific &lt;strong&gt;diallel models&lt;/strong&gt; to describe the results of diallel experiments!&lt;/p&gt;
 &lt;/div&gt;
-&lt;div id=&#34;the-hayman-model-type-1&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;The “Hayman” model (type 1)&lt;/h1&gt;
+&lt;div id=&#34;the-haymans-model-type-1&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;The Hayman’s model type 1&lt;/h1&gt;
 &lt;p&gt;The first diallel model was proposed by Hayman (1954) and it was devised for complete diallel experiments, where reciprocals are available. Neglecting the design effects (blocks and/or environments), the Hayman’s model is defined as:&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[y _{ijk} = \mu + \textrm{g}_i + \textrm{g}_j + \textrm{ts}_{ij} + \textrm{rg}^a_{i} + \textrm{rg}^b_{j} + rs_{ij} + \varepsilon_{ijk} \quad\quad\quad (Eq. 1)\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(\mu\)&lt;/span&gt; is expected value (the overall mean, in the balanced case) and &lt;span class=&#34;math inline&#34;&gt;\(\varepsilon_{ijk}\)&lt;/span&gt; is the residual random error terms for the observation in the &lt;span class=&#34;math inline&#34;&gt;\(k^{th}\)&lt;/span&gt; block and with the parentals &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(j\)&lt;/span&gt;. All the other terms correspond to genetic effects, namely:&lt;/p&gt;
@@ -904,6 +1071,50 @@ dfM
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# library(devtools) # Install if necessary
 # install_github(&amp;quot;OnofriAndreaPG/lmDiallel&amp;quot;)
 library(lmDiallel)
+## Loading required package: multcomp
+## Loading required package: mvtnorm
+## Loading required package: survival
+## Loading required package: TH.data
+## Loading required package: MASS
+## 
+## Attaching package: &amp;#39;MASS&amp;#39;
+## The following object is masked from &amp;#39;package:dplyr&amp;#39;:
+## 
+##     select
+## 
+## Attaching package: &amp;#39;TH.data&amp;#39;
+## The following object is masked from &amp;#39;package:MASS&amp;#39;:
+## 
+##     geyser
+## Loading required package: plyr
+## ------------------------------------------------------------------------------
+## You have loaded plyr after dplyr - this is likely to cause problems.
+## If you need functions from both plyr and dplyr, please load plyr first, then dplyr:
+## library(plyr); library(dplyr)
+## ------------------------------------------------------------------------------
+## 
+## Attaching package: &amp;#39;plyr&amp;#39;
+## The following objects are masked from &amp;#39;package:dplyr&amp;#39;:
+## 
+##     arrange, count, desc, failwith, id, mutate, rename, summarise,
+##     summarize
+## The following object is masked from &amp;#39;package:purrr&amp;#39;:
+## 
+##     compact
+## Loading required package: sommer
+## Loading required package: Matrix
+## 
+## Attaching package: &amp;#39;Matrix&amp;#39;
+## The following objects are masked from &amp;#39;package:tidyr&amp;#39;:
+## 
+##     expand, pack, unpack
+## Loading required package: lattice
+## Loading required package: crayon
+## 
+## Attaching package: &amp;#39;crayon&amp;#39;
+## The following object is masked from &amp;#39;package:ggplot2&amp;#39;:
+## 
+##     %+%
 dMod &amp;lt;- lm(Yield ~ Block + GCA(Par1, Par2) + tSCA(Par1, Par2) +
               RGCA(Par1, Par2) + RSCA(Par1, Par2), data = df)
 summary(dMod)
@@ -1098,58 +1309,37 @@ summary(gh2, test = adjusted(type = &amp;quot;none&amp;quot;))
 &lt;/div&gt;
 &lt;div id=&#34;estimation-of-variance-components-random-genetic-effects&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Estimation of variance components (random genetic effects)&lt;/h1&gt;
-&lt;p&gt;In some cases, genetic effects are regarded as random and the aim is to estimate variance components. For this, we can use the &lt;code&gt;mmer()&lt;/code&gt; function in the ‘sommer’ package (Covarrubias-Pazaran, 2019), although we need to code two dummy variables:&lt;/p&gt;
-&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
-&lt;li&gt;‘dr’: assuming a value of zero for selfs, a value of -1 for crosses and 1 for the respective reciprocals;&lt;/li&gt;
-&lt;li&gt;‘combination’: which gives the reciprocals the same label (i.e. BA is given the same label as AB), so that any difference is erased.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;By using the &lt;code&gt;overlay()&lt;/code&gt; function in the ‘sommer’ package and the above dummy variables, we can code the following effects:&lt;/p&gt;
-&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
-&lt;li&gt;GCA effect: &lt;code&gt;~overlay(Par1, Par2)&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;RGCA effect: &lt;code&gt;~overlay(Par1, Par2):dr&lt;/code&gt; (please, note that the interaction with ‘dr’ excludes the selfs, which are coded as 0s, and distinguish the reciprocals, as they are coded with opposite signs)&lt;/li&gt;
-&lt;li&gt;SCA effect : &lt;code&gt;~combination&lt;/code&gt; (reciprocals are not considered)&lt;/li&gt;
-&lt;li&gt;RSCA effect: &lt;code&gt;~combination:dr&lt;/code&gt; (same note as above for RGCA)&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;It would make no sense to estimate the variance components for genetic effects with a diallel experiment based on three parentals. Therefore, we give an example based on the ‘hayman54’ dataset, as available in the ‘lmDiallel’ package and relating to a complete diallel experiment with eight parentals (Hayman, 1954).&lt;/p&gt;
+&lt;p&gt;In some cases, genetic effects are regarded as random and the aim is to estimate variance components. For this, we can use the &lt;code&gt;mmer()&lt;/code&gt; function in the ‘sommer’ package (Covarrubias-Pazaran, 2016), although we need to code a few dummy variables, which may make the task difficult for practitioners. Therefore, we coded a wrapper for the &lt;code&gt;mmer()&lt;/code&gt; function (&lt;code&gt;mmer.diallel()&lt;/code&gt;)that uses the same syntax as &lt;code&gt;lm.diallel()&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;It would make no sense to estimate the variance components for genetic effects with a diallel experiment based on three parentals and, therefore, we give an example based on the ‘hayman54’ dataset, as available in the ‘lmDiallel’ package and relating to a complete diallel experiment with eight parentals (Hayman, 1954).&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rm(list=ls())
-library(sommer)
-library(lmDiallel)
 data(hayman54)
-
-# Dummy variables
-hayman54$dr &amp;lt;- ifelse(as.character(hayman54$Par1) &amp;lt; as.character(hayman54$Par2), -1,
-                ifelse(as.character(hayman54$Par1) == as.character(hayman54$Par2), 0, 1))
-hayman54$combination &amp;lt;- factor( ifelse(as.character(hayman54$Par1) &amp;lt;=
-                                         as.character(hayman54$Par2),
-                                 paste(hayman54$Par1, hayman54$Par2, sep =&amp;quot;&amp;quot;),
-                                 paste(hayman54$Par2, hayman54$Par1, sep =&amp;quot;&amp;quot;)) )
-mod1h &amp;lt;- mmer(Ftime ~ Block, data = hayman54, 
-              random = ~ overlay(Par1, Par2)
-              + overlay(Par1, Par2):dr
-              + combination
-              + combination:dr, verbose = F)
-summary(mod1h)$varcomp
-##                                       VarComp VarCompSE    Zratio Constraint
-## overlay(Par1, Par2).Ftime-Ftime    1276.49877 750.02253 1.7019472   Positive
-## overlay(Par1, Par2):dr.Ftime-Ftime   17.97648  19.91001 0.9028864   Positive
-## combination.Ftime-Ftime            1108.86771 329.97440 3.3604659   Positive
-## combination:dr.Ftime-Ftime           29.41085  46.54826 0.6318356   Positive
-## units.Ftime-Ftime                   422.99303  75.36714 5.6124330   Positive&lt;/code&gt;&lt;/pre&gt;
+mod.ran &amp;lt;- mmer.diallel(Ftime ~ Par1 + Par2, Block = Block,
+                        data = hayman54, fct = &amp;quot;HAYMAN1&amp;quot;)
+mod.ran
+##              VarComp  VarCompSE
+## Block        0.00000   9.321698
+## GCA       1276.73142 750.174164
+## RGCA        17.97647  19.909911
+## tSCA      1110.99398 330.172943
+## RSCA        30.53937  46.467163
+## Residuals  418.47875  74.563526&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;We do hope that you enjoyed this post; if you are interested in diallel models, please, stay tuned: we have other examples on the way.&lt;/p&gt;
 &lt;p&gt;Thanks for reading&lt;/p&gt;
 &lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Prof. Luigi Russi&lt;br /&gt;
+Dr. Niccolò Terzaroli&lt;br /&gt;
 Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
 University of Perugia (Italy)&lt;br /&gt;
-&lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
 &lt;hr /&gt;
 &lt;/div&gt;
 &lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;References&lt;/h1&gt;
 &lt;ul&gt;
-&lt;li&gt;Covarrubias-Pazaran, G., 2019. Quantitative genetics using the sommer package.&lt;/li&gt;
+&lt;li&gt;Covarrubias-Pazaran, G., 2016. Genome-Assisted Prediction of Quantitative Traits Using the R Package sommer. PLOS ONE 11, e0156744. &lt;a href=&#34;https://doi.org/10.1371/journal.pone.0156744&#34; class=&#34;uri&#34;&gt;https://doi.org/10.1371/journal.pone.0156744&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;Hayman, B.I., 1954. The Analysis of Variance of Diallel Tables. Biometrics 10, 235. &lt;a href=&#34;https://doi.org/10.2307/3001877&#34; class=&#34;uri&#34;&gt;https://doi.org/10.2307/3001877&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;Möhring, J., Melchinger, A.E., Piepho, H.P., 2011b. REML-Based Diallel Analysis. Crop Science 51, 470–478. &lt;a href=&#34;https://doi.org/10.2135/cropsci2010.05.0272&#34; class=&#34;uri&#34;&gt;https://doi.org/10.2135/cropsci2010.05.0272&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Onofri, A., Terzaroli, N., Russi, L., 2020. Linear models for diallel crosses: a review with R functions. Theor Appl Genet. &lt;a href=&#34;https://doi.org/10.1007/s00122-020-03716-8&#34; class=&#34;uri&#34;&gt;https://doi.org/10.1007/s00122-020-03716-8&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Onofri, A., Terzaroli, N., Russi, L., 2020. Linear models for diallel crosses: a review with R functions. Theoretical Applied Genetics, &lt;a href=&#34;https://doi.org/10.1007/s00122-020-03716-8&#34; class=&#34;uri&#34;&gt;https://doi.org/10.1007/s00122-020-03716-8&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 </description>

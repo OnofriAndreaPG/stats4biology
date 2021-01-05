@@ -1,0 +1,168 @@
+---
+title: 'lmDiallel: a new R package to fit diallel models. The Hayman''s model (type 2)'
+author: "Andrea Onofri, Niccolò Terzaroli and Luigi Russi"
+date: 2021-01-05
+slug: 'Multi_environment_studies'
+categories:
+  - R
+  - 'Multi_environment_studies'
+tags:
+  - R
+  - 'Multi_environment_studies'
+  - 'lmDiallel'
+  - 'diallel_models'
+archives:
+  - 2021
+---
+
+
+
+<p>This posts follows two other previously published posts, where we presented our new ‘lmDiallel’ package (<a href="https://www.statforbiology.com/2020/stat_met_diallel1/">see here</a>) and showed how we can use it to fit the Hayman’s model type 1, as proposed in Hayman (1954) (<a href="https://www.statforbiology.com/2020/stat_met_diallel_hayman1/">see here</a>). In this post, we will give a further example relating to another very widespread model from the same author, the Hayman’s model type 2. We apologise for some overlapping with previous posts: we think this is necessary so that each post can be read on its own.</p>
+<p>The model we are going to talk about is used to describe the results of full (complete) diallel experiments, where we have crosses + reciprocals + selfs. If you are not sure what a diallel experiment is, we suggest you go back to one of our previous posts on this sequence, where we give some preliminary information for beginners. Otherwise, we can proceed to the motivating example.</p>
+<div id="the-example" class="section level1">
+<h1>The example</h1>
+<p>In this post we will use the same example as provided in the original Hayman’s paper (Hayman, 1954), relating to a complete diallel experiment with eight parental lines. The R dataset is included in the ‘lmDiallel’ package; in the box below we load the data, after installing (if necessary) and loading the ‘lmDiallel’ package (see box below).</p>
+<pre class="r"><code># library(devtools) # Install if necessary
+# install_github(&quot;OnofriAndreaPG/lmDiallel&quot;)
+library(lmDiallel)
+data(&quot;hayman54&quot;)
+head(hayman54)
+##   Block Par1 Par2 Ftime
+## 1     1    A    A   276
+## 2     1    A    B   156
+## 3     1    A    C   322
+## 4     1    A    D   250
+## 5     1    A    E   162
+## 6     1    A    F   193</code></pre>
+</div>
+<div id="the-haymans-model-type-2" class="section level1">
+<h1>The Hayman’s model type 2</h1>
+<p>The Hayman’s model type 2 is derived from type 1 (see our previous post), by partitioning the tSCA effect in three additive components. The equation is:</p>
+<p><span class="math display">\[y_{ijk} = \left\{ {\begin{array}{ll}
+\mu + \gamma_k + \textrm{g}_i + \textrm{g}_j + m + d_i + d_j + s_{ij} + rg^a_i + rg^b_j + rs_{ij} + \varepsilon_{ijk} &amp; \textrm{for} \quad i \neq j\\
+\mu + \gamma_k + 2\, \textrm{g}_i - (n - 1)m - (n - 2)d_i + \varepsilon_{ijk} &amp; \textrm{for} \quad i = j \end{array}} \right.\]</span></p>
+<p>where <span class="math inline">\(\mu\)</span> is the expected value (the overall mean, in the case of fully orthogonal designs), <span class="math inline">\(n\)</span> is the number of parentals and <span class="math inline">\(\varepsilon_{ijk}\)</span> is the residual random error term. All the other terms correspond to genetic effects, namely:</p>
+<ol style="list-style-type: decimal">
+<li>the <span class="math inline">\(\textrm{g}_i\)</span> and <span class="math inline">\(\textrm{g}_j\)</span> terms are the <strong>general combining abilities</strong> (GCAs) of the <span class="math inline">\(i^{th}\)</span> and <span class="math inline">\(j^{th}\)</span> parents (<a href="https://www.statforbiology.com/2020/stat_met_diallel_hayman1/">see here</a>).</li>
+<li>The <span class="math inline">\(rg^a_i\)</span> and <span class="math inline">\(rg^b_j\)</span> terms are the <strong>reciprocal general combining abilities</strong> (RGCAs) for the <span class="math inline">\(i^{th}\)</span> and <span class="math inline">\(j^{th}\)</span> parents (<a href="https://www.statforbiology.com/2020/stat_met_diallel_hayman1/">see here</a>).</li>
+<li>The <span class="math inline">\(m\)</span> term relates to the difference between the average value of all observations and the average values of crosses (<strong>Mean Dominance Deviation</strong>; MDD).</li>
+<li>The <span class="math inline">\(d_i\)</span> and <span class="math inline">\(df_j\)</span> terms relate to the differences between the yield of each selfed parent (<span class="math inline">\(Y_{ij}\)</span>, with <span class="math inline">\(i = j\)</span>) and the average yield of all selfed parents (<strong>dominance deviation</strong> for the <span class="math inline">\(i^{th}\)</span> parent; DD).</li>
+<li>The term <span class="math inline">\(s_{ij}\)</span> is the SCA effect for the combination <span class="math inline">\(ij\)</span>.</li>
+<li>The <span class="math inline">\(rs_{ij}\)</span> term is the <strong>reciprocal specific combining ability</strong> (RSCA) for a specific <span class="math inline">\(ij\)</span> combination, that is the discrepancy between the performances of the two reciprocals (e.g, A <span class="math inline">\(\times\)</span> B vs. B <span class="math inline">\(\times\)</span> A)(<a href="https://www.statforbiology.com/2020/stat_met_diallel_hayman1/">see here</a>).</li>
+</ol>
+<p>Similarly to type 1, the Hayman’s model type 2 considers the genetical effects as differences with respect to the intercept <span class="math inline">\(\mu\)</span>, that is the mean of all observations (when the design is orthogonal). However, with respect to type 1, this latter model permits the estimation of a higher number of genetic effects (GCAs, RGCAs, MDD, DDs, SCAs and RSCAs) and provides an approach to quantify heterotic effects. We should consider that, due to unbalance (the number of crosses is never equal to the number of selfs), it is necessary to introduce some coefficients (i.e. <span class="math inline">\(n - 1\)</span> and <span class="math inline">\(n - 2\)</span> in Equation 1), which do not have an obvious meaning. In future posts we will see that other diallel models were proposed, which account for heterotic effects in a different manner (Gardner and Eberhart, 1966).</p>
+</div>
+<div id="model-fitting-with-r" class="section level1">
+<h1>Model fitting with R</h1>
+<p>Let’s assume that all effects are fixed, apart from the residual error effect. Consequently, Equation 1 is a specific parameterisation of a general linear model, which we can fit by the usual <code>lm()</code> function and related methods. However, we need to exploit some of the facilities in our new ‘lmDiallel’ extension package, which consist of the <code>GCA()</code>, <code>MDD()</code>, <code>DD()</code>, <code>SCA()</code>, <code>RGCA()</code> and <code>RSCA()</code> functions (see the box below). The resulting <code>lm</code> object can be explored by the usual R methods, such as <code>summary()</code> and <code>anova()</code> (the output of the <code>summary()</code> method is partly hidden, for brevity)</p>
+<pre class="r"><code>contrasts(hayman54$Block) &lt;- &quot;contr.sum&quot;
+dMod &lt;- lm(Ftime ~ Block + GCA(Par1, Par2) + MDD(Par1, Par2) +
+             DD(Par1, Par2) + SCA(Par1, Par2) +
+             RGCA(Par1, Par2) + RSCA(Par1, Par2), data = hayman54)
+summary(dMod)$coef[1:6,]
+##                      Estimate Std. Error    t value     Pr(&gt;|t|)
+## (Intercept)        162.898437   1.804567 90.2700843 2.381071e-68
+## Block1              -1.054688   1.804567 -0.5844545 5.610017e-01
+## GCA(Par1, Par2)g_A  46.195312   3.376036 13.6832990 1.558468e-20
+## GCA(Par1, Par2)g_B -24.585938   3.376036 -7.2824864 6.421946e-10
+## GCA(Par1, Par2)g_C  49.632812   3.376036 14.7015049 4.900927e-22
+## GCA(Par1, Par2)g_D  18.351563   3.376036  5.4358311 9.415231e-07
+# ...
+# ...
+anova(dMod)
+## Analysis of Variance Table
+## 
+## Response: Ftime
+##                  Df Sum Sq Mean Sq F value    Pr(&gt;F)    
+## Block             1    142     142  0.3416   0.56100    
+## GCA(Par1, Par2)   7 277717   39674 95.1805 &lt; 2.2e-16 ***
+## MDD(Par1, Par2)   1  30797   30797 73.8840 3.259e-12 ***
+## DD(Par1, Par2)    7  34153    4879 11.7050 1.957e-09 ***
+## SCA(Par1, Par2)  20  37289    1864  4.4729 2.560e-06 ***
+## RGCA(Par1, Par2)  7   6739     963  2.3097   0.03671 *  
+## RSCA(Par1, Par2) 21  12373     589  1.4135   0.14668    
+## Residuals        63  26260     417                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>For the sake of simplicity, we also built a wrapper function named <code>lm.diallel()</code>, which can be used in the very same fashion as <code>lm()</code>. The syntax is:</p>
+<pre><code>lm.diallel(formula, Block, Env, data, fct)</code></pre>
+<p>where ‘formula’ specifies the response variable and the two variables for parentals (e.g., Yield ~ Par1 + Par2) and the two arguments ‘Block’ and ‘Env’ are used to specify optional variables, coding for blocks and environments, respectively. The argument ‘data’ is a ‘dataframe’ where to look for the explanatory variables and, finally, ‘fct’ is a string variable coding for the selected model (“HAYMAN2”, for this example; see below).</p>
+<pre class="r"><code>dMod2 &lt;- lm.diallel(Ftime ~ Par1 + Par2, Block = Block,
+                    data = hayman54, fct = &quot;HAYMAN2&quot;)
+# summary(dMod2)
+anova(dMod2)
+## Analysis of Variance Table
+## 
+## Response: Ftime
+##           Df Sum Sq Mean Sq F value    Pr(&gt;F)    
+## Block      1    142     142  0.3416   0.56100    
+## MDD        1  30797   30797 73.8840 3.259e-12 ***
+## GCA        7 277717   39674 95.1805 &lt; 2.2e-16 ***
+## DD         7  34153    4879 11.7050 1.957e-09 ***
+## SCA       20  37289    1864  4.4729 2.560e-06 ***
+## RGCA       7   6739     963  2.3097   0.03671 *  
+## RSCA      21  12373     589  1.4135   0.14668    
+## Residuals 63  26260                              
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>The above function works very much like the <code>lm()</code> function and makes use of the general purpose linear model solver <code>lm.fit()</code>. Apart from simplicity, another advantage is that the call to <code>lm.diallel()</code> returns an object of both ‘lm’ and ‘diallel’ classes. For this latter class, we built several specific S3 methods, such as the usual <code>anova()</code>, <code>summary()</code> and <code>model.matrix()</code> methods, partly shown in the box above.</p>
+<p>Considering that diallel models are usually fitted to determine genetical parameters, we also built the <code>glht.diallelMod()</code> method and the <code>diallel.eff()</code> function, which can be used with the ‘multcomp’ package, to retrieve the complete list of genetical parameters. An excerpt is shown in the box below.</p>
+<pre class="r"><code>library(multcomp)
+gh &lt;- glht(linfct = diallel.eff(dMod2))
+# summary(gh, test = adjusted(type = &quot;none&quot;))
+#    Simultaneous Tests for General Linear Hypotheses
+# 
+# Linear Hypotheses:
+#                Estimate Std. Error t value Pr(&gt;|t|)    
+# Intercept == 0 162.8984     1.8046  90.270  &lt; 2e-16 ***
+# m == 0          -5.8627     0.6821  -8.596 4.48e-09 ***
+# g_A == 0        46.1953     3.3760  13.683 2.17e-13 ***
+# g_B == 0       -24.5859     3.3760  -7.282 9.83e-08 ***
+# g_C == 0        49.6328     3.3760  14.702 4.13e-14 ***
+# g_D == 0        18.3516     3.3760   5.436 1.07e-05 ***
+# g_E == 0       -20.9297     3.3760  -6.199 1.47e-06 ***
+# g_F == 0         2.4453     3.3760   0.724 0.475340    
+# g_G == 0       -44.7109     3.3760 -13.244 4.57e-13 ***
+# g_H == 0       -26.3984     3.3760  -7.819 2.71e-08 ***
+# d_A == 0         1.2213     1.9492   0.627 0.536380    
+# d_B == 0        -2.6224     1.9492  -1.345 0.190113    
+# ...
+# ...</code></pre>
+<p>In a previous post (<a href="https://www.statforbiology.com/2020/stat_met_diallel_hayman1/">see here</a>) we have shown that, when diallel models are fitted to the genotype means (and thus we have no replicates), an appropriate estimate of residual mean square and degrees of freedom can be passed as arguments to the <code>summary()</code>, <code>anova()</code> and <code>diallel.eff()</code> methods.</p>
+</div>
+<div id="estimation-of-variance-components-random-genetic-effects" class="section level1">
+<h1>Estimation of variance components (random genetic effects)</h1>
+<p>If we intend to regard the genetic effects as random and to estimate variance components, we can use the <code>mmer()</code> function in the ‘sommer’ package (Covarrubias-Pazaran, 2016), although we need to code a bunch of dummy variables. In order to make things simpler for routine experiments, we have coded the <code>mmer.diallel()</code> wrapper using the same syntax as the <code>lm.diallel()</code> function. The exemplary code is given in the box below.</p>
+<pre class="r"><code># Random genetic effects
+mod1m &lt;- mmer.diallel(Ftime ~ Par1 + Par2, Block = Block, 
+                      data = hayman54,
+                      fct = &quot;HAYMAN2&quot;)
+mod1m
+##              VarComp   VarCompSE
+## Block        0.00000    9.188298
+## MDD       1783.96081 3118.893561
+## GCA       1005.92052  574.893353
+## RGCA        17.97898   19.920016
+## DD         659.53567  468.205470
+## SCA        351.74035  144.688653
+## RSCA        32.02325   46.361581
+## Residuals  412.54051   73.506382</code></pre>
+<p>That’s all about the Hayman’s models; you may have noted that both models (type 1 and 2) were devised for full diallel experiments, which are not so widespread in ‘genetical’ literature. A few years later, in 1956, the Australian scientist B. Griffing made the relevant effort of creating a comprehensive set of models which can be fitted to all types of diallel experiments. We will talk about these models in a future post.</p>
+<p>Thanks for reading (and happy 2021!)</p>
+<p>Prof. Andrea Onofri<br />
+Prof. Luigi Russi<br />
+Dr. Niccolò Terzaroli<br />
+Department of Agricultural, Food and Environmental Sciences<br />
+University of Perugia (Italy)<br />
+Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<hr />
+</div>
+<div id="references" class="section level1">
+<h1>References</h1>
+<ul>
+<li>Covarrubias-Pazaran, G., 2016. Genome-Assisted Prediction of Quantitative Traits Using the R Package sommer. PLOS ONE 11, e0156744. <a href="https://doi.org/10.1371/journal.pone.0156744" class="uri">https://doi.org/10.1371/journal.pone.0156744</a></li>
+<li>Hayman, B.I., 1954. The Analysis of Variance of Diallel Tables. Biometrics 10, 235. <a href="https://doi.org/10.2307/3001877" class="uri">https://doi.org/10.2307/3001877</a></li>
+<li>Möhring, J., Melchinger, A.E., Piepho, H.P., 2011b. REML-Based Diallel Analysis. Crop Science 51, 470–478. <a href="https://doi.org/10.2135/cropsci2010.05.0272" class="uri">https://doi.org/10.2135/cropsci2010.05.0272</a></li>
+<li>Onofri, A., Terzaroli, N., Russi, L., 2020. Linear models for diallel crosses: a review with R functions. Theor Appl Genet. <a href="https://doi.org/10.1007/s00122-020-03716-8" class="uri">https://doi.org/10.1007/s00122-020-03716-8</a></li>
+</ul>
+</div>

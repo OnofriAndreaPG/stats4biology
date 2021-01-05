@@ -22,11 +22,17 @@ knitr::knit_hooks$set(document = function(x){
 })
 ```
 
-In a previous post we have presented our new ‘lmDiallel’ package ([see this link here](https://www.statforbiology.com/2020/stat_met_diallel1/) and see also the original paper in [Theoretical and Applied Genetics](https://rdcu.be/caxZh)). It provides several extensions to the `lm()` function in R, to fit a class of linear models of interest for plant breeders or geneticists, the so-called diallel models. For those who are interested in this topic, we would like to present some examples of diallel models and how to fit them in R. Please, sit back and relax and, if you have comments, let us know, using the email link at the bottom of this post.
+In a previous post we have presented our new ‘lmDiallel’ package ([see this link here](https://www.statforbiology.com/2020/stat_met_diallel1/) and see also the original paper in [Theoretical and Applied Genetics](https://rdcu.be/caxZh)). This package provides an extensions to fit a class of linear models of interest for plant breeders or geneticists, the so-called diallel models. In this post and other future posts we would like to present some examples of how to use  this package: please, sit back and relax and, if you have comments, let us know, using the email link at the bottom of this post.
 
 # But... what is a 'diallel'?
 
-If you are not a plant breeder or a geneticist in general, you may be asking this question. From the ancient Greek language, the 'diallel' word means 'reciprocating' and a diallel cross is a set of several possible crosses and selfs between some parental lines. For example, if we take the male lines A, B and C together with the same female lines A, B and C and we imagine to cross those lines with one another, we obtain the selfs A$\times$A, B$\times$B and C$\times$C, the crosses A$\times$B, A$\times$C and B$\times$C and, in some instances, the reciprocals B$\times$A, C$\times$A and C$\times$B (where the father and mother are swapped). The performances of crosses and/or selfs and/or reciprocals can be compared by planning field experiments, usually known as **diallel experiments** and designed as randomised complete blocks with 3-4 replicates.
+If you are not a plant breeder or a geneticist in general, you may be asking this question. From the ancient Greek language, the 'diallel' word means 'reciprocating' and a diallel cross is a set of several possible crosses and selfs between some parental lines. For example, if we take the male lines A, B and C together with the same female lines A, B and C and we imagine to cross those lines with one another, we obtain:
+
+1. the selfs A$\times$A, B$\times$B and C$\times$C, 
+2. the crosses A$\times$B, A$\times$C and B$\times$C,
+3. and, in some instances, the reciprocals B$\times$A, C$\times$A and C$\times$B (where the father and mother are swapped).
+
+The performances of crosses and/or selfs and/or reciprocals can be compared by planning field experiments, usually known as **diallel experiments** and designed as randomised complete blocks with 3-4 replicates.
 
 # The example
 
@@ -56,7 +62,7 @@ In order to describe the above dataset, we might think of a two-way ANOVA model,
 
 This is a very tempting solution, but we should resist: a two way ANOVA model regards the 'father' and 'mother' effects as two completely different series of treatments, neglecting the fact that they are, indeed, the same genotypes in different combinations. That is exactly why we need specific **diallel models** to describe the results of diallel experiments!
 
-# The "Hayman" model (type 1)
+# The Hayman's model type 1
 
 The first diallel model was proposed by Hayman (1954) and it was devised for complete diallel experiments, where reciprocals are available. Neglecting the design effects (blocks and/or environments), the Hayman's model is defined as:
 
@@ -173,8 +179,8 @@ In this case, we have no reliable estimate of residual error, but the `summary()
 ```{r}
 anova(dMod3, MSE = 3.007/4, dfr = 24)
 summary(dMod3, MSE = 3.007/4, dfr = 24)
-
 ```
+
 
 ```{r eval=FALSE, include=FALSE}
 # Calcolo errori standard
@@ -194,40 +200,17 @@ summary(gh2, test = adjusted(type = "none"))
 
 # Estimation of variance components (random genetic effects)
 
-In some cases, genetic effects are regarded as random and the aim is to estimate variance components. For this, we can use the `mmer()` function in the 'sommer' package (Covarrubias-Pazaran, 2019), although we need to code two dummy variables:
+In some cases, genetic effects are regarded as random and the aim is to estimate variance components. For this, we can use the `mmer()` function in the 'sommer' package (Covarrubias-Pazaran, 2016), although we need to code a few dummy variables, which may make the task difficult for practitioners. Therefore, we coded a wrapper for the `mmer()` function (`mmer.diallel()`)that uses the same syntax as `lm.diallel()`.
 
-1. 'dr': assuming a value of zero for selfs, a value of -1 for crosses and 1 for the respective reciprocals;
-2. 'combination': which gives the reciprocals the same label (i.e. BA is given the same label as AB), so that any difference is erased.
-
-By using the `overlay()` function in the 'sommer' package and the above dummy variables, we can code the following effects:
-
-1. GCA effect: `~overlay(Par1, Par2)`
-2. RGCA effect: `~overlay(Par1, Par2):dr` (please, note that the interaction with 'dr' excludes the selfs, which are coded as 0s, and distinguish the reciprocals, as they are coded with opposite signs)
-3. SCA effect : `~combination` (reciprocals are not considered)
-4. RSCA effect: `~combination:dr` (same note as above for RGCA)
-
-It would make no sense to estimate the variance components for genetic effects with a diallel experiment based on three parentals. Therefore, we give an example based on the 'hayman54' dataset, as available in the 'lmDiallel' package and relating to a complete diallel experiment with eight parentals (Hayman, 1954).
+It would make no sense to estimate the variance components for genetic effects with a diallel experiment based on three parentals and, therefore, we give an example based on the 'hayman54' dataset, as available in the 'lmDiallel' package and relating to a complete diallel experiment with eight parentals (Hayman, 1954).
 
 
 ```{r message=FALSE, warning=FALSE}
 rm(list=ls())
-library(sommer)
-library(lmDiallel)
 data(hayman54)
-
-# Dummy variables
-hayman54$dr <- ifelse(as.character(hayman54$Par1) < as.character(hayman54$Par2), -1,
-                ifelse(as.character(hayman54$Par1) == as.character(hayman54$Par2), 0, 1))
-hayman54$combination <- factor( ifelse(as.character(hayman54$Par1) <=
-                                         as.character(hayman54$Par2),
-                                 paste(hayman54$Par1, hayman54$Par2, sep =""),
-                                 paste(hayman54$Par2, hayman54$Par1, sep ="")) )
-mod1h <- mmer(Ftime ~ Block, data = hayman54, 
-              random = ~ overlay(Par1, Par2)
-              + overlay(Par1, Par2):dr
-              + combination
-              + combination:dr, verbose = F)
-summary(mod1h)$varcomp
+mod.ran <- mmer.diallel(Ftime ~ Par1 + Par2, Block = Block,
+                        data = hayman54, fct = "HAYMAN1")
+mod.ran
 ```
 
 We do hope that you enjoyed this post; if you are interested in diallel models, please, stay tuned: we have other examples on the way.
@@ -236,19 +219,21 @@ Thanks for reading
 
 
 Prof. Andrea Onofri   
+Prof. Luigi Russi    
+Dr. Niccolò Terzaroli      
 Department of Agricultural, Food and Environmental Sciences    
 University of Perugia (Italy)    
-[andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)
+Send comments to: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)
 
  
 ---
 
 # References
 
-* Covarrubias-Pazaran, G., 2019. Quantitative genetics using the sommer package.
+* Covarrubias-Pazaran, G., 2016. Genome-Assisted Prediction of Quantitative Traits Using the R Package sommer. PLOS ONE 11, e0156744. https://doi.org/10.1371/journal.pone.0156744
 * Hayman, B.I., 1954. The Analysis of Variance of Diallel Tables. Biometrics 10, 235. https://doi.org/10.2307/3001877
 * Möhring, J., Melchinger, A.E., Piepho, H.P., 2011b. REML-Based Diallel Analysis. Crop Science 51, 470–478. https://doi.org/10.2135/cropsci2010.05.0272
-* Onofri, A., Terzaroli, N., Russi, L., 2020. Linear models for diallel crosses: a review with R functions. Theor Appl Genet. https://doi.org/10.1007/s00122-020-03716-8
+* Onofri, A., Terzaroli, N., Russi, L., 2020. Linear models for diallel crosses: a review with R functions. Theoretical Applied Genetics, https://doi.org/10.1007/s00122-020-03716-8
 
 
 
