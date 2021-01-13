@@ -6,10 +6,216 @@
     <description>Recent content in Lmdiallel on The broken bridge between biologists and statisticians</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2018, @AndreaOnofri</copyright>
-    <lastBuildDate>Tue, 05 Jan 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 14 Jan 2021 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="/tags/lmdiallel/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>lmDiallel: a new R package to fit diallel models. The Griffing&#39;s models (1956)</title>
+      <link>/2021/stat_met_diallel_griffing/</link>
+      <pubDate>Thu, 14 Jan 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/2021/stat_met_diallel_griffing/</guid>
+      <description>
+
+
+&lt;p&gt;Diallel mating designs are often used by plant breeders to compare the possible crosses between a set of genotypes. In spite of such widespread usage, the process of data analysis in R is not yet strightforward and it is not clear which tool should be routinely used. We recently gave a small contribution by publishing a paper in Plant Breeding (&lt;a href=&#34;https://link.springer.com/article/10.1007/s00122-020-03716-8&#34;&gt;Onofri et al., 2020&lt;/a&gt; ), where we advocated the idea that models for diallel crosses are just a class of general linear models, that should be fit by Ordinary Least Squares (OLS) or REstricted Maximum Likelihood methods (REML).&lt;/p&gt;
+&lt;p&gt;In that paper, we presented &lt;code&gt;lmDiallel&lt;/code&gt;, a new R package to fit diallel models, which we followed up with a series of three blog posts, giving more detail about the package (&lt;a href=&#34;https://www.statforbiology.com/2020/stat_met_diallel1/&#34;&gt;see here&lt;/a&gt;), about the Hayman’s models type 1 (&lt;a href=&#34;https://www.statforbiology.com/2020/stat_met_diallel_hayman1/&#34;&gt;see here&lt;/a&gt;) and type 2 (&lt;a href=&#34;https://www.statforbiology.com/2021/stat_met_diallel_hayman2/&#34;&gt;see here&lt;/a&gt;). These latter models can be used to describe the data from full diallel experiments.&lt;/p&gt;
+&lt;p&gt;In this fourth post we are going to talk about a very flexible family of models, that was introduced by Griffing in 1956 and it is still very used in plant breeding, to estimate General Combining Ability (GCA) and Specific Combining Ability (SCAs). The equations take different forms, to account for all possible mating schemes.&lt;/p&gt;
+&lt;p&gt;With full diallel experiments (including selfs and reciprocals; &lt;strong&gt;mating scheme 1&lt;/strong&gt;), the model is very similar to Hayman’s model type 1, except that reciprocal effects are not parted into RGCA and RSCA (Reciprocal General Combining Ability and Reciprocal Specific Combining Ability). The equation is:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[y _{ijk} = \mu + \textrm{g}_i + \textrm{g}_j + \textrm{ts}_{ij} + r_{ij} + \varepsilon_{ijk} \quad\quad\quad (1)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(\mu\)&lt;/span&gt; is the expected value (the overall mean, in the balanced case) and &lt;span class=&#34;math inline&#34;&gt;\(\varepsilon_{ijk}\)&lt;/span&gt; is the residual random error term for the observation in the &lt;span class=&#34;math inline&#34;&gt;\(k^{th}\)&lt;/span&gt; block and with the parentals &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(j\)&lt;/span&gt;. All the other terms correspond to genetic effects, namely:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;the &lt;span class=&#34;math inline&#34;&gt;\(\textrm{g}_i\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(\textrm{g}_j\)&lt;/span&gt; terms are the General Combining Abilities (GCAs) of the &lt;span class=&#34;math inline&#34;&gt;\(i^{th}\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(j^{th}\)&lt;/span&gt; parents.&lt;/li&gt;
+&lt;li&gt;The &lt;span class=&#34;math inline&#34;&gt;\(ts_{ij}\)&lt;/span&gt; term is the total Specific Combining Ability (SCA) for the combination &lt;span class=&#34;math inline&#34;&gt;\(ij\)&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;The &lt;span class=&#34;math inline&#34;&gt;\(r_{ij}\)&lt;/span&gt; term is the reciprocal effect for a specific &lt;span class=&#34;math inline&#34;&gt;\(ij\)&lt;/span&gt; combination.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;When the reciprocal crosses are not available (&lt;strong&gt;mating scheme 2&lt;/strong&gt;), the term &lt;span class=&#34;math inline&#34;&gt;\(\textrm{r}_{ij}\)&lt;/span&gt; needs to be dropped, so that the model reduces to:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[y _{ijk} = \mu + \textrm{g}_i + \textrm{g}_j + \textrm{ts}_{ij} + \varepsilon_{ijk} \quad\quad\quad (2)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;When the reciprocals are available, but selfs are missing (&lt;strong&gt;mating scheme 3&lt;/strong&gt;), the model is similar to equation 1, but the term &lt;span class=&#34;math inline&#34;&gt;\(\textrm{ts}_{ij}\)&lt;/span&gt; is replaced by &lt;span class=&#34;math inline&#34;&gt;\(\textrm{s}_{ij}\)&lt;/span&gt; (we use a different symbol, because the design matrix is slightly different and needs a different coding):&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[y _{ijk} = \mu + \textrm{g}_i + \textrm{g}_j + \textrm{s}_{ij} + r_{ij} + \varepsilon_{ijk} \quad\quad\quad (3)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Finally, when neither selfs nor reciprocals are available (&lt;strong&gt;mating scheme 4&lt;/strong&gt;), the equation reduces to:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[y _{ijk} = \mu + \textrm{g}_i + \textrm{g}_j + \textrm{s}_{ij} + \varepsilon_{ijk} \quad\quad\quad (4)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Let’s see how to fit the above models by using a set of examples with different mating schemes.&lt;/p&gt;
+&lt;div id=&#34;example-1-a-full-diallel-experiment&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Example 1: a full diallel experiment&lt;/h1&gt;
+&lt;p&gt;The example in Hayman (1954) relates to a complete diallel experiment with eight parental lines, producing 64 combinations (8 selfs + 28 crosses with 2 reciprocals each). The R dataset is included in the ‘lmDiallel’ package; in the box below we load the data, after installing (if necessary) and loading the ‘lmDiallel’ package (see box below). For brevity, some R commands are shown but not executed (they are commented out)&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# library(devtools) # Install if necessary
+# install_github(&amp;quot;OnofriAndreaPG/lmDiallel&amp;quot;)
+library(lmDiallel)
+data(&amp;quot;hayman54&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;For this complete diallel experiment we can fit equation 1, by including GCAs, tSCAs and reciprocal effects. Please, note that excluding any of these effects results in unreliable estimates of the residual mean square. We can use either the &lt;code&gt;lm()&lt;/code&gt; or the &lt;code&gt;lm.diallel()&lt;/code&gt; functions, as shown in the box below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;contrasts(hayman54$Block) &amp;lt;- &amp;quot;contr.sum&amp;quot;
+dMod &amp;lt;- lm(Ftime ~ Block + GCA(Par1, Par2) + tSCA(Par1, Par2) +
+             REC(Par1, Par2), data = hayman54)
+dMod2 &amp;lt;- lm.diallel(Ftime ~ Par1 + Par2, Block = Block,
+                    data = hayman54, fct = &amp;quot;GRIFFING1&amp;quot;)
+# summary(dMod2)
+anova(dMod2)
+## Analysis of Variance Table
+## 
+## Response: Ftime
+##             Df Sum Sq Mean Sq F value    Pr(&amp;gt;F)    
+## Block        1    142     142  0.3416   0.56100    
+## GCA          7 277717   39674 95.1805 &amp;lt; 2.2e-16 ***
+## SCA         28 102238    3651  8.7599 6.656e-13 ***
+## Reciprocals 28  19112     683  1.6375   0.05369 .  
+## Residuals   63  26260                              
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In order to obtain the full list of genetical parameters, we can use the &lt;code&gt;glht()&lt;/code&gt; function in the &lt;code&gt;multcomp&lt;/code&gt; package, together with the &lt;code&gt;diallel.eff()&lt;/code&gt; function in the ‘lmDiallel’ package. An excerpt of the results is shown below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(multcomp)
+gh &amp;lt;- glht(linfct = diallel.eff(dMod2))
+# summary(gh, test = adjusted(type = &amp;quot;none&amp;quot;))
+#    Simultaneous Tests for General Linear Hypotheses
+# 
+# Linear Hypotheses:
+#                  Estimate Std. Error t value Pr(&amp;gt;|t|)    
+# Intercept == 0  1.629e+02  1.805e+00  90.270  &amp;lt; 2e-16 ***
+# g_A == 0        4.620e+01  3.376e+00  13.683 2.17e-13 ***
+# g_B == 0       -2.459e+01  3.376e+00  -7.282 9.83e-08 ***
+# g_C == 0        4.963e+01  3.376e+00  14.702 4.13e-14 ***
+# g_D == 0        1.835e+01  3.376e+00   5.436 1.07e-05 ***
+# g_E == 0       -2.093e+01  3.376e+00  -6.199 1.47e-06 ***
+# g_F == 0        2.445e+00  3.376e+00   0.724 0.475340    
+# g_G == 0       -4.471e+01  3.376e+00 -13.244 4.57e-13 ***
+# g_H == 0       -2.640e+01  3.376e+00  -7.819 2.71e-08 ***
+# ts_A:A == 0     3.371e+01  1.263e+01   2.669 0.012941 *  
+# ts_A:B == 0    -3.151e+01  9.023e+00  -3.492 0.001731 ** 
+# ...
+# ...&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;example-2-no-reciprocals&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Example 2: no reciprocals&lt;/h1&gt;
+&lt;p&gt;As an example of a diallel experiments with no reciprocals, we consider the data reported in Lonnquist and Gardner (1961) relating to the yield of 21 maize genotypes, obtained from six male and six female parentals. The dataset is available as &lt;code&gt;lonnquist61&lt;/code&gt; in the &lt;code&gt;lmDiallel&lt;/code&gt; package and the model fitting process is very similar to that shown before for the mating scheme 1, apart from the fact that we fit equation 2 instead of equation 1. In the ‘lm()’ call, we use the &lt;code&gt;GCA()&lt;/code&gt; and &lt;code&gt;tSCA()&lt;/code&gt; functions, while in the &lt;code&gt;lm.diallel()&lt;/code&gt; call, we set the argument ‘fct’ to “GRIFFING2”.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rm(list=ls())
+data(lonnquist61)
+dMod &amp;lt;- lm(Yield ~ GCA(Par1, Par2) + tSCA(Par1, Par2), 
+           data = lonnquist61)
+dMod2 &amp;lt;- lm.diallel(Yield ~ Par1 + Par2,
+                    data = lonnquist61, fct = &amp;quot;GRIFFING2&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In this case the dataset has no replicates and, for the inferences, we need to provide an estimate of the residual mean square and degrees of freedom (see box below). If we have fitted the model by using the &lt;code&gt;lm()&lt;/code&gt; function, the resulting ‘lm’ object can be explored by using the &lt;code&gt;summary.diallel()&lt;/code&gt; and &lt;code&gt;anova.diallel()&lt;/code&gt; functions. Otherwise, if we have fitted the model with the &lt;code&gt;lm.diallel()&lt;/code&gt; function, the resulting ‘diallel’ object can be explored by using the &lt;code&gt;summary()&lt;/code&gt; and &lt;code&gt;anova()&lt;/code&gt; methods. See the box below for an example: the results are, obviously, the same.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# summary.diallel(dMod, MSE = 7.1, dfr = 60)
+anova.diallel(dMod, MSE = 7.1, dfr = 60)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##                  Df Sum Sq Mean Sq F value    Pr(&amp;gt;F)    
+## GCA(Par1, Par2)   5 234.23  46.846  6.5980 5.923e-05 ***
+## tSCA(Par1, Par2) 15 238.94  15.929  2.2436   0.01411 *  
+## Residuals        60          7.100                      
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+# summary(dMod2, MSE = 7.1, dfr = 60)
+anova(dMod2, MSE = 7.1, dfr = 60)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##           Df Sum Sq Mean Sq F value    Pr(&amp;gt;F)    
+## GCA        5 234.23  46.846  6.5980 5.923e-05 ***
+## SCA       15 238.94  15.929  2.2436   0.01411 *  
+## Residuals 60          7.100                      
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Also for the diallel object, we can retrieve the full list of genetical parameters with the &lt;code&gt;glht()&lt;/code&gt; function, by using the same syntax as shown above.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gh &amp;lt;- glht(linfct = diallel.eff(dMod2, MSE = 7.1, dfr = 60))
+# summary(gh, test = adjusted(type = &amp;quot;none&amp;quot;))&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;example-3-no-selfs&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Example 3: no selfs&lt;/h1&gt;
+&lt;p&gt;When the experimental design includes the reciprocal crosses but not the selfs, we can fit Equation 3. As an example, we take the same dataset as before (‘hayman54’), but we remove the selfs by using ‘dplyr’. The fitting process is the same as shown above and only the model specification is changed.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(dplyr)
+data(hayman54)
+hayman54b &amp;lt;- hayman54  %&amp;gt;% 
+  filter(Par1 != Par2)
+
+dMod &amp;lt;- lm(Ftime ~ Block + GCA(Par1, Par2) + 
+             SCA.G3(Par1, Par2) + REC.G3(Par1, Par2), 
+           data = hayman54b)
+dMod2 &amp;lt;- lm.diallel(Ftime ~ Par1 + Par2, Block = Block,
+                    data = hayman54b, fct = &amp;quot;GRIFFING3&amp;quot;)
+anova(dMod2)
+## Analysis of Variance Table
+## 
+## Response: Ftime
+##             Df Sum Sq Mean Sq F value    Pr(&amp;gt;F)    
+## Block        1    329   329.1  0.8367   0.36432    
+## GCA          7 168923 24131.9 61.3479 &amp;lt; 2.2e-16 ***
+## SCA         20  37289  1864.4  4.7398 2.318e-06 ***
+## Reciprocals 28  19112   682.6  1.7352   0.04052 *  
+## Residuals   55  21635                              
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+gh &amp;lt;- glht(linfct = diallel.eff(dMod2))
+# summary(gh, test = adjusted(type = &amp;quot;none&amp;quot;))&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;example-4-no-reciprocals-no-selfs&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Example 4: no reciprocals, no selfs&lt;/h1&gt;
+&lt;p&gt;In this final example, we consider a mating scheme where neither the reciprocal crosses nor the selfs are included (mating scheme 4). The dataset is taken from the original Griffing’s paper (Griffing, 1956) and it is available as ‘Griffing56’ in the ‘lmDiallel’ package. The analysis proceeds in the very same fashion as above, apart from the fact that we fit Equation 4, instead of 3 and that we input the appropriate residual error term to obtain the correct inferences, as the original dataset does not contain the replicated data.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;data(&amp;quot;griffing56&amp;quot;)
+
+dMod &amp;lt;- lm(Yield ~ GCA(Par1, Par2) + SCA.G3(Par1, Par2), 
+           data = griffing56)
+anova.diallel(dMod, MSE = 21.05, dfr = 2558)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##                      Df  Sum Sq Mean Sq F value    Pr(&amp;gt;F)    
+## GCA(Par1, Par2)       8 18606.0 2325.75 110.487 &amp;lt; 2.2e-16 ***
+## SCA.G3(Par1, Par2)   27  9164.9  339.44  16.125 &amp;lt; 2.2e-16 ***
+## Residuals          2558           21.05                      
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+dMod2 &amp;lt;- lm.diallel(Yield ~ Par1 + Par2,
+                    data = griffing56, fct = &amp;quot;GRIFFING4&amp;quot;)
+anova(dMod2, MSE = 21.05, dfr = 2558)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##             Df  Sum Sq Mean Sq F value    Pr(&amp;gt;F)    
+## GCA          8 18606.0 2325.75 110.487 &amp;lt; 2.2e-16 ***
+## SCA         27  9164.9  339.44  16.125 &amp;lt; 2.2e-16 ***
+## Residuals 2558           21.05                      
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+# summary(dMod2, MSE = 21.05, dfr = 2558)
+
+gh &amp;lt;- glht(linfct = diallel.eff(dMod2, MSE = 21.05, dfr = 2558))
+# summary(gh, test = adjusted(type = &amp;quot;none&amp;quot;))&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;estimation-of-variance-components-random-genetic-effects&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Estimation of variance components (random genetic effects)&lt;/h1&gt;
+&lt;p&gt;If we intend to regard the genetic effects as random and to estimate variance components, we can use the &lt;code&gt;mmer()&lt;/code&gt; function in the ‘sommer’ package (Covarrubias-Pazaran, 2016), although we need to code a bunch of dummy variables. In order to make things simpler for routine experiments, we have coded the &lt;code&gt;mmer.diallel()&lt;/code&gt; wrapper using the same syntax as the &lt;code&gt;lm.diallel()&lt;/code&gt; function. The exemplary code is given in the box below, relating to Equation 2, although the other equations can be fitted in a similar manner.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Random genetic effects
+mod1m &amp;lt;- mmer.diallel(Yield ~ Par1 + Par2,
+                      data = lonnquist61,
+                      fct = &amp;quot;GRIFFING2&amp;quot;)
+mod1m
+##        VarComp VarCompSE
+## GCA   3.863695  3.769373
+## tSCA 15.930144  5.819217&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In the next post we will consider another important family of models, devised by Gardner and Eberarth in 1966, which accounts for heterotic effects. Please, stay tuned!&lt;/p&gt;
+&lt;p&gt;Thanks for reading&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Dr. Niccolò Terzaroli&lt;br /&gt;
+Prof. Gino Russi&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+&lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;Covarrubias-Pazaran, G., 2016. Genome-Assisted Prediction of Quantitative Traits Using the R Package sommer. PLOS ONE 11, e0156744.&lt;/li&gt;
+&lt;li&gt;Griffing, B., 1956. Concept of general and specific combining ability in relation to diallel crossing systems. Australian Journal of Biological Science 9, 463–493.&lt;/li&gt;
+&lt;li&gt;Möhring, J., Melchinger, A.E., Piepho, H.P., 2011b. REML-Based Diallel Analysis. Crop Science 51, 470–478. &lt;a href=&#34;https://doi.org/10.2135/cropsci2010.05.0272&#34; class=&#34;uri&#34;&gt;https://doi.org/10.2135/cropsci2010.05.0272&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Onofri, A., Terzaroli, N., Russi, L., 2020. Linear models for diallel crosses: a review with R functions. Theor Appl Genet. &lt;a href=&#34;https://doi.org/10.1007/s00122-020-03716-8&#34; class=&#34;uri&#34;&gt;https://doi.org/10.1007/s00122-020-03716-8&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>lmDiallel: a new R package to fit diallel models. The Hayman&#39;s model (type 2)</title>
