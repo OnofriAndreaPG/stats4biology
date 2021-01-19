@@ -1,0 +1,127 @@
+---
+title: "Pairwise comparisons in nonlinear regression"
+author: "Andrea Onofri"
+date: 2021-01-19
+slug: 'nonlinear_regression'
+categories:
+  - R
+  - 'nonlinear_regression'
+tags:
+  - R
+  - 'nonlinear_regression'
+  - 'nls'
+  - 'aomisc'
+archives:
+  - 2021
+---
+
+
+
+<p>Pairwise comparisons are one of the most debated topic in agricultural research: they are very often used and, sometimes, abused, in literature. I have nothing against the appropriate use of this very useful technique and, for those who are interested, some colleagues and I have given a bunch of (hopefully) useful suggestions in a paper, a few years ago (<a href="https://onlinelibrary.wiley.com/doi/10.1111/j.1365-3180.2009.00758.x">follow this link here</a>).</p>
+<p>Pairwise comparisons usually follow the application of some sort of linear or generalised linear model; in this setting, the ‘emmeans’ package (Lenth, 2020) is very handy, as it uses a very logical approach. However, we can find ourselves in the need of making pairwise comparisons between the elements of a vector, which does not came as the result of linear model fitting.</p>
+<p>For example, we may happen to have an old table of means with standard errors and have lost the original raw data. Or, we may happen to have a vector of parameters from a nonlinear regression model, fitted with the <code>nls()</code> function. How do we make pairwise comparisons? Experienced users can make profit of the <code>glht()</code> function in the ‘multcomp’ package, although this is not immediate and, at least for me, it takes always some attempts to recall the exact syntax.</p>
+<p>Therefore, I have built the <code>pairComp()</code> wrapper, which is available within the ‘aomisc’ package, the accompanying package for this website. Let’s see how this function works by using a typical example.</p>
+<div id="a-case-study" class="section level1">
+<h1>A case-study</h1>
+<p>This is a real-life example, taken from a research published by Vischetti et al. in 1996 (we have used this example in other posts, before). That research considered three herbicides for weed control in sugar beet, i.e. metamitron (M), phenmedipham (P) and chloridazon (C). Four soil samples were contaminated, respectively with: (i) M alone, (ii) M + P (iii) M + C and (iv) M + P + C. The aim was to assess whether the degradation speed of metamitron in soil depended on the presence of co-applied herbicides. To reach this aim, the soil samples were incubated at 20°C and sub-samples were taken in different times after the beginning of the experiment. The concentration of metamitron in those sub-samples was measured by HPLC analyses, performed in triplicate. The resulting dataset is available within the ‘aomisc’ package.</p>
+<p>In the box below. we install the ‘aomisc’ package from gitHub (if necessary), load it and load the ‘metamitron’ dataset.</p>
+<pre class="r"><code># library(devtools)
+# install_github(&quot;OnofriAndreaPG/aomisc&quot;)
+library(aomisc)
+data(metamitron)
+head(metamitron)
+##   Time Herbicide   Conc
+## 1    0         M  92.00
+## 2    0         M 118.64
+## 3    0         M  89.58
+## 4    7         M  59.32
+## 5    7         M  62.95
+## 6    7         M  62.95
+#...
+#...
+tail(metamitron)
+##    Time Herbicide  Conc
+## 91   55       MPC 35.75
+## 92   55       MPC 37.83
+## 93   55       MPC 27.41
+## 94   67       MPC 23.38
+## 95   67       MPC 28.41
+## 96   67       MPC 18.92</code></pre>
+<p>The first step we take is to fit a first-order degradation model, as follows:</p>
+<p><span class="math display">\[C_{t, h} = A_h \, \exp \left(-k_h  \, t \right)\]</span>
+where <span class="math inline">\(C\)</span> is the concentration at time <span class="math inline">\(t\)</span> for metamitron in the <span class="math inline">\(h^{th}\)</span> combination (M alone, M + P, M + C and M + P + C), <span class="math inline">\(A\)</span> is the initial concentration for the metamitron in the <span class="math inline">\(h^{th}\)</span> combination, <span class="math inline">\(k\)</span> is the degradation rate for metamitron in the <span class="math inline">\(h^{th}\)</span> combination. This model is nonlinear and, therefore, we can use the <code>nls()</code> function for nonlinear least squares regression. The code is given below: please, note that the two parameters are followed by the name of the factor variable in square brackets (i.e.: A[Herbicide] and k[Herbicide]). This is necessary, to fit a different parameter value for each level of the ‘Herbicide’ factor.</p>
+<pre class="r"><code>#Fit nls grouped model
+modNlin &lt;- nls(Conc ~ A[Herbicide] * exp(-k[Herbicide] * Time), 
+               start=list(A=rep(100, 4), k=rep(0.06, 4)), 
+               data=metamitron)
+summary(modNlin)
+## 
+## Formula: Conc ~ A[Herbicide] * exp(-k[Herbicide] * Time)
+## 
+## Parameters:
+##     Estimate Std. Error t value Pr(&gt;|t|)    
+## A1 9.483e+01  4.796e+00   19.77   &lt;2e-16 ***
+## A2 1.021e+02  4.316e+00   23.65   &lt;2e-16 ***
+## A3 9.959e+01  4.463e+00   22.31   &lt;2e-16 ***
+## A4 1.116e+02  4.184e+00   26.68   &lt;2e-16 ***
+## k1 4.260e-02  4.128e-03   10.32   &lt;2e-16 ***
+## k2 2.574e-02  2.285e-03   11.26   &lt;2e-16 ***
+## k3 3.034e-02  2.733e-03   11.10   &lt;2e-16 ***
+## k4 2.186e-02  1.822e-03   12.00   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 9.701 on 88 degrees of freedom
+## 
+## Number of iterations to convergence: 5 
+## Achieved convergence tolerance: 7.136e-06</code></pre>
+<p>We can retrieve the degradation rates for the four herbicides (<em>k1</em>, <em>k2</em>, <em>k3</em> and <em>k4</em>) together with standard errors and load them into two vectors, as shown in the box below. In order to make pairwise comparisons, we also need to retrieve an estimate of the residual degrees of freedom, which we can also extract from the model fit object.</p>
+<pre class="r"><code>tab &lt;- summary(modNlin)
+dRates &lt;- tab$coef[5:8,1]
+SEs &lt;- tab$coef[5:8,2]
+dfr = tab$df[2]
+dRates
+##         k1         k2         k3         k4 
+## 0.04260044 0.02573512 0.03033803 0.02185935
+SEs
+##          k1          k2          k3          k4 
+## 0.004128447 0.002284696 0.002733498 0.001822218
+dfr
+## [1] 88</code></pre>
+<p>Now we have one vector of estimates to be compared and one vector of standard errors. In this situation, we can make pairwise comparisons by using the <code>pairComp()</code> function in the ‘aomisc’ package. We just have to pass the vector of model parameters, the vector of standard errors, and, optionally, the names of parameters (we do not need this, as ‘dRates’ is a named vector), the number of residual degrees of freedom (defaults to ‘Inf’) and the multiplicity adjustment method, as in the ‘multcomp’ package (defaults to “single-step”).</p>
+<pre class="r"><code>cp &lt;- pairComp(dRates, SEs, dfr = dfr, adjust = &quot;holm&quot;)
+cp$pairs
+## 
+##   Simultaneous Tests for General Linear Hypotheses
+## 
+## Linear Hypotheses:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## k1-k2 == 0  0.016865   0.004718   3.574  0.00286 ** 
+## k1-k3 == 0  0.012262   0.004951   2.477  0.04604 *  
+## k1-k4 == 0  0.020741   0.004513   4.596 8.58e-05 ***
+## k2-k3 == 0 -0.004603   0.003563  -1.292  0.37639    
+## k2-k4 == 0  0.003876   0.002922   1.326  0.37639    
+## k3-k4 == 0  0.008479   0.003285   2.581  0.04604 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## (Adjusted p values reported -- holm method)</code></pre>
+<p>We can also obtain a letter display, by taking the ‘Letters’ slot in the ‘cp’ object. In this case, we might like to change the yardstick protection level, by passing the ‘level’ argument in ‘pairComp()’, that defaults to 0.05.</p>
+<pre class="r"><code>cp$Letters
+##          Mean          SE CLD
+## k1 0.04260044 0.004128447   a
+## k2 0.02573512 0.002284696  bc
+## k3 0.03033803 0.002733498   b
+## k4 0.02185935 0.001822218   c</code></pre>
+<p>Please, note that the <code>pairComp()</code> function can be flexibly used in every situation where we have a vector of estimates and a vector of standard errors. It yields correct results whenever the elements of the vector of estimates are uncorrelated. Hope this is useful. Thanks for reading!</p>
+<p>Prof. Andrea Onofri<br />
+Department of Agricultural, Food and Environmental Sciences<br />
+University of Perugia (Italy)<br />
+email: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a>
+Blog <a href="www.statforbiology.com">www.statforbiology.com</a></p>
+<hr />
+<p>References</p>
+<ol style="list-style-type: decimal">
+<li>Torsten Hothorn, Frank Bretz and Peter Westfall (2008). Simultaneous Inference in General Parametric Models. Biometrical Journal 50(3), 346–363.</li>
+<li>Russell Lenth (2020). emmeans: Estimated Marginal Means, aka Least-Squares Means. R package version 1.5.0-5. <a href="https://github.com/rvlenth/emmeans" class="uri">https://github.com/rvlenth/emmeans</a></li>
+</ol>
+</div>
