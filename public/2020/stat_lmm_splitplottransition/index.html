@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-131792052-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  
+    gtag('config', 'UA-131792052-1');
+  </script>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>The broken bridge between biologists and statisticians  | Split-plot designs: the transition from &#39;aov()&#39; to &#39;lme()&#39;</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="/css/blog.css" />
+    <script type="text/javascript"
+      src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>    
+</head>
+<body>
+
+    
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="/">Home</a>
+            <a class="navbar-item" href="/aboutThis">About this site</a>
+            <a class="navbar-item" href="/Tutorials">Tutorials</a>
+            <a class="navbar-item" href="/_statbook">Book</a>
+            <a class="navbar-item" href="/Rpackages">R packages</a>
+            <a class="navbar-item" href="/links">Links</a>
+            <a class="navbar-item" href="/about">About me</a>
+        </div>
+    </nav>
+    
+
+    
+    <section class="hero is-info is-medium">
+        <div class="hero-body" style="background-image: url(/img/bg-blog.jpg);">
+            <div class="container has-text-centered">
+                <br>
+                <h1 class="title is-size-1">
+                    
+                        Split-plot designs: the transition from &#39;aov()&#39; to &#39;lme()&#39;
+                    
+                </h1>
+                
+            </div>
+        </div>
+    </section>
+
+
+
+<div class="container">
+    <div class="section">
+    
+
+<div class="columns">
+    <div class="column is-9">
+        <div class="tile is-child box">
+          <p class="subtitle is-size-6 has-text-grey-light">
+          Andrea Onofri &middot;&nbsp; Added on February 9, 2020 &middot;
+          <i class="far fa-clock"></i>&nbsp;13 min read 
+          </p><hr/>
+            <div class="content">
+                
+
+
+<p>I already mentioned in a previous post that, due to my age, I see myself as a dinosaur within the R-users community. I already expressed how difficult it is, sometimes, to adjust to new concepts and paradygms in data analysis, when you have done things differently for a long time (<a href="https://www.statforbiology.com/2020/stat_r_tidyverse_columnwise/">see this post here</a>). Data analyses for split-plot designs are another topic where I was forced to make a profund switch some years ago; I feel that most of my collegues are facing my same difficulties and, therefore, I decided to sit and write this post.</p>
+<p>Split-plot designs are very commonly used in agricultural field experiments and they have been in fashion for (at least) eighty years, long before that the mixed model platform with REML estimation was largely available. Whoever has taken a course in ‘experimental design’ at the end of the 80s has studied how to perform a split-plot ANOVA by hand-calculations, based on the method of moments. What did we do? Let’s consider a two factor factorial, with the two factors A and B, with A allocated to main-plots and B allocated to sub-plots. For such a split-plot design we:</p>
+<ol style="list-style-type: decimal">
+<li>calculated the overall mean and the means for the levels of A, B, for the combinations of the A and B levels and for the combinations of the Blocks and A levels;</li>
+<li>with those means, we calculated the deviances for all effects and interactions, based on the sums of squared residuals with respect to the overall mean;</li>
+<li>derived the related variance, by using the appropriate degrees of freedom for each effect;</li>
+<li>calculated F ratios, by using the appropriate error stratum, i.e. the mean square for the ‘Blocks ⨉ A’ combination (so called: error A) and the residual mean square.</li>
+</ol>
+<p>The above process is simple and we used to see it as totally correct with balanced (orthogonal) data. Those of you who are experienced with SAS should probably remember that, before the introduction of PROC MIXED in 1992, split-plot designs were analysed with PROC GLM, using the very same approach as outlined above.</p>
+<p>What did I do when I switched to R?</p>
+<div id="first-step-aov" class="section level1">
+<h1>First step: ‘aov()’</h1>
+<p>Let’s consider the dataset ‘beet.csv’, which is available in a web repository. It was obtained from a split-plot experiment with two experimental factors: three tillage methods (shallow ploughing, deep ploughing and minimum tillage) and two weed control methods (total and partial). Tillage methods were allocated to main-plots, while weed control methods were allocated to sub-plots and the experiment was designed in four balanced blocks. A typical split-plot field experiment, indeed. The code below can be used to load the data.</p>
+<pre class="r"><code>library(tidyverse)
+## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.0 ──
+## ✓ ggplot2 3.3.2     ✓ purrr   0.3.4
+## ✓ tibble  3.0.6     ✓ dplyr   1.0.3
+## ✓ tidyr   1.1.2     ✓ stringr 1.4.0
+## ✓ readr   1.4.0     ✓ forcats 0.5.1
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()
+fileName &lt;- &quot;https://www.casaonofri.it/_datasets/beet.csv&quot;
+dataset &lt;- read_csv(fileName)
+## 
+## ── Column specification ────────────────────────────────────────────────────────
+## cols(
+##   Tillage = col_character(),
+##   WeedControl = col_character(),
+##   Block = col_double(),
+##   Yield = col_double()
+## )
+dataset &lt;- dataset %&gt;% 
+  mutate(across(c(Tillage, WeedControl, Block), .fns = factor))
+dataset
+## # A tibble: 24 x 4
+##    Tillage WeedControl Block Yield
+##    &lt;fct&gt;   &lt;fct&gt;       &lt;fct&gt; &lt;dbl&gt;
+##  1 MIN     TOT         1     11.6 
+##  2 MIN     TOT         2      9.28
+##  3 MIN     TOT         3      7.02
+##  4 MIN     TOT         4      8.02
+##  5 MIN     PART        1      5.12
+##  6 MIN     PART        2      4.31
+##  7 MIN     PART        3      8.94
+##  8 MIN     PART        4      5.62
+##  9 SP      TOT         1     10.0 
+## 10 SP      TOT         2      8.69
+## # … with 14 more rows</code></pre>
+<p>Having the method of moments in mind, my first line of attack was to use the <code>aov()</code> function, which is also suggested in Venables and Ripley (2002) at pag. 283.</p>
+<pre class="r"><code>mod.aov &lt;- aov(Yield ~ Tillage*WeedControl +
+                 Error(Block/Tillage), data = dataset)
+summary(mod.aov)
+## 
+## Error: Block
+##           Df Sum Sq Mean Sq F value Pr(&gt;F)
+## Residuals  3   3.66    1.22               
+## 
+## Error: Block:Tillage
+##           Df Sum Sq Mean Sq F value Pr(&gt;F)   
+## Tillage    2 23.656   11.83    19.4 0.0024 **
+## Residuals  6  3.658    0.61                  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Error: Within
+##                     Df Sum Sq Mean Sq F value Pr(&gt;F)  
+## WeedControl          1   3.32   3.320   1.225 0.2972  
+## Tillage:WeedControl  2  19.46   9.732   3.589 0.0714 .
+## Residuals            9  24.40   2.711                 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>The analysis looks different from what I could obtain by hand calculations, because the block is regarded as random, while, in the traditional approach, I would have regarded it as fixed. Indeed, still today, there is no consensus among agricultural scientists on whether the block effect should be regarded as random or fixed (see Dixon, 2016); for the sake of this exercise, let me regard it as fixed. If we move the effect of blocks from the <code>Error()</code> definition to the fixed effects formula, we get a warning message, although the result is fully respecting my expectations.</p>
+<pre class="r"><code>mod.aov2 &lt;- aov(Yield ~ Block + Tillage*WeedControl +
+                 Error(Block:Tillage), data = dataset)
+## Warning in aov(Yield ~ Block + Tillage * WeedControl + Error(Block:Tillage), :
+## Error() model is singular
+summary(mod.aov2)
+## 
+## Error: Block:Tillage
+##           Df Sum Sq Mean Sq F value Pr(&gt;F)   
+## Block      3  3.660    1.22   2.001 0.2155   
+## Tillage    2 23.656   11.83  19.399 0.0024 **
+## Residuals  6  3.658    0.61                  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Error: Within
+##                     Df Sum Sq Mean Sq F value Pr(&gt;F)  
+## WeedControl          1   3.32   3.320   1.225 0.2972  
+## Tillage:WeedControl  2  19.46   9.732   3.589 0.0714 .
+## Residuals            9  24.40   2.711                 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>Here I made my first mistake, i.e. taking for granted that my expectations from hand-calculations are fully correct. They are not, as we will see in a few minutes.</p>
+</div>
+<div id="second-step-the-mixed-model-framework" class="section level1">
+<h1>Second step: the mixed model framework</h1>
+<p>The <code>aov()</code> function is useful, mainly because the result is very much like what I would expect, considering my experience with expected mean squares and error strata. However, it is easy to realise that that there are several limitations to this approach, relating to the lack of a wide framework of advanced methods to perform more complex modeling tasks.</p>
+<p>Therefore, I switched very soon to the <code>lme()</code> function in the ‘nlme’ package (Pinheiro et al., 2018). My first attempt was to try and reproduce the code above, but I immediately realised that taking the block effect as fixed does not lead to what I would expect to be the correct result.</p>
+<pre class="r"><code>library(nlme)
+## 
+## Attaching package: &#39;nlme&#39;
+## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     collapse
+mod.lme &lt;- lme(Yield ~ Block + Tillage*WeedControl,
+               random = ~1|Block/Tillage, data = dataset)
+anova(mod.lme)
+## Warning in pf(Fval[i], nDF[i], dDF[i]): NaNs produced
+##                     numDF denDF   F-value p-value
+## (Intercept)             1     9 120.85864  &lt;.0001
+## Block                   3     0   0.08045     NaN
+## Tillage                 2     6   6.32281  0.0333
+## WeedControl             1     9   1.77497  0.2155
+## Tillage:WeedControl     2     9   5.20229  0.0315</code></pre>
+<p>Refitting the model with the ‘lmer()’ function in the ‘lme4’ package permits to set the block effect as fixed but leads to different results with respect to the ‘aov()’ function. This raises a warning message and produces totally different F-ratios with respect to the ‘aov()’ function. Furthermore, p-levels are not even displayed (yes, I know, we can use the ‘lmerTest’ package, but, please, follow my reasoning).</p>
+<pre class="r"><code>library(lme4)
+## Loading required package: Matrix
+## 
+## Attaching package: &#39;Matrix&#39;
+## The following objects are masked from &#39;package:tidyr&#39;:
+## 
+##     expand, pack, unpack
+## 
+## Attaching package: &#39;lme4&#39;
+## The following object is masked from &#39;package:nlme&#39;:
+## 
+##     lmList
+mod.lmer.split &lt;- lmer(Yield ~ Block + WeedControl*Tillage +
+                     (1|Block:Tillage), 
+                     data=dataset)
+## boundary (singular) fit: see ?isSingular
+anova(mod.lmer.split)
+## Analysis of Variance Table
+##                     npar  Sum Sq Mean Sq F value
+## Block                  3  3.6596  1.2199  0.6521
+## WeedControl            1  3.3205  3.3205  1.7750
+## Tillage                2 23.6565 11.8282  6.3228
+## WeedControl:Tillage    2 19.4641  9.7321  5.2023</code></pre>
+<p>What’s wrong with that? Why am I not able to reproduce my hand-calculations? I investigated this matter and I found a very enlightning writing by Douglas Bates (the author of ‘nlme’ and ‘lme4’), which is avaialable at <a href="https://stat.ethz.ch/pipermail/r-help/2006-May/094765.html">this link</a>. From there it was clear to me that F ratios in mixed models are “<em>not based on expected means squares and error strata</em>”; further ahead, it is stated that Bates has “<em>a problem with the assumption that the reference distribution for these F statistics should be an F distribution with a known numerator degrees of freedom but a variable denominator degrees of freedom</em>”. In the end, it is clear that, according to Douglas Bates, the traditional approach of calculating p-values from F ratios based on expected mean squares and error strata is not necessarily correct.</p>
+<p>I made some further research on this matter. Indeed, if we look at the <code>aov()</code> output before, we see that the residual mean square is equal to 2.711, while the mean square for the ‘Block by Tillage’ interaction is 0.6097. Therefore, the method of moments brings to a negative estimate of the variance component for the main plot effect, that is <span class="math inline">\((0.6097 - 2.711)/4 = -0.5254\)</span>. This is unreasonable and, at least, it implies that the main plot random effect does not produce any significant further variability with respect to the plot-to-plot variability, which is measured by the residual error. In other words, the mean square for the Block by Tillage interaction produces no more than an additional estimate for the residual plot-to-plot error.</p>
+<p>If we consider that the main plot effect is not significant and remove it from the model, we see that our F ratios are much more similar to the mixed model fit.</p>
+<pre class="r"><code>mod.lm &lt;- lm(Yield ~ Block + WeedControl*Tillage, data=dataset) 
+anova(mod.lm)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##                     Df  Sum Sq Mean Sq F value  Pr(&gt;F)  
+## Block                3  3.6596  1.2199  0.6521 0.59389  
+## WeedControl          1  3.3205  3.3205  1.7750 0.20266  
+## Tillage              2 23.6565 11.8282  6.3228 0.01020 *
+## WeedControl:Tillage  2 19.4641  9.7321  5.2023 0.01922 *
+## Residuals           15 28.0609  1.8707                  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>In order to calculate the corresponding p-level, we need to determine the number of degrees of freedom for the denominator, which is not as easy as the hand-calculations imply. If we use ‘lmerTest’, we get different p-values, depending on the approximation we select for the degrees of freedom. See the box below to discover this.</p>
+<pre class="r"><code>library(lmerTest)
+## 
+## Attaching package: &#39;lmerTest&#39;
+## The following object is masked from &#39;package:lme4&#39;:
+## 
+##     lmer
+## The following object is masked from &#39;package:stats&#39;:
+## 
+##     step
+mod.lmer.split &lt;- lmer(Yield ~ Block + WeedControl*Tillage +
+                     (1|Block:Tillage), 
+                     data=dataset)
+## boundary (singular) fit: see ?isSingular
+anova(mod.lmer.split, ddf = &quot;Kenward-Roger&quot;)
+## Type III Analysis of Variance Table with Kenward-Roger&#39;s method
+##                      Sum Sq Mean Sq NumDF DenDF F value  Pr(&gt;F)  
+## Block                3.6596  1.2199     3     6  0.6521 0.61016  
+## WeedControl          3.3205  3.3205     1     9  1.7750 0.21552  
+## Tillage             23.6565 11.8282     2     6  6.3228 0.03332 *
+## WeedControl:Tillage 19.4641  9.7321     2     9  5.2023 0.03152 *
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+anova(mod.lmer.split, ddf = &quot;Satterthwaite&quot;)
+## Type III Analysis of Variance Table with Satterthwaite&#39;s method
+##                      Sum Sq Mean Sq NumDF DenDF F value  Pr(&gt;F)  
+## Block                3.6596  1.2199     3    15  0.6521 0.59389  
+## WeedControl          3.3205  3.3205     1    15  1.7750 0.20266  
+## Tillage             23.6565 11.8282     2    15  6.3228 0.01020 *
+## WeedControl:Tillage 19.4641  9.7321     2    15  5.2023 0.01922 *
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>All of a sudden, I had lost all of my sense of certainty: such a simple split-plot does not produce consistent results across different calculation methods. In that precise moment, I had the feeling tha I had to fully switch to the mixed model platform and abandon my confortable (but dangerouse) hand-calculations!</p>
+</div>
+<div id="fully-switching-to-the-mixed-model-platform" class="section level1">
+<h1>Fully switching to the mixed model platform</h1>
+<p>What do I mean by ‘fully switching to the mixed model platform’? Well, <strong>let’s forget that there is a specific split-plot model</strong>. Indeed, the split-plot is just a handy experimental design for field experiments, but there is absolutely no difference between the approach to data analyses for such designs and other types of repeated measures design. As suggested by Piepho et al. (2003), we should only be concerned about the presence of <em>grouping factors</em>, i.e. those factors which are needed to uniquely identify different groups of observational units.</p>
+<p>For this experiment, we need to uniquely identify two grouping factors, that are the main plots and the sub-plots. For the main plots, we can use <code>dplyr()</code> to identify them by combining the levels of blocks and tillage methods.</p>
+<pre class="r"><code>dataset &lt;- dataset %&gt;% 
+  mutate(mainPlots = factor(Block:Tillage))</code></pre>
+<p>These grouping factors need to be included in the model, otherwise we violate the independence of residuals. Following Piepho et al. (2003), both these factors reference randomisation units (tillage levels are allocated to main plots, while weed control methods are allocated to sub-plots) and, thus, they need to receive random effects. We can now build a correct model, by using a general procedure, tha holds for all types of repeated measures designs (not only for split-plots). Of course, the sub-plot effect corresponds to the residual error and we do not need to include it, as it is fitted by default. As we have no specific interest in variance components, we fit the model by using Maximum Likelihood instead of REML.</p>
+<pre class="r"><code>mod.lme2 &lt;- lme(Yield ~ Block + Tillage*WeedControl,
+               random = ~1|mainPlots, data = dataset,
+               method = &quot;ML&quot;)</code></pre>
+<pre class="r"><code>anova(mod.lme2)
+##                     numDF denDF  F-value p-value
+## (Intercept)             1     9 979.6128  &lt;.0001
+## Block                   3     6   0.6521  0.6102
+## Tillage                 2     6   6.3228  0.0333
+## WeedControl             1     9   1.7750  0.2155
+## Tillage:WeedControl     2     9   5.2023  0.0315
+mod.lme3 &lt;- lme(Yield ~ Block + Tillage + WeedControl,
+               random = ~1|mainPlots, data = dataset,
+               method = &quot;ML&quot;)
+anova(mod.lme2, mod.lme3)
+##          Model df       AIC      BIC    logLik   Test L.Ratio p-value
+## mod.lme2     1 11  93.86078 106.8194 -35.93039                       
+## mod.lme3     2  9 102.50589 113.1084 -42.25294 1 vs 2 12.6451  0.0018
+y &lt;- simulate(mod.lme3, nsim=10000, m2 = mod.lme2, method=&quot;ML&quot;,
+              set.seed = 1234)
+lrtSimT &lt;- as.numeric(2*(y$alt$ML[,2] - y$null$ML[,2]))
+length(lrtSimT[lrtSimT &gt; 12.6451])/length(lrtSimT)
+## [1] 0.0244</code></pre>
+<p>Hope this is useful! Have fun with it.</p>
+<hr />
+<p>Andrea Onofri<br />
+Department of Agricultural, Food and Environmental Sciences<br />
+University of Perugia (Italy)<br />
+<a href="mailto:andrea.onofri@unipg.it" class="email">andrea.onofri@unipg.it</a></p>
+</div>
+<div id="references" class="section level1">
+<h1>References</h1>
+<ol style="list-style-type: decimal">
+<li>Dixon, P., 2016. Should blocks be fixed or random? Conference on Applied Statistics in Agriculture. <a href="https://doi.org/10.4148/2475-7772.1474" class="uri">https://doi.org/10.4148/2475-7772.1474</a></li>
+<li>Fox J. and Weisberg S. (2011). An {R} Companion to Applied Regression, Second Edition. Thousand Oaks CA: Sage. URL: <a href="http://socserv.socsci.mcmaster.ca/jfox/Books/Companion" class="uri">http://socserv.socsci.mcmaster.ca/jfox/Books/Companion</a></li>
+<li>Gałecki, A., Burzykowski, T., 2013. Linear mixed-effects models using R: a step-by-step approach. Springer, Berlin.</li>
+<li>Piepho, H.-P., Büchse, A., Emrich, K., 2003. A Hitchhiker’s Guide to Mixed Models for Randomized Experiments. Journal of Agronomy and Crop Science 189, 310–322.</li>
+<li>Pinheiro J, Bates D, DebRoy S, Sarkar D, R Core Team (2018). nlme: Linear and Nonlinear Mixed Effects Models_. R package version 3.1-137, &lt;URL: <a href="https://CRAN.R-project.org/package=nlme" class="uri">https://CRAN.R-project.org/package=nlme</a>&gt;.</li>
+<li>Hadley Wickham (2011). The Split-Apply-Combine Strategy for Data Analysis. Journal of Statistical Software, 40(1), 1-29. URL: <a href="http://www.jstatsoft.org/v40/i01/" class="uri">http://www.jstatsoft.org/v40/i01/</a>.</li>
+<li>Venables, W.N., Ripley, B.D., Venables, W.N., 2002. Modern applied statistics with S, 4th ed. ed, Statistics and computing. Springer, New York.</li>
+</ol>
+</div>
+
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Tags</h1>
+        <div class="tags">
+        
+            <span class="tag"><a href="/tags/agricensdata">agricensdata</a></span>
+        
+            <span class="tag"><a href="/tags/ammi_analysis">ammi_analysis</a></span>
+        
+            <span class="tag"><a href="/tags/aomisc">aomisc</a></span>
+        
+            <span class="tag"><a href="/tags/asreml">asreml</a></span>
+        
+            <span class="tag"><a href="/tags/bayesian_stat">bayesian_stat</a></span>
+        
+            <span class="tag"><a href="/tags/blogdown">blogdown</a></span>
+        
+            <span class="tag"><a href="/tags/boxplot">boxplot</a></span>
+        
+            <span class="tag"><a href="/tags/correlation">correlation</a></span>
+        
+            <span class="tag"><a href="/tags/data_management">data_management</a></span>
+        
+            <span class="tag"><a href="/tags/delta_method">delta_method</a></span>
+        
+            <span class="tag"><a href="/tags/descriptive_statistics">descriptive_statistics</a></span>
+        
+            <span class="tag"><a href="/tags/diallel_models">diallel_models</a></span>
+        
+            <span class="tag"><a href="/tags/dplyr">dplyr</a></span>
+        
+            <span class="tag"><a href="/tags/drcseedgerm">drcseedgerm</a></span>
+        
+            <span class="tag"><a href="/tags/drm">drm</a></span>
+        
+            <span class="tag"><a href="/tags/error_propagation">error_propagation</a></span>
+        
+            <span class="tag"><a href="/tags/gnlht">gnlht</a></span>
+        
+            <span class="tag"><a href="/tags/jags">jags</a></span>
+        
+            <span class="tag"><a href="/tags/linear_models">linear_models</a></span>
+        
+            <span class="tag"><a href="/tags/lmdiallel">lmdiallel</a></span>
+        
+            <span class="tag"><a href="/tags/lme">lme</a></span>
+        
+            <span class="tag"><a href="/tags/long_term_experiments">long_term_experiments</a></span>
+        
+            <span class="tag"><a href="/tags/mixed_models">mixed_models</a></span>
+        
+            <span class="tag"><a href="/tags/multi_environment_studies">multi_environment_studies</a></span>
+        
+            <span class="tag"><a href="/tags/nlme">nlme</a></span>
+        
+            <span class="tag"><a href="/tags/nls">nls</a></span>
+        
+            <span class="tag"><a href="/tags/nmle">nmle</a></span>
+        
+            <span class="tag"><a href="/tags/nonlinear_regression">nonlinear_regression</a></span>
+        
+            <span class="tag"><a href="/tags/percentiles">percentiles</a></span>
+        
+            <span class="tag"><a href="/tags/qq_plot">qq_plot</a></span>
+        
+            <span class="tag"><a href="/tags/r">r</a></span>
+        
+            <span class="tag"><a href="/tags/seed_germination">seed_germination</a></span>
+        
+            <span class="tag"><a href="/tags/split_plot">split_plot</a></span>
+        
+            <span class="tag"><a href="/tags/tidyverse">tidyverse</a></span>
+        
+            <span class="tag"><a href="/tags/time_to_event_models">time_to_event_models</a></span>
+        
+            <span class="tag"><a href="/tags/variance">variance</a></span>
+        
+        </div>          
+    </div>
+</div><br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Recent posts</h1>
+        
+            <h1><a href="/2021/stat_nls_paircomp/">Pairwise comparisons in nonlinear regression</a></h1>
+            <time class="has-text-grey-light is-size-7">19 January 2021</time>
+        
+            <h1><a href="/2021/stat_met_diallel_griffing/">lmDiallel: a new R package to fit diallel models. The Griffing&#39;s models (1956)</a></h1>
+            <time class="has-text-grey-light is-size-7">12 January 2021</time>
+        
+            <h1><a href="/2021/stat_met_diallel_hayman2/">lmDiallel: a new R package to fit diallel models. The Hayman&#39;s model (type 2)</a></h1>
+            <time class="has-text-grey-light is-size-7">5 January 2021</time>
+        
+            <h1><a href="/2020/stat_bayesian_anovamodels/">General code to fit ANOVA models with JAGS and &#39;rjags&#39;</a></h1>
+            <time class="has-text-grey-light is-size-7">23 December 2020</time>
+        
+            <h1><a href="/2020/stat_r_tidyverse_columnwise/">From &#39;&#39;for()&#39;&#39; loops to the &#39;&#39;split-apply-combine&#39;&#39; paradigm for column-wise tasks: the transition for a dinosaur</a></h1>
+            <time class="has-text-grey-light is-size-7">11 December 2020</time>
+        
+    </div>
+</div>
+    <br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Archives</h1>
+        
+            <a href="/archives/2021">2021</a> (3)<br>
+        
+            <a href="/archives/2020">2020</a> (15)<br>
+        
+            <a href="/archives/2019">2019</a> (14)<br>
+        
+            <a href="/archives/2018">2018</a> (2)<br>
+        
+            <a href="/archives/2014">2014</a> (1)<br>
+        
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+    </div>
+</div>
+<footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+        <p>
+             <span class="icon is-large"><a href="mailto:andrea.onofri@unipg.it" class="mysocial"><i class="far fa-envelope-open fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://github.com/OnofriAndreaPG/" class="mysocial"><i class="fab fa-github fa-3x"></i></a></span>&nbsp;&nbsp;
+           <span class="icon is-large"><a href="https://twitter.com/onofriandreapg" class="mysocial"><i class="fab fa-twitter fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://www.r-project.org/" class="mysocial"><i class="fab fa-r-project fa-3x"></i></a></span>&nbsp;&nbsp;
+ 
+            <br><br>
+            Copyright &copy; The broken bridge between biologists and statisticians, 2021 - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a>
+            - <a class="mysocial" href="/aboutThis">About this site</a>
+        </p>
+    </div>
+</footer>
+
+<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+</body>
+</html>

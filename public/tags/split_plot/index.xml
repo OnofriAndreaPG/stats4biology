@@ -6,10 +6,235 @@
     <description>Recent content in Split_plot on The broken bridge between biologists and statisticians</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2018, @AndreaOnofri</copyright>
-    <lastBuildDate>Fri, 04 Dec 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 11 Feb 2021 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="/tags/split_plot/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Split-plot designs: the transition to mixed models for a dinosaur</title>
+      <link>/2021/stat_lmm_splitplottransition/</link>
+      <pubDate>Thu, 11 Feb 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/2021/stat_lmm_splitplottransition/</guid>
+      <description>
+&lt;script src=&#34;/rmarkdown-libs/header-attrs/header-attrs.js&#34;&gt;&lt;/script&gt;
+
+
+&lt;p&gt;&lt;em&gt;Those who long ago took courses in ‘analysis of variance’ or ‘experimental design’ … would have learned methods … based on observed and expected mean squares and methods of testing based on ‘error strata’ (if you weren’t forced to learn this, consider yourself lucky). (&lt;a href=&#34;https://stat.ethz.ch/pipermail/r-help/2006-May/094765.html&#34;&gt;Douglas Bates, 2006&lt;/a&gt;).&lt;/em&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;p&gt;In a previous post, I already mentioned that, due to my age, I see myself as a dinosaur within the R-users community. I already mentioned how difficult it is, for a dinosaur, to adjust to new concepts and paradigms in data analysis, after having done things differently for a long time ( &lt;a href=&#34;https://www.statforbiology.com/2020/stat_r_tidyverse_columnwise/&#34;&gt;see this post here&lt;/a&gt; ). Today, I decided to sit and write a second post, relating to data analyses for split-plot designs. Some years ago, when switching to R, this topic required some adjustments to my usual workflow, which gave me a few headaches.&lt;/p&gt;
+&lt;p&gt;Let’s start from a real-life example.&lt;/p&gt;
+&lt;div id=&#34;a-split-plot-experiment&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;A split-plot experiment&lt;/h1&gt;
+&lt;p&gt;The dataset ‘beet.csv’ is available in a web repository. It was obtained from a split-plot experiment with two experimental factors: three tillage methods (shallow ploughing, deep ploughing and minimum tillage) and two weed control methods (total and partial, meaning that the herbicide was sprayed broadcast or only along crop rows). Tillage methods were allocated to main-plots, while weed control methods were allocated to sub-plots and the experiment was designed in four complete blocks. A typical split-plot field experiment, indeed. The code below can be used to load the data.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(tidyverse)
+fileName &amp;lt;- &amp;quot;https://www.casaonofri.it/_datasets/beet.csv&amp;quot;
+dataset &amp;lt;- read_csv(fileName)
+dataset &amp;lt;- dataset %&amp;gt;% 
+  mutate(across(c(Tillage, WeedControl, Block), .fns = factor))
+dataset
+## # A tibble: 24 x 4
+##    Tillage WeedControl Block Yield
+##    &amp;lt;fct&amp;gt;   &amp;lt;fct&amp;gt;       &amp;lt;fct&amp;gt; &amp;lt;dbl&amp;gt;
+##  1 MIN     TOT         1     11.6 
+##  2 MIN     TOT         2      9.28
+##  3 MIN     TOT         3      7.02
+##  4 MIN     TOT         4      8.02
+##  5 MIN     PART        1      5.12
+##  6 MIN     PART        2      4.31
+##  7 MIN     PART        3      8.94
+##  8 MIN     PART        4      5.62
+##  9 SP      TOT         1     10.0 
+## 10 SP      TOT         2      8.69
+## # … with 14 more rows&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;the-traditional-approach&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;The traditional approach&lt;/h1&gt;
+&lt;p&gt;Split-plot designs are very commonly used in field experiments and they have been in fashion for (at least) eighty years, long before that the mixed model platform with REML estimation was largely available. Whoever has taken a course in ‘experimental design’ at the end of the 80s has studied how to perform a split-plot ANOVA by hand-calculations, based on the method of moments. For the youngest readers, it might be useful to give a few hints on what I used to do thirty years ago with the above dataset:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;calculate the overall mean and the means for the levels of blocks, tillage, weed control and for the combined levels of tillage and weed control.&lt;/li&gt;
+&lt;li&gt;Calculate the means for the combined levels of blocks and tillage, which would correspond to the means for the twelve main-plots.&lt;/li&gt;
+&lt;li&gt;With all those means, calculate the deviances for all effects and interactions, as the sums of squared residuals with respect to the overall mean.&lt;/li&gt;
+&lt;li&gt;Derive the related variance, by using the appropriate number of degrees of freedom for each effect.&lt;/li&gt;
+&lt;li&gt;Calculate F ratios, based on the appropriate error stratum, i.e. the mean square for the ‘blocks ⨉ tillage’ combinations (so called: error A) and the residual mean square.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The most relevant aspect in the approach outlined above is the ‘block by tillage’ interaction; the mean square for this effect was used as the denominator in the F ratio, to test for the significance of the tillage main effect.&lt;/p&gt;
+&lt;p&gt;The above process was simple to teach and simple to grasp and I used to see it as a totally correct approach to balanced (orthogonal) split-plot data. Those of you who are experienced with SAS should probably remember that, before the advent of PROC MIXED in 1992, split-plot designs were analysed with PROC GLM, using the very same approach as outlined above.&lt;/p&gt;
+&lt;p&gt;Considering the above background, let’s see what I did when I switched to R?&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;first-step-aov&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;First step: ‘aov()’&lt;/h1&gt;
+&lt;p&gt;Having the method of moments in mind, my first line of attack was to use the &lt;code&gt;aov()&lt;/code&gt; function, as suggested in Venables and Ripley (2002) at pag. 283. Those authors make use of the nesting operator in the expression &lt;code&gt;Error(Block/Tillage)&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod.aov &amp;lt;- aov(Yield ~ Tillage*WeedControl +
+                 Error(Block/Tillage), data = dataset)
+summary(mod.aov)
+## 
+## Error: Block
+##           Df Sum Sq Mean Sq F value Pr(&amp;gt;F)
+## Residuals  3   3.66    1.22               
+## 
+## Error: Block:Tillage
+##           Df Sum Sq Mean Sq F value Pr(&amp;gt;F)   
+## Tillage    2 23.656   11.83    19.4 0.0024 **
+## Residuals  6  3.658    0.61                  
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Error: Within
+##                     Df Sum Sq Mean Sq F value Pr(&amp;gt;F)  
+## WeedControl          1   3.32   3.320   1.225 0.2972  
+## Tillage:WeedControl  2  19.46   9.732   3.589 0.0714 .
+## Residuals            9  24.40   2.711                 
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In the above definition, the block effect is regarded as random, while, in the traditional approach, it is often regarded as fixed. Indeed, still today, there is no consensus among agricultural scientists on whether the block effect should be regarded as random or fixed (see Dixon, 2016); for the sake of this exercise, let me regard it as fixed. After a few attempts, I discovered that I could move the effect of blocks from the &lt;code&gt;Error()&lt;/code&gt; definition to the fixed effect formula and use the expression &lt;code&gt;Error(Block:Tillage)&lt;/code&gt; to specify the uppermost error stratum.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod.aov2 &amp;lt;- aov(Yield ~ Block + Tillage*WeedControl +
+                 Error(Block:Tillage), data = dataset)
+summary(mod.aov2)
+## 
+## Error: Block:Tillage
+##           Df Sum Sq Mean Sq F value Pr(&amp;gt;F)   
+## Block      3  3.660    1.22   2.001 0.2155   
+## Tillage    2 23.656   11.83  19.399 0.0024 **
+## Residuals  6  3.658    0.61                  
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Error: Within
+##                     Df Sum Sq Mean Sq F value Pr(&amp;gt;F)  
+## WeedControl          1   3.32   3.320   1.225 0.2972  
+## Tillage:WeedControl  2  19.46   9.732   3.589 0.0714 .
+## Residuals            9  24.40   2.711                 
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Although the above code produces a warning message, the result is totally the same as I would have obtained by hand-calculations.&lt;/p&gt;
+&lt;p&gt;For me, the &lt;code&gt;aov()&lt;/code&gt; function represented a safe harbour, mainly because the result was very much like what I would expect, considering my experience with mean squares and error strata. Unfortunately, I had to realise that there were several limitations to this approach and, finally, I had to switch to the mixed model platform.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;second-step-the-mixed-model-framework&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Second step: the mixed model framework&lt;/h1&gt;
+&lt;p&gt;When making this switch to mixed models, I had the expectation that I should be able to reproduce the results obtained with the &lt;code&gt;aov()&lt;/code&gt; function and, formerly, by hand-calculations.&lt;/p&gt;
+&lt;p&gt;I started with the &lt;code&gt;lme()&lt;/code&gt; function in the ‘nlme’ package (Pinheiro et al., 2018) and I had the idea that I could simply replace the &lt;code&gt;Error(Block:Tillage)&lt;/code&gt; statement with &lt;code&gt;random = ~1|Block:Tillage&lt;/code&gt;. Unfortunately, using the &lt;code&gt;:&lt;/code&gt; operator in the &lt;code&gt;lme()&lt;/code&gt; function is not possible and I had to resort to using the nesting operator &lt;code&gt;‘Block/Tillage’&lt;/code&gt;. Consequently, I noted that the F test for the block effect was wrong. Not a very important problem, indeed, but I was so stupidly determined to reproduce my hand-calculations.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(nlme)
+mod.lme &amp;lt;- lme(Yield ~ Block + Tillage*WeedControl,
+               random = ~1|Block/Tillage, data = dataset)
+anova(mod.lme)
+##                     numDF denDF   F-value p-value
+## (Intercept)             1     9 120.85864  &amp;lt;.0001
+## Block                   3     0   0.08045     NaN
+## Tillage                 2     6   6.32281  0.0333
+## WeedControl             1     9   1.77497  0.2155
+## Tillage:WeedControl     2     9   5.20229  0.0315&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Therefore, I tried to switch to the &lt;code&gt;lmer()&lt;/code&gt; function in the ‘lme4’ package (Bates et al., 2015). With this platform, it was possible to include the ‘block by tillage’ interaction as a random effect, according to my usual workflow. Still, the results did not match to those obtained with the &lt;code&gt;aov()&lt;/code&gt; function: an error message was raised and F ratios were totally different. Furthermore, p-levels were not even displayed (yes, now I know that we can use the ‘lmerTest’ package, but, please, wait a few seconds).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(lme4)
+mod.lmer.split &amp;lt;- lmer(Yield ~ Block + WeedControl*Tillage +
+                     (1|Block:Tillage), 
+                     data=dataset)
+anova(mod.lmer.split)
+## Analysis of Variance Table
+##                     npar  Sum Sq Mean Sq F value
+## Block                  3  3.6596  1.2199  0.6521
+## WeedControl            1  3.3205  3.3205  1.7750
+## Tillage                2 23.6565 11.8282  6.3228
+## WeedControl:Tillage    2 19.4641  9.7321  5.2023&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;What’s wrong with that? Why was I not able to reproduce my hand-calculations with the mixed model platform?&lt;/p&gt;
+&lt;p&gt;I investigated this matter and I found a very enlightening post by Douglas Bates (the author of ‘nlme’ and ‘lme4’), which is available at &lt;a href=&#34;https://stat.ethz.ch/pipermail/r-help/2006-May/094765.html&#34;&gt;this link&lt;/a&gt;. From there, it was clear to me that F ratios in mixed models are “&lt;em&gt;not based on expected mean squares and error strata&lt;/em&gt;”; further ahead, it is said that there is “&lt;em&gt;a problem with the assumption that the reference distribution for these F statistics should be an F distribution with a known numerator of degrees of freedom but a variable denominator degrees of freedom&lt;/em&gt;”. In the end, it was clear to me that, according to Douglas Bates, the traditional approach of calculating p-values from F ratios based on expected mean squares and error strata was not necessarily correct.&lt;/p&gt;
+&lt;p&gt;I made some further research on this matter. Indeed, looking at the &lt;code&gt;aov()&lt;/code&gt; output above, I noted that the residual mean square was equal to 2.711, while the mean square for the ‘Block by Tillage’ interaction was 0.6097. My beloved method of moments brought me to a negative estimate of the variance component for the ‘block by tillage’ interaction, that is &lt;span class=&#34;math inline&#34;&gt;\((0.6097 - 2.711)/4 = -0.5254\)&lt;/span&gt;. I gasped: this was unreasonable and, at least, it would imply that the variance component for the ‘block by tillage’ random effect was not significantly different from zero. In other words, the mean square for the ‘block by tillage’ interaction and the mean square for the residuals were nothing but two separate estimates of the residual plot-to-plot error. I started being suspicious about my hand-calculations. Why did I use two estimates of the same amount as two different error strata?&lt;/p&gt;
+&lt;p&gt;I tried a different line of attack: considering that the ‘block by tillage’ interaction was not significant, I removed it from the model. Afterwards I fitted a linear fixed effect model, where the two error strata had been pooled into the residual error term. I obtained the very same F ratios as those obtained from the ‘lmer’ fit.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod.lm &amp;lt;- lm(Yield ~ Block + WeedControl*Tillage, data=dataset) 
+anova(mod.lm)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##                     Df  Sum Sq Mean Sq F value  Pr(&amp;gt;F)  
+## Block                3  3.6596  1.2199  0.6521 0.59389  
+## WeedControl          1  3.3205  3.3205  1.7750 0.20266  
+## Tillage              2 23.6565 11.8282  6.3228 0.01020 *
+## WeedControl:Tillage  2 19.4641  9.7321  5.2023 0.01922 *
+## Residuals           15 28.0609  1.8707                  
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In that precise moment when I noted such a result, it was clear to me that, even with simple and orthogonal split-plot designs, hand-calculations do not necessarily produce correct results and should never, ever be used as the reference to assess the validity of a mixed model fit.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;suggestions-for-dinosaurs&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Suggestions for dinosaurs&lt;/h1&gt;
+&lt;p&gt;If you are one of those who have never taken a lesson about expected mean squares and error strata, well, believe me, you are lucky! For us dinosaurs, switching to the mixed model platform may be a daunting task. We need to free up our minds and change our workflow; a few suggestions are following.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;rule-1-change-model-building-process&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Rule 1: change model building process&lt;/h1&gt;
+&lt;p&gt;In principle, do no insist on including the ‘block by tillage’ interaction in the model. With split-plot experiments, the main-plot is to be regarded as a &lt;em&gt;grouping structure&lt;/em&gt;, wherein we take repeated measures in different sub-plots. These measures are correlated, as they are more alike than measures taken in different sub-plots.&lt;/p&gt;
+&lt;p&gt;Therefore, for this grouping structure (and for all grouping structures in general) we need to code a &lt;em&gt;grouping factor&lt;/em&gt;, to uniquely identify the repeated measures in each main-plot. This factor must be included in the model, otherwise we violate the basic assumption of independence of model residuals. Consider that the main-plot represent the randomisation units to which the tillage treatments were allocated; therefore, the main plot factor needs to be included in the model as a random effect. Please refer to the good paper of Piepho et al. (2003) for further information on this model building approach.&lt;/p&gt;
+&lt;p&gt;In the box below I created the main-plot factor by using &lt;code&gt;dplyr()&lt;/code&gt; to combine the levels of blocks and tillage methods. The difference with the traditional approach of using the ‘block by tillage’ interaction in the model is subtle, but, in this case, the &lt;code&gt;lme()&lt;/code&gt; function returns no error. Please, note that, having no interest in the estimation of variance components, I have fitted this model by maximum likelihood estimation: it is confirmed that the main-plot random effect is zero (see the output of the &lt;code&gt;VarCorr()&lt;/code&gt; function).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dataset &amp;lt;- dataset %&amp;gt;% 
+  mutate(mainPlots = factor(Block:Tillage))
+mod.lme2 &amp;lt;- lme(Yield ~ Block + Tillage * WeedControl,
+               random = ~1|mainPlots, data = dataset,
+               method = &amp;quot;ML&amp;quot;)
+VarCorr(mod.lme2)
+## mainPlots = pdLogChol(1) 
+##             Variance     StdDev      
+## (Intercept) 4.462849e-10 2.112546e-05
+## Residual    1.169203e+00 1.081297e+00&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;rule-2-change-the-approach-to-hypotheses-testing&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Rule 2: change the approach to hypotheses testing&lt;/h1&gt;
+&lt;p&gt;In the agricultural sciences we have been very much familiar with ANOVA tables, showing all fixed effects along with their significance level. I am very much convinced that we should refrain from such a (possibly bad) habit. Indeed, there is no point in testing the significance of main effects before testing the significance of the ‘tillage by weed control’ interaction, as main effects are marginal to the interaction effect.&lt;/p&gt;
+&lt;p&gt;At first, we need to concentrate on the interaction effect. According to maximum likelihood theory, it is very logic to think of a Likelihood Ratio Test (LRT), which consists of comparing the likelihoods of two alternative and nested models. In this case, the model above (‘mod.lme2’) can be compared with a ‘reduced’ model without the ‘tillage by weed control’ interaction term: if the two likelihoods are similar, that would be a sign that the interaction effect is not significant. The reduced model fit is shown below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod.lme3 &amp;lt;- lme(Yield ~ Block + Tillage + WeedControl,
+               random = ~1|mainPlots, data = dataset,
+               method = &amp;quot;ML&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The logarithms of the two likelihoods show that the ‘full model’ (with the interaction term) is more ‘likely’ than the reduced model. The LRT is calculated as twice the difference between the two log-likelihoods (the logarithm of the ratio of two numbers is the difference of the logarithms, remember?).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ll2 &amp;lt;- logLik(mod.lme2)
+ll3 &amp;lt;- logLik(mod.lme3)
+ll2; ll3
+## &amp;#39;log Lik.&amp;#39; -35.93039 (df=11)
+## &amp;#39;log Lik.&amp;#39; -42.25294 (df=9)
+LRT &amp;lt;- - 2 * (as.numeric(ll3) - as.numeric(ll2))
+LRT
+## [1] 12.6451&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;For large samples and under the null hypothesis that the two models are not significantly different, the LRT is distributed according to a &lt;span class=&#34;math inline&#34;&gt;\(\chi^2\)&lt;/span&gt; with two degrees of freedom (i.e. the difference in the number of model parameters used by the two models). We could use such an assumption to obtain a p-level for the null, for example by way of the &lt;code&gt;anova()&lt;/code&gt; function, to which we pass the two model objects as arguments.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;anova(mod.lme2, mod.lme3)
+##          Model df       AIC      BIC    logLik   Test L.Ratio p-value
+## mod.lme2     1 11  93.86078 106.8194 -35.93039                       
+## mod.lme3     2  9 102.50589 113.1084 -42.25294 1 vs 2 12.6451  0.0018&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;However, our experiment consists of only 24 observations and the large sample theory should not hold. Therefore, instead of relying on the &lt;span class=&#34;math inline&#34;&gt;\(\chi^2\)&lt;/span&gt; distribution, we can build an empirical sampling distribution for the LRT with Monte Carlo simulation (parametric bootstrap). The process is as follows:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;simulate a new dataset under the reduced model, using the fitted parameter estimates and assuming normality for the errors and random effects;&lt;/li&gt;
+&lt;li&gt;fit to this dataset both the full and the reduced model;&lt;/li&gt;
+&lt;li&gt;compute the LRT statistic;&lt;/li&gt;
+&lt;li&gt;repeat steps 1 to 3 many times (e.g., 10000);&lt;/li&gt;
+&lt;li&gt;examine the distribution of the bootstrapped LRT values and compute the proportion of those exceeding 12.6451 (empirical p-value).&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;To this aim, we can use the &lt;code&gt;simulate()&lt;/code&gt; function in the ‘nlme’ package. We pass the reduced model object as the first argument, the full model as the argument ‘m2’, the number of simulations and the seed (if we intend to obtain reproducible results). The fit may take quite a few minutes.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;y &amp;lt;- simulate(mod.lme3, nsim = 10000, m2 = mod.lme2, method=&amp;quot;ML&amp;quot;,
+               set.seed = 1234)
+lrtSimT &amp;lt;- as.numeric(2*(y$alt$ML[,2] - y$null$ML[,2]))
+length(lrtSimT[lrtSimT &amp;gt; 12.6451])/length(lrtSimT)
+## [1] 0.0223&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We conclude that the interaction is significant and we can go ahead with further analyses.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;take-home-message&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Take-home message&lt;/h1&gt;
+&lt;p&gt;What is the take-home message for this post? When we have to analyse a dataset coming from a split-plot experiment, R forces us to use the mixed model platform. We should not necessarily expect to reproduce the approach and the results we were used to obtain when we made our hand-calculations based on least squares and the method of moments. On the contrary, we should adapt our model building and hypothesis testing process to such a very powerful platform, wherein the slit-plot is treated on equal footing to all other types of repeated measures designs.&lt;/p&gt;
+&lt;p&gt;Hope this was fun! If you have any comments, drop me a line to the email below.&lt;/p&gt;
+&lt;hr /&gt;
+&lt;p&gt;Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Douglas Bates, Martin Maechler, Ben Bolker, Steve Walker (2015). Fitting Linear Mixed-Effects Models Using lme4. Journal of Statistical Software, 67(1), 1-48. &lt;a href=&#34;doi:10.18637/jss.v067.i01&#34; class=&#34;uri&#34;&gt;doi:10.18637/jss.v067.i01&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Dixon, P., 2016. Should blocks be fixed or random? Conference on Applied Statistics in Agriculture. &lt;a href=&#34;https://doi.org/10.4148/2475-7772.1474&#34; class=&#34;uri&#34;&gt;https://doi.org/10.4148/2475-7772.1474&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Piepho, H.-P., Büchse, A., Emrich, K., 2003. A Hitchhiker’s Guide to Mixed Models for Randomized Experiments. Journal of Agronomy and Crop Science 189, 310–322.&lt;/li&gt;
+&lt;li&gt;Pinheiro J, Bates D, DebRoy S, Sarkar D, R Core Team (2018). nlme: Linear and Nonlinear Mixed Effects Models_. R package version 3.1-137, &amp;lt;URL: &lt;a href=&#34;https://CRAN.R-project.org/package=nlme&#34; class=&#34;uri&#34;&gt;https://CRAN.R-project.org/package=nlme&lt;/a&gt;&amp;gt;.&lt;/li&gt;
+&lt;li&gt;Venables, W.N., Ripley, B.D., Venables, W.N., 2002. Modern applied statistics with S, 4th ed. ed, Statistics and computing. Springer, New York.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Accounting for the experimental design in linear/nonlinear regression analyses</title>
