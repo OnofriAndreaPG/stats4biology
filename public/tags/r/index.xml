@@ -18,7 +18,6 @@
       
       <guid>/2021/stat_lmm_splitplottransition/</guid>
       <description>
-&lt;script src=&#34;/rmarkdown-libs/header-attrs/header-attrs.js&#34;&gt;&lt;/script&gt;
 
 
 &lt;p&gt;&lt;em&gt;Those who long ago took courses in ‘analysis of variance’ or ‘experimental design’ … would have learned methods … based on observed and expected mean squares and methods of testing based on ‘error strata’ (if you weren’t forced to learn this, consider yourself lucky). (&lt;a href=&#34;https://stat.ethz.ch/pipermail/r-help/2006-May/094765.html&#34;&gt;Douglas Bates, 2006&lt;/a&gt;).&lt;/em&gt;&lt;/p&gt;
@@ -91,6 +90,8 @@ summary(mod.aov)
 &lt;p&gt;In the above definition, the block effect is regarded as random, while, in the traditional approach, it is often regarded as fixed. Indeed, still today, there is no consensus among agricultural scientists on whether the block effect should be regarded as random or fixed (see Dixon, 2016); for the sake of this exercise, let me regard it as fixed. After a few attempts, I discovered that I could move the effect of blocks from the &lt;code&gt;Error()&lt;/code&gt; definition to the fixed effect formula and use the expression &lt;code&gt;Error(Block:Tillage)&lt;/code&gt; to specify the uppermost error stratum.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod.aov2 &amp;lt;- aov(Yield ~ Block + Tillage*WeedControl +
                  Error(Block:Tillage), data = dataset)
+## Warning in aov(Yield ~ Block + Tillage * WeedControl + Error(Block:Tillage), :
+## Error() model is singular
 summary(mod.aov2)
 ## 
 ## Error: Block:Tillage
@@ -114,11 +115,17 @@ summary(mod.aov2)
 &lt;div id=&#34;second-step-the-mixed-model-framework&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Second step: the mixed model framework&lt;/h1&gt;
 &lt;p&gt;When making this switch to mixed models, I had the expectation that I should be able to reproduce the results obtained with the &lt;code&gt;aov()&lt;/code&gt; function and, formerly, by hand-calculations.&lt;/p&gt;
-&lt;p&gt;I started with the &lt;code&gt;lme()&lt;/code&gt; function in the ‘nlme’ package (Pinheiro et al., 2018) and I had the idea that I could simply replace the &lt;code&gt;Error(Block:Tillage)&lt;/code&gt; statement with &lt;code&gt;random = ~1|Block:Tillage&lt;/code&gt;. Unfortunately, using the &lt;code&gt;:&lt;/code&gt; operator in the &lt;code&gt;lme()&lt;/code&gt; function is not possible and I had to resort to using the nesting operator &lt;code&gt;‘Block/Tillage’&lt;/code&gt;. Consequently, I noted that the F test for the block effect was wrong. Not a very important problem, indeed, but I was so stupidly determined to reproduce my hand-calculations.&lt;/p&gt;
+&lt;p&gt;I started with the &lt;code&gt;lme()&lt;/code&gt; function in the ‘nlme’ package (Pinheiro et al., 2018) and I had the idea that I could simply replace the &lt;code&gt;Error(Block:Tillage)&lt;/code&gt; statement with &lt;code&gt;random = ~1|Block:Tillage&lt;/code&gt;. Unfortunately, using the &lt;code&gt;:&lt;/code&gt; operator in the &lt;code&gt;lme()&lt;/code&gt; function is not possible and I had to resort to using the nesting operator &lt;code&gt;‘Block/Tillage’&lt;/code&gt;. Consequently, I noted that the F test for the block effect was wrong (of course: the specification was wrong…). I could have removed the block from the fixed effect model, but I was so stupidly determined to reproduce my hand-calculations.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(nlme)
+## 
+## Attaching package: &amp;#39;nlme&amp;#39;
+## The following object is masked from &amp;#39;package:dplyr&amp;#39;:
+## 
+##     collapse
 mod.lme &amp;lt;- lme(Yield ~ Block + Tillage*WeedControl,
                random = ~1|Block/Tillage, data = dataset)
 anova(mod.lme)
+## Warning in pf(Fval[i], nDF[i], dDF[i]): NaNs produced
 ##                     numDF denDF   F-value p-value
 ## (Intercept)             1     9 120.85864  &amp;lt;.0001
 ## Block                   3     0   0.08045     NaN
@@ -210,7 +217,7 @@ LRT
                set.seed = 1234)
 lrtSimT &amp;lt;- as.numeric(2*(y$alt$ML[,2] - y$null$ML[,2]))
 length(lrtSimT[lrtSimT &amp;gt; 12.6451])/length(lrtSimT)
-## [1] 0.0223&lt;/code&gt;&lt;/pre&gt;
+## [1] 0.0211&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;We conclude that the interaction is significant and we can go ahead with further analyses.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;take-home-message&#34; class=&#34;section level1&#34;&gt;

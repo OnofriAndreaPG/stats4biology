@@ -69,7 +69,6 @@
           </p><hr/>
             <div class="content">
                 
-<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
 <p><em>Those who long ago took courses in ‘analysis of variance’ or ‘experimental design’ … would have learned methods … based on observed and expected mean squares and methods of testing based on ‘error strata’ (if you weren’t forced to learn this, consider yourself lucky). (<a href="https://stat.ethz.ch/pipermail/r-help/2006-May/094765.html">Douglas Bates, 2006</a>).</em></p>
@@ -142,6 +141,8 @@ summary(mod.aov)
 <p>In the above definition, the block effect is regarded as random, while, in the traditional approach, it is often regarded as fixed. Indeed, still today, there is no consensus among agricultural scientists on whether the block effect should be regarded as random or fixed (see Dixon, 2016); for the sake of this exercise, let me regard it as fixed. After a few attempts, I discovered that I could move the effect of blocks from the <code>Error()</code> definition to the fixed effect formula and use the expression <code>Error(Block:Tillage)</code> to specify the uppermost error stratum.</p>
 <pre class="r"><code>mod.aov2 &lt;- aov(Yield ~ Block + Tillage*WeedControl +
                  Error(Block:Tillage), data = dataset)
+## Warning in aov(Yield ~ Block + Tillage * WeedControl + Error(Block:Tillage), :
+## Error() model is singular
 summary(mod.aov2)
 ## 
 ## Error: Block:Tillage
@@ -165,11 +166,17 @@ summary(mod.aov2)
 <div id="second-step-the-mixed-model-framework" class="section level1">
 <h1>Second step: the mixed model framework</h1>
 <p>When making this switch to mixed models, I had the expectation that I should be able to reproduce the results obtained with the <code>aov()</code> function and, formerly, by hand-calculations.</p>
-<p>I started with the <code>lme()</code> function in the ‘nlme’ package (Pinheiro et al., 2018) and I had the idea that I could simply replace the <code>Error(Block:Tillage)</code> statement with <code>random = ~1|Block:Tillage</code>. Unfortunately, using the <code>:</code> operator in the <code>lme()</code> function is not possible and I had to resort to using the nesting operator <code>‘Block/Tillage’</code>. Consequently, I noted that the F test for the block effect was wrong. Not a very important problem, indeed, but I was so stupidly determined to reproduce my hand-calculations.</p>
+<p>I started with the <code>lme()</code> function in the ‘nlme’ package (Pinheiro et al., 2018) and I had the idea that I could simply replace the <code>Error(Block:Tillage)</code> statement with <code>random = ~1|Block:Tillage</code>. Unfortunately, using the <code>:</code> operator in the <code>lme()</code> function is not possible and I had to resort to using the nesting operator <code>‘Block/Tillage’</code>. Consequently, I noted that the F test for the block effect was wrong (of course: the specification was wrong…). I could have removed the block from the fixed effect model, but I was so stupidly determined to reproduce my hand-calculations.</p>
 <pre class="r"><code>library(nlme)
+## 
+## Attaching package: &#39;nlme&#39;
+## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     collapse
 mod.lme &lt;- lme(Yield ~ Block + Tillage*WeedControl,
                random = ~1|Block/Tillage, data = dataset)
 anova(mod.lme)
+## Warning in pf(Fval[i], nDF[i], dDF[i]): NaNs produced
 ##                     numDF denDF   F-value p-value
 ## (Intercept)             1     9 120.85864  &lt;.0001
 ## Block                   3     0   0.08045     NaN
@@ -261,7 +268,7 @@ LRT
                set.seed = 1234)
 lrtSimT &lt;- as.numeric(2*(y$alt$ML[,2] - y$null$ML[,2]))
 length(lrtSimT[lrtSimT &gt; 12.6451])/length(lrtSimT)
-## [1] 0.0223</code></pre>
+## [1] 0.0211</code></pre>
 <p>We conclude that the interaction is significant and we can go ahead with further analyses.</p>
 </div>
 <div id="take-home-message" class="section level1">

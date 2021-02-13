@@ -73,7 +73,7 @@ summary(mod.aov)
 
 In the above definition, the block effect is regarded as random, while, in the traditional approach, it is often regarded as fixed. Indeed, still today, there is no consensus among agricultural scientists on whether the block effect should be regarded as random or fixed (see Dixon, 2016); for the sake of this exercise, let me regard it as fixed. After a few attempts, I discovered that I could move the effect of blocks from the `Error()` definition to the fixed effect formula and use the expression `Error(Block:Tillage)` to specify the uppermost error stratum.
 
-```{r}
+```{r message=TRUE, warning=TRUE}
 mod.aov2 <- aov(Yield ~ Block + Tillage*WeedControl +
                  Error(Block:Tillage), data = dataset)
 summary(mod.aov2)
@@ -88,9 +88,9 @@ For me, the `aov()` function represented a safe harbour, mainly because the resu
 
 When making this switch to mixed models, I had the expectation that I should be able to reproduce the results obtained with the `aov()` function and, formerly, by hand-calculations.
 
-I started with the `lme()` function in the 'nlme' package (Pinheiro et al., 2018) and I had the idea that I could simply replace the `Error(Block:Tillage)` statement with `random = ~1|Block:Tillage`. Unfortunately, using the `:`  operator in the `lme()` function is not possible and I had to resort to using the nesting operator `‘Block/Tillage’`. Consequently, I noted that the F test for the block effect was wrong. Not a very important problem, indeed, but I was so stupidly determined to reproduce my hand-calculations.
+I started with the `lme()` function in the 'nlme' package (Pinheiro et al., 2018) and I had the idea that I could simply replace the `Error(Block:Tillage)` statement with `random = ~1|Block:Tillage`. Unfortunately, using the `:`  operator in the `lme()` function is not possible and I had to resort to using the nesting operator `‘Block/Tillage’`. Consequently, I noted that the F test for the block effect was wrong (of course: the specification was wrong...). I could have removed the block from the fixed effect model, but I was so stupidly determined to reproduce my hand-calculations.
 
-```{r}
+```{r message=TRUE, warning=TRUE}
 library(nlme)
 mod.lme <- lme(Yield ~ Block + Tillage*WeedControl,
                random = ~1|Block/Tillage, data = dataset)
