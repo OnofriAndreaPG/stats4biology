@@ -4,21 +4,21 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Capitolo 10 Modelli ANOVA con fattori di blocco | Metodologia sperimentale per le scienze agrarie</title>
-  <meta name="description" content="Capitolo 10 Modelli ANOVA con fattori di blocco | Metodologia sperimentale per le scienze agrarie con applicazioni in R" />
+  <title>Capitolo 3 Richiami di statistica descrittiva | Metodologia sperimentale per le scienze agrarie</title>
+  <meta name="description" content="Capitolo 3 Richiami di statistica descrittiva | Metodologia sperimentale per le scienze agrarie con applicazioni in R" />
   <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Capitolo 10 Modelli ANOVA con fattori di blocco | Metodologia sperimentale per le scienze agrarie" />
+  <meta property="og:title" content="Capitolo 3 Richiami di statistica descrittiva | Metodologia sperimentale per le scienze agrarie" />
   <meta property="og:type" content="book" />
   
   
-  <meta property="og:description" content="Capitolo 10 Modelli ANOVA con fattori di blocco | Metodologia sperimentale per le scienze agrarie con applicazioni in R" />
+  <meta property="og:description" content="Capitolo 3 Richiami di statistica descrittiva | Metodologia sperimentale per le scienze agrarie con applicazioni in R" />
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Capitolo 10 Modelli ANOVA con fattori di blocco | Metodologia sperimentale per le scienze agrarie" />
+  <meta name="twitter:title" content="Capitolo 3 Richiami di statistica descrittiva | Metodologia sperimentale per le scienze agrarie" />
   
-  <meta name="twitter:description" content="Capitolo 10 Modelli ANOVA con fattori di blocco | Metodologia sperimentale per le scienze agrarie con applicazioni in R" />
+  <meta name="twitter:description" content="Capitolo 3 Richiami di statistica descrittiva | Metodologia sperimentale per le scienze agrarie con applicazioni in R" />
   
 
 <meta name="author" content="Andrea Onofri e Dario Sacco" />
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="contrasti-e-confronti-multipli.html"/>
-<link rel="next" href="modelli-anova-a-due-vie.html"/>
+<link rel="prev" href="progettare-un-esperimento.html"/>
+<link rel="next" href="modelli-statistici-ed-analisi-dei-dati.html"/>
 <script src="book_assets/header-attrs-2.6/header-attrs.js"></script>
 <script src="book_assets/jquery-2.2.3/jquery.min.js"></script>
 <link href="book_assets/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -551,247 +551,329 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="modelli-anova-con-fattori-di-blocco" class="section level1" number="10">
-<h1><span class="header-section-number">Capitolo 10</span> Modelli ANOVA con fattori di blocco</h1>
-<p>Nel capitolo 7 abbiamo visto come è possibile costruire modelli nei quali abbiamo una sola variabile dipendente quantitativa e una variabile indipendente categorica. Abbiamo anche visto che questo tipo di modelli lineari sono normalmente noti come modelli ‘ANOVA’ ad una via e presuppongono che le unità sperimentali siano totalmente indipendenti tra loro. Per questo motivo, essi possono essere utilizzati solo con disegni sperimentali a randomizzazione completa, dove non esistano raggruppamenti di alcun tipo, escluso quello dettato dal trattamento in studio.</p>
-<p>Ovviamente è possibile definire modelli analoghi, ma più complessi, nei quali introdurre anche l’effetto di eventuali <em>blocking factors</em>. Vediamo ora alcuni esempi</p>
-<div id="caso-studio-confronto-tra-erbicidi-in-campo" class="section level2" number="10.1">
-<h2><span class="header-section-number">10.1</span> Caso-studio: confronto tra erbicidi in campo</h2>
-<p>Abbiamo una prova di confronto tra erbicidi in mais, con 13 formulati, due testimoni inerbiti (che, per comodità, considereremo due trattamenti diversi) e un testimone scerbato. Date le dimensioni della prova, è lecito ipotizzare che, pur scegliendo un appezzamento il più omogeneo possibile, ci potrebbero essere differenze di infestazione tra un punto e l’altro del campo, con un presumibile gradiente procedendo dai lati (vicino alle fosse) verso il centro. In questa situazione, se l’esperimento fosse disegnato a randomizzazione completa, le differenze di infestazione tra una parte e l’altra del campo sarebbero trascurate e finirebbero per incrementare l’errore sperimentale, diminuendo l’efficienza dell’esperimento.</p>
-<p>Si impiega quindi un disegno a blocchi randomizzati con quattro repliche. Ricordiamo che, con questo disegno, il campo è suddiviso in tante sezioni (dette blocchi) quante sono le repliche (quattro), perpendicolarmente al gradiente di infestazione trasversale. In questo modo, l’ambiente è relativamente omogeneo all’interno di ciascun blocco, nel quale viene collocata una replica per trattamento.</p>
-<p>Per questa lezione è necessario caricare il package ‘aomisc,’ che deve essere preventivamente installato, facendo riferimento, se necessario, al capitolo introduttivo. Il dataset dei risultati (‘rimsulfuron’) è, appunto, contenuto in questo package.</p>
-<div class="sourceCode" id="cb123"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb123-1"><a href="modelli-anova-con-fattori-di-blocco.html#cb123-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(aomisc)</span>
-<span id="cb123-2"><a href="modelli-anova-con-fattori-di-blocco.html#cb123-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(rimsulfuron)</span></code></pre></div>
-<p>Più sotto, riportiamo l’output di R relativo ai dati tabulati, con le relative medie di riga (trattamento) e di colonna (blocco)</p>
-<pre><code>##                                                 1       2       3       4  Medie
-## Alachlor + terbuthylazine                  12.060  49.580  41.340  16.370 29.838
-## Hand-Weeded                                77.580  92.080  86.590  99.630 88.970
-## Metolachlor + terbuthylazine (pre)         51.770  52.100  49.460  34.670 47.000
-## Pendimethalin (post) + rimsuulfuron (post) 94.820  87.720 102.050 101.940 96.632
-## Pendimethalin (pre) + rimsulfuron (post)   65.510  88.720  95.520  82.390 83.035
-## Rimsulfuron (40)                           85.910  91.090 111.420  93.150 95.392
-## Rimsulfuron (45)                           93.030 105.000  89.190  79.040 91.565
-## Rimsulfuron (50)                           86.930 105.820 110.020  89.100 97.968
-## Rimsulfuron (50+30 split)                  71.360  77.570 115.910  92.160 89.250
-## Rimsulfuron (60)                           52.990 102.860 100.620  97.040 88.377
-## Rimsulfuron + Atred                        94.110  89.860 104.340  99.630 96.985
-## Rimsulfuron + hoeing                       73.220  86.060 118.010  98.320 93.903
-## Rimsulfuron + thyfensulfuron               75.280  82.590  94.960  85.850 84.670
-## Thifensulfuron                             78.470  42.320  62.520  24.340 51.913
-## Unweeded 1                                 10.880  31.770  23.920  20.850 21.855
-## Unweeded 2                                 27.580  51.550  25.130  38.610 35.718
-## Medie                                      65.719  77.293  83.188  72.068 74.567</code></pre>
-</div>
-<div id="definizione-di-un-modello-lineare-1" class="section level2" number="10.2">
-<h2><span class="header-section-number">10.2</span> Definizione di un modello lineare</h2>
-<p>La produzione di ogni unità sperimentale (parcella) è condizionata da più di un effetto:</p>
+<div id="richiami-di-statistica-descrittiva" class="section level1" number="3">
+<h1><span class="header-section-number">Capitolo 3</span> Richiami di statistica descrittiva</h1>
+<p>Qualunque esperimento include una serie di rilievi, al termine dei quali ci troviamo con una o più variabili, che costituiscono un ‘dataset.’ Il nostro primo compito è quello di comprendere e descrivere le caratteristiche fondamentali di ogni variabile, utilizzando opportune statistiche descrittive, che cambiano al cambiare del tipo di variabile.</p>
+<div id="dati-quantitativi" class="section level2" number="3.1">
+<h2><span class="header-section-number">3.1</span> Dati quantitativi</h2>
+<p>Se i dati sono stati ottenuti con un processo di misurazione e rappresentano una quantità, come, ad esempio, il peso, l’altezza, la concentrazione e così via, abbiamo una variabile quantitativa, le cui caratteristiche fondamentali sono almeno due:</p>
 <ol style="list-style-type: decimal">
-<li>il diserbante con cui essa è stata trattata;</li>
-<li>il blocco di cui essa fa parte;</li>
-<li>ogni altro effetto non conoscibile e puramente casuale.</li>
+<li>tendenza centrale</li>
+<li>dispersione</li>
 </ol>
-<p>Il modello è quindi:</p>
-<p><span class="math display">\[ Y_{ij} = \mu + \gamma_i + \alpha_j + \varepsilon_{ij}\]</span></p>
-<p>dove <span class="math inline">\(Y\)</span> è la produzione nel blocco <span class="math inline">\(i\)</span> e con il diserbo <span class="math inline">\(j\)</span>, <span class="math inline">\(\mu\)</span> è l’intercetta, <span class="math inline">\(\gamma\)</span> è l’effetto del blocco <span class="math inline">\(i\)</span>, <span class="math inline">\(\alpha\)</span> è l’effetto del trattamento <span class="math inline">\(j\)</span> e <span class="math inline">\(\varepsilon\)</span> è l’errore sperimentale per ogni singola parcella, che si assume normalmente distribuito, con media 0 e deviazione standard <span class="math inline">\(\sigma\)</span>. Per gli usuali problemi di stimabilità, poniamo i vincoli <span class="math inline">\(\gamma_1 = 0\)</span> e <span class="math inline">\(\alpha_1 = 0\)</span> (vincolo sul trattamento), in modo che <span class="math inline">\(\mu\)</span> rappresenta il valore atteso nel primo blocco e per il primo trattamento in ordine alfabetico. In totale, vi sono 19 parametri da stimare, più <span class="math inline">\(\sigma\)</span>.</p>
+<p>La tendenza centrale di una variabile quantitativa è un valore, intorno al quale si collocano tutte le osservazioni, mentre la dispersione misura, in qualche modo, la distanza delle osservazioni tra di loro. Esistono diverse statistiche di tendenza centrale e dispersione; di seguito, descriveremo le più importanti.</p>
+<div id="indicatori-di-tendenza-centrale" class="section level3" number="3.1.1">
+<h3><span class="header-section-number">3.1.1</span> Indicatori di tendenza centrale</h3>
+<p>L’indicatore di tendenza centrale più diffuso è la <em>media</em> aritmetica, che non necessita di particolari spiegazioni: si tratta della somma dei dati (<span class="math inline">\(x\)</span>) divisa per il loro numero (<span class="math inline">\(n\)</span>):</p>
+<p><span class="math display">\[\mu = \frac{\sum\limits_{i = 1}^n x}{n}\]</span></p>
+<p>Per esempio, consideriamo il seguente dataset, che elenca le altezze di quattro piante di mais <span class="math inline">\(d = [178, 175, 158, 153]\)</span></p>
+<p>Il calcolo della media è banale:</p>
+<p><span class="math display">\[\mu = \frac{178 + 175 + 158 + 153}{4} = 166\]</span></p>
+<p>Un altro indicatore di tendenza centrale è la <em>mediana</em>, cioè il valore che bipartisce i dati in modo da lasciarne metà a sinistra e metà a destra, così da risultare superiore a quello del 50% degli individui. Per calcolare la mediana, basta ordinare i soggetti in ordine crescente: se il numero di individui è dispari, la mediana è data dal valore dall’individuo che occupa il posto centrale o, se gli individui sono in numero pari, dalla media delle due osservazioni centrali. Nel nostro dataset relativo alle altezze, i dati sono in numero pari, quindi dopo averli ordinati, prendiamo il secondo e il terzo valore e calcoliamo la loro media, pari a <span class="math inline">\((158 + 175)/2 = 166.5\)</span>.</p>
+<p>La mediana è un indicatore più robusto della media: infatti, supponiamo di avere i cinque valori: 1 - 4 - 7 - 9 - 10. La media è pari a 6.2, mentre la mediana è pari a 7 (valore centrale). Se cambiano il numero più alto in questo modo, sostituendolo con 100, la media diventa 24.2, mentre la mediana rimane pari a 7, mostrando come essa non sia per nulla influenzata dai valori estremi (<em>outliers</em>).</p>
 </div>
-<div id="stima-dei-parametri-1" class="section level2" number="10.3">
-<h2><span class="header-section-number">10.3</span> Stima dei parametri</h2>
-<div id="coefficienti-del-modello" class="section level3" number="10.3.1">
-<h3><span class="header-section-number">10.3.1</span> Coefficienti del modello</h3>
-<p>La stima dei parametri viene eseguita con il metodo dei minimi quadrati. In questo caso l’esperimento è completamente bilanciato e la stima potrebbe essere fatta banalmente, considerando i valori osservati e le medie aritmetiche per gruppo. Infatti, se prendiamo la media generale, la media del primo blocco e la media del primo erbicida riportate nel codice sovrastante, vediamo che il primo erbicida, rispetto alla media generale, ha determinato un aumento di -44.729375 unità. D’altra parte, il primo blocco ha comportanto un aumento di -8.848125 unità. Di conseguenza, il valore atteso nel primo trattamento e nel primo blocco dovrebbe essere pari a:</p>
-<p><span class="math display">\[ \bar{Y}_{11} = \mu = 74.56687 - 44.72937 - 8.848125 = 20.98937\]</span></p>
-<p>Analogamente, considerando che la media del secondo blocco è di 2.72625 unità più alta della media generale, il valore atteso per il primo trattamento nel secondo blocco è pari a:</p>
-<p><span class="math display">\[ \bar{Y}_{12} = 74.56687 - 44.72937 + 2.72625 = 32.56375\]</span>
-Di conseguenza:</p>
-<p><span class="math display">\[ \gamma_2 = 32.56375 - 20.98937 = 11.57438\]</span></p>
-<p>Ancora, considerando che la media del secondo trattamento è di 14.403125 unità più alta della media generale, il valore atteso per il secondo trattamento nel primo blocco è pari a:</p>
-<p><span class="math display">\[ \bar{Y}_{21} = 74.56687 + 14.40313 - 8.848125 = 80.12188\]</span></p>
-<p>Di conseguenza:</p>
-<p><span class="math display">\[ \alpha_2 = 80.12188 - 20.98937 = 59.13251\]</span></p>
-<p>Ovviamente, continuare questi calcoli è abbastanza tedioso e quindi eseguiamo il ‘model fitting’ con R, osservando che esso produce gli stessi risultati già calcolati a mano.</p>
-<div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb125-1"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">width =</span> <span class="dv">170</span>)</span>
-<span id="cb125-2"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-2" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">&lt;-</span> <span class="fu">lm</span>(Yield <span class="sc">~</span> <span class="fu">factor</span>(Block) <span class="sc">+</span> <span class="fu">factor</span>(Herbicide), <span class="at">data =</span> rimsulfuron)</span>
-<span id="cb125-3"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mod)</span>
-<span id="cb125-4"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-4" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb125-5"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-5" aria-hidden="true" tabindex="-1"></a><span class="do">## Call:</span></span>
-<span id="cb125-6"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-6" aria-hidden="true" tabindex="-1"></a><span class="do">## lm(formula = Yield ~ factor(Block) + factor(Herbicide), data = rimsulfuron)</span></span>
-<span id="cb125-7"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-7" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb125-8"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-8" aria-hidden="true" tabindex="-1"></a><span class="do">## Residuals:</span></span>
-<span id="cb125-9"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-9" aria-hidden="true" tabindex="-1"></a><span class="do">##     Min      1Q  Median      3Q     Max </span></span>
-<span id="cb125-10"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-10" aria-hidden="true" tabindex="-1"></a><span class="do">## -26.539  -8.740   1.102   6.209  35.406 </span></span>
-<span id="cb125-11"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-11" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb125-12"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-12" aria-hidden="true" tabindex="-1"></a><span class="do">## Coefficients:</span></span>
-<span id="cb125-13"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-13" aria-hidden="true" tabindex="-1"></a><span class="do">##                                                             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
-<span id="cb125-14"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-14" aria-hidden="true" tabindex="-1"></a><span class="do">## (Intercept)                                                   20.989      6.886   3.048 0.003847 ** </span></span>
-<span id="cb125-15"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-15" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Block)2                                                11.574      4.468   2.590 0.012874 *  </span></span>
-<span id="cb125-16"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-16" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Block)3                                                17.469      4.468   3.910 0.000309 ***</span></span>
-<span id="cb125-17"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-17" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Block)4                                                 6.349      4.468   1.421 0.162206    </span></span>
-<span id="cb125-18"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-18" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Hand-Weeded                                  59.133      8.936   6.617 3.78e-08 ***</span></span>
-<span id="cb125-19"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-19" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Metolachlor + terbuthylazine (pre)           17.163      8.936   1.921 0.061144 .  </span></span>
-<span id="cb125-20"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-20" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Pendimethalin (post) + rimsuulfuron (post)   66.795      8.936   7.474 2.03e-09 ***</span></span>
-<span id="cb125-21"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-21" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Pendimethalin (pre) + rimsulfuron (post)     53.198      8.936   5.953 3.67e-07 ***</span></span>
-<span id="cb125-22"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-22" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Rimsulfuron (40)                             65.555      8.936   7.336 3.25e-09 ***</span></span>
-<span id="cb125-23"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-23" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Rimsulfuron (45)                             61.728      8.936   6.907 1.40e-08 ***</span></span>
-<span id="cb125-24"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-24" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Rimsulfuron (50)                             68.130      8.936   7.624 1.22e-09 ***</span></span>
-<span id="cb125-25"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-25" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Rimsulfuron (50+30 split)                    59.413      8.936   6.648 3.39e-08 ***</span></span>
-<span id="cb125-26"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-26" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Rimsulfuron (60)                             58.540      8.936   6.551 4.74e-08 ***</span></span>
-<span id="cb125-27"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-27" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Rimsulfuron + Atred                          67.148      8.936   7.514 1.77e-09 ***</span></span>
-<span id="cb125-28"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-28" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Rimsulfuron + hoeing                         64.065      8.936   7.169 5.73e-09 ***</span></span>
-<span id="cb125-29"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-29" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Rimsulfuron + thyfensulfuron                 54.832      8.936   6.136 1.96e-07 ***</span></span>
-<span id="cb125-30"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-30" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Thifensulfuron                               22.075      8.936   2.470 0.017359 *  </span></span>
-<span id="cb125-31"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-31" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Unweeded 1                                   -7.982      8.936  -0.893 0.376473    </span></span>
-<span id="cb125-32"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-32" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Unweeded 2                                    5.880      8.936   0.658 0.513902    </span></span>
-<span id="cb125-33"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-33" aria-hidden="true" tabindex="-1"></a><span class="do">## ---</span></span>
-<span id="cb125-34"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-34" aria-hidden="true" tabindex="-1"></a><span class="do">## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span>
-<span id="cb125-35"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-35" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb125-36"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-36" aria-hidden="true" tabindex="-1"></a><span class="do">## Residual standard error: 12.64 on 45 degrees of freedom</span></span>
-<span id="cb125-37"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-37" aria-hidden="true" tabindex="-1"></a><span class="do">## Multiple R-squared:  0.8664, Adjusted R-squared:  0.8129 </span></span>
-<span id="cb125-38"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-38" aria-hidden="true" tabindex="-1"></a><span class="do">## F-statistic: 16.21 on 18 and 45 DF,  p-value: 4.916e-14</span></span></code></pre></div>
+<div id="indicatori-di-dispersione" class="section level3" number="3.1.2">
+<h3><span class="header-section-number">3.1.2</span> Indicatori di dispersione</h3>
+<p>Gli indicatori di tendenza centrale, da soli, non ci informano su come le unità sperimentali tendono a differire l’una dall’altra: ad esempio una media pari a 100 può essere ottenuta con tre individui che misurano 99, 100 e 101 rispettivamente o con tre individui che misurano 1, 100 e 199. E’ evidente che in questo secondo gruppo gli individui sono molto più differenti tra loro (dispersi) che nel primo gruppo.</p>
+<p>Pertanto, i risultati di un processo di misurazione non possono essere descritti solo con la media, ma è necessario anche calcolare un indice di variabilità. Tra essi, il più semplice è il <em>campo di variazione</em>, che è la differenza tra la misura più bassa e la misura più alta. In realtà, non si tratta di un vero e proprio indice di variabilità, in quanto dipende solo dai termini estremi della distribuzione e non necessariamente cresce al crescere della variabilità degli individui. Per questo motivo, si preferisce utilizzare indicatori più affidabili, come la devianza, la varianza, la deviazione standard ed il coefficiente di variabilità, tutti collegati da relazioni algebriche ben definite.</p>
+<p>La <em>devianza</em> (generalmente nota come SS, cioè somma dei quadrati, <em>sum of squares</em>) è data da:</p>
+<p><span class="math display">\[SS = \sum\limits_{i = 1}^n {(x_i  - \bar x)^2 }\]</span></p>
+<p>Si tratta di un indicatore caratterizzato da un significato geometrico molto preciso, collegabile alla somma dei quadrati delle distanze euclidee di ogni osservazione rispetto alla media. Per le altezze che abbiamo utilizzato in precedenza, la devianza si calcola:</p>
+<p><span class="math display">\[SS = \left(178 - 166 \right)^2 + \left(175 - 166 \right)^2 + \left(158 - 166 \right)^2  + \left(153 - 166 \right)^2= 458\]</span></p>
+<p>La devianza è molto utile in alcuni contesti che vedremo, ma per la semplice descrizione della variabilità dei dati ha due problemi: in primo luogo, proprio perché è una somma, il valore finale dipende dal numero di addendi e quindi non lo si può utilizzare per confrontare la variabilità di collettivi diversamente numerosi. Inoltre, l’unità di misura della devianza è al quadrato rispetto all’unità di misura originale dei dati; ad esempio se le osservazioni sono espresse in centimetri (come in questo caso), la devianza è espressa in centimetri quadrati, il che rende più difficoltosa l’interpretazione di questa statistica.</p>
+<p>Oltre dalla devianza, si può calcolare la <em>varianza</em> (o meglio, varianza campionaria), definita come segue:</p>
+<p><span class="math display">\[\sigma^2  = \frac{SS}{n - 1}\]</span></p>
+<p>Nel nostro caso:</p>
+<p><span class="math display">\[\sigma^2  = \frac{458}{3} = 152.67\]</span></p>
+<p>La varianza permette di confrontare la variabilità di collettivi diversamente numerosi, anche se permane il problema che questo indicatore è espresso in un’unità di misura al quadrato, rispetto a quella delle osservazioni originali. Per eliminare questo problema si ricorre alla radice quadrata della varianza, cioè la <em>deviazione standard</em>, che si indica con <span class="math inline">\(\sigma\)</span>. La deviazione standard è espressa nella stessa unità di misura dei dati originari ed è quindi molto informativa sulla banda di oscillazione dei dati rispetto alla media. Viene frequentemente utilizzata per descrivere l’<em>incertezza assoluta</em> di una misura ripetuta più volte. Nel nostro caso, risulta che:</p>
+<p><span class="math display">\[\sigma  = \sqrt{152.67} = 12.36\]</span></p>
+<p>e questo valore ci fa capire che, ‘mediamente,’ la distanza euclidea tra le osservazioni e la media è 12.36 centimetri. Media e deviazione standard sono spesso riportate contemporaneamente, utilizzando un intervallo <span class="math inline">\(l\)</span> definito come:</p>
+<p><span class="math display">\[l = \mu \pm \sigma\]</span></p>
+<p>In assenza della media, <span class="math inline">\(\sigma\)</span> non riesce a dare informazioni facilmente comprensibili: se in un collettivo la deviazione standard è 12.36 come è questo collettivo? Molto o poco variabile? Non possiamo dirlo: potrebbe essere molto disperso se la media fosse bassa (ad esempio 16), oppure poco disperso, se la media fosse alta (esempio 1600). Per questo, se dobbiamo descrivere la variabilità dei dati indipendentemente dalla media, utilizziamo il <em>coefficiente di variabilità</em> (CV):</p>
+<p><span class="math display">\[CV = \frac{\sigma }{\mu } \times 100\]</span></p>
+<p>che è un numero puro e non dipende dall’unità di misura e dall’ampiezza del collettivo, sicché è molto adatto ad esprimere, ad esempio, l’errore degli strumenti di misura e delle apparecchiature di analisi (<strong>incertezza relativa</strong>). Nel nostro caso, abbiamo:</p>
+<p><span class="math display">\[CV = \frac{12.36}{166} \times 100 = 7.45 \%\]</span></p>
+<p>Come la media, anche la devianza, varianza e deviazione standard sono sensibili agli outliers. Pertanto, in presenza di queste osservazioni aberranti, possiamo estendere il concetto di mediana, calcolando i cosiddetti <em>percentili</em>, che bipartiscono la popolazione di partenza in modo da lasciare una certa quantità di termini alla sua sinistra e la restante quantità alla sua destra. Ad esempio, il primo percentile bipartisce la popolazione in modo da lasciare a sinistra l’ 1% dei valori e alla destra il restante 99%. Allo stesso modo l’ottantesimo percentile bipartisce la popolazione in modo da lasciare a sinistra l’80% dei termini e alla destra il restante 20%, mentre la mediana rappresenta il 50-esimo percentile.</p>
+<p>I percentili più utilizzati per descrivere la dispersione di un collettivo sono il 25-esimo e il 75-esimo: se questi sono molto vicini, significa che il 50% dei soggetti è compreso in un intervallo piccolo e quindi la variabilità della popolazione è bassa. Calcolare i percentili a mano non è banale e, di conseguenza, lo faremo nei paragrafi successivi utilizzando R.</p>
 </div>
-<div id="residui-e-devianze" class="section level3" number="10.3.2">
-<h3><span class="header-section-number">10.3.2</span> Residui e devianze</h3>
-<p>Nel capitolo 7 abbiamo visto come si calcolano i residui, sia a mano che con R. Abbiamo anche visto che la devianza dei residui è la somma dei loro quadrati:</p>
-<div class="sourceCode" id="cb126"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb126-1"><a href="modelli-anova-con-fattori-di-blocco.html#cb126-1" aria-hidden="true" tabindex="-1"></a>RSS <span class="ot">&lt;-</span> <span class="fu">sum</span>( <span class="fu">residuals</span>(mod)<span class="sc">^</span><span class="dv">2</span> )</span>
-<span id="cb126-2"><a href="modelli-anova-con-fattori-di-blocco.html#cb126-2" aria-hidden="true" tabindex="-1"></a>RSS</span>
-<span id="cb126-3"><a href="modelli-anova-con-fattori-di-blocco.html#cb126-3" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 7187.348</span></span></code></pre></div>
-<p>Da questa possiamo ottenere la deviazione standard (<span class="math inline">\(\sigma\)</span>), considerando che i gradi di libertà si calcolano partendo dallo stesso punto da cui siamo partiti per l’ANOVA ad una via: abbiamo 16 gruppi con quattro repliche, per cui la devianza, entro ogni gruppo, ha tre gradi di libertà. In totale abbiamo quindi <span class="math inline">\(16 \times 3 = 48\)</span> gradi di libertà anche se non dobbiamo dimenticare che, le repliche di ogni gruppo non differiscono solo per motivi casuali, ma anche perché appartengono a blocchi diversi. Abbiamo quattro blocchi, quindi tre gradi di libertà, che vanno dedotti dai 48 appena calcolati. Pertanto:</p>
-<div class="sourceCode" id="cb127"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb127-1"><a href="modelli-anova-con-fattori-di-blocco.html#cb127-1" aria-hidden="true" tabindex="-1"></a>sigma <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(RSS<span class="sc">/</span><span class="dv">45</span>)</span>
-<span id="cb127-2"><a href="modelli-anova-con-fattori-di-blocco.html#cb127-2" aria-hidden="true" tabindex="-1"></a>sigma</span>
-<span id="cb127-3"><a href="modelli-anova-con-fattori-di-blocco.html#cb127-3" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 12.63799</span></span></code></pre></div>
-<p>Più facilmente:</p>
-<div class="sourceCode" id="cb128"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb128-1"><a href="modelli-anova-con-fattori-di-blocco.html#cb128-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mod)<span class="sc">$</span>sigma</span>
-<span id="cb128-2"><a href="modelli-anova-con-fattori-di-blocco.html#cb128-2" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 12.63799</span></span></code></pre></div>
-<p>Da <span class="math inline">\(\sigma\)</span> possiamo ottenere SEM e SED, anche se questo calcolo ve lo lascio per esercizio.</p>
+<div id="incertezza-delle-misure-derivate" class="section level3" number="3.1.3">
+<h3><span class="header-section-number">3.1.3</span> Incertezza delle misure derivate</h3>
+<p>A volte noi misuriamo due quantità e poi le combiniamo, per ottenere una misura derivata. La combinazione più semplice è la somma, ad esempio quando determiniamo separatamente il peso di due specie infestanti in un vaso e poi sommiamo questi due valori per ottenere il peso totale della biomassa infestante. In questo caso, <strong>l’incertezza assoluta di una somma o di una differenza è sempre uguale alla radice quadrata della somma dei quadrati delle incertezze assolute degli addendi</strong>. Ad esempio, se abbiamo le due quantità <span class="math inline">\(22 \pm 2\)</span> e <span class="math inline">\(14 \pm 3\)</span>, la somma sarà <span class="math inline">\(36 \pm \sqrt{4 + 9}\)</span> e la differenza sarà <span class="math inline">\(8 \pm 3.6\)</span>.</p>
+</div>
+<div id="relazioni-tra-variabili-quantitative-correlazione" class="section level3" number="3.1.4">
+<h3><span class="header-section-number">3.1.4</span> Relazioni tra variabili quantitative: correlazione</h3>
+<p>Se su ogni soggetto abbiamo rilevato due caratteri quantitativi (ad esempio il peso e l’altezza, oppure la produzione e il contenuto di proteina della granella), è possibile verificare se esiste una relazione tra la coppia di variabili ottenuta, cioè se al variare di una cambia anche il valore dell’altra, in modo congiunto.</p>
+<p>Per questo fine, si utilizza il <em>coefficiente di correlazione di Péearson</em> costituito dal rapporto tra la codevianza (o somma dei prodotti) delle due variabili e la radice quadrata del prodotto delle loro devianze. Il coefficiente di correlazione varia tra <span class="math inline">\(-1\)</span> e <span class="math inline">\(+1\)</span>: un valore pari a <span class="math inline">\(+1\)</span> indica concordanza perfetta (quando aumenta una variabile, aumenta anche l’altra in modo proporzionale), mentre un valore pari a <span class="math inline">\(-1\)</span> indica discordanza perfetta (quando aumenta una variabile, diminuisce l’altra in modo inversamente proporzionale). Un valore pari a <span class="math inline">\(0\)</span> indica assenza di qualunque grado di variazione congiunta tra le due variabili (assenza di correlazione). Valori intermedi tra quelli anzidetti indicano correlazione positiva (se positivi) e negativa (se negativi).</p>
+<p>Proviamo a considerare questo esempio: il contenuto di olio di 9 lotti di acheni di girasole è stato misurato con due metodi diversi ed è riportato più sotto.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="richiami-di-statistica-descrittiva.html#cb1-1" aria-hidden="true" tabindex="-1"></a>A <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">45</span>, <span class="dv">47</span>, <span class="dv">49</span>, <span class="dv">51</span>, <span class="dv">44</span>, <span class="dv">37</span>, <span class="dv">48</span>, <span class="dv">44</span>, <span class="dv">53</span>)</span>
+<span id="cb1-2"><a href="richiami-di-statistica-descrittiva.html#cb1-2" aria-hidden="true" tabindex="-1"></a>B <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">44</span>, <span class="dv">44</span>, <span class="dv">49</span>, <span class="dv">53</span>, <span class="dv">48</span>, <span class="dv">34</span>, <span class="dv">47</span>, <span class="dv">46</span>, <span class="dv">51</span>)</span></code></pre></div>
+<p>Valutare la correlazione tra i risultati dei due metodi di analisi. Manualmente dobbiamo eseguire alcune operazioni:</p>
+<ol style="list-style-type: decimal">
+<li>calcolare la devianza di A</li>
+<li>calcolare la devianza di B</li>
+<li>calcolare la loro codevianza</li>
+</ol>
+<p>In primo luogo, vediamo che le due medie sono, rispettivamente 46.44 e 46.22. A questo punto possiamo calcolare gli scarti, come differenze tra ogni dato e la sua media e calcolare i loro quadrati, nonché i loro prodotti, riportando il tutto in una tabella, come indicato qui di seguito.</p>
+<p>A questo punto possiamo calcolare la somma dei quadrati degli scarti, ottenendo le devianze di <span class="math inline">\(A\)</span> e <span class="math inline">\(B\)</span> (rispettivamente 176.22 e 239.56) nonché le somme dei prodotti degli scarti, ottenendo la codevianza (pari a 184.11).</p>
+<p>Il coefficiente di correlazione è quindi:</p>
+<p><span class="math display">\[r = \frac{184.11}{\sqrt{176.22 \times 239.56}} = 0.896\]</span></p>
+<p>Vediamo che il coefficiente di correlazione è abbastanza vicino ad 1 e quindi possiamo concludere che i due metodi di analisi danno risultati ben concordanti.</p>
 </div>
 </div>
-<div id="scomposizione-della-varianza-1" class="section level2" number="10.4">
-<h2><span class="header-section-number">10.4</span> Scomposizione della varianza</h2>
-<p>La scomposizione della varianza è sequenziale ed analoga a quella che abbiamo operato per l’ANOVA ad una via; tuttavia, dobbiamo tener presente che, in questo caso, la devianza totale delle osservazione deve essere decomposta in tre quote: una dovuta al trattamento, una dovuta al blocco ed una dovuta agli effetti stocastici.</p>
-<p>La devianza totale dei dati, con R, potrebbe essere ottenuta considerando un modello lineare in cui esiste solo l’intercetta, il che equivale a dire che i residui rappresentano gli scostamenti rispetto alla media generale. La devianza dei residui (somma dei quadrati) è quindi la devianza totale delle osservazioni:</p>
-<div class="sourceCode" id="cb129"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb129-1"><a href="modelli-anova-con-fattori-di-blocco.html#cb129-1" aria-hidden="true" tabindex="-1"></a>mod1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Yield <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> rimsulfuron)</span>
-<span id="cb129-2"><a href="modelli-anova-con-fattori-di-blocco.html#cb129-2" aria-hidden="true" tabindex="-1"></a>RSS1 <span class="ot">&lt;-</span> <span class="fu">sum</span>( <span class="fu">residuals</span>(mod1)<span class="sc">^</span><span class="dv">2</span> )</span>
-<span id="cb129-3"><a href="modelli-anova-con-fattori-di-blocco.html#cb129-3" aria-hidden="true" tabindex="-1"></a>RSS1</span>
-<span id="cb129-4"><a href="modelli-anova-con-fattori-di-blocco.html#cb129-4" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 53779.07</span></span></code></pre></div>
-<p>In seconda battuta, inseriamo l’effetto del blocco:</p>
-<div class="sourceCode" id="cb130"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb130-1"><a href="modelli-anova-con-fattori-di-blocco.html#cb130-1" aria-hidden="true" tabindex="-1"></a>mod2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Yield <span class="sc">~</span> <span class="fu">factor</span>(Block), <span class="at">data =</span> rimsulfuron)</span>
-<span id="cb130-2"><a href="modelli-anova-con-fattori-di-blocco.html#cb130-2" aria-hidden="true" tabindex="-1"></a>RSS2 <span class="ot">&lt;-</span> <span class="fu">sum</span>( <span class="fu">residuals</span>(mod2)<span class="sc">^</span><span class="dv">2</span> )</span>
-<span id="cb130-3"><a href="modelli-anova-con-fattori-di-blocco.html#cb130-3" aria-hidden="true" tabindex="-1"></a>RSS2</span>
-<span id="cb130-4"><a href="modelli-anova-con-fattori-di-blocco.html#cb130-4" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 51118.58</span></span></code></pre></div>
-<p>Vediamo che la devianza del residuo è calata di <code>RSS1 - RSS2</code> unità, che corrispondono all’effetto del blocco e alla sua introduzione nel modello.</p>
-<p>Infine, inseriamo anche l’effetto del trattamento, tornando così al modello completo che abbiamo utilizzato più sopra. Considerando i paragrafi precedenti, notiamo che l’inserimento dell’effetto del trattamento ha determinato un calo della devianza dei residui pari <code>RSS2 - RSS</code>, che corrisponde appunto all’effetto del diserbo. Insomma, ogni effetto introdotto nel modello ha determinato un decremento della variabilità non spiegata, quantitativamente pari alla variabilità attribuibile all’effetto stesso. Alla fine del processo rimane comunque un certo residuo (RSS) non spiegato, corrispondente a <span class="math inline">\(\varepsilon\)</span>.</p>
-<p>Ci chiediamo se gli effetti attribuibili al blocco e al trattamento sono significativamente più grandi del residuo. Sappiamo già di non poter confrontare le devianze, ma possiamo calcolare e confrontare con un test di F le relative varianze. Basta tener conto che i gradi di libertà dei blocchi e dei trattamenti sono rispettivamente 3 e 15, cioè il numero dei blocchi meno uno e il numero dei trattamenti meno uno.</p>
-<p>La tabella ANOVA può essere facilmente ottenuta con R:</p>
-<div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb131-1"><a href="modelli-anova-con-fattori-di-blocco.html#cb131-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(mod)</span>
-<span id="cb131-2"><a href="modelli-anova-con-fattori-di-blocco.html#cb131-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Analysis of Variance Table</span></span>
-<span id="cb131-3"><a href="modelli-anova-con-fattori-di-blocco.html#cb131-3" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb131-4"><a href="modelli-anova-con-fattori-di-blocco.html#cb131-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Response: Yield</span></span>
-<span id="cb131-5"><a href="modelli-anova-con-fattori-di-blocco.html#cb131-5" aria-hidden="true" tabindex="-1"></a><span class="do">##                   Df Sum Sq Mean Sq F value    Pr(&gt;F)    </span></span>
-<span id="cb131-6"><a href="modelli-anova-con-fattori-di-blocco.html#cb131-6" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Block)      3   2660  886.83  5.5524  0.002496 ** </span></span>
-<span id="cb131-7"><a href="modelli-anova-con-fattori-di-blocco.html#cb131-7" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide) 15  43931 2928.75 18.3369 2.329e-14 ***</span></span>
-<span id="cb131-8"><a href="modelli-anova-con-fattori-di-blocco.html#cb131-8" aria-hidden="true" tabindex="-1"></a><span class="do">## Residuals         45   7187  159.72                      </span></span>
-<span id="cb131-9"><a href="modelli-anova-con-fattori-di-blocco.html#cb131-9" aria-hidden="true" tabindex="-1"></a><span class="do">## ---</span></span>
-<span id="cb131-10"><a href="modelli-anova-con-fattori-di-blocco.html#cb131-10" aria-hidden="true" tabindex="-1"></a><span class="do">## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span></code></pre></div>
-<p>Ovviamente, prima di considerare questa tabella dovremo preoccuparci del fatto che le assunzioni di base siano rispettate, cosa che possiamo facilmente verificare con un’analisi grafica dei residui, utilizzando il codice sottostante. L’output è visibile in Figura <a href="modelli-anova-con-fattori-di-blocco.html#fig:figName121">10.1</a>.</p>
-<pre><code>par(mfrow=c(1,2))
-plot(mod, which = 1)
-plot(mod, which = 2)</code></pre>
-<div class="figure" style="text-align: center"><span id="fig:figName121"></span>
-<img src="_main_files/figure-html/figName121-1.png" alt="Analisi grafica dei residui per la prova di confronto erbicida" width="90%" />
+<div id="dati-qualitativi" class="section level2" number="3.2">
+<h2><span class="header-section-number">3.2</span> Dati qualitativi</h2>
+<p>Nel capitolo 2 abbiamo visto che le variabili qualitative sono ottenute assegnando un soggetta ad una classe scelta tra due o più possibili opzioni. La descrizione di queste variabili di solito è effettuata calcolando le <em>frequenza assolute</em>, cioè il numero di individui assegnato ad ogni classe. Ad esempio, se abbiamo esaminato 500 insetti rilevando l’ordine a cui appartengono, le frequenze assolute potrebbero essere: 100 ditteri, 200 imenotteri e 150 ortotteri.</p>
+<p>Oltre alle frequenze assolute, possiamo calcolare anche le <em>frequenze relative</em>, dividendo le frequenze assolute per il numero totale degli individui del collettivo. Nel caso prima accennato, la frequenza relativa dei ditteri è pari a <span class="math inline">\(100/500 = 0.2\)</span>.</p>
+<p>Se le classi possono essere logicamente ordinate, oltre alle frequenze assolute e relative, possiamo calcolare anche le cosiddette <em>frequenze cumulate</em>, che si ottengono cumulando le frequenze relative di una classe con quelle di tutte le classi precedenti.</p>
+<div id="distribuzioni-di-frequenze-e-classamento" class="section level3" number="3.2.1">
+<h3><span class="header-section-number">3.2.1</span> Distribuzioni di frequenze e classamento</h3>
+<p>Quando rappresentiamo, in un grafico o in una tabella, le frequenze (assolute, relative o cumulate) per tutte le classi e tutti gli individui del collettivo, otteniamo una <em>distribuzione di frequenze</em>.</p>
+<p>Ad esempio, se consideriamo il famoso database ‘mtcars,’ relativo alle 32 auto storiche censite dalla rivista Motor Trends nel 1974, e analizziamo il numero delle marce, otteniamo la seguente distribuzione di frequenze assolute, relative e cumulate.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="right">Marce</th>
+<th align="right">Freq.Ass</th>
+<th align="right">Freq.Rel</th>
+<th align="right">Freq.Cum</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">3</td>
+<td align="right">15</td>
+<td align="right">0.47</td>
+<td align="right">0.47</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="right">12</td>
+<td align="right">0.38</td>
+<td align="right">0.84</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="right">5</td>
+<td align="right">0.16</td>
+<td align="right">1.00</td>
+</tr>
+</tbody>
+</table>
+<p>Una distribuzione di frequenze può essere rappresentata con un grafico a torte, come vedremo tra poco. Inoltre, precisiamo anche che le distribuzioni di frequenze possono essere costruite anche per le variabili quantitative, tramite un’operazione di <em>classamento</em>, che consiste nel creare classi con intervalli opportuni e contare i soggetti in ogni classe. In questo modo, se le osservazioni sono molto numerose, la lettura delle informazioni risulta più semplice e più completa che non elencando tutti i valori o, d’altra parte, riportando solo la media e la deviazione standard. Daremo un esempio di questa tecnica in un paragrafo successivo.</p>
+</div>
+<div id="statistiche-descrittive-per-le-distribuzioni-di-frequenze" class="section level3" number="3.2.2">
+<h3><span class="header-section-number">3.2.2</span> Statistiche descrittive per le distribuzioni di frequenze</h3>
+<p>Per una distribuzione di frequenze, il più semplice indicatore di tendenza centrale è la <em>moda</em>, cioè il valore della classe che presenta la maggior frequenza. Ovviamente, se la variabile è quantitativa ed è stata sottoposta a classamento, si considera come moda il punto centrale della classe con maggior frequenza. L’individuazione della moda è banale e non richiede calcoli di sorta.</p>
+<p>In alcune condizioni (distribuzioni di frequenze per caratteri qualitativi ordinabili o quantitativi sottoposti a classamento), oltre alla moda possiamo calcolare la <em>mediana</em> e gli altri percentili, nonché la media e le altre statistiche descrittive indicate per i caratteri quantitativi. Tuttavia, si tratta di una situazione più tipica delle scienze economiche e sociali che non delle scienze agrarie e biologiche e, per questo motivo, non la prenderemo in ulteriore considerazione.</p>
+</div>
+<div id="distribuzioni-di-frequenza-bivariate-le-tabelle-di-contingenze" class="section level3" number="3.2.3">
+<h3><span class="header-section-number">3.2.3</span> Distribuzioni di frequenza bivariate: le tabelle di contingenze</h3>
+<p>In alcuni casi, in ciascuna unità sperimentale del collettivo vengono studiati due (o più) caratteri qualitativi e, di conseguenza, si ha a che fare con distribuzioni di frequenze bivariate (o multivariate), rappresentabili con <em>tabelle di contingenze</em>. Si tratta di tabelle a due entrate, nelle quali ogni numero rappresenta la frequenza assoluta per una particolare combinazione delle due variabili.</p>
+<p>Ad esempio, se per un gruppo di bacche di pomodoro abbiamo rilevato, bacca per bacca, la varietà (nelle due classi SANREMO e FANO) e la forma (nelle tre classi LUNGO, TONDO ed OVALE) potremo definire la tabella di contingenze sotto riportata.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">LUNGO</th>
+<th align="right">TONDO</th>
+<th align="right">OVALE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">SANREMO</td>
+<td align="right">37</td>
+<td align="right">32</td>
+<td align="right">61</td>
+</tr>
+<tr class="even">
+<td align="left">FANO</td>
+<td align="right">45</td>
+<td align="right">74</td>
+<td align="right">59</td>
+</tr>
+</tbody>
+</table>
+<p>Ogni riga della tabella sovrastante costituisce una distribuzione di frequenze per la forma del frutto, data una certa classe di varietà (distribuzione di frequenze condizionate). Allo stesso modo si può dire che ogni colonna rapresenta una distribuzione di frequenze condizionate per una certa classe di forma.</p>
+</div>
+<div id="connessione" class="section level3" number="3.2.4">
+<h3><span class="header-section-number">3.2.4</span> Connessione</h3>
+<p>Se guardiamo le due distribuzioni condizionate per SANREMO e FANO possiamo notare che esiste una certa differenza. Potremmo chiederci quindi se il presentarsi di una data modalità del carattere varietà (SANREMO o FANO) influenza il presentarsi di una particolare modalità del carattere forma del frutto. In altre parole, potremmo chiederci se le baccke della varietà SANREMO sono più frequentemente ovali, mentre quelle della varietà FANO sono più frequentemente tonde. Se fosse così, si potrebbe parlare di dipendenza o connessione, mentre, nel caso contrario, si dovrebbe parlare di indipendenza dei caratteri.</p>
+<p>Come si fa a stabilire se i caratteri sono indipendenti o connessi? Bisogna pensare che, in caso di indipendenza, le distribuzioni condizionate di una variabile, ad esempio la forma, dovrebbero essere uguali per entrambe le varietà. Se consideriamo la classe LUNGO, la frequenza relativa marginale è pari ad <span class="math inline">\(82/308 = 0.266\)</span> (82 è il numero totale di pomodori di forma allungata, mentre 308 è il numero totale dei pomodori); in caso di indipendenza, questa frequenza dovrebbe essere la stessa, sia per SANREMO che per FANO. In cifre, la frequenza assoluta per la combinazione LUNGO|SANREMO dovrebbe essere pari a <span class="math inline">\(130 \times 0.266 =34.6\)</span>. mentre per la combinazione LUNGO|FANO dovrebbe essere pari a <span class="math inline">\(178 \times 0.266=47.4\)</span>. Procedendo allo stesso modo, possiamo costruire la tabella delle frequenze assolute attese, nell’ipotesi di indipendenza completa tra i due caratteri.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">LUNGO</th>
+<th align="right">TONDO</th>
+<th align="right">OVALE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">SANREMO</td>
+<td align="right">34.6</td>
+<td align="right">44.7</td>
+<td align="right">50.6</td>
+</tr>
+<tr class="even">
+<td align="left">FANO</td>
+<td align="right">47.4</td>
+<td align="right">61.3</td>
+<td align="right">69.4</td>
+</tr>
+</tbody>
+</table>
+<p>A questo punto è logico costruire un indice statistico di connessione, detto <span class="math inline">\(\chi^2\)</span>, che misuri lo scostamento tra le frequenze osservate e quelle attese nell’ipotesi di indipendenza perfetta:</p>
+<p><span class="math display">\[\chi ^2  = \sum \left[ \frac{\left( {f_o  - f_a } \right)^2 }{f_a } \right]\]</span></p>
+<p>dove <span class="math inline">\(f_o\)</span> sta per frequenza osservata ed <span class="math inline">\(f_a\)</span> sta per frequenza attesa nel caso indipendenza. Questo indice assume valore pari a zero nel caso di indipendenza completa (le frequenze osservate sono uguali a quelle attese) ed assume un valore positivo tanto più alto quanto maggiore è la connessione tra i due caratteri, fino ad un valore massimo dato dal prodotto del numero degli individui per il valore minimo tra il numero di righe meno una e il numero di colonne meno una:</p>
+<p><span class="math display">\[\max \chi ^2  = n \cdot \min (r - 1,\,c - 1)\]</span></p>
+<p>Nel nostro caso, il chi quadro è:</p>
+<p><span class="math display">\[\chi ^2  = \frac{\left( {37  - 34.6 } \right)^2 }{34.6 } + \frac{\left( {32  - 44.7 } \right)^2 }{44.7 } + ... + \frac{\left( {59  - 69.4 } \right)^2 }{69.4 } = 10.22\]</span></p>
+<p>Il valore massimo ammissibile sarebbe pari a 308, cioè il numero totale di bacche moltiplicato per uno, che è il valore minimo tra 2 (numero di colonne menu una) e 1 (numero di righe meno una). Il valore osservato è quindi il 3% circa di quello massimo possibile (<span class="math inline">\(10.22/308=0.033\)</span>) e si può concludere che la connessione tra i due caratteri esiste, ma non è molto forte.</p>
+</div>
+</div>
+<div id="statistiche-descrittive-con-r" class="section level2" number="3.3">
+<h2><span class="header-section-number">3.3</span> Statistiche descrittive con R</h2>
+<p>Le statistiche descrittive si calcolano facilmente con R. Per esercizio, utilizziamo il dataset ‘heights.csv,’ che è disponibile in una repository online. Il box sottostante mostra come caricare il dataset, del quale utilizzeremo la colonna ‘height’ che riporta le altezze di venti piante di mais.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="richiami-di-statistica-descrittiva.html#cb2-1" aria-hidden="true" tabindex="-1"></a>filePath <span class="ot">&lt;-</span> <span class="st">&quot;https://www.casaonofri.it/_datasets/heights.csv&quot;</span></span>
+<span id="cb2-2"><a href="richiami-di-statistica-descrittiva.html#cb2-2" aria-hidden="true" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(filePath, <span class="at">header =</span> T)</span>
+<span id="cb2-3"><a href="richiami-di-statistica-descrittiva.html#cb2-3" aria-hidden="true" tabindex="-1"></a>dataset<span class="sc">$</span>height</span>
+<span id="cb2-4"><a href="richiami-di-statistica-descrittiva.html#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="do">##  [1] 172 154 150 188 162 145 157 178 175 158 153 191 174 141 165 163</span></span>
+<span id="cb2-5"><a href="richiami-di-statistica-descrittiva.html#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="do">## [17] 148 152 169 185</span></span></code></pre></div>
+<p>La media si calcola con la funzione <code>mean()</code>, mentre la mediana si calcola con la funzione <code>median()</code>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="richiami-di-statistica-descrittiva.html#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(dataset<span class="sc">$</span>height)</span>
+<span id="cb3-2"><a href="richiami-di-statistica-descrittiva.html#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 164</span></span>
+<span id="cb3-3"><a href="richiami-di-statistica-descrittiva.html#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">median</span>(dataset<span class="sc">$</span>height)</span>
+<span id="cb3-4"><a href="richiami-di-statistica-descrittiva.html#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 162.5</span></span></code></pre></div>
+<p>Per la devianza, non esiste una funzione dedicata e, di conseguenza, si deve utilizzare l’equazione fornita più sopra:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="richiami-di-statistica-descrittiva.html#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>( (dataset<span class="sc">$</span>height <span class="sc">-</span> <span class="fu">mean</span>(dataset<span class="sc">$</span>height))<span class="sc">^</span><span class="dv">2</span> )</span>
+<span id="cb4-2"><a href="richiami-di-statistica-descrittiva.html#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 4050</span></span></code></pre></div>
+<p>Varianza e deviazione standard sono molto facili da calcolare, grazie alle funzioni apposite, mentre il coefficiente di variabilità si può calcolare con la formula data più sopra:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="richiami-di-statistica-descrittiva.html#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">var</span>(dataset<span class="sc">$</span>height)</span>
+<span id="cb5-2"><a href="richiami-di-statistica-descrittiva.html#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 213.1579</span></span>
+<span id="cb5-3"><a href="richiami-di-statistica-descrittiva.html#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(dataset<span class="sc">$</span>height)</span>
+<span id="cb5-4"><a href="richiami-di-statistica-descrittiva.html#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 14.59993</span></span>
+<span id="cb5-5"><a href="richiami-di-statistica-descrittiva.html#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(dataset<span class="sc">$</span>height)<span class="sc">/</span><span class="fu">mean</span>(dataset<span class="sc">$</span>height) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb5-6"><a href="richiami-di-statistica-descrittiva.html#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 8.902395</span></span></code></pre></div>
+<p>Per calcolare i percentili si usa la funzione <code>quantile()</code>, fornendo le proporzioni di soggetti da lasciare sulla sinistra con l’argomento ‘probs.’ Ad esempio, per il 25-esimo percentile utilizzeremo 0.25, mentre per il 75-esimo utilizzeremo 0.75:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="richiami-di-statistica-descrittiva.html#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">quantile</span>(dataset<span class="sc">$</span>height, <span class="at">probs =</span> <span class="fu">c</span>(<span class="fl">0.25</span>, <span class="fl">0.75</span>))</span>
+<span id="cb6-2"><a href="richiami-di-statistica-descrittiva.html#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="do">##    25%    75% </span></span>
+<span id="cb6-3"><a href="richiami-di-statistica-descrittiva.html#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="do">## 152.75 174.25</span></span></code></pre></div>
+<p>La correlazione si calcola invece con la funzione <code>cor()</code>, come indicato più sotto.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="richiami-di-statistica-descrittiva.html#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(A, B)</span>
+<span id="cb7-2"><a href="richiami-di-statistica-descrittiva.html#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 0.8960795</span></span></code></pre></div>
+<div id="descrizione-dei-sottogruppi" class="section level3" number="3.3.1">
+<h3><span class="header-section-number">3.3.1</span> Descrizione dei sottogruppi</h3>
+<p>In biometria è molto comune che il gruppo di soggetti sia divisibile in più sottogruppi, corrispondenti, ad esempio, ai diversi trattamenti sperimentali. In questa comune situazione siamo soliti calcolare, per ogni gruppo, le statistiche descrittive già viste in precedenza, utilizzando la funzione <code>tapply()</code> in R, come mostrata più sotto.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="richiami-di-statistica-descrittiva.html#cb8-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">tapply</span>(dataset<span class="sc">$</span>height, dataset<span class="sc">$</span>var, mean)</span>
+<span id="cb8-2"><a href="richiami-di-statistica-descrittiva.html#cb8-2" aria-hidden="true" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="fu">tapply</span>(dataset<span class="sc">$</span>height, dataset<span class="sc">$</span>var, sd)</span>
+<span id="cb8-3"><a href="richiami-di-statistica-descrittiva.html#cb8-3" aria-hidden="true" tabindex="-1"></a>descript <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Media =</span> m, <span class="at">SD =</span> s)</span>
+<span id="cb8-4"><a href="richiami-di-statistica-descrittiva.html#cb8-4" aria-hidden="true" tabindex="-1"></a>descript</span>
+<span id="cb8-5"><a href="richiami-di-statistica-descrittiva.html#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="do">##    Media       SD</span></span>
+<span id="cb8-6"><a href="richiami-di-statistica-descrittiva.html#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="do">## C 165.00 14.36431</span></span>
+<span id="cb8-7"><a href="richiami-di-statistica-descrittiva.html#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="do">## N 164.00 16.19877</span></span>
+<span id="cb8-8"><a href="richiami-di-statistica-descrittiva.html#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="do">## S 160.00 12.16553</span></span>
+<span id="cb8-9"><a href="richiami-di-statistica-descrittiva.html#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="do">## V 165.25 19.51709</span></span></code></pre></div>
+<p>Nel codice sovrastante, <code>height</code> è la variabile che contiene i valori da mediare, <code>var</code> è la variabile che contiene la codifica di gruppo, <code>mean</code> è la funzione che dobbiamo calcolare. Ovviamente <code>mean</code> può essere sostituito da qualunque altra funzione ammissibile in R, come ad esempio la deviazione standard; successivamente, nel codice sovrastante abbiamo utilizzato la funzione <code>data.frame()</code> per creare un nuovo dataset con le medie e le deviazioni standard.</p>
+<p>Oltre che in una tabella, i risultati possono anche essere riportati in un grafico a barre, con l’indicazione della variabilità dei dati. Possiamo utilizzare la funzione <code>barplot()</code> alla quale passeremo come argomenti l’altezza delle barre, data dalle medie dei diversi gruppi, i nomi dei gruppi medesimi e, opzionalmente, la scala dell’asse delle ordinate. La funzione <code>barplot()</code>, oltre che creare il grafico, restituisce le ascisse del centro di ogni barra, che possiamo utilizzare per creare dei segmenti verticali corrispondenti alle deviazioni standard di ogni gruppo, attraverso la funzione <code>arrows()</code>.</p>
+<p>Se, per ogni gruppo, le ascisse sono nel vettore ‘coord,’ i segmenti di variabilità avranno un punto di partenza con ascissa ‘coord’ e ordinata uguale al valore medio dell’altezza meno la deviazione standard e un punto di arrivo con ascissa sempre uguale a ‘coord’ e ordinata uguale all’altezza media più la deviazione standard. Gli altri argomenti della funzione <code>arrows()</code> servono per specificare il tipo di segmento che vogliamo tracciare; il codice sottostante produce l’output mostrato in Figura <a href="richiami-di-statistica-descrittiva.html#fig:figName242">3.1</a>.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="richiami-di-statistica-descrittiva.html#cb9-1" aria-hidden="true" tabindex="-1"></a>coord <span class="ot">&lt;-</span> <span class="fu">barplot</span>(descript<span class="sc">$</span>Media, <span class="at">names.arg =</span> descript<span class="sc">$</span>var, </span>
+<span id="cb9-2"><a href="richiami-di-statistica-descrittiva.html#cb9-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">200</span>))</span>
+<span id="cb9-3"><a href="richiami-di-statistica-descrittiva.html#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">arrows</span>(coord, descript<span class="sc">$</span>Media <span class="sc">-</span> descript<span class="sc">$</span>SD, </span>
+<span id="cb9-4"><a href="richiami-di-statistica-descrittiva.html#cb9-4" aria-hidden="true" tabindex="-1"></a>       coord, descript<span class="sc">$</span>Media <span class="sc">+</span> descript<span class="sc">$</span>SD, </span>
+<span id="cb9-5"><a href="richiami-di-statistica-descrittiva.html#cb9-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">length =</span> <span class="fl">0.05</span>, <span class="at">angle =</span> <span class="dv">90</span>, <span class="at">code =</span> <span class="dv">3</span>)</span></code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:figName242"></span>
+<img src="_main_files/figure-html/figName242-1.png" alt="Esempio di boxplot in R" width="90%" />
 <p class="caption">
-Figure 10.1: Analisi grafica dei residui per la prova di confronto erbicida
+Figure 3.1: Esempio di boxplot in R
 </p>
 </div>
-<p>Dopo esserci rassicurati su questo importante aspetto, possiamo vedere che abbiamo due ipotesi nulle da testare (effetto del trattamento non significativo ed effetto del blocco non significativo), che possono essere entrambe rifiutate per P &lt; 0.05.</p>
-<p>Da questo punto in avanti, l’analisi procede come usuale, calcolando le medie marginali attese ed, eventualmente, confrontandole tra loro con una procedura di confronto multiplo, come descritto nei capitoli precedenti. Tener presente che, in questo esperimento, abbiamo 16 trattamenti, cioè <span class="math inline">\(16 \times 15 / 2 = 120\)</span> confronti; di conseguenza, può essere opportuno operare la correzione per la molteplicità. Inoltre, dato che il trattamento più interessante è quello che rende massima la produzione, sarà opportuno ordinare le medie in senso decrescente, utilizzando l’argomento ‘reverse = T.’</p>
-<div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb133-1"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(emmeans)</span>
-<span id="cb133-2"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-2" aria-hidden="true" tabindex="-1"></a>medie <span class="ot">&lt;-</span> <span class="fu">emmeans</span>(mod, <span class="sc">~</span><span class="fu">factor</span>(Herbicide))</span>
-<span id="cb133-3"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-3" aria-hidden="true" tabindex="-1"></a>multcomp<span class="sc">::</span><span class="fu">cld</span>(medie, <span class="at">Letters =</span> LETTERS, <span class="at">reverse =</span> T)</span>
-<span id="cb133-4"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-4" aria-hidden="true" tabindex="-1"></a><span class="do">##  Herbicide                                  emmean   SE df lower.CL upper.CL .group</span></span>
-<span id="cb133-5"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-5" aria-hidden="true" tabindex="-1"></a><span class="do">##  Rimsulfuron (50)                             98.0 6.32 45    85.24    110.7  A    </span></span>
-<span id="cb133-6"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-6" aria-hidden="true" tabindex="-1"></a><span class="do">##  Rimsulfuron + Atred                          97.0 6.32 45    84.26    109.7  A    </span></span>
-<span id="cb133-7"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-7" aria-hidden="true" tabindex="-1"></a><span class="do">##  Pendimethalin (post) + rimsuulfuron (post)   96.6 6.32 45    83.91    109.4  A    </span></span>
-<span id="cb133-8"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-8" aria-hidden="true" tabindex="-1"></a><span class="do">##  Rimsulfuron (40)                             95.4 6.32 45    82.67    108.1  A    </span></span>
-<span id="cb133-9"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-9" aria-hidden="true" tabindex="-1"></a><span class="do">##  Rimsulfuron + hoeing                         93.9 6.32 45    81.18    106.6  A    </span></span>
-<span id="cb133-10"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-10" aria-hidden="true" tabindex="-1"></a><span class="do">##  Rimsulfuron (45)                             91.6 6.32 45    78.84    104.3  A    </span></span>
-<span id="cb133-11"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-11" aria-hidden="true" tabindex="-1"></a><span class="do">##  Rimsulfuron (50+30 split)                    89.2 6.32 45    76.52    102.0  A    </span></span>
-<span id="cb133-12"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-12" aria-hidden="true" tabindex="-1"></a><span class="do">##  Hand-Weeded                                  89.0 6.32 45    76.24    101.7  A    </span></span>
-<span id="cb133-13"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-13" aria-hidden="true" tabindex="-1"></a><span class="do">##  Rimsulfuron (60)                             88.4 6.32 45    75.65    101.1  A    </span></span>
-<span id="cb133-14"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-14" aria-hidden="true" tabindex="-1"></a><span class="do">##  Rimsulfuron + thyfensulfuron                 84.7 6.32 45    71.94     97.4  A    </span></span>
-<span id="cb133-15"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-15" aria-hidden="true" tabindex="-1"></a><span class="do">##  Pendimethalin (pre) + rimsulfuron (post)     83.0 6.32 45    70.31     95.8  AB   </span></span>
-<span id="cb133-16"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-16" aria-hidden="true" tabindex="-1"></a><span class="do">##  Thifensulfuron                               51.9 6.32 45    39.19     64.6   BC  </span></span>
-<span id="cb133-17"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-17" aria-hidden="true" tabindex="-1"></a><span class="do">##  Metolachlor + terbuthylazine (pre)           47.0 6.32 45    34.27     59.7    C  </span></span>
-<span id="cb133-18"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-18" aria-hidden="true" tabindex="-1"></a><span class="do">##  Unweeded 2                                   35.7 6.32 45    22.99     48.4    C  </span></span>
-<span id="cb133-19"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-19" aria-hidden="true" tabindex="-1"></a><span class="do">##  Alachlor + terbuthylazine                    29.8 6.32 45    17.11     42.6    C  </span></span>
-<span id="cb133-20"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-20" aria-hidden="true" tabindex="-1"></a><span class="do">##  Unweeded 1                                   21.9 6.32 45     9.13     34.6    C  </span></span>
-<span id="cb133-21"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-21" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb133-22"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-22" aria-hidden="true" tabindex="-1"></a><span class="do">## Results are averaged over the levels of: Block </span></span>
-<span id="cb133-23"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-23" aria-hidden="true" tabindex="-1"></a><span class="do">## Confidence level used: 0.95 </span></span>
-<span id="cb133-24"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-24" aria-hidden="true" tabindex="-1"></a><span class="do">## P value adjustment: tukey method for comparing a family of 16 estimates </span></span>
-<span id="cb133-25"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-25" aria-hidden="true" tabindex="-1"></a><span class="do">## significance level used: alpha = 0.05</span></span></code></pre></div>
-<p>Vi lascio il commento dei risultati come esercizio.</p>
-</div>
-<div id="disegni-a-quadrato-latino-1" class="section level2" number="10.5">
-<h2><span class="header-section-number">10.5</span> Disegni a quadrato latino</h2>
-<p>A volte i fattori di blocco sono più di uno e danno origine ad un disegno sperimentale detto ‘quadrato latino’ di cui abbiamo parlato nel capitolo 3. Qui, forniremo un esempio tratto dalla pratica sperimentale industriale.</p>
-</div>
-<div id="caso-studio-confronto-tra-metodi-costruttivi" class="section level2" number="10.6">
-<h2><span class="header-section-number">10.6</span> Caso studio: confronto tra metodi costruttivi</h2>
-<p>Immaginiamo di voler studiare il tempo necessario per costruire un componente elettronico, utilizzando quattro metodi diversi. E’ evidente che il tempo di costruzione sarà influenzato dalla perizia del tecnico e, per questo, utilizziamo quattro tecnici diversi, ad ognuno dei quali facciamo utilizzare tutti e quattro i metodi. Un esperimento così disegnato sarebbe a blocchi randomizzati, con il tecnico che fa da blocco per i trattamenti. Tuttavia, dobbiamo anche riconoscere che i quattro tecnici saranno via via meno efficienti, e quindi il metodo che utilizzeranno per primo sarà avvantaggiato, mentre quello che utilizzeranno per ultimo sarà svantaggiato. E’vero che i metodi sono assegnati in ordine random ad ogni tecnico, ma non si può comunque evitare che un metodo venga avvantaggiato rispetto ad un altro, perché, ad esempio, non viene mai ad occupare l’ultima posizione (o meglio, l’ultimo turno).</p>
-<p>Per evitare questo problema imponiamo un vincolo ulteriore alla randizzazione e facciamo in modo che ogni metodo occupi tutte e quattro i turni, in tecnici diversi. Il disegno è quindi a quadrato latino.</p>
-<p>Il dataset dei risultati è disponibile su gitHub:</p>
-<div class="sourceCode" id="cb134"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb134-1"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-1" aria-hidden="true" tabindex="-1"></a>path1 <span class="ot">&lt;-</span> <span class="st">&quot;https://raw.githubusercontent.com/OnofriAndreaPG/&quot;</span></span>
-<span id="cb134-2"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-2" aria-hidden="true" tabindex="-1"></a>path2 <span class="ot">&lt;-</span> <span class="st">&quot;aomisc/master/data/&quot;</span></span>
-<span id="cb134-3"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-3" aria-hidden="true" tabindex="-1"></a>fileName <span class="ot">&lt;-</span> <span class="st">&quot;Technicians.csv&quot;</span></span>
-<span id="cb134-4"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-4" aria-hidden="true" tabindex="-1"></a>filePath <span class="ot">&lt;-</span> <span class="fu">paste</span>(path1, path2, fileName, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)</span>
-<span id="cb134-5"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-5" aria-hidden="true" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(filePath, <span class="at">header=</span>T)</span>
-<span id="cb134-6"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-6" aria-hidden="true" tabindex="-1"></a>dataset</span>
-<span id="cb134-7"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-7" aria-hidden="true" tabindex="-1"></a><span class="do">##    Shift Technician Method Time</span></span>
-<span id="cb134-8"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 1      I     Andrew      C   90</span></span>
-<span id="cb134-9"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 2     II     Andrew      B   90</span></span>
-<span id="cb134-10"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 3    III     Andrew      A   89</span></span>
-<span id="cb134-11"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-11" aria-hidden="true" tabindex="-1"></a><span class="do">## 4     IV     Andrew      D  104</span></span>
-<span id="cb134-12"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-12" aria-hidden="true" tabindex="-1"></a><span class="do">## 5      I       Anna      D   96</span></span>
-<span id="cb134-13"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-13" aria-hidden="true" tabindex="-1"></a><span class="do">## 6     II       Anna      C   91</span></span>
-<span id="cb134-14"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-14" aria-hidden="true" tabindex="-1"></a><span class="do">## 7    III       Anna      B   97</span></span>
-<span id="cb134-15"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-15" aria-hidden="true" tabindex="-1"></a><span class="do">## 8     IV       Anna      A  100</span></span>
-<span id="cb134-16"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-16" aria-hidden="true" tabindex="-1"></a><span class="do">## 9      I    Michael      A   84</span></span>
-<span id="cb134-17"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-17" aria-hidden="true" tabindex="-1"></a><span class="do">## 10    II    Michael      D   96</span></span>
-<span id="cb134-18"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-18" aria-hidden="true" tabindex="-1"></a><span class="do">## 11   III    Michael      C   98</span></span>
-<span id="cb134-19"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-19" aria-hidden="true" tabindex="-1"></a><span class="do">## 12    IV    Michael      B  104</span></span>
-<span id="cb134-20"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-20" aria-hidden="true" tabindex="-1"></a><span class="do">## 13     I      Sarah      B   88</span></span>
-<span id="cb134-21"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-21" aria-hidden="true" tabindex="-1"></a><span class="do">## 14    II      Sarah      A   88</span></span>
-<span id="cb134-22"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-22" aria-hidden="true" tabindex="-1"></a><span class="do">## 15   III      Sarah      D   98</span></span>
-<span id="cb134-23"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-23" aria-hidden="true" tabindex="-1"></a><span class="do">## 16    IV      Sarah      C  106</span></span></code></pre></div>
-</div>
-<div id="definizione-di-un-modello-lineare-2" class="section level2" number="10.7">
-<h2><span class="header-section-number">10.7</span> Definizione di un modello lineare</h2>
-<p>In questo caso abbiamo un trattamento (metodo) e due effetti ‘blocco’ (tecnico e turno) da includere nel modello, che può essere così definito:</p>
-<p><span class="math display">\[Y_{ijk} = \mu + \gamma_k + \beta_j + \alpha_i + \varepsilon_{ijk}\]</span></p>
-<p>dove <span class="math inline">\(\mu\)</span> è l’intercetta, <span class="math inline">\(\gamma\)</span> è l’effetto del turno k, <span class="math inline">\(\beta\)</span> è l’effetto del tecnico j e <span class="math inline">\(\alpha\)</span> è l’effetto del metodo i. L’elemento <span class="math inline">\(\varepsilon_{ijk}\)</span> rappresenta la componente random individuale, di ogni osservazione e si assume normalmente distribuita, con media 0 e deviazione standard <span class="math inline">\(\sigma\)</span>.</p>
-<p>Avendo già illustrato il processo di stima dei parametri e di scomposizione della varianza e quindi utilizziamo subito R per il ‘model fitting’:</p>
-<div class="sourceCode" id="cb135"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb135-1"><a href="modelli-anova-con-fattori-di-blocco.html#cb135-1" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">&lt;-</span> <span class="fu">lm</span>(Time <span class="sc">~</span> Method <span class="sc">+</span> Technician</span>
-<span id="cb135-2"><a href="modelli-anova-con-fattori-di-blocco.html#cb135-2" aria-hidden="true" tabindex="-1"></a>          <span class="sc">+</span> Shift, <span class="at">data =</span> dataset)</span></code></pre></div>
-<p>Verifichiamo il rispetto delle assunzioni di base, con l’analisi grafica dei residui, riportata in Figura <a href="modelli-anova-con-fattori-di-blocco.html#fig:figName122">10.2</a> (il codice è analogo a quello fornito più sopra).</p>
-<div class="figure" style="text-align: center"><span id="fig:figName122"></span>
-<img src="_main_files/figure-html/figName122-1.png" alt="Analisi grafica dei residui per la prova di confronto tra metodi costruttivi" width="90%" />
+<p>Il grafico non è bellissimo; per ora ci accontenteremo, ma, con un po’ di esercizio, è possibile ottenere grafici di alto livello.</p>
+<p>Quando abbiamo a che fare con gruppi molto numerosi, con un certo numero di outliers, è bene sostituire la mediana alla media, in associazione con il 25-esimo e 75-esimo percentile, come indicazioni di variabilità. Da un punto di vista grafico, possiamo utilizzare un <em>boxplot</em> (grafico Box-Whisker). Si tratta di una scatola (box) che ha per estremi il 25-esimo e il 75-esimo percentile ed è tagliata da una linea centrale in corrispondenza della mediana. Dalla scatola partono due linee verticali (baffi = whiskers) che identificano il valore massimo e il minimo. Se il massimo (o il minimo) distano dalla mediana più di 1.5 volte la differenza tra la mediana stessa e il 75-esimo (o 25-esimo) percentile, allora le linee verticali si fermano ad un valore pari ad 1.5 volte il 75-esimo (o il 25-esimo) percentile ed i dati più estremi vengono raffigurati come outliers. In basso abbiamo create tre gruppi con una funzione di estrazione di numeri casuali e li abbiamo rappresentati nel boxplot mostrato in Figura <a href="richiami-di-statistica-descrittiva.html#fig:figName241">3.2</a>.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="richiami-di-statistica-descrittiva.html#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb10-2"><a href="richiami-di-statistica-descrittiva.html#cb10-2" aria-hidden="true" tabindex="-1"></a>A <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="dv">20</span>)</span>
+<span id="cb10-3"><a href="richiami-di-statistica-descrittiva.html#cb10-3" aria-hidden="true" tabindex="-1"></a>B <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="dv">20</span>)</span>
+<span id="cb10-4"><a href="richiami-di-statistica-descrittiva.html#cb10-4" aria-hidden="true" tabindex="-1"></a>C <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="dv">20</span>)</span>
+<span id="cb10-5"><a href="richiami-di-statistica-descrittiva.html#cb10-5" aria-hidden="true" tabindex="-1"></a>series <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>), <span class="at">each =</span> <span class="dv">20</span>)</span>
+<span id="cb10-6"><a href="richiami-di-statistica-descrittiva.html#cb10-6" aria-hidden="true" tabindex="-1"></a>values <span class="ot">&lt;-</span> <span class="fu">c</span>(A, B, C)</span>
+<span id="cb10-7"><a href="richiami-di-statistica-descrittiva.html#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(values <span class="sc">~</span> series)</span></code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:figName241"></span>
+<img src="_main_files/figure-html/figName241-1.png" alt="Esempio di boxplot in R" width="90%" />
 <p class="caption">
-Figure 10.2: Analisi grafica dei residui per la prova di confronto tra metodi costruttivi
+Figure 3.2: Esempio di boxplot in R
 </p>
 </div>
-<p>Non essendovi evidenti problemi, valutiamo la significatività degli effetti nel modello, analogamente a quanto abbiamo fatto nel caso dell’ANOVA a blocchi randomizzati. L’unica differenza sta nel fatto che, nei disegni a quadrato latino, vi sono tre effetti da testare, anche se l’unico ad avere una certa rilevanza è l’effetto del metodo di lavoro.</p>
-<div class="sourceCode" id="cb136"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb136-1"><a href="modelli-anova-con-fattori-di-blocco.html#cb136-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(mod)</span>
-<span id="cb136-2"><a href="modelli-anova-con-fattori-di-blocco.html#cb136-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Analysis of Variance Table</span></span>
-<span id="cb136-3"><a href="modelli-anova-con-fattori-di-blocco.html#cb136-3" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb136-4"><a href="modelli-anova-con-fattori-di-blocco.html#cb136-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Response: Time</span></span>
-<span id="cb136-5"><a href="modelli-anova-con-fattori-di-blocco.html#cb136-5" aria-hidden="true" tabindex="-1"></a><span class="do">##            Df Sum Sq Mean Sq F value    Pr(&gt;F)    </span></span>
-<span id="cb136-6"><a href="modelli-anova-con-fattori-di-blocco.html#cb136-6" aria-hidden="true" tabindex="-1"></a><span class="do">## Method      3 145.69  48.563 12.7377 0.0051808 ** </span></span>
-<span id="cb136-7"><a href="modelli-anova-con-fattori-di-blocco.html#cb136-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Technician  3  17.19   5.729  1.5027 0.3065491    </span></span>
-<span id="cb136-8"><a href="modelli-anova-con-fattori-di-blocco.html#cb136-8" aria-hidden="true" tabindex="-1"></a><span class="do">## Shift       3 467.19 155.729 40.8470 0.0002185 ***</span></span>
-<span id="cb136-9"><a href="modelli-anova-con-fattori-di-blocco.html#cb136-9" aria-hidden="true" tabindex="-1"></a><span class="do">## Residuals   6  22.87   3.812                      </span></span>
-<span id="cb136-10"><a href="modelli-anova-con-fattori-di-blocco.html#cb136-10" aria-hidden="true" tabindex="-1"></a><span class="do">## ---</span></span>
-<span id="cb136-11"><a href="modelli-anova-con-fattori-di-blocco.html#cb136-11" aria-hidden="true" tabindex="-1"></a><span class="do">## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span></code></pre></div>
-<p>Vediamo che esiste una differenza significativa tra i metodi e l’ipotesi nulla può essere rifiutata con una bassissima probabilità di errore di prima specie.</p>
-<p>Ovviamente, dopo aver eseguito un’ANOVA a blocchi randomizzati o a quadrato latino, andremo eventualmente ad eseguire un test di confronto multiplo, seguendo le raccomandazioni esposte nel capitolo precedente. Anche questa parte ve la lascio per esercizio.</p>
+</div>
+<div id="distribuzioni-di-frequenze-e-classamento-1" class="section level3" number="3.3.2">
+<h3><span class="header-section-number">3.3.2</span> Distribuzioni di frequenze e classamento</h3>
+<p>Utilizziamo il dataset ‘mtcars’ disponibile nell’installazione di base di R, che possiamo caricare utilizzando la funzione <code>data()</code>.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="richiami-di-statistica-descrittiva.html#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(mtcars)</span></code></pre></div>
+<p>In questo dataset, la variabile ‘gear’ indica il numero di marce e le frequenze assolute possono essere ottenute con la funzione <code>table()</code>.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="richiami-di-statistica-descrittiva.html#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Frequenze assolute</span></span>
+<span id="cb12-2"><a href="richiami-di-statistica-descrittiva.html#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(mtcars<span class="sc">$</span>gear)</span>
+<span id="cb12-3"><a href="richiami-di-statistica-descrittiva.html#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb12-4"><a href="richiami-di-statistica-descrittiva.html#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="do">##  3  4  5 </span></span>
+<span id="cb12-5"><a href="richiami-di-statistica-descrittiva.html#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="do">## 15 12  5</span></span></code></pre></div>
+<p>Per le frequenze relative e percentuali, possiamo combinare il codice soprastante con l’impiego della funzione <code>length()</code>, che restituisce il numero di elementi in un vettore.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="richiami-di-statistica-descrittiva.html#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Frequenze relative</span></span>
+<span id="cb13-2"><a href="richiami-di-statistica-descrittiva.html#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(mtcars<span class="sc">$</span>gear)<span class="sc">/</span><span class="fu">length</span>(mtcars<span class="sc">$</span>gear)</span>
+<span id="cb13-3"><a href="richiami-di-statistica-descrittiva.html#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb13-4"><a href="richiami-di-statistica-descrittiva.html#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="do">##       3       4       5 </span></span>
+<span id="cb13-5"><a href="richiami-di-statistica-descrittiva.html#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="do">## 0.46875 0.37500 0.15625</span></span>
+<span id="cb13-6"><a href="richiami-di-statistica-descrittiva.html#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">#Frequenze percentuali</span></span>
+<span id="cb13-7"><a href="richiami-di-statistica-descrittiva.html#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(mtcars<span class="sc">$</span>gear)<span class="sc">/</span><span class="fu">length</span>(mtcars<span class="sc">$</span>gear) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb13-8"><a href="richiami-di-statistica-descrittiva.html#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb13-9"><a href="richiami-di-statistica-descrittiva.html#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="do">##      3      4      5 </span></span>
+<span id="cb13-10"><a href="richiami-di-statistica-descrittiva.html#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 46.875 37.500 15.625</span></span></code></pre></div>
+<p>Mostriamo ora l’operazione di classamento di una variabile quantitativa, che tornerà utile nei prossimi capitoli. Prendiamo con R mille valori casuali da una distribuzione uniforme nell’intervallo da 130 a 200 ed esprimiamo questi mille valori tramite una distribuzione di frequenze nelle sei classi: &lt;140, 140-150, 150-160, 160-170, 170-190, &gt;190. Per il classamento si utilizza la funzione <code>cut()</code>, che con l’argomento <code>breaks()</code> consente di specificare gli estremi inferiori delle classi, inclusi per default nella classe precedente (intervalli aperti a destra e chiusi a sinistra).</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="richiami-di-statistica-descrittiva.html#cb14-1" aria-hidden="true" tabindex="-1"></a>vals <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="dv">1000</span>, <span class="at">min =</span> <span class="dv">130</span>, <span class="at">max =</span> <span class="dv">200</span>)</span>
+<span id="cb14-2"><a href="richiami-di-statistica-descrittiva.html#cb14-2" aria-hidden="true" tabindex="-1"></a>freq <span class="ot">&lt;-</span> <span class="fu">table</span>( <span class="fu">cut</span>(vals, <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">100</span>, <span class="dv">140</span>,<span class="dv">150</span>,<span class="dv">160</span>,<span class="dv">170</span>,<span class="dv">190</span>,<span class="dv">200</span>)) )</span>
+<span id="cb14-3"><a href="richiami-di-statistica-descrittiva.html#cb14-3" aria-hidden="true" tabindex="-1"></a>freq</span>
+<span id="cb14-4"><a href="richiami-di-statistica-descrittiva.html#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb14-5"><a href="richiami-di-statistica-descrittiva.html#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="do">## (100,140] (140,150] (150,160] (160,170] (170,190] (190,200] </span></span>
+<span id="cb14-6"><a href="richiami-di-statistica-descrittiva.html#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="do">##       141       135       143       139       282       160</span></span></code></pre></div>
+<p>Per le frequenze cumulate si usa invece la funzione <code>cumsum()</code>.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="richiami-di-statistica-descrittiva.html#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cumsum</span>(freq)</span>
+<span id="cb15-2"><a href="richiami-di-statistica-descrittiva.html#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="do">## (100,140] (140,150] (150,160] (160,170] (170,190] (190,200] </span></span>
+<span id="cb15-3"><a href="richiami-di-statistica-descrittiva.html#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="do">##       141       276       419       558       840      1000</span></span></code></pre></div>
+<p>Una distribuzione di frequenze può essere rappresentata con un grafico a torta, che, in R, può essere disegnato con le funzioni <code>pie()</code>. Il grafico sottostante è abbastanza banale, in quanto le classi sono più o meno di ampiezza equivalente, dato che abbiamo utilizzato un campionamento da una distribuzione uniforme.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="richiami-di-statistica-descrittiva.html#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pie</span>(<span class="fu">table</span>(freq))</span></code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:figName243"></span>
+<img src="_main_files/figure-html/figName243-1.png" alt="Rappresentazione di una distribuzione di frequenze con un grafico a torta" width="70%" />
+<p class="caption">
+Figure 3.3: Rappresentazione di una distribuzione di frequenze con un grafico a torta
+</p>
+</div>
+</div>
+<div id="connessione-1" class="section level3" number="3.3.3">
+<h3><span class="header-section-number">3.3.3</span> Connessione</h3>
+<p>Consideriamo il dataset ‘HairEyeColor,’ disponibile nell’installazione di base di R e relativo al colore degli occhi e dei capelli di 520 studenti di statistica. La tabella delle contingenze, per le femmine, è la seguente:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="richiami-di-statistica-descrittiva.html#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(HairEyeColor)</span>
+<span id="cb17-2"><a href="richiami-di-statistica-descrittiva.html#cb17-2" aria-hidden="true" tabindex="-1"></a>tab <span class="ot">&lt;-</span> HairEyeColor[,,<span class="dv">2</span>]</span>
+<span id="cb17-3"><a href="richiami-di-statistica-descrittiva.html#cb17-3" aria-hidden="true" tabindex="-1"></a>tab</span>
+<span id="cb17-4"><a href="richiami-di-statistica-descrittiva.html#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="do">##        Eye</span></span>
+<span id="cb17-5"><a href="richiami-di-statistica-descrittiva.html#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="do">## Hair    Brown Blue Hazel Green</span></span>
+<span id="cb17-6"><a href="richiami-di-statistica-descrittiva.html#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="do">##   Black    36    9     5     2</span></span>
+<span id="cb17-7"><a href="richiami-di-statistica-descrittiva.html#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="do">##   Brown    66   34    29    14</span></span>
+<span id="cb17-8"><a href="richiami-di-statistica-descrittiva.html#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="do">##   Red      16    7     7     7</span></span>
+<span id="cb17-9"><a href="richiami-di-statistica-descrittiva.html#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="do">##   Blond     4   64     5     8</span></span></code></pre></div>
+<p>Se vogliamo sapere se il colore degli occhi è legato a quello dei capelli, possiamo utilizzare la funzione <code>as.table()</code> per trasformare l’oggetto <code>tab</code> in una tabella di contingenze (in questo caso non sarebbe necessario, visto che ‘tab’ è già una tabella di contingenze) ed applicare la funzione <code>summary()</code>. Oltre al chi quadro, l’output fornisce altre informazioni, che approfondiremo in un prossimo capitolo.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="richiami-di-statistica-descrittiva.html#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">as.table</span> (tab))</span>
+<span id="cb18-2"><a href="richiami-di-statistica-descrittiva.html#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Number of cases in table: 313 </span></span>
+<span id="cb18-3"><a href="richiami-di-statistica-descrittiva.html#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Number of factors: 2 </span></span>
+<span id="cb18-4"><a href="richiami-di-statistica-descrittiva.html#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Test for independence of all factors:</span></span>
+<span id="cb18-5"><a href="richiami-di-statistica-descrittiva.html#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="do">##  Chisq = 106.66, df = 9, p-value = 7.014e-19</span></span>
+<span id="cb18-6"><a href="richiami-di-statistica-descrittiva.html#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="do">##  Chi-squared approximation may be incorrect</span></span></code></pre></div>
+<hr />
+</div>
+</div>
+<div id="altre-letture-2" class="section level2" number="3.4">
+<h2><span class="header-section-number">3.4</span> Altre letture</h2>
+<ol style="list-style-type: decimal">
+<li>F. Crivellari (2006). Analisi statistica dei dati con R. Apogeo, Milano.</li>
+<li>G. Leti e L. Cerbara (2009). Elementi di statistica descrittiva. Il Mulino Editore, Bologna.</li>
+</ol>
 
 </div>
 </div>
@@ -800,8 +882,8 @@ Figure 10.2: Analisi grafica dei residui per la prova di confronto tra metodi co
           </div>
         </div>
       </div>
-<a href="contrasti-e-confronti-multipli.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="modelli-anova-a-due-vie.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="progettare-un-esperimento.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="modelli-statistici-ed-analisi-dei-dati.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="book_assets/gitbook-2.6.7/js/app.min.js"></script>

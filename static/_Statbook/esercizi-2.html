@@ -4,21 +4,21 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Capitolo 10 Modelli ANOVA con fattori di blocco | Metodologia sperimentale per le scienze agrarie</title>
-  <meta name="description" content="Capitolo 10 Modelli ANOVA con fattori di blocco | Metodologia sperimentale per le scienze agrarie con applicazioni in R" />
+  <title>Capitolo 14 Esercizi | Metodologia sperimentale per le scienze agrarie</title>
+  <meta name="description" content="Capitolo 14 Esercizi | Metodologia sperimentale per le scienze agrarie con applicazioni in R" />
   <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Capitolo 10 Modelli ANOVA con fattori di blocco | Metodologia sperimentale per le scienze agrarie" />
+  <meta property="og:title" content="Capitolo 14 Esercizi | Metodologia sperimentale per le scienze agrarie" />
   <meta property="og:type" content="book" />
   
   
-  <meta property="og:description" content="Capitolo 10 Modelli ANOVA con fattori di blocco | Metodologia sperimentale per le scienze agrarie con applicazioni in R" />
+  <meta property="og:description" content="Capitolo 14 Esercizi | Metodologia sperimentale per le scienze agrarie con applicazioni in R" />
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Capitolo 10 Modelli ANOVA con fattori di blocco | Metodologia sperimentale per le scienze agrarie" />
+  <meta name="twitter:title" content="Capitolo 14 Esercizi | Metodologia sperimentale per le scienze agrarie" />
   
-  <meta name="twitter:description" content="Capitolo 10 Modelli ANOVA con fattori di blocco | Metodologia sperimentale per le scienze agrarie con applicazioni in R" />
+  <meta name="twitter:description" content="Capitolo 14 Esercizi | Metodologia sperimentale per le scienze agrarie con applicazioni in R" />
   
 
 <meta name="author" content="Andrea Onofri e Dario Sacco" />
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="contrasti-e-confronti-multipli.html"/>
-<link rel="next" href="modelli-anova-a-due-vie.html"/>
+<link rel="prev" href="la-regressione-non-lineare.html"/>
+<link rel="next" href="appendice-1-breve-introduzione-ad-r.html"/>
 <script src="book_assets/header-attrs-2.6/header-attrs.js"></script>
 <script src="book_assets/jquery-2.2.3/jquery.min.js"></script>
 <link href="book_assets/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -551,248 +551,2028 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="modelli-anova-con-fattori-di-blocco" class="section level1" number="10">
-<h1><span class="header-section-number">Capitolo 10</span> Modelli ANOVA con fattori di blocco</h1>
-<p>Nel capitolo 7 abbiamo visto come è possibile costruire modelli nei quali abbiamo una sola variabile dipendente quantitativa e una variabile indipendente categorica. Abbiamo anche visto che questo tipo di modelli lineari sono normalmente noti come modelli ‘ANOVA’ ad una via e presuppongono che le unità sperimentali siano totalmente indipendenti tra loro. Per questo motivo, essi possono essere utilizzati solo con disegni sperimentali a randomizzazione completa, dove non esistano raggruppamenti di alcun tipo, escluso quello dettato dal trattamento in studio.</p>
-<p>Ovviamente è possibile definire modelli analoghi, ma più complessi, nei quali introdurre anche l’effetto di eventuali <em>blocking factors</em>. Vediamo ora alcuni esempi</p>
-<div id="caso-studio-confronto-tra-erbicidi-in-campo" class="section level2" number="10.1">
-<h2><span class="header-section-number">10.1</span> Caso-studio: confronto tra erbicidi in campo</h2>
-<p>Abbiamo una prova di confronto tra erbicidi in mais, con 13 formulati, due testimoni inerbiti (che, per comodità, considereremo due trattamenti diversi) e un testimone scerbato. Date le dimensioni della prova, è lecito ipotizzare che, pur scegliendo un appezzamento il più omogeneo possibile, ci potrebbero essere differenze di infestazione tra un punto e l’altro del campo, con un presumibile gradiente procedendo dai lati (vicino alle fosse) verso il centro. In questa situazione, se l’esperimento fosse disegnato a randomizzazione completa, le differenze di infestazione tra una parte e l’altra del campo sarebbero trascurate e finirebbero per incrementare l’errore sperimentale, diminuendo l’efficienza dell’esperimento.</p>
-<p>Si impiega quindi un disegno a blocchi randomizzati con quattro repliche. Ricordiamo che, con questo disegno, il campo è suddiviso in tante sezioni (dette blocchi) quante sono le repliche (quattro), perpendicolarmente al gradiente di infestazione trasversale. In questo modo, l’ambiente è relativamente omogeneo all’interno di ciascun blocco, nel quale viene collocata una replica per trattamento.</p>
-<p>Per questa lezione è necessario caricare il package ‘aomisc,’ che deve essere preventivamente installato, facendo riferimento, se necessario, al capitolo introduttivo. Il dataset dei risultati (‘rimsulfuron’) è, appunto, contenuto in questo package.</p>
-<div class="sourceCode" id="cb123"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb123-1"><a href="modelli-anova-con-fattori-di-blocco.html#cb123-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(aomisc)</span>
-<span id="cb123-2"><a href="modelli-anova-con-fattori-di-blocco.html#cb123-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(rimsulfuron)</span></code></pre></div>
-<p>Più sotto, riportiamo l’output di R relativo ai dati tabulati, con le relative medie di riga (trattamento) e di colonna (blocco)</p>
-<pre><code>##                                                 1       2       3       4  Medie
-## Alachlor + terbuthylazine                  12.060  49.580  41.340  16.370 29.838
-## Hand-Weeded                                77.580  92.080  86.590  99.630 88.970
-## Metolachlor + terbuthylazine (pre)         51.770  52.100  49.460  34.670 47.000
-## Pendimethalin (post) + rimsuulfuron (post) 94.820  87.720 102.050 101.940 96.632
-## Pendimethalin (pre) + rimsulfuron (post)   65.510  88.720  95.520  82.390 83.035
-## Rimsulfuron (40)                           85.910  91.090 111.420  93.150 95.392
-## Rimsulfuron (45)                           93.030 105.000  89.190  79.040 91.565
-## Rimsulfuron (50)                           86.930 105.820 110.020  89.100 97.968
-## Rimsulfuron (50+30 split)                  71.360  77.570 115.910  92.160 89.250
-## Rimsulfuron (60)                           52.990 102.860 100.620  97.040 88.377
-## Rimsulfuron + Atred                        94.110  89.860 104.340  99.630 96.985
-## Rimsulfuron + hoeing                       73.220  86.060 118.010  98.320 93.903
-## Rimsulfuron + thyfensulfuron               75.280  82.590  94.960  85.850 84.670
-## Thifensulfuron                             78.470  42.320  62.520  24.340 51.913
-## Unweeded 1                                 10.880  31.770  23.920  20.850 21.855
-## Unweeded 2                                 27.580  51.550  25.130  38.610 35.718
-## Medie                                      65.719  77.293  83.188  72.068 74.567</code></pre>
-</div>
-<div id="definizione-di-un-modello-lineare-1" class="section level2" number="10.2">
-<h2><span class="header-section-number">10.2</span> Definizione di un modello lineare</h2>
-<p>La produzione di ogni unità sperimentale (parcella) è condizionata da più di un effetto:</p>
+<div id="esercizi-2" class="section level1" number="14">
+<h1><span class="header-section-number">Capitolo 14</span> Esercizi</h1>
+<div id="capitoli-1-e-2" class="section level2" number="14.1">
+<h2><span class="header-section-number">14.1</span> Capitoli 1 e 2</h2>
+<div id="esercizio-1" class="section level3" number="14.1.1">
+<h3><span class="header-section-number">14.1.1</span> Esercizio 1</h3>
+<p>Vi è stata affidata una prova sperimentale per la taratura agronomica di un nuovo diserbante appartenente al gruppo chimico delle solfoniluree (AGRISULFURON), utilizzabile alla dose presumibile di 20 g/ha, per il diserbo di post-emergenza del mais. Gli obiettivi della prova sono:</p>
 <ol style="list-style-type: decimal">
-<li>il diserbante con cui essa è stata trattata;</li>
-<li>il blocco di cui essa fa parte;</li>
-<li>ogni altro effetto non conoscibile e puramente casuale.</li>
+<li>Valutare se è opportuno un certo aggiustamento della dose (incremento/diminuzione)</li>
+<li>Valutare se è opportuna l’aggiunta di un bagnante non-ionico</li>
+<li>Valutare se è opportuno splittare la dose di 20 g/ha in due distribuzioni</li>
+<li>Valutare l’efficacia del nuovo diserbante con gli opportuni controlli (testimoni)</li>
 </ol>
-<p>Il modello è quindi:</p>
-<p><span class="math display">\[ Y_{ij} = \mu + \gamma_i + \alpha_j + \varepsilon_{ij}\]</span></p>
-<p>dove <span class="math inline">\(Y\)</span> è la produzione nel blocco <span class="math inline">\(i\)</span> e con il diserbo <span class="math inline">\(j\)</span>, <span class="math inline">\(\mu\)</span> è l’intercetta, <span class="math inline">\(\gamma\)</span> è l’effetto del blocco <span class="math inline">\(i\)</span>, <span class="math inline">\(\alpha\)</span> è l’effetto del trattamento <span class="math inline">\(j\)</span> e <span class="math inline">\(\varepsilon\)</span> è l’errore sperimentale per ogni singola parcella, che si assume normalmente distribuito, con media 0 e deviazione standard <span class="math inline">\(\sigma\)</span>. Per gli usuali problemi di stimabilità, poniamo i vincoli <span class="math inline">\(\gamma_1 = 0\)</span> e <span class="math inline">\(\alpha_1 = 0\)</span> (vincolo sul trattamento), in modo che <span class="math inline">\(\mu\)</span> rappresenta il valore atteso nel primo blocco e per il primo trattamento in ordine alfabetico. In totale, vi sono 19 parametri da stimare, più <span class="math inline">\(\sigma\)</span>.</p>
-</div>
-<div id="stima-dei-parametri-1" class="section level2" number="10.3">
-<h2><span class="header-section-number">10.3</span> Stima dei parametri</h2>
-<div id="coefficienti-del-modello" class="section level3" number="10.3.1">
-<h3><span class="header-section-number">10.3.1</span> Coefficienti del modello</h3>
-<p>La stima dei parametri viene eseguita con il metodo dei minimi quadrati. In questo caso l’esperimento è completamente bilanciato e la stima potrebbe essere fatta banalmente, considerando i valori osservati e le medie aritmetiche per gruppo. Infatti, se prendiamo la media generale, la media del primo blocco e la media del primo erbicida riportate nel codice sovrastante, vediamo che il primo erbicida, rispetto alla media generale, ha determinato un aumento di -44.729375 unità. D’altra parte, il primo blocco ha comportanto un aumento di -8.848125 unità. Di conseguenza, il valore atteso nel primo trattamento e nel primo blocco dovrebbe essere pari a:</p>
-<p><span class="math display">\[ \bar{Y}_{11} = \mu = 74.56687 - 44.72937 - 8.848125 = 20.98937\]</span></p>
-<p>Analogamente, considerando che la media del secondo blocco è di 2.72625 unità più alta della media generale, il valore atteso per il primo trattamento nel secondo blocco è pari a:</p>
-<p><span class="math display">\[ \bar{Y}_{12} = 74.56687 - 44.72937 + 2.72625 = 32.56375\]</span>
-Di conseguenza:</p>
-<p><span class="math display">\[ \gamma_2 = 32.56375 - 20.98937 = 11.57438\]</span></p>
-<p>Ancora, considerando che la media del secondo trattamento è di 14.403125 unità più alta della media generale, il valore atteso per il secondo trattamento nel primo blocco è pari a:</p>
-<p><span class="math display">\[ \bar{Y}_{21} = 74.56687 + 14.40313 - 8.848125 = 80.12188\]</span></p>
-<p>Di conseguenza:</p>
-<p><span class="math display">\[ \alpha_2 = 80.12188 - 20.98937 = 59.13251\]</span></p>
-<p>Ovviamente, continuare questi calcoli è abbastanza tedioso e quindi eseguiamo il ‘model fitting’ con R, osservando che esso produce gli stessi risultati già calcolati a mano.</p>
-<div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb125-1"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">width =</span> <span class="dv">170</span>)</span>
-<span id="cb125-2"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-2" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">&lt;-</span> <span class="fu">lm</span>(Yield <span class="sc">~</span> <span class="fu">factor</span>(Block) <span class="sc">+</span> <span class="fu">factor</span>(Herbicide), <span class="at">data =</span> rimsulfuron)</span>
-<span id="cb125-3"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mod)</span>
-<span id="cb125-4"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-4" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb125-5"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-5" aria-hidden="true" tabindex="-1"></a><span class="do">## Call:</span></span>
-<span id="cb125-6"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-6" aria-hidden="true" tabindex="-1"></a><span class="do">## lm(formula = Yield ~ factor(Block) + factor(Herbicide), data = rimsulfuron)</span></span>
-<span id="cb125-7"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-7" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb125-8"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-8" aria-hidden="true" tabindex="-1"></a><span class="do">## Residuals:</span></span>
-<span id="cb125-9"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-9" aria-hidden="true" tabindex="-1"></a><span class="do">##     Min      1Q  Median      3Q     Max </span></span>
-<span id="cb125-10"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-10" aria-hidden="true" tabindex="-1"></a><span class="do">## -26.539  -8.740   1.102   6.209  35.406 </span></span>
-<span id="cb125-11"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-11" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb125-12"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-12" aria-hidden="true" tabindex="-1"></a><span class="do">## Coefficients:</span></span>
-<span id="cb125-13"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-13" aria-hidden="true" tabindex="-1"></a><span class="do">##                                                             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
-<span id="cb125-14"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-14" aria-hidden="true" tabindex="-1"></a><span class="do">## (Intercept)                                                   20.989      6.886   3.048 0.003847 ** </span></span>
-<span id="cb125-15"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-15" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Block)2                                                11.574      4.468   2.590 0.012874 *  </span></span>
-<span id="cb125-16"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-16" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Block)3                                                17.469      4.468   3.910 0.000309 ***</span></span>
-<span id="cb125-17"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-17" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Block)4                                                 6.349      4.468   1.421 0.162206    </span></span>
-<span id="cb125-18"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-18" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Hand-Weeded                                  59.133      8.936   6.617 3.78e-08 ***</span></span>
-<span id="cb125-19"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-19" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Metolachlor + terbuthylazine (pre)           17.163      8.936   1.921 0.061144 .  </span></span>
-<span id="cb125-20"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-20" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Pendimethalin (post) + rimsuulfuron (post)   66.795      8.936   7.474 2.03e-09 ***</span></span>
-<span id="cb125-21"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-21" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Pendimethalin (pre) + rimsulfuron (post)     53.198      8.936   5.953 3.67e-07 ***</span></span>
-<span id="cb125-22"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-22" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Rimsulfuron (40)                             65.555      8.936   7.336 3.25e-09 ***</span></span>
-<span id="cb125-23"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-23" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Rimsulfuron (45)                             61.728      8.936   6.907 1.40e-08 ***</span></span>
-<span id="cb125-24"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-24" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Rimsulfuron (50)                             68.130      8.936   7.624 1.22e-09 ***</span></span>
-<span id="cb125-25"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-25" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Rimsulfuron (50+30 split)                    59.413      8.936   6.648 3.39e-08 ***</span></span>
-<span id="cb125-26"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-26" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Rimsulfuron (60)                             58.540      8.936   6.551 4.74e-08 ***</span></span>
-<span id="cb125-27"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-27" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Rimsulfuron + Atred                          67.148      8.936   7.514 1.77e-09 ***</span></span>
-<span id="cb125-28"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-28" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Rimsulfuron + hoeing                         64.065      8.936   7.169 5.73e-09 ***</span></span>
-<span id="cb125-29"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-29" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Rimsulfuron + thyfensulfuron                 54.832      8.936   6.136 1.96e-07 ***</span></span>
-<span id="cb125-30"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-30" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Thifensulfuron                               22.075      8.936   2.470 0.017359 *  </span></span>
-<span id="cb125-31"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-31" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Unweeded 1                                   -7.982      8.936  -0.893 0.376473    </span></span>
-<span id="cb125-32"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-32" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide)Unweeded 2                                    5.880      8.936   0.658 0.513902    </span></span>
-<span id="cb125-33"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-33" aria-hidden="true" tabindex="-1"></a><span class="do">## ---</span></span>
-<span id="cb125-34"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-34" aria-hidden="true" tabindex="-1"></a><span class="do">## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span>
-<span id="cb125-35"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-35" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb125-36"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-36" aria-hidden="true" tabindex="-1"></a><span class="do">## Residual standard error: 12.64 on 45 degrees of freedom</span></span>
-<span id="cb125-37"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-37" aria-hidden="true" tabindex="-1"></a><span class="do">## Multiple R-squared:  0.8664, Adjusted R-squared:  0.8129 </span></span>
-<span id="cb125-38"><a href="modelli-anova-con-fattori-di-blocco.html#cb125-38" aria-hidden="true" tabindex="-1"></a><span class="do">## F-statistic: 16.21 on 18 and 45 DF,  p-value: 4.916e-14</span></span></code></pre></div>
-</div>
-<div id="residui-e-devianze" class="section level3" number="10.3.2">
-<h3><span class="header-section-number">10.3.2</span> Residui e devianze</h3>
-<p>Nel capitolo 7 abbiamo visto come si calcolano i residui, sia a mano che con R. Abbiamo anche visto che la devianza dei residui è la somma dei loro quadrati:</p>
-<div class="sourceCode" id="cb126"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb126-1"><a href="modelli-anova-con-fattori-di-blocco.html#cb126-1" aria-hidden="true" tabindex="-1"></a>RSS <span class="ot">&lt;-</span> <span class="fu">sum</span>( <span class="fu">residuals</span>(mod)<span class="sc">^</span><span class="dv">2</span> )</span>
-<span id="cb126-2"><a href="modelli-anova-con-fattori-di-blocco.html#cb126-2" aria-hidden="true" tabindex="-1"></a>RSS</span>
-<span id="cb126-3"><a href="modelli-anova-con-fattori-di-blocco.html#cb126-3" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 7187.348</span></span></code></pre></div>
-<p>Da questa possiamo ottenere la deviazione standard (<span class="math inline">\(\sigma\)</span>), considerando che i gradi di libertà si calcolano partendo dallo stesso punto da cui siamo partiti per l’ANOVA ad una via: abbiamo 16 gruppi con quattro repliche, per cui la devianza, entro ogni gruppo, ha tre gradi di libertà. In totale abbiamo quindi <span class="math inline">\(16 \times 3 = 48\)</span> gradi di libertà anche se non dobbiamo dimenticare che, le repliche di ogni gruppo non differiscono solo per motivi casuali, ma anche perché appartengono a blocchi diversi. Abbiamo quattro blocchi, quindi tre gradi di libertà, che vanno dedotti dai 48 appena calcolati. Pertanto:</p>
-<div class="sourceCode" id="cb127"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb127-1"><a href="modelli-anova-con-fattori-di-blocco.html#cb127-1" aria-hidden="true" tabindex="-1"></a>sigma <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(RSS<span class="sc">/</span><span class="dv">45</span>)</span>
-<span id="cb127-2"><a href="modelli-anova-con-fattori-di-blocco.html#cb127-2" aria-hidden="true" tabindex="-1"></a>sigma</span>
-<span id="cb127-3"><a href="modelli-anova-con-fattori-di-blocco.html#cb127-3" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 12.63799</span></span></code></pre></div>
-<p>Più facilmente:</p>
-<div class="sourceCode" id="cb128"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb128-1"><a href="modelli-anova-con-fattori-di-blocco.html#cb128-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mod)<span class="sc">$</span>sigma</span>
-<span id="cb128-2"><a href="modelli-anova-con-fattori-di-blocco.html#cb128-2" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 12.63799</span></span></code></pre></div>
-<p>Da <span class="math inline">\(\sigma\)</span> possiamo ottenere SEM e SED, anche se questo calcolo ve lo lascio per esercizio.</p>
+<p>Coerentemente con questi obiettivi, scrivere un protocollo sperimentale sufficientemente dettagliato (una pagina) ed aggiungere lo schema della prova</p>
 </div>
 </div>
-<div id="scomposizione-della-varianza-1" class="section level2" number="10.4">
-<h2><span class="header-section-number">10.4</span> Scomposizione della varianza</h2>
-<p>La scomposizione della varianza è sequenziale ed analoga a quella che abbiamo operato per l’ANOVA ad una via; tuttavia, dobbiamo tener presente che, in questo caso, la devianza totale delle osservazione deve essere decomposta in tre quote: una dovuta al trattamento, una dovuta al blocco ed una dovuta agli effetti stocastici.</p>
-<p>La devianza totale dei dati, con R, potrebbe essere ottenuta considerando un modello lineare in cui esiste solo l’intercetta, il che equivale a dire che i residui rappresentano gli scostamenti rispetto alla media generale. La devianza dei residui (somma dei quadrati) è quindi la devianza totale delle osservazioni:</p>
-<div class="sourceCode" id="cb129"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb129-1"><a href="modelli-anova-con-fattori-di-blocco.html#cb129-1" aria-hidden="true" tabindex="-1"></a>mod1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Yield <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> rimsulfuron)</span>
-<span id="cb129-2"><a href="modelli-anova-con-fattori-di-blocco.html#cb129-2" aria-hidden="true" tabindex="-1"></a>RSS1 <span class="ot">&lt;-</span> <span class="fu">sum</span>( <span class="fu">residuals</span>(mod1)<span class="sc">^</span><span class="dv">2</span> )</span>
-<span id="cb129-3"><a href="modelli-anova-con-fattori-di-blocco.html#cb129-3" aria-hidden="true" tabindex="-1"></a>RSS1</span>
-<span id="cb129-4"><a href="modelli-anova-con-fattori-di-blocco.html#cb129-4" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 53779.07</span></span></code></pre></div>
-<p>In seconda battuta, inseriamo l’effetto del blocco:</p>
-<div class="sourceCode" id="cb130"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb130-1"><a href="modelli-anova-con-fattori-di-blocco.html#cb130-1" aria-hidden="true" tabindex="-1"></a>mod2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Yield <span class="sc">~</span> <span class="fu">factor</span>(Block), <span class="at">data =</span> rimsulfuron)</span>
-<span id="cb130-2"><a href="modelli-anova-con-fattori-di-blocco.html#cb130-2" aria-hidden="true" tabindex="-1"></a>RSS2 <span class="ot">&lt;-</span> <span class="fu">sum</span>( <span class="fu">residuals</span>(mod2)<span class="sc">^</span><span class="dv">2</span> )</span>
-<span id="cb130-3"><a href="modelli-anova-con-fattori-di-blocco.html#cb130-3" aria-hidden="true" tabindex="-1"></a>RSS2</span>
-<span id="cb130-4"><a href="modelli-anova-con-fattori-di-blocco.html#cb130-4" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 51118.58</span></span></code></pre></div>
-<p>Vediamo che la devianza del residuo è calata di <code>RSS1 - RSS2</code> unità, che corrispondono all’effetto del blocco e alla sua introduzione nel modello.</p>
-<p>Infine, inseriamo anche l’effetto del trattamento, tornando così al modello completo che abbiamo utilizzato più sopra. Considerando i paragrafi precedenti, notiamo che l’inserimento dell’effetto del trattamento ha determinato un calo della devianza dei residui pari <code>RSS2 - RSS</code>, che corrisponde appunto all’effetto del diserbo. Insomma, ogni effetto introdotto nel modello ha determinato un decremento della variabilità non spiegata, quantitativamente pari alla variabilità attribuibile all’effetto stesso. Alla fine del processo rimane comunque un certo residuo (RSS) non spiegato, corrispondente a <span class="math inline">\(\varepsilon\)</span>.</p>
-<p>Ci chiediamo se gli effetti attribuibili al blocco e al trattamento sono significativamente più grandi del residuo. Sappiamo già di non poter confrontare le devianze, ma possiamo calcolare e confrontare con un test di F le relative varianze. Basta tener conto che i gradi di libertà dei blocchi e dei trattamenti sono rispettivamente 3 e 15, cioè il numero dei blocchi meno uno e il numero dei trattamenti meno uno.</p>
-<p>La tabella ANOVA può essere facilmente ottenuta con R:</p>
-<div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb131-1"><a href="modelli-anova-con-fattori-di-blocco.html#cb131-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(mod)</span>
-<span id="cb131-2"><a href="modelli-anova-con-fattori-di-blocco.html#cb131-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Analysis of Variance Table</span></span>
-<span id="cb131-3"><a href="modelli-anova-con-fattori-di-blocco.html#cb131-3" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb131-4"><a href="modelli-anova-con-fattori-di-blocco.html#cb131-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Response: Yield</span></span>
-<span id="cb131-5"><a href="modelli-anova-con-fattori-di-blocco.html#cb131-5" aria-hidden="true" tabindex="-1"></a><span class="do">##                   Df Sum Sq Mean Sq F value    Pr(&gt;F)    </span></span>
-<span id="cb131-6"><a href="modelli-anova-con-fattori-di-blocco.html#cb131-6" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Block)      3   2660  886.83  5.5524  0.002496 ** </span></span>
-<span id="cb131-7"><a href="modelli-anova-con-fattori-di-blocco.html#cb131-7" aria-hidden="true" tabindex="-1"></a><span class="do">## factor(Herbicide) 15  43931 2928.75 18.3369 2.329e-14 ***</span></span>
-<span id="cb131-8"><a href="modelli-anova-con-fattori-di-blocco.html#cb131-8" aria-hidden="true" tabindex="-1"></a><span class="do">## Residuals         45   7187  159.72                      </span></span>
-<span id="cb131-9"><a href="modelli-anova-con-fattori-di-blocco.html#cb131-9" aria-hidden="true" tabindex="-1"></a><span class="do">## ---</span></span>
-<span id="cb131-10"><a href="modelli-anova-con-fattori-di-blocco.html#cb131-10" aria-hidden="true" tabindex="-1"></a><span class="do">## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span></code></pre></div>
-<p>Ovviamente, prima di considerare questa tabella dovremo preoccuparci del fatto che le assunzioni di base siano rispettate, cosa che possiamo facilmente verificare con un’analisi grafica dei residui, utilizzando il codice sottostante. L’output è visibile in Figura <a href="modelli-anova-con-fattori-di-blocco.html#fig:figName121">10.1</a>.</p>
-<pre><code>par(mfrow=c(1,2))
-plot(mod, which = 1)
-plot(mod, which = 2)</code></pre>
-<div class="figure" style="text-align: center"><span id="fig:figName121"></span>
-<img src="_main_files/figure-html/figName121-1.png" alt="Analisi grafica dei residui per la prova di confronto erbicida" width="90%" />
-<p class="caption">
-Figure 10.1: Analisi grafica dei residui per la prova di confronto erbicida
-</p>
+<div id="capitolo-3" class="section level2" number="14.2">
+<h2><span class="header-section-number">14.2</span> Capitolo 3</h2>
+<div id="esercizio-1-1" class="section level3" number="14.2.1">
+<h3><span class="header-section-number">14.2.1</span> Esercizio 1</h3>
+<p>Un’analisi chimica è stata eseguita i triplicato e i risultati sono stati i seguenti: 125, 169 and 142 ng/g. Calcolate la media e tutti gli indicatori di variabilità che conoscete.</p>
 </div>
-<p>Dopo esserci rassicurati su questo importante aspetto, possiamo vedere che abbiamo due ipotesi nulle da testare (effetto del trattamento non significativo ed effetto del blocco non significativo), che possono essere entrambe rifiutate per P &lt; 0.05.</p>
-<p>Da questo punto in avanti, l’analisi procede come usuale, calcolando le medie marginali attese ed, eventualmente, confrontandole tra loro con una procedura di confronto multiplo, come descritto nei capitoli precedenti. Tener presente che, in questo esperimento, abbiamo 16 trattamenti, cioè <span class="math inline">\(16 \times 15 / 2 = 120\)</span> confronti; di conseguenza, può essere opportuno operare la correzione per la molteplicità. Inoltre, dato che il trattamento più interessante è quello che rende massima la produzione, sarà opportuno ordinare le medie in senso decrescente, utilizzando l’argomento ‘reverse = T.’</p>
-<div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb133-1"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(emmeans)</span>
-<span id="cb133-2"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-2" aria-hidden="true" tabindex="-1"></a>medie <span class="ot">&lt;-</span> <span class="fu">emmeans</span>(mod, <span class="sc">~</span><span class="fu">factor</span>(Herbicide))</span>
-<span id="cb133-3"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-3" aria-hidden="true" tabindex="-1"></a>multcomp<span class="sc">::</span><span class="fu">cld</span>(medie, <span class="at">Letters =</span> LETTERS, <span class="at">reverse =</span> T)</span>
-<span id="cb133-4"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-4" aria-hidden="true" tabindex="-1"></a><span class="do">##  Herbicide                                  emmean   SE df lower.CL upper.CL .group</span></span>
-<span id="cb133-5"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-5" aria-hidden="true" tabindex="-1"></a><span class="do">##  Rimsulfuron (50)                             98.0 6.32 45    85.24    110.7  A    </span></span>
-<span id="cb133-6"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-6" aria-hidden="true" tabindex="-1"></a><span class="do">##  Rimsulfuron + Atred                          97.0 6.32 45    84.26    109.7  A    </span></span>
-<span id="cb133-7"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-7" aria-hidden="true" tabindex="-1"></a><span class="do">##  Pendimethalin (post) + rimsuulfuron (post)   96.6 6.32 45    83.91    109.4  A    </span></span>
-<span id="cb133-8"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-8" aria-hidden="true" tabindex="-1"></a><span class="do">##  Rimsulfuron (40)                             95.4 6.32 45    82.67    108.1  A    </span></span>
-<span id="cb133-9"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-9" aria-hidden="true" tabindex="-1"></a><span class="do">##  Rimsulfuron + hoeing                         93.9 6.32 45    81.18    106.6  A    </span></span>
-<span id="cb133-10"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-10" aria-hidden="true" tabindex="-1"></a><span class="do">##  Rimsulfuron (45)                             91.6 6.32 45    78.84    104.3  A    </span></span>
-<span id="cb133-11"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-11" aria-hidden="true" tabindex="-1"></a><span class="do">##  Rimsulfuron (50+30 split)                    89.2 6.32 45    76.52    102.0  A    </span></span>
-<span id="cb133-12"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-12" aria-hidden="true" tabindex="-1"></a><span class="do">##  Hand-Weeded                                  89.0 6.32 45    76.24    101.7  A    </span></span>
-<span id="cb133-13"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-13" aria-hidden="true" tabindex="-1"></a><span class="do">##  Rimsulfuron (60)                             88.4 6.32 45    75.65    101.1  A    </span></span>
-<span id="cb133-14"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-14" aria-hidden="true" tabindex="-1"></a><span class="do">##  Rimsulfuron + thyfensulfuron                 84.7 6.32 45    71.94     97.4  A    </span></span>
-<span id="cb133-15"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-15" aria-hidden="true" tabindex="-1"></a><span class="do">##  Pendimethalin (pre) + rimsulfuron (post)     83.0 6.32 45    70.31     95.8  AB   </span></span>
-<span id="cb133-16"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-16" aria-hidden="true" tabindex="-1"></a><span class="do">##  Thifensulfuron                               51.9 6.32 45    39.19     64.6   BC  </span></span>
-<span id="cb133-17"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-17" aria-hidden="true" tabindex="-1"></a><span class="do">##  Metolachlor + terbuthylazine (pre)           47.0 6.32 45    34.27     59.7    C  </span></span>
-<span id="cb133-18"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-18" aria-hidden="true" tabindex="-1"></a><span class="do">##  Unweeded 2                                   35.7 6.32 45    22.99     48.4    C  </span></span>
-<span id="cb133-19"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-19" aria-hidden="true" tabindex="-1"></a><span class="do">##  Alachlor + terbuthylazine                    29.8 6.32 45    17.11     42.6    C  </span></span>
-<span id="cb133-20"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-20" aria-hidden="true" tabindex="-1"></a><span class="do">##  Unweeded 1                                   21.9 6.32 45     9.13     34.6    C  </span></span>
-<span id="cb133-21"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-21" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb133-22"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-22" aria-hidden="true" tabindex="-1"></a><span class="do">## Results are averaged over the levels of: Block </span></span>
-<span id="cb133-23"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-23" aria-hidden="true" tabindex="-1"></a><span class="do">## Confidence level used: 0.95 </span></span>
-<span id="cb133-24"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-24" aria-hidden="true" tabindex="-1"></a><span class="do">## P value adjustment: tukey method for comparing a family of 16 estimates </span></span>
-<span id="cb133-25"><a href="modelli-anova-con-fattori-di-blocco.html#cb133-25" aria-hidden="true" tabindex="-1"></a><span class="do">## significance level used: alpha = 0.05</span></span></code></pre></div>
-<p>Vi lascio il commento dei risultati come esercizio.</p>
+<div id="esercizio-2" class="section level3" number="14.2.2">
+<h3><span class="header-section-number">14.2.2</span> Esercizio 2</h3>
+<p>Scaricare il file EXCEL ‘rimsulfuron.xlsx.’
+In questo file sono riportati i risultati di un esperimento con 15 trattamenti e 4 repliche, nel quale sono stati posti a confronti diversi erbicidi e/o dosi per il diserbo nel mais. Calcolare le medie produttive ottenute con le diverse tesi sperimentali e riportarle su un grafico, includendo anche un’indicazione di variabilità. Verificare se la produzione è correlata con l’altezza delle piante e commentare i risultati ottenuti. Il file può essere scaricato <a href="https://www.casaonofri.it/_datasets/rimsulfuron.xlsx">da questo link</a>.</p>
 </div>
-<div id="disegni-a-quadrato-latino-1" class="section level2" number="10.5">
-<h2><span class="header-section-number">10.5</span> Disegni a quadrato latino</h2>
-<p>A volte i fattori di blocco sono più di uno e danno origine ad un disegno sperimentale detto ‘quadrato latino’ di cui abbiamo parlato nel capitolo 3. Qui, forniremo un esempio tratto dalla pratica sperimentale industriale.</p>
+<div id="esercizio-3" class="section level3" number="14.2.3">
+<h3><span class="header-section-number">14.2.3</span> Esercizio 3</h3>
+<p>Caricare il datasets ‘students’ disponibile nel package ‘aomisc.’ In questo file potete trovare una database relativo alla valutazione degli studenti in alcune materie del primo anno di Agraria. Ogni record rappresenta un esame, con il relativo voto, la materia e la scuola di provenienza dello studente. Con un uso appropriato delle tabelle di contingenza e del chi quadro, valutare se il voto dipende dalla materia e dalla scuola di provenienza dello studente.</p>
+<hr />
 </div>
-<div id="caso-studio-confronto-tra-metodi-costruttivi" class="section level2" number="10.6">
-<h2><span class="header-section-number">10.6</span> Caso studio: confronto tra metodi costruttivi</h2>
-<p>Immaginiamo di voler studiare il tempo necessario per costruire un componente elettronico, utilizzando quattro metodi diversi. E’ evidente che il tempo di costruzione sarà influenzato dalla perizia del tecnico e, per questo, utilizziamo quattro tecnici diversi, ad ognuno dei quali facciamo utilizzare tutti e quattro i metodi. Un esperimento così disegnato sarebbe a blocchi randomizzati, con il tecnico che fa da blocco per i trattamenti. Tuttavia, dobbiamo anche riconoscere che i quattro tecnici saranno via via meno efficienti, e quindi il metodo che utilizzeranno per primo sarà avvantaggiato, mentre quello che utilizzeranno per ultimo sarà svantaggiato. E’vero che i metodi sono assegnati in ordine random ad ogni tecnico, ma non si può comunque evitare che un metodo venga avvantaggiato rispetto ad un altro, perché, ad esempio, non viene mai ad occupare l’ultima posizione (o meglio, l’ultimo turno).</p>
-<p>Per evitare questo problema imponiamo un vincolo ulteriore alla randizzazione e facciamo in modo che ogni metodo occupi tutte e quattro i turni, in tecnici diversi. Il disegno è quindi a quadrato latino.</p>
-<p>Il dataset dei risultati è disponibile su gitHub:</p>
-<div class="sourceCode" id="cb134"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb134-1"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-1" aria-hidden="true" tabindex="-1"></a>path1 <span class="ot">&lt;-</span> <span class="st">&quot;https://raw.githubusercontent.com/OnofriAndreaPG/&quot;</span></span>
-<span id="cb134-2"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-2" aria-hidden="true" tabindex="-1"></a>path2 <span class="ot">&lt;-</span> <span class="st">&quot;aomisc/master/data/&quot;</span></span>
-<span id="cb134-3"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-3" aria-hidden="true" tabindex="-1"></a>fileName <span class="ot">&lt;-</span> <span class="st">&quot;Technicians.csv&quot;</span></span>
-<span id="cb134-4"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-4" aria-hidden="true" tabindex="-1"></a>filePath <span class="ot">&lt;-</span> <span class="fu">paste</span>(path1, path2, fileName, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)</span>
-<span id="cb134-5"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-5" aria-hidden="true" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(filePath, <span class="at">header=</span>T)</span>
-<span id="cb134-6"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-6" aria-hidden="true" tabindex="-1"></a>dataset</span>
-<span id="cb134-7"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-7" aria-hidden="true" tabindex="-1"></a><span class="do">##    Shift Technician Method Time</span></span>
-<span id="cb134-8"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 1      I     Andrew      C   90</span></span>
-<span id="cb134-9"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 2     II     Andrew      B   90</span></span>
-<span id="cb134-10"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 3    III     Andrew      A   89</span></span>
-<span id="cb134-11"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-11" aria-hidden="true" tabindex="-1"></a><span class="do">## 4     IV     Andrew      D  104</span></span>
-<span id="cb134-12"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-12" aria-hidden="true" tabindex="-1"></a><span class="do">## 5      I       Anna      D   96</span></span>
-<span id="cb134-13"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-13" aria-hidden="true" tabindex="-1"></a><span class="do">## 6     II       Anna      C   91</span></span>
-<span id="cb134-14"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-14" aria-hidden="true" tabindex="-1"></a><span class="do">## 7    III       Anna      B   97</span></span>
-<span id="cb134-15"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-15" aria-hidden="true" tabindex="-1"></a><span class="do">## 8     IV       Anna      A  100</span></span>
-<span id="cb134-16"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-16" aria-hidden="true" tabindex="-1"></a><span class="do">## 9      I    Michael      A   84</span></span>
-<span id="cb134-17"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-17" aria-hidden="true" tabindex="-1"></a><span class="do">## 10    II    Michael      D   96</span></span>
-<span id="cb134-18"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-18" aria-hidden="true" tabindex="-1"></a><span class="do">## 11   III    Michael      C   98</span></span>
-<span id="cb134-19"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-19" aria-hidden="true" tabindex="-1"></a><span class="do">## 12    IV    Michael      B  104</span></span>
-<span id="cb134-20"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-20" aria-hidden="true" tabindex="-1"></a><span class="do">## 13     I      Sarah      B   88</span></span>
-<span id="cb134-21"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-21" aria-hidden="true" tabindex="-1"></a><span class="do">## 14    II      Sarah      A   88</span></span>
-<span id="cb134-22"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-22" aria-hidden="true" tabindex="-1"></a><span class="do">## 15   III      Sarah      D   98</span></span>
-<span id="cb134-23"><a href="modelli-anova-con-fattori-di-blocco.html#cb134-23" aria-hidden="true" tabindex="-1"></a><span class="do">## 16    IV      Sarah      C  106</span></span></code></pre></div>
 </div>
-<div id="definizione-di-un-modello-lineare-2" class="section level2" number="10.7">
-<h2><span class="header-section-number">10.7</span> Definizione di un modello lineare</h2>
-<p>In questo caso abbiamo un trattamento (metodo) e due effetti ‘blocco’ (tecnico e turno) da includere nel modello, che può essere così definito:</p>
-<p><span class="math display">\[Y_{ijk} = \mu + \gamma_k + \beta_j + \alpha_i + \varepsilon_{ijk}\]</span></p>
-<p>dove <span class="math inline">\(\mu\)</span> è l’intercetta, <span class="math inline">\(\gamma\)</span> è l’effetto del turno k, <span class="math inline">\(\beta\)</span> è l’effetto del tecnico j e <span class="math inline">\(\alpha\)</span> è l’effetto del metodo i. L’elemento <span class="math inline">\(\varepsilon_{ijk}\)</span> rappresenta la componente random individuale, di ogni osservazione e si assume normalmente distribuita, con media 0 e deviazione standard <span class="math inline">\(\sigma\)</span>.</p>
-<p>Avendo già illustrato il processo di stima dei parametri e di scomposizione della varianza e quindi utilizziamo subito R per il ‘model fitting’:</p>
-<div class="sourceCode" id="cb135"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb135-1"><a href="modelli-anova-con-fattori-di-blocco.html#cb135-1" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">&lt;-</span> <span class="fu">lm</span>(Time <span class="sc">~</span> Method <span class="sc">+</span> Technician</span>
-<span id="cb135-2"><a href="modelli-anova-con-fattori-di-blocco.html#cb135-2" aria-hidden="true" tabindex="-1"></a>          <span class="sc">+</span> Shift, <span class="at">data =</span> dataset)</span></code></pre></div>
-<p>Verifichiamo il rispetto delle assunzioni di base, con l’analisi grafica dei residui, riportata in Figura <a href="modelli-anova-con-fattori-di-blocco.html#fig:figName122">10.2</a> (il codice è analogo a quello fornito più sopra).</p>
-<div class="figure" style="text-align: center"><span id="fig:figName122"></span>
-<img src="_main_files/figure-html/figName122-1.png" alt="Analisi grafica dei residui per la prova di confronto tra metodi costruttivi" width="90%" />
-<p class="caption">
-Figure 10.2: Analisi grafica dei residui per la prova di confronto tra metodi costruttivi
-</p>
+<div id="capitolo-4" class="section level2" number="14.3">
+<h2><span class="header-section-number">14.3</span> Capitolo 4</h2>
+<div id="esercizio-1-2" class="section level3" number="14.3.1">
+<h3><span class="header-section-number">14.3.1</span> Esercizio 1</h3>
+<p>E’ data una distribuzione normale con <span class="math inline">\(\mu\)</span> = 23 e <span class="math inline">\(\sigma\)</span> = 1. Calcolare la probabilità di estrarre individui:</p>
+<ol style="list-style-type: decimal">
+<li>maggiori di 25</li>
+<li>minori di 21</li>
+<li>compresi tra 21 e 25</li>
+</ol>
 </div>
-<p>Non essendovi evidenti problemi, valutiamo la significatività degli effetti nel modello, analogamente a quanto abbiamo fatto nel caso dell’ANOVA a blocchi randomizzati. L’unica differenza sta nel fatto che, nei disegni a quadrato latino, vi sono tre effetti da testare, anche se l’unico ad avere una certa rilevanza è l’effetto del metodo di lavoro.</p>
-<div class="sourceCode" id="cb136"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb136-1"><a href="modelli-anova-con-fattori-di-blocco.html#cb136-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(mod)</span>
-<span id="cb136-2"><a href="modelli-anova-con-fattori-di-blocco.html#cb136-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Analysis of Variance Table</span></span>
-<span id="cb136-3"><a href="modelli-anova-con-fattori-di-blocco.html#cb136-3" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb136-4"><a href="modelli-anova-con-fattori-di-blocco.html#cb136-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Response: Time</span></span>
-<span id="cb136-5"><a href="modelli-anova-con-fattori-di-blocco.html#cb136-5" aria-hidden="true" tabindex="-1"></a><span class="do">##            Df Sum Sq Mean Sq F value    Pr(&gt;F)    </span></span>
-<span id="cb136-6"><a href="modelli-anova-con-fattori-di-blocco.html#cb136-6" aria-hidden="true" tabindex="-1"></a><span class="do">## Method      3 145.69  48.563 12.7377 0.0051808 ** </span></span>
-<span id="cb136-7"><a href="modelli-anova-con-fattori-di-blocco.html#cb136-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Technician  3  17.19   5.729  1.5027 0.3065491    </span></span>
-<span id="cb136-8"><a href="modelli-anova-con-fattori-di-blocco.html#cb136-8" aria-hidden="true" tabindex="-1"></a><span class="do">## Shift       3 467.19 155.729 40.8470 0.0002185 ***</span></span>
-<span id="cb136-9"><a href="modelli-anova-con-fattori-di-blocco.html#cb136-9" aria-hidden="true" tabindex="-1"></a><span class="do">## Residuals   6  22.87   3.812                      </span></span>
-<span id="cb136-10"><a href="modelli-anova-con-fattori-di-blocco.html#cb136-10" aria-hidden="true" tabindex="-1"></a><span class="do">## ---</span></span>
-<span id="cb136-11"><a href="modelli-anova-con-fattori-di-blocco.html#cb136-11" aria-hidden="true" tabindex="-1"></a><span class="do">## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span></code></pre></div>
-<p>Vediamo che esiste una differenza significativa tra i metodi e l’ipotesi nulla può essere rifiutata con una bassissima probabilità di errore di prima specie.</p>
-<p>Ovviamente, dopo aver eseguito un’ANOVA a blocchi randomizzati o a quadrato latino, andremo eventualmente ad eseguire un test di confronto multiplo, seguendo le raccomandazioni esposte nel capitolo precedente. Anche questa parte ve la lascio per esercizio.</p>
+<div id="esercizio-2-1" class="section level3" number="14.3.2">
+<h3><span class="header-section-number">14.3.2</span> Esercizio 2</h3>
+<p>E’ data una distribuzione normale con <span class="math inline">\(\mu\)</span> = 156 e <span class="math inline">\(\sigma\)</span> = 13. Calcolare la probabilità di estrarre individui:</p>
+<ol style="list-style-type: decimal">
+<li>maggiori di 170</li>
+<li>minori di 140</li>
+<li>compresi tra 140 e 170</li>
+</ol>
+</div>
+<div id="esercizio-3-1" class="section level3" number="14.3.3">
+<h3><span class="header-section-number">14.3.3</span> Esercizio 3</h3>
+<p>Un erbicida si degrada nel terreno seguendo una cinetica del primo ordine:</p>
+<p><span class="math display">\[Y = 100 \, e^{-0.07 \, t}\]</span></p>
+<p>dove Y è la concentrazione al tempo t. Dopo aver spruzzato questo erbicida, che probabilità abbiamo che dopo 50 giorni la concentrazione si sia abbassata al disotto della soglia di tossicità per i mammiferi (2 ng/g)? Tenere conto che lo strumento di misura produce un coefficiente di variabilità del 20%</p>
+</div>
+<div id="esercizio-4" class="section level3" number="14.3.4">
+<h3><span class="header-section-number">14.3.4</span> Esercizio 4</h3>
+<p>Una coltura produce in funzione della sua fittezza, secondo la seguente relazione:</p>
+<p><span class="math display">\[ Y = 8 + 8 \, X - 0.07 \, X^2\]</span></p>
+<p>Stabilire la fittezza necessaria per ottenere il massimo produttivo (graficamente o analiticamente). Valutare la probabilità di ottenere una produzione compresa tra 180 e 200 q/ha, seminando alla fittezza ottimale. Considerare che la variabilità stocastica è del 12%.</p>
+</div>
+<div id="esercizio-5" class="section level3" number="14.3.5">
+<h3><span class="header-section-number">14.3.5</span> Esercizio 5</h3>
+<p>La tossicità di un insetticida varia con la dose, secondo la legge log-logistica:</p>
+<p><span class="math display">\[ Y = \frac{1}{1 + exp\left\{ -2 \, \left[log(X) - log(15)\right] \right\}}\]</span>
+Dove Y è la proporzione di animali morti e X è la dose. Se trattiamo 150 insetti con una dose pari a 35 g, qual è la probabilità di trovare più di 120 morti? Considerare che la risposta è variabile da individuo ad individuo nella popolazione e questa variabilità può essere approssimata utilizzando una distribuzione gaussiana con un errore standard pari a 10.</p>
+</div>
+<div id="esercizio-6" class="section level3" number="14.3.6">
+<h3><span class="header-section-number">14.3.6</span> Esercizio 6</h3>
+<p>Simulare i risultati di un esperimento varietale, con sette varietà di frumento e quattro repliche. Considerare che il modello deterministico è un modello ANOVA, nel quale vengono definite le medie delle sette varietà (valori attesi). Decidere autonomamente sui parametri da impiegare per la simulazione (da <span class="math inline">\(\mu_1\)</span> a <span class="math inline">\(\mu_7\)</span> e <span class="math inline">\(\sigma\)</span>)</p>
+</div>
+<div id="esercizio-7" class="section level3" number="14.3.7">
+<h3><span class="header-section-number">14.3.7</span> Esercizio 7</h3>
+<p>Considerando il testo dell’esercizio 5, simulare un esperimento in cui l’insetticida viene utilizzato a cinque dosi crescenti, con quattro repliche.</p>
+<hr />
+</div>
+</div>
+<div id="capitolo-5" class="section level2" number="14.4">
+<h2><span class="header-section-number">14.4</span> Capitolo 5</h2>
+<div id="esercizio-1-3" class="section level3" number="14.4.1">
+<h3><span class="header-section-number">14.4.1</span> Esercizio 1</h3>
+<p>Dati i tre individui con misure di altezza pari a 140, 170 e 155, stimare i limiti di confidenza di <span class="math inline">\(\mu\)</span> (p <span class="math inline">\(&lt;\)</span> 0.05).</p>
+</div>
+<div id="esercizio-2-2" class="section level3" number="14.4.2">
+<h3><span class="header-section-number">14.4.2</span> Esercizio 2</h3>
+<p>Un campione di 400 insetti a cui è stato somministrato un certo insetticida mostra che 136 di essi sono sopravvissuti. Determinare un intervallo di confidenza con grado di fiducia del 95% per la proporzione della popolazione insensibile al trattamento.</p>
+<hr />
+</div>
+</div>
+<div id="chapter-6" class="section level2" number="14.5">
+<h2><span class="header-section-number">14.5</span> Chapter 6</h2>
+<div id="esercizio-1-4" class="section level3" number="14.5.1">
+<h3><span class="header-section-number">14.5.1</span> Esercizio 1</h3>
+<p>Uno sperimentatore ha impostato un esperimento verificare l’effetto di un fungicida (A) in confronto al testimone non trattato (B), in base al numero di colonie fungine sopravvissute. Il numero delle colonie trattate è di 200, mentre il numero di quelle non trattate è di 100. Le risposte (frequenze) sono come segue:</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="center">Morte</th>
+<th align="center">Sopravvissute</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A</td>
+<td align="center">180</td>
+<td align="center">20</td>
+</tr>
+<tr class="even">
+<td>B</td>
+<td align="center">50</td>
+<td align="center">50</td>
+</tr>
+</tbody>
+</table>
+<p>Stabilire se i risultati possono essere considerati significativamente diversi, per un livello di probabilità del 5%</p>
+</div>
+<div id="esercizio-2-3" class="section level3" number="14.5.2">
+<h3><span class="header-section-number">14.5.2</span> Esercizio 2</h3>
+<p>Uno sperimentatore ha impostato un esperimento per confrontare due tesi sperimentali (A, B). I risultati sono i seguenti (in q/ha):</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">A</th>
+<th align="center">B</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">9.3</td>
+<td align="center">12.6</td>
+</tr>
+<tr class="even">
+<td align="center">10.2</td>
+<td align="center">12.3</td>
+</tr>
+<tr class="odd">
+<td align="center">9.7</td>
+<td align="center">12.5</td>
+</tr>
+</tbody>
+</table>
+<p>Stabilire se i risultati per le tre tesi sperimentali possono essere considerati significativamente diversi, per un livello di probabilità del 5%.</p>
+</div>
+<div id="esercizio-3-2" class="section level3" number="14.5.3">
+<h3><span class="header-section-number">14.5.3</span> Esercizio 3</h3>
+<p>Uno sperimentatore ha impostato un esperimento per confrontare se l’effetto di un fungicida è significativo, in un disegno sperimentale con tre ripetizioni. Con ognuna delle due opzioni di trattamento i risultati produttivi sono i seguenti (in t/ha):</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">A</th>
+<th align="center">NT</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">65</td>
+<td align="center">54</td>
+</tr>
+<tr class="even">
+<td align="center">71</td>
+<td align="center">51</td>
+</tr>
+<tr class="odd">
+<td align="center">6.8</td>
+<td align="center">59</td>
+</tr>
+</tbody>
+</table>
+<p>E’significativo l’effetto del trattamento fungicida sulla produzione, per un livello di probabilità di errore del 5%?</p>
+</div>
+<div id="esercizio-4-1" class="section level3" number="14.5.4">
+<h3><span class="header-section-number">14.5.4</span> Esercizio 4</h3>
+<p>Immaginate di aver riscontrato che, in determinate condizioni ambientali, 60 olive su 75 sono attaccate da <em>Daucus olee</em> (mosca dell’olivo). Nelle stesse condizioni ambientali, diffondendo in campo un insetto predatore siamo riusciti a ridurre il numero di olive attaccate a 12 su 75. Si tratta di una oscillazione casuale del livello di attacco o possiamo concludere che l’insetto predatore è stato un mezzo efficace di lotta biologica alla mosca dell’olivo?</p>
+</div>
+<div id="esercizio-5-1" class="section level3" number="14.5.5">
+<h3><span class="header-section-number">14.5.5</span> Esercizio 5</h3>
+<p>In un ospedale, è stata misurata la concentrazione di colesterolo nel sangue di otto pazienti, prima e dopo un trattamento medico. Per ogni paziente, sono stati analizzati due campioni, ottenendo le seguenti concentrazioni:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="right">Paziente</th>
+<th align="right">Prima</th>
+<th align="center">Dopo</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">167.3</td>
+<td align="center">166.7</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">186.7</td>
+<td align="center">184.2</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="right">107.0</td>
+<td align="center">104.9</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="right">214.5</td>
+<td align="center">205.3</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="right">149.5</td>
+<td align="center">148.5</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="right">171.5</td>
+<td align="center">157.3</td>
+</tr>
+<tr class="odd">
+<td align="right">7</td>
+<td align="right">161.5</td>
+<td align="center">149.4</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="right">243.6</td>
+<td align="center">241.5</td>
+</tr>
+</tbody>
+</table>
+<p>Si può concludere che il trattamento medico è stato efficace?</p>
+<hr />
+</div>
+</div>
+<div id="capitoli-da-7-a-9" class="section level2" number="14.6">
+<h2><span class="header-section-number">14.6</span> Capitoli da 7 a 9</h2>
+<div id="esercizio-1-5" class="section level3" number="14.6.1">
+<h3><span class="header-section-number">14.6.1</span> Esercizio 1</h3>
+<p>Un esperimento a randomizzazione completa relativo ad una prova varietale di frumento ha l’obiettivo di porre a confronto la produzione di 5 varietà. Le produzioni (in bushels per acre) osservate siano le seguenti:</p>
+<table>
+<tbody>
+<tr class="odd">
+<td align="center">Variety</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">3</td>
+</tr>
+<tr class="even">
+<td align="center">A</td>
+<td align="center">32.4</td>
+<td align="center">34.3</td>
+<td align="center">37.3</td>
+</tr>
+<tr class="odd">
+<td align="center">B</td>
+<td align="center">20.2</td>
+<td align="center">27.5</td>
+<td align="center">25.9</td>
+</tr>
+<tr class="even">
+<td align="center">C</td>
+<td align="center">29.2</td>
+<td align="center">27.8</td>
+<td align="center">30.2</td>
+</tr>
+<tr class="odd">
+<td align="center">D</td>
+<td align="center">12.8</td>
+<td align="center">12.3</td>
+<td align="center">14.8</td>
+</tr>
+<tr class="even">
+<td align="center">E</td>
+<td align="center">21.7</td>
+<td align="center">24.5</td>
+<td align="center">23.4</td>
+</tr>
+</tbody>
+</table>
+<p>Eseguire l’ANOVA, presentare i risultati e commentarli (esempio tratto da Le Clerg <em>et al</em>., 1962)</p>
+</div>
+<div id="esercizio-2-4" class="section level3" number="14.6.2">
+<h3><span class="header-section-number">14.6.2</span> Esercizio 2</h3>
+<p>Colture di tessuto di pomodoro sono state allevate su capsule Petri trattate con una diversa concentrazione di zuccheri, utilizzando cinque repliche. La crescita colturale è riportata in tabella</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Control</th>
+<th align="center">Glucose</th>
+<th align="center">Fructose</th>
+<th align="center">Sucrose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">45</td>
+<td align="center">25</td>
+<td align="center">28</td>
+<td align="center">31</td>
+</tr>
+<tr class="even">
+<td align="center">39</td>
+<td align="center">28</td>
+<td align="center">31</td>
+<td align="center">37</td>
+</tr>
+<tr class="odd">
+<td align="center">40</td>
+<td align="center">30</td>
+<td align="center">24</td>
+<td align="center">35</td>
+</tr>
+<tr class="even">
+<td align="center">45</td>
+<td align="center">29</td>
+<td align="center">28</td>
+<td align="center">33</td>
+</tr>
+<tr class="odd">
+<td align="center">42</td>
+<td align="center">33</td>
+<td align="center">27</td>
+<td align="center">34</td>
+</tr>
+</tbody>
+</table>
+<p>Calcolare le medie ed eseguire l’ANOVA. Eseguire i test di confronto multiplo. Commentare i risultati.</p>
+</div>
+<div id="esercizio-3-3" class="section level3" number="14.6.3">
+<h3><span class="header-section-number">14.6.3</span> Esercizio 3</h3>
+<p>E’stato impostato un test di durata su un impianto di riscaldamento, per verificare come la temperatura di esercizio influenza la durata del riscaldatore. Sono state testate 4 temperature, con sei repliche e, per ciascun riscaldatore, è stato rilevato il numero di ore prima della rottura. I risultati sono i seguenti:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="right">Temp.</th>
+<th align="right">Hours to failure</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1520</td>
+<td align="right">1953</td>
+</tr>
+<tr class="even">
+<td align="right">1520</td>
+<td align="right">2135</td>
+</tr>
+<tr class="odd">
+<td align="right">1520</td>
+<td align="right">2471</td>
+</tr>
+<tr class="even">
+<td align="right">1520</td>
+<td align="right">4727</td>
+</tr>
+<tr class="odd">
+<td align="right">1520</td>
+<td align="right">6134</td>
+</tr>
+<tr class="even">
+<td align="right">1520</td>
+<td align="right">6314</td>
+</tr>
+<tr class="odd">
+<td align="right">1620</td>
+<td align="right">1190</td>
+</tr>
+<tr class="even">
+<td align="right">1620</td>
+<td align="right">1286</td>
+</tr>
+<tr class="odd">
+<td align="right">1620</td>
+<td align="right">1550</td>
+</tr>
+<tr class="even">
+<td align="right">1620</td>
+<td align="right">2125</td>
+</tr>
+<tr class="odd">
+<td align="right">1620</td>
+<td align="right">2557</td>
+</tr>
+<tr class="even">
+<td align="right">1620</td>
+<td align="right">2845</td>
+</tr>
+<tr class="odd">
+<td align="right">1660</td>
+<td align="right">651</td>
+</tr>
+<tr class="even">
+<td align="right">1660</td>
+<td align="right">837</td>
+</tr>
+<tr class="odd">
+<td align="right">1660</td>
+<td align="right">848</td>
+</tr>
+<tr class="even">
+<td align="right">1660</td>
+<td align="right">1038</td>
+</tr>
+<tr class="odd">
+<td align="right">1660</td>
+<td align="right">1361</td>
+</tr>
+<tr class="even">
+<td align="right">1660</td>
+<td align="right">1543</td>
+</tr>
+<tr class="odd">
+<td align="right">1708</td>
+<td align="right">511</td>
+</tr>
+<tr class="even">
+<td align="right">1708</td>
+<td align="right">651</td>
+</tr>
+<tr class="odd">
+<td align="right">1708</td>
+<td align="right">651</td>
+</tr>
+<tr class="even">
+<td align="right">1708</td>
+<td align="right">652</td>
+</tr>
+<tr class="odd">
+<td align="right">1708</td>
+<td align="right">688</td>
+</tr>
+<tr class="even">
+<td align="right">1708</td>
+<td align="right">729</td>
+</tr>
+</tbody>
+</table>
+<p>Valutare se la temperatura di esercizio infleunza significativamente la durata del riscaldatore</p>
+</div>
+<div id="esercizio-4-2" class="section level3" number="14.6.4">
+<h3><span class="header-section-number">14.6.4</span> Esercizio 4</h3>
+<p>Un entomologo ha contato il numero di uova deposte da un lepidottero sulle foglie di tre varietà di tabacco, valutando 15 femmine per varietà. I risultati sono i seguenti:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="right">Female</th>
+<th align="right">Field</th>
+<th align="right">Resistant</th>
+<th align="right">USDA</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">211</td>
+<td align="right">0</td>
+<td align="right">448</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">276</td>
+<td align="right">9</td>
+<td align="right">906</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="right">415</td>
+<td align="right">143</td>
+<td align="right">28</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="right">787</td>
+<td align="right">1</td>
+<td align="right">277</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="right">18</td>
+<td align="right">26</td>
+<td align="right">634</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="right">118</td>
+<td align="right">127</td>
+<td align="right">48</td>
+</tr>
+<tr class="odd">
+<td align="right">7</td>
+<td align="right">1</td>
+<td align="right">161</td>
+<td align="right">369</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="right">151</td>
+<td align="right">294</td>
+<td align="right">137</td>
+</tr>
+<tr class="odd">
+<td align="right">9</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">29</td>
+</tr>
+<tr class="even">
+<td align="right">10</td>
+<td align="right">253</td>
+<td align="right">348</td>
+<td align="right">522</td>
+</tr>
+<tr class="odd">
+<td align="right">11</td>
+<td align="right">61</td>
+<td align="right">0</td>
+<td align="right">319</td>
+</tr>
+<tr class="even">
+<td align="right">12</td>
+<td align="right">0</td>
+<td align="right">14</td>
+<td align="right">242</td>
+</tr>
+<tr class="odd">
+<td align="right">13</td>
+<td align="right">275</td>
+<td align="right">21</td>
+<td align="right">261</td>
+</tr>
+<tr class="even">
+<td align="right">14</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">566</td>
+</tr>
+<tr class="odd">
+<td align="right">15</td>
+<td align="right">153</td>
+<td align="right">218</td>
+<td align="right">734</td>
+</tr>
+</tbody>
+</table>
+<p>Eseguite l’ANOVA. Quali sono le assunzioni necessarie per l’ANOVA? Sono rispettate? Vi sono outliers? Calcolate SEM e SED in modo attendibile.</p>
+<hr />
+</div>
+</div>
+<div id="capitolo-10" class="section level2" number="14.7">
+<h2><span class="header-section-number">14.7</span> Capitolo 10</h2>
+<div id="esercizio-1-6" class="section level3" number="14.7.1">
+<h3><span class="header-section-number">14.7.1</span> Esercizio 1</h3>
+<p>E’ stato impostanto un esperimento a blocchi randomizzati per confrontare sei tipi di irrigazione, in un aranceto della Spagna. I risultati sono i seguenti (in pounds per parcella):</p>
+<table>
+<thead>
+<tr class="header">
+<th align="right">Metodo</th>
+<th align="right">1</th>
+<th align="right">2</th>
+<th align="right">3</th>
+<th align="right">4</th>
+<th align="right">5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">Goccia</td>
+<td align="right">438</td>
+<td align="right">413</td>
+<td align="right">375</td>
+<td align="right">127</td>
+<td align="right">320</td>
+</tr>
+<tr class="even">
+<td align="right">Conche</td>
+<td align="right">413</td>
+<td align="right">398</td>
+<td align="right">348</td>
+<td align="right">112</td>
+<td align="right">297</td>
+</tr>
+<tr class="odd">
+<td align="right">Aspersione</td>
+<td align="right">346</td>
+<td align="right">334</td>
+<td align="right">281</td>
+<td align="right">43</td>
+<td align="right">231</td>
+</tr>
+<tr class="even">
+<td align="right">Aspersione+goccia</td>
+<td align="right">335</td>
+<td align="right">321</td>
+<td align="right">267</td>
+<td align="right">33</td>
+<td align="right">219</td>
+</tr>
+<tr class="odd">
+<td align="right">Sommersione</td>
+<td align="right">403</td>
+<td align="right">380</td>
+<td align="right">336</td>
+<td align="right">101</td>
+<td align="right">293</td>
+</tr>
+</tbody>
+</table>
+<p>Eseguire l’ANOVA. Quali sono le assunzioni necessarie per l’ANOVA? Sono rispettate? Calcolate SEM e SED ed eseguite il confronto multiplo. Qual è il metodo di irrigazione migliore?</p>
+</div>
+<div id="esercizio-2-5" class="section level3" number="14.7.2">
+<h3><span class="header-section-number">14.7.2</span> Esercizio 2</h3>
+<p>E’ stato impostato un esperimento di fertilizzazione secondo uno schema a blocchi randomizzati. I dati ottenuti sono i contenuti percentuali (moltiplicati per 100) in fosforo, in un campione di tessuti vegetali prelevato per parcella:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="right">Trattamento</th>
+<th align="right">1</th>
+<th align="right">2</th>
+<th align="right">3</th>
+<th align="right">4</th>
+<th align="right">5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">Non fertilizzato</td>
+<td align="right">5.6</td>
+<td align="right">6.1</td>
+<td align="right">5.3</td>
+<td align="right">5.9</td>
+<td align="right">7.4</td>
+</tr>
+<tr class="even">
+<td align="right">50 lb N</td>
+<td align="right">7.3</td>
+<td align="right">NA</td>
+<td align="right">7.7</td>
+<td align="right">7.7</td>
+<td align="right">7.0</td>
+</tr>
+<tr class="odd">
+<td align="right">100 lb N</td>
+<td align="right">6.9</td>
+<td align="right">6</td>
+<td align="right">5.6</td>
+<td align="right">7.4</td>
+<td align="right">8.2</td>
+</tr>
+<tr class="even">
+<td align="right">50 lb N + 75 lb P2O5</td>
+<td align="right">10.8</td>
+<td align="right">11.2</td>
+<td align="right">8.8</td>
+<td align="right">12.9</td>
+<td align="right">10.4</td>
+</tr>
+<tr class="odd">
+<td align="right">100 lb N + 75 lb P205</td>
+<td align="right">9.6</td>
+<td align="right">9.3</td>
+<td align="right">12</td>
+<td align="right">10.6</td>
+<td align="right">11.6</td>
+</tr>
+</tbody>
+</table>
+<p>Eseguire l’ANOVA, considerando il dato mancante. Calcolare SEM e SED. Qual è il trattamento migliore? Aumentare il dosaggio di N senza P2O5 è conveniente? E in presenza di P2O5?</p>
+</div>
+<div id="esercizio-3-4" class="section level3" number="14.7.3">
+<h3><span class="header-section-number">14.7.3</span> Esercizio 3</h3>
+<p>È stato condotto un esperimento a quadrato latino per valutare l’effetto di quattro diversi metodi di fertilizzazione. Sono stati osservati i seguenti risultati:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="right">Fertiliser</th>
+<th align="center">Row</th>
+<th align="center">Column</th>
+<th align="center">Yield</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">A</td>
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">104</td>
+</tr>
+<tr class="even">
+<td align="right">B</td>
+<td align="center">1</td>
+<td align="center">2</td>
+<td align="center">114</td>
+</tr>
+<tr class="odd">
+<td align="right">C</td>
+<td align="center">1</td>
+<td align="center">3</td>
+<td align="center">90</td>
+</tr>
+<tr class="even">
+<td align="right">D</td>
+<td align="center">1</td>
+<td align="center">4</td>
+<td align="center">140</td>
+</tr>
+<tr class="odd">
+<td align="right">A</td>
+<td align="center">2</td>
+<td align="center">4</td>
+<td align="center">134</td>
+</tr>
+<tr class="even">
+<td align="right">B</td>
+<td align="center">2</td>
+<td align="center">3</td>
+<td align="center">130</td>
+</tr>
+<tr class="odd">
+<td align="right">C</td>
+<td align="center">2</td>
+<td align="center">1</td>
+<td align="center">144</td>
+</tr>
+<tr class="even">
+<td align="right">D</td>
+<td align="center">2</td>
+<td align="center">2</td>
+<td align="center">174</td>
+</tr>
+<tr class="odd">
+<td align="right">A</td>
+<td align="center">3</td>
+<td align="center">3</td>
+<td align="center">146</td>
+</tr>
+<tr class="even">
+<td align="right">B</td>
+<td align="center">3</td>
+<td align="center">4</td>
+<td align="center">142</td>
+</tr>
+<tr class="odd">
+<td align="right">C</td>
+<td align="center">3</td>
+<td align="center">2</td>
+<td align="center">152</td>
+</tr>
+<tr class="even">
+<td align="right">D</td>
+<td align="center">3</td>
+<td align="center">1</td>
+<td align="center">156</td>
+</tr>
+<tr class="odd">
+<td align="right">A</td>
+<td align="center">4</td>
+<td align="center">2</td>
+<td align="center">147</td>
+</tr>
+<tr class="even">
+<td align="right">B</td>
+<td align="center">4</td>
+<td align="center">1</td>
+<td align="center">160</td>
+</tr>
+<tr class="odd">
+<td align="right">C</td>
+<td align="center">4</td>
+<td align="center">4</td>
+<td align="center">160</td>
+</tr>
+<tr class="even">
+<td align="right">D</td>
+<td align="center">4</td>
+<td align="center">3</td>
+<td align="center">163</td>
+</tr>
+</tbody>
+</table>
+<p>Analizzate i dati e commentate i risultati ottenuti</p>
+<hr />
+</div>
+</div>
+<div id="capitoli-11-e-12" class="section level2" number="14.8">
+<h2><span class="header-section-number">14.8</span> Capitoli 11 e 12</h2>
+<div id="esercizio-1-7" class="section level3" number="14.8.1">
+<h3><span class="header-section-number">14.8.1</span> Esercizio 1</h3>
+<p>La biologia di <em>Sorghum halepense</em> da rizoma mostra che il peso dei rizomi raggiunge un minimo intorno alla quarta foglia. Di conseguenza, eseguire un trattamento in quest’epoca dovrebbe minimizzare le possibilità di ripresa degli individui trattati, portando anche ad un certo risanamento del terreno. Tuttavia, ci si attende che gli effetti siano maggiori quando le piante provengono da rizomi più piccoli, con un minor contenuto di sostanze di riserva. Per affrontare questi argomenti è stata organizzata una prova in vaso, secondo un disegno a randomizzazione completa con quattro repliche. I risultati sono i seguenti:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Sizes ↓ / Timing →</th>
+<th align="center">2-3</th>
+<th align="center">4-5</th>
+<th align="center">6-7</th>
+<th align="center">8-9</th>
+<th align="center">3-4/8-9</th>
+<th align="center">Untreated</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">2-nodes</td>
+<td align="center">34.03</td>
+<td align="center">0.10</td>
+<td align="center">30.91</td>
+<td align="center">33.21</td>
+<td align="center">2.89</td>
+<td align="center">41.63</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="center">22.31</td>
+<td align="center">6.08</td>
+<td align="center">35.34</td>
+<td align="center">43.44</td>
+<td align="center">19.06</td>
+<td align="center">22.96</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="center">21.70</td>
+<td align="center">3.73</td>
+<td align="center">24.23</td>
+<td align="center">44.06</td>
+<td align="center">0.10</td>
+<td align="center">52.14</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="center">14.90</td>
+<td align="center">9.15</td>
+<td align="center">28.27</td>
+<td align="center">35.34</td>
+<td align="center">0.68</td>
+<td align="center">59.81</td>
+</tr>
+<tr class="odd">
+<td align="left">4-nodes</td>
+<td align="center">42.19</td>
+<td align="center">14.86</td>
+<td align="center">52.34</td>
+<td align="center">39.06</td>
+<td align="center">8.62</td>
+<td align="center">68.15</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="center">51.06</td>
+<td align="center">36.03</td>
+<td align="center">43.17</td>
+<td align="center">61.59</td>
+<td align="center">0.05</td>
+<td align="center">42.75</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="center">43.77</td>
+<td align="center">21.85</td>
+<td align="center">57.28</td>
+<td align="center">48.89</td>
+<td align="center">0.10</td>
+<td align="center">57.77</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="center">31.74</td>
+<td align="center">8.71</td>
+<td align="center">29.71</td>
+<td align="center">49.14</td>
+<td align="center">9.65</td>
+<td align="center">44.85</td>
+</tr>
+<tr class="odd">
+<td align="left">6-nodes</td>
+<td align="center">20.84</td>
+<td align="center">11.37</td>
+<td align="center">55.00</td>
+<td align="center">41.77</td>
+<td align="center">9.80</td>
+<td align="center">43.20</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="center">26.12</td>
+<td align="center">2.24</td>
+<td align="center">28.46</td>
+<td align="center">37.38</td>
+<td align="center">0.10</td>
+<td align="center">40.68</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="center">35.24</td>
+<td align="center">14.17</td>
+<td align="center">21.81</td>
+<td align="center">39.55</td>
+<td align="center">1.42</td>
+<td align="center">34.11</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="center">13.32</td>
+<td align="center">23.93</td>
+<td align="center">60.72</td>
+<td align="center">48.37</td>
+<td align="center">6.83</td>
+<td align="center">32.21</td>
+</tr>
+</tbody>
+</table>
+<p>Eseguite l’ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente.</p>
+</div>
+<div id="esercizio-2-6" class="section level3" number="14.8.2">
+<h3><span class="header-section-number">14.8.2</span> Esercizio 2</h3>
+<p>Un agronomo ha organizzato un confronto varietale in favino, considerando due epoche di semina: autunnale e primaverile. E’ stato utilizzato un disegno a blocchi randomizzati e a parcella suddivisa, con le epoche di semina nelle parcelle principali e le varietà nelle sub-parcelle. I risultati sono i seguenti:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Sowing Time</th>
+<th align="right">Genotype</th>
+<th align="center">1</th>
+<th align="center">2</th>
+<th align="center">3</th>
+<th align="center">4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Autum</td>
+<td align="right">Chiaro</td>
+<td align="center">4.36</td>
+<td align="center">4.00</td>
+<td align="center">4.23</td>
+<td align="center">3.83</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="right">Collameno</td>
+<td align="center">3.01</td>
+<td align="center">3.32</td>
+<td align="center">3.27</td>
+<td align="center">3.40</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="right">Palombino</td>
+<td align="center">3.85</td>
+<td align="center">3.85</td>
+<td align="center">3.68</td>
+<td align="center">3.98</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="right">Scuro</td>
+<td align="center">4.97</td>
+<td align="center">3.98</td>
+<td align="center">4.39</td>
+<td align="center">4.14</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="right">Sicania</td>
+<td align="center">4.38</td>
+<td align="center">4.01</td>
+<td align="center">3.94</td>
+<td align="center">2.99</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="right">Vesuvio</td>
+<td align="center">3.94</td>
+<td align="center">4.47</td>
+<td align="center">3.93</td>
+<td align="center">4.21</td>
+</tr>
+<tr class="odd">
+<td align="left">Spring</td>
+<td align="right">Chiaro</td>
+<td align="center">2.76</td>
+<td align="center">2.64</td>
+<td align="center">2.25</td>
+<td align="center">2.38</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="right">Collameno</td>
+<td align="center">2.50</td>
+<td align="center">1.79</td>
+<td align="center">1.57</td>
+<td align="center">1.77</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="right">Palombino</td>
+<td align="center">2.24</td>
+<td align="center">2.21</td>
+<td align="center">2.50</td>
+<td align="center">2.05</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="right">Scuro</td>
+<td align="center">3.45</td>
+<td align="center">2.94</td>
+<td align="center">3.12</td>
+<td align="center">2.69</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="right">Sicania</td>
+<td align="center">3.24</td>
+<td align="center">3.60</td>
+<td align="center">3.16</td>
+<td align="center">3.08</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="right">Vesuvio</td>
+<td align="center">2.34</td>
+<td align="center">2.44</td>
+<td align="center">1.71</td>
+<td align="center">2.00</td>
+</tr>
+</tbody>
+</table>
+<p>Eseguite l’ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente.</p>
+</div>
+<div id="exercise-3" class="section level3" number="14.8.3">
+<h3><span class="header-section-number">14.8.3</span> Exercise 3</h3>
+<p>Gli erbicidi mostrano sempre un certo grado di persistenza nel terreno. Di conseguenza, se la coltura fallisce subito dopo il diserbo, la scelta delle colture di sostituzione può essere condizionata dal diserbo già eseguito. Per questo motivo, è stato impostato un esperimento di pieno campo volto a valutare se tre erbicidi del mais (rimsulfuron, imazethapyr and primisulfuron) erano in grado di danneggiare quattro colture (soia, girasole, rapa e sorgo) seminate 20 giorni dopo il trattamento. Gli erbicidi sono stati distribuiti su terreno nudo, seguendo un disegno a blocchi randomizzati, su parcelle di elevate dimensioni. Per ogni blocco, la semina è stata eseguita su strisce trasversali, perpendicolari ai trattamenti eseguiti (schema a strip-plot). I risultati sono i seguenti:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Herbidicide</th>
+<th align="center">Block</th>
+<th align="center">sorghum</th>
+<th align="center">rape</th>
+<th align="center">soyabean</th>
+<th align="center">sunflower</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Untreated</td>
+<td align="center">1</td>
+<td align="center">180</td>
+<td align="center">157</td>
+<td align="center">199</td>
+<td align="center">201</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="center">2</td>
+<td align="center">236</td>
+<td align="center">111</td>
+<td align="center">257</td>
+<td align="center">358</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="center">3</td>
+<td align="center">287</td>
+<td align="center">217</td>
+<td align="center">346</td>
+<td align="center">435</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="center">4</td>
+<td align="center">350</td>
+<td align="center">170</td>
+<td align="center">211</td>
+<td align="center">327</td>
+</tr>
+<tr class="odd">
+<td align="left">Imazethapyr</td>
+<td align="center">1</td>
+<td align="center">47</td>
+<td align="center">10</td>
+<td align="center">193</td>
+<td align="center">51</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="center">2</td>
+<td align="center">43</td>
+<td align="center">1</td>
+<td align="center">113</td>
+<td align="center">4</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="center">3</td>
+<td align="center">0</td>
+<td align="center">20</td>
+<td align="center">187</td>
+<td align="center">13</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="center">4</td>
+<td align="center">3</td>
+<td align="center">21</td>
+<td align="center">122</td>
+<td align="center">15</td>
+</tr>
+<tr class="odd">
+<td align="left">primisulfuron</td>
+<td align="center">1</td>
+<td align="center">271</td>
+<td align="center">8</td>
+<td align="center">335</td>
+<td align="center">379</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="center">2</td>
+<td align="center">182</td>
+<td align="center">0</td>
+<td align="center">201</td>
+<td align="center">201</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="center">3</td>
+<td align="center">283</td>
+<td align="center">22</td>
+<td align="center">206</td>
+<td align="center">307</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="center">4</td>
+<td align="center">147</td>
+<td align="center">24</td>
+<td align="center">240</td>
+<td align="center">337</td>
+</tr>
+<tr class="odd">
+<td align="left">rimsulfuron</td>
+<td align="center">1</td>
+<td align="center">403</td>
+<td align="center">238</td>
+<td align="center">226</td>
+<td align="center">290</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="center">2</td>
+<td align="center">227</td>
+<td align="center">169</td>
+<td align="center">195</td>
+<td align="center">494</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="center">3</td>
+<td align="center">400</td>
+<td align="center">364</td>
+<td align="center">257</td>
+<td align="center">397</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="center">4</td>
+<td align="center">171</td>
+<td align="center">134</td>
+<td align="center">137</td>
+<td align="center">180</td>
+</tr>
+</tbody>
+</table>
+<p>Eseguite l’ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente.</p>
+</div>
+<div id="esercizio-4-3" class="section level3" number="14.8.4">
+<h3><span class="header-section-number">14.8.4</span> Esercizio 4</h3>
+<p>E’ stato condotto un esperimento parcellare per valutare l’interazione tra il momento dell’applicazione dell’azoto al terreno (early, optimum, late) e due livelli di un inibitore della nitrificazione (none, 5 lb/acre). L’inibitore ritarda la nitrificazione e riduce le perdite per lisciviazione profonda. L’azoto è stato somministrato in forma marcata (<span class="math inline">\(^{15}\)</span>N) e i dati raccolti riguardano la percentuale di azoto assorbito dalla pianta.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Genotype</th>
+<th align="center">Block</th>
+<th align="center">Early</th>
+<th align="center">Med</th>
+<th align="center">Late</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">A</td>
+<td align="center">1</td>
+<td align="center">21.4</td>
+<td align="center">50.8</td>
+<td align="center">53.2</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="center">2</td>
+<td align="center">11.3</td>
+<td align="center">42.7</td>
+<td align="center">44.8</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="center">3</td>
+<td align="center">34.9</td>
+<td align="center">61.8</td>
+<td align="center">57.8</td>
+</tr>
+<tr class="even">
+<td align="left">B</td>
+<td align="center">1</td>
+<td align="center">54.8</td>
+<td align="center">56.9</td>
+<td align="center">57.7</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="center">2</td>
+<td align="center">47.9</td>
+<td align="center">46.8</td>
+<td align="center">54.0</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="center">3</td>
+<td align="center">40.1</td>
+<td align="center">57.9</td>
+<td align="center">62.0</td>
+</tr>
+</tbody>
+</table>
+<p>Analizzare i dati e commentare i risultati</p>
+</div>
+<div id="esercizio-5-2" class="section level3" number="14.8.5">
+<h3><span class="header-section-number">14.8.5</span> Esercizio 5</h3>
+<p>E’ stato organizzato un esperimento per valutare l’effetto della temperatura di lavaggio sulla riduzione di lunghezza di alcuni tessuti. I risultati sono espressi in percentuale di riduzione e sono stati ottenuti in un disegno sperimentale a randomizzazione completa, con quattro tessuti e altrettante temperature.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Fabric</th>
+<th align="center">210 °F</th>
+<th align="center">215 °F</th>
+<th align="center">220 °F</th>
+<th align="center">225 °F</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">A</td>
+<td align="center">1.8</td>
+<td align="center">2.0</td>
+<td align="center">4.6</td>
+<td align="center">7.5</td>
+</tr>
+<tr class="even">
+<td align="center"></td>
+<td align="center">2.1</td>
+<td align="center">2.1</td>
+<td align="center">5.0</td>
+<td align="center">7.9</td>
+</tr>
+<tr class="odd">
+<td align="center">B</td>
+<td align="center">2.2</td>
+<td align="center">4.2</td>
+<td align="center">5.4</td>
+<td align="center">9.8</td>
+</tr>
+<tr class="even">
+<td align="center"></td>
+<td align="center">2.4</td>
+<td align="center">4.0</td>
+<td align="center">5.6</td>
+<td align="center">9.2</td>
+</tr>
+<tr class="odd">
+<td align="center">C</td>
+<td align="center">2.8</td>
+<td align="center">4.4</td>
+<td align="center">8.7</td>
+<td align="center">13.2</td>
+</tr>
+<tr class="even">
+<td align="center"></td>
+<td align="center">3.2</td>
+<td align="center">4.8</td>
+<td align="center">8.4</td>
+<td align="center">13.0</td>
+</tr>
+<tr class="odd">
+<td align="center">D</td>
+<td align="center">3.2</td>
+<td align="center">3.3</td>
+<td align="center">5.7</td>
+<td align="center">10.9</td>
+</tr>
+<tr class="even">
+<td align="center"></td>
+<td align="center">3.6</td>
+<td align="center">3.5</td>
+<td align="center">5.8</td>
+<td align="center">11.1</td>
+</tr>
+</tbody>
+</table>
+<p>Analizzare i dati e commentare i risultati</p>
+</div>
+<div id="esercizio-6-1" class="section level3" number="14.8.6">
+<h3><span class="header-section-number">14.8.6</span> Esercizio 6</h3>
+<p>Un processo di sintesi chimica prevede due reazioni, la prima richiede un alcool e la seconda richiede una base. Viene impostato un esperimento fattoriale 3 x 2, con tre alcools e due basi, con uno schema sperimentale completamente randomizzato a quattro repliche. Quali sono le vostre raccomandazioni per la prima e la seconda reazione, sulla base dei risultati dell’esperimento. La variabile rilevata mostra la produzione percentuale del processo.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Base</th>
+<th align="center">Alcohol 1</th>
+<th align="center">Alcohol 2</th>
+<th align="center">Alcohol 3</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">A</td>
+<td align="center">91.3</td>
+<td align="center">89.9</td>
+<td align="center">89.3</td>
+</tr>
+<tr class="even">
+<td align="center"></td>
+<td align="center">88.1</td>
+<td align="center">89.5</td>
+<td align="center">87.6</td>
+</tr>
+<tr class="odd">
+<td align="center"></td>
+<td align="center">90.7</td>
+<td align="center">91.4</td>
+<td align="center">90.4</td>
+</tr>
+<tr class="even">
+<td align="center"></td>
+<td align="center">91.4</td>
+<td align="center">88.3</td>
+<td align="center">90.3</td>
+</tr>
+<tr class="odd">
+<td align="center">B</td>
+<td align="center">87.3</td>
+<td align="center">89.4</td>
+<td align="center">92.3</td>
+</tr>
+<tr class="even">
+<td align="center"></td>
+<td align="center">91.5</td>
+<td align="center">93.1</td>
+<td align="center">90.7</td>
+</tr>
+<tr class="odd">
+<td align="center"></td>
+<td align="center">91.5</td>
+<td align="center">88.3</td>
+<td align="center">90.6</td>
+</tr>
+<tr class="even">
+<td align="center"></td>
+<td align="center">94.7</td>
+<td align="center">91.5</td>
+<td align="center">89.8</td>
+</tr>
+</tbody>
+</table>
+<p>Analizzare i dati e commentare i risultati</p>
+<hr />
+</div>
+</div>
+<div id="capitolo-13" class="section level2" number="14.9">
+<h2><span class="header-section-number">14.9</span> Capitolo 13</h2>
+<div id="exercise-1" class="section level3" number="14.9.1">
+<h3><span class="header-section-number">14.9.1</span> Exercise 1</h3>
+<p>È stato condotto uno studio per verificare l’effetto della concimazione azotata sulla lattuga, utilizzando uno schema a blocchi randomizzati. I risultat sono i seguenti:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">N level</th>
+<th align="center">B1</th>
+<th align="center">B2</th>
+<th align="center">B3</th>
+<th align="center">B4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">0</td>
+<td align="center">124</td>
+<td align="center">114</td>
+<td align="center">109</td>
+<td align="center">124</td>
+</tr>
+<tr class="even">
+<td align="center">50</td>
+<td align="center">134</td>
+<td align="center">120</td>
+<td align="center">114</td>
+<td align="center">134</td>
+</tr>
+<tr class="odd">
+<td align="center">100</td>
+<td align="center">146</td>
+<td align="center">132</td>
+<td align="center">122</td>
+<td align="center">146</td>
+</tr>
+<tr class="even">
+<td align="center">150</td>
+<td align="center">157</td>
+<td align="center">150</td>
+<td align="center">140</td>
+<td align="center">163</td>
+</tr>
+<tr class="odd">
+<td align="center">200</td>
+<td align="center">163</td>
+<td align="center">156</td>
+<td align="center">156</td>
+<td align="center">171</td>
+</tr>
+</tbody>
+</table>
+<p>Analizzare i dati e commentare i risultati</p>
+</div>
+<div id="esercizio-2-7" class="section level3" number="14.9.2">
+<h3><span class="header-section-number">14.9.2</span> Esercizio 2</h3>
+<p>Per valutare la soglia economica d’intervento, è necessario definire la relazione tra la densità di una pianta infestante e la perdita produttiva della coltura. Ipotizziamo che, nel range di densità osservato, il modello di competizione sia una retta. Per parametrizzare questo modello e verificarne la validità, è stato organizzato un esperimento a blocchi randomizzati, dove sono stati inclusi sette diversi livelli di infestazione di <em>Sinapis arvensis</em> ed è stata rilevata la produzione di acheni del girasole. I risultati sono:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">density</th>
+<th align="right">Rep y</th>
+<th align="left">ield</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">0</td>
+<td align="right">1</td>
+<td align="left">36.63</td>
+</tr>
+<tr class="even">
+<td align="center">14</td>
+<td align="right">1</td>
+<td align="left">29.73</td>
+</tr>
+<tr class="odd">
+<td align="center">19</td>
+<td align="right">1</td>
+<td align="left">32.12</td>
+</tr>
+<tr class="even">
+<td align="center">28</td>
+<td align="right">1</td>
+<td align="left">30.61</td>
+</tr>
+<tr class="odd">
+<td align="center">32</td>
+<td align="right">1</td>
+<td align="left">27.7</td>
+</tr>
+<tr class="even">
+<td align="center">38</td>
+<td align="right">1</td>
+<td align="left">27.43</td>
+</tr>
+<tr class="odd">
+<td align="center">54</td>
+<td align="right">1</td>
+<td align="left">24.79</td>
+</tr>
+<tr class="even">
+<td align="center">0</td>
+<td align="right">2</td>
+<td align="left">36.11</td>
+</tr>
+<tr class="odd">
+<td align="center">14</td>
+<td align="right">2</td>
+<td align="left">34.72</td>
+</tr>
+<tr class="even">
+<td align="center">19</td>
+<td align="right">2</td>
+<td align="left">30.12</td>
+</tr>
+<tr class="odd">
+<td align="center">28</td>
+<td align="right">2</td>
+<td align="left">30.8</td>
+</tr>
+<tr class="even">
+<td align="center">32</td>
+<td align="right">2</td>
+<td align="left">26.53</td>
+</tr>
+<tr class="odd">
+<td align="center">38</td>
+<td align="right">2</td>
+<td align="left">27.6</td>
+</tr>
+<tr class="even">
+<td align="center">54</td>
+<td align="right">2</td>
+<td align="left">23.31</td>
+</tr>
+<tr class="odd">
+<td align="center">0</td>
+<td align="right">3</td>
+<td align="left">38.35</td>
+</tr>
+<tr class="even">
+<td align="center">14</td>
+<td align="right">3</td>
+<td align="left">32.16</td>
+</tr>
+<tr class="odd">
+<td align="center">19</td>
+<td align="right">3</td>
+<td align="left">31.72</td>
+</tr>
+<tr class="even">
+<td align="center">28</td>
+<td align="right">3</td>
+<td align="left">28.69</td>
+</tr>
+<tr class="odd">
+<td align="center">32</td>
+<td align="right">3</td>
+<td align="left">25.88</td>
+</tr>
+<tr class="even">
+<td align="center">38</td>
+<td align="right">3</td>
+<td align="left">28.43</td>
+</tr>
+<tr class="odd">
+<td align="center">54</td>
+<td align="right">3</td>
+<td align="left">30.26</td>
+</tr>
+<tr class="even">
+<td align="center">0</td>
+<td align="right">4</td>
+<td align="left">36.74</td>
+</tr>
+<tr class="odd">
+<td align="center">14</td>
+<td align="right">4</td>
+<td align="left">32.566</td>
+</tr>
+<tr class="even">
+<td align="center">19</td>
+<td align="right">4</td>
+<td align="left">29.57</td>
+</tr>
+<tr class="odd">
+<td align="center">28</td>
+<td align="right">4</td>
+<td align="left">33.663</td>
+</tr>
+<tr class="even">
+<td align="center">32</td>
+<td align="right">4</td>
+<td align="left">28.751</td>
+</tr>
+<tr class="odd">
+<td align="center">38</td>
+<td align="right">4</td>
+<td align="left">27.114</td>
+</tr>
+<tr class="even">
+<td align="center">54</td>
+<td align="right">4</td>
+<td align="left">24.664</td>
+</tr>
+</tbody>
+</table>
+<p>Eseguire l’ANOVA e verificare il rispetto delle assunzioni di base. E’corretto eseguire un test di confronto multiplo e perchè? Eseguire l’analisi di regressione lineare, verificando la bontà di adattamento del modello. Definire il modello parametrizzato. Stabilire la soglia d’intervento, ipotizzando il costo del prodotto e dell’intervento diserbante.</p>
+<hr />
+</div>
+</div>
+<div id="capitolo-14" class="section level2" number="14.10">
+<h2><span class="header-section-number">14.10</span> Capitolo 14</h2>
+<div id="esercizio-1-8" class="section level3" number="14.10.1">
+<h3><span class="header-section-number">14.10.1</span> Esercizio 1</h3>
+<p>Due campioni di terreno sono stati trattati con due erbicidi diversi e sono stati posti in cella climatica alle medesime condizioni di temperatura ed umidità. In tempi diversi dopo l’inizio dell’esperimento sono state prelevate aliquote di ciascun terreno e ne è stata determinata la concentrazione residua di erbicida. I risultati ottenuti sono i seguenti:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Time</th>
+<th align="center">Herbicide A</th>
+<th align="center">Herbicide B</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">0</td>
+<td align="center">100.00</td>
+<td align="center">100.00</td>
+</tr>
+<tr class="even">
+<td align="center">10</td>
+<td align="center">50.00</td>
+<td align="center">60.00</td>
+</tr>
+<tr class="odd">
+<td align="center">20</td>
+<td align="center">25.00</td>
+<td align="center">40.00</td>
+</tr>
+<tr class="even">
+<td align="center">30</td>
+<td align="center">15.00</td>
+<td align="center">23.00</td>
+</tr>
+<tr class="odd">
+<td align="center">40</td>
+<td align="center">7.00</td>
+<td align="center">19.00</td>
+</tr>
+<tr class="even">
+<td align="center">50</td>
+<td align="center">3.50</td>
+<td align="center">11.00</td>
+</tr>
+<tr class="odd">
+<td align="center">60</td>
+<td align="center">2.00</td>
+<td align="center">5.10</td>
+</tr>
+<tr class="even">
+<td align="center">70</td>
+<td align="center">1.00</td>
+<td align="center">3.00</td>
+</tr>
+</tbody>
+</table>
+<p>Ipotizzando che la degradazione dei due erbicidi segue una cinetica del primo ordine, parametrizzare la relativa equazione e determinare la semivita dei due erbicidi. Quale sostanza degrada più velocemente?</p>
+</div>
+<div id="esercizio-2-8" class="section level3" number="14.10.2">
+<h3><span class="header-section-number">14.10.2</span> Esercizio 2</h3>
+<p>Un popolazione microbica in condizioni non-limitanti di substrato cresce seguendo una cinetica del primo ordine. Un esperimento da i seguenti risultati:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Time</th>
+<th align="center">Cells</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">0</td>
+<td align="center">2</td>
+</tr>
+<tr class="even">
+<td align="center">10</td>
+<td align="center">3</td>
+</tr>
+<tr class="odd">
+<td align="center">20</td>
+<td align="center">5</td>
+</tr>
+<tr class="even">
+<td align="center">30</td>
+<td align="center">9</td>
+</tr>
+<tr class="odd">
+<td align="center">40</td>
+<td align="center">17</td>
+</tr>
+<tr class="even">
+<td align="center">50</td>
+<td align="center">39</td>
+</tr>
+<tr class="odd">
+<td align="center">60</td>
+<td align="center">94</td>
+</tr>
+<tr class="even">
+<td align="center">70</td>
+<td align="center">201</td>
+</tr>
+</tbody>
+</table>
+<p>Parametrizzare un modello esponenziale e calcolarne la bontà di adattamento.</p>
+</div>
+<div id="esercizio-3-5" class="section level3" number="14.10.3">
+<h3><span class="header-section-number">14.10.3</span> Esercizio 3</h3>
+<p>E’ stato organizzato un esperimento per valutare il tasso di assorbimento radicale di azoto da parte di <em>Lemna minor</em> allevata in coltura idroponica. I risultati medi ottenuti sono i seguenti:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">conc</th>
+<th align="center">rate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">2.86</td>
+<td align="center">14.58</td>
+</tr>
+<tr class="even">
+<td align="center">5.00</td>
+<td align="center">24.74</td>
+</tr>
+<tr class="odd">
+<td align="center">7.52</td>
+<td align="center">31.34</td>
+</tr>
+<tr class="even">
+<td align="center">22.10</td>
+<td align="center">72.97</td>
+</tr>
+<tr class="odd">
+<td align="center">27.77</td>
+<td align="center">77.50</td>
+</tr>
+<tr class="even">
+<td align="center">39.20</td>
+<td align="center">96.09</td>
+</tr>
+<tr class="odd">
+<td align="center">45.48</td>
+<td align="center">96.97</td>
+</tr>
+<tr class="even">
+<td align="center">203.78</td>
+<td align="center">108.88</td>
+</tr>
+</tbody>
+</table>
+<p>Parametrizzare il modello iperbolico di Michaelis-Menten:</p>
+<p><span class="math display">\[y = \frac{a x} {b + x}\]</span></p>
+<p>Valutarne la bontà di adattamento.</p>
+</div>
+<div id="esercizio-4-4" class="section level3" number="14.10.4">
+<h3><span class="header-section-number">14.10.4</span> Esercizio 4</h3>
+<p>E’ stato organizzato un esperimento di competizione per valutare l’effetto di densità crescenti di <em>Ammi majus</em> sulla produttività del girasole. I risultati ottenuti sono i seguenti:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Weed density</th>
+<th align="center">Yield</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">0</td>
+<td align="center">3.52</td>
+</tr>
+<tr class="even">
+<td align="center">23</td>
+<td align="center">2.89</td>
+</tr>
+<tr class="odd">
+<td align="center">31</td>
+<td align="center">2.76</td>
+</tr>
+<tr class="even">
+<td align="center">39</td>
+<td align="center">2.75</td>
+</tr>
+<tr class="odd">
+<td align="center">61</td>
+<td align="center">2.48</td>
+</tr>
+</tbody>
+</table>
+<p>Parametrizzare l’iperbole di Cousens:</p>
+<p><span class="math display">\[Y_W  = Y_{WF} \left( 1 - \frac{i \cdot x}{100\left( 1 + \frac{i \cdot x}{a} \right)} \right)\]</span></p>
+<p>Valutarne la bontà di adattamento. Determinare la soglia economica di intervento.</p>
+</div>
+<div id="exercise-5" class="section level3" number="14.10.5">
+<h3><span class="header-section-number">14.10.5</span> Exercise 5</h3>
+<p>Uno degli aspetti fondamentali degli studi relativi alla diversità degli ambienti è la valutazione delle curve area-specie. E’ stato considerato un aranceto siciliano, del quale è stata valutata con un apposito campionamento ’innestato’ la curva area-specie.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Area</th>
+<th align="center">numSpecie</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center">4</td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="center">5</td>
+</tr>
+<tr class="odd">
+<td align="center">4</td>
+<td align="center">7</td>
+</tr>
+<tr class="even">
+<td align="center">8</td>
+<td align="center">8</td>
+</tr>
+<tr class="odd">
+<td align="center">16</td>
+<td align="center">10</td>
+</tr>
+<tr class="even">
+<td align="center">32</td>
+<td align="center">14</td>
+</tr>
+<tr class="odd">
+<td align="center">64</td>
+<td align="center">19</td>
+</tr>
+<tr class="even">
+<td align="center">128</td>
+<td align="center">22</td>
+</tr>
+<tr class="odd">
+<td align="center">256</td>
+<td align="center">22</td>
+</tr>
+</tbody>
+</table>
+<p>Parametrizzare una curva ’di potenza’ (power curve):</p>
+<p><span class="math display">\[a \cdot x^b\]</span></p>
+<p>Valutarne la bontà di adattamento. Determinare l’area minima di campionamento.</p>
+</div>
+<div id="exercise-6" class="section level3" number="14.10.6">
+<h3><span class="header-section-number">14.10.6</span> Exercise 6</h3>
+<p>Si ritiene che la crescita di una coltura possa essere descritta accuratamente con un’equazione di Gompertz. Si ritiene inoltre che la presenza delle piante infestanti possa modificare la crescita della coltura, alterando i valori dei parametri del modello anzidetto. Per questo motivo viene organizzato un esperimento a randomizzazione completa con tre repliche, 6 tempi di prelievo (DAE) e 2 stati di infestazione (infestato e libero). In ogni tempo di prelievo, le tre repliche vengono raccolte e viene determinato il peso della coltura. I risultati ottenuti sono i seguenti:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">DAE</th>
+<th align="center">Infested</th>
+<th align="center">Weed Free</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">21</td>
+<td align="center">0.06</td>
+<td align="center">0.07</td>
+</tr>
+<tr class="even">
+<td align="center">21</td>
+<td align="center">0.06</td>
+<td align="center">0.07</td>
+</tr>
+<tr class="odd">
+<td align="center">21</td>
+<td align="center">0.11</td>
+<td align="center">0.07</td>
+</tr>
+<tr class="even">
+<td align="center">27</td>
+<td align="center">0.20</td>
+<td align="center">0.34</td>
+</tr>
+<tr class="odd">
+<td align="center">27</td>
+<td align="center">0.20</td>
+<td align="center">0.40</td>
+</tr>
+<tr class="even">
+<td align="center">27</td>
+<td align="center">0.21</td>
+<td align="center">0.25</td>
+</tr>
+<tr class="odd">
+<td align="center">38</td>
+<td align="center">2.13</td>
+<td align="center">2.32</td>
+</tr>
+<tr class="even">
+<td align="center">38</td>
+<td align="center">3.03</td>
+<td align="center">1.72</td>
+</tr>
+<tr class="odd">
+<td align="center">38</td>
+<td align="center">1.27</td>
+<td align="center">1.22</td>
+</tr>
+<tr class="even">
+<td align="center">49</td>
+<td align="center">6.13</td>
+<td align="center">11.78</td>
+</tr>
+<tr class="odd">
+<td align="center">49</td>
+<td align="center">5.76</td>
+<td align="center">13.62</td>
+</tr>
+<tr class="even">
+<td align="center">49</td>
+<td align="center">7.78</td>
+<td align="center">12.15</td>
+</tr>
+<tr class="odd">
+<td align="center">65</td>
+<td align="center">17.05</td>
+<td align="center">33.11</td>
+</tr>
+<tr class="even">
+<td align="center">65</td>
+<td align="center">22.48</td>
+<td align="center">24.96</td>
+</tr>
+<tr class="odd">
+<td align="center">65</td>
+<td align="center">12.66</td>
+<td align="center">34.66</td>
+</tr>
+<tr class="even">
+<td align="center">186</td>
+<td align="center">21.51</td>
+<td align="center">38.83</td>
+</tr>
+<tr class="odd">
+<td align="center">186</td>
+<td align="center">26.26</td>
+<td align="center">27.84</td>
+</tr>
+<tr class="even">
+<td align="center">186</td>
+<td align="center">27.68</td>
+<td align="center">37.72</td>
+</tr>
+</tbody>
+</table>
+<p>Parametrizzare il modello di Gompertz:</p>
+<p><span class="math display">\[a \cdot exp(-b \cdot exp(-c \cdot x))\]</span></p>
+<p>e verificarne la bontà di adattamento nelle due situazioni. Quali parametri del modello di Gompertz sono maggiormente influenzati dalle piante infestanti? Abbiamo elementi per ritenere che la crescita segua un’equazione di Gompertz piuttosto che una logistica simmetrica?</p>
+</div>
+<div id="esercizio-7-1" class="section level3" number="14.10.7">
+<h3><span class="header-section-number">14.10.7</span> Esercizio 7</h3>
+<p>Piante di <em>Tripleuspermum inodorum</em> in vaso sono state trattate con erbicida sulfonilureico (tribenuron-methyl) a dosi crescenti. Tre settimano deopo il trattamento è stato registrato il peso delle piante sopravvissute, ottenendo i risulti riportati nella tabella seguente:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Dose (g a.i. ha<span class="math inline">\(^{-1}\)</span>)</th>
+<th align="center">Fresh weight (g pot <span class="math inline">\(^{-1}\)</span>)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">0</td>
+<td align="center">115.83</td>
+</tr>
+<tr class="even">
+<td align="center">0</td>
+<td align="center">102.90</td>
+</tr>
+<tr class="odd">
+<td align="center">0</td>
+<td align="center">114.35</td>
+</tr>
+<tr class="even">
+<td align="center">0.25</td>
+<td align="center">91.60</td>
+</tr>
+<tr class="odd">
+<td align="center">0.25</td>
+<td align="center">103.23</td>
+</tr>
+<tr class="even">
+<td align="center">0.25</td>
+<td align="center">133.97</td>
+</tr>
+<tr class="odd">
+<td align="center">0.5</td>
+<td align="center">98.66</td>
+</tr>
+<tr class="even">
+<td align="center">0.5</td>
+<td align="center">92.51</td>
+</tr>
+<tr class="odd">
+<td align="center">0.5</td>
+<td align="center">124.19</td>
+</tr>
+<tr class="even">
+<td align="center">1</td>
+<td align="center">93.92</td>
+</tr>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center">49.21</td>
+</tr>
+<tr class="even">
+<td align="center">1</td>
+<td align="center">49.24</td>
+</tr>
+<tr class="odd">
+<td align="center">2</td>
+<td align="center">21.85</td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="center">23.77</td>
+</tr>
+<tr class="odd">
+<td align="center">2</td>
+<td align="center">22.46</td>
+</tr>
+</tbody>
+</table>
+<p>Si ipotizza che la relazione dose-effetto possa essere descritta con un modello log-logistico:</p>
+<p><span class="math display">\[c + \frac{d - c}{1 + exp(b ( log (x) - log (a))}\]</span></p>
+<p>Parametrizzare questo modello e verificarne la bontà d’adattamento.</p>
 
+</div>
 </div>
 </div>
             </section>
@@ -800,8 +2580,8 @@ Figure 10.2: Analisi grafica dei residui per la prova di confronto tra metodi co
           </div>
         </div>
       </div>
-<a href="contrasti-e-confronti-multipli.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="modelli-anova-a-due-vie.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="la-regressione-non-lineare.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="appendice-1-breve-introduzione-ad-r.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="book_assets/gitbook-2.6.7/js/app.min.js"></script>

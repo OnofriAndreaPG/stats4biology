@@ -1,62 +1,90 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 0.9 (18/01/2020), compil. 2020-10-20"
+date: "Update: v. 1.0 (15/03/2021), compil. 2021-03-15"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
 bibliography: [statBook.bib]
 biblio-style: apalike
 link-citations: yes
-description: "Appunti dai corsi di Metodologia Sperimentale in Agricoltura"
+description: "Metodologia sperimentale per le scienze agrarie con applicazioni in R"
 delete_merged_file: true
 #always_allow_html: yes
 ---
 
 
 
-# Introduzione {-}
 
-[Da fare]
+# Premessa {-}
 
-
-## Organizzazione del testo {-}
-
-[Da fare]
+<img src= "_images/cover.jpeg" width="350" align="right" alt="" class="cover" />
 
 
-## Gli autori {-}
 
-[Da fare]
+In questo sito troverete il libro "Metodologia sperimentale per le scienze agrarie", con il quale ci siamo posti il compito di fornirvi informazioni su come sia possibile ottenere informazioni scientificamente attendibili, partendo da un esperimento opportunamente pianificato ed organizzato. Siamo convinti che già sappiate come gli esperimenti siano l'elemento chiave del progresso scientifico; forse però non siete coscienti del fatto che non tutti gli esperimenti sono ugualmente buoni e producono dati ugualmente validi. In questo libro, cercheremo di mostrarvi come si riconosce un buon esperimento da un cattivo esperimento e, di conseguenza, come si riconosce la scienza dalla pseudoscienza.
 
-## Pre-requisiti {-}
+Ovviamente, un buon ricercatore non è soltanto in grado di pianificare un esperimento valido ed ottenere quindi risultati scientificamente affidabili. Un buon ricercatore deve essere anche in grado di interpretarne correttamente i risultati, attraverso l'impiego di metodiche di analisi statistica, che consentano di separare l'informazione dal rumore di fondo. Siamo perfettamente coscienti del fatto che la statistica non è una materia molto praticata nei piani di studio relativi alle scienze agrarie e, di conseguenza, in questo libro seguiremo un approccio fondamentalmente pratico, orientato al 'problem solving'; in fin dei conti, quando impariamo a guidare un auto ci preoccupiamo di riuscire a raggiungere la nostra destinazione senza incidenti, ma non ci preoccupiamo esattamente di capire quali siano le reazioni chimiche che avvengono all'interno del motore.
 
-[Da fare.] Elementi di statistica descrittiva. Conoscenze preliminari di R.
+Secondo questo approccio, faremo grande uso di esempi, in gran parte relativi a sperimentazioni tipiche delle scienze agrarie, con le quali si confrontano tecniche colturali, genotipi innovativi, erbicidi ed altri metodi di controllo dei patogeni, degli insetti e delle piante infestanti. Siamo fermamente convinti che qualunque progresso tecnico in agricoltura debba sempre essere basata su dati attendibili ottenuti con esperimenti validi; delle opinioni, per quanto autorevoli, abbiamo da sempre imparato a dubitare...
 
-## Packages aggiuntivi {-}
+Questo sito web è e sempre sarà gratuito, seconda la licenza Creative Commons Attribution-NonCommercial-NoDerivs 3.0. È stato scritto in R, con un linguaggio favoloso, chiamato RMarkdown e utilizzando la libreria 'bookdown'. Viene ricompilato di frequente, perché sia sempre il più aggiornato possibile, cosa che è indispensabile in quanto R è un linguaggio che si evolve molto rapidamente.
 
-Questo testo è basato sul software R e sull'ambiente RStudio. Siamo veramente grati agli sviluppatori di questi due fantastici strumenti, che consentono a chiunque di eseguire analisi statistiche estremamente potenti ed avanzate a costo nullo. Negli anni in cui abbiamo iniziato questo lavoro, la situazione era notevolmente diversa e l'alto costo dei software statistici costituiva un notevole limite alla  possibilità di espandere la nostra capacità di ottenere informazioni dai dati sperimentali. R ha una struttura modulare, che può essere espansa aggiungendo uno o più packages all'installazione di base. In questo testo, utilizzeremo i packages elencati più sotto, che potrette installare con il codice fornito come esempio.
+## Obiettivi {-}
+
+In questo libro non cerchiamo di essere esaustivi perché la materia è molto ampia. Abbiamo cercato di adattare la lunghezza ad un corso di 6 CFU anche se, probabilmente, qualche capitolo sembrerà un po' eccessivo. Tuttavia, abbiamo preferito aggiungerlo, in quanto ci sembrava che alcune parti, pur non essendo indispensabili per la preparazione dell'esame, potrebbero risultare utili per le applicazioni professionali. È un libro introduttivo, il primo passo in questa affascinante disciplina e dovrebbe mettervi nelle condizioni di affrontare studi più avanzati, se mai lo vorrete.
+
+
+## Organizzazione  {-}
+
+I primi due capitoli di questo libro riguardano il disegno sperimentale; spiegano come distinguere un esperimento buono da uno cattivo. Forse vi sembrerà strano, ma non avremo mai la garanzia che i dati che abbiamo raccolto siano infallibili e quindi il nostro giudizio sulla loro attendibilità sarà solo ed esclusivamente basato sulla bontà dei metodi impiegati: se i metodi sono buoni i dati sono buoni, altrimenti no.
+
+Nel terzo capitolo vedremo come descrivere i risultati ottenuti, utilizzando semplici statistiche come la media, la mediana il valore di chi quadro e il coefficiente di correlazione di Pearson. Nel quarto capitolo vedremo come il dataset che abbiamo ottenuto possa essere immaginato come il prodotto finale di una serie di processi deterministici e stocastici, che possiamo descrivere utilizzando un modello statistico.
+
+Nei capitoli cinque e sei vedremo come il dataset che abbiamo raccolto, proprio perché prodotto in conseguenza di processi, almeno in parte, stocastici, debba essere considerato come un campione estratto da un universo di possibili risultati. Visto che vogliamo sempre ottenere informazioni generali, non saremo mai interessati solo ai risultati ottenuti, ma cercheremo di ottenere informazioni su tutto l'universo da cui i nostri data sono stati campionati. Generalizzare i risultati di un campione comporta sempre un certo grado di incertezza, che dovremo imparare ad esplicitare e presentare come una componente integrante del nostro report.
+
+Nei capitoli da sette a dodici ci occuperemo dell'ANOVA, una delle tecniche più importanti per l'analisi dei dati. Gli ultimi due capitoli si occuperanno invece dei modelli di regressione.
+
+In ogni capitolo, patrtiremo da un esempio pratico, in modo che possiate cogliere la finalità del lavoro prima di passare ad un'analisi più dettagliata. Nell'ultimo capitolo forniremo una serie di esercizi, con i quali potrete acquisire un po' di pratica.
+
+
+## Software statistico {-}
+
+In questo libro lavoreremo con il software R, all'interno dell'interfaccia grafica RStudio. Abbiamo scelto questo software per un certo numero di ragioni: in primo luogo, ci piace molto e pensiamo che sia un piacere utilizzarlo. Vi sembrerà strano, ma vi assicuriamo che alcuni studenti, dopo aver superato le iniziali difficoltà rimangono affascinati dal linguaggio. Alcuni altri, purtroppo, imparano ad odiarlo... speriamo nessuno di voi sia tra quelli!
+
+In secondo luogo, R è gratuito (freeware), cosa che è fondamentale per uno studente. Terzo, dobbiamo dire che le capacità informatiche dello studente medio si sono moltiplicate negli ultimi anni e, a livello di laurea specialistica, abbiamo notato che nessuno è ormai ad un livello così basso da non riuscire a scrivere quei semplici pezzi di codice che utilizzeremo per le nostre elaborazioni. Infine, vogliamo anche dire che la richiesta di lavorare con R è arrivata anche dai vostri colleghi più anziani, che si sono accorto che la capacità, almeno elementare, di lavorare con questo software è spesso richiesta dalle aziende che assumono laureati in agraria.
+
+R ha una struttura modulare e le sue potenzialità possono essere notevolmente estese installando librerie aggiuntive. Per semplicità, in questo libro abbiamo deciso di utilizzare l'installazione di base, evitando il più possibile l'installazione di altre librerie aggiuntive. In alcuni casi ciò non è stato possibile e quindi sarà necessario installare i componenti che vi indicheremo di volta in volta.
+
+Riconosciamo che la curva di apprendimento con R è un po' ripida, all'inizio. Non preoccupatevi, non daremo nulla per scontato e partiremo dall'inizio, procedendo lentamente, passo dopo passo. Concludiamo questa introduzione ringraziando gli autori di R e di RStudio: senza di essi questo libro non avrebbe certamente visto la luce. Se trovate degli errori perdonateci e, se potete, segnalateceli... vi saremo molto grati.
+
+
+## The authors {-}
+
+Andrea è Professore Associato al Dipartimento di Scienze Agrarie, Alimentari e Ambientali dell'Università degli Studi di Perugia ed insegna Metodologia Sperimentale in Agricoltura dal 2000. Dario era Professore Associato al Dipartimento di Scienze Agrarie, Forestali e Alimentari dell'Università degli Studi di Torino e ha insegnato Metodologia Sperimentale fino al 2020, quando è venuto improvvisamente a mancare prematuramente nel 2020. Purtroppo non ha mai visto questo libro completo... Ciao Dario!
+
+## Ringraziamenti {-}
+
 
 <!--chapter:end:index.Rmd-->
 
 # Scienza e pseudo-scienza
 
-In una società caratterizzata dal sovraccarico cognitivo, immaginiamo sia giusto chiedersi (e chiedere) che cosa sia la scienza, cosa distingua le informazioni scientifiche da tutto quello che invece non è altro che pura opinione, magari autorevole, ma senza il sigillo dell'oggettività.
+In una società caratterizzata dal sovraccarico cognitivo, è chiedersi (e chiedere) che cosa sia la scienza, cioè cosa distingua le informazioni scientifiche da tutto quello che invece non è altro che pura opinione, magari autorevole, ma senza il sigillo dell'oggettività.
 
-Per quanto affascinante possa sembrare l'idea del ricercatore che con un'improvviso colpo di genio elabora una stupefacente teoria, dovrebbe essere chiaro che l'intuizione, per quanto geniale ed innovativa, è solo un possibile punto di partenza, che non necessariamente prelude al progresso scientifico. In generale, almeno in ambito biologico, nessuna teoria acquisisce automaticamente valenza scientifica, ma rimane solo nell'ambito delle opinioni, indipendentemente dal fatto che nasca da un colpo di genio, oppure grazie ad un paziente e meticoloso lavoro di analisi intellettuale, che magari si concretizza in un modello matematico altamente elegante e complesso.
+Per quanto affascinante possa sembrare l'idea del ricercatore che con un'improvviso colpo di genio elabora una stupefacente teoria, dovrebbe essere chiaro che l'intuizione, per quanto geniale ed innovativa, è solo un possibile punto di partenza, che non necessariamente prelude al progresso scientifico. In generale, almeno in ambito biologico, nessuna teoria acquisisce automaticamente valenza scientifica, ma rimane solo nell'ambito delle opinioni, indipendentemente dal fatto che nasca da un colpo di genio, oppure da un paziente e meticoloso lavoro di analisi intellettuale, che magari si concretizza in un modello matematico altamente elegante e complesso.
 
 Che cosa è che permette ad una prova scientifica di uscire dall'ambito delle opinioni legate a divergenze di cultura, percezione e/o credenze individuali, per divenire, al contrario, oggettiva e universalmente valida? Che cosa è che distingue la verità scientifica da altre verità di natura metafisica, religiosa o pseudoscientifica?
 
 A questo proposito, si riportano alcuni aforismi significativi:
 
-1. Proof is a justified true belief (Platone, Dialoghi)
-2. The interest I have in believing a thing is not a proof of the existence of that thing (Voltaire)
-3. A witty saying proves nothing (Voltaire)
+1.  Analogy cannot serve as proof (Pasteur)
+2.  The interest I have in believing a thing is not a proof of the existence of that thing (Voltaire)
+3.  A witty saying proves nothing (Voltaire)
 
 ## Scienza = dati
 
 La base di tutta la scienza risiede nel cosiddetto 'metodo scientifico', che si fa comunemente risalire a Galileo Galilei (1564-1642) e che è riassunto nella figura seguente.
-
 
 <div class="figure" style="text-align: center">
 <img src="_images/MSAMap.jpg" alt="Il metodo scientifico Galileiano" width="75%" />
@@ -65,88 +93,99 @@ La base di tutta la scienza risiede nel cosiddetto 'metodo scientifico', che si 
 
 Senza andare troppo in profondità, è importante notare due aspetti:
 
-1. il ruolo fondamentale dell'esperimento scientifico, che produce dati a supporto di ipotesi pre-esistenti;
-2. lo sviluppo di teorie basate sui dati, che rimangono valide fino a che non si raccolgono altri dati che le confutano, facendo nascere nuove ipotesi che possono portare allo sviluppo di nuove teorie, più affidabili o più semplici.
+1.  il ruolo fondamentale dell'esperimento scientifico, che produce dati a supporto di ipotesi pre-esistenti;
+2.  lo sviluppo di teorie basate sui dati, che rimangono valide fino a che non si raccolgono altri dati che le confutano, facendo nascere nuove ipotesi che possono portare allo sviluppo di nuove teorie, più affidabili o più semplici.
 
 Insomma, l'ingrediente fondamentale di una prova scientifica è quello di essere supportata dai dati sperimentali: di fatto, non esiste scienza senza dati! Resta famoso l'aforisma "In God we trust, all the others bring data", attribuito all'ingegnere e statistico americano W. Edwards Deming (1900-1993), anche se pare che egli, in realtà, non l'abbia mai pronunciato.
 
-##  Dati 'buoni' e 'cattivi'
+## Dati 'buoni' e 'cattivi'
 
 Detto che la scienza si basa sui dati, bisogna anche dire che non tutti i dati sono ugualmente 'buoni'. Nelle scienze biologiche, così come nelle altre scienze, è importante che i dati siano in grado di cogliere gli effetti che vogliamo studiare, senza introdurre distorsioni.
 
-In particolare, i dati debbono essere: (1) precisi e (2) accurati. Con il termine **precisione** intendiamo due cose: la prima è relativa al numero di decimali che ci fornisce il nostro strumento di misura. E'evidente, ad esempio, come un calibro sia più preciso di un metro da sarto. Oltre a questo significato, abbastanza intuitivo, ce n'è un altro, più specificatamente legato agli esperimenti scientifici: la precisione di un dato ottenuto attraverso un processo di misurazione non è altro che la variabilità riscontrata quando la misurazione viene ripetuta più volte.
+In agricoltura e nelle altre scienze quantitative abbiamo a che fare con fenomeni 'misurabili' e, di conseguenza, i nostri dati consistono di un set di misure di diverso tipo (ci torneremo nel secondo capitolo). L'aspetto più importante è che, per tutta una serie di motivi che dettaglieremo tra poco, le nostre misure non necessariamente riflettono il valore vero della caratteristica misurata nel nostro soggetto. Ciò è noto con il termine di **errore sperimentale**, che non significa che abbiamo necessariamente fatto qualcosa di sbagliato. Anzi, l'errore sperimentale è considerato una componente inevitabile di ogni esperimento, in grado di proiettare un alea d'incertezza su ogni risultato scientifico.
 
-La precisione, da sola, non garantisce che i dati siano affidabili. Infatti, è anche necessario che questi corrispondano al valore vero del soggetto misurato (**accuratezza**). Può sembrare una banalità, ma proviamo a pensare ad uno strumento non tarato, che produce errori sistematici; ad esempio, pensiamo ad un gascromatografo, che restituisce sempre una concentrazione maggiorata del 20%. Se noi ripetessimo le analisi 100 volte, in assenza di altri errori, otterremmo sempre lo stesso risultato, molto preciso, ma totalmente inaffidabile, nel senso che non riflette la concentrazione reale della soluzione in studio. L'accuratezza è addirittura più importante della precisione: infatti una misura accurata, ma imprecisa, riflette bene la realtà, anche se in modo vago. Al contrario, una misura precisa, ma inaccurata, ci porta completamente fuori strada, perché non riflette la realtà. Con linguaggio tecnico, un dato non accurato si dice 'distorto' (*biased*).
+Ci sono tre fondamentali fonti di errore sperimentale:
 
-Per ottenere dati precisi ed accurati è necessario porre grande attenzione in relazione a tre aspetti fondamentali:
+1.  Errore di misura
+2.  Variabilità dei soggetti sperimentali
+3.  Campionamento
 
-1. Errore sperimentale
-2. Variabilità dei soggetti sperimentali
-3. Campionamento
+Gli errori di misura sono legati allo strumento e dipendono dall'errata taratura, dall'impiego di un protocollo sbagliato, da inesattezze strumentali, da errori nella trascrizione dei risultati oppure dall'irregolarità dell'oggetto da misurare. Ad esempio, pensate alla misurazione dell'altezza di una pianta di mais: è facile riscontrare difficoltà legate, ad esempio, all'individuazione del punto esatto in cui inizia il culmo e del punto esatto dove termina l'infiorescenza apicale.
 
-Vediamo ora qualche dettaglio a proposito di ciascuno di questi tre elementi.
+A parte gli errori di misura, ci sono anche altre sorgenti di errore meno evidenti e legate al fatto che, nel lavoro sperimentale, siamo di solito interessati non ad un singolo soggetto, ma ad un gruppo più o meno numeroso. Ad esempio, se dobbiamo misurare l'effetto di un erbicida, non possiamo farlo trattando una sola pianta, ma dobbiamo ripetere le misure su un gruppo di piante, il che ci porta ad avere un gruppo di misure, una diversa dall'altra. Quindi, qual è l'effetto dell'erbicida? Il fatto di avere tanti effetti diversi quante sono le piante studiate crea comunque un certo grado di variabilità che non dipende da alcun errore tecnico, ma è una caratteristica intrinseca del fenomeno biologico in studio.
 
-### L'errore sperimentale
+Di per se', la variabilità naturale dei soggetti sperimentali non sarebbe un grosso problema, in quanto potremmo calcolarci l'effetto medio e ritenerci soddisfatti in relazione alle finalità dell'esperimento. Tuttavia sorge un nuovo problema legato al fatto che spesso i soggetti sono così numerosi che non possiamo misurarli tutti e siamo costretti a misurare un campione composto da un ridotto numero di individui. Abbiamo un nuovo elemento di incertezza: come facciamo ad essere sicuri che la media, o qualunque altra statistica, misurata nel nostro campione rifletta la media dell'intera popolazione? Anche se abbiamo fatto del tutto per scegliere un campione rappresentativo, è evidente che il campione perfetto non esiste: cosa potrebbe succedere se prendessimo un altro campione?
 
-In ogni processo di misurazione esiste sempre la possibilità di commettere due tipi di errore: **sistematico** ed **accidentale (casuale)**. L'errore sistematico è provocato da difetti intrinseci dello strumento o incapacità peculiari dell'operatore e tende a ripetersi costantemente in misure successive. Un esempio tipico è quello di una bilancia non tarata, che tende ad aggiungere 20 grammi ad ogni misura che effettuiamo. Per queste sue peculiarità, l'errore sistematico non è quantificabile e deve essere contenuto al minimo livello possibile tramite la perfetta taratura degli strumenti e l'adozione di metodi di misura rigidamente standardizzati e accettati dalla comunità scientifica mondiale. Ad esempio, a livello di laboratorio, vengono utilizzati standard di confronto, la cui misura è perfettamente nota e viene periodicamente confrontata con quella rilevabile dallo strumento stesso, per verificarne la taratura. Altro metodo utilizzato nelle procedure di accreditamento dei laboratori è rappresentato dal *ring test*, dove campioni reali della matrice da misurare sono inviati a più laboratori a livello nazionale, in modo da poter confrontare le misure ottenute e valutarne la variabilità. Con un *ring test*, un laboratorio può valutare la sua stessa affidabilità in confronto con laboratori simili, basandosi sull'eventuale differenza tra il risultato ottenuto e la distribuzione di quelli ottenuti in tutti gli altri laboratori valutati.
+## Dati 'buoni' e metodi 'buoni'
 
-L'errore accidentale (o casuale) è invece legato a fattori variabili nel tempo e nello spazio, quali:
+Quindi la ricerca scientifica non è esente da 'errori' in senso lato (componenti di incertezza). Tuttavia, gli errori non sono tutti uguali e si dividono in **sistematici** ed **accidentali (casuali)**. L'errore sistematico è provocato da difetti intrinseci dello strumento o incapacità peculiari dell'operatore e tende a ripetersi costantemente e con lo stesso segno in misure successive. Un esempio tipico è quello di una bilancia non tarata, che tende ad aggiungere 20 grammi ad ogni misura che effettuiamo. D'altra parte, l'errore accidentale, essendo di natura casuale, tende a ripresentarsi con valori e segni diversi. Di conseguenza, è ragionevole pensare che le repliche, nel lungo periodo, producano sovrastime e sottostime con uguale probabilità, in modo che la media tende a coincidere con il valore vero.
 
-1. malfunzionamenti accidentali dello strumento;
-2. imprecisioni o disattenzioni casuali dell'operatore;
-3. irregolarità dell'oggetto da misurare. Si pensi alla misurazione dell'altezza di una pianta di mais: è facile immaginare di riscontrare difficoltà legate, ad esempio, all'individuazione del punto esatto in cui inizia il culmo e del punto esatto dove termina l'infiorescenza apicale.
+È facile capire che le conseguenze degli errori sistematici e accidentali sono ben diverse. A questi proposito, dobbiamo considerare due aspetti molto importanti, cioè:
 
-L'errore accidentale è meno pericoloso di quello sistematico, poiché, essendo di natura casuale, se ripetiamo la misurazione tende a ripresentarsi con valori e segni diversi. Di conseguenza, è ragionevole pensare che le repliche, in media, possono fornire un valore accurato.
+1.  precisione
+2.  accuratezza
 
-### La variabilità naturale
+Con il termine **precisione** intendiamo due cose: la prima è relativa al numero di decimali che ci fornisce il nostro strumento di misura. E'evidente, ad esempio, come un calibro sia più preciso di un metro da sarto. Oltre a questo significato, abbastanza intuitivo, ce n'è un altro, più specificatamente legato agli esperimenti scientifici: la precisione di un dato ottenuto attraverso un processo di misurazione non è altro che la variabilità riscontrata quando la misurazione viene ripetuta più volte. L'errore casuale produce sempre un calo di precisione.
 
-Di solito non si effettua una sola misura, sia perché sussiste il dubbio di aver commesso un errore, sia perché, frequentemente, abbiamo a che fare con un collettivi di individui, più o meno numeroso. In questo caso, anche se fossimo certi di non aver commesso alcun errore di misura, dovremmo comunque considerare la naturale variabilità di tutti i fenomeni biologici, oltre a quella degli strumenti di misura. Ad esempio, pensiamo alla misurazione della produzione di granella di una certa varietà di frumento: anche ipotizzando di avere uno strumento di misura perfetto, e quindi esente da errore, la produzione mostrerebbe comunque una variabilità naturale da pianta a pianta, o da parcella a parcella, in base al patrimonio genetico, alla pedologia, al microclima, alle condizioni di coltivazione, che non possono essere standardizzate oltre ad un certo livello.
+Il termine accuratezza ha invece un significato completamente diverso, riconducibile alla differenza tra la misura effettuata e il valore vero della caratteristica da misurare. Può sembrare una banalità, ma proviamo a pensare ad uno strumento non tarato, come, ad esempio, un gascromatografo, che restituisce sempre una concentrazione maggiorata del 20%. Se noi ripetessimo le analisi 100 volte, in assenza di altri errori, otterremmo sempre lo stesso risultato, molto preciso, ma totalmente inaffidabile, nel senso che non riflette la concentrazione reale della soluzione in studio. L'errore sistematico, oltre a produrre un calo di precisione, produce anche inaccuratezza.
 
-La presenza di variabilità naturale è un elemento importante; infatti non dobbiamo solo preoccuparci se il nostro strumento è in grado di intercettare la misura vera del soggetto, dobbiamo anche caratterizzare la variabilità esistente tra soggetto e soggetto e, di conseguenza, tra misura e misura, che, in qualche modo, ci permette di quantificare il livello di precisione del nostro esperimento.
+Comprendiamo bene che l'accuratezza è più importante della precisione: infatti una misura accurata, ma imprecisa, riflette bene la realtà, anche se in modo vago. Al contrario, una misura precisa, ma inaccurata, ci porta completamente fuori strada, perché non riflette la realtà. Con linguaggio tecnico, un dato non accurato si dice 'distorto' (*biased*) e, siccome l'a distosione dipende'inaccuratezza dipende dagli errori sistematici, questi utlimi vanno assolutamente evitati, ad esempio con la perfetta taratura degli strumenti e l'adozione di metodi di misura rigidamente standardizzati e accettati dalla comunità scientifica mondiale.
 
+L'inaccuratezza preoccupa molto i laboratori di analisi, che spesso utilizzanostandard di confronto, la cui misura è perfettamente nota e viene periodicamente confrontata con quella rilevabile dallo strumento stesso, per verificarne la taratura. Altro metodo utilizzato nelle procedure di accreditamento dei laboratori è il *ring test*, dove campioni reali della matrice da misurare sono inviati a più laboratori a livello nazionale, in modo da poter confrontare le misure ottenute e valutarne la variabilità. Con un *ring test*, un laboratorio può valutare la sua stessa affidabilità in confronto con laboratori simili, basandosi sull'eventuale differenza tra il risultato ottenuto e quelli ottenuti in tutti gli altri laboratori valutati.
 
-### Il campionamento
-
-Se è vero che i collettivi sono variabili e producono misure individuali tutte diverse una dall'altra, è evidente che l'unica  possibilità che abbiamo per arrivare a risultati totalmente affidabili è quella di sottoporre a misurazione tutti i soggetti del collettivo stesso. Certo, questo è possibile solo con collettivi molto piccoli, mentre, in natura, i collettivi sono talmente numerosi che la misurazione 'globale' è quasi sempre improponibile.
-
-Qual è la strada seguita dagli scienziati, quindi? E' quella di raccogliere un numero finito di misure, sufficientemente basso da essere compatibile con le umane risorse di tempo e denaro, ma sufficientemente alto da essere giudicato attendibile. Qualunque sia questo valore finito, è evidente che ci troviamo difronte solo ad un campione delle infinite misure che avremmo dovuto fare, ma che non abbiamo fatto. La domanda è: questo campione è rappresentativo o no? E' in grado di descrivere adeguatamente la realtà? E' possibile che, per errore, abbiamo trascurato alcuni dei soggetti con misure, ad esempio, molto alte e, di conseguenza, stiamo sottostimando il valore vero della misura? In altre parole: possiamo fidarci dei dati che abbiamo raccolto?  Tanto per cominciare possiamo intuire che tanto maggiore è la numerosità del campione, quanto più affidabile sarà il risultato che otterremo.
-
-Tuttavia, anche quando il campione è sufficientemente numeroso, la possibilità di raccogliere dati sbagliati è tutt'altro che remota. Gli scienziati americani Pons e Fleischmann il 23 Marzo del 1989 diffusero pubblicamente la notizia di essere riusciti a riprodurre la fusione nucleare fredda, causando elevatissimo interesse nella comunità scientifica. Purtroppo le loro misure erano viziate da una serie di problemi e il loro risultato fu clamorosamente smentito da esperimenti successivi.
+Sfortunatamente la possibilità di raccogliere dati inaccurati è tutt'altro che remota. Gli scienziati americani Pons e Fleischmann, il 23 Marzo del 1989, diffusero pubblicamente la notizia di essere riusciti a riprodurre la fusione nucleare fredda, causando elevatissimo interesse nella comunità scientifica. Purtroppo le loro misure erano viziate da una serie di problemi e il loro risultato fu clamorosamente smentito da esperimenti successivi.
 
 <div class="figure" style="text-align: center">
 <img src="_images/FalseResults.jpg" alt="Conseguenze di un esperimento sbagliato" width="50%" />
 <p class="caption">(\#fig:figName2)Conseguenze di un esperimento sbagliato</p>
 </div>
 
-## Scienza = metodo
+A parte questo clamoroso esempio, torniamo alla nostra domanda iniziale: come facciamo ad essere sicuri che i dati siano validi ed affidabili? La risposta è semplice: non possiamo mai essere sicuri, ma **dobbiamo fare del nostro meglio per applicare metodi rigorosi, così da minimizzare la possibilità di ottenere errori sistematici**. In altre parole, dati 'buoni' sono conseguenza di metodi 'buoni' e, pertanto **una prova scientifica è tale non perché siamo certi che corrisponda alla realtà, ma perché siamo ragionevolmente certi che sia stata ottenuta con metodi validi!**.
 
-Insomma, la scienza deve essere basata sui dati, che tuttavia contengono inevitabili fonti di incertezza, legate all'errore sperimentale, alla variabilità dei soggetti e al processo di campionamento. Come si può procedere in queste condizioni? Il punto fondamentale è quello di adottare metodi rigorosi, all'interno di un esperimento scientifico 'valido'. In questo modo possiamo sperare di ottenere dati che, pur in presenza delle inevitabili componenti di incertezza che abbiamo già citato, sono **il più  affidabili possibile**.
+## Il principio di falsificazione
 
-Come si distingue un esperimento 'valido' da uno 'invalido'? Tanto per cominciare, dobbiamo tener presenti due caratteristiche fondamentali, cioè:
+L'approccio che abbiamo indicato poco sopra ha un'importante conseguenza: anche se abbiamo utilizzato un metodo perfettamente valido non potremo mai avere la certezza di aver ottenuto un risultato corrispondente alla realtà e, quindi, ci dovremo sempre aspettare che ulteriori dati smentiscano la nostra conclusione. Questa è la base del principio di falsificazione, definito da Karl Popper (1902-1994): non potremo mai dimostrare che una nostra ipotesi è vera, ma potremo solo dimostrare che è falsa.
 
-1. Replicabilità
-2. Riproducibilità
+In pratica, tornando al metodo scientifico, partiamo da un'ipotesi e organizziamo un esperimento perfettamente valido che produce, di conseguenza, dati validi. Se i nostri dati sconfermano l'ipotesi, abbiamo dimostrato che questa è falsa e dovremo quindi produrre una nuova ipotesi da sottoporre a verifica. Se invece i dati confermano la nostra ipotesi (o meglio, non la smentiscono) allora, non potremo concludere che l'ipotesi è vera, in quanto rimarrà sempre il dubbio che non abbiamo raccolto abbastanza dati. Tuttavia, in mancanza di altre informazioni, prenderemo per buona la nostra ipotesi, fino a che non sarà smentita. Una sorta di 'assoluzione' per insufficienza di prove, quindi...
+
+Il principio di falsificazione è piuttosto importante nel mondo scientifico ed ha alcune importanti implicazioni:
+
+1.  Scienza non necessariamente significa 'certezza' o 'verità'. Tutto quello che possiamo fare con certezza è rigettare ipotesi (provare che sono false), ma non dimostrarne la validità.
+2.  Il nostro compito è quello di cercare di eliminare tutte le fonti di errore sistematico, per rendere il risultato il più accurato possibile.
+3.  Eliminato l'errore sistematico, l'evantuale errore casuale residuo deve essere sempre quantificato e visualizzato insieme ai risultati.
+4.  In considerazione dell'errore residuo, dobbiamo decidere se i dati raccolti consentono di rigettare la nostra ipotesi di partenza. Altrimenti, l'esperimento è inconclusivo e, pur non avendone la certezza, terremo per vera la nostra ipotesi di partenza fino a che non sarà smentita da future osservazioni.
+
+Oltre al principio di falsificazione, la scienza fa largo uso del principio del 'rasoio di Occam'. Guglielmo di Occam (XIV secolo) era un frate francescano che, in un periodo in cui le dimostrazioni scientifiche iniziavano a divenire troppo complesse, voleva ribadire l'importanza della semplicità. Il suo principio è solitamente formulato come '*Entia non sunt multiplicanda praeter necessitatem*' ed è noto come il 'rasoio' in quanto porta a respingere con nettezza (tagliare con il rasoio) le spiegazioni troppo complesse. Nela comunità scientifica, applichiamo questo principio preferendo sempre, tra due ipotesi alternative ugualmente buone, quella più semplice.
+
+## Falsificare un risultato
+
+Se un esperimento è inconclusivo e porta ad eccettare un'ipotesi, è sempre possibile eseguire un ulteriore esperimento per rigettarla. Se anche questo secondo esperimento non riesce a rigettare l'ipotesi di partenza, allora la bontà di quest'ultima è certamente rafforzata. Parliamo quindi di esperimenti confermativi che costituiscono un elemento molto importante del metodo scientifico.
+
+A questo proposito, distinguiamo:
+
+1.  replicabilità
+2.  riproducibilità
 
 Un esperimento è replicabile se, quando ripetuto in condizioni assolutamente analoghe (stessi soggetti, ambiente, strumenti...), restituisce risultati equivalenti. Per questo motivo, quando si pubblicano i risultati di un esperimento, è sempre necessario descrivere accuratamente i metodi impiegati, in modo da consentire a chiunque la verifica dei risultati.
 
 In alcuni casi, tuttavia, questa verifica indipendente è pressoché impossibile; ad esempio, nelle scienze agronomiche, le caratteristiche genetiche e pedo-climatiche giocano un ruolo molto importante e non è facile replicare un esperimento di pieno campo esattamente nelle stesse condizioni. Per questo motivo, alcuni biostatistici distinguono la replicabilità dalla riproducibilità, definita come il grado di concordanza tra esperimenti ripetuti in condizioni diverse (diversi soggetti, diverso ambiente...). Se la replicabilità di un esperimento non può essere dimostrata, bisogna avere almeno un'idea della sua riproducibilità, ripetendo l'esperimento in condizioni diverse e discutendo attentamente le eventuali differenze riscontrate nei risultati.
 
+---
 
 ## Elementi fondamentali del disegno sperimentale
 
 La metodica di organizzazione di un esperimento valido prende il nome di *disegno sperimentale* e le sue basi si fanno in genere risalire a Sir Ronald A. Fisher, vissuto in Inghilterra dal 7 Febbraio 1890 al 29 luglio 1962. Laureatosi nel 1912, lavora come statistico per il comune di Londra, fino a quando diviene socio della prestigiosa Eugenics Education Society di Cambridge, fondata nel 1909 da Francis Galton, cugino di Charles Darwin. Dopo la fine della guerra, Karl Pearson gli propone un lavoro presso il rinomato Galton Laboratory, ma egli non accetta a causa della profonda rivalità esistente tra lui e Pearson stesso. Nel 1919 viene assunto presso la Rothamsted Experimental Station, dove si occupa dell'elaborazione dei dati sperimentali e, nel corso dei successivi 7 anni, definisce le basi del disegno sperimentale ed elabora la sua teoria della "analysis of variance". Il suo libro più importante è "The design of experiment", del 1935. E' sua la definizione delle tre componenti fondamentali del disegno sperimentale:
 
-1. controllo degli errori;
-2. replicazione;
-3. randomizzazione.
-
+1.  controllo degli errori;
+2.  replicazione;
+3.  randomizzazione.
 
 ### Controllo degli errori
 
 Controllare gli errori, o, analogamente, eseguire un esperimento controllato significa fondamentalmente due cose:
 
-1. adottare provvedimenti idonei ad evitare le fonti di errore, mantenendole al livello più basso possibile (alta precisione);
-2. agire in modo da isolare l'effetto in studio (accuratezza), evitando che si confonda con effetti casuali e di altra natura. Ad esempio, se dobbiamo confrontare due fitofarmaci, dobbiamo fare in modo che i soggetti inclusi nell'esperimento differiscano tra di loro solo per il fitofarmaco impiegato e non per altro.
+1.  adottare provvedimenti idonei ad evitare le fonti di errore, mantenendole al livello più basso possibile (alta precisione);
+2.  agire in modo da isolare l'effetto in studio (accuratezza), evitando che si confonda con effetti casuali e di altra natura. Ad esempio, se dobbiamo confrontare due fitofarmaci, dobbiamo fare in modo che i soggetti inclusi nell'esperimento differiscano tra di loro solo per il fitofarmaco impiegato e non per altro.
 
 Mettere in pratica questi principi fondamentali richiede una vita di esperienza! Tuttavia, vogliamo solo sottolineare alcuni aspetti, come il rigore metodologico. È evidente che, ad esempio, se vogliamo sapere la cinetica di degradazione di un erbicida a 20 °C dovremo realizzare una prova esattamente a quella temperatura, con un erbicida uniformemente distribuito nel terreno, dentro una camera climatica capace di un controllo perfetto della temperatura. Gli strumenti dovranno essere ben tarati e sarà necessario attenersi scrupolosamente a metodi validati e largamente condivisi. Tuttavia, a proposito di rigore, non bisogna scordare quanto diceva C.F. Gauss a proposito della precisione nei calcoli, e che può essere anche riferito al rigore nella ricerca : "*Manca di mentalità matematica tanto chi non sa riconoscere rapidamente ciò che è evidente, quanto chi si attarda nei calcoli con una precisione superiore alla necessità*"
 
@@ -160,10 +199,10 @@ Un esempio è questo: uno sperimentatore vuole studiare l'entità della predazio
 
 In ogni esperimento, i trattamenti dovrebbe essere replicati su due o più unità sperimentali. Ciò permette di:
 
-1. dimostrare che i risultati sono replicabili (ma non è detto che siano riproducibili!);
-2. rassicurare che eventuali circostanze aberranti casuali non abbiano provocato risultati distorti;
-3. misurare la precisione dell'esperimento, come variabilità di risposta tra repliche trattate nello stesso modo;
-4. incrementare la precisione dell'esperimento (più sono le repliche più l'esperimento è preciso, perché si migliora la stima della caratteristica misurata, diminuendo l'incertezza).
+1.  dimostrare che i risultati sono replicabili (ma non è detto che siano riproducibili!);
+2.  rassicurare che eventuali circostanze aberranti casuali non abbiano provocato risultati distorti;
+3.  misurare la precisione dell'esperimento, come variabilità di risposta tra repliche trattate nello stesso modo;
+4.  incrementare la precisione dell'esperimento (più sono le repliche più l'esperimento è preciso, perché si migliora la stima della caratteristica misurata, diminuendo l'incertezza).
 
 Per poter essere utili, le repliche debbono essere indipendenti, cioè debbono **aver subito tutte le manipolazioni necessarie per l'allocazione del trattamento in modo totalmente indipendente l'una dall'altra**. Le manipolazioni comprendono tutte le pratiche necessarie, come ad esempio la preparazione delle soluzioni, la diluizione dei prodotti, ecc..
 
@@ -171,31 +210,28 @@ La manipolazione indipendente è fondamentale, perché in ogni parte del process
 
 Il numero di repliche dipende dal tipo di esperimento: più sono e meglio è, anche se è necessario trovare un equilibrio accettabile tra precisione e costo dell'esperimento. Nella sperimentazione di campo, due repliche sono poche, tre appena sufficienti, quattro costituiscono la situazione più comune, mentre un numero maggiore di repliche è abbastanza raro, non solo per la difficoltà di seguire l'esperimento, ma anche perché aumentano la dimensione della prova e, di conseguenza, la variabilità del terreno.
 
-
 ### Randomizzazione
 
 L'indipendenza di manipolazione non garantisce da sola un esperimento corretto. Infatti potrebbe accadere che le caratteristiche innate dei soggetti, o una qualche 'intrusione' influenzino in modo sistematico tutte le unità sperimentali trattate nello stesso modo, così da confondersi con l'effetto del trattamento. Un esempio banale è che potremmo somministrare un farmaco a quattro soggetti in modo totalmente indipendente, ma se i quattro soggetti fossero sistematicamente più alti di quelli non trattati finiremmo per confondere una caratteristica innata con l'effetto del farmaco. Oppure, se le piante di una certa varietà di sorgo si trovassero tutte più vicine alla scolina rispetto a quelle di un'altra varietà, potrebbero essere più danneggiate dal ristagno idrico, il cui effetto si confonderebbe con quello del trattamento stesso.
 
 Questi problemi sono particolarmente insidiosi e si nascondono anche dietro ai particolari apparentemente più insignificanti. La randomizzazione è l'unico sistema per evitare, o almeno rendere molto improbabile, la confusione dell'effetto del trattamento con fattori casuali e/o comunque diversi dal trattamento stesso. La randomizzazione si declina in vari modi:
 
-1. allocazione casuale del trattamento alle unità sperimentali. Gli esperimenti che prevedono l'allocazione del trattamento sono detti 'manipolativi' o 'disegnati'.
-2. A volte l'allocazione del trattamento non è possibile o non è etica. Se volessimo studiare l'effetto delle cinture di sicurezza nell'evitare infortuni gravi, non potremmo certamente provocare incidenti deliberati. In questo caso la randomizzazione è legata alla scelta casuale di soggetti che sono 'naturalmente' trattati. Esperimenti di questi tipo, si dicono **osservazionali**. Un esempio è la valutazione dell'effetto dell'inquinamento con metalli pesanti nella salute degli animali: ovviamente non è possibile, se non su piccola scala, realizzare il livello di inquinamento desiderato e, pertanto, dovremo scegliere soggetti che sono naturalmente sottoposti a questo genere di inquinamento, magari perché vivono vicino a zone industriali.
-3. Se i soggetti sono immobili, la randomizzazione ha anche una connotazione legata alla disposizione spaziale e/o temporale casuale.
+1.  allocazione casuale del trattamento alle unità sperimentali. Gli esperimenti che prevedono l'allocazione del trattamento sono detti 'manipolativi' o 'disegnati'.
+2.  A volte l'allocazione del trattamento non è possibile o non è etica. Se volessimo studiare l'effetto delle cinture di sicurezza nell'evitare infortuni gravi, non potremmo certamente provocare incidenti deliberati. In questo caso la randomizzazione è legata alla scelta casuale di soggetti che sono 'naturalmente' trattati. Esperimenti di questi tipo, si dicono **osservazionali**. Un esempio è la valutazione dell'effetto dell'inquinamento con metalli pesanti nella salute degli animali: ovviamente non è possibile, se non su piccola scala, realizzare il livello di inquinamento desiderato e, pertanto, dovremo scegliere soggetti che sono naturalmente sottoposti a questo genere di inquinamento, magari perché vivono vicino a zone industriali.
+3.  Se i soggetti sono immobili, la randomizzazione ha anche una connotazione legata alla disposizione spaziale e/o temporale casuale.
 
-L'assegnazione casuale del trattamento, o la selezione casuale dei soggetti trattati, fanno si che tutti i soggetti abbiano la stessa probabilità di ricevere qualunque trattamento oppure qualunque intrusione casuale. In questo modo, la probabilità che tutte le repliche di un trattamento abbiano qualche caratteristica innata o qualche intrusione comune che li penalizzi/avvantaggi viene minimizzata. Di conseguenza, confondere l'effetto del trattamento con variabilità casuale ('confounding’), anche se teoricamente possibile, diviene altamente improbabile.
-
-
+L'assegnazione casuale del trattamento, o la selezione casuale dei soggetti trattati, fanno si che tutti i soggetti abbiano la stessa probabilità di ricevere qualunque trattamento oppure qualunque intrusione casuale. In questo modo, la probabilità che tutte le repliche di un trattamento abbiano qualche caratteristica innata o qualche intrusione comune che li penalizzi/avvantaggi viene minimizzata. Di conseguenza, confondere l'effetto del trattamento con variabilità casuale ('confounding'), anche se teoricamente possibile, diviene altamente improbabile.
 
 ### Esperimenti invalidi
 
 A questo punto dovrebbe essere chiaro che un esperimento valido deve essere controllato, replicato e randomizzato: la mancanza anche di uno solo di questi elementi pone dubbi ragionevoli sull'affidabilità dei risultati. In particolare, gli esperimenti 'invalidi' sono caratterizzati da:
 
-1. Cattivo controllo degli errori
-2. Fondati sospetti di confounding
-3. Mancanza di repliche vere
-4. Confusione tra repliche vere e pseudo-repliche
-5. Mancanza di randomizzazione
-6. Presenza di vincoli alla randomizzazione, trascurati in fase di analisi.
+1.  Cattivo controllo degli errori
+2.  Fondati sospetti di confounding
+3.  Mancanza di repliche vere
+4.  Confusione tra repliche vere e pseudo-repliche
+5.  Mancanza di randomizzazione
+6.  Presenza di vincoli alla randomizzazione, trascurati in fase di analisi.
 
 Le conseguenze di queste problematiche sono abbastanza diverse.
 
@@ -216,10 +252,9 @@ Chiaramente, rimangono dei rischi che sono tipici di situazioni nelle quali il c
 <p class="caption">(\#fig:figName22)Esempio di correlazione spuria</p>
 </div>
 
-A volte il confounding non è casuale, ma è legato ad una variabile esterna che si agisce all'insaputa dello sperimentatore. Ad esempio, è stato osservato che il tasso di crimini è più alto nelle città che hanno più chiese. La spiegazione di questo paradosso sta nel fatto che esiste un 'confounder', cioè l'ampiezza della popolazione. Nelle grandi città si riscontrano sia una maggiore incidenza criminale, sia un grande numero di chiese. In sostanza, la popolazione determina sia l'elevato numero di chiese che l'elevato numero di crimini, ma queste ultime due variabili non sono legate tra loro da una relazione causa-effetto (A implica B e A implica C, ma B non implica C). 
+A volte il confounding non è casuale, ma è legato ad una variabile esterna che si agisce all'insaputa dello sperimentatore. Ad esempio, è stato osservato che il tasso di crimini è più alto nelle città che hanno più chiese. La spiegazione di questo paradosso sta nel fatto che esiste un 'confounder', cioè l'ampiezza della popolazione. Nelle grandi città si riscontrano sia una maggiore incidenza criminale, sia un grande numero di chiese. In sostanza, la popolazione determina sia l'elevato numero di chiese che l'elevato numero di crimini, ma queste ultime due variabili non sono legate tra loro da una relazione causa-effetto (A implica B e A implica C, ma B non implica C).
 
-Il confounding non casuale è spesso difficile da evidenziare, soprattutto se le correlazioni misurate sono spiegabili. Inoltre, non è eliminabile con un'accurata randomizzazione, ma solo con l'esecuzione di un esperimento totalmente controllato, nel quale ci si preoccupa di rilevare tutte le variabili necessarie per spiegare gli effetti riscontrati. Di  questo è importante tener conto soprattutto negli esperimenti osservazionali, dove il controllo è sempre più difficile e meno completo.
-
+Il confounding non casuale è spesso difficile da evidenziare, soprattutto se le correlazioni misurate sono spiegabili. Inoltre, non è eliminabile con un'accurata randomizzazione, ma solo con l'esecuzione di un esperimento totalmente controllato, nel quale ci si preoccupa di rilevare tutte le variabili necessarie per spiegare gli effetti riscontrati. Di questo è importante tener conto soprattutto negli esperimenti osservazionali, dove il controllo è sempre più difficile e meno completo.
 
 #### Pseudo-repliche e randomizzazione poco attenta
 
@@ -236,17 +271,17 @@ Il disegno A1 è corretto, in quanto si tratta di un esperimento completamente r
 
 Il disegno A3 è quantomeno 'sospetto': vi sono repliche vere, ma l'allocazione dei trattamenti non è randomizzata ed avviene con un processo sistematico per il quale 'nero' e 'bianco' si alternano. Cosa succederebbe se vi fosse un gradiente di fertilità decrescente da destra verso sinistra? Le unità nere sarebbero avvantaggiate rispetto alle bianche! Insomma, rimangono sospetti di confounding, a meno che non si sia assolutamente certi dell'assenza di gradienti, come capita ad esempio se all'interno dei blocchi, dobbiamo creare una sequenza spazio-temporale. Vediamo tre esempi:
 
-1. ho quattro piante e, per ogni pianta, voglio confrontare un ramo basso con uno alto: è evidente che i due trattamenti sono sempre ordinati in modo sistematico (basso prima di alto).
-2. Dobbiamo valutare l'effetto di fitofarmaci somministrati in due epoche diverse (accestimento e inizio-levata); anche qui non possiamo randomizzare, giacché un'epoca precede sempre l'altra.
-3. Dobbiamo confrontare la presenza di residui di un fitofarmaco a due profondità e non possiamo randomizzare, perché una profondità precede sempre l'altra nello spazio.
+1.  ho quattro piante e, per ogni pianta, voglio confrontare un ramo basso con uno alto: è evidente che i due trattamenti sono sempre ordinati in modo sistematico (basso prima di alto).
+2.  Dobbiamo valutare l'effetto di fitofarmaci somministrati in due epoche diverse (accestimento e inizio-levata); anche qui non possiamo randomizzare, giacché un'epoca precede sempre l'altra.
+3.  Dobbiamo confrontare la presenza di residui di un fitofarmaco a due profondità e non possiamo randomizzare, perché una profondità precede sempre l'altra nello spazio.
 
 In queste situazioni l'esperimento rimane valido, anche se la randomizzazione segue un processo sistematico e non casuale.
 
 Il disegno B1 è usualmente invalido: non vi è randomizzazione e ciò massimizza i problemi del disegno A3: la separazione delle unità sperimentali 'bianche' e 'nere' non consente una valutazione adeguata dell'effetto del trattamento, che è confuso con ogni potenziale differenza tra la parte destra e la sinistra dell'ambiente in cui la sperimentazione viene eseguita. Ovviamente, la separazione può essere non solo spaziale, ma anche temporale. Anche in questo caso diamo alcuni esempi in cui una situazione come quella descritta in B1 è valida:
 
-1. Vogliamo confrontare la produzione in pianura e in collina. Ovviamente dobbiamo scegliere campioni in due situazioni fisicamente separate
-2. Vogliamo confrontare la pescosità di due laghetti
-3. Vogliamo confrontare la produttività di due campi contigui.
+1.  Vogliamo confrontare la produzione in pianura e in collina. Ovviamente dobbiamo scegliere campioni in due situazioni fisicamente separate
+2.  Vogliamo confrontare la pescosità di due laghetti
+3.  Vogliamo confrontare la produttività di due campi contigui.
 
 Queste situazioni sono valide, anche se con una restrizione: non siamo in grado di stabilire a chi debba essere attribuito l'effetto. Ad esempio, per la prima situazione, pianura e collina possono dare produzioni diverse per il suolo diverso, il clima diverso, la precessione colturale diversa o un qualunque altro elemento che differenzi le due località.
 
@@ -256,28 +291,13 @@ Il disegno B3 è analogo al disegno B2, ma costituisce una situazione molto freq
 
 Altri esempi di **pseudorepliche** sono schematizzati con il codice B4. Ad esempio:
 
-1. trattare piante in vaso ed analizzare in modo indipendente i singoli individui invece che tutto il vaso;
-2. trattare una parcella di terreno e prelevare da essa più campioni, analizzandoli separatamente;
-3. trattare una capsula Petri ed analizzare separatamente i semi germinati al suo interno.
+1.  trattare piante in vaso ed analizzare in modo indipendente i singoli individui invece che tutto il vaso;
+2.  trattare una parcella di terreno e prelevare da essa più campioni, analizzandoli separatamente;
+3.  trattare una capsula Petri ed analizzare separatamente i semi germinati al suo interno.
 
 Questi disegni, in assenza di repliche vere aggiuntive non sono da considerarsi validi. Ad esempio, se io ho due vasetti trattati in modo totalmente indipendente e da ciascuno di essi prelevo due piante e le analizzo separatamente, il disegno è caratterizzato da due repliche vere e due pseudorepliche per ogni replica ed è, pertanto, valido.
 
 Il disegno B5 è invece evidentemente invalido, per totale mancanza di repliche.
-
-## Scienza e falsificabilità
-
-Certo è che, per quanto detto in precedenza, il fatto che i dati provengano da un processo di campionamento impedisce, di fatto, di ottenere un'affidabilità totale. Cosa succederebbe se ripetessimo l'esperimento?
-
-Insomma, bisogna fare alcune considerazioni, riportate di seguito:
-
-1. in primo luogo si dovrà accettare il fatto che, contrariamente a quanto si potrebbe o vorrebbe credere, non esistono prove scientifiche totalmente certe, ma l'incertezza è un elemento intrinseco della scienza.
-2. In secondo luogo si dovranno utilizzare gli strumenti della statistica necessari per quantificare l'incertezza residua, che dovrà essere sempre riportata a corredo dei risultati di ogni esperimento scientifico.
-3.  Ogni risultato sarà quindi valutato dalla comunità scientifica sullo sfondo della sua incertezza, seguendo alcune regole di natura probabilistica che consentono di stabilire se la prova scientifica è sufficientemente forte per essere considerata tale.
-
-
-È chiaro comunque che ogni esperimento può essere smentito. Questo non è un problema: la scienza è pronta a considerare una prova scientifica valida fino a che non si raccolgono dati altrettanto affidabili che la confutino. In questo caso, si abbandona la teoria confutata e si abbraccia la nuova. L'abbandono può anche non essere totale: ad esempio la teoria gravitazionale di Newton è ancora oggi valida per molto situazioni pratiche, anche se è stata abbandonata in favore della teoria della relatività, che spiega meglio il moto dei corpi ad altissime velocità.
-
-In effetti, la scienza considera sempre con attenzione il principio del rasoio di Occam, per il quale si accetta sempre la teoria più semplice per interpretare una dato fenomeno, riservando le teorie più complesse alle situazioni più difficili, che giustificano tale livello di complessità.
 
 ## Chi valuta se un esperimento è attendibile?
 
@@ -285,17 +305,14 @@ Quanto detto finora vorrebbe chiarire come il punto centrale della scienza non �
 
 L'unica risposta accettabile è quella di controllare l'attendibilità delle fonti di informazione. In ambito biologico, le riviste autorevoli sono caratterizzate dal procedimento di '*peer review*', nel quale i manoscritti scientifici, prima della pubblicazione, sono sottoposti ad un comitato editoriale ed assegnati ad un 'editor', il quale legge il lavoro e contemporaneamente lo invia a due o tre scienziati anonimi e particolarmente competenti in quello specifico settore scientifico (*reviewers* o revisori).
 
-I revisori, insieme all'*editor*, compiono un attento lavoro di esame  e stabiliscono se l'evidenza scientifica presentata è sufficientemente 'forte'. Le eventuali critiche vengono presentate all'autore, che è tenuto a rispondere in modo convincente, anche ripetendo gli esperimenti se necessario. Il processo richiede spesso interi mesi ed è abbastanza impegnativo per uno scenziato. E' piuttosto significativa l'immagine presentata in [scienceBlog.com](http://scienceblogs.com/startswithabang/2013/06/07/the-4-jobs-of-a-referee-in-peer-review/), che allego qui.
-
+I revisori, insieme all'*editor*, compiono un attento lavoro di esame e stabiliscono se l'evidenza scientifica presentata è sufficientemente 'forte'. Le eventuali critiche vengono presentate all'autore, che è tenuto a rispondere in modo convincente, anche ripetendo gli esperimenti se necessario. Il processo richiede spesso interi mesi ed è abbastanza impegnativo per uno scenziato. E' piuttosto significativa l'immagine presentata in [scienceBlog.com](http://scienceblogs.com/startswithabang/2013/06/07/the-4-jobs-of-a-referee-in-peer-review/), che allego qui.
 
 <div class="figure" style="text-align: center">
 <img src="_images/PeerReview.jpg" alt="Il processo di peer review" width="75%" />
 <p class="caption">(\#fig:figName3)Il processo di peer review</p>
 </div>
 
-In sostanza il meccanismo di *peer review* porta a rigettare un lavoro scientifico in presenza di qualunque ragionevole dubbio metodologico. Desideriamo sottolineare che abbiamo parlato di dubbio metodologico, dato che il dubbio sul risultato non può essere allontanato completamente e i reviewer controlleranno solo che il rischio di errore sia al disotto della soglia massima arbitrariamente stabilita (di solito pari al 5%).
-Questo procedimento, se effettuato con competenza, dovrebbe aiutare a separare la scienza dalla pseudo-scienza e, comunque, ad eliminare la gran parte degli errori metodologici dai lavori scientifici.
-
+In sostanza il meccanismo di *peer review* porta a rigettare un lavoro scientifico in presenza di qualunque ragionevole dubbio metodologico. Desideriamo sottolineare che abbiamo parlato di dubbio metodologico, dato che il dubbio sul risultato non può essere allontanato completamente e i reviewer controlleranno solo che il rischio di errore sia al disotto della soglia massima arbitrariamente stabilita (di solito pari al 5%). Questo procedimento, se effettuato con competenza, dovrebbe aiutare a separare la scienza dalla pseudo-scienza e, comunque, ad eliminare la gran parte degli errori metodologici dai lavori scientifici.
 
 ## Conclusioni
 
@@ -303,191 +320,100 @@ In conclusione, possiamo ripartire dalla domanda iniziale: "Che cosa è la scien
 
 Qual è il *take-home message* di questo capitolo? Fidatevi solo delle riviste scientifiche attendibili, cioè quelle che adottano un serio processo di *peer review* prima della pubblicazione.
 
----
+------------------------------------------------------------------------
 
-## Per approfondire un po'...
+## Altre letture
 
-
-1. Fisher, Ronald A. (1971) [1935]. The Design of Experiments (9th ed.). Macmillan. ISBN 0-02-844690-9.
-2. Hurlbert, S., 1984. Pseudoreplication and the design of ecological experiments. Ecological Monographs, 54, 187-211
-3. Kuehl, R. O., 2000. Design of experiments: statistical principles of research design and analysis. Duxbury Press (CHAPTER 1)
-
-
+1.  Fisher, Ronald A. (1971) [1935]. The Design of Experiments (9th ed.). Macmillan. ISBN 0-02-844690-9.
+2.  Hurlbert, S., 1984. Pseudoreplication and the design of ecological experiments. Ecological Monographs, 54, 187-211
+3.  Kuehl, R. O., 2000. Design of experiments: statistical principles of research design and analysis. Duxbury Press (CHAPTER 1)
 
 <!--chapter:end:01-introBiometry.Rmd-->
 
 # Progettare un esperimento
 
-Qualunque sia l'ambito scientifico, nella progettazione di un esperimento possiamo individuare alcune fasi fondamentali, che proviamo ad elencare:
+## Gli elementi della ricerca
 
-1. individuazione del background (ricerca bibliografica)
-2. definizione dell'ipotesi scientifica e dell'obiettivo;
-3. identificazione dei fattore/i sperimentale/i;
-4. identificazione dei soggetti sperimentali e delle repliche;
-5. identificazione delle variabili da rilevare;
-6. allocazione dei trattamenti;
-7. impianto dell'esperimento.
+Nel capitolo precedente abbiamo visto che ogni esperimento, per essere valido, deve conformarsi a tre principi di base, cioè la replicazione, la randomizzazione e il controllo. Non è facile spiegare come si mettano in atto questi principi e, certamente, non esiste una risposta generalmente valida; l'esperienza gioca un ruolo fondamentalmente e, quando si muovono i primi passi, è sempre bene cercare l'aiuto di un collega più anziano.
 
-Nell'analizzare questi aspetti, faremo riferimento ad alcuni esempi pratici, che verranno presentati tra poco.
+In questo capitolo prenderemo in esame una serie di elementi che riguardano tutti gli esperimenti scientifici, indipendentemente dalla disciplina e dalle finalità. Per la loro importanza, ognuno di questi elementi richiederà decisioni opportune in fase di pianificazione e dovrà essere accuratamente dettagliato in ogni progetto o rapporto di ricerca, per permettere la valutazione della bontà della ricerca stessa. Questi elementi sono:
+
+1. ipotesi ed obiettivi
+2. fattore/i sperimentale/i;
+3. soggetti sperimentali (unità sperimentali);
+4. allocazione dei trattamenti;
+5. le variabili sperimentali.
+
 
 ## Ipotesi scientifica $\rightarrow$ obiettivo dell'esperimento
 
-Trascurando la parte di ricerca bibliografica, che è pur fondamentale, nel metodo scientifico galileiano, il punto di partenza di un esperimento è l'**ipotesi scientifica**, che determina l'obiettivo dell'esperimento. Si tratta del passaggio fondamentale dal quale dipende in modo logico tutto il lavoro successivo. Gli obiettivi debbono essere:
+Trascurando la ricerca bibliografica, che è pur fondamentale, nel metodo scientifico galileiano, il punto di partenza di un esperimento è l'**ipotesi scientifica**, dalla quale discende tutto il lavoro successivo. Questa ipotesi deve essere rilevante,  chiaramente definita e specifica; insomma, dobbiamo aver individuato con chiarezza una connessione tra eventi che potrebbe essere spiegata da una relazione causa-effetto. Un ipotesi, solitamente si pone in forma dubitativa: "*la germinazione di un lotto di semi potrebbe dipendere dall'adozione di un certo metodo di priming*"; oppure: "*la produttività di una coltura potrebbe migliorare con l'adozione di una maggiore fittezza d'impianto*".
 
-1. rilevanti;
-2. chiaramente definiti;
-3. specifici;
-4. misurabili;
-5. raggiungibili/realistici;
-6. temporalmente organizzati.
+Dall'ipotesi, in modo consequenziale scaturiscono gli obiettivi della ricerca, cioè le domande alle quali la ricerca intende dare risposta. Questi obiettivi dovranno essere raggiungibili/realistici e temporalmente organizzati; inoltre, dovrà essere possibile capire se e quando siano stati raggiunti attraverso un qualche indicatore misurabile. 
 
-Il rischio che si corre con obiettivi mal posti è quello di eseguire una ricerca dispersiva, con raccolta di dati non necessari e/o mancanza di dati fondamentali, con costi più elevati del necessario e un uso poco efficiente delle risorse. In genere, prima si definisce un obiettivo generale, seguito da uno o più obiettivi specifici, in genere proiettati su un più breve spazio temporale e che possono essere visti anche come le fasi necessarie per raggiungere l'obiettivo generale.
+Il rischio che si corre con obiettivi mal posti è quello di eseguire una ricerca dispersiva, con raccolta di dati non necessari e/o mancanza di dati fondamentali, con costi più elevati del necessario e un uso poco efficiente delle risorse. In genere, prima si definisce un obiettivo generale, poi si definiscono uno o più obiettivi specifici, proiettati su un più breve spazio temporale, anche per marcare le fasi necessarie per raggiungere l'obiettivo generale.
+
+Non è un caso se, in un lavoro scientifico, gli obiettivi della ricerca sono posti in fondo all'introduzione, appena prima dell'esposizione dei materiali e metodi.
 
 ## Identificazione dei fattori sperimentali
 
-A differeza degli esperimenti **osservazionali**, più tipici delle scienze naturali, dove ci si limita ad osservare quanto accade in natura, nelle scienze agrarie si tende  lavorare con esperimenti manipolati, dove cioè le unità sperimentali sono sottoposte a stimoli differenti a seconda della risposta che si vuole valutare.
-Dopo aver definito l'obiettivo di un esperimento, pertanto, è necessario chiarire esattamente gli stimoli a cui saranno sottoposte le unità sperimentali. Uno 'stimolo' sperimentale prende il nome di **fattore sperimentale**, che può avere più **livelli**. I livelli del fattore sperimentale prendono il nome di **trattamenti (o tesi) sperimentali**.
+A differenza degli esperimenti **osservazionali**, più tipici delle scienze mediche e sociali, dove ci si limita ad osservare quanto accade in natura, gli esperimenti **manipolativi** sono basati appunto sulla 'manipolazione' dei soggetti sperimentali, che vengono sottoposti a stimoli differenti, a seconda della risposta che si vuole valutare.
+
+Dopo aver definito l'obiettivo di un esperimento, pertanto, è necessario chiarire esattamente quali saranno gli stimoli ai quali sottoporremo le unità sperimentali. Uno 'stimolo' sperimentale prende il nome di **fattore sperimentale**, che può avere più **livelli**, detti **trattamenti (o tesi) sperimentali**. Ad esempio, se l'obiettivo è quello di valutare l'effetto della temperatura sulla germinazione dei semi di quinoa, il fattore sperimentale sarà la temperatura, con tre livelli, 10, 15 e 25°C, ai quali verranno sottoposte le capsule Petri incluse in prova.
 
 
-### Esperimenti (multi)fattoriali
+### Esperimenti (multi-)fattoriali
 
-In alcuni casi è necessario inserire in prova più di un fattore sperimentale. In questo caso si parla di esperimenti **fattoriali**, che possono essere **incrociati (crossed)** quando sono presenti in prova tutte le possibili combinazioni dei livelli di ogni fattore, oppure di esperimenti **innestati (nested)** quando i livelli di un fattore cambiano al cambiare dei livelli dell'altro. Il vantaggio di questi tipi di esperimento è che permettono di valutare non solo l'effetto di ogni singolo fattore, ma anche la risposta congiunta di due fattori, che a volte può essere più che additiva (i due trattamenti insieme permettono un risultato superiore al vantaggio derivante singolarmente dai due trattamenti) o meno che additiva (i due trattamenti in quanche modo si elidono).
+Talvolta gli obiettivi dell'esperimento comportano lo studio di più di un fattore sperimentale; ad esempio, oltre che alla temperatura, potremmo anche essere interessati a studiare l'effetto dell'umidità sulla germinazione dei semi. In questo caso potremmo pianificare due esperimenti separati oppure un unico esperimento, in cui prendiamo in considerazione entrambi i fattori sperimentali. Un esperimenti di questo tipo si dice  **fattoriale**, o meglio, **multi-fattoriale** ed i fattori possono essere **incrociati (crossed)** oppure **innestati**. Nel primo caso includeremo in prova tutte le possibili combinazioni tra i livelli di ogni fattore. Ad esempio, se volessimo studiare il comportamento di tre varietà di girasole (A, B e C) con due tipi di concimi (pollino e urea), potremmo disegnare un esperimento con 6 trattamenti, rappresentati da tutte le possibili combinazioni di varietà e concimi, cioè A-pollina, A-urea, B-pollina, B-urea, C-pollina e C-urea.
 
-Ad esempio:
+In un disegno a fattori innestati, invece, i livelli di un fattore cambiano al cambiare dei livelli dell'altro. Ad esempio, se volessimo confrontare tre varietà di frumento in due sistemi colturali (convenzionale e biologico), potremmo decidere di utilizzare varietà diverse in sistemi diversi, alla ricerca del miglior adattamento possibile per una certa specie. In questo caso avremmo comunque sei trattamenti, ma le combinazioni sarebbero: biologico-A, biologico-B, biologico-C, convenzionale-D, convenzionale-E e convenzionale-F.
 
-1. Immaginiamo di voler studiare due fattori sperimentali: la varietà di girasole (tre livelli: A, B e C) e la concimazione (2 livelli: pollino e urea). Abbiamo quindi 6 possibili trattamenti (combinazioni): A-pollina, A-urea, B-pollina, B-urea, C-pollina e C-urea. Il disegno è completamente incrociato.
-2. Immaginiamo di voler confrontare due specie in agricoltura biologica (orzo e triticale), con tre varietà ciascuna (A, B e C per orzo, D, E e F per triticale). Anche in questo caso abbiamo sei trattamenti: orzo-A, orzo-B, orzo-C, triticale-D, triticale-E e triticale-F, ma il disegno è innestato, perché per il fattore sperimentale 'varietà' i livelli cambiano a seconda dei livelli del fattore 'specie'.
+Il vantaggio degli esperimenti fattoriali è che permettono di valutare la presenza di 'interazione', un fenomeno che si produce quando le combinazioni tra alcuni dei livelli inclusi in prova per ogni fattore producono risposte inattese, particolarmente buone o cattive rispetto a quello che avremmo potuto attenderci, considerando i due fattori sperimentali uno separatamente dall'altro. Ad esempio, se considerassimo le due varietà di mais A e B, con A mediamente più produttiva di B, coltivate in due annate, ad esempio 2025 e 2026, con la seconda molto più sfavorevole, perché siccitosa, dovremmo aspettarci che la combinazione A-2025 fornisca i migliori risultati, mentre la combinazione B-2026 fornisca i peggiori. Se questo non avviene, ad esempio perché B è particolarmente adatta a resistere alla siccità, allora abbiamo un fenomeno d'interazione, che è molto importante studiare nel dettaglio, con un esperimento fattoriale.
 
-### L'importanza del controllo
+### Controllo o testimone
 
-In alcuni casi si pone il problema di inserire in prova un trattamento che funga da riferimento per tutti gli altri. In questi casi si parla comunemente di **controllo** o **testimone**, che può essere
+In alcuni casi è necessario inserire in prova un trattamento che funga da riferimento per tutti gli altri; questo trattamento è comunemente detto **controllo** o **testimone**. Possiamo avere:
 
-1. non sottoposto a trattamento
-2. trattato con placebo
-3. trattato secondo le modalità usuali di riferimento
+1. controllo non trattato
+2. controllo trattato con placebo
+3. controllo trattato secondo le modalità usuali
 
-Ad esempio, è usuale includere in un confronto varietale, la varietà di riferimento, che ci consente di capire se le prestazione delle nuove varietà sono effettivamente interessanti oppure no.
+Il controllo cosiddetto 'non trattato' è tipico degli esperimenti in ambito fitopatologico, ad esempio quando si vogliono confrontare sostanze chimiche caratterizzate da attività biologica contro un certo organismo. In questi esperimenti, si include sempre un controllo non trattato, che ci permette di capire quale sarebbe stato lo sviluppo dell'organismo sensibile in assenza del trattamento. Nelle prove di confronto erbicida, in assenza del controllo non trattato, non saremmo in grado di stabilire l'efficacia degli erbicidi di pre-emergenza, perché non sapremmo mai se l'assenza delle piante infestanti sia dovuta all'effetto del diserbo o ad altri effetti ambientali.
 
-Per quello che riguarda invece gli studi tossicologici, è evidente l'importanza di includere un controllo non trattato. Il placebo è una preparazione che contiene tutti gli ingredienti della formulazione attiva, meno che il principio attivo. Il placebo si rende necessario in una serie di circostanze, ad esempio:
+In alcuni casi, il soggetto è influenzabile e può reagire alla semplice idea di essere stato trattato. Ciò capita soprattutto con soggetti umani in ambito medico e, pertanto, invece che il controllo non trattato, si preferisce utilizzare un controllo trattato con placebo, cioè una preparazione che contiene tutti gli ingredienti della formulazione, meno che il principio attivo. In ambito agrario non si parla di placebo, ma talvolta si impiegano formulazioni senza principio attivo con funzioni di controllo, quando si sospetti che i co-formulanti o la soluzione impiegata per veicolare il principio attivo possano mostrare un qualche effetto biologico sul soggetto. Ad esempio, se volessimo provare un erbicida miscelato con un olio minerale, che ha di per se' un certo effetto sulla flora infestante, dovremmo includere sia un controllo non trattato, che un controllo trattato solo con olio minerale.
 
-1. quando il soggetto è influenzabile e può reagire alla semplice idea di essere stato trattato (effetto placebo)
-2. quando i co-formulanti o la soluzione impiegata per veicolare il principio attivo possono mostrare un effetto sul soggetto.
+In altri casi, i trattamenti sperimentali non sono costituiti da trattamenti chimici e, pertanto, non possiamo parlare di controllo non trattato. Anche in questi casi, tuttavia, può sussistere la necessità di avere un riferimento, contro il quale valutare l'efficacia, per esempio, di una tecnica agronomica innovativa. In questi casi siamo soliti includere in prova una tecnica di riferimento, che di solito è quella più consolidata negli usi locali; ad esempio, in un confronto varietale, viene sempre inclusa una varietà di riferimento locale, che ci consente di capire se le prestazioni delle varietà innovative siano effettivamente interessanti oppure no. Diversamente, non saremmo in grado di capire se le produzioni osservate siano dovute al genotipo, oppure ad effetti ambientali favorevoli/sfavorevoli.
 
-Poichè gli esperimenti ci permettono non solo di capire se il comportamento di un livello di un fattore è uguale o differente da un altro, ma anche di misurare l'incremento che possiamo avere rispetto ad un altro, è molto importante il ruolo del controllo, perchè esso diventa il riferimento rispetto al quale noi possiamo misurare il miglioramento dell'innovazione testata ('trattato').
+Un altro esempio importante è relativo alle prove di diserbo, nelle quali, oltre al controllo non trattato, viene spesso inserito un controllo scerbato manualmente, che diviene il riferimento per valutare potenziali effetti fitotossici verso la coltura.
 
-### Fattori sperimentali di trattamento e di blocco
 
-Finora abbiamo menzionato quelli che, in lingua inglese, vengono definiti *treatment factor* (trattamenti sperimentali). Tuttavia, possono esserci altri fattori sperimentali non allocati, ma 'innati' e legati alla collocazione spazio-temporale o alle caratteristiche dei soggetti. Questi fattori vengono definiti, sempre in inglese, *blocking factors*. Di questi fanno parte, ad esempio, il blocco, la località ed ogni altro elemento che permette di raggruppare i soggetti. Anche questi *blocking factors* devono essere chiaramente identificati ed elencati.
+## Le unità sperimentali
 
-## Identificazione delle unità sperimentali
+L'unità sperimentale è l'entità fisica che riceve il trattamento sperimentale; può essere una pianta, un animale, un vaso, una capsula Petri o ogni altra entità di rilievo per lo studio in atto. Le unità sperimentali non vanno confuse con le unità osservazionali, perché le due entità non sempre coincidono. Ad esempio, noi potremmo allocare il trattamento erbicida ad un vaso e poi misurare l'altezza delle singole piante trattate; in questo caso il vaso è l'unità sperimentale (perché ha subito il trattamento), mentre la pianta è l'unità osservazionale. Avere chiara questa differenza è fondamentale per evitare problemi di pseudo-replicazione, come abbiamo dettagliato nel capitolo precedente.
 
-### Cornice di campionamento
+Le unità sperimentali sono sempre selezionate da una popolazione più grande, detta **cornice di campionamento**; ad esempio, noi selezioniamo le parcelle da un campo, gli animali da una mandria e le piante da una coltura. Comunque sia, il campione selezionato deve essere omogeneo e rappresentativo, anche se i due concetti sono spesso discordanti. Infatti, se  selezioniamo soggetti molto omogenei, potremmo ottenere un campione che non rappresenta più tutte le caratteristiche della cornice di campionamento. Ad esempio, se selezioniamo solo individui maschi in buona salute, il campione non necessariamente rappresenta l'intera popolazione, se composta anche da femmine e da soggetti con patologie in atto.
 
-Prima di iniziare un esperimento, deve essere chiaro qual è la popolazione di riferimento (cornice di campionamento). Ad esempio, se vogliamo determinare la produttività delle varietà di tabacco e la loro adattabilità alle condizioni umbre, la cornice di campionamento sarà la media e alta valle del Tevere. Se invece vogliamo individuare la risposta di bovini adulti ad un certo tipo di alimentazione, dovremo campionare soggetti di entrambi i sessi, diverse età (ma comunque adulti) e in buone condizioni di salute. Insomma, la cornice di campionamento deve essere composta da soggetti che presentano tutte le caratteristiche richieste dall'obiettivo dell'esperimento.
+Campionare una popolazione d'interesse non è un procedimento banale, specie nelle scienze sociali, laddove è stato necessario definire diversi protocolli di campionamento (casuale, sistematico, stratificato, a quota ...), per i quali si rimanda ai testi specializzati (ad esempio, Daniel 2011). In questo libro noi facciamo riferimento soprattutto alle prove di pieno campo e di laboratorio. Per le prime, la selezione delle unità sperimentali corrisponde fondamentalmente con la selezione dell'appezzamento di prova e l'identificazione delle parcelle, di cui parleremo tra poco.
 
-La scelta della cornice di campionamento è fondamentale, perché è ad essa che si riferiscono i risultati ottenuti; ad esempio, se la cornice di campionamento è la media valle del Tevere, i risultati ottenuti non potranno essere riferiti alla Pianura Padana oppure al Tavoliere delle Puglie.
+Per le prove di laboratorio, invece, la situazione può essere abbastanza diversa, in quanto le unità sperimentali sono specificatamente create per un certo esperimento (vasetti, capsule Petri ad altri preparati). Di conseguenza, non vi è un vero e proprio processo di selezione, il che, tuttavia, non significa che non ci sia campionamento. Infatti, anche le unità sperimentali preparate in laboratorio debbono comunque essere considerate come campionate da un universo più grande, costituito da tutte le altre unità sperimentali che avremmo potuto preparare.
 
-### Scelta delle unità sperimentali
-
-All'interno della cornice di campionamento, adottando criteri rigorosi, andremo a scegliere i soggetti da includere in prova. I soggetti dovranno essere rappresentativi della cornice di campionamento, ma, per il resto, il più possibile omogenei, per minimizzare le fluttuazioni casuali di rispsposta.
-
-Per quanto riguarda la sperimentazione di pieno campo, l'omogeneità dell'ambiente è fondamentale per aumentare la precisione dell'esperimento, cosa che si consegue, innanzitutto, con la scelta dell'appezzamento giusto. Questa scelta è particolarmente delicata ed è guidata soprattutto dall'esperienza, tenendo conto anche di aspetti come la facilità di accesso e la vicinanza di strutture (laboratori, capannoni...), che consentano un'accurata esecuzione degli eventuali prelievi. Oltre a scegliere correttamente l'appezzamento, è importante anche porre in atto alcune operazioni che consentano di incrementare ulteriormente l'omogenità dell'appezzamento prescelto. Ad esempio, talvolta si usa far precedere la prova da una coltura di 'omogeneizzazione', ad esempio avena, che è molto avida di azoto e lascia nel terreno poca fertilità residua. Oppure un prato di erba medica, che, grazie agli sfalci periodici, lascia il terreno libero da piante infestanti.
-
-Gli sforzi operati al fine di rendere il più omogeneo possibile l'insieme delle unità sperimentali servono ad aumentare la capacità di rendere evidente l'effetto dei trattamenti praticati. Occorre tuttavia sottolineare che la variabilità è intrinseca nel sistema biologico e questa variabilità diventa il metro di giudizio per verificare se esiste veramente un effetto trattamento o no. Occorre pertanto assicirarsi che l'attività sperimentale non introduca (o introduca il meno possibile) ulteriore variabilità a quella normalmente presente in natura.
-
-### Unità sperimentali in campo: le parcelle
-
-Solitamente, nella ricerca biologica, le unità sperimentali sono chiaramente definite: un animale, una persona, un insetto, un'aliquota di terreno. In genere, qualunque esse siano, debbono essere chiaramente identificate prima di procedere all'allocazione dei trattamenti.
-
-Nella sperimentazione di pieno campo, le unità sperimentali sono costituite dalle cosiddette 'parcelle' (Figura \@ref(fig:figName21) ), che, almeno inizialmente, non sono chiaramente identificate. La loro identificazione, dopo aver selezionato l'appezzamento giusto e averlo reso più uniforme possibile, viene usualmente eseguita su carta, redigendo la **mappa dell'esperimento**.
-
-<div class="figure" style="text-align: center">
-<img src="_images/SorgoProveVarietali.jpg" alt="Una prova sperimentale in campo (Foto D. Alberati)" width="90%" />
-<p class="caption">(\#fig:figName21)Una prova sperimentale in campo (Foto D. Alberati)</p>
-</div>
-
-In primo luogo, si decide la **dimensione e la forma della parcella**. L'aspetto fondamentale è che ogni parcella deve contenere un numero di piante sufficientemente alto da essere rappresentativo. Per questo motivo le colture a bassa fittezza (es. mais) hanno sempre bisogno di parcelle più grandi che non quelle ad alta fittezza (es. frumento). La dimensione non deve tuttavia eccedere una certa soglia, in quanto con essa aumenta anche la variabilità del terreno e, di conseguenza, diminuisce l'omogeneità dell'esperimento. Per questo motivo, talvolta si preferisce diminuire la dimensione delle parcelle ed, avendo lo spazio sufficiente, aumentare il numero delle repliche. E' poi importante tenere conto di come saranno effettuare le pratiche colturali. Se queste saranno effettuate con normali attrezzature aziendali, occorre tenere conto della larghezza di lavoro degli organi lavoranti ed utilizzare multipli di questi. 
-
-Nello stabilire la dimensione delle parcelle, dovremo tener conto del fatto che la parte più delicata è il bordo, in quanto le piante che si trovano lungo il bordo esterno risentono di condizioni diverse dalle altre piante situate al centro della parcella (**effetto bordo**). Questo determina variabilità all'interno della parcella, che possiamo minimizzare raccogliendo solo la parte centrale. Si viene così a distinguere la superficie totale della parcella dalla superficie di raccolta (**superficie utile**), che può essere anche molto minore di quella totale.
-
-Tenendo conto degli aspetti detti in precedenza, ritieniamo che le colture ad elevata fittezza (frumento, cereali, erba medica...) dovrebbero avere parcelle di almeno 10-20 m^2^, mentre a bassa fittezza (mais, girasole...) dovrebbero avere parcelle di almeno 20-40 m^2^. Queste dimensioni sono riferite alla superficie utile di raccolta, non alla dimensione totale: se si ritiene di dover raccogliere solo una parte della parcella per limitare l'effetto bordo, allora le dimensioni totali dovranno essere opportunamente aumentate, rispetto a quanto indicato sopra.
-
-Per quanto riguarda la forma, le parcelle quadrate minimizzano l'effetto bordo, perché, a parità di superficie, hanno un perimetro più basso. Tuttavia esse sono di più difficile gestione, in quanto, considerando il fronte di lavoro di una seminatrice o una mietitrebbiatrice parcellare, possono richiedere la semina o la raccolta in più passate, il che finisce per essere una fonte di errore. Per questo motivo le parcelle sono usualmente rettangolari, con una larghezza pari a quella delle macchine operatrici.
-
-Dopo aver stabilito la forma e la dimensione delle parcelle, si può procedere alla redazione della mappa, tenendo conto che il numero delle parcelle risulta dal prodotto tra il numero delle tesi sperimentali e il numero delle repliche.  
-
-In genere, si cerca di fare in modo che l'esperimento no sia troppo lungo (il che potrebbe aumenterebbe la variabilità), ma neanche troppo largo, per evitare di avvicinarsi troppo alle scoline, dove possono manifestarsi ristagni idrici. Lungo il contorno della prova è possibile sistemare altre parcelle fuori esperimento con funzione di 'bordi'. In questo modo si evita che i bordi esterni delle parcelle esterne siano esposti a condizioni molto diverse dagli altri, cosa che potrebbe accentuare l'effetto 'bordo', di cui abbiamo parlato in precedenza. Queste parcelle di bordo verranno trattate in modo ordinario.
-
-La figura \@ref(fig:figName31) riporta la mappa di un esperimento sistemato su un appezzamento largo 30 metri e lungo 400 metri. In questo caso abbiamo disegnato otto file di parcelle in senso trasversale (8 x 2.25 m = 18 m di larghezza), e quattro parcelle in senso longitudinale. Vediamo in figura che la mappa riporta tutte le informazioni relative al disegno sperimentale in modo da facilitare l'orientamento della mappa stessa. Un altro fondamentale aspetto è che le parcelle sono tutte chiaramente identificate con un numero.
-
-<div class="figure" style="text-align: center">
-<img src="_images/Mappa1.png" alt="Mappa di campo di un esperimento con 32 parcelle" width="90%" />
-<p class="caption">(\#fig:figName31)Mappa di campo di un esperimento con 32 parcelle</p>
-</div>
-
-## Allocazione dei trattamenti e disegno sperimentale
+## Allocazione dei trattamenti
 
 Il problema dell'allocazione dei trattamenti non si pone con gli esperimenti osservazionali, in quanto con questi si scelgono unità sperimentali già 'naturalmente' trattate.
 
-Per tutti gli esperimenti manipolati si pone invece il problema di scegliere quali soggetti trattare e come. A seconda di quali vincoli introduciamo nella selezioni dei soggetti possiamo avere diversi schemi sperimentali. Quelli che descriviamo di seguito, sono quelli più comunemente usati nella sperimentazione di pieno campo, ma, con le opportune modifiche, possono trovare impiego anche in molte altre discipline scientifiche.
+Per tutti gli esperimenti manipolativi si pone invece il problema di scegliere quali soggetti trattare e come. In generale, seguendo il principio Fisheriano di randomizzazione, l'allocazione dei trattamenti dovrebbe essere effettuata scegliendo le unità sperimentali completamente a caso (**esperimenti completamente randomizzati**). Tuttavia vedremo che in molte circostanze è conveniente porre dei vincoli al processo di randomizzazione, il che non è sbagliato se questi vincoli sono tenuti in debita considerazione durante il processo di analisi dei dati (*Analyse them as you have randomised them! R. Fisher*). Questi vincoli costituiscono la base del **disegno sperimentale** di cui parleremo tra breve.
 
-
-### Disegni completamente randomizzati
-
-Per queste prove, le più semplici, la scelta dei soggetti da trattare è totalmente casuale, senza vincoli di sorta. Il vantaggio principale è la semplicità; lo svantaggio sta nel fatto che tutte le eventuali differenze e disomogeneità tra unità sperimentali restano non riconosciute ed entrano nella definizione della variabilità residua. Per questo, i disegno completamente randomizzati sono utilizzato soprattutto per le situazioni di buona uniformità ambientale e tra i soggetti.
-
-Come esempio mostriamo un disegno completamente randomizzato utilizzando le parcelle della figura \@ref(fig:figName31), dove abbiamo allocato 8 trattamenti) identificati con le lettere da A ad H) con quattro repliche. Come si può notare, l'allocazione è completamente casuale (figura \@ref(fig:figName33))
-
-<div class="figure" style="text-align: center">
-<img src="_images/Mappa1CRD.png" alt="Esempio di uno schema sperimentale a randomizzazione completa" width="90%" />
-<p class="caption">(\#fig:figName33)Esempio di uno schema sperimentale a randomizzazione completa</p>
-</div>
-
-### Disegni a blocchi randomizzati
-
-Quando le unità sperimentali non sono totalmenete omogenee, ma vi è una certa variabilità per una qualche caratteristiche rilevante, potremo dividere i soggetti in base a questa caratteristica, in tanti gruppi quante sono le repliche.
-
-Ad esempio, nel caso dello schema in figura \@ref(fig:figName31), è lecito aspettarsi un gradiente trasversale, dato che il campo sarà certamente meno fertile vicino alle scoline. Per questo motivo, dato che abbiamo scelto di fare quattro repliche, divideremo l'appezzamento in quattro blocchi perpendicolari al gradiente di fertilità. Ad esempio il blocco 1 conterrà le parcelle 1, 9, 17, 25, 2, 10, 18 e 26, cioè le prime due colonne della mappa, con un numero di parcelle esattamente uguali al numero delle tesi. Il blocco 2 conterrà le colonne 3 e 4 e così via. Dato che il gradiente è trasversale, le parcelle di un stesso blocco saranno più omogenee che non parcelle su blocchi diversi. Dopo aver diviso la mappa in quattro blocchi di otto parcelle, possiamo allocare gli otto trattamenti a random all'interno di ogni blocco (\@ref(fig:figName34))
-
-<div class="figure" style="text-align: center">
-<img src="_images/Mappa1CRBD.png" alt="Esempio di uno schema sperimentale a blocchi randomizzati" width="90%" />
-<p class="caption">(\#fig:figName34)Esempio di uno schema sperimentale a blocchi randomizzati</p>
-</div>
-
-Un disegno a blocchi randomizzati non è solo tipico della sperimentazione di campo. Ad esempio, volendo determinare la contaminazione da micotossine nelle confezioni di datteri, a seconda della modalità di confezionamento (es. carta, busta di plastica, scatola di plastica perforata), si può sospettare che il supermercato nel quale le confezioni vengono vendute potrebbe avere un certo effetto, legato alle modalità di conservazione. Per cui, invece che prelevare trenta confezioni (dieci per metodo) a caso nei supermercati di una città, scegliamo dieci supermercati e, in ognuno, prendiamo una confezione per tipo. In questo caso, il supermercato fa da blocco.
-
-In generale, potremmo immaginare un esperimento con trattamenti che vengono allocati a caso agli animali di una stalla e ripetuti su stalle diverse, o a soggetti in gruppi omogenei di età e così via.
-
-Il vantaggio del disegno a blocchi randomizzati sta nel fatto che ci permetto di utilizzare soggetti sperimentali con una più bassa omogeneità iniziale, aspetto importante quando il numero di unità sperimentali richieste comincia ad essere elevato. Infatti, le differenze tra soggetti sperimentali, almeno in parte, possono essere spiegate attraverso l'appartenenza ad un determinato gruppo e possono quindi essere scorporate dal calcolo della variabilità residua.
-
-### Disegni a quadrato latino
-
-In questo caso, le unità sperimentali presentano due 'gradienti', cioè vi sono differenze legate a due elementi importanti, oltre al trattamento sperimentale. Vediamo un esempio.
-
-Una certo oggetto richiede un solo operatore per essere costruito, ma l'operazione può essere eseguita in quattro modi diversi. Vogliamo capire qual è il modo più veloce e, pertanto, pianifichiamo un esperimento. L'unità sperimentale è il lavoratore. I metodi sono quattro e, volendo lavorare con quattro repliche, avremmo bisogno di sedici operatori per disegnare un esperimento completamente randomizzato. Possiamo tuttavia considerare che un operatore, in quattro turni successivi, può operare con tutti e quattro i metodi. Quindi possiamo disegnare un esperimento in cui il turno fa da unità sperimentale e l'operatore fa da blocco (esperimento a blocchi randomizzati).
-
-Tuttavia, in ogni blocco (operatore) vi è un gradiente, nel senso che i turni successivi al primo sono via via meno efficienti, perché l'operatore accumula stanchezza. Per tener conto di questo potremmo lasciare all'operatore un congruo periodo di tempo tra un turno e l'altro. Oppure, potremmo introdurre un vincolo ulteriore, per ogni operatore, randomizzando i quattro metodi tra i turni, in modo che ogni metodo, in operatori diversi, capiti in tutti i turni. In sostanza, l'operatore fa da blocco, perché in esso sono contenuti tutti i metodi. Ma anche il turno (per tutti gli operatori) fa da blocco, in quanto in esso sono ancora contenuti tutti i metodi. Proviamo a schematizzare, nella figura seguente (\@ref(fig:figName391) ).
-
-<div class="figure" style="text-align: center">
-<img src="_images/TurniOperatori.png" alt="Allocazione di quattro metodi di lavoro (A, B, C e D), tra quattro operatori, in quattro turni, seguendo uno schema a quadrato latino" width="90%" />
-<p class="caption">(\#fig:figName391)Allocazione di quattro metodi di lavoro (A, B, C e D), tra quattro operatori, in quattro turni, seguendo uno schema a quadrato latino</p>
-</div>
-
-Questo schema prende il nome di quadrato latino, in quanto il numero delle repliche è uguale al numero dei trattamenti e, schematizzando lo schema su una mappa, otteniamo una griglia quadrata, nella quale ogni trattamento occupa tutte le righe e tutte le colonne. Chi lo conosce, riconosce in questo schema i principi di fondo del Sudoku.
-
-Questo disegno è utile, perché possiamo dar conto sia delle differenza tra righe (turni), che delle differenze tra colonne (operatori), in modo da ridurre al minimo possibile la variabilità inspiegata. Lo svantaggio sta nel fatto che, dovendo avere tante repliche quanti sono i trattamenti, è utilizzabile solo per esperimenti abbastanza piccoli.
-
-**[NOTA: Secondo me occorre inserire il disegno a split plot. Per ora non lo faccio per andare avanti e per decidere come vogliamo trattarlo. Metteresti i mixed in un corso magistrale?. Facendo una teoria leggera, secondo me si può fare, anche perchè introduce il concetto delle misure ripetute. Cosa facciamo?]**
+In alcuni casi è opportuno nascondere i dettagli dell'allocazione dei trattamenti. Parliamo quindi di esperimento **cieco**, quando i soggetti non sono coscienti del trattamento che ricevono o **doppio cieco**, quando neanche i ricercatori lo sono. Un esperimento cieco o doppio cieco è necessario quando sapere quale trattamento è stato allocato può provocare effetti inconsci o indurre errori di valutazione nel ricercatore. Quest'ultimo caso è importante anche nelle scienze agrarie, dove sapere con che principio attivo è stata diserbata una parcella può indurre preconcetti in chi deve realizzare un rilievo visivo.
 
 ## Le variabili sperimentali
 
-Per ogni singolo carattere, l'insieme delle modalità/valori che ognuno dei soggetti presenta prende il nome di **variabile** (proprio perché varia, cioè assume diversi valori, a seconda del soggetto).
+Per ogni singolo carattere, l'insieme delle modalità/valori che ognuno dei soggetti presenta prende il nome di **variabile** (proprio perché varia, cioè assume diversi valori, a seconda del soggetto). In questo senso è necessario precisare che non è corretto utilizzare il termine parametri, in quanto in statistica i parametri sono entità che rimangono costanti all'interno di una popolazione di soggetti. Ne parleremo meglio nei prossimi capitoli.
 
-Fondamentalmente, esistono due grandi gruppi di variabili: quelle che definiscono lo 'stimolo' sperimentale e quelle che misurano la risposta dei soggetti trattati. Delle prime abbiamo già parlato, in quanto sono definite all'inizio dell'esperimento e rappresentano i livelli del/dei trattamento/i sperimentali. Ad esempio, fanno parte del primo gruppo le variabili come le modalità di lavorazione del suolo (aratura, minima lavorazione, semina su sodo) o il valore di azoto apportato (0, 50, 100, 150 kg N ha^-1^). Le variabili che definiscono uno 'stimolo' sperimentale sono anche dette variabili 'indipendenti' in quanto non dipendono da nessun altro interno all'esperimento, a parte la volontà dello sperimentatore.
+Fondamentalmente, esistono due grandi gruppi di variabili: quelle che definiscono lo 'stimolo' sperimentale e quelle che misurano la risposta dei soggetti trattati. Le variabili che definiscono uno 'stimolo' sperimentale sono anche dette variabili 'indipendenti' in quanto non dipendono da nessun altro elemento interno all'esperimento, a parte la volontà dello sperimentatore. Di queste variabili abbiamo già parlato, in quanto esse sono definite all'inizio dell'esperimento e rappresentano i livelli del/dei trattamento/i sperimentali, ad esempio, le modalità di lavorazione del suolo (aratura, minima lavorazione, semina su sodo) o il valore di azoto apportato (0, 50, 100, 150 kg N ha^-1^). 
 
 Durante e al termine dell'esperimento vengono invece rilevate le variabili 'risposta' che esprimono l'effetto dei trattamenti sperimentali, come, ad esempio, la produzione della coltura, il peso delle piante trattate con un diserbante, la quantità di azoto lisciviato dopo la fertilizzazione. Queste variabili vengono normalmente definite 'dipendenti', in quanto i valori assunti da ogni unità sperimentale dipendono, normalmente' dallo stimolo che hanno ricevuto. 
 
-Sia le variabili indipendenti sia quelle dipendenti possono essere di diversi tipi, che è molto importante saper riconoscere, perché condizionano il tipo di analisi statistica da eseguire. In particolare, distinguiamo:
+Sia le variabili indipendenti che quelle dipendenti possono essere di diversi tipi, che dobbiamo saper riconoscere per scegliere che tipo di analisi statistica da eseguire. In particolare, distinguiamo:
 
 1. variabili nominali (categoriche);
 2. variabili ordinali;
@@ -496,27 +422,26 @@ Sia le variabili indipendenti sia quelle dipendenti possono essere di diversi ti
 
 ### Variabili nominali (categoriche)
 
-Le variabili nominali esprimono, per ciascun soggetto, l'appartenenza ad una determinata categoria o raggruppamento ed il valore che assumono lo definiamo modalità. L'unica caratteristica delle categorie è l'esclusività, cioè un soggetto che appartiene ad una di esse non può appartenere a nessuna delle altre. Variabili nominali sono, ad esempio, il sesso, la varietà, il tipo di diserbante impiegato, la lavorazione e così via. Le variabili categoriche permettono di raggruppare i soggetti, ma non possono essere utilizzate per fare calcoli, se non per definire le frequenze dei soggetti in ciascun gruppo.
+Le variabili nominali esprimono, per ciascun soggetto, l'appartenenza ad una determinata categoria o raggruppamento ed il valore che assumono lo definiamo modalità. L'unica caratteristica delle modalità è l'esclusività, cioè un soggetto che ha una certa modalità non può averne nessun altra. Le variabili nominali sono, ad esempio, il sesso, la varietà, il tipo di diserbante impiegato, la lavorazione e così via. Le variabili categoriche permettono di raggruppare i soggetti, ma non possono essere utilizzate per fare calcoli, se non per definire le frequenze dei soggetti in ciascun gruppo.
 
 ### Variabili ordinali
 
-Anche le variabili ordinali esprimono, per ciascun soggetto, l'appartenenza ad una determinata categoria o raggruppamento. Tuttavia, le diverse categorie sono caratterizzate, oltre che dall'esclusività, anche da una relazione di ordine, nel senso che è possibile stabilire una naturale graduatoria tra esse. Ad esempio, la risposta degli agricoltori a domande relative alla loro percezione sull'utilità di una pratica agronomica può essere espressa utilizzando una scala con sei categorie (0, 1, 2, 3, 4 e 5), in ordine crescente da 0 a 5 (scala Likert). Di conseguenza possiamo confrontare categorie diverse ed esprimere un giudizio di ordine (2 è maggiore di 1, 3 è minore di 5), ma non possiamo eseguire operazioni matematiche, tipo sottrarre dalla categoria 3 la categoria 2 e così via, dato che la distanza tra le categorie non è necessariamente la stessa.
+Anche le variabili ordinali esprimono, per ciascun soggetto, l'appartenenza ad una determinata categoria o raggruppamento. Tuttavia, le diverse categorie sono caratterizzate, oltre che dall'esclusività, anche da una relazione di ordine, nel senso che è possibile stabilire una naturale graduatoria tra esse. Ad esempio, la risposta degli agricoltori a domande relative alla loro percezione sull'utilità di una pratica agronomica può essere espressa utilizzando una scala con sei categorie (0, 1, 2, 3, 4 e 5), in ordine crescente da 0 a 5 (scala Likert). Di conseguenza possiamo confrontare categorie diverse ed esprimere un giudizio di ordine (2 è maggiore di 1, 3 è minore di 5), ma non possiamo eseguire operazioni matematiche, tipo sottrarre dalla categoria 3 la categoria 2 e così via, dato che la distanza tra le categorie non è specificata e, soprattutto, non è necessariamente la stessa.
 
 ### Variabili quantitative discrete
 
-Le variabili discrete sono caratterizzate dal fatto che possiedono, oltre alle proprietà dell'esclusività e dell'ordine, anche quella dell'equidistanza tra gli attributi (es., in una scala a 5 punti, la distanza – o la differenza – fra 1 e 3 è uguale a quella fra 2 e 4 e doppia di quella tra 1 e 2). Una tipica variabile discreta è il conteggio di piante infestanti all'interno di una parcella di terreno.
+Le variabili discrete sono caratterizzate dal fatto che possiedono, oltre alle proprietà dell'esclusività e dell'ordine, anche quella dell'equidistanza tra gli attributi (es., in una scala a 5 punti, la distanza – o la differenza – fra 1 e 3 è uguale a quella fra 2 e 4 e doppia di quella tra 1 e 2). Una tipica variabile discreta è il conteggio di piante infestanti all'interno di una parcella di terreno. Anche le proporzioni sono da considerare variabili discrete, in quanto non possono assumere valori nell'ambito dei numeri reali.
 
 Le variabili discrete consentono la gran parte delle operazioni matematiche e permettono di calcolare molte importanti statistiche come la media, la mediana, la varianza e la deviazione standard.
 
 
 ### Variabili quantitative continue
 
-Le variabili quantitative continue possiedono tutte le proprietà precedentemente esposte (esclusività delle categorie, ordine, distanza) oltre alla continuità, almeno in un certo intervallo. Tipiche variabili continue sono l'altezza, la produzione, il tempo, la fittezza...
+Le variabili quantitative continue possiedono tutte le proprietà precedentemente esposte (esclusività delle categorie, ordine, distanza) oltre alla continuità, almeno in un certo intervallo. Tipiche variabili continue sono l'altezza, la produzione, il tempo e la fittezza.
 
-Dato che gli strumenti di misura nella realtà sono caratterizzati da una certa risoluzione, si potrebbe arguire che misure su scala continua effettivamente non esistono. Tuttavia questo argomento è più teorico che pratico e, nella ricerca biologica, consideriamo continue tutte le misure nelle quali la risoluzione dello strumento è sufficientemente piccola rispetto alla grandezza da misurare, purchè la scelta dello strumento sia effettuata in modo oculato. Viceversa, le variabili continue sono piuttosto rare nelle scienze economiche e sociali in genere.
+Dato che gli strumenti di misura, nella realtà, sono caratterizzati da una risoluzione non infinita, si potrebbe arguire che le variabili continue, in pratica, non esistano. Tuttavia questo argomento è più teorico che pratico e, nella ricerca biologica, consideriamo continue tutte le variabili misurate con strumenti caratterizzati da un risoluzione sufficientemente buona rispetto alla grandezza da misurare. Insomma, se dobbiamo misurare l'altezza del mais ed utilizziamo un metro da sarto, possiamo ottenere una variabile che può essere considerata continua.
 
-La quantità di informazione fornita dagli strumenti di valutazione cresce passando dalle scale nominali, di più basso livello, a quelle quantitative continue, di livello più elevato. Variabili esprimibili con scale quantitative continue o discrete possono essere espresse anche con scale qualitative, adottando un'opportuna operazione di classamento. Il contrario, cioè trasformare in quantitativa una variabile qualitativa, non è invece possibile.
-Va tuttavia ricordato che che le variabili discrete tendono ad assumere un comportamento simile alle continue quando il numero di valori che può essere assunto dalla variabile risulta molto ampio. 
+Talvolta, per esigenze di rappresentazione, le variabili continue possono essere espresse su una scale qualitativa, adottando un'opportuna operazione di classamento. Il contrario, cioè trasformare in quantitativa una variabile qualitativa, non è invece possibile.
 
 ### Rilievi visivi e sensoriali
 
@@ -532,7 +457,7 @@ A questi vantaggi fanno da contraltare alcuni svantaggi, cioè:
 
 1. Minor precisione (in generale)
 2. Soggettività
-3. L'osservatore può essere prevenuto
+3. L'osservatore può essere influenzabile
 4. Difficoltà di mantenere uniformità di giudizio
 5. Richiede esperienza specifica e allenamento
 
@@ -544,48 +469,157 @@ Quando si pianificano i rilievi da eseguire, oppure anche nel corso dell'esecuzi
 
 Ad esempio, immaginiamo di voler valutare la produttività di una specie arborea in funzione della varietà. Immaginiamo anche di sapere che, per questa specie, la produttività dipende anche dall'età. Se facciamo un esperimento possiamo utilizzare alberi della stessa età per minimizzare la variabilità dei soggetti. Tuttavia, se questo non fosse possibile, per ogni albero dobbiamo rilevare non solo la produttività, ma anche l'età, in modo da poter valutare anche l'effetto di questo fattore aggiuntivo e separarlo dall'effetto della varietà. In questo modo l'esperimento diviene molto più preciso.
 
+## Esperimenti di campo
 
-## Impianto delle prove
+Una volta che tutti gli elementi della ricerca sono stati attentamente pianificati possiamo realizzare l'esperimento. Le tecniche che utilizzeremo saranno fortemente dipendenti dalla discipline, dagli obiettivi, dalla scala (esperimento di laboratorio, serra, campo...) e non è possibile dare indicazioni generali, a parte che ogni esperimento valido deve essere controllato, replicato e randomizzato.
+In questo capitolo parleremo solo di esperimenti di pieno campo, che costituiscono un elemento fondamentale della ricerca in agricoltura. Tuttavia, si può ragionevolmente ritenere che la gran parte delle informazioni che troverete sono valide anche per altri tipi di esperimenti.
 
-Da questo punto in poi, subentrano le competenze agronomiche e fitopatologiche necessarie per condurre gli esperimenti. Occorre, tuttavia, ricordare alcune pratiche usuali nella sperimentazione di pieno campo, destinate a migliorare l'efficienza della prova.
+### Scegliere il campo
 
-1. Seminare a densità più alte e poi diradare, per assicurare una migliore uniformità di impianto
-2. Prelevare da ogni parcella più campioni ed, eventualmente, omogeneizzarli o mediare i risultati ottenuti (vedi il caso dei 1000 semi)
-3. Considerare le caratteristiche naturalmente meno variabili (es. la produzione areica e non la produzione per pianta)
+Per quanto riguarda la sperimentazione di pieno campo, l'omogeneità dell'ambiente è fondamentale per aumentare la precisione dell'esperimento, cosa che si consegue, innanzitutto, con la scelta dell'appezzamento giusto. Questa scelta è particolarmente delicata ed è guidata soprattutto dall'esperienza, tenendo conto anche di aspetti come la facilità di accesso e la vicinanza di strutture (laboratori, capannoni...), che consentano un'accurata esecuzione degli eventuali prelievi. In genere, si cerca di non avvicinarsi troppo alle scoline, dove possono manifestarsi ristagni idrici, oppure a zone del campo che presentino evidenti segni di difformità.
 
-Si vuole inoltre ricordare che gli esperimenti parcellari configurano una situazione nella quale, per l'elevata cura che si pone nelle tecniche agronomiche, la produttività è almeno del 20% superiore rispetto a quanto avviene nella normale pratica agricola.
-
-## Scrivere un progetto/report di ricerca: semplici indicazioni
-
-Quanto abbiamo finora esposto costituisce uno schema generale che può essere adottato per redigere un progetto di ricerca o un report sui risultati ottenuti (tesi, pubblicazione). Bisogna provare che la ricerca che si è eseguita è precisa, accurata e replicabile/riproducibile e, di conseguenza, i risultati sono validi.
-
-Nella redazione di un progetto di ricerca o di un report, è fondamentale tratteggiare bene i seguenti elementi:
+Oltre a scegliere correttamente l'appezzamento, è importante anche porre in atto alcune operazioni preliminari che consentano di migliorare l'omogeneità del campo o della coltura. Ad esempio, talvolta si usa far precedere la prova da una coltura come l'avena, che è molto avida di azoto e lascia nel terreno poca fertilità residua. Oppure, si può impiantare un prato di erba medica, che, grazie agli sfalci periodici, lascia il terreno libero da piante infestanti. Un'altra tecnica molto usata è quella di seminare a densità più alte del normale e poi diradare, per assicurare una migliore uniformità d'impianto.
 
 
-1. Titolo della ricerca
-2. Descrizione del problema e background scientifico
-3. Ipotesi scientifica, motivazioni e obiettivi
-4. Tipo di esperimento e durata
-5. Disegno sperimentale: trattamenti sperimentali (tesi) a confronto con dettagli relativi all'applicazione
-6. Unità sperimentali e criteri per la loro selezione. Dettagli su repliche e randomizzazione
-7. Dettagli su eventuali tecniche di 'blocking'
-8. Variabili da rilevare/rilevate
-9. Dettagli su come le variabili saranno/sono state rilevate
-10. Esposizione dei risultati (solo nel report)
-11. Discussione (solo nel report)
-12. Conclusioni (solo nel report)
+### Le unità sperimentali in campo
+
+Dopo aver scelto il campo dobbiamo scegliere le unità sperimentali, distinguendo:
+
+1. prove dimostrative
+2. prove parcellari
+
+Le prove dimostrative, di solito, costituiscono la fase finale dello sviluppo di una nuova tecnica agronomica e, pertanto, vengono condotte su scala aziendale, utilizzando i normali macchinari di un'azienda agraria e considerando tutta la variabilità tipica delle normali condizioni di coltivazione in pieno campo. Questi esperimenti, usualmente, vengono condotti su **striscie di terreno** (strip), usualmente di forma rettangolare e di dimensione adatta alle normali seminatrici e trebbiatrici aziendali.
+
+Di solito il numero dei trattamenti è basso, spesso pari a due: la tecnica innovativa e quella usuale, con funzioni di controllo. Questi due trattamenti sono allocati a due strisce contigue che costituiscono un 'blocco', ripetuto tre o quattro volte, in modo da catturare la variabilità del campo. Per semplicità, considerando l'ampia dimensione delle strisce, la randomizzazione può essere omessa, cosi che il disegno assomiglia al tipo A3 nella Figura 1.4 (capitolo precedente). Un esempio di questo lay-out è riportato in Figura \@ref(fig:figName30a), dove si vedono quattro campi con due strisce ciascuno. In un campo, i trattamenti sono allocati a ciascuna delle due strisce.
+
+<div class="figure" style="text-align: center">
+<img src="_images/OnFarmTrial.png" alt="Esempio di disegno sperimentale per una prova dimostrativa, con quattro campi, due strisce per campo e un diverso trattamento per striscia (giallo e bianco)" width="90%" />
+<p class="caption">(\#fig:figName30a)Esempio di disegno sperimentale per una prova dimostrativa, con quattro campi, due strisce per campo e un diverso trattamento per striscia (giallo e bianco)</p>
+</div>
+
+Gli esperimenti dimostrativi sono spesso ripetuti nello spazio e nel tempo, per ottenere informazioni più attendibili sulla validità della tecnica innovativa.
+
+Le prove parcellari sono, invece, una via di mezzo tra le prove dimostrative e gli esperimenti di laboratorio: pur essendo in pieno campo, le parcelle di terreno sono sufficientemente piccole per consentire un elevato grado di precisione e di controllo (Figura \@ref(fig:figName21) ). Ovviamente, questo elevato grado di controllo consente di ottenere produzioni che sono, mediamente, un 10-30% maggiori di quelle ottenibili su scala aziendale.
+
+<div class="figure" style="text-align: center">
+<img src="_images/SorgoProveVarietali.jpg" alt="Una prova sperimentale in campo (Foto D. Alberati)" width="90%" />
+<p class="caption">(\#fig:figName21)Una prova sperimentale in campo (Foto D. Alberati)</p>
+</div>
+
+La **dimensione delle parcelle** viene scelta in modo da avere un numero di piante sufficientemente alto da essere rappresentativo. Per questo motivo le colture a bassa fittezza (es. mais) hanno sempre bisogno di parcelle più grandi che non quelle ad alta fittezza (es. frumento). La dimensione non deve tuttavia essere troppo elevata, in quanto si viene a determinare un incremento della variabilità del terreno e, di conseguenza, una diminuzione della precisione dell'esperimento. Per questo motivo, talvolta si preferisce diminuire la dimensione delle parcelle ed, avendo lo spazio sufficiente, aumentare il numero delle repliche. E' poi importante tenere conto delle dimensioni delle macchine operatrici che verranno utilizzate per le pratiche colturali; in genere, la larghezza della parcella dovrebbe essere pari a un multiplo della larghezza di lavoro delle seminatrici e/o raccoglitrici e/o delle macchine per la distribuzione dei fitofarmaci. 
+
+Nello stabilire la dimensione delle parcelle, dovremo tener conto del fatto che la parte più delicata è il bordo, in quanto le piante che si trovano lungo di esso risentono di condizioni diverse dalle altre piante situate al centro della parcella (**effetto bordo**). Questo determina variabilità all'interno della parcella, che possiamo minimizzare raccogliendo solo la parte centrale. Si viene così a distinguere la superficie totale della parcella dalla superficie di raccolta (**superficie utile**), che può essere anche molto minore di quella totale.
+
+Tenendo conto degli aspetti detti in precedenza, riteniamo che le colture ad elevata fittezza (frumento, cereali, erba medica...) dovrebbero avere parcelle di almeno 10-20 m^2^, mentre le colture a bassa fittezza (mais, girasole...) dovrebbero avere parcelle di almeno 20-40 m^2^, con riferimento alla superficie utile di raccolta.
+
+Per quanto riguarda la **forma delle parcelle**, anche se il quadrato minimizzerebbe l'effetto bordo, perché, a parità di superficie, ha un perimetro più basso, nella pratica le parcelle sono sempre rettangolari, per facilitare l'esecuzione delle operazioni meccaniche.Come già detto, la larghezza dovrebbe essere pari ad un multiplo del fronte di lavoro delle macchine operatrici da impiegare.
+
+### Numero di repliche
+
+Per gli esperimenti di pieno campo il numero di repliche oscilla tra tre e cinque; con meno repliche l'esperimento è inefficiente, mentre un numero più elevato di repliche può essere dannoso, in quanto aumenta la dimensione dell'esperimento e, con essa, la variabilità del campo. Inoltre, un numero alto di repliche aumenta i costi e i tempi di esecuzione dei rilievi. Il numero totale di parcella, alla fine, risulta dal prodotto tra il numero delle tesi sperimentali e il numero delle repliche. 
+
+### La mappa di campo
+
+Il disegno di un esperimento, di solito, è pianificato su una mappa. Un esempio è riportato in Figura \@ref(fig:figName31), relativamente ad un esperimento sistemato su un appezzamento largo 30 metri e lungo 400 metri. In questo caso abbiamo disegnato otto file di parcelle in senso trasversale (8 x 2.25 m = 18 m di larghezza), e quattro parcelle in senso longitudinale. Intorno all'esperimento abbiamo sistemato una serie di parcelle addizionali, con lo scopo di ridurre l'effetto 'bordo'. Vediamo in figura che la mappa riporta tutte le informazioni che consentono di collocare correttamente l'esperimento nello spazio ed, inoltre, che le parcelle sono tutte chiaramente identificate con un codice numerico.
+
+<div class="figure" style="text-align: center">
+<img src="_images/Mappa1.png" alt="Mappa di campo di un esperimento con 32 parcelle" width="90%" />
+<p class="caption">(\#fig:figName31)Mappa di campo di un esperimento con 32 parcelle</p>
+</div>
+
+### Lay-out sperimentale
+
+Abbiamo già parlato di come possa essere conveniente, nella pratica sperimentale, porre dei vincoli alla randomizzazione. A seconda di come poniamo questi vincoli, distinguiamo diversi disegni sperimentali, che descriveremo nei prossimi paragrafi.
+
+#### Disegni completamente randomizzati
+
+Per queste prove, le più semplici, la scelta dei soggetti da trattare è totalmente casuale, senza vincoli di sorta. Il vantaggio principale è la semplicità; lo svantaggio sta nel fatto che tutte le eventuali differenze e disomogeneità tra unità sperimentali restano non riconosciute ed entrano nella definizione della variabilità residua. Per questo, i disegno completamente randomizzati sono utilizzato soprattutto per le situazioni di buona uniformità ambientale e tra i soggetti.
+
+Come esempio, mostriamo un disegno completamente randomizzato utilizzando le parcelle della figura \@ref(fig:figName31), alle quali abbiamo allocato 8 trattamenti (da A ad H) con quattro repliche. Come si può notare, l'allocazione è completamente casuale (figura \@ref(fig:figName33))
+
+<div class="figure" style="text-align: center">
+<img src="_images/Mappa1CRD.png" alt="Esempio di uno schema sperimentale a randomizzazione completa" width="90%" />
+<p class="caption">(\#fig:figName33)Esempio di uno schema sperimentale a randomizzazione completa</p>
+</div>
+
+#### Disegni a blocchi randomizzati
+
+Quando le unità sperimentali non sono totalmente omogenee, ma vi è una certa variabilità per una qualche caratteristiche rilevante, potremo dividere i soggetti in base a questa caratteristica, in tanti gruppi quante sono le repliche.
+
+Ad esempio, nel caso dello schema in figura \@ref(fig:figName33), se ammettiamo l'esistenza di un gradiente di fertilità crescente das sinistra verso destra, allora il trattamento H è stato avvantaggiato, perché tre delle quattro repliche si trovano nella parte destra, mentre il trattamento G è stato svantaggiato, per il motivo opposto.
+
+Si può ottenere un disegno più efficiente se dividendo l'esperimento in quattro blocchi perpendicolari al gradiente di fertilità. Ad esempio il blocco 1 conterrà le parcelle 1, 9, 17, 25, 2, 10, 18 e 26, cioè le prime due colonne della mappa, con un numero di parcelle esattamente uguali al numero dei trattamenti. Il blocco 2 conterrà le colonne 3 e 4 e così via. Dato che il gradiente è trasversale, le parcelle di un stesso blocco saranno più omogenee che non parcelle su blocchi diversi. Dopo aver diviso la mappa in quattro blocchi di otto parcelle, potremo allocare gli otto trattamenti a random all'interno di ogni blocco (\@ref(fig:figName34))
+
+<div class="figure" style="text-align: center">
+<img src="_images/Mappa1CRBD.png" alt="Esempio di uno schema sperimentale a blocchi randomizzati" width="90%" />
+<p class="caption">(\#fig:figName34)Esempio di uno schema sperimentale a blocchi randomizzati</p>
+</div>
+
+Un disegno a blocchi randomizzati non è solo tipico della sperimentazione di campo. Ad esempio, volendo determinare la contaminazione da micotossine nelle confezioni di datteri, a seconda della modalità di confezionamento (es. carta, busta di plastica, scatola di plastica perforata), si può sospettare che il supermercato nel quale le confezioni vengono vendute potrebbe avere un certo effetto, legato alle modalità di conservazione. Per cui, invece che prelevare trenta confezioni (dieci per metodo) a caso nei supermercati di una città, scegliamo dieci supermercati e, in ognuno, prendiamo una confezione per tipo. In questo caso, il supermercato fa da blocco.
+
+Il vantaggio del disegno a blocchi randomizzati sta nel fatto che ci permetto di utilizzare soggetti sperimentali con una più bassa omogeneità iniziale, aspetto importante quando il numero di unità sperimentali richieste comincia ad essere elevato. Infatti, le differenze tra soggetti sperimentali, almeno in parte, possono essere spiegate attraverso l'appartenenza ad un determinato gruppo (blocco) e possono quindi essere scorporate dal calcolo della variabilità residua.
+
+#### Disegni a quadrato latino
+
+In questo caso, le unità sperimentali presentano due 'gradienti', cioè vi sono differenze legate a due elementi importanti, oltre al trattamento sperimentale. La Figura \@ref(fig:figName35) mostra un esperimento con quattro trattamenti e altrettante repliche, nel quale ogni trattamento si trova in tutte le righe e tutte le colonne, in modo da poter considerare eventuali gradienti di fertilità da destra verso sinistra e dall'alto verso il basso. La figura mostra anche perché si parli di quadrato latino: in effetti il numero di righe è uguale al numero di colonne, secondo una griglia quadrata. Qualcuno di voi riconoscerà in questo schema i principi di fondo del Sudoku.
+
+<div class="figure" style="text-align: center">
+<img src="_images/Mappa2LS.png" alt="Esempio di un disegno sperimentale a quadrato latino, con quattro trattamenti (A, B, C e D) ed altrettante repliche. I colri aiutano ad identificare i quattro trattamenti e la posizione delle rispettive parcelle" width="70%" />
+<p class="caption">(\#fig:figName35)Esempio di un disegno sperimentale a quadrato latino, con quattro trattamenti (A, B, C e D) ed altrettante repliche. I colri aiutano ad identificare i quattro trattamenti e la posizione delle rispettive parcelle</p>
+</div>
+
+I disegni a quadrato latino non sono solo utili per gli esperimenti di pieno campo; ad esempio, se un certo oggetto richiede un solo operatore per essere costruito e vogliamo confrontare quattro metodi costruttivi, possiamo pianificare un esperimento dove l'unità sperimentale è il lavoratore. Volendo lavorare con quattro repliche, avremmo bisogno di sedici operatori per disegnare un esperimento completamente randomizzato. Possiamo tuttavia considerare che un operatore, in quattro turni successivi, può operare con tutti e quattro i metodi. Quindi possiamo disegnare un esperimento in cui il turno fa da unità sperimentale e l'operatore fa da blocco (esperimento a blocchi randomizzati).
+
+Tuttavia, in ogni blocco (operatore) vi è un gradiente, nel senso che i turni successivi al primo sono via via meno efficienti, perché l'operatore accumula stanchezza. Per tener conto di questo, potremmo lasciare all'operatore un congruo periodo di tempo tra un turno e l'altro. Oppure, potremmo introdurre un vincolo ulteriore, per ogni operatore, randomizzando i quattro metodi tra i turni, in modo che ogni metodo, in operatori diversi, capiti in tutti i turni. In sostanza, l'operatore fa da blocco, perché in esso sono contenuti tutti i metodi. Ma anche il turno (per tutti gli operatori) fa da blocco, in quanto in esso sono ancora contenuti tutti i metodi. Proviamo a schematizzare, nella figura seguente (\@ref(fig:figName391) ).
+
+<div class="figure" style="text-align: center">
+<img src="_images/TurniOperatori.png" alt="Allocazione di quattro metodi di lavoro (A, B, C e D), tra quattro operatori, in quattro turni, seguendo uno schema a quadrato latino" width="90%" />
+<p class="caption">(\#fig:figName391)Allocazione di quattro metodi di lavoro (A, B, C e D), tra quattro operatori, in quattro turni, seguendo uno schema a quadrato latino</p>
+</div>
+
+Il disegno a quadrato latino è utile, perché possiamo dar conto sia delle differenza tra righe (es. turni), che delle differenze tra colonne (es. operatori), in modo da ridurre al minimo possibile la variabilità inspiegabile. Lo svantaggio sta nel fatto che, dovendo avere tante repliche quanti sono i trattamenti, è utilizzabile solo per esperimenti abbastanza piccoli.
+
+#### Disegni a split-plot
+
+Gli esperimenti fattoriali possono essere disegnati con uno schema a randomizzazione completa o a blocchi randomizzati, allocando alle unità sperimentali tutte le combinazioni dei fattori in studio. Per esempio, consideriamo un esperimento per confrontare tre tipi di lavorazioni del terreno (minimum tillage = MIN; aratura superficiale = SP; aratura profonda = DP) e due tipi di controllo chimico delle piante infestanti (a pieno campo = TOT; lungo la fila = PARZ). Se vogliamo fare quattro repliche, i sei trattamenti sperimentali (MIN-TOT, SP-TOT, DP-TOT, MIN-PARZ, SP-PARZ and DP-PARZ) possono essere allocati alle 24 parcelle secondo uno schema a blocchi randomizzati, come indicato in Figura \@ref(fig:figName37). In questo caso è necessario lasciare un ampio spazio tra le parcelle, in modo da permettere la circolazione delle macchine operatrici per la lavorazione ed, inoltre, le parcelle debbono essere grandi, per consentire una buona esecuzione dell'aratura.
+
+<div class="figure" style="text-align: center">
+<img src="_images/Mappa3FATT.png" alt="Mappa di campo per un esperimento fattoriale con due fattori, disegnato a blocchi randomizzati" width="75%" />
+<p class="caption">(\#fig:figName37)Mappa di campo per un esperimento fattoriale con due fattori, disegnato a blocchi randomizzati</p>
+</div>
+
+Dato che il trattamento di diserbo non richiede parcelle altrettanto grosse, potremmo pensare di suddividere ogni parcella in due sub-parcelle, sulle quali allocare il trattamento di diserbo (disegno a **parcella suddivisa** o **split-plot**). Un esempio è riportato in Figura \@ref(fig:figName38), dove possiamo osservare che le lavorazioni sono allocate su 12 parcelle principali (mainplots), secondo uno schema a blocchi randomizzati, mentre i trattamenti di diserbo sono allocati in modo randomizzato sulle due subplot in ogni mainplot. Tecnicamente, diciamo che la lavorazione è il fattore di primo ordine, mentre il diserbo chimico è il fattore di secondo ordine. Notiamo che l'esperimento diviene più piccolo e quindi più preciso.
 
 
-Alcuni aspetti che divengono elemento di valutazione del progetto e/o del report sono i seguenti:
+<div class="figure" style="text-align: center">
+<img src="_images/Mappa3split.png" alt="Stesso esperimento descritto nella figura precedente, ma disegnato con uno schema a split-plot." width="75%" />
+<p class="caption">(\#fig:figName38)Stesso esperimento descritto nella figura precedente, ma disegnato con uno schema a split-plot.</p>
+</div>
 
-1. La selezione dei metodi deve essere coerente con gli obiettivi
-2. Descrizione dettagliata dei materiali e metodi (bisogna che chiunque sia in grado di replicare l'esperimento)
-3. Esposizione dei risultati chiara e convincente
-4. Discussione approfondita e con molti riferimenti alla letteratura per confermare quanto ottenuto in passato o giusitificare risultati differenti.
+In generale, un disegno a split-plot può rendersi necessario per i seguenti motivi:
+
+1. un fattore sperimentale richiede parcelle più grandi dell'altro. Di conseguenza si disegna l'esperimento per il fattore che richiede parcelle più grandi, che vengono poi suddivise per accomodare l'altro fattore sperimentale.
+2. Uno dei due fattori sperimentali è più 'difficile' da assegnare rispetto all'altro e quindi è preferibile manipolare congiuntamente tutto il gruppo di unità sperimentali che deve riceverlo. Ad esempio, se vogliamo misurare la resistenza alla corrosione di barre d'acciaio con diversi rivestimenti e forgiate a diverse temperature, è evidente che la gestione della temperatura nella fornace è piuttosto complessa, perché richiede tempi lunghi per essere cambiata e raggiungere un nuovo equilibrio. Invece che preparare una fornace per ogni rivestimento (manipolazione indipendente delle unità sperimentali), si mettono nella stessa fornace tutte le unità sperimentali con i diversi rivestimenti. Una situazione analoga si può avere se vogliamo provare diverse miscele per torte (con vari ingredienti), e diversi tempi di cottura; dato che non è agevole preparare una miscela diversa per ogni tempo di cottura, potremmo preparare una miscela tutta insieme, per poi suddividerla tra i diversi tempi di cottura.
+3. La disponibilità di unità sperimentali è limitata, come accade con gli armadi climatici, che vengono impostati a diversa temperatura e all'interno delle quali vengono randomizzate le tesi sperimentali di secondo ordine.
+
+Un'importante conseguenza dei disegni a split-plot è che ogni mainplot funge da replica per il fattore sperimentale di secondo ordine. In effetti, se guardiamo alla Figura \@ref(fig:figName38), possiamo osservare che ci sono quattro repliche per ogni lavorazione, ma 12 repliche per ogni tipo di diserbo chimico. Di conseguenza, l'effetto del fattore sperimentale di secondo ordine è stimato con maggior precisione.
+
+#### Disegni a strip-plot
+
+In alcune circostanze, soprattutto nelle prove di diserbo chimico, potrebbe trovare applicazione un altro tipo di schema sperimentale, nel quale ogni blocco viene diviso in tante righe quanti sono i livelli di un fattore sperimentale e tante colonne quanti sono i livelli dell'altro. In questo modo, il primo trattamento sperimentale viene applicato a tutte le parcelle di una riga e l'altro trattamento a tutte le parcelle di una colonna. Ovviamente, l'allocazione alle righe e alle colonne è casuale e cambia in ogni blocco.
+
+Questo disegno è detto **strip-plot** ed è molto comodo perché consente di lavorare velocemente. Se consideriamo il caso studio precedente, un disegno a strip-plot potrebbe essere immaginato come in Figura \@ref(fig:figName253).
+
+
+<div class="figure" style="text-align: center">
+<img src="_images/Mappa3Strip.png" alt="Esempio di un disegno a strip-plot per il dataset 'beet.csv', che prevede tre livelli di lavorazione e due livelli di diserbo chimico" width="70%" />
+<p class="caption">(\#fig:figName253)Esempio di un disegno a strip-plot per il dataset 'beet.csv', che prevede tre livelli di lavorazione e due livelli di diserbo chimico</p>
+</div>
+
 
 ---
 
-## Per approfondire un po'...
+## Altre letture
 
 1. Cochran, W.G., Cox, G.M., 1950. Experimental design. John Wiley & Sons, Inc., Books.
 2. LeClerg, E.L., Leonard, W.H., Clark, A.G., 1962. Field Plot Technique. Burgess Publishing Company, Books.
@@ -597,50 +631,466 @@ Alcuni aspetti che divengono elemento di valutazione del progetto e/o del report
 
 
 
-<!--chapter:end:03-ResProject.Rmd-->
+<!--chapter:end:02-ResProject.Rmd-->
+
+# Richiami di statistica descrittiva
+
+
+Qualunque esperimento include una serie di rilievi, al termine dei quali ci troviamo con una o più variabili, che costituiscono un 'dataset'. Il nostro primo compito è quello di comprendere e descrivere le caratteristiche fondamentali di ogni variabile, utilizzando opportune statistiche descrittive, che cambiano al cambiare del tipo di variabile.
+
+## Dati quantitativi
+
+Se i dati sono stati ottenuti con un processo di misurazione e rappresentano una quantità, come, ad esempio, il peso, l'altezza, la concentrazione e così via, abbiamo una variabile quantitativa, le cui caratteristiche fondamentali sono almeno due:
+
+1. tendenza centrale
+2. dispersione
+
+La tendenza centrale di una variabile quantitativa è un valore, intorno al quale si collocano tutte le osservazioni, mentre la dispersione misura, in qualche modo, la distanza delle osservazioni tra di loro. Esistono diverse statistiche di tendenza centrale e dispersione; di seguito, descriveremo le più importanti. 
+
+### Indicatori di tendenza centrale
+
+L'indicatore di tendenza centrale più diffuso è la *media* aritmetica, che non necessita di particolari spiegazioni: si tratta della somma dei dati ($x$) divisa per il loro numero ($n$):
+
+$$\mu = \frac{\sum\limits_{i = 1}^n x}{n}$$
+
+Per esempio, consideriamo il seguente dataset, che elenca le altezze di quattro piante di mais $d = [178, 175, 158, 153]$
+
+Il calcolo della media è banale:
+
+$$\mu = \frac{178 + 175 + 158 + 153}{4} = 166$$
+
+Un altro indicatore di tendenza centrale è la *mediana*, cioè il valore che bipartisce i dati in modo da lasciarne metà a sinistra e metà a destra, così da risultare superiore a quello del 50% degli individui. Per calcolare la mediana, basta ordinare i soggetti in ordine crescente: se il numero di individui è dispari, la mediana è data dal valore dall’individuo che occupa il posto centrale o, se gli individui sono in numero pari, dalla media delle due osservazioni centrali. Nel nostro dataset relativo alle altezze, i dati sono in numero pari, quindi dopo averli ordinati, prendiamo il secondo e il terzo valore e calcoliamo la loro media, pari a $(158 + 175)/2 = 166.5$.
+
+La mediana è un indicatore più robusto della media: infatti, supponiamo di avere i cinque valori: 1 - 4 - 7 - 9 - 10. La media è pari a 6.2, mentre la mediana è pari a 7 (valore centrale). Se cambiano il numero più alto in questo modo, sostituendolo con 100, la media diventa 24.2, mentre la mediana rimane pari a 7, mostrando come essa non sia per nulla influenzata dai valori estremi (*outliers*).
+
+
+### Indicatori di dispersione
+
+Gli indicatori di tendenza centrale, da soli, non ci informano su come le unità sperimentali tendono a differire l’una dall’altra: ad esempio una media pari a 100 può essere ottenuta con tre individui che misurano 99, 100 e 101 rispettivamente o con tre individui che misurano 1, 100 e 199. E’ evidente che in questo secondo gruppo gli individui sono molto più differenti tra loro (dispersi) che nel primo gruppo.
+
+Pertanto, i risultati di un processo di misurazione non possono essere descritti solo con la media, ma è necessario anche calcolare un indice di variabilità. Tra essi, il più semplice è il *campo di variazione*, che è la differenza tra la misura più bassa e la misura più alta. In realtà, non si tratta di un vero e proprio indice di variabilità, in quanto dipende solo dai termini estremi della distribuzione e non necessariamente cresce al crescere della variabilità degli individui. Per questo motivo, si preferisce utilizzare indicatori più affidabili, come la devianza, la varianza, la deviazione standard ed il coefficiente di variabilità, tutti collegati da relazioni algebriche ben definite.
+
+La *devianza* (generalmente nota come SS, cioè somma dei quadrati, *sum of squares*) è data da:
+
+$$SS = \sum\limits_{i = 1}^n {(x_i  - \bar x)^2 }$$
+
+Si tratta di un indicatore caratterizzato da un significato geometrico molto preciso, collegabile alla somma dei quadrati delle distanze euclidee di ogni osservazione rispetto alla media. Per le altezze che abbiamo utilizzato in precedenza, la devianza si calcola:
+
+$$SS = \left(178 - 166 \right)^2 + \left(175 - 166 \right)^2 + \left(158 - 166 \right)^2  + \left(153 - 166 \right)^2= 458$$
+
+La devianza è molto utile in alcuni contesti che vedremo, ma per la semplice descrizione della variabilità dei dati ha due problemi: in primo luogo, proprio perché è una somma, il valore finale dipende dal numero di addendi e quindi non lo si può utilizzare per confrontare la variabilità di collettivi diversamente numerosi. Inoltre, l'unità di misura della devianza è al quadrato rispetto all'unità di misura originale dei dati; ad esempio se le osservazioni sono espresse in centimetri (come in questo caso), la devianza è espressa in centimetri quadrati, il che rende più difficoltosa l'interpretazione di questa statistica.
+
+Oltre dalla devianza, si può calcolare la *varianza* (o meglio, varianza campionaria), definita come segue:
+
+$$\sigma^2  = \frac{SS}{n - 1}$$
+
+Nel nostro caso:
+
+$$\sigma^2  = \frac{458}{3} = 152.67$$
+
+La varianza permette di confrontare la variabilità di collettivi diversamente numerosi, anche se permane il problema che questo indicatore è espresso in un’unità di misura al quadrato, rispetto a quella delle osservazioni originali. Per eliminare questo problema si ricorre alla radice quadrata della varianza, cioè la *deviazione standard*, che si indica con $\sigma$. La deviazione standard è espressa nella stessa unità di misura dei dati originari ed è quindi molto informativa sulla banda di oscillazione dei dati rispetto alla media. Viene frequentemente utilizzata per descrivere l'*incertezza assoluta* di una misura ripetuta più volte. Nel nostro caso, risulta che:
+
+$$\sigma  = \sqrt{152.67} = 12.36$$
+
+e questo valore ci fa capire che, 'mediamente', la distanza euclidea tra le osservazioni e la media è 12.36 centimetri. Media e deviazione standard sono spesso riportate contemporaneamente, utilizzando un intervallo $l$ definito come:
+
+$$l = \mu \pm \sigma$$
+
+In assenza della media, $\sigma$ non riesce a dare informazioni facilmente comprensibili: se in un collettivo la deviazione standard è 12.36 come è questo collettivo? Molto o poco variabile? Non possiamo dirlo: potrebbe essere molto disperso se la media fosse bassa (ad esempio 16), oppure poco disperso, se la media fosse alta (esempio 1600). Per questo, se dobbiamo descrivere la variabilità dei dati indipendentemente dalla media, utilizziamo il *coefficiente di variabilità* (CV):
+
+$$CV = \frac{\sigma }{\mu } \times 100$$
+
+che è un numero puro e non dipende dall’unità di misura e dall’ampiezza del collettivo, sicché è molto adatto ad esprimere, ad esempio, l’errore degli strumenti di misura e delle apparecchiature di analisi (**incertezza relativa**). Nel nostro caso, abbiamo:
+
+$$CV = \frac{12.36}{166} \times 100 = 7.45 \%$$
+
+Come la media, anche la devianza, varianza e deviazione standard sono sensibili agli outliers. Pertanto, in presenza di queste osservazioni aberranti, possiamo estendere il concetto di mediana, calcolando i cosiddetti *percentili*, che bipartiscono la popolazione di partenza in modo da lasciare una certa quantità di termini alla sua sinistra e la restante quantità alla sua destra. Ad esempio, il primo percentile bipartisce la popolazione in modo da lasciare a sinistra l’ 1% dei valori e alla destra il restante 99%. Allo stesso modo l’ottantesimo percentile bipartisce la popolazione in modo da lasciare a sinistra l’80% dei termini e alla destra il restante 20%, mentre la mediana rappresenta il 50-esimo percentile.
+
+I percentili più utilizzati per descrivere la dispersione di un collettivo sono il 25-esimo e il 75-esimo: se questi sono molto vicini, significa che il 50% dei soggetti è compreso in un intervallo piccolo e quindi la variabilità della popolazione è bassa. Calcolare i percentili a mano non è banale e, di conseguenza, lo faremo nei paragrafi successivi utilizzando R. 
+
+### Incertezza delle misure derivate
+
+A volte noi misuriamo due quantità e poi le combiniamo, per ottenere una misura derivata. La combinazione più semplice è la somma, ad esempio quando determiniamo separatamente il peso di due specie infestanti in un vaso e poi sommiamo questi due valori per ottenere il peso totale della biomassa infestante. In questo caso, **l'incertezza assoluta di una somma o di una differenza è sempre uguale alla radice quadrata della somma dei quadrati delle incertezze assolute degli addendi**. Ad esempio, se abbiamo le due quantità $22 \pm 2$ e $14 \pm 3$, la somma sarà $36 \pm \sqrt{4 + 9}$ e la differenza sarà $8 \pm 3.6$.
+
+### Relazioni tra variabili quantitative: correlazione
+
+Se su ogni soggetto abbiamo rilevato due caratteri quantitativi (ad esempio il peso e l'altezza, oppure la produzione e il contenuto di proteina della granella), è possibile verificare se esiste una relazione tra la coppia di variabili ottenuta, cioè se al variare di una cambia anche il valore dell’altra, in modo congiunto.
+
+Per questo fine, si utilizza il *coefficiente di correlazione di Péearson* costituito dal rapporto tra la codevianza (o somma dei prodotti) delle due variabili e la radice quadrata del prodotto delle loro devianze. Il coefficiente di correlazione varia tra $-1$ e $+1$: un valore pari a $+1$ indica concordanza perfetta (quando aumenta una variabile, aumenta anche l’altra in modo proporzionale), mentre un valore pari a $-1$ indica discordanza perfetta (quando aumenta una variabile, diminuisce l’altra in modo inversamente proporzionale). Un valore pari a $0$ indica assenza di qualunque grado di variazione congiunta tra le due variabili (assenza di correlazione). Valori intermedi tra quelli anzidetti indicano correlazione positiva (se positivi) e negativa (se negativi).
+
+Proviamo a considerare questo esempio: il contenuto di olio di 9 lotti di acheni di girasole è stato misurato con due metodi diversi ed è riportato più sotto.
+
+
+```r
+A <- c(45, 47, 49, 51, 44, 37, 48, 44, 53)
+B <- c(44, 44, 49, 53, 48, 34, 47, 46, 51)
+```
+
+Valutare la correlazione tra i risultati dei due metodi di analisi. Manualmente dobbiamo eseguire alcune operazioni:
+
+1. calcolare la devianza di A
+2. calcolare la devianza di B
+3. calcolare la loro codevianza
+
+In primo luogo, vediamo che le due medie sono, rispettivamente 46.44 e 46.22. A questo punto possiamo calcolare gli scarti, come differenze tra ogni dato e la sua media e calcolare i loro quadrati, nonché i loro prodotti, riportando il tutto in una tabella, come indicato qui di seguito.
+
+
+
+A questo punto possiamo calcolare la somma dei quadrati degli scarti, ottenendo le devianze di $A$ e $B$ (rispettivamente 176.22 e 239.56) nonché le somme dei prodotti degli scarti, ottenendo la codevianza (pari a 184.11).
+
+Il coefficiente di correlazione è quindi:
+
+$$r = \frac{184.11}{\sqrt{176.22 \times 239.56}} = 0.896$$
+
+
+Vediamo che il coefficiente di correlazione è abbastanza vicino ad 1 e quindi possiamo concludere che i due metodi di analisi danno risultati ben concordanti.
+
+## Dati qualitativi
+
+Nel capitolo 2 abbiamo visto che le variabili qualitative sono ottenute assegnando un soggetta ad una classe scelta tra due o più possibili opzioni. La descrizione di queste variabili di solito è effettuata calcolando le *frequenza assolute*, cioè il numero di individui assegnato ad ogni classe. Ad esempio, se abbiamo esaminato 500 insetti rilevando l'ordine a cui appartengono, le frequenze assolute potrebbero essere: 100 ditteri, 200  imenotteri e 150 ortotteri.
+
+Oltre alle frequenze assolute, possiamo calcolare anche le *frequenze relative*, dividendo le frequenze assolute per il numero totale degli individui del collettivo. Nel caso prima accennato, la frequenza relativa dei ditteri è pari a $100/500 = 0.2$.
+
+Se le classi possono essere logicamente ordinate, oltre alle frequenze assolute e relative, possiamo calcolare anche le cosiddette *frequenze cumulate*, che si ottengono cumulando le frequenze relative di una classe con quelle di tutte le classi precedenti.
+
+### Distribuzioni di frequenze e classamento
+
+Quando rappresentiamo, in un grafico o in una tabella, le frequenze (assolute, relative o cumulate) per tutte le classi e tutti gli individui del collettivo, otteniamo una *distribuzione di frequenze*. 
+
+Ad esempio, se consideriamo il famoso database 'mtcars', relativo alle 32 auto storiche censite dalla rivista Motor Trends nel 1974, e analizziamo il numero delle marce, otteniamo la seguente distribuzione di frequenze assolute, relative e cumulate.
+
+
+| Marce| Freq.Ass| Freq.Rel| Freq.Cum|
+|-----:|--------:|--------:|--------:|
+|     3|       15|     0.47|     0.47|
+|     4|       12|     0.38|     0.84|
+|     5|        5|     0.16|     1.00|
+
+
+Una distribuzione di frequenze può essere rappresentata con un grafico a torte, come vedremo tra poco. Inoltre, precisiamo anche che le distribuzioni di frequenze possono essere costruite anche per le variabili quantitative, tramite un’operazione di *classamento*, che consiste nel creare classi con intervalli opportuni e contare i soggetti in ogni classe. In questo modo, se le osservazioni sono molto numerose, la lettura delle informazioni risulta più semplice e più completa che non elencando tutti i valori o, d'altra parte, riportando solo la media e la deviazione standard. Daremo un esempio di questa tecnica in un paragrafo successivo.
+
+
+### Statistiche descrittive per le distribuzioni di frequenze 
+
+Per una distribuzione di frequenze, il più semplice indicatore di tendenza centrale è la *moda*, cioè il valore della classe che presenta la maggior frequenza. Ovviamente, se la variabile è quantitativa ed è stata sottoposta a classamento, si considera come moda il punto centrale della classe con maggior frequenza. L’individuazione della moda è banale e non richiede calcoli di sorta.
+
+In alcune condizioni (distribuzioni di frequenze per caratteri qualitativi ordinabili o quantitativi sottoposti a classamento), oltre alla moda possiamo calcolare la *mediana* e gli altri percentili, nonché la media e le altre statistiche descrittive indicate per i caratteri quantitativi. Tuttavia, si tratta di una situazione più tipica delle scienze economiche e sociali che non delle scienze agrarie e biologiche e, per questo motivo, non la prenderemo in ulteriore considerazione.
+
+### Distribuzioni di frequenza bivariate: le tabelle di contingenze
+
+In alcuni casi, in ciascuna unità sperimentale del collettivo vengono studiati due (o più) caratteri qualitativi e, di conseguenza, si ha a che fare con distribuzioni di frequenze bivariate (o multivariate), rappresentabili con *tabelle di contingenze*. Si tratta di tabelle a due entrate, nelle quali ogni numero rappresenta la frequenza assoluta per una particolare combinazione delle due variabili.
+
+Ad esempio, se per un gruppo di bacche di pomodoro abbiamo rilevato, bacca per bacca, la varietà (nelle due classi SANREMO e FANO) e la forma (nelle tre classi LUNGO, TONDO ed OVALE) potremo definire la tabella di contingenze sotto riportata.
+
+
+
+|        | LUNGO| TONDO| OVALE|
+|:-------|-----:|-----:|-----:|
+|SANREMO |    37|    32|    61|
+|FANO    |    45|    74|    59|
+
+Ogni riga della tabella sovrastante costituisce una distribuzione di frequenze per la forma del frutto, data una certa classe di varietà (distribuzione di frequenze condizionate). Allo stesso modo si può dire che ogni colonna rapresenta una distribuzione di frequenze condizionate per una certa classe di forma.
+
+
+### Connessione
+
+Se guardiamo le due distribuzioni condizionate per SANREMO e FANO possiamo notare che esiste una certa differenza. Potremmo chiederci quindi se il presentarsi di una data modalità del carattere varietà (SANREMO o FANO) influenza il presentarsi di una particolare modalità del carattere forma del frutto. In altre parole, potremmo chiederci se le baccke della varietà SANREMO sono più frequentemente ovali, mentre quelle della varietà FANO sono più frequentemente tonde. Se fosse così, si potrebbe parlare di dipendenza o connessione, mentre, nel caso contrario, si dovrebbe parlare di indipendenza dei caratteri.
+
+Come si fa a stabilire se i caratteri sono indipendenti o connessi? Bisogna pensare che, in caso di indipendenza, le distribuzioni condizionate di una variabile, ad esempio la forma, dovrebbero essere uguali per entrambe le varietà. Se consideriamo la classe LUNGO, la frequenza relativa marginale è pari ad $82/308 = 0.266$ (82 è il numero totale di pomodori di forma allungata, mentre 308 è il numero totale dei pomodori); in caso di indipendenza, questa frequenza dovrebbe essere la stessa, sia per SANREMO che per FANO. In cifre, la frequenza assoluta per la combinazione LUNGO|SANREMO dovrebbe essere pari a $130 \times 0.266 =34.6$. mentre per la combinazione LUNGO|FANO dovrebbe essere pari a $178 \times 0.266=47.4$. Procedendo allo stesso modo, possiamo costruire la tabella delle frequenze assolute attese, nell'ipotesi di indipendenza completa tra i due caratteri.
+
+
+|        | LUNGO| TONDO| OVALE|
+|:-------|-----:|-----:|-----:|
+|SANREMO |  34.6|  44.7|  50.6|
+|FANO    |  47.4|  61.3|  69.4|
+
+A questo punto è logico costruire un indice statistico di connessione, detto $\chi^2$, che misuri lo scostamento tra le frequenze osservate e quelle attese nell’ipotesi di indipendenza perfetta:
+
+$$\chi ^2  = \sum \left[ \frac{\left( {f_o  - f_a } \right)^2 }{f_a } \right]$$
+
+dove $f_o$ sta per frequenza osservata ed $f_a$ sta per frequenza attesa nel caso indipendenza. Questo indice assume valore pari a zero nel caso di indipendenza completa (le frequenze osservate sono uguali a quelle attese) ed assume un valore positivo tanto più alto quanto maggiore è la connessione tra i due caratteri, fino ad un valore massimo dato dal prodotto del numero degli individui per il valore minimo tra il numero di righe meno una e il numero di colonne meno una:
+
+$$\max \chi ^2  = n \cdot \min (r - 1,\,c - 1)$$
+
+Nel nostro caso, il chi quadro è:
+
+$$\chi ^2  = \frac{\left( {37  - 34.6 } \right)^2 }{34.6 } + \frac{\left( {32  - 44.7 } \right)^2 }{44.7 } + ... + \frac{\left( {59  - 69.4 } \right)^2 }{69.4 } = 10.22$$
+
+Il valore massimo ammissibile sarebbe pari a 308, cioè il numero totale di bacche moltiplicato per uno, che è il valore minimo tra 2 (numero di colonne menu una) e 1 (numero di righe meno una). Il valore osservato è quindi il 3% circa di quello massimo possibile ($10.22/308=0.033$) e si può concludere che la connessione tra i due caratteri esiste, ma non è molto forte.
+
+
+## Statistiche descrittive con R
+
+Le statistiche descrittive si calcolano facilmente con R. Per esercizio, utilizziamo il dataset 'heights.csv', che è disponibile in una repository online. Il box sottostante mostra come caricare il dataset, del quale utilizzeremo la colonna 'height' che riporta le altezze di venti piante di mais.
+
+
+```r
+filePath <- "https://www.casaonofri.it/_datasets/heights.csv"
+dataset <- read.csv(filePath, header = T)
+dataset$height
+##  [1] 172 154 150 188 162 145 157 178 175 158 153 191 174 141 165 163
+## [17] 148 152 169 185
+```
+
+La media si calcola con la funzione `mean()`, mentre la mediana si calcola con la funzione `median()`.
+
+
+
+```r
+mean(dataset$height)
+## [1] 164
+median(dataset$height)
+## [1] 162.5
+```
+
+Per la devianza, non esiste una funzione dedicata e, di conseguenza, si deve utilizzare l'equazione fornita più sopra:
+
+
+```r
+sum( (dataset$height - mean(dataset$height))^2 )
+## [1] 4050
+```
+
+Varianza e deviazione standard sono molto facili da calcolare, grazie alle funzioni apposite, mentre il coefficiente di variabilità si può calcolare con la formula data più sopra:
+
+
+```r
+var(dataset$height)
+## [1] 213.1579
+sd(dataset$height)
+## [1] 14.59993
+sd(dataset$height)/mean(dataset$height) * 100
+## [1] 8.902395
+```
+
+Per calcolare i percentili si usa la funzione `quantile()`, fornendo le proporzioni di soggetti da lasciare sulla sinistra con l'argomento 'probs'. Ad esempio, per il 25-esimo percentile utilizzeremo 0.25, mentre per il 75-esimo utilizzeremo 0.75:
+
+
+```r
+quantile(dataset$height, probs = c(0.25, 0.75))
+##    25%    75% 
+## 152.75 174.25
+```
+
+La correlazione si calcola invece con la funzione `cor()`, come indicato più sotto.
+
+
+```r
+cor(A, B)
+## [1] 0.8960795
+```
+
+
+### Descrizione dei sottogruppi
+
+In biometria è molto comune che il gruppo di soggetti sia divisibile in più sottogruppi, corrispondenti, ad esempio, ai diversi trattamenti sperimentali. In questa comune situazione siamo soliti calcolare, per ogni gruppo, le statistiche descrittive già viste in precedenza, utilizzando la funzione `tapply()` in R, come mostrata più sotto.
+
+
+```r
+m <- tapply(dataset$height, dataset$var, mean)
+s <- tapply(dataset$height, dataset$var, sd)
+descript <- data.frame(Media = m, SD = s)
+descript
+##    Media       SD
+## C 165.00 14.36431
+## N 164.00 16.19877
+## S 160.00 12.16553
+## V 165.25 19.51709
+```
+
+Nel codice sovrastante, `height` è la variabile che contiene i valori da mediare, `var` è la variabile che contiene la codifica di gruppo, `mean` è la funzione che dobbiamo calcolare. Ovviamente `mean` può essere sostituito da qualunque altra funzione ammissibile in R, come ad esempio la deviazione standard; successivamente, nel codice sovrastante abbiamo utilizzato la funzione `data.frame()` per creare un nuovo dataset con le medie e le deviazioni standard.
+
+Oltre che in una tabella, i risultati possono anche essere riportati in un grafico a barre, con l'indicazione della variabilità dei dati. Possiamo utilizzare la funzione `barplot()` alla quale passeremo come argomenti l'altezza delle barre, data dalle medie dei diversi gruppi, i nomi dei gruppi medesimi e, opzionalmente, la scala dell'asse delle ordinate. La funzione `barplot()`, oltre che creare il grafico, restituisce le ascisse del centro di ogni barra, che possiamo utilizzare per creare dei segmenti verticali corrispondenti alle deviazioni standard di ogni gruppo, attraverso la funzione `arrows()`.
+
+Se, per ogni gruppo, le ascisse sono nel vettore 'coord', i segmenti di variabilità avranno un punto di partenza con  ascissa 'coord' e ordinata uguale al valore medio dell'altezza meno la deviazione standard e un punto di arrivo con ascissa sempre uguale a 'coord' e ordinata uguale all'altezza media più la deviazione standard. Gli altri argomenti della funzione `arrows()` servono per specificare il tipo di segmento che vogliamo tracciare; il codice sottostante produce l'output mostrato in Figura \@ref(fig:figName242).
+
+
+```r
+coord <- barplot(descript$Media, names.arg = descript$var, 
+                 ylim = c(0, 200))
+arrows(coord, descript$Media - descript$SD, 
+       coord, descript$Media + descript$SD, 
+       length = 0.05, angle = 90, code = 3)
+```
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName242-1.png" alt="Esempio di boxplot in R" width="90%" />
+<p class="caption">(\#fig:figName242)Esempio di boxplot in R</p>
+</div>
+
+Il grafico non è bellissimo; per ora ci accontenteremo, ma, con un po' di esercizio, è possibile ottenere grafici di alto livello.
+
+Quando abbiamo a che fare con gruppi molto numerosi, con un certo numero di outliers, è bene sostituire la mediana alla media, in associazione con il 25-esimo e 75-esimo percentile, come indicazioni di variabilità. Da un punto di vista grafico, possiamo utilizzare un *boxplot* (grafico Box-Whisker). Si tratta di una scatola (box) che ha per estremi il 25-esimo e il 75-esimo percentile ed è tagliata da una linea centrale in corrispondenza della mediana. Dalla scatola partono due linee verticali (baffi = whiskers) che identificano il valore massimo e il minimo. Se il massimo (o il minimo) distano dalla mediana più di 1.5 volte la differenza tra la mediana stessa e il 75-esimo (o 25-esimo) percentile, allora le linee verticali si fermano ad un valore pari ad 1.5 volte il 75-esimo (o il 25-esimo) percentile ed i dati più estremi vengono raffigurati come outliers. In basso abbiamo create tre gruppi con una funzione di estrazione di numeri casuali e li abbiamo rappresentati nel boxplot mostrato in Figura \@ref(fig:figName241).
+
+
+```r
+set.seed(1234)
+A <- runif(20)
+B <- runif(20)
+C <- runif(20)
+series <- rep(c("A", "B", "C"), each = 20)
+values <- c(A, B, C)
+boxplot(values ~ series)
+```
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName241-1.png" alt="Esempio di boxplot in R" width="90%" />
+<p class="caption">(\#fig:figName241)Esempio di boxplot in R</p>
+</div>
+
+
+### Distribuzioni di frequenze e classamento
+
+Utilizziamo il dataset 'mtcars' disponibile nell'installazione di base di R, che possiamo caricare utilizzando la funzione `data()`.
+
+
+```r
+data(mtcars)
+```
+
+In questo dataset, la variabile 'gear' indica il numero di marce e le frequenze assolute possono essere ottenute con la funzione `table()`.
+
+
+```r
+# Frequenze assolute
+table(mtcars$gear)
+## 
+##  3  4  5 
+## 15 12  5
+```
+
+Per le frequenze relative e percentuali, possiamo combinare il codice soprastante con l’impiego della funzione `length()`, che restituisce il numero di elementi in un vettore.
+
+
+```r
+#Frequenze relative
+table(mtcars$gear)/length(mtcars$gear)
+## 
+##       3       4       5 
+## 0.46875 0.37500 0.15625
+#Frequenze percentuali
+table(mtcars$gear)/length(mtcars$gear) * 100
+## 
+##      3      4      5 
+## 46.875 37.500 15.625
+```
+
+Mostriamo ora l'operazione di classamento di una variabile quantitativa, che tornerà utile nei prossimi capitoli. Prendiamo con R mille valori casuali da una distribuzione uniforme nell'intervallo da 130 a 200 ed esprimiamo questi mille valori tramite una distribuzione di frequenze nelle sei classi: <140, 140-150, 150-160, 160-170, 170-190, >190. Per il classamento si utilizza la funzione `cut()`, che con l'argomento `breaks()` consente di specificare gli estremi inferiori delle classi, inclusi per default nella classe precedente (intervalli aperti a destra e chiusi a sinistra).
+
+
+```r
+vals <- runif(1000, min = 130, max = 200)
+freq <- table( cut(vals, breaks = c(100, 140,150,160,170,190,200)) )
+freq
+## 
+## (100,140] (140,150] (150,160] (160,170] (170,190] (190,200] 
+##       141       135       143       139       282       160
+```
+
+Per le frequenze cumulate si usa invece la funzione `cumsum()`.
+
+
+```r
+cumsum(freq)
+## (100,140] (140,150] (150,160] (160,170] (170,190] (190,200] 
+##       141       276       419       558       840      1000
+```
+
+Una distribuzione di frequenze può essere rappresentata con un grafico a torta, che, in R, può essere disegnato con le funzioni `pie()`. Il grafico sottostante è abbastanza banale, in quanto le classi sono più o meno di ampiezza equivalente, dato che abbiamo utilizzato un campionamento da una distribuzione uniforme.
+
+
+```r
+pie(table(freq))
+```
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName243-1.png" alt="Rappresentazione di una distribuzione di frequenze con un grafico a torta" width="70%" />
+<p class="caption">(\#fig:figName243)Rappresentazione di una distribuzione di frequenze con un grafico a torta</p>
+</div>
+
+
+### Connessione
+
+Consideriamo il dataset 'HairEyeColor', disponibile nell'installazione di base di R e relativo al colore degli occhi e dei capelli di 520 studenti di statistica. La tabella delle contingenze, per le femmine, è la seguente:
+
+
+```r
+data(HairEyeColor)
+tab <- HairEyeColor[,,2]
+tab
+##        Eye
+## Hair    Brown Blue Hazel Green
+##   Black    36    9     5     2
+##   Brown    66   34    29    14
+##   Red      16    7     7     7
+##   Blond     4   64     5     8
+```
+
+Se vogliamo sapere se il colore degli occhi è legato a quello dei capelli, possiamo utilizzare la funzione `as.table()` per trasformare l'oggetto  `tab` in una tabella di contingenze (in questo caso non sarebbe necessario, visto che 'tab' è già una tabella di contingenze) ed applicare la funzione `summary()`. Oltre al chi quadro, l'output fornisce altre informazioni, che approfondiremo in un prossimo capitolo.
+
+
+```r
+summary(as.table (tab))
+## Number of cases in table: 313 
+## Number of factors: 2 
+## Test for independence of all factors:
+## 	Chisq = 106.66, df = 9, p-value = 7.014e-19
+## 	Chi-squared approximation may be incorrect
+```
+
+
+
+---
+
+## Altre letture
+
+1. F. Crivellari (2006). Analisi statistica dei dati con R. Apogeo, Milano.
+2. G. Leti e L. Cerbara (2009). Elementi di statistica descrittiva. Il Mulino Editore, Bologna.
+
+
+<!--chapter:end:03-StatisticaDescrittiva.Rmd-->
 
 # Modelli statistici ed analisi dei dati
 
+
 L'eredità galileiana ci porta ad immaginare che il funzionamento della natura sia basato su una serie di relazioni causa-effetto, descrivibili utilizzando il linguaggio universale della matematica. La conoscenza esatta di queste relazioni, nella teoria, ci potrebbe consentire di prevedere l'andamento di ogni fenomeno naturale, almeno quelli osservabili con sufficiente precisione.
 
-In effetti era proprio questa l'ambizione più grande degli scienziati all'inizio dell'ottocento: conoscendo lo stato iniziale di un sistema, doveva essere possibile prevederne l'evoluzione futura. In realtà si è ben presto scoperto che si trattava di un'ambizione irrealistica, non tanto e non solo per la comparsa della meccanica quantistica un secolo dopo, ma anche per l'aumento di importanza degli studi in ambito psichiatrico e medico/biologico. Questi studi, infatti, venivano (e vengono) eseguiti su organismi viventi molto complessi, che, se sottoposti allo stesso stimolo, danno risposte altamente variabili e, spesso, anche difficilmente misurabili e controllabili. Immaginiamo quanto possa essere difficile quantificare uno stato legato ad una patologia mentale e individuare un pattern di risposta ad un certo stimolo, ad esempio farmacologico. 
+In effetti era proprio questa l'ambizione più grande degli scienziati all'inizio dell'ottocento: conoscendo lo stato iniziale di un sistema, doveva essere possibile prevederne con precisione l'evoluzione futura. Laplace diceva: *"Possiamo considerare lo stato attuale dell'universo come l'effetto del suo passato e la causa del suo futuro. Un intelletto che ad un determinato istante dovesse conoscere tutte le forze che mettono in moto la natura, e tutte le posizioni di tutti gli oggetti di cui la natura è composta, se questo intelletto fosse inoltre sufficientemente ampio da sottoporre questi dati ad analisi, esso racchiuderebbe in un'unica formula i movimenti dei corpi più grandi dell'universo e quelli degli atomi più piccoli; per un tale intelletto nulla sarebbe incerto ed il futuro proprio come il passato sarebbe evidente davanti ai suoi occhi"*. In realtà si è ben presto scoperto che si trattava di un'ambizione irrealistica, non tanto e non solo per la comparsa della meccanica quantistica un secolo dopo, ma anche per l'aumento di importanza degli studi in ambito psichiatrico e medico/biologico. Questi studi, infatti, venivano (e vengono) eseguiti su organismi viventi molto complessi, che, se sottoposti allo stesso stimolo, davano risposte altamente variabili e, spesso, anche difficilmente misurabili e controllabili.
 
-Queste difficoltà fecero prevalere, tra i biologi, la convinzione che la natura funzionasse in base a meccanismi deterministici ben definiti, anche se difficilmente osservabili nella pratica sperimentale, a causa dei numerosi elementi d'incertezza che si manifestavano nel corso delle osservazioni sperimentali. Insomma, la natura è perfetta, ma l'osservazione è fallace, perché influenzata dalla presenza di una forte componente stocastica e imprevedibile, che va sotto il nome generico di ’errore sperimentale’.
+Queste difficoltà fecero prevalere, tra i biologi, la convinzione che la natura funzionasse in base a meccanismi deterministici ben definiti, anche se difficilmente osservabili nella pratica sperimentale, a causa dei numerosi elementi d'incertezza che si manifestavano nel corso delle osservazioni sperimentali. Insomma, la natura è perfetta, ma l'osservazione è fallace, perché influenzata dalla presenza di una forte componente stocastica ed imprevedibile, che va sotto il nome generico di errore sperimentale. Di questo abbiamo già parlato nei capitoli precedenti. Abbiamo anche visto che Ronald Fisher, nel suo famoso testo “Il disegno degli esperimenti” ha posto le basi per una corretta metodica sperimentale, finalizzata a minimizzare l'impatto della componente stocastica e, soprattutto, ad impedire che essa si confondesse con gli effetti degli stimoli sperimentali in studio. 
 
-Dell'errore sperimentale abbiamo già parlato nei capitoli precedenti. Abbiamo anche visto che Ronald Fisher, nel suo famoso testo “Il disegno degli esperimenti” ha posto le basi per una corretta metodica sperimentale, volta a minimizzare l'impatto della componente stocastica e, soprattutto, ad impedire che essa possa confondersi con gli effetti degli stimoli sperimentali in studio. Minimizzare, tuttavia, non significa eliminare ed è evidente che, pur con tutti gli sforzi possibili, i risultati sperimentali saranno influenzati sempre e comunque da una certa quota di variabilità stocastica. Si vengono quindi a creare due contrapposte situazioni:
+Minimizzare, tuttavia, non significa eliminare ed è evidente che, pur con tutti gli sforzi possibili, è impossibile evitare che i risultati sperimentali siano influenzati, sempre e comunque, da una certa quota di variabilità stocastica. Si vengono quindi a creare due contrapposte situazioni:
 
 1. la verità 'vera', immanente, che 'agisce' in base a meccanismi deterministici causa-effetto ben definiti.
 2. La 'verità' sperimentale, che si produce a partire dalla verità 'vera', per effetto dell'azione di elementi perturbativi casuali, che non ci permettono di osservare la verità 'vera'.
 
-Tenendo conto di questo, nella logica galileiana, possiamo provare ad utilizzare dei modelli matematici per descrivere le nostre osservazioni sperimentali e come esse si producono. Tuttavia, nessun modello è da considerare completo, se non è caratterizzato dalla capacità di descrivere sia la componente deterministica che quella stocastica, che sono alla base della formazione delle osservazioni sperimentali.
+Di conseguenza, la descrizione di qualunque risultato sperimentale non può essere realistica se non utilizzando un modello in grado di considerare contemporaneamente sia i nessi causa-effetto, che le altre forze ignote e, almeno apparentemente, di natura stocastica. I modelli matematici che incorporano anche effetti di natura casuale sono detti modelli statistici.
 
 ## Verità 'vera' e modelli deterministici
 
-In semplice linguaggio algebrico, possiamo porre un modello deterministico causa-effetto utilizzando una funzione di questo tipo:
+In semplice linguaggio algebrico, possiamo porrescrivere un modello deterministico causa-effetto utilizzando una funzione di questo tipo:
 
 $$ Y_E = f(X, \theta) $$
 
 dove $Y_E$ è l'effetto atteso dello stimolo $X$, secondo la funzione $f$, basata su una collezioni di parametri $\theta$. 
 
-In questo modello vi sono una serie di componenti, che proviamo a guardare un po' più nel dettaglio.
+In questo modello vi sono una serie di componenti, che proviamo a guardare un po' più nel dettaglio. La risposta attesa ($Y_E$) è l'oggetto del nostro studio e può assumere le forme più disparate: spesso è numerica, ma a volte rappresenta una qualità. In questo libro consideremo solo la situazione in cui $Y_E$ è rappresentato da una sola variabile (analisi univariata), ma esistono casi in cui viene osservata ed analizzata la risposta di soggetti in relazione a molte variabili (analisi multivariata).
 
-La risposta attesa ($Y_E$) è l'oggetto del nostro studio e può assumere le forme più disparate: spesso è numerica, ma a volte rappresenta una qualità. In questo libro consideremo solo la situazione in cui $Y$ è rappresentato da una sola variabile (analisi univariata), ma esistono casi in cui viene osservata e analizzata la risposta di soggetti in relazione a molte variabili (analisi multivariata).
+Lo stimolo sperimentale ($X$) è costituito da una o più variabili continue, discrete o categoriche, che rappresentano i trattamenti sperimentali. Insieme ad $Y_E$, $X$ è l'elemento noto di un esperimento, in quanto viene definito *a priori* con il disegno sperimentale.
 
-Lo stimolo sperimentale ($X$) è costituito da una o più variabili continue, discrete o categoriche, che rappresenta/ano il/i trattamento/i sperimentale/i (fattore/i sperimentale/i). Insieme ad $Y$, è l'elemento noto di un esperimento, in quanto viene definito *a priori* con il disegno sperimentale.
+La 'funzione' di risposta ($f$) è un'equazione, lineare o non-lineare, scelta in base a considerazioni di carattere biologico, o con un approccio puramente empirico, osservando l’andamento della curva di risposta.
 
-La 'funzione' di risposta ($f$) è un'equazione, altrimenti detta 'modello matematico'. L'equazione può essere lineare o non-lineare ed è selezionata o in base a considerazioni di carattere biologico, o con un approccio puramente empirico, nel quale osservo la risposta e scelgo un'equazione la cui forma si adatta bene ad essa.
+I parametri di una funzione ($\theta$) sono un insieme di valori numerici che permettono di definire l’equazione di risposta.
 
-I parametri di una funzione ($\theta$) sono un insieme di valori numerici che definiscono il modello. Nel prossimo paragrafo vedremo qualche esempio.
+Vediamo alcuni esempi.
 
-### Qualche esempio di modello deterministico
-
-Il modello più semplice è il cosiddetto modello della media:
+Il modello più semplice è il cosiddetto *modello della media*:
 
 $$ Y = \mu $$
 
-Con questo modello si vuole indicare che un'osservazione dovrebbe conformarsi ad un certo valore atteso, come effetto di un unico stimolo sperimentale noto. Ha un solo parametro, cioè $\mu$.
+Si tratta di una funzione identità, secondo la quale un'osservazione sperimentale dovrebbe conformarsi ad un certo valore atteso, come effetto di un unico stimolo sperimentale noto. Ha un solo parametro, cioè $\mu$.
 
-Un modello analogo, ma più complesso è il cosidetto modello ANOVA:
+Un modello analogo, ma più complesso è il cosidetto *modello ANOVA*:
 
 $$
 Y = \left\{ {\begin{array}{ll}
@@ -649,87 +1099,80 @@ Y = \left\{ {\begin{array}{ll}
 \end{array}} \right.
 $$
 
-In questo caso la risposta attesa dipende dallo stimolo sperimentale X, che è composto di due trattamenti: se il soggetto è trattato con A, fornisce la risposta $\mu_1$, se è trattato con B fornisce $\mu_2$. Il trattamento sperimentale è costituito da una variabile categorica con due modalità, ma l'estensione a più modalità è immediata. In questo caso, abbiamo due parametri ($\mu_1$ e $\mu_2$).
+In questo caso la risposta attesa dipende dallo stimolo sperimentale $X$, che è composto di due trattamenti: se il soggetto è trattato con A, fornisce la risposta $\mu_1$, se è trattato con B fornisce $\mu_2$. Il trattamento sperimentale è costituito da una variabile categorica con due modalità e quindi abbiamo due parametri ($\mu_1$ e $\mu_2$), ma l'estensione a più di due modalità è immediata.
 
-Un ulteriore esempio di modello che vedremo in questo libro è la regressione lineare semplice, dove la relazione di risposta è descrivibile con una retta, la cui equazione generale è:
+Un ulteriore esempio di modello che vedremo in questo libro è la *regressione lineare semplice*, dove la relazione di risposta è descrivibile con una retta, la cui equazione generale è:
 
-$$ Y = a + b \times X $$
+$$ Y = \beta_0 + \beta_1 \times X $$
 
-In questo caso sia la $Y$ che la $X$ sono variabili quantitative e vi sono due parametri $a$ e $b$.
+In questo caso sia la $Y$ che la $X$ sono variabili quantitative e vi sono due parametri $\beta_0$ e $\beta_1$.
 
-I modelli finora descritti sono lineari, ma esistono numerosi funzioni che descrivono relazioni curvilinee. Come, ad esempio, la parabola:
+I modelli finora descritti sono lineari, ma esistono numerose funzioni che descrivono relazioni curvilinee, come, ad esempio, la parabola:
 
-$$ Y = a + b \, X + c \, X^2$$
+$$ Y = \beta_0 + \beta_1 \, X + \beta_2 \, X^2$$
+
 caratterizzata da tre parametri, oppure la funzione esponenziale:
 
-$$ Y = a \, e^{b X} $$
+$$ Y = \beta_0 \, e^{\beta_1 X} $$
 
-caratterizzata da due parametri ($a$ e $b$), mentre $e$ è l'operatore di Nepero. Delle funzioni curvilinea parleremo al termine di questo libro.
+caratterizzata da due parametri ($\beta_0$ e $\beta_1$), mentre $e$ è l'operatore di Nepero. Delle funzioni curvilinee parleremo al termine di questo libro.
 
 ## Genesi deterministica delle osservazioni sperimentali
 
-Le equazioni esposte più sopra sono tutte nella loro forma generale e non sono utilizzabili se ai parametri non viene sostituito un valore numerico. E'proprio questo il nostro punto di partenza: un fenomeno scientifico può essere descritto attraverso un'equazione e dei parametri.
+Le equazioni esposte più sopra sono tutte nella loro forma generale e non sono utilizzabili se ai parametri non viene sostituito un valore numerico. E'proprio questo il nostro punto di partenza: **un fenomeno scientifico può essere descritto attraverso un'equazione, nella quale ogni parametro assume un valore numerico specifico**.
 
-Ad esempio, potremmo immaginare che la risposta produttiva (Y) di una coltura (es. frumento) dipenda dalla dose della concimazione azotata (X), seguendo un andamento lineare, con $a = 20$ e $b = 0.3$. Rifacendosi alla notazione esposta sopra diremo che $\theta$ è l'insieme dei valori 20 e 0.3.
+Facciamo un esempio: un pozzo è inquinato e contiene esattamente 120 $mg/L$ di una sostanza erbicida. Pertanto, se facciamo un esperimento è preleviamo un'aliquota d'acqua da quel pozzo, determinando la concentrazione di erbicida, dovremmo ottenere un valore pari a 120 $mg/L$. Utilizzando il modello della media, questo concetto si può esprimere come: $Y_E = 120$; in questo caso $f$ è la funzione identità e $\theta = \mu = 120$.
 
-Se questo assunto è vero, un eventuale esperimento di concimazione azotata, in assenza di qualunque fattore perturbativo, dovrebbe dare risultati assolutamento prevedili. Ad esempio, se concimiamo il frumento con 0, 30, 60, 90, 120 e 150 kg/ha di azoto, dovremmo osservare le risposte riportate qui di seguito.
+Innalzando leggermente il livello di complessità, potremmo immaginare che la risposta produttiva (Y) del frumento dipenda dalla dose della concimazione azotata (X), seguendo un andamento lineare, con $\beta_0 = 25$ e $\beta_1 = 0.15$. Rifacendosi alla notazione esposta sopra, diremo che $f$ è una retta e $\theta = [25, 0.15]$. Di conseguenza, un eventuale esperimento di concimazione azotata, in assenza di qualunque fattore perturbativo, dovrebbe dare risultati assolutamento prevedili, come mostrato nel *box* sottostante, considerando livelli di concimazione pari a 0, 60, 120 e 180 kg/ha di azoto per ettaro.
 
 
 ```r
-X <- c(0, 30, 60, 90, 120, 150)
-Ye <- 20 + 0.3 * X
+X <- c(0, 60, 120, 180)
+Ye <- 25 + 0.15 * X
 Ye
-## [1] 20 29 38 47 56 65
+## [1] 25 34 43 52
 ```
 
 Qualcuno potrebbe obiettare che si tratta di una situazione irrealistica, perché la relazione tra concimazione azotata e produzione del frumento non è lineare. Non importa; in questo momento vogliamo semplicemente illustrare qual è la genesi delle osservazioni sperimentali. Fondamentalmente postuliamo l'esistenza di un modello matematico deterministico (causa-effetto) che, in assenza di errore sperimentale, è in grado di descrivere il comportamento della natura in una data situazione pedo-climatica.
 
 ## Errore sperimentale e modelli stocastici
 
-Tuttavia esiste un problema: l'errore sperimentale, puramente stocastico, confonde le nostre osservazioni e le rende diverse da quanto previsto dal modello deterministico. Come fare per incorporare questi effetti stocastici in un modello matematico? Ne parliamo immediatamente attraverso un esempio, semplice, ma concreto.
+In pratica, le risposte attese sono impossibili da riscontrare; infatti, l'errore sperimentale, puramente stocastico, confonde le nostre osservazioni e le rende diverse da quanto previsto dal modello deterministico. Come fare per incorporare questi effetti stocastici in un modello matematico?
 
-Immaginiamo un campo di frumento, di notevoli dimensioni. Un campo nella valle del Tevere, con milioni di piante geneticamente simili, in un ambiente abbastanza uniforme da un punto di vista del microclima. Immaginiamo di voler determinare l'altezza delle piante di questo campo. Immaginiamo di non avere limitazioni e di poter determinare l'altezza di tutte le piante dell'appezzamento. La nostra popolazione di soggetti diviene una popolazione di misure. Come è fatta questa popolazione? Quali sono le sue caratteristiche? Basiamoci sulla nostra esperienza professionale, cercando di utilizzare argomenti che possano essere condivisibili per l'intera comunità scientifica.
+Continuiamo a considerare l'esempio precedente, relativo al pozzo inquinato con un erbicida e caratterizzato da una concentrazione pari a 120 $mg/L$. Anche se un qualunque campione di acqua analizzata con un gas-cromatografo dovrebbe restituire una misura pari esattamente a 120 $mg/L$, ci rendiamo conto che, nella pratica, è molto probabile che questo non accada. Infatti, lo strumento è comunque caratterizzato da una sua imprecisione di misura che, per quanto piccola, fa si che ogni campione di acqua $i$ restituisca una concentrazione diversa da quella degli altri campioni eventualmente analizzati. Quindi non osserveremo esattamente $Y_E = 120$, ma, al suo posto, osserveremo $Y_O \neq Y_E$, o meglio $Y_O = 120 + \varepsilon$, dove $\varepsilon$ è appunto una misura della componente stocastica individuale che distorce i risultati ogni volta che ripetiamo la misura.
 
-In primo luogo, possiamo dire che l'altezza delle piante dovrebbe essere quella dettata dal loro patrimonio genetico. Poniamo che questa altezza sia $\mu = 100$; di conseguenza, il valore atteso di altezza è:
+Ci chiediamo: che valori potrebbe assumere $\varepsilon$? I valori individuali esatti non possiamo prevederli perchè sono frutto di errori casuali. Ma possiamo fare alcune considerazioni probabilistiche: se il valore atteso è 120, trovare concentrazioni comprese tra 119 e 121 (quindi $\varepsilon = \pm 1$) dovrebbe essere molto più frequente che non trovare concentrazioni pari a 40 $mg/L$ o 200 $mg/L$ ($\varepsilon = \pm 80$). In generale, trovare valori di $\varepsilon$ vicini allo 0 dovrebbe essere molto più probabile che non trovarli lontani.
 
-$$Y_E  = \mu = 100$$
-
-In realtà, questo valore $\mu$ non è osservabile, perché, pur nella loro relativa omogeneità, l'ambiente e il patrimonio genetico non sono totalmente uguali, il che fa si che ogni pianta abbia la sua altezza, diversa da quella delle altre piante circostanti. Quindi non osserveremo esattamente $Y_E$, ma, al suo posto osserveremo $Y_O \neq Y_E$, con:
-
-$$ Y_O = \mu + \varepsilon $$
-
-dove $\varepsilon$ è appunto una misura della componente stocastica individuale che distorce i risultati. Che valori potrebbe assumere $\varepsilon$? I valori individuali non possiamo conoscerli, ma possiamo fare alcune considerazioni probabilistiche: se il valore atteso è 100, trovare altezze comprese tra 99 e 101 cm dovrebbe essere molto più frequente che non trovare altezze pari a 40 cm o 180 cm. Quindi trovare valori di $\varepsilon$ vicini allo 0 dovrebbe essere molto più frequente che non trovarli lontani.
-
-Ci chiediamo, esiste una funzione che ci permetta di assegnare valori di probabilità alle diverse altezze che troviamo in un campo di frumento? La risposta è si: funzioni di questo tipo si chiamano **funzioni di probabilità**.
+Insomma, anche se non siamo in grado di prevedere con esattezza $\varepsilon$ per ogni misura che andremo a fare, potremmo pensare di utilizzare una funzione che restituisca la probabilità di ottenere una certa risposta, piuttosto che un'altra. Potremmo quindi pensare di modellizzare l'elemento stocastico con una **funzione di probabilità**.
 
 ### Funzioni di probabilità
 
 Se avessimo rilevato una qualità del soggetto, come il sesso (M/F), la mortalità (vivo/morto), la germinabilità (germinato/non germinato), avremmo una variabile categorica nominale e potremmo calcolare le probabilità definita come rapporto tra il numero degli eventi favorevoli e il numero totale di eventi possibili (probabilità 'frequentista').
 
-Ad esempio, immaginiamo di aver rilevato il numero di germogli 'laterali' di accestimento di 20 piante di frumento e di averne trovate 4 con 0 germigli, 6 con 1 germoglio, 8 con due germogli e 2 con tre germogli. La funzione che assegna la probabilità P ad ognuno dei quattro eventi X possibili (**funzione di probabilità**) è:
+Ad esempio, immaginiamo di aver rilevato il numero di germogli 'laterali' di accestimento di 20 piante di frumento e di averne trovate 4 con 0 germogli, 6 con 1 germoglio, 8 con due germogli e 2 con tre germogli. La funzione che assegna la probabilità P ad ognuno dei quattro eventi Y possibili (**funzione di probabilità**) è:
 
 $$
-P(X) = \left\{ \begin{array}{l}
- 4/20 = 0.2 \,\,\,\,\,\,se\,\,\,\,\,\,X = 0 \\ 
- 6/20 = 0.3 \,\,\,\,\,\,se\,\,\,\,\,\,X = 1 \\ 
- 8/20 = 0.4\,\,\,\,\,\,se\,\,\,\,\,\, X = 2 \\ 
- 2/20 = 0.1 \,\,\,\,\,\,se\,\,\,\,\,\,X = 3 \\ 
+P(Y) = \left\{ \begin{array}{l}
+ 4/20 = 0.2 \,\,\,\,\,\,se\,\,\,\,\,\,Y = 0 \\ 
+ 6/20 = 0.3 \,\,\,\,\,\,se\,\,\,\,\,\,Y = 1 \\ 
+ 8/20 = 0.4\,\,\,\,\,\,se\,\,\,\,\,\, Y = 2 \\ 
+ 2/20 = 0.1 \,\,\,\,\,\,se\,\,\,\,\,\,Y = 3 \\ 
  \end{array} \right.
 $$
 
 Viene ad essere definita una **distribuzione di probabilità**, che ha due caratteristiche importanti:
 
-1. P(X) è sempre non-negativo (ovvio! le probabilità sono solo positive o uguali a 0);
+1. P(Y) è sempre non-negativo (ovvio! le probabilità sono solo positive o uguali a 0);
 2. la somma delle probabilità di tutti gli eventi è sempre pari ad 1 (ovvio anche questo: la probabilità che capiti uno qualunque degli eventi è sempre 1).
 
-Se gli eventi possibili sono ordinabili (come nel caso precedente), oltre alla funzione di probabilità, si può definire anche la **funzione di probabilità cumulata**, detta anche **funzione di ripartizione** con la quale si assegna ad ogni evento la sua probabilità più quella di tutti gli eventi 'inferiori'. Nell'esempio precedente:
+Se gli eventi possibili sono ordinabili (come nel caso precedente), oltre alla funzione di probabilità, si può definire anche la **funzione di probabilità cumulata**, detta anche **funzione di ripartizione**, con la quale si assegna ad ogni evento la sua probabilità più quella di tutti gli eventi 'inferiori'. Nell'esempio precedente:
 
 $$
-P(X) = \left\{ \begin{array}{l}
- 0.2\,\,\,\,\,\,se\,\,\,\,\,\,X \leq 0 \\ 
- 0.5\,\,\,\,\,\,se\,\,\,\,\,\,X \leq 1 \\ 
- 0.9\,\,\,\,\,\,se\,\,\,\,\,\,X \leq 2 \\ 
- 1.0\,\,\,\,\,\,se\,\,\,\,\,\,X \leq 3 \\ 
+P(Y) = \left\{ \begin{array}{l}
+ 0.2\,\,\,\,\,\,se\,\,\,\,\,\,Y \leq 0 \\ 
+ 0.5\,\,\,\,\,\,se\,\,\,\,\,\,Y \leq 1 \\ 
+ 0.9\,\,\,\,\,\,se\,\,\,\,\,\,Y \leq 2 \\ 
+ 1.0\,\,\,\,\,\,se\,\,\,\,\,\,Y \leq 3 \\ 
  \end{array} \right.
 $$
 
@@ -737,12 +1180,12 @@ $$
 Per una distribuzione di probabilità come questa (classi numeriche ordinate), considerando il valore centrale di ogni classe, possiamo calcolare la media (valore atteso) come:
  
 $$
-\mu  = E(X) = \sum{\left[ x_i \cdot P(X = x_i ) \right]}
+\mu  = E(Y) = \sum{\left[ y_i \cdot P(Y = y_i ) \right]}
 $$
  
 e la varianza come:
 
-$$\sigma ^2  = Var(X) = E\left[ {X - E(X)} \right]^2  = \sum{ \left[ {\left( {x_i  - \mu } \right)^2 \cdot P(X = x_i )} \right]}$$
+$$\sigma ^2  = Var(Y) = E\left[ {Y - E(Y)} \right]^2  = \sum{ \left[ {\left( {y_i  - \mu } \right)^2 \cdot P(Y = y_i )} \right]}$$
 
 In questo caso specifico, la media è pari a:
 
@@ -767,43 +1210,43 @@ Mediamente, le nostre piante hanno 1.4 germogli con una varianza pari a 1.06.
 
 ### Funzioni di densità
 
-Ciò che abbiamo detto finora non si applica al nostro caso, in quanto abbiamo rilevato una variabile continua (altezza) e non abbiamo intenzione di discretizzarla in classi. In teoria, le altezze che possiamo riscontrare sono pressoché infinite e non ha molto senso chiedersi, ad esempio, qual è la probabilità di trovare un individuo alto esattamente 96 cm (e non 96.0000001 cm, o 95.99999 cm). Capiamo da soli che questa probabilità è un infinitesimo.
+Ciò che abbiamo detto finora non si applica al nostro caso, in quanto abbiamo rilevato una variabile continua (concentrazione) e non abbiamo intenzione di discretizzarla in classi. In teoria, misure ripetute di concentrazione possono portare ad un numero di valori pressoché infinito e non ha molto senso chiedersi, ad esempio, qual è la probabilità di trovare una concentrazione esattamente pari a 120 $mg/L$ (e non 120.0000001, o 119.99999). Capiamo da soli che questa probabilità è infinitesima.
 
-Al contrario, come abbiamo visto più sopra, possiamo calcolare la probabilità di ottenere un valore compreso in un intervallo, per esempio da 80 a 90 cm. Tuttavia, abbiamo detto di non voler discretizzare, anche perché la probabilità dipenderebbe dall'ampiezza dell'intervallo prescelto, il che introdurrebbe un elemento arbitrario. Possiamo tuttavia pensare di calcolare la **densità di probabilità**, vale a dire il rapporto tra la probabilità di un intervallo e la sua ampiezza (cioè la probabilità per unità di ampiezza dell'intervallo; per questo si parla di densità). E' evidente che se un intervallo diventa infinitamente piccolo anche la probabilità tende a zero con la stessa 'velocità', in modo che la densità di probabilità tende ad un numero finito (ricordate il limite del rapporto di polinomi?).
+Al contrario, potremmo pensare di calcolare la probabilità di ottenere un valore compreso in un intervallo, per esempio da 119 a 121 $mg/L$, anche se questa operazione porterebbe all'introduzione di un elemento arbitrario, cioè l'ampiezza dell'intervallo prescelto. Possiamo tuttavia pensare di calcolare la **densità di probabilità**, vale a dire il rapporto tra la probabilità di un intervallo e la sua ampiezza (cioè la probabilità per unità di ampiezza dell'intervallo; per questo si parla di densità). Ora, se immaginiamo di restringere l’intervallo fino a farlo diventare infinitamente piccolo, anche la probabilità tende a diventare infinitesima con la stessa 'velocità', in modo che la densità di probabilità di un singolo valore di concentrazione tende ad un numero finito (ricordate il limite del rapporto di polinomi?).
 
-Insomma, con i fenomeni continui non possiamo lavorare con la probabilità dei singoli eventi, ma possiamo lavorare con la densità di probabilità e definire quindi apposite **funzioni di densità**. Analogamente alle funzioni di probabilità, le funzioni di densità debbono avere due caratteristiche:
+Insomma, con i fenomeni continui non possiamo calcolare la probabilità dei singoli eventi puntiformi, ma possiamo calcolare la loro densità di probabilità e definire quindi apposite **funzioni di densità**. Analogamente alle funzioni di probabilità, le funzioni di densità debbono avere due caratteristiche:
 
 1. assumere solo valori non-negativi;
 2. la somma delle probabilità di tutti gli eventi possibili, calcolabile come integrale della funzione di densità, deve essere unitaria (anche in questo caso la densità di probabilità di tutti gli eventi possibili è pari ad 1).
 
-Data una funzione di densità, possiamo costruire la corrispondente **funzione di probabilità cumulata**, facendo l'integrale per ogni evento pari o inferiore a quello dato. Più in generale, per variabili continue sia la funzione di ripartizione (probabilità cumulata), che la media o la devianza sono definite ricorrendo agli integrali:
+Data una funzione di densità, possiamo costruire la corrispondente **funzione di probabilità cumulata**, facendo l'integrale per ogni evento pari o inferiore a quello dato (esempio: probabilità di trovare concentrazioni inferiori a 120 $mg/L$). Più in generale, per variabili continue sia la funzione di ripartizione (probabilità cumulata), che la media o la devianza sono definite ricorrendo agli integrali:
 
 $$ \begin{array}{l}
-P(X) = f(x) \\ 
-P(X \le x) = \int\limits_{ - \infty }^x {f(x)} dx \\ 
-\mu  = E(X) = \int\limits_{ - \infty }^{ + \infty } {xf(x)} dx \\ 
-\sigma ^2  = Var(X) = \int\limits_{ - \infty }^{ + \infty } {\left( {x - \mu } \right)^2 f(x)} dx \\ 
-\end{array} $$
+P(Y) = f(y) \\ 
+P(Y \leq y) = \int\limits_{ - \infty }^y {f(y)} dy \\ 
+\mu  = E(Y) = \int\limits_{ - \infty }^{ + \infty } {yf(y)} dy \\ 
+\sigma^2  = Var(Y) = \int\limits_{ - \infty }^{ + \infty } {\left( {y - \mu } \right)^2 f(y)} dy \\ 
+\end{array}$$
  
  
 In pratica, vedremo che, a seconda della funzione di densità, è possibile adottare formule semplificate per le diverse statistiche descrittive.
 
 
-## La distribuzione normale (curva di Gauss)
+### La distribuzione normale (curva di Gauss)
 
-Torniamo ancora alla nostra popolazione di misure, relative alle altezze del frumento nella media Valle del Tevere. E' ragionevole pensare che, effettuando le misurazioni con uno strumento sufficientemente preciso e in presenza delle sole variazioni casuali (visto che abbiamo idealmente rimosso ogni differenza sistematica spiegabile), i risultati tendono a differire tra di loro, muovendosi intorno ad un valor medio, rispetto al quale le misure superiori ed inferiori sono equiprobabili e tendono ad essere più rare, via via che ci si allontana dal valore medio. Questo ragionamento ci porta verso una densità di probabilità (parliamo di variabili continue) a forma di campana, che potrebbe essere descritta con una funzione continua detta **curva di Gauss**.
+Torniamo ancora alla nostra popolazione di misure, relative alle concentrazioni di campioni di acqua prelevati dal pozzo inquinato. E' ragionevole pensare che, effettuando le misurazioni con uno strumento sufficientemente preciso e in presenza delle sole variazioni casuali (visto che abbiamo idealmente rimosso ogni differenza sistematica spiegabile), i risultati tendono a differire tra di loro, muovendosi intorno ad un valor medio, rispetto al quale le misure superiori ed inferiori sono equiprobabili e tendono ad essere più rare, via via che ci si allontana dal valore medio. Questo ragionamento ci porta verso una densità di probabilità (parliamo di variabili continue) a forma di campana, che potrebbe essere descritta con una funzione continua detta **curva di Gauss**.
 
 La curva è descritta dalla seguente funzione di densità:
 
-$$P(X) = \frac{1}{{\sigma \sqrt {2\pi } }}\exp \left[{\frac{\left( {X - \mu } \right)^2 }{2\sigma ^2 }} \right]$$
+$$P(Y) = \frac{1}{{\sigma \sqrt {2\pi } }}\exp \left[{\frac{\left( {Y - \mu } \right)^2 }{2\sigma ^2 }} \right]$$
 
-ove $P(X)$ è la densità di probabilità di una certa misura $X$, mentre $\mu$ e $\sigma$ sono rispettivamente la media e la deviazione standard della popolazione (per la dimostrazione si rimanda a testi specializzati). Le variabili casuali che possono essere descritte con la curva di Gauss, prendono il nome di *variabili normali* o *normalmente distribuite*.
+ove $P(Y)$ è la densità di probabilità di una certa misura $Y$, mentre $\mu$ e $\sigma$ sono rispettivamente la media e la deviazione standard della popolazione (per la dimostrazione si rimanda a testi specializzati). Le variabili casuali che possono essere descritte con la curva di Gauss, prendono il nome di *variabili normali* o *normalmente distribuite*.
 
 Studiare le principali proprietà matematiche della curva di Gauss è estremamente utile. Ad esempio, senza voler entrare troppo nel dettaglio, guardando la curva di Gauss possiamo notare che:
 
-1. la forma della curva dipende da solo da $\mu$ e $\sigma$ (figura \@ref{fig:figName51}). Ciò significa che, se prendiamo un gruppo di individui e partiamo dal presupposto (**assunzione parametrica**) che in relazione ad un determinato carattere quantitativo (es. produzione) la distribuzione di frequenza è normale (e quindi può essere descritta con una curva di Gauss), allora basta conoscere la media e la deviazione standard degli individui e immediatamente conosciamo l'intera distribuzione di frequenza (cioè l'intera popolazione di misure);
+1. la forma della curva dipende da solo da $\mu$ e $\sigma$ (figura \@ref(fig:figName51)). Ciò significa che, se prendiamo un gruppo di individui e partiamo dal presupposto (**assunzione parametrica**) che in relazione ad un determinato carattere quantitativo (es. produzione) la distribuzione di frequenza è normale (e quindi può essere descritta con una curva di Gauss), allora basta conoscere la media e la deviazione standard degli individui e immediatamente conosciamo l'intera distribuzione di frequenza (cioè l'intera popolazione di misure);
 2. la curva ha due asintoti e tende a 0 quando x tende a infinito. Questo ci dice che se assumiamo che un fenomeno è descrivibile con una curva di Gauss, allora assumiamo che tutte le misure sono possibili, anche se la loro frequenza decresce man mano che ci si allontana dalla media;
-3. la probabilità che la x assuma valori compresi in un certo intervallo è data dall'integrale della curva di Gauss in quell'intervallo. Ad esempio, la figura \@ref{fig:figName52} mostra l'80° percentile, cioè la misura più alta dell'80% delle misure possibili;
+3. la probabilità che la x assuma valori compresi in un certo intervallo è data dall'integrale della curva di Gauss in quell'intervallo. Ad esempio, la figura \@ref(fig:figName52) mostra l'80° percentile, cioè la misura più alta dell'80% delle misure possibili;
 4. Se la curva di Gauss è stata costruita utilizzando le frequenze relative, l'integrale della funzione è uguale ad 1. Infatti la somma delle frequenze relative di tutte le varianti possibili non può che essere uguale ad 1;
 5. la curva è simmetrica. Questo indica che la frequenza dei valori superiori alla media è esattamente uguale alla frequenza dei valori inferiori alla media.
 6. dato  $\sigma$, possiamo dire che la frequenza dei valori superiori a $\mu + \sigma$ è pari al 15.87\% ed è uguale alla frequenza dei valori inferiori a $\mu - \sigma$.
@@ -820,161 +1263,96 @@ Studiare le principali proprietà matematiche della curva di Gauss è estremamen
 <p class="caption">(\#fig:figName52)Integrale della curva di densità normale (80° percentile; sinistra) e curva di probabilità cumulata (destra)</p>
 </div>
 
+
 ## Modelli 'a due facce'
 
-A questo punto, sempre in relazione al nostro frumento, possiamo scrivere che l'altezza della pianta $i$ è:
+Teendo conto di quanto appena detto, possiamo modificare i nostri modelli per la descrizione dei risultati degli esperimenti in questo modo:
 
-$$Y_i = \mu + \varepsilon_i$$
-dove abbiamo introdotto l'elemento stocastico $\varepsilon$, per ogni soggetto $i$, tale che:
 
-$$ \varepsilon \sim N(0, \sigma) $$
+$$Y_i = f(X, \theta) + \varepsilon_i$$
 
-cioè la componente stocastica $\varepsilon$ è normalmente distribuita, con media 0 e deviazione standard $\sigma$. E'abbastanza evidente che è possibile scrivere:
+introducendo l'elemento stocastico $\varepsilon$ per descrivere l' effetti casuali che subisce ogni soggetto $i$. Globalmente, questi effetti vengono considerati come normalmente distribuiti, con media 0 e deviazione standard $\sigma$:
 
-$$Y_i \sim N(\mu, \varepsilon)$$
+$$ \varepsilon_i \sim N(0, \sigma) $$
 
-cioè che l'altezza del frumento è normalmente distribuita con media $\mu$ e deviazione standard $\sigma$. Dato che si tratta di una semplice traslazione di una distribuzione normale lungo l'asse delle ascisse (come in figura \@ref{figName51}), le due espressioni sono totalmente equivalenti.
+Analogamente, possiamo scrivere:
 
-Ora si può dire che conosciamo perfettamente la popolazione di partenza se conosciamo $\mu$ e $\sigma$, cioè la parte ('faccia') deterministica e la parte ('faccia') stocastica del modello. Se quindi immaginiamo che $\mu = 100$ (come abbiamo detto in precedenza) e $\sigma = 8$, possiamo risolvere alcuni semplici esercizi, utilizzando le funzioni di calcolo di probabilità di R.
+$$Y_i \sim N[f(X, \theta), \sigma]$$
 
-**ESERCIZIO 1**. Calcolare la densità di un'altezza pari a 120 cm.
+cioè che il valore osservato è normalmente distribuita con media che cambia in funzione dello stimolo $X$ e deviazione standard $\sigma$. Dato che si tratta di una semplice traslazione di una distribuzione normale lungo l'asse delle ascisse (come in figura \@ref(fig:figName51)), le due espressioni sono totalmente equivalenti.
+
+Un modello di questo tipo (a due facce: deterministica + stocastica) ci consente la miglior descrizione di un qualunque fenomeno biologico: la parte deterministica ci consente di prevedere il risultato atteso, quella stocastica ci consente di capire quali osservazioni sono più probabili in pratica. Ad esempio, se ipotizziamo di misurare la concentrazione del nostro pozzo con uno strumento caratterizzato da $\sigma = 12$, possiamo rispondere a tutte le seguenti domande
+
+1. Qual è la misura di concentrazione più probabile?
+2. Qual è la densità di probabilità di ottenere una concentrazione pari a 120 $mg/L$?
+3. Qual è la probabilità di ottenere una concentrazione inferiore a 110 $mg/L$?
+4. Qual è la probabilità di ottenere una concentrazione superiore a 130 $mg/L$?
+5. Qual è la probabilità di ottenere una concentrazione compresa tra 110 e 130 $mg/L$
+6. Quale concentrazione è superiore al 90% di tutte i valori ottenibili (90° percentile)?
+7. Quali sono quei due valori, simmetrici rispetto alla media e tali da formare un intervallo all'interno del quale cadono il 95% delle misure possibili?
+
+La risposta alla prima domanda è banale ($Y_E = 120$), mentre per rispondere alle altre domande possiamo utilizzare le apposite funzioni di R. Per ogni distribuzione abbiamo a disposizione una funzione di densità (con prefisso 'd'), una funzione di probabilità cumulata (con prefisso 'p') e una funzione inversa (prefisso 'q') che consente di calcolare i percentili. Nel caso della funzione gaussiana, abbiamo le funzioni `dnorm()`, `pnorm()` e `qnorm()`, che possiamo utilizzare per calcolare densità, probabilità e percentili, come indicato di seguito. 
 
 
 ```r
-dnorm(120, mean = 100, sd = 8)
-## [1] 0.002191038
+# Domanda 2
+dnorm(120, mean = 120, sd = 12)
+## [1] 0.03324519
+# Domanda 3
+pnorm(110, mean = 120, sd = 12)
+## [1] 0.2023284
 ```
 
-**ESERCIZIO 2**. Qual è la probabilità di ottenere piante con altezza inferiore a 80 cm?
+Per la quarta domanda dobbiamo considerare che la funzione `pnorm()` fornisce la coda bassa della funzione, mentre dobbiamo individuare la coda alta (altezze maggiori della soglia data). Pertanto, abbiamo due possibili soluzioni, come indicato più sotto.
 
 
 ```r
-pnorm(80, mean = 100, sd = 8)
-## [1] 0.006209665
-```
-
-**ESERCIZIO 3**. Qual è la probabilità di ottenere piante con altezza superiore a 110 cm?
-
-
-```r
-pnorm(110, mean = 100, sd = 8, lower.tail = F)
-## [1] 0.1056498
-```
-
-Si utilizza l'argomento lower.tail=FALSE, in quanto stiamo cercando la probabilità di un'a concentrazione pari o superiore ad 1.1, e non pari od inferiore.'altezza pari o superiore a 110 cm (upper-tail) e non quella pari o inferiore a 110 cm (lower-tail), che sarebbe fornita di default. E' totalmente equivalente utilizzare la funzione sottostante.
-
-
-```r
-1 - pnorm(110, mean = 100, sd = 8)
-## [1] 0.1056498
-```
-
-
-**ESERCIZIO 4**. Qual è la probabilità di ottenere piante con altezza compresa tra 80 e 110 cm?
-
-
-```r
-pnorm(110, mean = 100, sd = 8) - pnorm(80, mean = 100, sd = 8)
-## [1] 0.8881406
-```
-
-**ESERCIZIO 5**. Qual è quella misura che è superiore al 90% di tutte le piante del campo (90° percentile?
-
-
-```r
-qnorm(0.9, 100, 8)
-## [1] 110.2524
-```
-
-**ESERCIZIO 6**. Qual è quella misura che è inferiore al 20% di tutte le piante del campo (80° percentile?
-
-
-```r
-qnorm(0.8, 100, 8)
-## [1] 106.733
-qnorm(0.2, 100, 8, lower.tail=F)
-## [1] 106.733
-```
-
-**ESERCIZIO 7**. Quali sono quei due valori, simmetrici rispetto alla media e tali da formare un intervallo all'interno del quale cadono il 95% delle piante?
-
-
-```r
-qnorm(0.025, 100, 8)
-## [1] 84.32029
-qnorm(0.975, 100, 8)
-## [1] 115.6797
+# Domanda 4
+pnorm(130, mean = 120, sd = 12, lower.tail = F)
+## [1] 0.2023284
+1 - pnorm(130, mean = 120, sd = 12)
+## [1] 0.2023284
+# Domanda 5
+pnorm(130, mean = 120, sd = 12) - pnorm(110, mean = 120, sd = 12)
+## [1] 0.5953432
+# Domanda 6
+qnorm(0.9, mean = 120, sd = 12)
+## [1] 135.3786
+# Domanda 7
+qnorm(0.025, mean = 120, sd = 12)
+## [1] 96.48043
+qnorm(0.975, mean = 120, sd = 12)
+## [1] 143.5196
 ```
 
 
 ## E allora?
 
-Cerchiamo di ricapitolare. Le popolazioni di soggetti sperimentali e delle loro misure sono un oggetto largamente ignoto e inconoscibile. Infatti, le caratteristiche dei soggetti della popolazione sono, in parte, determinate in base a relazioni causa-effetto, ma, in altra parte, esse sono puramente stocastiche. Tuttavia è ragionevole supporre che esse seguano una qualche funzione di probabilità/densità (**assunzione parametrica**). Se questo è vero, allora possiamo utilizzare queste funzioni e i loro integrali per calcolare la probabilità di ottenere una certa misura o un certo insieme di misure.
+Cerchiamo di ricapitolare. I risultati sperimentali sono un oggetto largamente ignoto e inconoscibile, perché sono, in parte, determinati in base a relazioni causa-effetto, ma, d'altra parte, essi sono puramente stocastici. Tuttavia è ragionevole supporre che essi seguano una qualche funzione di probabilità/densità (**assunzione parametrica**). Se questo è vero, allora possiamo utilizzare queste funzioni e i loro integrali per calcolare la probabilità di ottenere un certo risultato o un insieme di risultati.
 
 ## Le simulazioni Monte Carlo
 
-Se quanto abbiamo detto è vero, ogni esperimento scientifico non è altro che un'operazione di campionamento da una certa distribuzione di probabilità. Questo campionamento può essere simulato impiegando un generatore di numeri casuali. Immaginiamo di avere disegnato un esperimento con otto parcelle (repliche) per determinare la produzione del mais in un certo appezzamento e immaginiamo che queste parcelle costituiscano un campione rappresentativo della popolazione di parcelle di quell'appezzamento. Se la popolazione è distribuita normalmente, con media pari a 12 t/ha e deviazione standard pari ad 1.2 t/ha, allora possiamo simulare i risultati del nostro esperimento come segue:
+Guardandolo dal punto di vista che abbiamo appena illustrato, ogni esperimento scientifico non è altro che un'operazione di campionamento da una certa distribuzione di probabilità e questo campionamento può essere simulato impiegando un generatore di numeri casuali, con un procedimento che prende il nome di 'metodo Monte Carlo'.
+
+Prendiamo ancora il nostro pozzo inquinato e contenente 120 $mg/L$ di un erbicida e immaginiamo di misurare la concentrazione di tre campioni d'acqua, utilizzando uno strumento caratterizzato da $\sigma = 12$. I risultati di questo esperimento possono essere simulati:
+
+1. usando il modello deterministico per definire il valore atteso della produzione per ogni dose di azoto, che sarà la stessa per tutte le repliche (in questo caso $Y_E = 120$);
+2. utilizzando un generatore gaussiano di numeri casuali, per simulare gli effetti stocastici, campionandoli da una distribuzione normale, con le caratteristiche desiderate.
+
 
 
 ```r
 set.seed(1234)
-Y <- rnorm(8, 15, 1.2)
-Y
-## [1] 13.55152 15.33292 16.30133 12.18516 15.51495
-## [6] 15.60727 14.31031 14.34404
-mean(Y)
-## [1] 14.64344
-sd(Y)
-## [1] 1.328183
+Y_E <- 120
+epsilon <- rnorm(3, 0, 12)
+Y_O <- Y_E + epsilon
+Y_O
+## [1] 105.5152 123.3292 133.0133
 ```
 
-La generazione di numeri casuali con il computer viene fatta attraverso algoritmi che, a partire da un *seed* iniziale, forniscono sequenze che obbediscono a certe proprietà fondamentali (numeri pseudo-casuali). Il comando 'set.seed(1234)' ci permette di partire dallo stesso valore e quindi di ottenere lo stesso campione. Un'altra cosa da notare è che il nome della funzione che genara numeri casuali è formato con il nome della distribuzione ('norm') più il prefisso 'r'. Questo è vero per tutte le altre distribuzioni in R ('rbinom', 'rt' e così via)
+La generazione di numeri casuali con il computer viene fatta attraverso algoritmi che, a partire da un *seed* iniziale, forniscono sequenze che obbediscono a certe proprietà fondamentali (numeri pseudo-casuali). Il comando `set.seed(1234)` ci permette di partire da un *seed* predefinito, in modo che, chiunque ripeta la simulazione con lo stesso *seed*, ottiene lo stesso risultato. Un'altra cosa da notare è che il nome della funzione che genera numeri casuali è formato dal nome della distribuzione ('norm') più il prefisso 'r'. Questo è vero per tutte le altre distribuzioni in R ('rbinom', 'rt' e così via). Inoltre, il primo argomento definisce il numero di valori che vogliamo ottenere (tre, tanti quante sono le repliche).
 
-I valori campionati non riflettono le caratteristiche della popolazione, nel senso che la media e la deviazione standard del campione differiscono da quelle della popolazione. E' esattamente ciò che capita durante un esperimento!
-
-
-## Analisi dei dati e 'model fitting'
-
-Secondo il principio illustrato in questo capitolo, un ricercatore arriverebbe a conoscere perfettamente la realtà se riuscisse ad individuare l'equazione e i parametri che governano il fenomeno in studio. Di conseguenza, l'ipotesi scientifica che sta alla base di un esperimento può essere posta sotto forma di modello matematico. Ad esempio, potremmo ipotizzare che la degradazione di un erbicida nel terreno segua una legge di decadimento esponenziale, rappresentabile, in genere, con l'equazione:
-
-$$ C= a \, e^{-k T} + \varepsilon$$
-
-dove $C$ è la concentrazione dell'erbicida in un dato momento $T$ ed $a$ e $k$ sono i parametri. Per quanto riguarda l'elemento stocastico, possiamo assumere che:
-
-$$ \varepsilon \sim N(0, \sigma)$$
-
-In modo equivalente, potremmo scrivere:
-
-$$ C \sim N(a \, e^{-k T}, \sigma)$$
-
-Questo modello è assolutamente generale; se vogliamo specificarlo per una certa situazione sperimentale, ad esempio per la degradazione di imazethapyr a 20°C, possiamo realizzare un esperimento nel quale contaminamo un terreno con questo erbicida, lo mettiamo a 20°C e, in tempi diversi, preleviamo aliquote di terreno da sottoporre a determinazione analitica. L'analisi dei dati raccolti consisterà nell'individuare $a$, $k$ e $\sigma$, con una tecnica definita di *model fitting*. 
-
-Le diverse tecniche di analisi dei dati che descriveremo nei capitoli successivi sono accomunate dall'essere appunto tecniche di *model fitting*. Vedremo anche come queste tecniche possono essere utilizzate per verificare che le osservazioni sperimentali si conformino ad un dato modello (*goodness of fit*) oppure per confrontare due ipotesi alternative poste sotto forma di modelli diversi (*model comparison*).
-
----
-
-
-## Per approfondire un po'...
-
-### Generazione dei dati sperimentali: un esempio più realistico
-
-Immaginiamo di conoscere la legge deterministica che definisce la risposta del frumento alla concimazione azotata. In particolare, immaginiamo che questa risposta produttiva sia fondamentalmente lineare:
-
-$$Y_E = b_0 + b_1 X$$
-
-ed immaginiamo che, senza concimazione (X = 0), la produzione sia pari a 25 q/ha ($b_0$ = 25). Immaginiamo che l'incremente produttivo per kg di azoto somministrato sia pari a 0.15 q/ha ($b_1$ = 0.15).
-
-Per individuare questa legge naturale organizziamo un esperimento, con quattro dosi di azoto e quattro repliche. In questo esperimento, come in tutti gli esperimenti, agirà anche una componente stocastica, che in qualche modo sposterà la risposta osservata dalla risposta attesa:
-
-$$Y_o = b_0 + b_1 X + \varepsilon \quad \textrm{con}  \quad \varepsilon \sim N(0, \sigma)$$
-
-Assumiamo che la componente stocastica $\varepsilon$ sia distribuita normalmente, come media 0 e deviazione standard $\sigma$, che immaginiamo essere pari a 2.5 q/ha.
-
-Su questa base, generiamo i dati osservati, nelle seguenti fasi:
-
-1. generiamo i valori attesi ('Yield_E'), utilizzando il modello deterministico di risposta. Le quattro repliche di una dose hanno, ovviamente, lo stesso valore;
-2. aggiungiamo l'elemento stocastico, specifico per ogni osservazione, campionando da una distribuzione normale;
-3. creiamo un dataframe con le osservazioni sperimentali
+La stessa strategia può essere utilizzata per simulare risultati sotto modelli deterministici più complessi: definisco i risultati attesi con il modello deterministico prescelto e ci aggiungo una componente casuale, campionandola da un distribuzione di probabilità/densità adeguata (usualmente gaussiana). Come ulteriore esempio possiamo considerare il codice sottostante, che può essere utilizzato per simulare un esperimento di concimazione azotata del frumento, con quattro dosi (0, 60, 120 e 180 kg/ha) e quattro repliche (sedici dati in totale).
 
 
 ```r
@@ -1002,128 +1380,25 @@ dataset
 ## 14  180 52.16115
 ## 15  180 54.39874
 ## 16  180 51.72429
-# write.csv(dataset, file = "Nwheat.csv", row.names = F)
 ```
 
-Il dataset che otteniamo è realistico e lo utilizzeremo per l'analisi (regressione lineare semplice) nel capitolo 12.
+
+## Analisi dei dati e 'model fitting'
+
+Nelle simulazioni sovrastanti abbiamo ipotizzato di conoscere il meccanismo di base che ha generato le nostre osservazioni sperimentali. In particolare, considerando il modello $Y = f(X, \theta)$   abbiamo ipotizzato di conoscere $f$, $X$ e $\theta$ ed abbiamo simulato $Y$.
+
+Nella realtà, noi non conosciamo i meccanismi che governano i fenomeni naturali ed è proprio per questo che facciamo esperimenti. Di conseguenza noi conosciamo $X$ (stimolo sperimentale) ed $Y$, ma ignoriamo $f$ e $\theta$. L'aspetto interessante è che l'ipotesi scientifica che sta alla base di un esperimento può essere posta sotto forma di modello matematico $f$ e i risultati sperimentali possono essere utilizzati per determinare $\theta$, con una tecnica definita *model fitting*. 
+
+Le diverse tecniche di analisi dei dati che descriveremo nei capitoli successivi sono accomunate dall'essere appunto tecniche di *model fitting*. Vedremo anche come queste tecniche possono essere utilizzate per verificare che le osservazioni sperimentali si conformino ad un dato modello (*goodness of fit*) oppure per confrontare due ipotesi alternative poste sotto forma di modelli diversi (*model comparison*).
 
 
-### Modelli stocastici non-normali
+## Modelli stocastici non-normali
 
-Oltre alla distribuzione gaussiana, che è largamente la più importante, esistono molti altri modelli stocastici, sia per eventi continui che discreti. Chi volesse approfondire queste distribuzioni trova informazioni in seguito. Per gli altri vogliamo solo far notare che le funzioni di R per il calcolo di probabilità hanno sempre la stessa sintassi, che, dato il nome della distribuzione (es. 'norm' per la distribuzione normale), assegna il prefisso 'd' per la funzione di probabilità/densità, 'p' per la funzione di probabilità cumulata, 'q' per la funzione quantile. Ad esempio, per la distribuzione binomiale, il nome è 'binom' e, di conseguenza, le funzioni in R sono: 'dbinom()' (probabilità), 'pbinom()' (probabilità cumulata) e 'qbinom()' (funzione 'quantile').
+In questo capitolo abbiamo utilizzato un solo modello stocastico, cioè la funzione di densità gaussiana. Oltre a questa, che è largamente la più importante, esistono molti altri modelli stocastici, sia per eventi continui che discreti. Chi volesse approfondire queste distribuzioni trova informazioni in letteratura e, in particolare, nel primo dei riferimenti bibliografici forniti più sotto.
 
+---
 
-#### t di Student
-
-La distribuzione t di Student è analoga, per forma, ad una distribuzione normale con media 0 e deviazione standard 1. Rispetto a quest'ultima, la dispersione è un po' più ampia, nel senso la probabilità di avere valori lontani dalla media è più alta. In realtà, non esiste una sola distribuzione t di Student, ma ne esistono molte, caratterizzate da un diverso numero di gradi di libertà ($\nu$); maggiore è $\nu$, minore la sovradispersione; se il numero di gradi di libertà è infinito, la distribuzione t di Student è identica alla normale standardizzata (distribuzione normale con media 0 e deviazione standard uguale ad 1).
-
-La Figura \@ref(fig:figName2521) riporta un esempio di come diminuisce la sovradispersione all'aumentare del numero di gradi di libertà.
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName2521-1.png" alt="Distribuzione t di Student, con diversi gradi di libertà" width="90%" />
-<p class="caption">(\#fig:figName2521)Distribuzione t di Student, con diversi gradi di libertà</p>
-</div>
-
-#### F di Fisher
-
-La distribuzione F di Fisher è definita solo per valori positivi ed è fortemente asimmetrica. Anche in questo caso, abbiamo una famiglia di distribuzioni, che differiscono tra di loro per due parametri (gradi di libertà)  $\nu_1$  e $\nu_2$. Solitamente questa distribuzione viene utilizzata per descrivere il rapporto tra le varianze di coppie di campioni estratti da un distribuzione normale standardizzata, per cui $\nu_1$ e $\nu_2$ sono i gradi di libertà del numeratore e del denominatore.
-
-La Figura \@ref(fig:figName2522) mostra diverse funzioni di densità: possiamo notare come, all'aumentare dei gradi di libertà, la funzione F di Fisher tende ad assomigliare sempre di più ad una normale.
-
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName2522-1.png" alt="Distribuzioni F di Fisher, con $
-u_1 = 
-u_2 = 
-u$ e $
-u = 1$ (linea nera), $
-u = 3$ (linea rossa), $
-u = 10$ (linea blues), $
-u = 30$ (linea violetta) e $
-u = 60$ (linea marrone)" width="90%" />
-<p class="caption">(\#fig:figName2522)Distribuzioni F di Fisher, con $
-u_1 = 
-u_2 = 
-u$ e $
-u = 1$ (linea nera), $
-u = 3$ (linea rossa), $
-u = 10$ (linea blues), $
-u = 30$ (linea violetta) e $
-u = 60$ (linea marrone)</p>
-</div>
-
-#### La distribuzione binomiale
-
-Ogni esperimento per il quale ci siano solo due esiti possibili (successo ed insuccesso) e una certa probabilità di successo, viene detto **esperimento Bernoulliano**. Il tipico esempio è il lancio della moneta, nel quale possiamo ottenere solo testa o croce, con una probabilità di 0.5 (se la moneta non è truccata). In alcuni casi, potremmo avere una serie di esperimenti Bernoulliani indipendenti, con probabilità di successo costante (ad esempio, lanciare la moneta 10 volte) e potremmo essere interessati a conoscere la probabilità di ottenere *k* successi su *n* prove. Questa probabilità può essere descritta attraverso la **funzione di probabilità binomiale**.
-
-Poniamo di sapere che in una Facoltà di Agraria con un numero molto elevato di studenti, il rapporto tra maschi e femmine sia pari a 0.7 e quindi che la probabilità di incontrare un maschio sia pari a $p = 0.7$ (evento semplice). Deve essere estratto a sorte un viaggio studio per quattro studenti e, per una questione di pari opportunità, si preferirebbe che fossero premiati in ugual misura maschi e femmine (cioè si vogliono premiare due femmine). Qual è la probabilità che un simile evento si realizzi?
-
-La probabilità cercata si può ottenere pensando che abbiamo un evento "estrazione" che può dare due risultati possibili (maschio o femmina) e che deve essere ripetuto quattro volte. Se consideriamo "successo" estrarre una femmina, allora la probabilità di successo in ogni estrazione è $p = 0.3$ mentre quella di insuccesso (evento complementare) è pari a $1 - p = q = 0.7$. Facciamo attenzione! Quanto abbiamo detto è vero solo se la popolazione è sufficientemente numerosa da pensare che la singola estrazione non cambia la probabilità degli eventi nelle successive (eventi indipendenti). La probabilità che su quattro estrazioni si abbiano 2 successi (due femmine) e due insuccessi (due maschi) è data da (teorema della probabilità composta):
-
-$$0.3 \cdot 0.3 \cdot 0.7 \cdot 0.7 = 0.3^2 \cdot 0.7^2$$
-
-In generale, data una popolazione molto numerosa, nella quale gli individui si presentano con due modalità possibili (in questo caso maschio e femmina) e posto di sapere che la frequenza con cui si presenta la prima modalità è pari a $p$ (in questo caso la frequenza delle femmine è pari a 0.3), mentre la frequenza della seconda modalità è pari a $q = 1 - p$, se vogliamo estrarre da questa popolazione $n$ elementi, la probabilità che $k$ di questi presentino la prima modalità (successo) è data da:
-
-$$p^k \cdot q^{(n-k)}$$
-
-La formula di cui sopra, tuttavia, non risolve il nostro problema, in quanto noi vogliamo che vengano estratte due femmine, indipendentemente dall'ordine con cui esse vengono estratte (prima, seconda, terza o quarta estrazione), mentre la probabilità che abbiamo appena calcolato è quella relativa all'evento in cui le due femmine sono estratte al primo e secondo posto.
-
-Di conseguenza (teorema della probabilità totale), alla probabilità dell'evento indicato in precedenza (estrazione di due femmine in prima e seconda posizione) dobbiamo sommare la probabilità di tutti gli altri eventi utili (due femmine in seconda e terza posizione, oppure in terza e seconda, oppure in terza e quarta e così via). Il numero delle combinazioni possibili per 2 femmine in quattro estrazioni (combinazione di 4 elementi di classe 2) è dato dal coefficiente binomiale:
-
-$$\left( {\begin{array}{*{20}c}
-n  \\
-k  \\
-\end{array}} \right) = \frac{n!}{(n - k)!k!} $$
-
-
-Moltiplicando le due equazioni date in precedenza otteniamo la funzione di probabilità binomiale:
-
-$$P(X = x_i ) = \frac{{n!}}{{(n - k)!k!}} \cdot p^k \cdot q^{(n - k)} $$
-
-Nel caso specifico otteniamo il risultato:
-
-$$P(X = 2) = \frac{4!}{(4 - 2)!2!} \cdot 0.3^2 \cdot 0.7^{(4 - 2)}  = 0.2646 $$
-
-che è appunto la probabilità cercata.
-
-In R, utilizziamo la funzione 'dbinom(successi, prove, probabilità semplice)' per calcolare la probabilità di ottenere $k$ successi in $n$ prove:
-
-
-```r
-dbinom(2, 4, 0.3)
-## [1] 0.2646
-```
-
-La funzione binomiale è un modello stocastico e si può dimostrare che il valore atteso (media) è uguale ad $n\cdot p$, mentre la varianza è pari a  $n\cdot p \cdot q$:
-
-La funzione di ripartizione (probabilità cumulata) si calcola in R con la funzione 'pbinom(successi, prove, probabilità semplice)'. Nell'esempio, se vogliamo sapere la probabilità totale di estrarre meno di tre femmine (2 femmine o meno), possiamo operare in questo modo:
-
-
-```r
-pbinom(2,4,0.3)
-## [1] 0.9163
-```
-
-Che risulta anche dalla somma della probabilità di estrarre 0, 1, 2 femmine:
-
-
-```r
-zero <- dbinom(0,4,0.3)
-uno <- dbinom(1,4,0.3)
-due <- dbinom(2,4,0.3)
-zero + uno + due
-## [1] 0.9163
-```
-
-La funzione di ripartizione può anche essere utilizzata al contrario, per determinare i quantili, cioè il numero di successi che corrispondono ad una probabilità cumulata pari ad alfa:
-
-
-```r
-qbinom(0.9163,4,0.3)
-## [1] 2
-```
-
-### Altre letture
+## Altre letture
 
 1. Bolker, B.M., 2008. Ecological models and data in R. Princeton University Press, Books.
 2. Schabenberger, O., Pierce, F.J., 2002. Contemporary statistical models for the plant and soil sciences. Taylor & Francis, CRC Press, Books.
@@ -1138,55 +1413,26 @@ qbinom(0.9163,4,0.3)
 
 
 
+Nel capitolo precedente abbiamo visto che: 
 
-Abbiamo già visto che un esperimento scientifico non è altro che un'operazione di campionamento, con la quale io, invece che studiare una popolazione enorme di soggetti, posso studiarne un gruppo sufficientemente piccolo, e compatibile con le mie limitate risorse di tempo e denaro. Anche se il campione estratto è effettivamente rappresentativo della popolazione, rimane il fatto che esso è il risultato di uno solo degli infiniti sforzi di campionamento possibili. Con due importanti conseguenze:
-
-1. le sue caratteristiche non necessariamente riflettono quelle della popolazione che lo ha generato;
-2. campionamenti successivi forniscono risultati diversi, perché diversi sono i soggetti e, spesso, anche le condizioni in cui l'esperimento viene eseguito.
-
-Di conseguenza, al di là del campione, il nostro interesse rimane fondamentalmente rivolto verso la popolazione che lo ha generato. Ci dobbiamo chiedere quale sia la relazione tra le caratteristiche del campione e quelle della popolazione da cui esso è estratto. Questo processo logico prende il nome di *inferenza statistica* e può essere condotto secondo le teorie di Karl Pearson (1857-1936), Egon Pearson (suo figlio: 1895-1980) e Jarzy Neyman (1894-1981), oltre al solito Ronald Fisher.
-
-## L'analisi dei dati: gli 'ingredienti' fondamentali
-
-Richiamiamo il percorso logico che abbiamo introdotto nel capitolo precedente:
-
-1.  I fenomeni biologici seguono una legge di natura (verità 'vera'), che ne costituisce il meccanismo deterministico fondamentale.
+1.  I fenomeni biologici seguono una legge di natura (verità 'vera'), che ne costituisce il meccanismo deterministico fondamentale. Questa legge di natura produce un risultato atteso $Y_E$.
 2.  Quando si organizza un esperimento, i soggetti sperimentali obbediscono a questo meccanismo di fondo, al quale tuttavia si sovrappongono molto altri elementi di 'confusione', altamente incontrollabili, che vanno sotto il nome di errore sperimentale.
-3.  L'osservazione sperimentale è quindi un'immagine confusa della verità vera e, soprattutto, l'osservazione sperimentale tende ad essere diversa per ogni sforzo di campionamento.
-4.  Compito del ricercatore è quello di separare l'informazione (che rappresenta la verità 'vera') dal 'rumore di fondo' provocato dall'errore sperimentale.
+3.  L'osservazione sperimentale è quindi un'immagine confusa della verità vera ($Y_O \neq Y_E$) e, soprattutto, essa tende ad essere diversa per ogni sforzo di campionamento.
+4.  Compito del ricercatore è comprendere come sia la verità 'vera', separata dal 'rumore di fondo' generato dall'errore sperimentale.
 
 
-Questo dualismo tra verità 'vera' (inconoscibile) e verità sperimentale (esplorabile tramite un esperimento opportunamente pianificato) è l'aspetto centrale di tutta la biometria ed è schematizzato nella figura \@ref(fig:figName61). Di esso abbiamo fatto menzione più volte nei capitoli precedenti.
+Questo dualismo tra verità 'vera' (inconoscibile) e verità sperimentale (esplorabile tramite un esperimento opportunamente pianificato) è l'aspetto centrale di tutta la biometria ed è schematizzato nella figura \@ref(fig:figName61).
+
 
 <div class="figure" style="text-align: center">
 <img src="_images/InferenceProcess.jpeg" alt="Osservazioni sperimentali e meccanismi perturbativi" width="75%" />
 <p class="caption">(\#fig:figName61)Osservazioni sperimentali e meccanismi perturbativi</p>
 </div>
 
-In questo percorso logico ci sono due aspetti fondamentali che debbono essere attentamente valutati:
-
-1.  modello di generazione dei dati sperimentali;
-2.  sampling distribution (o sample space).
-
-Chiariamo i due concetti con un esempio.
 
 ## Esempio: una soluzione erbicida
 
-Immaginiamo questa situazione: abbiamo una soluzione erbicida a concentrazione pari a 120 $mg/l$, che viene misurata tramite un gascromatografo. Lo strumento di misura, unitamente a tutte le altre fonti ignote di errore, produce un coefficiente di variabilità del 10% (corrispondente ad una deviazione standard pari a 12 $mg/l$). Facciamo le analisi in triplicato, come usuale per questo tipo di lavori.
-
-### Il modello dei dati
-
-In primo luogo, ci chiediamo quale sia il modello matematico che genera le nostre osservazioni. Considerando quanto detto nel capitolo precedente, possiamo assumere che:
-
-$$ Y_i = \mu + \varepsilon_i$$
-
-dove:
-
-$$ \varepsilon_i \sim N(\mu, \sigma)$$
-
-cioè possiamo assumere che i risultati delle nostre misure siano normalmente distribuiti con media $\mu = 120$ e deviazione standard $\sigma = 12$.
-
-Con queste informazioni possiamo simulare un esperimento con R, ottenendo i seguenti risultati:
+Nel capitolo precedente, abbiamo introdotto un esempio relativo ad un pozzo inquinato da un erbicida a concentrazione pari a 120 $mg/l$, che viene misurata tramite un gascromatografo. Questo strumento di misura, unitamente a tutte le altre fonti ignote di errore, produce un coefficiente di variabilità del 10% (corrispondente ad una deviazione standard pari a 12 $mg/l$). Abbiamo anche visto che, se immaginiamo di fare le analisi in triplicato, come usuale per questo tipo di lavori, i risultati di questo esperimento possono essere simulati ricorrendo ad un generatore di numeri casuali:
 
 
 ```r
@@ -1198,7 +1444,15 @@ Y
 
 ### Analisi dei dati: stima dei parametri
 
-Nelle due equazioni sovrastanti, gli elementi incogniti sono $\mu$ e $\sigma$. In realtà, dato che si tratta di una simulazione, sappiamo che essi sono pari, rispettivamente, a 120 e 12; tuttavia, nella realtà questa informazione sarebbe totalmente sconosciuta. Guardando il campione, le nostre migliori stime $\mu$ e $\sigma$, che chiameremo rispettivamente $m$ ed $s$, sono pari rispettivamente alla media e alla deviazione standard del campione.
+A questo punto mettiamoci in una situazione reale e, di conseguenza, dimentichiamo di conoscere che la concentrazione ignota è pari a 120 $mg/L$ e che $\sigma = 12$. Ipotizziamo quindi che le nostre osservazioni sperimentali siano generate da un modello del tipo:
+
+$$Y_i = \mu + \varepsilon_i$$
+
+con:
+
+$$\varepsilon_i \sim N(0, \sigma)$$
+
+Nelle due equazioni sovrastanti, gli elementi incogniti sono $\mu$ e $\sigma$. Guardando il campione, le nostre migliori stime per queste due quantità, che chiameremo rispettivamente $m$ ed $s$, sono pari rispettivamente alla media e alla deviazione standard del campione.
 
 
 ```r
@@ -1209,7 +1463,7 @@ m; s
 ## [1] 13.9479
 ```
 
-Questo processo con il quale assegniamo alla popolazione le caratteristiche del campione prende il nome di **stima puntuale** dei parametri. Vediamo ancora una volta che l'osservazione sperimentale non coincide con la verità 'vera' ($m \ne \mu$ e $s \ne \sigma)$, ma non siamo molto distanti, considerando il 10% di variabilità dello strumento di analisi. Tuttavia, visto che dobbiamo trarre conclusioni che riguardano la popolazione e non il campione, è giustificato da parte nostra un atteggiamento prudenziale: prima di dire che la concentrazione erbicida nella soluzione è pari 120.6192187, dobbiamo chiederci: che cosa succederebbe se ripetessimo l'esperimento molte altre volte?
+Questo processo con il quale assegniamo alla popolazione le caratteristiche del campione prende il nome di **stima puntuale** dei parametri. Vediamo ancora una volta che l'osservazione sperimentale non coincide con la verità 'vera' ($m \neq \mu$ e $s \neq \sigma)$, ma non siamo molto distanti, considerando il 10% di variabilità dello strumento di analisi. Tuttavia, visto che dobbiamo trarre conclusioni che riguardano la popolazione e non il campione, è giustificato da parte nostra un atteggiamento prudenziale: prima di dire che la concentrazione erbicida nella soluzione è pari 120.6192187, dobbiamo chiederci: che cosa succederebbe se ripetessimo l'esperimento molte altre volte?
 
 
 ### La 'sampling distribution'
@@ -2221,7 +2475,7 @@ Vediamo che vi sono 19 valori più alti di quello da noi osservato, quindi il p-
 
 # Modelli ANOVA ad una via
 
-Nel capitolo 4 abbiamo già parlato di come assumiamo che  risultati di un esperimento si generino attraverso un doppio meccanismo deterministico e stocastico, rappresentabile attraverso un modello matematico contenento uno o più elementi casuali, descritti da una funzione di densità, solitamente gaussiana. Abbiamo già visto che i modelli più utilizzati sono lineari e, tra questi, il gruppo più diffuso, almeno in ambito biologico-agrario, è quello dei modelli ANOVA.
+Nel capitolo 4 abbiamo già parlato di come assumiamo che risultati di un esperimento si generino attraverso un doppio meccanismo deterministico e stocastico, rappresentabile attraverso un modello matematico contenento uno o più elementi casuali, descritti da una funzione di densità, solitamente gaussiana. Abbiamo già visto che i modelli più utilizzati sono lineari e, tra questi, il gruppo più diffuso, almeno in ambito biologico-agrario, è quello dei modelli ANOVA.
 
 La nomenclatura è impropria; infatti, con il termine ANOVA, si intende un'operazione di scomposizione della varianza, inventata da Fisher negli anni '30 del '900, che costituisce ancora oggi una delle più fondamentali tecniche di analisi dei dati sperimentali. Tuttavia, ci sono alcuni modelli che, più naturalmente di altri, sono connessi all'esecuzione dell'ANOVA fisheriana. Si tratta di modelli lineari nei quali la/le variabile/i indipendenti, che descrivono gli stimoli sperimentali, sono nominali (categoriche) e, nella letteratura anglosassone, prendono il nome di 'factors' (fattori sperimentali).
 
@@ -2231,34 +2485,31 @@ Questi modelli rappresentano il punto di ingresso nell'analisi dei dati e la gra
 
 Abbiamo eseguito un esperimento in vaso, nel quale abbiamo utilizzato quattro trattamenti erbicidi:
 
-1. Metribuzin
-2. Rimsulfuron
-3. Metribuzin + rimsulfuron
-4. Testimone non trattato
-
+1.  Metribuzin
+2.  Rimsulfuron
+3.  Metribuzin + rimsulfuron
+4.  Testimone non trattato
 
 
 
 Lo scopo dell'esperimento era quello di verificare se la miscela metribuzin e rimsulfuron è più efficace dei due componenti utilizzati separatamente. L'esperimento era disegnato a randomizzazione completa con quattro repliche e prevedeva il rilievo della biomassa presente su ogni vaso, tre settimane dopo il trattamento: un più basso valore di biomassa implica un miglior effetto del trattamento.
 
-I risultati di questo esperimento sono riportati nel dataset 'mixture.csv', che è disponibile su gitHub. Per prima cosa, carichiamo il file.
+I risultati di questo esperimento sono riportati nel dataset 'mixture.csv', che è disponibile su una repository web. Per prima cosa, carichiamo il file.
 
 \vspace{12pt}
 
-```r
-str1 <- "https://raw.githubusercontent.com/OnofriAndreaPG"
-str2 <- "/agroBioData/master/mixture.csv"
-pathData <- paste(str1, str2, sep = "")
 
-dataset <- read.csv(pathData, header = T)
+```r
+fileName <- "https://www.casaonofri.it/_datasets/mixture.csv"
+dataset <- read.csv(fileName, header = T)
 head(dataset)
 ##             Treat Weight
-## 1        Unweeded  24.62
-## 2        Unweeded  30.94
-## 3        Unweeded  24.02
-## 4        Unweeded  27.51
-## 5 Metribuzin__348  15.20
-## 6 Metribuzin__348   4.38
+## 1 Metribuzin__348  15.20
+## 2 Metribuzin__348   4.38
+## 3 Metribuzin__348  10.32
+## 4 Metribuzin__348   6.80
+## 5     Mixture_378   6.14
+## 6     Mixture_378   1.95
 ```
 
 Il dataset è organizzato come un database, nel quale ogni riga contraddistingue un'unità sperimentale (record) e ogni colonna rappresenta una caratteristica del record (campo). In questo caso abbiamo due colonne: una per la variabile indipendente (fattore sperimentale 'Treat'), che ci dice con quale erbicida è stata trattata ogni unità sperimentale, ed una per la variabile dipendente ('Weight').
@@ -2267,10 +2518,10 @@ Il dataset è organizzato come un database, nel quale ogni riga contraddistingue
 
 La prima analisi dei dati consiste nella valutazione descrittiva del dataset. In particolare, calcoliamo:
 
-1. le medie per ogni tesi sperimentale
-2. Le deviazioni standard per ogni tesi sperimentale
+1.  le medie per ogni tesi sperimentale
+2.  Le deviazioni standard per ogni tesi sperimentale
 
-Utilizziamo la funzione 'tapply' in R.
+Utilizziamo la funzione `tapply` in R.
 
 
 ```r
@@ -2289,10 +2540,9 @@ Che cosa ci dice questa tabella, in base agli obiettivi dell'esperimento?
 
 Ci suggerisce che:
 
-1. La miscela sembra leggermente più efficace dei prodotti singoli
-2. Esiste una certa variabilità (errore sperimentale), che impedisce un giudizio certo
-3. La variabilità è abbastanza simile per tutti i trattamenti
-
+1.  La miscela sembra leggermente più efficace dei prodotti singoli
+2.  Esiste una certa variabilità (errore sperimentale), che impedisce un giudizio certo
+3.  La variabilità è abbastanza simile per tutti i trattamenti
 
 ## Definizione di un modello lineare
 
@@ -2308,19 +2558,29 @@ Il valore atteso per un soggetto, in assenza di errore sperimentale, è:
 
 $$\bar{Y_i} = \mu + \alpha_j$$
 
-
 È abbastanza facile intuire che, se non ci fosse l'errore sperimentale, un soggetto dovrebbe avere un valore pari alla media del gruppo di cui fa parte, per cui:
 
-$$\bar{Y_i} = \mu_j = \mu + \alpha_j$$
+$$\bar{Y_i} = \mu_j = \mu + \alpha_j$$ \#\# Parametrizzazione del modello
 
-## Parametrizzazione del modello 
+Dobbiamo spendere alcune parole per capire il significato della espressione prima riportata ($Y_i = \mu + \alpha_j + \varepsilon_i$) con la quale, di fatto, ci stiamo proponendo di ottenere la quantità $Y_i$ (ognuno dei dati osservati) come somma di tre valori incogniti. È chiaro che, posto in questi termini, il problema è indeterminato. Infatti esistono infinite triplette di valori che, sommati, possono restituire $Y_i$, qualunque esso sia. Proviamo per un attimo a considerare il primo dato del nostro dataset, cioè $15.20$: esso può essere ottenuto come $10 + 5 + 0.2$ oppure come $9 + 6 + 0.2$ oppure in un numero infinito di altri modi diversi. Come facciamo allora a individuare i valori $\mu$, $\alpha_j$ e $\varepsilon_i$? Dobbiamo porre qualche vincolo, in modo che il problema diventi determinato.
 
+Una prima possibilità consiste nell'imporre che la somma degli $\alpha_j$ sia pari a 0 (**vincolo sulla somma**). Abbiamo visto che le medie dei quattro gruppi ($\mu_j$) sono pari alla somma $\mu + \alha_j$ e quindi, sommando le quattro medie otteniamo:
 
-Gli elementi $\mu$ ed $\alpha$ hanno un significato diverso a seconda della **parametrizzazione del modello**. Infatti, dobbiamo tener presente che, con il modello lineare sopra riportato, ci stiamo proponendo di ottenere la quantità $Y_i$ come somma di tre valori ed, in questi termini, il problema è indeterminato. Infatti esistono infinite triplette di valori che, sommati, possono restituire $Y_i$, qualunque esso sia. Per questo motivo dobbiamo porre un qualche vincolo su uno degli elementi in gioco. Esistono diversi tipi di vincoli, ma, in questo testo, ne tratteremo solo due, quelli più rilevanti.
+$$ \mu_1 + \mu_2 + \mu_3 + \mu_4 = 4 \mu + \sum{\alpha_j}$$
 
-### Vincolo sul trattamento
+Con il vincolo sulla somma:
 
-Un vincolo molto usato è $\alpha_1 = 0$. Di conseguenza, risulta che:
+$$ \mu_1 + \mu_2 + \mu_3 + \mu_4 = 4 \mu$$
+
+quindi:
+
+$$\mu = \frac{\mu_1 + \mu_2 + \mu_3 + \mu_4}{4} $$
+
+cioè $\mu$ è la media generale e $\alpha_j$ rappresentano gli scostamenti di ogni trattamento rispetto alla media generale, usualmente definiti **effetti dei trattamenti**. Se un prodotto è efficace, abbasserà di più il peso delle infestanti e quindi avrà un elevato effetto negativo.
+
+Ora il problema è completamente definito: se $\mu = 14.48375$ e $\mu_1 = 9.175$ allora deve essere $\alpha_1 = 9.175 - 14.48375 = -5.30875$ ed $\epsilon_1 = 15.20 - 9.175 = 6.025$, cosicché $14.48375 - 5.30875 + 6.025 = 15.20 = Y_1$.
+
+Questa parametrizzazione con vincolo sulla somma è abbastanza ben 'comprensibile' e, se il disegno è bilanciato, è facile stimare i parametri 'a mano', partendo dalle medie aritmetiche dei trattamenti e dalla media generale, come vedremo tra poco. Tuttavia, non possiamo non precisare che questa parametrizzazione non è quella utilizzata di default dalla gran parte dei software statistici, incluso R. In particolare, R impone il vincolo che $\alpha_1 = 0$ (**vincolo sul trattamento**), in modo che:
 
 $$ \left\{ {\begin{array}{l}
 \mu_1 = \mu + \alpha_1 = \mu + 0\\
@@ -2329,89 +2589,74 @@ $$ \left\{ {\begin{array}{l}
 \mu_4 = \mu + \alpha_4
 \end{array}} \right.$$
 
+Di conseguenza, $\mu$ è la media del primo trattamento, usualmente inteso in ordine alfabetico (ma il riferimento può cambiare, a seconda delle esigenze) a i valori $\alpha_j$, sono differenze tra le medie dei gruppi da 2 a 4 con la media del gruppo 1. Anche in questo caso, il problema è completamente definito: la prima osservazione deve essere ottenuta sommando $\mu = 9.175$ (media del primo trattamento), $\alpha_1 = 0$ ed un valore $\epsilon$ che possiamo individuare come pari a $\epsilon_1 = Y_1 - \mu_1 = 5.20 - 9.175 = 6.025$.
 
-quindi $\mu$ è la media del primo trattamento, usualmente inteso in ordine alfabetico (ma il riferimento può cambiare, a seconda delle esigenze). Gli altri valori $\alpha_j$, sono differenze tra le medie dei gruppi da 2 a 4 con la media del gruppo 1.
-
-In generale, adottando il vincolo sul trattamento, i parametri sono medie, valori attesi oppure differenze tra medie e/o differenze tra valori attesi.
-
-### Vincolo sulla somma
-
-Un altro possibile vincolo consiste nell'imporre che la somma degli $\alpha_j$ sia pari a 0. In questo caso, abbiamo quattro gruppi, quindi quattro medie. Se prendiamo l'espressione precedente e sommiamo membro a membro, otteniamo:
-
-$$ \mu_1 + \mu_2 + \mu_3 + \mu_4 = 4 \mu + \sum{\alpha_j}$$
-
-Quindi, con il vincolo sulla somma:
-
-$$ \mu_1 + \mu_2 + \mu_3 + \mu_4 = 4 \mu$$
-Quindi:
-
-$$\mu = \frac{\mu_1 + \mu_2 + \mu_3 + \mu_4}{4} $$
-
-cioè $\mu$ è la media generale e $\alpha_j$ rappresentano gli scostamenti di ogni trattamento rispetto alla media generale, usualmente definiti **effetti dei trattamenti**. Se un prodotto è efficace, abbasserà di più il peso delle infestanti e quindi avrà un elevato effetto negativo.
-
-La seconda parametrizzazione è forse più 'comprensibile' e, se il disegno è bilanciato, è abbastanza facile stimare i parametri 'a mano', utilizzando il metodo dei momenti, a partire dalle medie aritmetiche dei trattamenti.
-
-I software statistici, invece, non utilizzano il metodo dei momenti, ma scelgono i valori dei parametri ai quali corrisponde il minimo valore della somma dei quadrati dei residui (metodo dei minimi quadrati). Solitamente utilizzano di default la parametrizzazione con vincolo sul trattamento, anche se questa impostazione, se necessario, può essere cambiata.
-
-Indipendentemente dalla parametrizzazione prescelta, i valori attesi, e quindi i residui, sono gli stessi; l'errore sperimentale viene assunto gaussiano e omoscedastico, cioè la varianza è unica ed uguale per tutte le tesi:
-
-$$\varepsilon_i \sim N(0, \sigma)$$
-
+Vediamo che le stima di $\mu$ ed $\alpha_j$ ottenute con le due parametrizzazioni sono diverse, ma il residuo $\epsilon$ non cambia. Nel seguito di questo libro, per i calcoli manuali utilizzeremo sempre il vincolo sulla somma, che è più facile da gestire e dovremo tener presente che le nostre stime non corrisponderanno con quelle ottenute con R con le impostazioni di default. Ma, come vedremo, entrambi i metodi ci porteranno alle stesse conclusioni
 
 ## Assunzioni di base
 
 In questa costruzione algebrica abbiamo implicitamente posto alcuni 'punti fermi', detti **assunzioni di base**, che sono i seguenti:
 
-1. la componente deterministica è lineare e additiva
-2. non vi sono altri effetti, se non il trattamento e l'errore, che è puramente stocastico, senza componenti sistematiche
-3. gli errori sono campionati in modo indipendente, da una distribuzione normale, con media 0 e deviazione standard $\sigma$
-4. le varianze sono omogenee (unico valore di $\sigma$, comune per tutti i gruppi)
+1.  la componente deterministica è lineare e additiva ($\mu + \alpha_j$)
+2.  non vi sono altri effetti, se non il trattamento e l'errore, che è puramente stocastico, senza componenti sistematiche
+3.  gli errori sono campionati in modo indipendente, da una distribuzione normale, con media 0 e deviazione standard $\sigma$
+4.  le varianze sono omogenee (unico valore di $\sigma$, comune per tutti i gruppi)
 
 È evidente che il nostro dataset deve conformarsi a queste nostre aspettative, altrimenti il modello è invalido. Ci occuperemo di questa verifica nel prossimo capitolo.
 
-## Stima dei parametri
+## Fitting del modello: metodo manuale
 
-### Coefficienti del modello
+Abbiamo definito un modello con il quale descrivere le nostre osservazioni sperimentali. Ora bisogna assegnare un valore ai parametri di questo modello, cioè $\mu$, $\alpha_1$, $\alpha_2$, $\alpha_3$, $\alpha_4$ e $\sigma$, in modo che il modello non sia più una rappresentazione generale di un fenomeno, bensì diventi una rappresentazione specifica del nostro esperimento. Anche se nella pratica professionale il *model fitting* viene eseguito con il computer, inzialmente procederemo a mano, per comprendere bene il senso delle operazioni effettuate. In genere, il model fitting si compone delle seguenti fasi:
 
-Iniziamo il nostro lavoro di inferenza con la stima dei parametri. Dato che il disegno è bilanciato (stesso numero di repliche per trattamento), la stima dei parametri può essere fatta a mano, a partire dalle medie aritmetiche dei trattamenti e dalla media generale (metodo dei momenti). Avendo scelto di imporre un vincolo sul trattamento ($\alpha_1 = 0$), i valori dei parametri possono essere così ottenuti:
+1.  stima dei parametri $\mu$ ed $\alpha$;
+2.  calcolo dei residui;
+3.  stima di $\sigma$
+4.  scomposizione delle varianze;
+5.  test d'ipotesi ed inferenza.
+
+### Stima dei parametri
+
+Imponendo un vincolo sulla somma e considerando che il disegno è bilanciato (stesso numero di repliche per tutti i trattamenti), la stima dei parametri può essere fatta a mano, a partire dalle medie aritmetiche dei trattamenti e dalla media generale (metodo dei momenti). La media generale è $14.48375$, quindi:
 
 $$ \left\{ {\begin{array}{l}
-\mu = 9.175\\
-\alpha_2 = \mu_2 - \mu = 5.1275 - 9.1750 =  - 4.0475\\
-\alpha_3 = \mu_3 - \mu = 16.86 - 9.1750 =  7.685\\
-\alpha_4 = \mu_4 - \mu = 26.7725 - 9.1750 =  17.5975\\
+\mu = 14.48375\\
+\alpha_1 = \mu_1 - \mu = 9.175 - 14.48375 =  - 5.30875\\
+\alpha_2 = \mu_2 - \mu = 5.1275 - 14.48375 =  - 9.35625\\
+\alpha_3 = \mu_3 - \mu = 16.86 - 14.48375 =  2.37625\\
+\alpha_4 = \mu_4 - \mu = 26.7725 - 14.48375 =  12.28875\\
 \end{array}} \right.$$
 
-### Residui
+### Calcolo dei residui
 
-Abbiamo già visto che i valori attesi ($\bar{Y_i}$) sono pari, per ogni osservazione, alla somma tra $\mu$ e il valor $\alpha$ relativo al gruppo di cui l'osservazione fa parte. In questo caso, il valore atteso coincide con la media di ogni gruppo e, pertanto, i residui ($\varepsilon_i = Y - \bar{Y_i}$) possono essere calcolati facilmente, come indicato in Tabella \@ref(tab:tabResidui).
+Abbiamo già visto che i valori attesi ($\bar{Y_i}$) sono pari, per ogni osservazione, alla somma tra $\mu$ e il valor $\alpha$ relativo al gruppo di cui l'osservazione fa parte. Per facilitare i calcoli, costruiamo una tabella in cui riportiamo la media generale, gli affetti $\alpha_j$ e i valori attesi, ottenuti come indicato poco fa. I residui possono essere calcolati facilmente, come scostamenti tra i valori osservati e i valori attesi (Tabella \@ref(tab:tabResidui)).
 
 
 Table: (\#tab:tabResidui)Tabella dei dati osservati, dei valori attesi, dei residui e dei loro quadrati
 
-|Erbicida        | Weight| Attesi| Residui| Residui^2|
-|:---------------|------:|------:|-------:|---------:|
-|Unweeded        |  24.62| 26.773|  -2.153|     4.633|
-|Unweeded        |  30.94| 26.773|   4.167|    17.368|
-|Unweeded        |  24.02| 26.772|  -2.752|     7.576|
-|Unweeded        |  27.51| 26.772|   0.738|     0.544|
-|Metribuzin__348 |  15.20|  9.175|   6.025|    36.301|
-|Metribuzin__348 |   4.38|  9.175|  -4.795|    22.992|
-|Metribuzin__348 |  10.32|  9.175|   1.145|     1.311|
-|Metribuzin__348 |   6.80|  9.175|  -2.375|     5.641|
-|Mixture_378     |   6.14|  5.127|   1.013|     1.025|
-|Mixture_378     |   1.95|  5.127|  -3.177|    10.097|
-|Mixture_378     |   7.27|  5.127|   2.143|     4.590|
-|Mixture_378     |   5.15|  5.127|   0.023|     0.001|
-|Rimsulfuron_30  |  10.50| 16.860|  -6.360|    40.450|
-|Rimsulfuron_30  |  20.70| 16.860|   3.840|    14.746|
-|Rimsulfuron_30  |  20.74| 16.860|   3.880|    15.054|
-|Rimsulfuron_30  |  15.50| 16.860|  -1.360|     1.850|
-
+|Erbicida        | Weight|     mu|  alpha| Attesi| Residui|
+|:---------------|------:|------:|------:|------:|-------:|
+|Metribuzin__348 |  15.20| 14.484| -5.309|  9.175|   6.025|
+|Metribuzin__348 |   4.38| 14.484| -5.309|  9.175|  -4.795|
+|Metribuzin__348 |  10.32| 14.484| -5.309|  9.175|   1.145|
+|Metribuzin__348 |   6.80| 14.484| -5.309|  9.175|  -2.375|
+|Mixture_378     |   6.14| 14.484| -9.356|  5.127|   1.012|
+|Mixture_378     |   1.95| 14.484| -9.356|  5.128|  -3.178|
+|Mixture_378     |   7.27| 14.484| -9.356|  5.128|   2.142|
+|Mixture_378     |   5.15| 14.484| -9.356|  5.128|   0.022|
+|Rimsulfuron_30  |  10.50| 14.484|  2.376| 16.860|  -6.360|
+|Rimsulfuron_30  |  20.70| 14.484|  2.376| 16.860|   3.840|
+|Rimsulfuron_30  |  20.74| 14.484|  2.376| 16.860|   3.880|
+|Rimsulfuron_30  |  15.50| 14.484|  2.376| 16.860|  -1.360|
+|Unweeded        |  24.62| 14.484| 12.289| 26.773|  -2.152|
+|Unweeded        |  30.94| 14.484| 12.289| 26.773|   4.168|
+|Unweeded        |  24.02| 14.484| 12.289| 26.773|  -2.753|
+|Unweeded        |  27.51| 14.484| 12.289| 26.773|   0.738|
 
 ### Stima di $\sigma$
 
-Abbiamo detto che $\sigma$ è la deviazione standard dei residui, che tuttavia deve essere calcolata facendo attenzione al numero dei gradi di libertà. Partiamo dalla devianza dei residui, che possiamo ottenere come somma dei quadrati riportati nell'ultima colonna a destra in Tabella \@ref(tab:tabResidui). Otteniamo il valore RSS = 184.17745.
+Abbiamo detto che $\sigma$ è la deviazione standard dei residui, che tuttavia deve essere calcolata facendo attenzione al numero dei gradi di libertà. In primo luogo, calcoliamo la devianza dei residui, cioè la somma dei quadrati degli scarti rispetto alla media (RSS: *Residual Sum of Squares*). Siccome la media dei residui è zero per definizione, la devianza dei residui non è altro che la somma dei loro quadrati ed è pari a:
+
+$$\textrm{RSS} = 6.025^2 + (-4.795^2) ... + 0.738^2 = 184.1774$$
 
 I residui costituiscono lo scostamento di ogni dato rispetto alla media del trattamento e, di conseguenza, per ogni gruppo la loro somma deve essere 0. Quindi per ogni gruppo vi sono 3 gradi di libertà, cioè 12 gradi di libertà in totale (3 $\times$ 4, cioè il numero dei trattamenti per il numero delle repliche meno una). Ne consegue che la varianza dei residui è pari a:
 
@@ -2419,23 +2664,11 @@ $$MS_{e}  = \frac{184.178}{12} = 15.348$$
 
 La deviazione standard $\sigma$ è:
 
-
 $$ \sqrt{15.348} = 3.9177$$
-
-### SEM e SED
-
-Abbiamo visto che la varianza d'errore è pari a 15.348 e pertiene ad ogni singola osservazione effettuata durante l'esperimento. Questa osservazione ci può aiutare a costruire una banda di inferenza attorno alle medie stimate; infatti, noi abbiamo osservato $m_1$, $m_2$, $m_3$ ed $m_4$ e con la nostra stima puntuale, abbiamo assunto che i valori osservati coincidessero rispettivamente con $\mu_1$, $\mu_2$, $\mu_3$ e $\mu_4$. Analogamente a quanto abbiamo visto in un capitolo precedente, possiamo calcolare l'incertezza associata alle nostre stime attraverso l'Errore Standard di una Media (SEM), pari a:
-
-$$SEM = \sqrt{ \frac{MS_e}{n} } =  \frac{3.9177}{\sqrt{4}}$$
-
-Oltre che di una media, spesso siamo interessati anche a conoscere la varianza della differenza di due medie. Dato che la differenza di variabili casuali ha una varianza pari alla somma delle varianza delle due variabili originali, possiamo scrivere che:
-
-$$SED = \sqrt{ MS_{media1} + MS_{media2} } = \sqrt{ 2 \cdot \frac{MS_e}{n} } =  \sqrt{2}  \cdot \frac{3.9177}{\sqrt{4}} = \sqrt{2} \cdot SEM$$
-
 
 ## Scomposizione della varianza
 
-La scomposizione della varianza, il cui significato sarà più chiaro in seguito, è la vera e propria ANOVA fisheriana. Può essere eseguita seguendo un metodo *sequenziale*, che è molto semplice e perfettamente valido quando i dati sono bilanciati, come in questo caso.
+La scomposizione della varianza, il cui significato sarà più chiaro in seguito, è la vera e propria ANOVA fisheriana, che può essere eseguita facilmente utilizzando la Tabella \@ref(tab:tabResidui).
 
 Il primo elemento da stimare è la devianza totale dei dati, cioè la somma dei quadrati degli scarti di ogni dato rispetto alla media generale:
 
@@ -2443,7 +2676,6 @@ $$\begin{array}{c}
 SS = \left(24.62 - 14.48375\right)^2 + \left(30.94 - 14.48375\right)^2 + ... \\
 ... + \left(15.50 - 14.48375\right)^2 = 1273.706
 \end{array}$$
-
 
 Questa devianza esprime la variabilità totale tra un dato e l'altro, sia quella dovuta al trattamento, sia quella puramente stocastica.
 
@@ -2453,15 +2685,13 @@ A questo punto ci chiediamo: qual è la devianza prodotta dal trattamento sperim
 
 $$SS_t = SS - RSS = 1273.706 + 184.1774 = 1089.529$$
 
-In realtà, oltreché per differenza, la devianza del trattamento potrebbe anche essere ottenuta direttamente. Dobbiamo tener conto che la media generale delle osservazioni è pari a 14.48375; se le medie dei gruppi differiscono dalla media generale, ciò potrebbe essere dovuto all'effetto del trattamento, che è diverso in ogni gruppo. Quindi, la devianza del trattamento può essere calcolata come il quadruplo (abbiamo quattro repliche) della devianza tra le medie dei trattamenti:
-
+In realtà, oltreché per differenza, la devianza del trattamento potrebbe anche essere ottenuta direttamente, sommando i quadrati dei valori $\alpha$, il che equivale al quadruplo (abbiamo quattro repliche) della devianza tra le medie dei trattamenti:
 
 $${\begin{array}{l}
 SS_t = 4 \times \left[ \left(9.1750 - 14.48375\right)^2 
 + \left(5.1275 - 14.48375\right)^2 + \right. \\
 + \left. \left(16.86 - 14.48375\right)^2 + \left(26.7725 - 14.48375\right)^2 \right] = 1089.529
-\end{array}} $$
-
+\end{array}}$$
 
 A questo punto, ricordiamo che il nostro obiettivo è stabilire se il trattamento ha avuto un effetto significativo, cioè se l'effetto da esso prodotto si distingue dal 'rumore di fondo', ossia dall'elemento casuale rappresentato dal residuo. Tuttavia, le devianza del trattamento e del residuo non possono essere confrontate direttamente, in quanto hanno un numero diverso di gradi di libertà.
 
@@ -2473,12 +2703,11 @@ La varianza del residuo è invece pari a 15.348 e, come abbiamo visto più sopra
 
 Prima, però, vale la pena di sottolineare come la procedura precedente ci abbia permesso di suddividere la variabilità totale delle osservazioni in due componenti, una dovuta al trattamento e una dovuta all'errore sperimentale. Per questo motivo, parliamo di scomposizione della varianza (variance partitioning) o analisi della varianza (ANalysis Of VAriance = ANOVA), che è lo strumento più utilizzato nella sperimentazione biologica e che dobbiamo totalmente all'inventiva di Ronald Fisher.
 
-
 ## Test d'ipotesi
 
 Abbiamo descritto il nostro esperimento e ne abbiamo individuato le caratteristiche rilevanti, stimando i parametri che meglio le descrivono (effetti dei trattamenti e varianza). Come già detto, dobbiamo chiederci se i dati rispettano le assunzioni di base del modello, ma di questo parleremo in una lezione a parte.
 
-Ora, il nostro scopo è capire se il trattamento sperimentale abbia prodotto un effetto rilevante, maggiore di quello prodotto da altri elementi puramente casuali ('rumore di fondo'). 
+Ora, il nostro scopo è capire se il trattamento sperimentale abbia prodotto un effetto rilevante, maggiore di quello prodotto da altri elementi puramente casuali ('rumore di fondo').
 
 L'ipotesi nulla è che il trattamento non abbia avuto effetto, cioè che:
 
@@ -2492,19 +2721,17 @@ Una statistica rilevante per testare questa ipotesi è data dal rapporto tra la 
 
 $$F = \frac{MS_t}{MS_e} = \frac{363.18}{15.348} = 23.663$$
 
-
 E' evidente che se il trattamento non fosse stato efficace, non dovrebbe aver prodotto una variabilità di molto superiore a quella dell'errore (quindi F = 1). In questo caso la variabilità prodotta dal trattamento è stata oltre 23 volte superiore a quella dell'errore. Delle due l'una: o il trattamento è stato efficace oppure io sono stato particolarmente sfortunato e, nell'organizzare questo esperimento, si è verificato un caso particolarmente raro.
 
 Ci chiediamo: "se l'ipotesi nulla è vera, qual è la probabilità di osservare un valore di F così alto o più alto?". In altre parole, "qual è la *sampling distribution* per F?". Potremmo costruire questa distribuzione empiricamente, attraverso una simulazione Monte Carlo.
 
-Se assumiamo che l'ipotesi nulla è vera, allora i dati dovrebbero essere campionati da una distribuzione gaussiana con media pari a 14.48375 e deviazione standard pari a 3.9177 (vedi sopra). Possiamo quindi utilizzare un generatore di numeri casuali gaussiani, per ottenere un dataset, per il quale l'ipotesi nulla è certamente vera e sottoporlo alla scomposizine della varianza, per calcolare un valore di F. 
+Se assumiamo che l'ipotesi nulla è vera, allora i dati dovrebbero essere campionati da una distribuzione gaussiana con media pari a 14.48375 e deviazione standard pari a 3.9177 (vedi sopra). Possiamo quindi utilizzare un generatore di numeri casuali gaussiani, per ottenere un dataset, per il quale l'ipotesi nulla è certamente vera e sottoporlo alla scomposizione della varianza, per calcolare un valore di F.
 
-Se ripetiamo questo processo, ad esempio, 100'000 volte, otteniamo 100'000 dataset, nei quali non vi è effetto del trattamento e altrettanti valori F in situazioni nelle quali l'ipotesi nulla è vera. Otteniamo quindi  una *sampling distribution* empirica per F e possiamo valutare quanti valori sono superiori a 23.66.
+Se ripetiamo questo processo, ad esempio, 100'000 volte, otteniamo 100'000 dataset, nei quali non vi è effetto del trattamento e altrettanti valori F in situazioni nelle quali l'ipotesi nulla è vera. Otteniamo quindi una *sampling distribution* empirica per F e possiamo valutare quanti valori sono superiori a 23.66.
 
 Per chi voglia eseguire questa simulazione, il codice da utilizzare è riportato nell'appendice finale di questo capitolo. Diciamo solo che il valore minimo di F è stato 0.00019, il massimo 32.87, la media è stata 1.19 e la mediana 0.84. Tra tutti i 100'000 valori, ne abbiamo trovati solo due pari o superiori a quello osservato, il che vuol dire che la probabilità che l'ipotesi nulla sia vera con F = 23.66 è pari a 2 $\times 10^{-5}$.
 
 La sampling distribution (opportunamente discretizzata) è riportata in figura \@ref(fig:figName91). Si tratta di una distribuzione chiaramente non normale, ma assimilabile alla distribuzione F di Fisher (in realtà l'invenzione è di Snedecor, allievo di Fisher), con 3 gradi di libertà al numeratore e 12 al denominatore (in blue in figura).
-
 
 
 
@@ -2521,11 +2748,21 @@ pf(23.663, 3, 12, lower.tail = F)
 ## [1] 2.508789e-05
 ```
 
-che porta ad un risultato molto simile a quello ottenuto con la simulazione di Monte Carlo. Insomma, in assenza di un effetto del trattamento (quindi per il solo effetto del caso), se ripetiamo l'esperimento infinite volte, abbiamo una probabilità molto bassa che si produca un valore di F altrettanto alto o più alto di quello da noi osservato.
+che porta ad un risultato molto simile a quello ottenuto con la simulazione di Monte Carlo. Insomma, in assenza di un effetto del trattamento (quindi per il solo effetto del caso), se ripetessimo l'esperimento infinite volte, avremmo una probabilità molto bassa che si produca un valore di F altrettanto alto o più alto di quello da noi osservato.
 
-Di conseguenza, se rifiutiamo l'ipotesi nulla di assenza di effetto del trattamento e accettiamo l'ipotesi alternativa (il trattamento ha avuto effetto significativo) ci portiamo dietro un rischio di errore estremamente piccolo, comunque molto al disotto della soglia prefissata del 5%.
+Di conseguenza, rifiutiamo l'ipotesi nulla di assenza di effetto del trattamento e accettiamo l'ipotesi alternativa (il trattamento ha avuto effetto significativo). In questo modo, ci assumiamo un rischio d'errore estremamente piccolo, comunque molto al disotto della soglia prefissata del 5%.
 
-## Operazioni con R
+### Inferenza statistica
+
+Abbiamo visto che la varianza d'errore è pari a 15.348 e pertiene ad ogni singola osservazione effettuata durante l'esperimento. Questa osservazione ci può aiutare a costruire una banda di inferenza attorno alle medie stimate; infatti, noi abbiamo osservato $m_1$, $m_2$, $m_3$ ed $m_4$ e con la nostra stima puntuale, abbiamo assunto che i valori osservati coincidessero rispettivamente con $\mu_1$, $\mu_2$, $\mu_3$ e $\mu_4$. Analogamente a quanto abbiamo visto in un capitolo precedente, possiamo calcolare l'incertezza associata alle nostre stime attraverso l'Errore Standard di una Media (SEM), pari a:
+
+$$SEM = \sqrt{ \frac{MS_e}{n} } =  \frac{3.9177}{\sqrt{4}}$$
+
+Oltre che di una media, spesso siamo interessati anche a conoscere la varianza della differenza di due medie. Dato che la differenza di variabili casuali ha una varianza pari alla somma delle varianza delle due variabili originali, possiamo scrivere che:
+
+$$SED = \sqrt{ MS_{media1} + MS_{media2} } = \sqrt{ 2 \cdot \frac{MS_e}{n} } =  \sqrt{2}  \cdot \frac{3.9177}{\sqrt{4}} = \sqrt{2} \cdot SEM$$
+
+## Fitting del modello con R
 
 La stima dei parametri di un modello lineare, in R, può essere eseguita in modo molto banale, utilizzando la funzione 'lm()' Il codice è il seguente:
 
@@ -2534,7 +2771,7 @@ La stima dei parametri di un modello lineare, in R, può essere eseguita in modo
 mod <- lm(Weight ~ factor(Treat), data = dataset)
 ```
 
-Il primo argomento rappresenta il modello lineare che vogliamo adattare ai dati: l'incusione dell'intercetta, codificata con il carattere '1' è opzionale ('Weight ~ 1 + Treat' e 'Weight ~ Treat' sono equivalenti), mentre il termine stocastico $\epsilon$ viene incluso di default e non deve essere indicato. Il termine 'factor' sta a significare che la variabile 'Treat' è un fattore sperimentale; questa specifica è opzionale quando la variabile è di tipo 'carattere' (come in questo caso), ma è fondamentale quando abbiamo a che fare con una variabile a codifica numerica.
+Il primo argomento rappresenta il modello lineare che vogliamo adattare ai dati: l'incusione dell'intercetta, codificata con il carattere '1' è opzionale ('Weight \~ 1 + Treat' e 'Weight \~ Treat' sono equivalenti), mentre il termine stocastico $\epsilon$ viene incluso di default e non deve essere indicato. Il termine 'factor' sta a significare che la variabile 'Treat' è un fattore sperimentale; questa specifica è opzionale quando la variabile è di tipo 'carattere' (come in questo caso), ma è fondamentale quando abbiamo a che fare con una variabile a codifica numerica.
 
 Una volta operato l'adattamento, l'oggetto 'mod' contiene tutti i risultati, che possiamo ottenere con opportuni 'estrattori'. Ad esempio, la funzione 'summary()' restituisce le stime dei parametri:
 
@@ -2570,7 +2807,6 @@ summary(mod)
 Notiamo immediatamente che viene utilizzata la parametrizzazione con vincolo sul trattamento, visto che l'intercetta coincide con la media del primo trattamento. I valori di $\alpha$ non sono altro che differenze tra questa media e tutte le altre medie.
 
 I valori attesi e i residui possono essere ottenuti, in R, applicando due metodi 'fitted()' e 'residuals()' all'oggetto ottenuto dal fitting:
-
 
 
 ```r
@@ -2609,7 +2845,6 @@ anova(mod)
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-
 ## Medie marginali attese
 
 Abbiamo visto che le somme $\mu + \alpha_j$ restituiscono le medie dei trattamenti e prendono il nome di **medie marginali attese**. Quando l'esperimento è bilanciato (ugual numero di repliche per ogni trattamento), esse sono uguali alle medie aritmetiche di ogni gruppo, mentre, quando l'esperimento è sbilanciato esso sono diverse, ma costituiscono una stima migliore delle medie delle popolazioni da cui i gruppi sono estratti rispetto alle medie aritmetiche. In R, il metodo più semplice per calcolare le medie marginali attese è quello di utilizzare la funzione 'emmeans()', nel package 'emmeans' (Lenth, 2016), che deve essere preventivamente installato e caricato in memoria.
@@ -2629,20 +2864,18 @@ medie
 ## Confidence level used: 0.95
 ```
 
-
 ## Per concludere ...
 
-1. Con l'ANOVA la variabilità totale dei dati viene decomposta in due quote, una attribuibile al trattamento sperimentale ed una inspiegabile (residuo)
-2. L'effetto del trattamento è significativo, se la variabilità che esso provoca è superiore a quella inspiegabile
-3. Il confronto tra varianze viene impostato sotto forma di rapporto (F).
-4. L'ipotesi nulla è che il trattamento NON HA AVUTO effetto significativo
-5. Sotto questa ipotesi nulla, l'F osservato ha una distribuzione F di Fisher
-6. L'ipotesi nulla è rifiutata quando P $\leq$ 0.05 (livello di protezione arbitrario, ma universalmente accettato)
+1.  Con l'ANOVA la variabilità totale dei dati viene decomposta in due quote, una attribuibile al trattamento sperimentale ed una inspiegabile (residuo)
+2.  L'effetto del trattamento è significativo, se la variabilità che esso provoca è superiore a quella inspiegabile
+3.  Il confronto tra varianze viene impostato sotto forma di rapporto (F).
+4.  L'ipotesi nulla è che il trattamento NON HA AVUTO effetto significativo
+5.  Sotto questa ipotesi nulla, l'F osservato ha una distribuzione F di Fisher
+6.  L'ipotesi nulla è rifiutata quando P $\leq$ 0.05 (livello di protezione arbitrario, ma universalmente accettato)
 
+Ovviamente, è necessario ricordare che tutte le considerazioni fatte finora sono valide se il dataset è conforme alle assunzioni di base per l'ANOVA, per cui bisogna sempre eseguire i necessari controlli, di cui parleremo nel prossimo capitolo.
 
-Ovviamente, è necessario ricordare che tutte  le considerazioni fatte finora sono valide se il dataset è conforme alle assunzioni di base per l'ANOVA, per cui bisogna sempre eseguire i necessari controlli, di cui parleremo nel prossimo capitolo.
-
----
+------------------------------------------------------------------------
 
 ## Per approfondire un po'...
 
@@ -2650,27 +2883,24 @@ Ovviamente, è necessario ricordare che tutte  le considerazioni fatte finora so
 
 Di seguito forniamo il codice per simulare la *sampling distribution* per F, quando l'ipotesi nulla è vera. Il codice impiega un generatore di numeri casuali gaussiano per ottenere dataset nei quali l'ipotesi nulla è vera, perché non vi è effetto del trattamento.
 
-
-```
-Fvals <- c()
-set.seed(1234)
-for(i in 1:100000){
-  Ysim <- rnorm(16, 14.48375, 3.9177)
-  Fvals[i] <- anova ( lm(Ysim ~ factor(Treat), data = dataset))$F[1]
-}
-min(Fvals)
-max(Fvals)
-length(Fvals[Fvals > 23.663])
-```
+    Fvals <- c()
+    set.seed(1234)
+    for(i in 1:100000){
+      Ysim <- rnorm(16, 14.48375, 3.9177)
+      Fvals[i] <- anova ( lm(Ysim ~ factor(Treat), data = dataset))$F[1]
+    }
+    min(Fvals)
+    max(Fvals)
+    length(Fvals[Fvals > 23.663])
 
 I risultati ottenuti sono quelli esposti più sopra
 
 ### Altre letture
 
-1. Faraway, J.J., 2002. Practical regression and Anova using R. http://cran.r-project.org/doc/contrib/Faraway-PRA.pdf, R.
-2. Fisher, Ronald (1918). "Studies in Crop Variation. I. An examination of the yield of dressed grain from Broadbalk" (PDF). Journal of Agricultural Science. 11 (2): 107–135.
-2. Kuehl, R. O., 2000. Design of experiments: statistical principles of research design and analysis. Duxbury Press (CHAPTER 2)
-3. Lenth, R.V., 2016. Least-Squares Means: The R Package lsmeans. Journal of Statistical Software 69. https://doi.org/10.18637/jss.v069.i01
+1.  Faraway, J.J., 2002. Practical regression and Anova using R. <http://cran.r-project.org/doc/contrib/Faraway-PRA.pdf>, R.
+2.  Fisher, Ronald (1918). "Studies in Crop Variation. I. An examination of the yield of dressed grain from Broadbalk" (PDF). Journal of Agricultural Science. 11 (2): 107--135.
+3.  Kuehl, R. O., 2000. Design of experiments: statistical principles of research design and analysis. Duxbury Press (CHAPTER 2)
+4.  Lenth, R.V., 2016. Least-Squares Means: The R Package lsmeans. Journal of Statistical Software 69. <https://doi.org/10.18637/jss.v069.i01>
 
 <!--chapter:end:09-oneWayANOVA.Rmd-->
 
@@ -4670,7 +4900,7 @@ summary(modelReg)
 
 Ora sappiamo che la relazione tra la dose di azoto e la risposta produttiva del frumento è:
 
-$$ Y_i = 23.111 + 0.170 \times X_i $$
+$$ Y_i = 23.111 + 0.1544 \times X_i $$
 
 L'elemento stocastico $\varepsilon_i$ è normalmente distribuito, con media 0 e deviazione standard 2.029 (vedi la voce 'Residual standard error' nell'output sovrstante).
 
@@ -5043,8 +5273,13 @@ La Figura \@ref(fig:figName154) non mostra deviazioni rispetto agli assunti di b
 
 ```r
 library(lattice)
-# plotnls(modNlin)
+nlstools::plotfit(modNlin, smooth = T)
 ```
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName155-1.png" alt="Cinetica di degradazione di metamitron nel suolo: i punti mostrano i valori osservati, la linea mostra i valori attesi con l'equazione esponziale." width="90%" />
+<p class="caption">(\#fig:figName155)Cinetica di degradazione di metamitron nel suolo: i punti mostrano i valori osservati, la linea mostra i valori attesi con l'equazione esponziale.</p>
+</div>
 
 ### Test F per la mancanza di adattamento (approssimato)
 
@@ -5275,17 +5510,34 @@ class(modNlin)
 modNlin2 <- boxcox(modNlin)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-171-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-180-1.png)<!-- -->
 
-```
-## 
-## Estimated lambda: 0.8 
-## Confidence interval for lambda: [0.56,0.96]
+```r
 modNlin2
-## NULL
+## Nonlinear regression model
+##   model: bcFct1(Conc) ~ bcFct2(A * exp(-k * Time))
+##    data: degradation
+##        A        k 
+## 99.41873  0.06665 
+##  residual sum-of-squares: 51.88
+## 
+## Number of iterations to convergence: 2 
+## Achieved convergence tolerance: 7.511e-06
 summary(modNlin2)
-## Length  Class   Mode 
-##      0   NULL   NULL
+## 
+## Formula: bcFct1(Conc) ~ bcFct2(A * exp(-k * Time))
+## 
+## Parameters:
+##    Estimate Std. Error t value Pr(>|t|)    
+## A 99.418732   2.091374   47.54   <2e-16 ***
+## k  0.066654   0.002042   32.65   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 1.536 on 22 degrees of freedom
+## 
+## Number of iterations to convergence: 2 
+## Achieved convergence tolerance: 7.511e-06
 ```
 
 Invece che far scegliere alla funzione 'boxcox' il valore di $\lambda$ ottimale, possiamo imporlo noi, con l'argomento 'lambda'.
@@ -5296,15 +5548,24 @@ Invece che far scegliere alla funzione 'boxcox' il valore di $\lambda$ ottimale,
 modNlin3 <- boxcox(modNlin, lambda = 0.5)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-172-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-181-1.png)<!-- -->
 
-```
-## 
-## Estimated lambda: 0.5 
-## Confidence interval for lambda: [NA,NA]
+```r
 summary(modNlin3)
-## Length  Class   Mode 
-##      0   NULL   NULL
+## 
+## Formula: bcFct1(Conc) ~ bcFct2(A * exp(-k * Time))
+## 
+## Parameters:
+##    Estimate Std. Error t value Pr(>|t|)    
+## A 99.532761   4.625343   21.52 2.87e-16 ***
+## k  0.067068   0.002749   24.40  < 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.9196 on 22 degrees of freedom
+## 
+## Number of iterations to convergence: 1 
+## Achieved convergence tolerance: 7.541e-06
 ```
 
 Gli outputs mostrano che, nonostante la trasformazione, i parametri hanno conservato la loro scala originale e, di conseguenza, il loro significato biologico.
@@ -5438,7 +5699,667 @@ Pur essendo entrambi gli approcci corretti, il secondo è certamente più elegan
 
 <!--chapter:end:15-NonLineare.Rmd-->
 
+# Esercizi
+
+## Capitoli 1 e 2
+
+### Esercizio 1
+
+Vi è stata affidata una prova sperimentale per la taratura agronomica di un nuovo diserbante appartenente al gruppo chimico delle solfoniluree (AGRISULFURON), utilizzabile alla dose presumibile di 20 g/ha, per il diserbo di post-emergenza del mais. Gli obiettivi della prova sono:
+
+1. Valutare se è opportuno un certo aggiustamento della dose (incremento/diminuzione)
+2. Valutare se è opportuna l'aggiunta di un bagnante non-ionico
+3. Valutare se è opportuno splittare la dose di 20 g/ha in due distribuzioni
+4. Valutare l'efficacia del nuovo diserbante con gli opportuni controlli (testimoni)
+
+Coerentemente con questi obiettivi, scrivere un protocollo sperimentale sufficientemente dettagliato (una pagina) ed aggiungere lo schema della prova
+
+## Capitolo 3
+
+### Esercizio 1
+
+Un'analisi chimica è stata eseguita i triplicato e i risultati sono stati i seguenti: 125,  169 and 142 ng/g. Calcolate la media e tutti gli indicatori di variabilità che conoscete.
+
+### Esercizio 2
+
+Scaricare il file EXCEL 'rimsulfuron.xlsx'. 
+In questo file sono riportati i risultati di un esperimento con 15 trattamenti e 4 repliche, nel quale sono stati posti a confronti diversi erbicidi e/o dosi per il diserbo nel mais. Calcolare le medie produttive ottenute con le diverse tesi sperimentali e riportarle su un grafico, includendo anche un'indicazione di variabilità. Verificare se la produzione è correlata con l'altezza delle piante e commentare i risultati ottenuti. Il file può essere scaricato [da questo link](https://www.casaonofri.it/_datasets/rimsulfuron.xlsx).
+
+### Esercizio 3
+
+Caricare il datasets 'students' disponibile nel package 'aomisc'. In questo file potete trovare una database relativo alla valutazione degli studenti in alcune materie del primo anno di Agraria. Ogni record rappresenta un esame, con il relativo voto, la materia e la scuola di provenienza dello studente. Con un uso appropriato delle tabelle di contingenza e del chi quadro, valutare se il voto dipende dalla materia e dalla scuola di provenienza dello studente.
+
+---
+
+## Capitolo 4
+
+
+### Esercizio 1
+
+E’ data una distribuzione normale con $\mu$ = 23 e $\sigma$ = 1. Calcolare la probabilità di estrarre individui:
+
+1.  maggiori di 25
+2.  minori di 21
+3.  compresi tra 21 e 25
+
+### Esercizio 2
+
+E’ data una distribuzione normale con $\mu$ = 156 e $\sigma$ = 13. Calcolare la probabilità di estrarre individui:
+
+1.  maggiori di 170
+2.  minori di 140
+3.  compresi tra 140 e 170
+
+
+### Esercizio 3
+
+Un erbicida si degrada nel terreno seguendo una cinetica del primo ordine:
+
+$$Y = 100 \, e^{-0.07 \, t}$$
+
+dove Y è la concentrazione al tempo t. Dopo aver spruzzato questo erbicida, che probabilità abbiamo che dopo 50 giorni la concentrazione si sia abbassata al disotto della soglia di tossicità per i mammiferi (2 ng/g)? Tenere conto che lo strumento di misura produce un coefficiente di variabilità del 20%
+
+
+
+
+### Esercizio 4
+
+Una coltura produce in funzione della sua fittezza, secondo la seguente relazione:
+
+$$ Y = 8 + 8 \, X - 0.07 \, X^2$$
+
+
+
+Stabilire la fittezza necessaria per ottenere il massimo produttivo (graficamente o analiticamente). Valutare la probabilità di ottenere una produzione compresa tra 180 e 200 q/ha, seminando alla fittezza ottimale. Considerare che la variabilità stocastica è del 12%.
+
+
+
+
+
+### Esercizio 5
+
+La tossicità di un insetticida varia con la dose, secondo la legge log-logistica:
+
+$$ Y = \frac{1}{1 + exp\left\{ -2 \, \left[log(X) - log(15)\right] \right\}}$$
+Dove Y è la proporzione di animali morti e X è la dose. Se trattiamo 150 insetti con una dose pari a 35 g, qual è la probabilità di trovare più di 120 morti? Considerare che la risposta è variabile da individuo ad individuo nella popolazione e questa variabilità può essere approssimata utilizzando una distribuzione gaussiana con un errore standard pari a 10.
+
+
+
+### Esercizio 6
+
+Simulare i risultati di un esperimento varietale, con sette varietà di frumento e quattro repliche. Considerare che il modello deterministico è un modello ANOVA, nel quale vengono definite le medie delle sette varietà (valori attesi). Decidere autonomamente sui parametri da impiegare per la simulazione (da $\mu_1$ a $\mu_7$ e $\sigma$)
+
+### Esercizio 7
+
+Considerando il testo dell'esercizio 5, simulare un esperimento in cui l'insetticida viene utilizzato a cinque dosi crescenti, con quattro repliche.
+
+---
+
+## Capitolo 5
+
+### Esercizio 1
+
+Dati i tre individui con misure di altezza pari a 140, 170 e 155, stimare i limiti di confidenza di $\mu$ (p $<$ 0.05).
+
+### Esercizio 2
+
+Un campione di 400 insetti a cui è stato somministrato un certo insetticida mostra che 136 di essi sono sopravvissuti. Determinare un intervallo di confidenza con grado di fiducia del 95% per la proporzione della popolazione insensibile al trattamento.
+
+---
+
+## Chapter 6
+
+### Esercizio 1
+
+Uno sperimentatore ha impostato un esperimento verificare l’effetto di un fungicida (A) in confronto al testimone non trattato (B), in base al numero di colonie fungine sopravvissute. Il numero delle colonie trattate è di 200, mentre il numero di quelle non trattate è di 100. Le risposte (frequenze) sono come segue:
+
+       Morte   Sopravvissute
+  --- ------- ---------------
+   A    180         20
+   B    50          50
+
+Stabilire se i risultati possono essere considerati significativamente diversi, per un livello di probabilità del 5%
+
+
+### Esercizio 2
+
+Uno sperimentatore ha impostato un esperimento per confrontare due tesi sperimentali (A, B). I risultati sono i seguenti (in q/ha):
+
+    A      B
+  ------ ------
+   9.3    12.6
+   10.2   12.3
+   9.7    12.5
+
+Stabilire se i risultati per le tre tesi sperimentali possono essere considerati significativamente diversi, per un livello di probabilità del 5%.
+
+### Esercizio 3
+
+Uno sperimentatore ha impostato un esperimento per confrontare se l’effetto di un fungicida è significativo, in un disegno sperimentale con tre ripetizioni. Con ognuna delle due opzioni di trattamento i risultati produttivi sono i seguenti (in t/ha):
+
+    A    NT
+  ----- ----
+   65    54
+   71    51
+   6.8   59
+
+E’significativo l’effetto del trattamento fungicida sulla produzione, per un livello di probabilità di errore del 5%?
+
+### Esercizio 4
+
+Immaginate di aver riscontrato che, in determinate condizioni ambientali, 60 olive su 75 sono attaccate da *Daucus olee* (mosca dell’olivo). Nelle stesse condizioni ambientali, diffondendo in campo un insetto predatore siamo riusciti a ridurre il numero di olive attaccate a 12 su 75. Si tratta di una oscillazione casuale del livello di attacco o possiamo concludere che l’insetto predatore è stato un mezzo efficace di lotta biologica alla mosca dell’olivo?
+
+
+### Esercizio 5
+
+In un ospedale, è stata misurata la concentrazione di colesterolo nel sangue di otto pazienti, prima e dopo un trattamento medico. Per ogni paziente, sono stati analizzati due campioni, ottenendo le seguenti concentrazioni:
+
+    Paziente      Prima      Dopo
+  ---------- ---------- ----------
+           1      167.3      166.7
+           2      186.7      184.2
+           3      107.0      104.9
+           4      214.5      205.3
+           5      149.5      148.5
+           6      171.5      157.3
+           7      161.5      149.4
+           8      243.6      241.5
+
+Si può concludere che il trattamento medico è stato efficace?
+
+---
+
+## Capitoli da 7 a 9
+
+### Esercizio 1
+
+Un esperimento a randomizzazione completa relativo ad una prova varietale di frumento ha l’obiettivo di porre a confronto la produzione di 5 varietà. Le produzioni (in bushels per acre) osservate siano le seguenti:
+
+  --------- ------ ------ ------
+   Variety    1      2      3
+      A      32.4   34.3   37.3
+      B      20.2   27.5   25.9
+      C      29.2   27.8   30.2
+      D      12.8   12.3   14.8
+      E      21.7   24.5   23.4
+  --------- ------ ------ ------
+
+Eseguire l’ANOVA, presentare i risultati e commentarli (esempio tratto da Le Clerg *et al*., 1962)
+
+### Esercizio 2
+
+Colture di tessuto di pomodoro sono state allevate su capsule Petri trattate con una diversa concentrazione di zuccheri, utilizzando cinque repliche. La crescita colturale è riportata in tabella
+
+Control | Glucose | Fructose | Sucrose |
+|:----:|:----:|:----:|:----:|
+45 | 25 | 28 | 31 |
+39 | 28 | 31 | 37 |
+40 | 30 | 24 | 35 |
+45 | 29 | 28 | 33 |
+42 | 33 | 27 | 34 |
+
+Calcolare le medie ed eseguire l’ANOVA. Eseguire i test di confronto multiplo. Commentare i risultati.
+
+
+
+### Esercizio 3
+
+E’stato impostato un test di durata su un impianto di riscaldamento, per verificare come la temperatura di esercizio influenza la durata del riscaldatore. Sono state testate 4 temperature, con sei repliche e, per ciascun riscaldatore, è stato rilevato il numero di ore prima della rottura. I risultati sono i seguenti:
+
+    Temp.   Hours to failure
+  ------- ------------------
+     1520               1953
+     1520               2135
+     1520               2471
+     1520               4727
+     1520               6134
+     1520               6314
+     1620               1190
+     1620               1286
+     1620               1550
+     1620               2125
+     1620               2557
+     1620               2845
+     1660                651
+     1660                837
+     1660                848
+     1660               1038
+     1660               1361
+     1660               1543
+     1708                511
+     1708                651
+     1708                651
+     1708                652
+     1708                688
+     1708                729
+     
+Valutare se la temperatura di esercizio infleunza significativamente la durata del riscaldatore     
+
+### Esercizio 4
+
+Un entomologo ha contato il numero di uova deposte da un lepidottero sulle foglie di tre varietà di tabacco, valutando 15 femmine per varietà. I risultati sono i seguenti:
+
+    Female   Field   Resistant   USDA
+  -------- ------- ----------- ------
+         1     211           0    448
+         2     276           9    906
+         3     415         143     28
+         4     787           1    277
+         5      18          26    634
+         6     118         127     48
+         7       1         161    369
+         8     151         294    137
+         9       0           0     29
+        10     253         348    522
+        11      61           0    319
+        12       0          14    242
+        13     275          21    261
+        14       0           0    566
+        15     153         218    734
+
+Eseguite l’ANOVA. Quali sono le assunzioni necessarie per l’ANOVA? Sono rispettate? Vi sono outliers? Calcolate SEM e SED in modo attendibile.
+
+
+---
+
+## Capitolo 10
+
+### Esercizio 1
+
+E’ stato impostanto un esperimento a blocchi randomizzati per confrontare sei tipi di irrigazione, in un aranceto della Spagna. I risultati sono i seguenti (in pounds per parcella):
+
+               Metodo     1     2     3     4     5
+  ------------------- ----- ----- ----- ----- -----
+               Goccia   438   413   375   127   320
+               Conche   413   398   348   112   297
+           Aspersione   346   334   281    43   231
+    Aspersione+goccia   335   321   267    33   219
+          Sommersione   403   380   336   101   293
+
+Eseguire l’ANOVA. Quali sono le assunzioni necessarie per l’ANOVA? Sono rispettate? Calcolate SEM e SED ed eseguite il confronto multiplo. Qual è il metodo di irrigazione migliore?
+
+### Esercizio 2
+
+E’ stato impostato un esperimento di fertilizzazione secondo uno schema a blocchi randomizzati. I dati ottenuti sono i contenuti percentuali (moltiplicati per 100) in fosforo, in un campione di tessuti vegetali prelevato per parcella:
+
+              Trattamento      1      2     3      4      5
+  ----------------------- ------ ------ ----- ------ ------
+         Non fertilizzato    5.6    6.1   5.3    5.9    7.4
+                  50 lb N    7.3     NA   7.7    7.7    7.0
+                 100 lb N    6.9      6   5.6    7.4    8.2
+     50 lb N + 75 lb P2O5   10.8   11.2   8.8   12.9   10.4
+    100 lb N + 75 lb P205    9.6    9.3    12   10.6   11.6
+
+Eseguire l’ANOVA, considerando il dato mancante. Calcolare SEM e SED. Qual è il trattamento migliore? Aumentare il dosaggio di N senza P2O5 è conveniente? E in presenza di P2O5?
+
+### Esercizio 3
+
+È stato condotto un esperimento a quadrato latino per valutare l'effetto di quattro diversi metodi di fertilizzazione. Sono stati osservati i seguenti risultati:
+
+   Fertiliser   Row   Column      Yield
+  ----------- ------ --------- ------------
+      A          1        1         104
+      B          1        2         114
+      C          1        3          90
+      D          1        4         140
+      A          2        4         134
+      B          2        3         130
+      C          2        1         144
+      D          2        2         174
+      A          3        3         146
+      B          3        4         142
+      C          3        2         152
+      D          3        1         156
+      A          4        2         147
+      B          4        1         160
+      C          4        4         160
+      D          4        3         163
+      
+Analizzate i dati e commentate i risultati ottenuti
+
+---
+
+## Capitoli 11 e 12
+
+### Esercizio 1
+
+La biologia di *Sorghum halepense* da rizoma mostra che il peso dei rizomi raggiunge un minimo intorno alla quarta foglia. Di conseguenza, eseguire un trattamento in quest’epoca dovrebbe minimizzare le possibilità di ripresa degli individui trattati, portando anche ad un certo risanamento del terreno. Tuttavia, ci si attende che gli effetti siano maggiori quando le piante provengono da rizomi più piccoli, con un minor contenuto di sostanze di riserva. Per affrontare questi argomenti è stata organizzata una prova in vaso, secondo un disegno a randomizzazione completa con quattro repliche. I risultati sono i seguenti:
+
+| Sizes ↓ / Timing → | 2-3   | 4-5   | 6-7   | 8-9   | 3-4/8-9 | Untreated|
+|:----|:----:|:----:|:----:|:----:|:----:|:----:|
+| 2-nodes       | 34.03 | 0.10  | 30.91 | 33.21 | 2.89    | 41.63|
+|               | 22.31 | 6.08  | 35.34 | 43.44 | 19.06   | 22.96|
+|               | 21.70 | 3.73  | 24.23 | 44.06 | 0.10    | 52.14|
+|               | 14.90 | 9.15  | 28.27 | 35.34 | 0.68    | 59.81|
+| 4-nodes       | 42.19 | 14.86 | 52.34 | 39.06 | 8.62    | 68.15|
+|               | 51.06 | 36.03 | 43.17 | 61.59 | 0.05    | 42.75|
+|               | 43.77 | 21.85 | 57.28 | 48.89 | 0.10    | 57.77|
+|               | 31.74 | 8.71  | 29.71 | 49.14 | 9.65    | 44.85|
+| 6-nodes       | 20.84 | 11.37 | 55.00 | 41.77 | 9.80    | 43.20|
+|               | 26.12 | 2.24  | 28.46 | 37.38 | 0.10    | 40.68|
+|               | 35.24 | 14.17 | 21.81 | 39.55 | 1.42    | 34.11|
+|               | 13.32 | 23.93 | 60.72 | 48.37 | 6.83    | 32.21|
+
+Eseguite l’ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente.
+
+
+### Esercizio 2
+
+Un agronomo ha organizzato un confronto varietale in favino, considerando due epoche di semina: autunnale e primaverile. E’ stato utilizzato un disegno a blocchi randomizzati e a parcella suddivisa, con le epoche di semina nelle parcelle principali e le varietà nelle sub-parcelle. I risultati sono i seguenti:
+
+ |Sowing  Time| Genotype    |    1  |    2  |    3  |    4  |
+|:-----------|------------:|:-----:|:-----:|:-----:|:-----:|
+|Autum       |     Chiaro  | 4.36  | 4.00  | 4.23  | 3.83  |
+|            |  Collameno  | 3.01  | 3.32  | 3.27  | 3.40  |
+|            |  Palombino  | 3.85  | 3.85  | 3.68  | 3.98  |
+|            |      Scuro  | 4.97  | 3.98  | 4.39  | 4.14  |
+|            |    Sicania  | 4.38  | 4.01  | 3.94  | 2.99  |
+|            |    Vesuvio  | 3.94  | 4.47  | 3.93  | 4.21  |
+|Spring      |     Chiaro  | 2.76  | 2.64  | 2.25  | 2.38  |
+|            |  Collameno  | 2.50  | 1.79  | 1.57  | 1.77  |
+|            |  Palombino  | 2.24  | 2.21  | 2.50  | 2.05  |
+|            |      Scuro  | 3.45  | 2.94  | 3.12  | 2.69  |
+|            |    Sicania  | 3.24  | 3.60  | 3.16  | 3.08  |
+|            |    Vesuvio  | 2.34  | 2.44  | 1.71  | 2.00  |
+
+Eseguite l’ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente.
+
+
+### Exercise 3
+
+Gli erbicidi mostrano sempre un certo grado di persistenza nel terreno. Di conseguenza, se la coltura fallisce subito dopo il diserbo, la scelta delle colture di sostituzione può essere condizionata dal diserbo già eseguito. Per questo motivo, è stato impostato un esperimento di pieno campo volto a valutare se tre erbicidi del mais (rimsulfuron, imazethapyr and primisulfuron) erano in grado di danneggiare quattro colture (soia, girasole, rapa e sorgo) seminate 20 giorni dopo il trattamento. Gli erbicidi sono stati distribuiti su terreno nudo, seguendo un disegno a blocchi randomizzati, su parcelle di elevate dimensioni. Per ogni blocco, la semina è stata eseguita su strisce trasversali, perpendicolari ai trattamenti eseguiti (schema a strip-plot). I risultati sono i seguenti:
+
+|  Herbidicide     |Block| sorghum  | rape  | soyabean  | sunflower |
+|:-----------------|:---:|:--------:|:-----:|:---------:|:---------:|
+|  Untreated       | 1   |     180  |  157  |      199  |       201 |
+|                  | 2   |     236  |  111  |      257  |       358 |
+|                  | 3   |     287  |  217  |      346  |       435 |
+|                  | 4   |     350  |  170  |      211  |       327 |
+|  Imazethapyr     | 1   |      47  |   10  |      193  |        51 |
+|                  | 2   |      43  |    1  |      113  |         4 |
+|                  | 3   |       0  |   20  |      187  |        13 |
+|                  | 4   |       3  |   21  |      122  |        15 |
+|  primisulfuron   | 1   |     271  |    8  |      335  |       379 |
+|                  | 2   |     182  |    0  |      201  |       201 |
+|                  | 3   |     283  |   22  |      206  |       307 |
+|                  | 4   |     147  |   24  |      240  |       337 |
+|  rimsulfuron     | 1   |     403  |  238  |      226  |       290 |
+|                  | 2   |     227  |  169  |      195  |       494 |
+|                  | 3   |     400  |  364  |      257  |       397 |
+|                  | 4   |     171  |  134  |      137  |       180 |
+  
+
+Eseguite l’ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente.
+
+### Esercizio 4
+
+E’ stato condotto un esperimento parcellare per valutare l’interazione tra il momento dell’applicazione dell’azoto al terreno (early, optimum, late) e due livelli di un inibitore della nitrificazione (none, 5 lb/acre). L’inibitore ritarda la nitrificazione e riduce le perdite per lisciviazione profonda. L’azoto è stato somministrato in forma marcata ($^{15}$N) e i dati raccolti riguardano la percentuale di azoto assorbito dalla pianta.
+
+
+| Genotype | Block  |   Early |  Med  |  Late  |
+|:---------|:------:|:-------:|:-----:|:------:|
+| A        |    1   |   21.4  |  50.8 |  53.2  |
+|          |    2   |   11.3  |  42.7 |  44.8  |
+|          |    3   |   34.9  |  61.8 |  57.8  |
+| B        |    1   |   54.8  |  56.9 |  57.7  |
+|          |    2   |   47.9  |  46.8 |  54.0  |
+|          |    3   |   40.1  |  57.9 |  62.0  |
+
+Analizzare i dati e commentare i risultati
+
+### Esercizio 5
+
+E’ stato organizzato un esperimento per valutare l’effetto della temperatura di lavaggio sulla riduzione di lunghezza di alcuni tessuti. I risultati sono espressi in percentuale di riduzione e sono stati ottenuti in un disegno sperimentale a randomizzazione completa, con quattro tessuti e altrettante temperature.
+
+  | Fabric  |     210 °F  |    215 °F  |    220 °F   |  225 °F   |
+  |:-------:|:-----------:|:----------:|:-----------:|:---------:|
+  |    A    |     1.8     |     2.0    |     4.6     |    7.5    |
+  |         |     2.1     |     2.1    |     5.0     |    7.9    |
+  |    B    |     2.2     |     4.2    |     5.4     |    9.8    |
+  |         |     2.4     |     4.0    |     5.6     |    9.2    |
+  |    C    |     2.8     |     4.4    |     8.7     |   13.2    |
+  |         |     3.2     |     4.8    |     8.4     |   13.0    |
+  |    D    |     3.2     |     3.3    |     5.7     |   10.9    |
+  |         |     3.6     |     3.5    |     5.8     |   11.1    |    
+
+Analizzare i dati e commentare i risultati
+
+### Esercizio 6
+
+Un processo di sintesi chimica prevede due reazioni, la prima richiede un alcool e la seconda richiede una base. Viene impostato un esperimento fattoriale 3 x 2, con tre alcools e due basi, con uno schema sperimentale completamente randomizzato a quattro repliche. Quali sono le vostre raccomandazioni per la prima e la seconda reazione, sulla base dei risultati dell’esperimento. La variabile rilevata mostra la produzione percentuale del processo.
+
+ | Base  | Alcohol 1 | Alcohol 2 | Alcohol 3 |
+ |:-----:|:---------:|:---------:|:---------:|
+ |   A   |  91.3     |    89.9   |     89.3  |
+ |       |  88.1     |    89.5   |     87.6  |
+ |       |  90.7     |    91.4   |     90.4  |
+ |       |  91.4     |    88.3   |     90.3  |
+ |   B   |  87.3     |    89.4   |     92.3  |
+ |       |  91.5     |    93.1   |     90.7  |
+ |       |  91.5     |    88.3   |     90.6  |
+ |       |  94.7     |    91.5   |     89.8  |
+
+Analizzare i dati e commentare i risultati
+
+---
+
+## Capitolo 13
+
+### Exercise 1
+
+È stato condotto uno studio per verificare l'effetto della concimazione azotata sulla lattuga, utilizzando uno schema a blocchi randomizzati. I risultat sono i seguenti:
+
+
+   N level   B1    B2    B3    B4
+  --------- ----- ----- ----- -----
+      0      124   114   109   124
+     50      134   120   114   134
+     100     146   132   122   146
+     150     157   150   140   163
+     200     163   156   156   171
+
+Analizzare i dati e commentare i risultati
+
+### Esercizio 2
+
+Per valutare la soglia economica d’intervento, è necessario definire la relazione tra la densità di una pianta infestante e la perdita produttiva della coltura. Ipotizziamo che, nel range di densità osservato, il modello di competizione sia una retta. Per parametrizzare questo modello e verificarne la validità, è stato organizzato un esperimento a blocchi randomizzati, dove sono stati inclusi sette diversi livelli di infestazione di *Sinapis arvensis* ed è stata rilevata la produzione di acheni del girasole. I risultati sono:
+
+   density   Rep   yield
+  --------- ------- --------
+      0        1     36.63
+     14        1     29.73
+     19        1     32.12
+     28        1     30.61
+     32        1      27.7
+     38        1     27.43
+     54        1     24.79
+      0        2     36.11
+     14        2     34.72
+     19        2     30.12
+     28        2      30.8
+     32        2     26.53
+     38        2      27.6
+     54        2     23.31
+      0        3     38.35
+     14        3     32.16
+     19        3     31.72
+     28        3     28.69
+     32        3     25.88
+     38        3     28.43
+     54        3     30.26
+      0        4     36.74
+     14        4     32.566
+     19        4     29.57
+     28        4     33.663
+     32        4     28.751
+     38        4     27.114
+     54        4     24.664
+
+Eseguire l’ANOVA e verificare il rispetto delle assunzioni di base. E’corretto eseguire un test di confronto multiplo e perchè? Eseguire l’analisi di regressione lineare, verificando la bontà di adattamento del modello. Definire il modello parametrizzato. Stabilire la soglia d’intervento, ipotizzando il costo del prodotto e dell’intervento diserbante.
+
+---
+
+## Capitolo 14
+
+### Esercizio 1
+
+Due campioni di terreno sono stati trattati con due erbicidi diversi e sono stati posti in cella climatica alle medesime condizioni di temperatura ed umidità. In tempi diversi dopo l’inizio dell’esperimento sono state prelevate aliquote di ciascun terreno e ne è stata determinata la concentrazione residua di erbicida. I risultati ottenuti sono i seguenti:
+
+   Time   Herbicide A   Herbicide B
+  ------ ------------- -------------
+    0       100.00        100.00
+    10       50.00         60.00
+    20       25.00         40.00
+    30       15.00         23.00
+    40       7.00          19.00
+    50       3.50          11.00
+    60       2.00          5.10
+    70       1.00          3.00
+
+Ipotizzando che la degradazione dei due erbicidi segue una cinetica del primo ordine, parametrizzare la relativa equazione e determinare la semivita dei due erbicidi. Quale sostanza degrada più velocemente?
+
+### Esercizio 2
+
+Un popolazione microbica in condizioni non-limitanti di substrato cresce seguendo una cinetica del primo ordine. Un esperimento da i seguenti risultati:
+
+   Time   Cells
+  ------ -------
+    0       2
+    10      3
+    20      5
+    30      9
+    40     17
+    50     39
+    60     94
+    70     201
+
+Parametrizzare un modello esponenziale e calcolarne la bontà di adattamento.
+
+### Esercizio 3
+
+E’ stato organizzato un esperimento per valutare il tasso di assorbimento radicale di azoto da parte di *Lemna minor* allevata in coltura idroponica. I risultati medi ottenuti sono i seguenti:
+
+    conc     rate
+  -------- --------
+    2.86    14.58
+    5.00    24.74
+    7.52    31.34
+   22.10    72.97
+   27.77    77.50
+   39.20    96.09
+   45.48    96.97
+   203.78   108.88
+
+Parametrizzare il modello iperbolico di Michaelis-Menten:
+
+$$y = \frac{a x} {b + x}$$
+
+Valutarne la bontà di adattamento.
+
+
+### Esercizio 4
+
+E’ stato organizzato un esperimento di competizione per valutare l’effetto di densità crescenti di *Ammi majus* sulla produttività del girasole. I risultati ottenuti sono i seguenti:
+
+   Weed density   Yield
+  -------------- -------
+        0         3.52
+        23        2.89
+        31        2.76
+        39        2.75
+        61        2.48
+
+Parametrizzare l’iperbole di Cousens:
+
+$$Y_W  = Y_{WF} \left( 1 - \frac{i \cdot x}{100\left( 1 + \frac{i \cdot x}{a} \right)} \right)$$
+
+Valutarne la bontà di adattamento. Determinare la soglia economica di intervento.
+
+### Exercise 5
+
+Uno degli aspetti fondamentali degli studi relativi alla diversità degli ambienti è la valutazione delle curve area-specie. E’ stato considerato un aranceto siciliano, del quale è stata valutata con un apposito campionamento ’innestato’ la curva area-specie.
+
+   Area   numSpecie
+  ------ -----------
+    1         4
+    2         5
+    4         7
+    8         8
+    16       10
+    32       14
+    64       19
+   128       22
+   256       22
+
+Parametrizzare una curva ’di potenza’ (power curve):
+
+$$a \cdot x^b$$
+
+Valutarne la bontà di adattamento. Determinare l’area minima di campionamento.
+
+### Exercise 6
+
+Si ritiene che la crescita di una coltura possa essere descritta accuratamente con un’equazione di Gompertz. Si ritiene inoltre che la presenza delle piante infestanti possa modificare la crescita della coltura, alterando i valori dei parametri del modello anzidetto. Per questo motivo viene organizzato un esperimento a randomizzazione completa con tre repliche, 6 tempi di prelievo (DAE) e 2 stati di infestazione (infestato e libero). In ogni tempo di prelievo, le tre repliche vengono raccolte e viene determinato il peso della coltura. I risultati ottenuti sono i seguenti:
+
+   DAE   Infested   Weed Free
+  ----- ---------- -----------
+   21      0.06       0.07
+   21      0.06       0.07
+   21      0.11       0.07
+   27      0.20       0.34
+   27      0.20       0.40
+   27      0.21       0.25
+   38      2.13       2.32
+   38      3.03       1.72
+   38      1.27       1.22
+   49      6.13       11.78
+   49      5.76       13.62
+   49      7.78       12.15
+   65     17.05       33.11
+   65     22.48       24.96
+   65     12.66       34.66
+   186    21.51       38.83
+   186    26.26       27.84
+   186    27.68       37.72
+
+Parametrizzare il modello di Gompertz:
+
+$$a \cdot exp(-b \cdot exp(-c \cdot x))$$
+
+e verificarne la bontà di adattamento nelle due situazioni. Quali parametri del modello di Gompertz sono maggiormente influenzati dalle piante infestanti? Abbiamo elementi per ritenere che la crescita segua un’equazione di Gompertz piuttosto che una logistica simmetrica?
+
+### Esercizio 7
+
+Piante di *Tripleuspermum inodorum* in vaso sono state trattate con erbicida sulfonilureico (tribenuron-methyl) a dosi crescenti. Tre settimano deopo il trattamento è stato registrato il peso delle piante sopravvissute, ottenendo i risulti riportati nella tabella seguente:
+
+   Dose (g a.i. ha$^{-1}$)   Fresh weight (g pot $^{-1}$)
+  ------------------------- ------------------------------
+              0                         115.83
+              0                         102.90
+              0                         114.35
+            0.25                        91.60
+            0.25                        103.23
+            0.25                        133.97
+             0.5                        98.66
+             0.5                        92.51
+             0.5                        124.19
+              1                         93.92
+              1                         49.21
+              1                         49.24
+              2                         21.85
+              2                         23.77
+              2                         22.46
+
+Si ipotizza che la relazione dose-effetto possa essere descritta con un modello log-logistico:
+
+$$c + \frac{d - c}{1 + exp(b ( log (x) - log (a))}$$
+
+Parametrizzare questo modello e verificarne la bontà d’adattamento.
+
+<!--chapter:end:16-Esercizi.Rmd-->
+
 # Appendice 1: breve introduzione ad R
+
 
 ## Cosa è R? {-}
 
@@ -5605,7 +6526,6 @@ summary(tabella)
 ```
 
 
-
 ## Operazioni ed operatori {-}
 
 Gli oggetti numerici possono essere manipolati anche con opportune operazioni algebriche, che si eseguono utilizzando i normali operatori (+, -, *, /). Ad esempio:
@@ -5659,58 +6579,19 @@ log(2, 100)
 
 ## Consigli per l'immissione di dati sperimentali {-}
 
-I dati delle prove sperimentali si possono o importare in R da altri software (ad esempio Excel) oppue si possono digitare direttamente in R. In quest'ultimo caso, in genere, si crea  un vettore per ogni colonna di dati e, successivamente, si riuniscono i vettori in un dataframe, che viene poi salvato nel workspace, come vedremo in seguito. 
+I dati delle prove sperimentali si possono o importare in R da altri software (ad esempio Excel) oppue si possono digitare direttamente in R. In quest'ultimo caso, in genere, si crea  un vettore per ogni colonna di dati e, successivamente, si riuniscono i vettori in un dataframe, che viene poi salvato nel workspace, come vedremo immediatamente. 
 
-### Immissione manuale di dati {-}
-
-L'immissione dei dati in R (e quindi la creazione di vettori) può essere velocizzata utilizzando la funzione `scan()`, separando i dati con INVIO (questo è comodo perchè ci permette di lavorare senza abbandonare il tastierino numerico!). L'immissione termina quando si digita un INVIO a vuoto.
-
-```
-dati <- scan()
-1: 12
-2: 14
-3: 16
-4: 18
-5: 20
-6:
-Read 5 items
-dati
-[1] 12 14 16 18 20
-```
-
-La stessa funzione può essere anche utilizzata per immettere comodamente stringhe di caratteri, con un opportuno impiego dell'argomento `what`. In questo caso è possibile omettere le virgolette.
-
-```
-tesi  <-  scan(what = "character")
-1: aurelio
-2: aurelio
-3: aurelio
-4: claudio
-5: claudio
-6: claudio
-7: latino
-8: latino
-9: latino
-10: 
-Read 9 items
-tesi
-[1] "aurelio" "aurelio" "aurelio" "claudio" 
-    "claudio" "claudio" "latino"  "latino"  "latino" 
->
-```
 
 ### Immissione di numeri progressivi {-}
 
-Per creare una serie progressiva, si può utilizzare il comando `seq(n,m,by=step)` che genera una sequenza da $n$ a $m$ con passo pari a $step$.
+In genere le osservazioni debbono essere identificate univocamente e, per questo, immetteremo una serie di codici numerici progressivi da uno al numero di dati da immettere. Per creare velocemente una serie progressiva, si può utilizzare il comando `seq(n, m, by=step)` che genera una sequenza da $n$ a $m$ con passo pari a $step$. Il codice sottostante crea una serie da 1 a 12.
 
 
 ```r
 options(width = 55)
-parcelle  <-  seq(1,50,1)
+parcelle  <-  seq(1, 12, 1)
 parcelle
-##  [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17
-## [18] 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34
-## [35] 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50
+##  [1]  1  2  3  4  5  6  7  8  9 10 11 12
 ```
 
 ### Immissione dei codici delle tesi e dei blocchi {-}
@@ -5732,58 +6613,70 @@ tesi
 ## Levels: BAIO DUILIO PLINIO
 ```
 
-Notare l'uso della funzione `factor() ` per creare un vettore di dati qualitativi (fattore).
-Allo stesso modo, per immettere i codici dei blocchi possiamo utilizzare la stessa funzione in un modo diverso. Ammettiamo infatti che i quattro valori di ogni tesi appartengano rispettivamente ai quattro blocchi; si opera quindi in questo modo.
+Notare l'uso della funzione `factor() ` per creare un vettore di dati qualitativi (fattore). Allo stesso modo, per immettere i codici dei blocchi possiamo utilizzare la stessa funzione in un modo diverso. Ammettiamo infatti che i quattro valori di ogni tesi appartengano rispettivamente ai quattro blocchi; si opera quindi in questo modo.
 
 
 ```r
-tesi  <-  (c (1, 2, 3, 4))
-tesi <- rep(tesi, times=3)
-tesi
+blocchi  <-  (c (1, 2, 3, 4))
+blocchi <- rep(blocchi, times=3)
+blocchi
 ##  [1] 1 2 3 4 1 2 3 4 1 2 3 4
 ```
 
+### Immissione dei valori e creazione del datframe {-}
+
+A questo punto possiamo immettere i dati, creando un vettore con 12 valori.
+
+
+```r
+yield <- c(12, 15, 17, 13, 19, 21, 22, 17, 12, 14, 16, 12)
+```
+
+A questo punto creiamo una tabella di dati, con la funzione `data.frame()`
+
+
+```r
+tab <- data.frame(parcelle, tesi, blocchi, yield)
+tab
+##    parcelle   tesi blocchi yield
+## 1         1   BAIO       1    12
+## 2         2   BAIO       2    15
+## 3         3   BAIO       3    17
+## 4         4   BAIO       4    13
+## 5         5 DUILIO       1    19
+## 6         6 DUILIO       2    21
+## 7         7 DUILIO       3    22
+## 8         8 DUILIO       4    17
+## 9         9 PLINIO       1    12
+## 10       10 PLINIO       2    14
+## 11       11 PLINIO       3    16
+## 12       12 PLINIO       4    12
+```
+
+È importante notare come i dati siano sistemati in modo ordinato, vale a dire:
+
+1. Vi è una sola riga per soggetto sperimentale
+2. ogni colonna contiene le diverse informazioni per ogni soggetto
+3. i nomi delle colonne sono immessi come 'header', cioè come etichette di colonna, ma non fanno parte fisicamente del dataset
+4. i nomi delle colonne sono semplici e non contengono spazi e altri caratteri invalidi.
+
 ### Leggere e salvare dati esterni {-}
 
-Oltre che immessi da tastiera, i dati possono essere importati in R da files esterni, Inoltre, gli oggetti di R creati nel corso di una sessione possono essere memorizzati su files esterni. Partiamo dal presupposto di aver creato (come frequentemente avviene) il nostro database con EXCEL e di volerlo importare in R nel DATAFRAME *dati*.
+Oltre che immessi da tastiera, i dati possono essere importati in R da files esterni, ed, inoltre, gli oggetti di R creati nel corso di una sessione possono essere memorizzati su files esterni. Partiamo dal presupposto di aver creato (come frequentemente avviene) il nostro database con EXCEL e di volerlo importare in R nel DATAFRAME *dati*. Per far questo avremo bisogno di una libreria addizionale, che dovremo installare e poi caricare in memoria, utilizzando il codice sottostante:
 
-Creiamo in EXCEL la tabella riportata di seguito, che si riferisce a 20 piante di mais. 
 
-Pianta | Var | Altezza 
--------|---------|---------
-1 | N | 172 
-2 | S | 154 
-3 | V | 150 
-4 | V | 188 
-5 | C | 162 
-6 | N | 145 
-7 | C | 157 
-8 | C | 178 
-9 | V | 175 
-10 | N | 158 
-11 | N | 153 
-12 | N | 191 
-13 | S | 174 
-14 | C | 141 
-15 | N | 165 
-16 | C | 163 
-17 | V | 148 
-18 | S | 152 
-19 | C | 169 
-20 | C | 185 
-
-La procedura è la seguente:
-
-1. salviamo questa tabella nel file di testo: *comma delineated* 'import.csv'. Per far questo scegliere 'Menù - File - Salva con nome'. Scegliere un nome per il file ed indicare: 'Tipo file = CSV (delimitato dal separatore di elenco) (*.csv). Salvare quindi il file in una directory prescelta.
-2. Avviare una sessione R, cambiare la directory predefinita del sistema, scegliendo, con il menu File - Change Directory, la cartella nella quale abbiamo memorizzato il file di importazione.
-3. Leggere il file di testo in un dataframe, con il seguente comando:
-
-```
-setwd("myWorkingDir")
-dati  <-  read.csv("import.csv", header=TRUE)
+```r
+#install.packages("readxl")
+library(readxl)
 ```
 
-Il comando appena descritto ha successo per file CSV creati con la versione inglese di Windows, caratterizzati dal punto come separatore decimale e dalla virgola come separatore di elenco. Se invece il computer fosse settato all'italiana, con la virgola come separatore decimale e il punto e virgola come separatore di elenco, allora si potrebbe utilizzare la funzione `read.csv2()` (stessa sintassi). Con questi due comandi, in R viene creato un dataframe di nome dati, contenente le tre colonne della tabella 'import.csv' appena creata, comprese le intestazioni di colonna.
+A questo punto, in R, possiamo digitare il seguente comando, che permette di selezionare un file, tramite una form di selezione e di leggere il foglio di lavoro con il nome indicato.
+
+```
+dati <- read_xlsx(file.choose(), sheet = "Foglio1")
+dati
+```
+
 
 I dati contenuti in un dataframe o in qualunque altro oggetto possono essere salvati in un file esterno (in formato R binario):
 
@@ -6155,370 +7048,11 @@ pie(c(20,30,50),label=c("B", "C"),
 
 ---
 
-## Per approfondire un po'...
+## Altre letture {-}
 
 
 1. Maindonald J. Using R for Data Analysis and Graphics - Introduction, Examples and Commentary. (PDF, data sets and scripts are available at [JM's homepage](https://cran.r-project.org/doc/contrib/usingR.pdff).
 2. Oscar Torres Reina, 2013. Introductio to RStudio (v. 1.3). [This homepage](https://dss.princeton.edu/training/RStudio101.pdf)
 
-<!--chapter:end:23-IntroduzioneR.Rmd-->
-
-# Appendice 2: Richiami di statistica descrittiva
-
-## Dati quantitativi: analisi chimiche e altre misurazioni fondamentali {-}
-
-Qualunque esperimento include un processo di misurazione, al termine del quale ci troviamo con un insieme di dati, usualmente definito dataset. Soprattutto se l'insieme è numeroso, è estrememente importante comprenderne le caratteristiche fondamentali e descriverle fedelmente, utilizzando opportune statistiche descrittive. Se le misure rappresentano una quantità, come, ad esempio, il peso, l'altezza, la concentrazione e così via, il dataset deve essere descritto in relazione ad almeno due caratteristiche fondamentali, vale a dire:
-
-1. tendenza centrale (location)
-2. dispersione (shape)
-
-La tendenza centrale di un dataset è un valore, intorno al quale si collocano tutte le osservazioni, mentre la dispersione misura, in qualche modo, la distanza delle osservazioni tra di loro. Esistono diverse statistiche di tendenza centrale e dispersione; di seguito, descriveremo le più importanti. 
-
-### Indicatori di tendenza centrale {-}
-
-L'indicatore di tendenza centrale più diffuso è la *media* aritmetica, che non necessita di particolari spiegazioni: si calcola con R mediante la funzione `mean()`. Per esempio, carichiamo il dataset 'heights' contenuto nel package 'aomisc' e calcoliamo la media delle altezze.
-
-
-```r
-library(aomisc)
-data(heights)
-mean(heights$height)
-## [1] 164
-```
-
-
-Un altro indicatore di tendenza centrale è la *mediana*, data dal valore che bipartisce i dati in modo da lasciarne metà a sinistra e metà a destra. Se abbiamo una serie di individui ordinati in graduatoria, la mediana è data dall’ individuo che occupa il posto (n + 1)/2 o, se gli individui sono in numero pari, dalla media delle due osservazioni centrali. In R, la mediana si calcola con la funzione `median()`.
-
-
-```r
-median(heights$height)
-## [1] 162.5
-```
-
-La mediana è un indicatore più robusto della media: infatti, supponiamo di avere cinque valori:
-
-1 - 4 - 7 - 9 - 10
-
-La media è pari a 6.2, mentre la mediana è pari a 7 (valore centrale). Se cambiano il numero più alto in questo modo:
-
-1 - 4 - 7 - 9 - 100
-
-la media di questi cinque valori sarà 24.2, mentre la mediana sarà sempre pari a 7. Insomma, la mediana non è influenzata da valori estremi (*outliers*), in senso positivo o negativo.
-
-
-### Indicatori di dispersione {-}
-
-Gli indicatori di tendenza centrale, da soli, non ci informano su come le unità sperimentali tendono a differire l’una dall’altra: ad esempio una media pari a 100 può essere ottenuta con tre individui che misurano 99, 100 e 101 rispettivamente o con tre individui che misurano 1, 100 e 199. E’ evidente che in questo secondo gruppo gli individui sono molto più differenti tra loro (dispersi) che nel primo gruppo.
-
-Pertanto, i risultati di un processo di misurazione non possono essere descritti solo con la media, ma è necessario anche calcolare un indice di variabilità. Tra essi, il più semplice è il *campo di variazione*, che è la differenza tra la misura più bassa e la misura più alta. In realtà, non si tratta di un vero e proprio indice di variabilità, in quanto dipende solo dai termini estremi della distribuzione e non necessariamente cresce al crescere della variabilità degli individui.
-
-Invece del campo di variazione, possiamo utilizzare i cosiddetti *percentili*, che bipartiscono la popolazione di partenza in modo da lasciare una certa quantità di termini alla sua sinistra e la restante quantità alla sua destra. Ad esempio, il primo percentile bipartisce la popolazione in modo da lasciare a sinistra l’ 1% dei termini e alla destra il restante 99%. Allo stesso modo l’ ottantesimo percentile bipartisce la popolazione in modo da lasciare a sinistra l’80% dei termini e alla destra il restante 20%. I percentili più utilizzati per descrivere la dispersione di un collettivo sono il 25-esimo e il 75-esimo: se questi sono molto vicini, significa che il 50 % dei soggetti è compreso in un intervallo piccolo e quindi la variabilità della popolazione è bassa. In R, i percentili si calcolano con il comando sottostante.
-
-
-```r
-quantile(heights$height, probs = c(0.25, 0.75))
-##    25%    75% 
-## 152.75 174.25
-```
-
-A questo proposito, possiamo introdurre il concetto di *boxplot* (grafico Box-Whisker). Si tratta di una scatola che ha per estremi il 25esimo e il 75esimo percentile ed è tagliata da una linea centrale in corrispondenza della mediana. Dalla scatola partono due linee verticali che identificano il valore massimo e il minimo. Se il massimo (o il minimo) distano dalla mediana più di 1.5 volte la differenza tra la mediana stessa e il 75esimo (o 25esimo) percentile, allora le linee verticali si fermano ad un valore pari ad 1.5 volte il 75esimo (o il 25esimo) percentile rispettivamente ed i dati esterni vengono raffigurati come outliers. I boxplot sono solitamente usati per descrivere campioni numerosi nei quali esista un qualche criterio di raggruppamento. In basso abbiamo create tre gruppi con una funzione di estrazione di numeri casuali e li abbiamo rappresentati nel boxplot mostrato in Figura \@ref(fig:figName241).
-
-
-```r
-set.seed(1234)
-A <- runif(20)
-B <- runif(20)
-C <- runif(20)
-series <- rep(c("A", "B", "C"), each = 20)
-values <- c(A, B, C)
-boxplot(values ~ series)
-```
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName241-1.png" alt="Esempio di boxplot in R" width="90%" />
-<p class="caption">(\#fig:figName241)Esempio di boxplot in R</p>
-</div>
-
-
-Oltre ad esprimere la variabilità di una popolazione con un intervallo (campo di variazione o coppia di percentili) è possibile utilizzare diversi indici sintetici di variabilità, tra cui i più diffusi sono la devianza, la varianza, la deviazione standard ed il coefficiente di variabilità.
-
-La *devianza* (generalmente nota come SS, cioè somma dei quadrati) è data da:
-
-$$SS = \sum\limits_{i = 1}^n {(x_i  - \bar x)^2 }$$
-
-Si tratta di un indicatore caratterizzato da significato geometrico molto preciso, collegabile alla somma dei quadrati delle distanze euclidee di ogni osservazione rispetto alla media. In R, non vi è una funzione per il calcolo della devianza (o meglio, esiste una possibilità nell'ambito dei modelli lineari, ma è troppo presto per introdurla...). Possiamo allora un'espressione del tipo:
-
-
-```r
-sum( (heights$height - mean(heights$height))^2 )
-## [1] 4050
-```
-
-Come misura di ’distanza’, la devianza ha alcune importanti proprietà (che vedremo meglio in seguito), ma essendo una somma, il valore finale dipende dal numero di scarti da sommare e quindi non è possibile operare confronti tra collettivi formati da un diverso numero di individui. 
-Si può quindi definire un altro indice, detto *varianza* (nei software di uso più corrente si parla di varianza campionaria, e definito come segue:
-
-$$\sigma^2  = \frac{SS}{n - 1}$$
-
-La varianza permette di confrontare la variabilità di collettivi formati da un numero diverso di individui, anche se permane il problema che questo indicatore è espresso in un’unità di misura al quadrato, rispetto a quella delle osservazioni originali: ad esempio se le osservazioni sono espresse in metri, la varianza è espressa in metri quadrati.
-
-Per eliminare questo problema si ricorre alla radice quadrata della varianza, cioè la *deviazione standard*, che si indica con *s*. La deviazione standard è espressa nella stessa unità di misura dei dati originari ed è quindi molto informativa sulla banda di oscillazione dei dati rispetto alla media.
-
-Spesso la variabilità dei dati è in qualche modo proporzionale alla media: collettivi con una media alta hanno anche una variabilità alta e viceversa. Per questo motivo viene utilizzato spesso il *coefficiente di variabilità*:
-
-$$CV = \frac{\sigma }{\mu } \times 100$$
-
-che è un numero puro e non dipende dall’unità di misura e dall’ampiezza del collettivo, sicché è molto adatto ad esprimere ad esempio l’errore degli strumenti di misura e delle apparecchiature di analisi.
-
-Varianza e deviazione standard sono molto facili da calcolare in R, grazie alle funzioni `var()`, `sd()`.
-
-In genere, la deviazione standard, per le sue caratteristiche, viene utilizzata come indicatore dell’incertezza assoluta associata ad una determinata misurazione, mentre il coefficiente di variabilità (incertezza relativa percentuale; CV), è molto adatto ad esprimere l’errore degli strumenti di misura e delle apparecchiature di analisi.
-
-
-```r
-var(heights$height)
-## [1] 213.1579
-sd(heights$height)
-## [1] 14.59993
-sd(heights$height)/mean(heights$height) * 100
-## [1] 8.902395
-```
-
-
-### Arrotondamenti {-}
-
-Il calcolo della media e della deviazione standard (sia a mano che con il computer) porta all’ottenimento di un numero elevato di cifre decimali. E’ quindi lecito chiedersi quante cifre riportare nel riferire i risultati della misura. L’indicazione generale, da prendere con le dovute cautele è che nel caso della media si riportano un numero di cifre decimali pari a quello rilevato nella misura, mentre per gli indicatori di variabilità si può utilizzare un decimale in più.
-
-### Descrizione dei sottogruppi {-}
-
-In biometria è molto comune che il gruppo di unità sperimentali sia divisibile in più sottogruppi, dei quali vogliamo conoscere alcune statistiche descrittive. Abbiamo già visto il boxplot; ora potremmo voler calcolare le medie per gruppo. Per questo, possiamo utilizzare la funzione 'tapply()':
-
-
-```r
-with(heights, tapply(height, var, mean) )
-##      C      N      S      V 
-## 165.00 164.00 160.00 165.25
-```
-
-dove `height` è la variabile che contiene i valori da mediare, `var` è la variabile che contiene la codifica di gruppo, `mean` è la funzione che dobbiamo calcolare. Ovviamente `mean` può essere sostituito da qualunque altra funzione ammissibile in R, come ad esempio la deviazione standard.
-
-Spesso vogliamo calcolare più di una funzione (ad esempio, la media e la deviazione standard). Per questo possiamo utilizzare il package 'plyr' e la funzione 'ddplyr()'.
-
-
-```r
-library(plyr)
-descript <- ddply(heights, ~var, summarise, 
-                  Media = mean(height), 
-                  SD = sd(height))
-descript
-##   var  Media       SD
-## 1   C 165.00 14.36431
-## 2   N 164.00 16.19877
-## 3   S 160.00 12.16553
-## 4   V 165.25 19.51709
-```
-
-Con la funzione soprastante abbia creato un nuovo dataset (descript), che può essere utilizzato per il plotting, ad esempio per creare un grafico a dispersione, con l'indicazione della dispersione dei dati. Per sapere le coordinate relative al centro di ogni barra, dobbiamo creare un oggetto con la funzione 'barplot()'. Questa funzione, oltre che disegnare il grafico, restituisce appunto le coordinate necessarie. Il codice sottostante produce l'output mostrato in Figura \@ref(fig:figName242).
-
-
-```r
-coord <- barplot(descript$Media, names.arg = descript$var, 
-                 ylim = c(0, 200))
-arrows(coord, descript$Media - descript$SD, 
-       coord, descript$Media + descript$SD, 
-       length = 0.05, angle = 90, code = 3)
-```
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName242-1.png" alt="Esempio di boxplot in R" width="90%" />
-<p class="caption">(\#fig:figName242)Esempio di boxplot in R</p>
-</div>
-
-Il grafico non è bellissimo; per ora ci accontenteremo, ma, con un po' di esercizio, è possibile ottenere grafici di alto livello.
-
-### Relazioni tra variabili quantitative: correlazione
-
-Se su ogni soggetto abbiamo rilevato due caratteri quantitativi è possibile studiare la coppia di variabili risultante per l’eventuale esistenza di variazione congiunta, che si ha quando al variare di una variabile cambia anche il valore dell’altra.
-
-La variazione congiunta si quantifica tramite il *coefficiente di correlazione* costituito dal rapporto tra la codevianza (o somma dei prodotti) delle due variabili e il prodotto delle loro devianze. Il coefficiente di correlazione varia tra -1 e +1: un valore pari a +1 indica concordanza perfetta (tanto aumenta una variabile, tanto aumenta l’altra), mentre un valore pari a -1 indica discordanza perfetta (tanto aumenta una variabile tanto diminuisce l’altra). Un valore pari a 0 indica assenza di qualunque grado di variazione congiunta tra le due variabili (assenza di correlazione). Valori intermedi tra quelli anzidetti indicano correlazione positiva (se positivi) e negativa (se negativi).
-
-Proviamo a considerare questo esempio: il contenuto di olio di 9 lotti di acheni di girasole è stato misurato con due metodi diversi ed è riportato più sotto.
-
-
-```r
-a <- c(45, 47, 49, 51, 44, 37, 48, 44, 53)
-b <- c(44, 44, 49, 53, 48, 34, 47, 46, 51)
-```
-
-Valutare la correlazione tra i risultati dei due metodi di analisi.
-
-
-```r
-cor(a, b)
-## [1] 0.8960795
-```
-
-Possiamo osservare che il coefficiente di correlazione è abbastanza vicino ad 1 e quindi possiamo concludere che esiste un buon grado di concordanza tra i due metodi di analisi.
-
-
-## Dati qualitativi: conteggi e frequenze {-}
-
-Avendo a che fare con variabili qualitative, possiamo considerare la *frequenza assoluta*, cioè il numero degli individui che presentano una certa modalità. Ad esempio, se su 500 insetti 100 sono eterotteri, 200 sono imenotteri e 150 sono ortotteri, possiamo concludere che la frequenza assoluta degli eterotteri è pari a 100.
-
-Oltre alle frequenze assolute, possiamo considerare anche le *frequenze relative*, che si calcolano dividendo le frequenze assolute per il numero totale degli individui del collettivo. Nel caso prima accennato, la frequenza relativa degli eterotteri è pari a 100/500, cioè 0.2.
-
-Se abbiamo una variabile nella quale le modalità possono essere logicamente ordinate, oltre alle frequenze assolute e relative possiamo prendere in considerazione le cosiddette *frequenze cumulate*, che si ottengono cumulando i valori di tutte le classi di frequenza che precedono quella considerata.
-
-### Distribuzioni di frequenze e classamento {-}
-
-Quando rappresentiamo, in grafico o tabella, le frequenze (assolute, relative o cumulate) per tutte le classi e tutti gli individui del collettivo, otteniamo una *distribuzione di frequenze*. Le distribuzioni di frequenze possono essere costruite anche per le variabili quantitative, tramite un’operazione di classamento, che consiste nel creare classi con intervalli opportuni. Su queste distribuzioni di frequenza possiamo quindi calcolare frequenze assolute, relative e cumulate. In genere, se abbiamo un collettivo molto numeroso è conveniente aggregare i *dati* in forma di distribuzioni di frequenza, perché la lettura delle informazioni è molto più facile. Qui facciamo un esempio, anche se il dataset che utilizzeremo ('heights') non è così numeroso.
-
-Vogliamo:
-
-1.  valutare la distribuzione delle frequenze assolute, relative e percentuali degli individui di ciascuna varietà;
-2.  valutare la distribuzione delle frequenze assolute, relative, percentuali e cumulate dell’ altezza degli individui, considerando classi di ampiezza pari a 5 cm;
-3.  disegnare la torta delle frequenze relative della varietà e l’istogramma delle frequenze assolute dell’altezza.
-
-La soluzione al punto 1 con R è facile, attraverso l’impiego della funzione `table()`. La funzione `length()` restituisce il numero di elementi in un vettore.
-
-
-```r
-#Frequenze assolute
-table(heights$var)
-## 
-## C N S V 
-## 7 6 3 4
-#Frequenze relative
-with(heights, table(var)/length(var) ) 
-## var
-##    C    N    S    V 
-## 0.35 0.30 0.15 0.20
-#Frequenze percentuali
-with(heights, table(var)/length(var) * 100 )
-## var
-##  C  N  S  V 
-## 35 30 15 20
-```
-
-Per la variabile altezza, che è di tipo quantitativo, si utilizza lo stesso comando `table(vettore)`, ma occorre specificare l’ampiezza delle classi di frequenza con la funzione `cut()` e l’argomento `breaks()`, con il quale vengono specificati gli estremi superiori della classe (inclusi per default nella classe stessa). Per le frequenze cumulate si usa invece la funzione `cumsum()`.
-
-
-```r
-freq <- table(cut (heights$height, 
-           breaks = c(140,150,160,170,190,200)))
-freq
-## 
-## (140,150] (150,160] (160,170] (170,190] (190,200] 
-##         4         5         4         6         1
-```
-
-
-Una distribuzione di frequenze può essere rappresentata graficamente con un grafico a torte o a barre, che, in R, possono essere disegnati con le funzioni `pie()` e `barplot()`.
-
-
-```r
-par(mfrow=c(1,2))
-pie(table(heights$var))
-barplot(freq, col="blue") 
-```
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName243-1.png" alt="Rappresentazione di una distribuzione di frequenze, con un grafico a torta o a barre" width="90%" />
-<p class="caption">(\#fig:figName243)Rappresentazione di una distribuzione di frequenze, con un grafico a torta o a barre</p>
-</div>
-
-
-### Statistiche descrittive per le distribuzioni di frequenze  {-}
-
-Il più semplice indicatore di tendenza centrale, utilizzabile con qualunque tipo di dati è la *moda*, cioè il valore della classe che presenta la maggior frequenza. Ovviamente, se la variabile è quantitativa, si assume come moda il punto centrale della classe con maggior frequenza. L’individuazione della moda è banale e non richiede calcoli di sorta.
-
-Nel caso di distribuzioni di frequenza per caratteri ordinabili (qualitativi e quantitativi), oltre alla moda possiamo calcolare la *mediana* e gli altri percentili.
-
-Oltre a questi, per le distribuzioni di frequenza di caratteri quantitativi è anche possibile calcolare la media, come illustrato in precedenza, insiema tutti gli indicatori di variabilità già citati.
-
-### Distribuzioni di frequenza bivariate: le tabelle di contingenza  {-}
-
-In alcuni casi in ciascuna unità sperimentale del collettivo vengono studiati due (o più) caratteri e, di conseguenza, si ha a che fare con distribuzioni di frequenza bivariate (o multivariate). In questo caso si possono costruire delle *tabelle di contingenza*, cioè delle tabelle a due entrate nelle quali ogni numero rappresenta la frequenza congiunta (in genere assoluta) per una particolare combinazione delle due variabili.
-
-Ad esempio consideriamo le variabili Varietà (con i valori SANREMO e FANO) e 'Forma delle bacche' (con i valori LUNGO, TONDO, OVALE), riportati nella tabella di contingenza che creeremo come matrice.
-
-
-
-```r
-tabCon <- matrix(c(37, 45, 32, 74, 61, 59), nrow = 2, ncol = 3,
-                 byrow = F)
-row.names(tabCon) <- c("SANREMO", "FANO")
-colnames(tabCon) <- c("LUNGO", "TONDO", "OVALE")
-tabCon
-##         LUNGO TONDO OVALE
-## SANREMO    37    32    61
-## FANO       45    74    59
-```
-
-Ogni riga della tabella sovrastante costituisce una distribuzione condizionata della forma del frutto, dato un certo valore della Varietà, mentre ogni colonna costituisce una distribuzione condizionata della Varietà, data una certa forma del frutto.
-
-
-### Connessione {-}
-
-Se guardiamo le due distribuzioni condizionate per SANREMO e FANO possiamo notare che esiste una certa differenza. Potremmo chiederci quindi se il presentarsi di una data modalità del carattere Varietà (SANREMO o FANO) influenza il presentarsi di una particolare modalità del carattere Forma del frutto. Se ciò non è vero si parla di indipendenza delle variabili (allora le distribuzioni condizionate sono uguali) altrimenti si parla di dipendenza o connessione. In caso di indipendenza, le distribuzioni condizionate delle due variabili dovrebbero essere uguali tra loro, cioè la frequenza relativa condizionale di X per una data modalità di Y deve essere uguale alla frequenza relativa condizionale di X per l’altra modalità di Y e quindi alla frequenza marginale di X.
-
-Ad esempio, per il carattere LUNGO la frequenza relativa marginale è pari ad 82/308=0.266 (82 è la somma dei pomodori di forma allungata, mentre 308 è il numero totale dei pomodori); in caso di indipendenza, questa frequenza dovrebbe essere la stessa, indipendentemente dal fatto che il pomodoro sia di varietà SANREMO oppure Fano. In cifre, la frequenza assoluta condizionata per LUNGO|SANREMO dovrebbe essere pari a 0.266x130=34.6. mentre LUNGO|FANO dovrebbe essere pari a 0.266x178=47.4. Con questi principi, possiamo costruire la tabella delle frequenze assolute attese, in caso di indipendenza completa tra i due caratteri.
-
-
-```r
-expF <- matrix(c(34.6, 47.4, 44.7, 61.3, 50.6, 69.4), 
-                 nrow = 2, ncol = 3,
-                 byrow = F)
-row.names(expF) <- c("SANREMO", "FANO")
-colnames(expF) <- c("LUNGO", "TONDO", "OVALE")
-```
-
-A questo punto è logico costruire un indice statistico di connessione, detto $\chi^2$, che misuri lo scostamento tra le frequenze osservate e quelle attese nell’ipotesi di indipendenza perfetta:
-
-$$\chi ^2  = \sum \left[ \frac{\left( {f_o  - f_a } \right)^2 }{f_a } \right]$$
-
-dove $f_o$ sta per frequenza osservata ed $f_a$ sta per frequenza attesa nel caso indipendenza. Questo indice assume valore pari a zero nel caso di indipendenza completa (le frequenze osservate sono uguali a quelle attese) ed assume un valore positivo tanto più alto quanto maggiore è la connessione tra i due caratteri, fino ad un valore massimo dato dal prodotto del numero degli individui per il valore minimo tra il numero di righe - 1 e il numero di colonne - 1:
-
-$$\max \chi ^2  = n \cdot \min (r - 1,\,c - 1)$$
-
-Nel nostro caso, potremmo calcolare il chi quadro in questo modo:
-
-
-```r
-sum( ((tabCon - expF) ^ 2) /expF )
-## [1] 10.22348
-```
-
-Esiste anche un comando più semplice, che consiste nell'utilizzare la funzione ` as.table() ` per forzare la matrice `dati` in una tabella di contingenza ed applicare la funzione 'summary()'.
-
-
-```r
-summary( as.table (tabCon))
-## Number of cases in table: 308 
-## Number of factors: 2 
-## Test for independence of all factors:
-## 	Chisq = 10.223, df = 2, p-value = 0.006027
-```
-
-Il valore massimo di chi quadro è pari a 308 e di conseguenza il valore osservato, espresso in relazione al valore massimo è pari a 10.22/308=0.033. Si può quindi concludere che la connessione tra i due caratteri è piuttosto debole.
-
-
-
-## Esercizi {-}
-
-### Esercizio 1 {-}
-Scaricare il file EXCEL 'rimsulfuron.xlsx'. 
-In questo file sono riportati i risultati di un esperimento con 15 trattamenti e 4 repliche, nel quale sono stati posti a confronti diversi erbicidi e/o dosi per il diserbo nel mais. Calcolare le medie produttive ottenute con le diverse tesi sperimentali e riportarle su un grafico, includendo anche un'indicazione di variabilità. Verificare se la produzione è correlata con l'altezza delle piante e commentare i risultati ottenuti. Il file può essere scaricato [da questo link](https://www.casaonofri.it/_datasets/rimsulfuron.xlsx).
-
-### Esercizio 2 {-}
-Caricare il datasets 'students' disponibile nel package 'aomisc'. In questo file potete trovare una database relativo alla valutazione degli studenti in alcune materie del primo anno di Agraria. Ogni record rappresenta un esame, con il relativo voto, la materia e la scuola di provenienza dello studente. Con un uso appropriato delle tabelle di contingenza e del chi quadro, valutare se il voto dipende dalla materia e dalla scuola di provenienza dello studente. 
-
----
-
-## Per approfondire un po'...
-
-1. F. Crivellari (2006). Analisi statistica dei dati con R. Apogeo, Milano.
-2. G. Leti e L. Cerbara (2009). Elementi di statistica descrittiva. Il Mulino Editore, Bologna.
-
-
-<!--chapter:end:24-StatisticaDescrittiva.Rmd-->
+<!--chapter:end:17-IntroduzioneR.Rmd-->
 
