@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.0 (15/03/2021), compil. 2021-03-15"
+date: "Update: v. 1.0 (15/03/2021), compil. 2021-03-16"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
