@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.0 (15/03/2021), compil. 2021-03-30"
+date: "Update: v. 1.0 (15/03/2021), compil. 2021-03-31"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -5864,6 +5864,20 @@ E'stata impostata una prova sperimentale per confrontare due varietà di mais, c
 ### Esercizio 4
 
 Un campione di 400 insetti a cui è stato somministrato un certo insetticida mostra che 136 di essi sono sopravvissuti. Determinare un intervallo di confidenza con grado di fiducia del 95% per la proporzione della popolazione insensibile al trattamento.
+
+### Esercizio 5
+
+È stata studiata la risposta produttiva del sorgo alla concimazione azotata. I dati ottenuti sono:
+
+| Dose | Yield |
+|:----:|:----:|
+| 0   | 1.26 |
+| 30  | 2.50 |
+| 60  | 3.25 |
+| 90  | 4.31 |
+|120  | 5.50 |
+
+Assumendo che la relazione sia lineare (retta), stimare la pendenza e l'intercetta della popolazione di riferimento, dalla quale è stato estratto il campione in studio. Utilizzare la funzione `lm(Yield ~ Dose)` ed estrarre gli errori standard con il metodo `summary()`.
 
 ---
 
