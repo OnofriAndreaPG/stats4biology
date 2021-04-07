@@ -5782,6 +5782,43 @@ In un ospedale, è stata misurata la concentrazione di colesterolo nel sangue di
 
 Si può concludere che il trattamento medico è stato efficace?
 
+### Esercizio 6
+
+I Q.I. di 16 studenti provenienti da un quartiere di una certa città sono risultati pari a:
+
+90.31 112.63 101.93 121.47 111.37 100.37 106.80 101.57 113.25 120.76  88.58 107.53 102.62 104.26 95.06 104.88
+
+Gli studenti provenienti da un'altra parte della stessa città hanno invece mostrato i seguenti Q.I.:
+
+90.66 101.41 104.61  91.77 107.06  89.51  87.91  92.31 112.96  90.33  99.86  88.99  98.97  97.92
+
+Esiste una differenza significativa tra i Q.I. dei due gruppi?
+
+### Esercizio 7
+
+Viene estratto un campione di rondelle da una macchina in perfette condizioni di funzionamento. Lo spessore delle rondelle misurate è:
+
+0.0451 0.0511 0.0478 0.0477 0.0458 0.0509 0.0446 0.0516 0.0458 0.0490
+
+Dopo alcuni giorni, per determinare se la macchina sia ancora a punto, viene estratto un campione di 10 rondelle, il cui spessore medio risulta:
+
+0.0502 0.0528 0.0492 0.0556 0.0501 0.0500 0.0498 0.0526 0.0517 0.0550
+
+verificare se la macchina è ancora ben tarata, oppure necessita di revisione.
+
+### Esercizio 8
+
+Sono stati osservati 153 calciatori registrando la dominanza della mano e quella del piede, ottenendo la tabella riportata qui di seguito.
+
+
+|         | piede.sx    | piede.dx    |
+|:-------:|:----:|:----:|
+| mano sx | 26  | 11 |
+| mano dx | 21  | 95 |
+
+
+Esiste indipendenza tra la dominanza della mano e del piede? 
+
 ---
 
 ## Capitoli da 7 a 9
@@ -5790,9 +5827,8 @@ Si può concludere che il trattamento medico è stato efficace?
 
 Un esperimento a randomizzazione completa relativo ad una prova varietale di frumento ha l'obiettivo di porre a confronto la produzione di 5 varietà. Le produzioni (in bushels per acre) osservate siano le seguenti:
 
-|         |      |      |      |
-|:-------:|:----:|:----:|:----:|
 | Variety |  1   |  2   |  3   |
+|:-------:|:----:|:----:|:----:|
 |    A    | 32.4 | 34.3 | 37.3 |
 |    B    | 20.2 | 27.5 | 25.9 |
 |    C    | 29.2 | 27.8 | 30.2 |
