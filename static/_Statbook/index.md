@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.0 (15/03/2021), compil. 2021-04-07"
+date: "Update: v. 1.0 (15/03/2021), compil. 2021-04-08"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -5735,7 +5735,7 @@ Uno sperimentatore ha impostato un esperimento verificare l'effetto di un fungic
 | A   |  180  |      20       |
 | B   |  50   |      50       |
 
-Stabilire se i risultati possono essere considerati significativamente diversi, per un livello di probabilità del 5%
+Stabilire se i risultati possono essere considerati significativamente diversi, per un livello di probabilità del 5%.
 
 ### Esercizio 2
 
@@ -5747,7 +5747,7 @@ Uno sperimentatore ha impostato un esperimento per confrontare due tesi sperimen
 | 10.2 | 12.3 |
 | 9.7  | 12.5 |
 
-Stabilire se i risultati per le tre tesi sperimentali possono essere considerati significativamente diversi, per un livello di probabilità del 5%.
+Stabilire se i risultati per le due tesi sperimentali possono essere considerati significativamente diversi, per un livello di probabilità del 5%.
 
 ### Esercizio 3
 
@@ -5757,9 +5757,9 @@ Uno sperimentatore ha impostato un esperimento per confrontare se l'effetto di u
 |:---:|:---:|
 | 65  | 54  |
 | 71  | 51  |
-| 6.8 | 59  |
+| 68 | 59  |
 
-E'significativo l'effetto del trattamento fungicida sulla produzione, per un livello di probabilità di errore del 5%?
+E'significativo l'effetto del trattamento fungicida sulla produzione, per un livello di probabilità del 5%?
 
 ### Esercizio 4
 
@@ -5786,11 +5786,20 @@ Si può concludere che il trattamento medico è stato efficace?
 
 I Q.I. di 16 studenti provenienti da un quartiere di una certa città sono risultati pari a:
 
-90.31 112.63 101.93 121.47 111.37 100.37 106.80 101.57 113.25 120.76  88.58 107.53 102.62 104.26 95.06 104.88
+
+```r
+QI1 <- c(90.31, 112.63, 101.93, 121.47, 111.37, 100.37, 106.80,
+         101.57, 113.25, 120.76,  88.58, 107.53, 102.62, 104.26,
+         95.06, 104.88)
+```
 
 Gli studenti provenienti da un'altra parte della stessa città hanno invece mostrato i seguenti Q.I.:
 
-90.66 101.41 104.61  91.77 107.06  89.51  87.91  92.31 112.96  90.33  99.86  88.99  98.97  97.92
+
+```r
+QI2 <- c(90.66, 101.41, 104.61,  91.77, 107.06,  89.51,  87.91,
+         92.31, 112.96,  90.33,  99.86,  88.99,  98.97,  97.92)
+```
 
 Esiste una differenza significativa tra i Q.I. dei due gruppi?
 
@@ -5798,13 +5807,22 @@ Esiste una differenza significativa tra i Q.I. dei due gruppi?
 
 Viene estratto un campione di rondelle da una macchina in perfette condizioni di funzionamento. Lo spessore delle rondelle misurate è:
 
-0.0451 0.0511 0.0478 0.0477 0.0458 0.0509 0.0446 0.0516 0.0458 0.0490
+
+```r
+S1 <- c(0.0451, 0.0511, 0.0478, 0.0477, 0.0458, 0.0509, 0.0446,
+        0.0516, 0.0458, 0.0490)
+```
 
 Dopo alcuni giorni, per determinare se la macchina sia ancora a punto, viene estratto un campione di 10 rondelle, il cui spessore medio risulta:
 
-0.0502 0.0528 0.0492 0.0556 0.0501 0.0500 0.0498 0.0526 0.0517 0.0550
 
-verificare se la macchina è ancora ben tarata, oppure necessita di revisione.
+```r
+S2 <- c(0.0502, 0.0528, 0.0492, 0.0556, 0.0501, 0.0500, 0.0498,
+        0.0526, 0.0517, 0.0550)
+```
+
+
+Verificare se la macchina sia ancora ben tarata, oppure necessiti di revisione.
 
 ### Esercizio 8
 
@@ -5817,7 +5835,7 @@ Sono stati osservati 153 calciatori registrando la dominanza della mano e quella
 | mano dx | 21  | 95 |
 
 
-Esiste indipendenza tra la dominanza della mano e del piede? 
+Esiste dipendenza tra la dominanza della mano e del piede? 
 
 ---
 
