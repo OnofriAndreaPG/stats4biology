@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.0 (15/03/2021), compil. 2021-03-16"
+date: "Update: v. 1.0 (15/03/2021), compil. 2021-04-08"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -1413,6 +1413,8 @@ In questo capitolo abbiamo utilizzato un solo modello stocastico, cioè la funzi
 
 
 
+
+
 Nel capitolo precedente abbiamo visto che: 
 
 1.  I fenomeni biologici seguono una legge di natura (verità 'vera'), che ne costituisce il meccanismo deterministico fondamentale. Questa legge di natura produce un risultato atteso $Y_E$.
@@ -1432,7 +1434,7 @@ Questo dualismo tra verità 'vera' (inconoscibile) e verità sperimentale (esplo
 
 ## Esempio: una soluzione erbicida
 
-Nel capitolo precedente, abbiamo introdotto un esempio relativo ad un pozzo inquinato da un erbicida a concentrazione pari a 120 $mg/l$, che viene misurata tramite un gascromatografo. Questo strumento di misura, unitamente a tutte le altre fonti ignote di errore, produce un coefficiente di variabilità del 10% (corrispondente ad una deviazione standard pari a 12 $mg/l$). Abbiamo anche visto che, se immaginiamo di fare le analisi in triplicato, come usuale per questo tipo di lavori, i risultati di questo esperimento possono essere simulati ricorrendo ad un generatore di numeri casuali:
+Nel capitolo precedente, abbiamo introdotto un esempio relativo ad un pozzo inquinato da un erbicida a concentrazione pari a 120 $mg/L$, che viene misurata tramite un gascromatografo. Questo strumento di misura, unitamente a tutte le altre fonti ignote di errore, produce un coefficiente di variabilità del 10% (corrispondente ad una deviazione standard di 12 $mg/L$). Abbiamo anche visto che, se immaginiamo di fare le analisi in triplicato, come usuale per questo tipo di lavori, i risultati di questo esperimento possono essere simulati ricorrendo ad un generatore di numeri casuali:
 
 
 ```r
@@ -1441,6 +1443,8 @@ Y <- rnorm(3, 120, 12)
 Y
 ## [1] 105.5152 123.3292 133.0133
 ```
+
+Ricordiamo che i numeri casuali, in quanto tali, dovrebbero essere diversi ogni volta che li estraiamo, anche se, utilizzando la funzione `set.seed()`, è possibile indurre l'algoritmo a produrre sempre gli stessi valori, in modo che i calcoli di questo capitolo siano riproducibili.
 
 ### Analisi dei dati: stima dei parametri
 
@@ -1523,7 +1527,7 @@ $$\sigma_m  = \frac{\sigma }{\sqrt n }$$
 dove *n* è la dimensione del campione.
 
 
-## Riepilogo 1: Caratterizzare l'incertezza di un esperimento
+## Stima per intervallo
 
 Che cosa ci insegna questo esperimento? Ci insegna che, se prendiamo una distribuzione normale con media $\mu$ e deviazione standard $\sigma$ e cominciamo ad estrarre campioni, le medie dei campioni sono variabili, secondo una distribuzione normale con media $\mu$ e deviazione standard $\sigma / \sqrt{n}$. Questo concetto è interessante e può essere utilizzato per caratterizzare l'incertezza dei risultati di un esperimento. Riassumiamo:
 
@@ -1538,47 +1542,60 @@ Che cosa ci insegna questo esperimento? Ci insegna che, se prendiamo una distrib
 sd(Y) / sqrt(3)
 ## [1] 8.052824
 ```
-6.  Concludiamo quindi che $\mu$ è pari a 120.6192 $\pm$ 8.053
+
+6.  Concludiamo quindi che $\mu$ è pari a 120.6192 $\pm$ 8.053.
 
 Abbiamo caratterizzato l'incertezza del risultato attraverso un intervallo di valori (**stima per intervallo**).
 
 ## L'intervallo di confidenza
 
-Sarebbe interessante poter rispondere a questa domanda: "qual è la proporzione di medie campionarie (cioè di ipotetici risultati del mio esperimento) che si trova all'interno della fascia di incertezza data?". Un passo in avanti in questo senso è stato fatto da Neyman (1941), che propose di lavorare con la statistica T, definita come:
-
-$$T = \frac{m - \mu}{\sigma_m}$$
-
-dove $\sigma_m$ è l'errore standard $\sigma / \sqrt{n}$. Se $m$ è distribuito normalmente con media $\mu$ e deviazione standard $\sigma$, la legge di propagazione degli errori ci dice che T è distribuito normalmente con media pari a $m - \mu = 0$ e deviazione standard $\sigma_m/\sigma_m = 1$. Cioè la *sampling distribution* di T è una distribuzione normale standardizzata. ^[Tra tutte le distribuzioni normali, ce n'è una particolare, che ha media 0 e deviazione standard 1. Questa si chiama **distribuzione normale standardizzata**]
-
-Quindi possiamo scrivere:
-
-$$ P \left[ \textrm{qnorm}(0.025, 0, 1) \le \frac{m - \mu }{\sigma_m} \le \textrm{qnorm}(0.975, 0, 1) \right] = 0.95 $$
-
-cioè: esiste una probabilità pari a 0.95 che $T = (m - \mu)/\sigma_m$ è compreso tra il 2.5-esimo e il 97.5-esimo percentile di una distribuzione normale standardizzata. E' facile vedere che:
+La stima per intervallo fu uno degli interessi di ricerca del matematico polacco Jerzy Neyman (1894-1981), che definì la teoria degli intervalli di confidenza, ancora molto seguita anche ai giorni nostri. Partendo dal presupposto che le medie campionarie sono distribuite normalmente con media $\mu$ e deviazione standard $\sigma/\sqrt{n}$, è possibile calcolare la probabilità $\alpha$ di trovare un campione la cui media era contenuta in un certo intervallo. Prendiamo, ad esempio, l'intervallo sovrastante ottenuto come $\mu \pm \sigma/\sqrt{n}$. Nel nostro esempio, la probabilità di trovare una media in questo intervallo è pari al 68% circa:
 
 
 ```r
-qnorm(0.025, 0, 1)
-## [1] -1.959964
-qnorm(0.975, 0, 1)
-## [1] 1.959964
+pnorm(120 + 12/sqrt(3), 120, 12/sqrt(3)) - 
+  pnorm(120 - 12/sqrt(3), 120, 12/sqrt(3))
+## [1] 0.6826895
 ```
 
-Quindi, approssimando alla seconda cifra decimale:
+Aumentando l'ampiezza dell'intervallo, è possibile aumentare la probabilità di campionare al suo interno. Ad esempio, se moltiplichiamo l'errore standard per due, la probabilità di campionare all'interno dell'intervallo $\mu \pm 2 \times\sigma/\sqrt{n}$ supera (di poco) il 95%:
 
-$$P \left[ -1.96 \le \frac{m - \mu }{\sigma_m} \le 1.96 \right] = 0.95$$
+
+```r
+mult <- 2
+pnorm(120 + mult * 12/sqrt(3), 120, 12/sqrt(3)) - 
+  pnorm(120 - mult * 12/sqrt(3), 120, 12/sqrt(3))
+## [1] 0.9544997
+```
+
+È possibile ottenere esattamente una probabilità del 95% utilizzando come moltiplicatore dell'errore standard il 97.5-esimo quantile della distribuzione normale standardizzata ^[Tra tutte le distribuzioni normali, ce n'è una particolare, che ha media 0 e deviazione standard 1. Questa si chiama **distribuzione normale standardizzata**]:
+
+
+```r
+mult <- qnorm(0.975, mean = 0, sd = 1)
+pnorm(120 + mult * 12/sqrt(3), 120, 12/sqrt(3)) - 
+  pnorm(120 - mult * 12/sqrt(3), 120, 12/sqrt(3))
+## [1] 0.95
+```
+
+
+Se approssimiamo il 97.5-esimo quantile della distribuzione normale standardizzata alla seconda cifra decimale (per semplicità), possiamo scrivere:
+
+$$ P \left[ \mu - 1.96 \times \frac{\sigma}{\sqrt{n} } \leq m \leq \mu + 1.96 \times \frac{\sigma}{\sqrt{n} } \right] = 0.95 $$
+
+Per il nostro esempio possiamo concludere che la probabilità di estrarre un campione di acqua dal nostro pozzo inquinato, analizzarlo in triplicato ed ottenere una concentrazione media all'interno dell'intervallo $\mu \pm 1.96 \times\sigma/\sqrt{n}$ è del 95%.
 
 Con semplici passaggi algebrici, possiamo ottenere l'intervallo di confidenza:
 
-$$P \left[ m -1.96 \times \sigma_m \le \mu \le m + 1.96 \times \sigma_m \right] = 0.95$$
+$$ P \left[ m - 1.96 \times \frac{\sigma}{\sqrt{n} } \leq \mu \leq m + 1.96 \times \frac{\sigma}{\sqrt{n} } \right] = 0.95 $$
 
-Proviamo a leggere l'espressione sovrastante: se prendiamo la stima $m$ e il suo errore standard $\sigma_m$ e calcoliamo un intervallo di confidenza come 1.96 volte l'errore standard, **esiste una probabilità pari a 0.95 che questo intervallo contenga $\mu$, cioè la media vera e ignota della popolazione**. In pratica, l'intervallo di confidenza potrebbe essere approssimato con il doppio dell'errore standard.
+Proviamo a leggere l'espressione sovrastante: se prendiamo la stima $m$ e il suo errore standard $\sigma_m$ e calcoliamo un intervallo di confidenza come 1.96 volte $\sigma_m$, **esiste una probabilità pari a 0.95 che questo intervallo contenga $\mu$, cioè la media vera e ignota della popolazione**. In pratica, l'intervallo di confidenza potrebbe essere approssimato con il doppio dell'errore standard.
 
 Il problema è che, nella pratica sperimentale, $\sigma$ non è noto. Neyman propose di utilizzare $s$ al posto di $\sigma$, cioè la deviazione standard del campione, invece che quella della popolazione. Quindi, nel nostro caso, i limiti dell'intervallo di confidenza sono pari a:
 
 
 ```r
-m + qnorm(0.025) * s/sqrt(3)
+m - qnorm(0.975) * s/sqrt(3)
 ## [1] 104.836
 m + qnorm(0.975) * s/sqrt(3)
 ## [1] 136.4025
@@ -1588,13 +1605,13 @@ più semplicemente:
 
 
 ```r
-m + 2 * s/sqrt(3)
-## [1] 136.7249
+m - 2 * s/sqrt(3)
+## [1] 104.5136
 m + 2 * s/sqrt(3)
 ## [1] 136.7249
 ```
 
-Questo che abbiamo calcolato è l'intervallo di confidenza per P = 0.95. Aumentando opportunamente il moltiplicatore possiamo calcolare gli intervalli di confidenza per P = 0.99, P = 0.999 e così via. Di fatto, l'intervallo di confidenza per P = 0.95 è il più utilizzato in pratica.
+Questo che abbiamo calcolato è l'intervallo di confidenza per una probabilità del 95%. Aumentando opportunamente il moltiplicatore possiamo calcolare gli intervalli di confidenza per una probabilità del 99%, del 99.9% e così via. Di fatto, l'intervallo di confidenza del 95% è il più utilizzato in pratica.
 
 
 ## Qual è il senso dell'intervallo di confidenza?
@@ -1643,7 +1660,7 @@ Nel nostro esempio, con tre soggetti, l'intervallo di confidenza sarebbe:
 
 
 ```r
-m + qt(0.025, 2) * s/sqrt(3)
+m - qt(0.975, 2) * s/sqrt(3)
 ## [1] 85.97071
 m + qt(0.975, 2) * s/sqrt(3)
 ## [1] 155.2677
@@ -1685,11 +1702,6 @@ Considerando quanto finora detto, possiamo riassumere la logica dell'inferenza t
 5.  Assumiamo un modello stocastico ragionevole per spiegare $\epsilon$, quasi sempre di tipo gaussiano, con media 0 e deviazione standard pari a $\sigma$, indipendente dalla X (omoscedasticità)
 6.  Qualunque stima sperimentale deve essere associata ad un indicatore di variabilità (errore standard o intervallo di confidenza).
 
-## Esercizi
-
-1.  Un'analisi chimica è stata eseguita in triplicato, ottenendo i seguenti risultati: 125, 169 e 142 ng/g. Calcolare media, devianza, varianza, deviazione standard, coefficiente di variabilità ed errore standard.
-2.  Considerare il campione composto dai valori 140 - 170 - 155 e stimare i limiti di confidenza della media (P = 0.95).
-3.  Un campione di 400 insetti a cui è stato somministrato un certo insetticida mostra che 136 di essi sono sopravvissuti. Determinare un intervallo di confidenza con grado di fiducia del 95% per la proporzione della popolazione insensibile al trattamento.
 
 ---
 
@@ -1755,14 +1767,6 @@ for (i in 1:100000){
 
 Se riportiamo i valori ottenuti su una distribuzione di frequenze otteniamo il grafico in Figura \@ref(fig:figName2531).
 
-
-```r
-b <- seq(-600, 600, by=0.2)
-hist(result, breaks = b, freq=F, xlab = expression(paste(m)), ylab="Density", xlim=c(-10,10), ylim=c(0,0.4), main="")
-curve(dnorm(x, 0, 1), add=TRUE, col="blue")
-curve(dt(x, 2), add=TRUE, col="red")
-```
-
 <div class="figure" style="text-align: center">
 <img src="_main_files/figure-html/figName2531-1.png" alt="Sampling distribution empirica per le medie campionarie, insieme ad una distribuzione gaussiana (blue) e t di Student con 2 gradi di libertà (rossa)" width="90%" />
 <p class="caption">(\#fig:figName2531)Sampling distribution empirica per le medie campionarie, insieme ad una distribuzione gaussiana (blue) e t di Student con 2 gradi di libertà (rossa)</p>
@@ -1774,7 +1778,7 @@ Neyman scoprì che la sampling distribution di T poteva essere perfettamente des
 
 Quindi, quando i campioni sono piccoli, il modo giusto di calcolare l'intervallo di confidenza è quello di utilizzare l'espressione seguente:
 
-$$P \left( m + \textrm{qt}(0.025,n - 1) \cdot s_m \le \mu  \le m + \textrm{qt}(0.975,n - 1) \cdot s_m \right) = 0.95$$
+$$P \left( m - \textrm{qt}(0.975,n - 1) \cdot s_m \le \mu  \le m + \textrm{qt}(0.975,n - 1) \cdot s_m \right) = 0.95$$
 
 dove $\textrm{qt}(0.025,n - 1)$ e $\textrm{qt}(0.975,n - 1)$ sono rispettivamente il 2.5-esimo e il 97.5-esimo percentile della distribuzione t di Student, con n-1 gradi di libertà.
 
@@ -1920,159 +1924,10 @@ Vediamo che *sampling distribution* è approssimativamente normale con media par
 
 <!--chapter:end:05-InferenzaStatistica.Rmd-->
 
-# Decisioni e incertezza
-
-Nel capitolo precedente abbiamo visto come è possibile esprimere l'incertezza che il campionamente e, in genere, l'errore sperimentale producono sulle nostre stime. In particolare, abbiamo visto che, per una certa statistica rilevata su un campione, è possibile utilizzare la *sampling distribution* (o *sample space* o *distribuzione campionaria*), con un procedimento che prende il nome di inferenza statistica (stima per intervallo). Analogamente, la *sampling distribution* può essere utilizzata per prendere decisioni in presenza di incertezza, con un procedimento che si chiama test d'ipotesi. Anche in questo capitolo, vediamo alcuni esempi, partendo da quello già esposto in precedenza.
+# Decisioni ed incertezza
 
 
-## Confronto tra una media osservata e una media teorica
-
-Nel capitolo precedente, abbiamo misurato la concentrazione di una soluzione erbicida tramite un gascromatografo. Facendo l'analisi in triplicato, abbiamo ottenuto i tre valori riportati di seguito.
-
-
-```
-## [1] 105.5152 123.3292 133.0133
-```
-
-Abbiamo calcolato la media, la deviazione standard, l'errore standard e l'intervallo di confidenza. Ora immaginiamo che esista un livello soglia pari a 200 mg/l, al disopra del quale il prodotto diviene tossico per i mammiferi. Dato che non conosciamo il vero valore di $\mu$ ci chiediamo: *è possibile che le nostre tre repliche, nella realtà, provengano da una popolazione che ha media uguale a 200*?
-
-In questo caso sappiamo bene che non è possibile, visto che abbiamo generato i dati sperimentali (vedi il capitolo precedente), tramite simulazione Monte Carlo, partendo da una verità vera nota ($\mu$ = 120 e $\sigma$ = 12); tuttavia, nella realtà, la domanda è lecita.
-
-Potremmo formalizzare la nostra domanda mediante un'ipotesi scientifica, detta *ipotesi nulla* ($H_0$), per la quale assumiamo che $\mu = 200$. Scriviamo:
-
-$$H_0: \mu = 200$$
-
-Cerchiamo ora di vedere quanto la nostra osservazione è 'discrepante' rispetto all'ipotesi nulla.
-
-In particolare, possiamo calcolare una statistica, che abbiamo già utilizzato per l'intervallo di confidenza, in grado di misurare questa discrepanza:
-
-$$ T = \frac{m - 200}{s_m} $$
-
-Il valore da noi osservato è:
-
-
-```r
-Ti <- (m - 200)/sm
-Ti
-## [1] -9.857508
-```
-
-
-il che implica un certo grado di discrepanza, altrimenti avremmo dovuto osservare un valore di T più vicino a 0. **Possiamo affermare che ciò sia imputabile solo alla variabilità di campionamento e che quindi il nostro esperimento confermi l’ipotesi nulla ($\mu = 200$)**?
-
-È evidente che l'ipotesi nulla, oltre che come l'abbiamo scritta più sopra, potrebbe anche essere posta come:
-
-
-$$H_0: T = 0$$
-
-Oltre all'ipotesi nulla, dobbiamo anche definire l'ipotesi alternativa semplice (a 'due code'), che potrebbe essere:
-
-$$H_1: T \neq 0$$
-
-E'possibile anche definire ipotesi alternative complesse del tipo:
-
-$$H_1: T < 0$$
-
-oppure:
-
-$$H_1: T > 0$$
-
-Bisogna ricordare che le ipotesi debbono essere stabilite prima di effettuare l'esperimento. In questo caso abbiamo fatto un campionamento e abbiamo trovato un valore (120.619) inferiore a quello atteso (200). Che cosa ci attendevamo prima di fare l'esperimento? Ci attendevamo un valore diverso da 200, ma non avevamo informazioni per immaginare se avrebbe potuto essere maggiore o minore? In questo caso l'ipotesi alternativa dovrebbe essere la prima (quella semplice). Avevamo invece ragionevoli motivi per ritenere che $m$ avrebbe potuto essere inferiore, ma non superiore a 200?  In questo caso l'ipotesi alternativo potrebbe essere la seconda (ipotesi alternativa complessa). Propendiamo per quest'ultima ipotesi, cioè $\mu < 200$.
-
-Siamo in totale coerenza con la logica Galileiana: abbiamo un ipotesi di partenza e un esperimento, col quale eventualmente rigettare questa ipotesi ,per abbracciarno una alternativa. Fisher, negli anni 20 del 1900, propose di utilizzare come **‘forza dell’evidenza scientifica’ la probabilità di ottenere un risultato uguale o più estremo di quello osservato, calcolato supponendo vera l’ipotesi nulla.** Penso che il modo migliore di spiegare questo concetta è attraverso l'esempio pratico.
-
-### Simulazione Monte Carlo
-
-Supponiamo che l'ipotesi nulla sia vera. È evidente che, se prendiamo una popolazione gaussiana con $\mu = 200$, cominciamo ad estrarre campioni e, per ognuno di essi, calcoliamo T, otterremo un 'ventaglio di valori, che danno origine ad una *sampling distribution*. Ci chiediamo: come è fatta questa *sampling distribution*?
-
-La cosa migliore è costruirla con una simulazione Monte Carlo, ripetendo molte volte (es. 100'000) l'estrazione di campioni con numerosità pari a 3, da una distribuzione normale con media pari a 200 e deviazione standard pari a 13.948. Utilizziamo questo valore di deviazione standard perché è quello osservato nel campione e, nella realtà, sarebbe l'unico valore disponibile, dato che non sapremmo nulla della popolazione originale. Per eseguire questa operazione utilizziamo il seguente codice R:
-
-
-
-```r
-set.seed(1234)
-result <- rep(0, 100000)
-for (i in 1:100000){
-  sample <- rnorm(3, 200, s)
-  result[i] <- (mean(sample) - 200) / (sd(sample)/sqrt(3))
-}
-```
-
-
-In questo modo otteniamo 100'000 valori di T e possiamo calcolare la proporzione di questi che è pari o inferiore al valore da noi osservato (1):
-
-
-```r
-pLev <- length(result[result < Ti])/100000
-pLev
-## [1] 0.00517
-```
-
-Eseguendo questa simulazione, otteniamo una proporzione di valori pari a 0.00517. Il risultato si riassume dicendo che il P-level per l’ipotesi nulla è pari a 0.00517. La regola di condotta della statistica tradizionale è quella di rigettare l’ipotesi nulla quando il P-level è inferiore ad una certa soglia prefissata (normalmente P $\leq$ 0.05). Di conseguenza, concludiamo che vi sono elementi sufficienti per rifiutare l’ipotesi che il valore incognito della concentrazione di erbicida sia pari a 200 mg/l. Infatti, se l'ipotesi nulla fosse vera, avremmo osservato qualcosa di estremamente improbabile.
-
-In altre parole, l'evidenza scientifica è sufficientemente buona per il rifiuto dell'ipotesi nulla, anche se esiste una certa probabilità d'errore, pari appunto alla probabilità che l'ipotesi nulla sia vera (P = 0.00517).
-
-### Soluzione formale
-
-Possiamo definire una distribuzione di frequenze per T? Empiricamente possiamo osservare che, analogamente al caso degli intervalli di confidenza, la distribuzione di riferimento non è normale, bensì t di Student, con due gradi di libertà. Analogamente al caso degli intervalli di confidenza, la gaussiana è una buona approssimazione solo se il campione è molto numeroso o se $\sigma$ della popolazione è noto.
-
-
-
-```r
-#Sampling distribution per T 
-max(result);min(result)
-## [1] 545.0709
-## [1] -594.9397
-b <- seq(-600, 600, by=0.25)
-hist(result, breaks = b, freq=F, 
-  xlab = expression(paste(m)), ylab="Density", 
-  xlim=c(-10,10), ylim=c(0,0.45), main="")
-curve(dnorm(x), add=TRUE, col="blue")
-curve(dt(x, 2), add=TRUE, col="red")
-```
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName71-1.png" alt="Sampling distribution empirica a confronto con una distribuzione normale (in rosso) e una distribuzione t di Student con due gradi di libertà" width="85%" />
-<p class="caption">(\#fig:figName71)Sampling distribution empirica a confronto con una distribuzione normale (in rosso) e una distribuzione t di Student con due gradi di libertà</p>
-</div>
-
-Senza ricorrere alla simulazione Monte Carlo, possiamo quindi risolvere il problema utilizzando la distribuzione t di Student, nella quale cercheremo la probabilità di ottenere valori di T minori o uguali a quello da noi osservato:
-
-
-```r
-pt(Ti, df=2)
-## [1] 0.005067503
-```
-
-
-dove gli argomenti indicano rispettivamente il valore osservato. Il P-level è molto simile a quello ottenuto con la simulazione Monte Carlo.
-
-Allo stesso valore, più semplicemente, si giunge utilizzando la funzione "t.test()":
-
-
-```r
-t.test(Y, mu=200, alternative="less")
-## 
-## 	One Sample t-test
-## 
-## data:  Y
-## t = -9.8575, df = 2, p-value = 0.005068
-## alternative hypothesis: true mean is less than 200
-## 95 percent confidence interval:
-##      -Inf 144.1333
-## sample estimates:
-## mean of x 
-##  120.6192
-```
-
-
-### Interpretazione del P-level
-
-Quando il P-level è inferiore a 0.05, concludiamo che vi sono prove scientifiche sufficientemente forti per rifiutare la nostra ipotesi di partenza.
-
-Bisogna sottolineare come il P-level nella statistica tradizionale sia stato inizialmente proposto da Fisher come criterio di comportamento e non come un vero e proprio criterio inferenziale-probabilistico. Successivamente, Jarzy Neyman ed Egon Pearson, intorno al 1930, proposero di utilizzare il P-level come probabilità di errore di I specie, cioè come probabilità di rifiutare erroneamente l’ipotesi nulla. Tuttavia, trattandosi di una probabilità calcolata a partire da una *sampling distribution*, cioè da un’ipotetica infinita ripetizione dell’esperimento, essa non ha alcun valore in relazione al singolo esperimento effettivamente eseguito, come i due autori menzionati in precedenza hanno esplicitamente chiarito.
-
-Di conseguenza, nel caso in esempio, affermare che abbiamo una probabilità di errore pari a 0.0051 nel rifiutare l’ipotesi nulla, rappresenterebbe un abuso: le nostre conclusioni potrebbero essere false o vere, ma non abbiamo alcun elemento per scegliere tra le due opzioni. Possiamo solo affermare che, se ripetessimo infinite volte l’esperimento e se l’ipotesi nulla fosse vera, otterremmo un risultato estremo come il nostro o più estremo solo in 5 casi (circa) su 1000. In altre parole, nel lungo periodo, basando le nostre conclusioni sul criterio anzidetto (rifiuto l'ipotesi nulla se il P-value è inferiore a 0.05) commettiamo un errore in non più del 5% dei casi. Insomma, il P-level non può essere guardato come la probabilità di ‘falso-positivo’ ad ogni singolo test, ma solo nel lunghissimo periodo.
+Nel capitolo precedente abbiamo visto come è possibile esprimere l'incertezza che il campionamente e, in genere, l'errore sperimentale producono sulle nostre stime. In particolare, abbiamo visto che, per una certa statistica rilevata su un campione, è possibile costruire una *sampling distribution* (o *sample space* o *distribuzione campionaria*), che descrive la variabilità della statistica stessa tra un campionamento e l'altro. Utilizzando le caratteristiche di questa *sampling distribution* ed, in particolare, la sua deviazione standard (detta **errore standard**) è possibile definire una 'banda' di incertezza per la nostra stima, con un procedimento che prende il nome di inferenza statistica (stima per intervallo). Analogamente, la *sampling distribution* può essere utilizzata per prendere decisioni in presenza di incertezza, con un procedimento che si chiama **test d'ipotesi**. Anche in questo capitolo, vediamo alcuni semplici, ma realistici esempi.
 
 
 ## Confronto tra due medie: il test t di Student
@@ -2088,37 +1943,46 @@ P <- c(80, 81, 84, 88, 94)
 ```
 
 
-Nel campione A la media è pari a 70.2, mentre la deviazione standard è pari a 4.87. L'errore standard è pari a 2.18 e quindi l'intervallo di confidenza della media è 70.2 $\pm$ 6.04. Invece, nel campione P, la media è 85.4, mentre la deviazione standard è pari a 5.72. L'errore standard è pari a 2.56, mentre l'intervallo di confidenza per la media è 85.4 $\pm$ 7.11
+Nel campione A la media è pari a 70.2, mentre la deviazione standard è pari a 4.87. L'errore standard è pari a 2.18 e quindi l'intervallo di confidenza della media è 70.2 $\pm$ 6.04. Invece, nel campione P, la media è 85.4, mentre la deviazione standard è pari a 5.72. L'errore standard è pari a 2.56, mentre l'intervallo di confidenza per la media è 85.4 $\pm$ 7.11.
 
-Possiamo affermare che l'erbicida A riduce il peso delle piante trattate, coerentemente con le aspettative riguardo ad una molecola di questo tipo? Nel rispondere a questa domanda bisogna tener presente che i campioni sono totalmente irrilevanti, dato che il nostro interesse è rivolto alle popolazioni che hanno generato i campioni. Vogliamo cioè che le nostre conclusioni abbiano carattere di universalità e non siano specifiche a quanto abbiamo osservato nel nostro esperimento. Intanto possiamo notare che il limite di confidenza superiore per A (70.2 + 6.04 = 76.24) è inferiore al limite di confidenza inferiore per P (75.4 - 7.11 = 68.29). Questo non è un criterio sul quale basare le nostre considerazioni, ma è comunque un segno che le popolazioni da cui provengono i due campioni potrebbero essere diverse.
+Dopo aver completato questo esperimento, ci chiediamo se sia possibile concludere che l'erbicida A riduce il peso delle piante trattate, coerentemente con le aspettative riguardo ad una molecola di questo tipo. Nel rispondere a questa domanda bisogna tener presente che i campioni sono totalmente irrilevanti, dato che il nostro interesse è rivolto alle popolazioni che hanno generato i campioni; vogliamo infatti che le nostre conclusioni abbiano carattere di universalità e non siano specifiche per il nostro esperimento. **Si pone quindi il problema di trovare un metodo euristico per decidere se la popolazione delle piante trattate con A ha una media diversa dalla popolazione delle piante trattate con P**.
 
-Per trovare un criterio decisionali più rigoroso, possiamo formulare **l'ipotesi nulla in questi termini**:
+Un primo approccio intuitivo potrebbe essere basato sugli intervalli di confidenza delle due medie. Possiamo notare che il limite di confidenza superiore per A (70.2 + 6.04 = 76.24) è inferiore al limite di confidenza inferiore per P (85.4 - 7.11 = 78.29), in modo che gli intervalli di confidenza non si sovrappongono. In base a questo criterio, quindi, potremmo concludere che le popolazioni da cui provengono i due campioni sono diverse e, di conseguenza, A è un erbicida efficace.
 
-$$H_0: \mu_1 = \mu_2 = \mu$$
+Anche se questo criterio è accettabile, in pratica si preferisce utilizzare un altro criterio più rigoroso, che illustreremo di seguito.
 
-In altre parole, la nostra ipotesi di lavoro è che i due campioni siano in realtà estratti da due distribuzioni normali con la stessa media e la stessa deviazione standard, il che equivale a dire che essi provengono da un'unica distribuzione normale con media $\mu$ e deviazione standard $\sigma$.
+### L'ipotesi nulla e alternativa
 
-L'ipotesi alternativa semplice può essere definita:
+Innanzitutto, ricordiamo la logica Popperiana illustrata nel primo capitolo, secondo la quale nessun esperimento può dimostrare che un'ipotesi scientifica è vera, mentre è possibile dimostrare che essa è falsa. E'quindi conveniente porre la nostra ipotesi scientifica in modo che essa possa essere falsificata; dovendo dimostrare che l'effetto di A è diverso da quello di P, possiamo formulare l'ipotesi scientifica ($H_0$) in questo modo:
 
-$$H_1 :\mu_1  \ne \mu_2$$
+$$H_0: \mu_A = \mu_P = \mu$$
+In altre parole, la nostra ipotesi di lavoro è che i due campioni siano in realtà estratti da due distribuzioni normali con la stessa media e la stessa deviazione standard, il che equivale a dire che essi provengono da un'unica distribuzione normale con media $\mu$ e deviazione standard $\sigma$. Questa ipotesi si chiama **ipotesi nulla** e, se riuscissimo a falsificarla, avremmo conseguito il nostro obiettivo in totale coerenza con la logica Popperiana. Vi chiediamo di fare nuovamente attenzione al fatto che l'ipotesi nulla riguarda le popolazioni che hanno generato i campioni, non i campioni stessi, per i quali già sappiamo che le medie osservate sono diverse.
+
+Oltre all'ipotesi nulla, oggetto del nostro lavoro, possiamo anche definire l'ipotesi alternativa, che abbracceremmo se dovessimo riuscire a falsificare quella nulla. L'ipotesi alternativa semplice è:
+
+$$H_1 :\mu_A  \ne \mu_P$$
 
 Se avessimo elementi sufficienti già prima di effettuare l'esperimento (e non dopo aver visto i risultati), potremmo anche adottare ipotesi alternative complesse, del tipo
 
-$$H_1 :\mu _1  > \mu _2$$
+$$H_1 :\mu_A  > \mu_P$$
 
 oppure:
 
-$$H_1 :\mu _1  < \mu _2$$
+$$H_1 :\mu_A  < \mu_P$$
+Abbiamo già anticipato che le ipotesi (nulla ed alternativa) debbono essere stabilite prima di effettuare l'esperimento. Che cosa ci attendevamo? Sapendo che A è un erbicida, prima dell'esperimento ci saremmo potuti aspettare che $\mu_A  < \mu_P$. Tuttavia, si potrebbe obiettare che un erbicida utilizzato a certe dosi potrebbe indurre una stimolazione della crescita con un fenomeno detto 'ormesi', il che ci avrebbe indotto a pensare che $\mu_A  > \mu_P$. Di conseguenza, prima di fare l'esperimento, in assenza di altre informazioni, la cosa più ragionevole è attendersi semplicemente che $\mu_A  \neq \mu_P$ (ipotesi alternativa semplice). In generale, l'ipotesi alternativa semplice è quella più diffusa, mentre quelle complesse vengono adottate solo quando si può ragionevolmente sostenere che la scelta abbia avuto luogo prima di aver visto i dati e non dopo (l'ipotesi deve essere sempre indipendente dai dati).
 
+### La statistica T
 
-Quale statistica potrebbe meglio descrivere l'andamento dell'esperimento, in relazione all'ipotesi nulla? E' evidente che questa statistica dovrebbe essere basata su due indicatori diversi:
+Ma torniamo a lavorare sull'ipotesi nulla. Possiamo intuire che l'idea che $\mu_A = \mu_P$ non è 'fuori dal mondo'; infatti, se avessimo una sola popolazione gaussiana con media $\mu$, non sarebbe impossibile campionare cinque soggetti sulla coda sinistra (e quindi con bassa altezza) e cinque soggetti sulla coda destra (a quindi con elevata altezza), in modo che $m_A \neq m_P$. Il problema è capire quanto questo sia probabile.
 
-1. l'entità della differenza tra le medie: più la differenza tra le due medie è alta e più è probabile che essa sia significativa;
-2. l'entità dell'errore standard. Più è elevata la variabilità dei dati (e quindi l'errore di stima) più è bassa la probabilità che le differenze osservate tra le medie siano significative.
+Cerchiamo di definire una statistica che, posto $\mu_A = \mu_P$, ci permetta di capire che possibilità ho di trovare $m_A \neq m_P$. Due sono i valori di cui tenere conto:
+
+1. l'entità della differenza tra le medie: più la differenza tra le due medie è alta e più è improbabile che essa si produca quando $\mu_A = \mu_P$;
+2. l'entità dell'errore standard. Maggiore l'incertezza di stima delle due medie, maggiore la probabilità di trovare ampie differenze tra $m_A$ ed $m_P$ anche quando $\mu_A = \mu_P$.
 
 Su queste basi, si può individuare la seguente statistica:
 
-$$T = \frac{m_1 - m_2}{SED}$$
+$$T = \frac{m_A - m_P}{SED}$$
 
 Si può osservare che T, in realtà, non è altro che il rapporto tra le quantità indicate in precedenza ai punti 1 e 2: infatti la quantità al numeratore è la differenza tra le medie dei due campioni, mentre la quantità al denominatore è il cosiddetto errore standard della differenza tra due medie (SED). Quest'ultima quantità si può ottenere pensando che i due campioni sono estratti in modo indipendente e, pertanto, la varianza della somma (algebrica) è uguale alla somma delle varianze. La varianza delle due medie è data dal quadrato delle loro deviazioni standard, cioè dal quadrato degli errori standard (SEM). Pertanto:
 
@@ -2146,32 +2010,107 @@ $$SED = \sqrt{2 \, \frac{s^2}{n} } = \sqrt{2} \times SEM$$
 
 Il valore osservato per T è quindi uguale a:
 
-$$T = \frac{85.4 - 70.2}{3.361547} = 4.5217$$
+$$T = \frac{70.2 - 85.4}{3.361547} = -4.5217$$
 
 dove il denominatore è ottenuto come:
 
 $$SED = \sqrt{ 2.18^2 +  2.56^2 } = 3.361547$$
 
-A questo punto avendo osservato T = 4.5217, possiamo chiederci: qual è la 'sampling distribution' per T, cioè quali valori potrebbe assumere questa statistica se ripetessimo il campionamento infinite volte, assumendo che l'ipotesi nulla fosse vera?
+### Simulazione Monte Carlo
 
-La sampling distribution per T potrebbe essere ottenuta empiricamente, utilizzando una simulazione Monte Carlo. Il codice da utilizzare per questa simulazione è fornito in appendice, dove si può vedere che, formalmente, la sampling distribution per T è una distribuzione t di Student, con 8 gradi di libertà (quattro per campione). Siamo quindi in grado di calcolare la probabilità di ottenere valori di T altrettanto estremi o più estremi di quello da noi osservato, tenendo però presente che il test è 'a due code'. Infatti, il T osservato è positivo, ma solo perché abbiamo scritto la differenza come $m_2 - m_1$ invece che come $m_1 - m_2$. Tuttavia, entrambe le differenze sono possibili, quindi dobbiamo considerare anche il valore reciproco -T. In altre parole, ci chiediamo qual è la possibilità di campionare da una distribuzione t di Student valori esterni all'intervallo (-4.5217; 4.5217). La risposta, con R, è piuttosto semplice da ottenere:
+Il valore di T che abbiamo ottenuto indica un certo grado di discrepanza tra l'osservazione è l'ipotesi nulla, altrimenti avremmo dovuto osservare un valore di T più vicino a 0. **Possiamo affermare che ciò sia imputabile solo alla variabilità di campionamento e che quindi il nostro esperimento confermi l’ipotesi nulla**?
+
+Per rispondere a questa domanda, supponiamo che l'ipotesi nulla sia vera. In questo caso, immaginiamo che le nostre dieci piante siano tutte estratte da una sola popolazione con media e deviazione standard stimate (stima puntuale) come segue:
+
+
+```r
+media <- mean(c(A, P))
+devSt <- sd(c(A, P))
+media
+## [1] 77.8
+devSt
+## [1] 9.44928
+```
+
+Prendiamo quindi questa popolazione normale, con $\mu = 77.8$ e $\sigma = 9.45$, ed utilizziamo un generatore di numeri casuali gaussiani per estrarre numerose (100’000) coppie di campioni, calcolando, per ogni coppia, il valore T, come abbiamo fatto con la nostra coppia iniziale.
+
+Il codice da utilizzare in R per le simulazioni è il seguente:
+
+
+```r
+T_obs <- -4.521727
+set.seed(34)
+result <- rep(0, 100000)
+for (i in 1:100000){
+  sample1 <- rnorm(5, media, devSt)
+  sample2 <- rnorm(5, media, devSt)
+  SED <- sqrt( (sd(sample1)/sqrt(5))^2 +
+                 (sd(sample2)/sqrt(5))^2 )
+  result[i] <- (mean(sample1) - mean(sample2)) / SED
+}
+
+# Valutazione dei valori di T
+mean(result)
+## [1] -0.001230418
+max(result)
+## [1] 9.988315
+min(result)
+## [1] -9.993187
+# Quanti valori sono più discrepanti del mio?
+length(result[result < T_obs]) / 100000
+## [1] 0.00095
+length(result[result > - T_obs]) /100000
+## [1] 0.00082
+```
+
+Il vettore 'result' contiene una lista di valori di T che è possibile osservare quando l'ipotesi nulla è vera, cioè quando $\mu_A = \mu_P$; vediamo che ci sono anche valori piuttosto alti ($> 9$) e piuttosto bassi ($< - 9$). Negli anni 20 del 1900, Fischer propose di utilizzare come **‘forza dell’evidenza scientifica’** proprio la probabilità di ottenere un risultato uguale o più estremo di quello osservato, supponendo vera l’ipotesi nulla. Per applicare questo criterio, dobbiamo partire dalla nostra osservazione (T = -4.521727) e considerare che il valore è negativo, ma solo perché abbiamo scritto la differenza come $m_A - m_P$ invece che come $m_P - m_A$. Quindi dobbiamo andarci a cercare nel vettore 'result' i valori che risultano minori di -4.5217 e maggiori di 4.5217, che sono più discrepanti di quello da noi osservato.
+
+Vediamo che, dei 100'000 valori di T simulati assumendo vera l'ipotesi nulla, poco meno dell'uno per mille sono inferiori a -4.5217 e altrettanti sono superiori al suo reciproco (4.5217). In totale, la probabilità di osservare un valore di T uguale o più estremo di quello da noi osservato è molto bassa a pari allo 0.18% circa. Questo valore di probabilità è detto **P-level** e viene utilizzato come criterio decisionale: se esso è inferiore a 0.05 (5%), come in questo caso, rifiutiamo l'ipotesi nulla ed abbracciamo l'alternativa, concludendo che i due trattamenti sono significativamente diversi tra loro (in termini di risposta prodotta nei soggetti trattati, ovviamente).
+
+
+### Soluzione formale
+
+Eseguire una simulazione di Monte Carlo per costruire una *sampling distribution* per T non è sempre agevole e, pertanto, ci dobbiamo chiedere se esista una funzione di densità in grado di descriverla velocemente. Nel grafico sottostante abbiamo considerato una scala discreta da -10 a +10, con intervalli di ampiezza pari a 2.5. Poi abbiamo trasformato il vettore 'result' in una distribuzione di frequenze relative in ogni intervallo, ottenendo una *sampling distribution* discreta.
+
+
+```r
+#Sampling distribution per T 
+max(result);min(result)
+## [1] 9.988315
+## [1] -9.993187
+b <- seq(-10, 10, by = 0.25)
+hist(result, breaks = b, freq=F, 
+  xlab = "T", ylab="Density", 
+  xlim=c(-10,10), ylim=c(0,0.45), main="")
+curve(dnorm(x), add=TRUE, col="blue")
+curve(dt(x, 8), add=TRUE, col="red")
+```
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName71-1.png" alt="Sampling distribution empirica a confronto con una distribuzione normale (in rosso) e una distribuzione t di Student con otto gradi di libertà" width="85%" />
+<p class="caption">(\#fig:figName71)Sampling distribution empirica a confronto con una distribuzione normale (in rosso) e una distribuzione t di Student con otto gradi di libertà</p>
+</div>
+
+Vediamo che la *sampling distribution* di Monte Carlo, non è esattamente gaussiana (curva blu), in quanto le code sono leggermente più alte. Invece, possiamo notare che una funzione di densità 't di Student' con otto gradi di libertà (in rosso) fornisce una descrizione molto più precisa (Figura \@ref(fig:figName71)). Gli otto gradi di libertà sono ottenuti considerando che abbiamo due campioni con cinque individui e, quindi, quattro gradi di libertà ciascuno.
+
+Di conseguenza, siamo in grado di calcolare il P-level velocemente, senza simulazione Monte Carlo, utilizzando una funzione di densità di 't di Student' e prendendo entrambe le code (destra e sinistra). 
 
 
 
 ```r
-2 * pt(-4.5217, 8, lower.tail=T)
+2 * pt(-4.5217, 8, lower.tail=T) 
 ## [1] 0.00194554
 ```
 
-Abbiamo moltiplicato per 2 il risultato, in quanto la funzione 'dt()' fornisce la probabilità di trovare individui inferiori a -4.5217 ('lower.tail = T'). Essendo la distribuzione simmetrica, la probabilità di trovare soggetti superiori a 4.5217 è esattamente la stessa.
+Abbiamo moltiplicato per 2 il risultato, in quanto la funzione `dt()` fornisce la probabilità di trovare individui inferiori a -4.5217 ('lower.tail = T'). Essendo la distribuzione simmetrica, la probabilità di trovare soggetti superiori a 4.5217 è esattamente la stessa.
 
-Vediamo che il P-level è minore di 0.05 e possiamo quindi rifiutare l'ipotesi nulla. Concludiamo che vi è un'evidenza scientifica abbastanza forte per ritenere che l'erbicida A induca una riduzione del peso delle piante trattate.
+Vediamo che il P-level ottenuto formalmente è simile a quello ottenuto empiricamente, ma, rispetto a quest'ultimo, è più preciso, in quanto con la simulazione di Monte Carlo non abbiamo potuto considerare, come avremmo dovuto, un numero infinito di repliche dell'esperimento.
 
-Allo stesso valore, più semplicemente, si perviene utilizzando la funzione:
+Allo stesso valore, più semplicemente, si perviene utilizzando la funzione `t.test()`:
 
 
 ```r
-t.test(A, P, var.equal=T)
+t.test(A, P, var.equal = T)
 ## 
 ## 	Two Sample t-test
 ## 
@@ -2185,95 +2124,16 @@ t.test(A, P, var.equal=T)
 ##      70.2      85.4
 ```
 
-Gli argomenti della funzione 't.test()' sono i due vettori è l'argomento 'var.equal', che in questo caso è stato settato su TRUE. Chi volesse comprendere meglio il motivo di questa specifica, può leggerlo in appendice, alla fine del capitolo. Per gli altri, precisiamo solo che il test di t così eseguito è valido quando i due campioni sono indipendenti ed estratti da distribuzioni gaussiane con la stessa varianza. Queste assunzioni, soprattutto la seconda, sono sostenibili solo se le varianze osservate per i due campioni sono molto simili, con una differenza al di sotto di un ordine di grandezza, come accade nel nostro esempio.
+Gli argomenti di questa funzione sono i due vettori, oltre all'argomento 'var.equal', che in questo caso è stato settato su TRUE, considerando i due campioni estratti da distribuzioni gaussiane con la stessa varianza. Torneremo su questo aspetto tra poco.
 
+### Interpretazione del P-level
 
-## Confronto tra due proporzioni: il test $\chi^2$
+Abbiamo detto che quando il P-level è inferiore a 0.05, concludiamo che vi sono prove scientifiche sufficientemente forti per rifiutare la nostra ipotesi di partenza.
 
-Il test di t è molto utile, ma soltanto nel caso in cui si abbia a che fare con caratteri quantitativi, cioè con variabili misurate su una scala continua, per le quali sia possibile calcolare statistiche descrittive, come appunto la media. Talvolta, i ricercatori sono interessati a rilevare caratteristiche qualitative, come ad esempio lo stato di una pianta in seguito ad un trattamento (morta o viva), il colore dei semi (si ricordino i piselli verdi e gialli di Mendel) ed altre caratteristiche che non sono misurabili su una scala continua.
+Bisogna sottolineare come il P-level nella statistica tradizionale sia stato inizialmente proposto da Fisher come criterio di comportamento e non come un vero e proprio criterio inferenziale-probabilistico. Successivamente, Jarzy Neyman ed Egon Pearson, intorno al 1930, proposero di utilizzare il P-level come probabilità di errore di I specie, cioè come probabilità di rifiutare erroneamente l’ipotesi nulla. Tuttavia, trattandosi di una probabilità calcolata a partire da una *sampling distribution*, cioè da un’ipotetica infinita ripetizione dell’esperimento, essa non ha alcun valore in relazione al singolo esperimento effettivamente eseguito, come i due autori menzionati in precedenza hanno esplicitamente chiarito.
 
-Avendo a che fare con variabili qualitative, l'unica statistica rilevabile è il numero di soggetti che presentano le diverse modalità. Ad esempio, immaginiamo un esperimento per verificare se un coadiuvante aumenta l'efficacia di un insetticida. In questo esperimento, utilizziamo l'insetticida da solo e miscelato con il coadiuvante su due gruppi di insetti diversi. Nel primo gruppo (trattato con insetticida) contiamo 56 morti su 75 insetti trattate, mentre nel secondo gruppo (trattato con insetticida e coadiuvante) otteniamo 48 morti su 50 insetti trattati.
+Di conseguenza, nel caso in esempio, affermare che abbiamo una probabilità di errore pari a 0.0019 nel rifiutare l’ipotesi nulla, rappresenterebbe un abuso: le nostre conclusioni potrebbero essere false o vere, ma non abbiamo alcun elemento per scegliere tra le due opzioni. Possiamo solo affermare che, se ripetessimo infinite volte l’esperimento e se l’ipotesi nulla fosse vera, otterremmo un risultato estremo come il nostro o più estremo solo in 2 casi (circa) su 1000. In altre parole, nel lungo periodo, basando le nostre conclusioni sul criterio anzidetto (rifiuto l'ipotesi nulla se il P-value è inferiore a 0.05) commettiamo un errore in non più del 5% dei casi. Insomma, il P-level non può essere guardato come la probabilità di ‘falso-positivo’ ad ogni singolo test, ma solo nel lunghissimo periodo.
 
-I risultati di questo esperimento si riducono ad una tabella di contingenza ^[da Wikipedia: *Le tabelle di contingenza sono un particolare tipo di tabelle a doppia entrata (cioè tabelle con etichette di riga e di colonna), utilizzate in statistica per rappresentare e analizzare le relazioni tra due o più variabili. In esse si riportano le frequenze congiunte delle variabili*]:
-
-
-```r
-counts <- c(56, 19, 48, 2)
-tab <- matrix(counts, 2, 2, byrow = T)
-row.names(tab) <- c("I", "IC")
-colnames(tab) <- c("M", "V")
-tab
-##     M  V
-## I  56 19
-## IC 48  2
-```
-
-
-Per una tabella di contingenza, possiamo determinare una statistica che misura la connessione tra variabili (trattamento e mortalità), detta $\chi^2$. La connessione è l'indicatore giusto per rispondere alla nostra domanda di ricerca; infatti ci stiamo chiedendo se la proporzione dei morti è indipendente dal tipo di trattamento oppure no.
-
-Con R, il $\chi^2$ si calcola applicando la funzione summary all'oggetto 'data.table'. Dato che la nostra tabella 'tab' è, in realtà, una matrice (almeno così come l'abbiamo creata), prima di interrogarla con il metodo 'summary()' dobbiamo trasformarla in un oggetto 'data.table', con la funzione 'as.table()':
-
-
-```r
-summary( as.table(tab) )
-## Number of cases in table: 125 
-## Number of factors: 2 
-## Test for independence of all factors:
-## 	Chisq = 9.768, df = 1, p-value = 0.001776
-```
-
-Il valore di $\chi^2$ osservato è pari a 9.768, il che indica un certo grado di connessione. Infatti, ricordiamo che, in caso di indipendenza tra le variabili, $\chi^2$ dovrebbe essere zero. Tuttavia, noi non siamo interessati ai due campioni, in quanto i 125 soggetti osservati sono tratti da due popolazioni più ampie. Considerando queste due popolazioni, poniamo l'ipotesi nulla in questi termini:
-
-$$H_o :\pi_1  = \pi_2  = \pi$$
-
-Vediamo che, come negli altri esempio, l'ipotesi nulla riguarda i parametri delle popolazioni ($\pi_1$ e $\pi_2$), non quelli dei campioni  ($p_1$ e $p_2$). Ci chiediamo: se l'ipotesi nulla è vera ($\pi_1  = \pi_2$), qual è la sampling distribution per $\chi^2$? E soprattutto, quanto è probabile ottenere un valore alto come il nostro o più alto?
-
-In appendice mostriamo come si possa arrivare a questo risultato con una simulazione Monte Carlo. In modo formale, si può dimostrare che, se $n$ è sufficientemente grande (n > 30), il valore osservato di $\chi^2$ segue appunto la distribuzione di probabilità $\chi^2$, con un numero di gradi di libertà $\nu$ pari al numero dei dati indipendenti, che, in questo caso, è pari ad 1. Infatti, una volta fissata una frequenza, le altre sono automaticamente definite, dovendo restituire i totali marginali. In R, possiamo utilizzare la funzione 'pchi()' per calcolare la probabilità di ottenere valori pari o superiori a 9.768:
-
-
-```r
-pchisq(9.76801, 1, lower.tail=F)
-## [1] 0.001775746
-```
-
-Allo stesso risultato, ma in modo più semplice, è possibile pervenire utilizzando la già citata funzione 'summary()', applicata alla tabella di contingenza (vedi sopra), oppure:
-
-
-```r
-chisq.test(tab, correct = F)
-## 
-## 	Pearson's Chi-squared test
-## 
-## data:  tab
-## X-squared = 9.768, df = 1, p-value = 0.001776
-```
-
-Come nel caso del 't' di Student, abbiamo diversi tipi di test di chi quadro. In particolare, possiamo applicare o no la correzione per la continuità, che è necessaria quando il numero dei soggetti è piccolo (minore di 30, grosso modo),. Nel nostro caso, non lo abbiamo ritenuto necessario ed abbiamo quindi aggiunto l'argomento 'correct = F'.
-
-## Conclusioni
-
-Abbiamo visto quale strumento abbiamo a disposizione per tirare conclusioni in presenza di incertezza sperimentale. Dovrebbe essere evidente che anche le nostre conclusioni sono incerte, in quanto soggette all'errore di campionamento. In particolare, abbiamo visto che esiste un rischio di errore di prima specie, cioè rifiutare erronamente l'ipotesi nulla (falso positivo). Allo stesso modo, esiste anche un rischio di errore di II specie, cioè accettare erroneamente l'ipotesi nulla (falso negativo). Di questi due tipi di errore abbiamo parlato più diffusamente in appendice.
-
-## Riepilogo
-
-Lo schema di lavoro, nel test d'ipotesi, è il seguente:
-
-1. Si formula l'ipotesi nulla;
-2. Si individua una statistica che descriva l'andamento dell'esperimento, in relazione all'ipotesi nulla;
-3. Si individua la sampling distribution per questa statistica, assumendo vera l'ipotesi nulla; la sampling distribution può essere empirica (ottenuta per simulazione) o teorica, scelta in base a considerazioni probabilistiche
-4. Si calcola la probabilità che, essendo vera l'ipotesi nulla, si possa osservare una valore altrettanto estremo o più estremo di quello calcolato, per la statistica di riferimento;
-5. Se il livello di probabilità è inferiore ad una certa soglia $\alpha$ prefissata (generalmente 0.05), si rifiuta l'ipotesi nulla.
-
-## Esercizi
-
-1. Uno sperimentatore ha impostato un esperimento verificare l’effetto di un fungicida (A) in confronto al testimone non trattato (B), in base al numero di colonie fungine sopravvissute. Il numero delle colonie trattate è di 200, con 180 colonie sopravvissute al trattamento. Il numero di quelle non trattate è di 100, con 50 colonie sopravvissute. Stabilire se i risultati possono essere considerati significativamente diversi, per un livello di probabilità del 5%
-2. Uno sperimentatore ha impostato un esperimento per confrontare due tesi sperimentali (A, B). Per la tesi A sono stati osservate le seguenti produzioni: 9.3, 10.2, 9.7. Per la tesi B, sono state osservati valori di 12.6, 12.3 e 12.5. Stabilire se i risultati possono essere considerati significativamente diversi, per un livello di probabilità del 5%.
-3. Uno sperimentatore ha impostato un esperimento per confrontare se l’effetto di un fungicida è significativo, in un disegno sperimentale con tre ripetizioni. Con il trattamento, i risultati produttivi (in t/ha) sono 65, 71 e 68. Con il non trattato, i risultati sono 54, 51 e 59. E’significativo l’effetto del trattamento fungicida sulla produzione, per un livello di probabilità di errore del 5%?
-4. Immaginate di aver riscontrato che, in determinate condizioni ambientali, 60 olive su 75 sono attaccate da *Daucus olee* (mosca dell’olivo). Nelle stesse condizioni ambientali, diffondendo in campo un insetto predatore siamo riusciti a ridurre il numero di olive attaccate a 12 su 75. Si tratta di una oscillazione casuale del livello di attacco o possiamo concludere che l’insetto predatore è stato un mezzo efficace di lotta biologica alla mosca dell’olivo?
-
----
-
-## Per approfondire un po'...
 
 ### Tipologie alternative di test t di Student
 
@@ -2283,45 +2143,9 @@ Chiunque abbia utilizzato un computer per eseguire un test di t, si sarà accort
 2. t-test omoscedastico. Le misure sono prese su soggetti diversi (indipendenti) e possiamo suppore che i due campioni provengano da due popolazioni con la stessa varianza.
 3. t-test eteroscedastico. Le misure sono prese su soggetti diversi, ma le varianze non sono omogenee.
 
-Consideriamo i due campioni:
+Quello che abbiamo appena utilizzato con la funzione `t.test()` è un test omoscedastico, che suppone che le varianze dei campioni siano simili tra loro, almeno dello stesso ordine di grandezza (omogeneità delle varianze od omoscedasticità).
 
-
-
-
-```r
-C1
-## [1] 12.660770  9.947017 10.500794 13.471233 13.459139
-C2
-## [1] 16.14014 16.20918 12.96391 15.51307 14.91213
-mean(C1)
-## [1] 12.00779
-mean(C2)
-## [1] 15.14769
-var(C1)
-## [1] 2.798071
-var(C2)
-## [1] 1.767402
-```
-
-Vediamo che le medie sono diverse ma le varianze sono simili, dello stesso ordine di grandezza. Pertanto, possiamo utilizzare un test t omoscedastico, che garantisce un più alto livello di potenza.
-
-
-```r
-t.test(C1, C2, var.equal = T, paired = F)
-## 
-## 	Two Sample t-test
-## 
-## data:  C1 and C2
-## t = -3.2859, df = 8, p-value = 0.01109
-## alternative hypothesis: true difference in means is not equal to 0
-## 95 percent confidence interval:
-##  -5.3434208 -0.9363712
-## sample estimates:
-## mean of x mean of y 
-##  12.00779  15.14769
-```
-
-Consideriamo invece quest'altra coppia di campioni:
+Se consideriamo invece quest'altra coppia di campioni:
 
 
 
@@ -2341,7 +2165,7 @@ var(D2)
 ## [1] 1.767402
 ```
 
-In questo caso le varianza sono molto diverse e l'assunzione di omoscedasticità non è tenibile. Dobbiamo utilizzare un test eteroscedastico e, di conseguenza, mentre il SED si calcola con la formula esposta più sopra, si pone il problema di stabilire il numero di gradi di libertà del SED stesso. Dato che il sed è ottenuto come somma di varianze, il numero di gradi di libertà può essere approssimato con la formula di Satterthwaite:
+possiamo notare che le varianza sono molto diverse e l'assunzione di omoscedasticità non è tenibile. Dobbiamo utilizzare un test eteroscedastico e, di conseguenza, mentre il SED si calcola con la formula esposta più sopra, si pone il problema di stabilire il numero di gradi di libertà del SED stesso. Infatti, non possiamo semplicemente sommare i gradi di libertà dei due campioni (come abbiamo fatto in precedenza), dato che dobbiamo considerare che la varianza con più gradi di libertà è stimata in modo più preciso e quindi deve pesare di più nella determinazione dei gradi di libertà totali. Di solito il numero di gradi di libertà di una somma di varianze può essere approssimato con la formula di Satterthwaite:
 
 $$DF_s \simeq \frac{ \left( s^2_1 + s^2_2 \right)^2 }{ \frac{(s^2_1)^2}{DF_1} + \frac{(s^2_2)^2}{DF_2} }$$
 
@@ -2364,7 +2188,7 @@ In effetti:
 
 
 ```r
-t.test(D1, D2, var.equal=F)
+t.test(D1, D2, var.equal = F)
 ## 
 ## 	Welch Two Sample t-test
 ## 
@@ -2378,7 +2202,7 @@ t.test(D1, D2, var.equal=F)
 ##  12.00078  34.14769
 ```
 
-Se le misure in D1 e D2 fossero state rilevate sugli stessi soggetti (due misure per soggetto), allora avremmo cinque soggetti invece che dieci e, di conseguenza solo 4 gradi di libertà:
+Il test di t appaiato è invece quello in cui le misure sono state prese negli stessi soggetti, prima e dopo un certo trattamento sperimentale. Ad esempio, se le misure D1 e D2 fossero state rilevate sugli stessi soggetti (due misure per soggetto, in posizioni corrispondenti dei vettori D1 e D2), allora avremmo cinque soggetti invece che dieci e, di conseguenza, avremmo solo solo 4 gradi di libertà invece che 8:
 
 
 ```r
@@ -2397,62 +2221,47 @@ t.test(D1, D2, var.equal=F, paired=T)
 ```
 
 
-### Simulazione del P-value nel test d'ipotesi
+## Confronto tra due proporzioni: il test $\chi^2$
 
-Più sopra abbiamo visto che il test d'ipotesi viene eseguito sulla base del principio che, quando l'ipotesi nulla è vera, una statistica campionaria (T, $\chi^2$ o altro) mostra una certa variabilità tra un campionamento e l’altro. Quando i campionamenti sono tanti (meglio, infiniti), i valori ottenuti danno origine ad una *sampling distribution*, che può essere modellizzata utilizzando una qualche distribuzione di probabilità formale, come il t di Student il chi quadro e così via.
+Il test di t è molto utile, ma soltanto nel caso in cui si abbia a che fare con caratteri quantitativi, cioè con variabili misurate su una scala continua, per le quali sia possibile calcolare statistiche descrittive, come appunto la media. Talvolta, i ricercatori sono interessati a rilevare caratteristiche qualitative, come ad esempio lo stato di una pianta in seguito ad un trattamento (morta o viva), il colore dei semi (si ricordino i piselli verdi e gialli di Mendel) ed altre caratteristiche che non sono misurabili su una scala continua.
 
-Invece che ricorrere ad una distribuzione di probabilità nota, possiamo costruire una sampling distribution empirica, utilizzando le simulazioni Monte Carlo. In questo caso, il campionamento viene ripetuto molte volte, assumendo che l'ipotesi nulla sia vera. Mostriamo ora come questo approccio possa essere utilizzato per confrontare due medie oppure due proporzioni campionarie.
+Avendo a che fare con variabili qualitative, l'unica statistica rilevabile è il numero di soggetti che presentano le diverse modalità. Ad esempio, immaginiamo un esperimento per verificare se un coadiuvante aumenta l'efficacia di un insetticida. In questo esperimento, utilizziamo l'insetticida da solo e miscelato con il coadiuvante su due gruppi di insetti diversi. Nel primo gruppo (trattato con insetticida) contiamo 56 morti su 75 insetti trattate, mentre nel secondo gruppo (trattato con insetticida e coadiuvante) otteniamo 48 morti su 50 insetti trattati.
 
-Immaginiamo di avere i due campioni, A e P, indicati in precedenza, con un T osservato pari a -4.521727. Se i due campioni fossero estratti dalla stessa popolazione normale, questa dovrebbe avere una media pari a (70.2 + 85.4)/2 = 77.8 e una deviazione standard pari alla deviazione standard delle dieci osservazioni (tutte insieme, senza distinzioni di trattamento), cioè 9.45.
-
-
-```r
-media <- mean(c(A, P))
-devSt <- sd(c(A, P))
-media
-## [1] 77.8
-devSt
-## [1] 9.44928
-```
-
-Proviamo ora ad utilizzare un generatore di numeri casuali gaussiani per estrarre numerose (100’000) coppie di campioni, e calcolare, per ogni coppia, il valore T, come abbiamo fatto con la nostra coppia iniziale.
-
-Il codice da utilizzare in R per le simulazioni è il seguente:
+Nel capitolo 3 abbiamo visto che i risultati di questo esperimento si riducono ad una tabella di contingenze, per la quale sappiamo già calcolare una statistica che misuri la connessione tra variabili (trattamento e mortalità), detta $\chi^2$:
 
 
 ```r
-T_obs <- -4.521727
-set.seed(34)
-result <- rep(0, 100000)
-for (i in 1:100000){
-  sample1 <- rnorm(5, media, devSt)
-  sample2 <- rnorm(5, media, devSt)
-  SED <- sqrt( (sd(sample1)/sqrt(5))^2 +
-                 (sd(sample2)/sqrt(5))^2 )
-  result[i] <- (mean(sample1) - mean(sample2)) / SED
-}
-
-length(result[result < T_obs]) / 100000
-## [1] 0.00095
-length(result[result > - T_obs]) /100000
-## [1] 0.00082
-```
-
-Possiamo notare che, dei 100'000 valori di T osservati assumendo vera l'ipotesi nulla, meno dell'un per mille sono inferiori a quello da noi osservato e altrettanti sono superiori al suo reciproco (4.5217). In totale, la probabilità di osservare un valore di T così alto in valore assoluto e dello 0.18 %, molto simile a quella ottenuta più sopra con il test t di Student.
-
-E se dobbiamo confrontare due proporzioni? Prendiamo la tabella di contingenze utilizzata più sopra:
-
-
-```r
+counts <- c(56, 19, 48, 2)
+tab <- matrix(counts, 2, 2, byrow = T)
+row.names(tab) <- c("I", "IC")
+colnames(tab) <- c("M", "V")
 tab
 ##     M  V
 ## I  56 19
 ## IC 48  2
+summary( as.table(tab) )
+## Number of cases in table: 125 
+## Number of factors: 2 
+## Test for independence of all factors:
+## 	Chisq = 9.768, df = 1, p-value = 0.001776
 ```
 
-La connessione si esprime con la statistica chi quadro e il valore osservato è 9.768. Qual è la probabilità che, se i caratteri sono indipendenti, si produca un valore di chi quadro pari o superiore a 9.768?
 
-Per la simulazione possiamo utilizzare la funzione 'r2dtable()', che produce il numero voluto di tabelle di contingenza, con righe e colonne indipendenti, rispettando i totali marginali voluti. Le tabelle prodotte (nel nostro caso 10'000) sono restituite come lista, quindi possiamo utilizzare la funzione 'lapply()' per applicare ad ogni elemento della lista la funzione che restituisce il $\chi^2$ ('chiSim'). 
+La connessione è la statistica giusta per rispondere alla nostra domanda di ricerca; infatti ci stiamo chiedendo se la proporzione dei morti è indipendente dal tipo di trattamento oppure no. Il valore di $\chi^2$ osservato è pari a 9.768, il che indica un certo grado di connessione. Infatti, ricordiamo che, in caso di indipendenza tra le variabili, $\chi^2$ dovrebbe essere zero.
+
+Tuttavia, noi non siamo interessati ai due campioni, in quanto i 125 soggetti osservati sono tratti da due popolazioni più ampie. Considerando queste due popolazioni, poniamo l'ipotesi nulla in questi termini:
+
+$$H_o :\pi_1  = \pi_2  = \pi$$
+
+Vediamo che, come negli altri esempio, l'ipotesi nulla riguarda i parametri delle popolazioni ($\pi_1$ e $\pi_2$), non quelli dei campioni  ($p_1$ e $p_2$). Ci chiediamo: se l'ipotesi nulla è vera ($\pi_1  = \pi_2$), qual è la sampling distribution per $\chi^2$? E soprattutto, quanto è probabile ottenere un valore alto come il nostro o più alto?
+
+Vediamo che l'output della funzione `summary()` ci da già il P-level, che, essendo inferiore a 0.05, ci consente di rigettare l'ipotesi nulla. Tuttavia, per chi fosse interessato, proviamo ad analizziamo più da vicino la sampling distribution di $\chi^2$.
+
+### Simulazione Monte Carlo
+
+Per la simulazione possiamo utilizzare la funzione `r2dtable()`, che produce il numero voluto di tabelle di contingenza (nel nostro caso 10'000), con righe e colonne indipendenti, rispettando i totali marginali della nostra tabella di contingenze. Le tabelle prodotte  sono restituite come lista, quindi possiamo utilizzare la funzione `lapply()` per applicare ad ogni elemento della lista la funzione che restituisce il $\chi^2$ ('chiSim'). 
+
+
 
 
 ```r
@@ -2464,9 +2273,47 @@ length(chiVals[chiVals > 9.768])
 ## [1] 19
 ```
 
-Vediamo che vi sono 19 valori più alti di quello da noi osservato, quindi il p-value è 0.0019. Anche in questo caso molto simile a quello ottenuto con un test statistico formale.
+Vediamo che vi sono 19 valori più alti di quello da noi osservato, quindi il P-value è 0.0019.
 
-### Altre letture
+### Soluzione formale
+
+In modo formale, si può dimostrare che, se $n$ è sufficientemente grande (n > 30), il valore osservato di $\chi^2$ segue appunto la distribuzione di probabilità $\chi^2$, con un numero di gradi di libertà $\nu$ pari al numero dei dati indipendenti, che, in questo caso, è pari ad 1. Infatti, una volta fissata una frequenza, le altre sono automaticamente definite, dovendo restituire i totali marginali. In R, possiamo utilizzare la funzione `pchisq()` per calcolare la probabilità di ottenere valori pari o superiori a 9.768:
+
+
+```r
+pchisq(9.76801, 1, lower.tail=F)
+## [1] 0.001775746
+```
+
+Allo stesso risultato, ma in modo più semplice, è possibile pervenire utilizzando la funzione `chisq.test()`, applicata alla tabella di contingenza:
+
+
+```r
+chisq.test(tab, correct = F)
+## 
+## 	Pearson's Chi-squared test
+## 
+## data:  tab
+## X-squared = 9.768, df = 1, p-value = 0.001776
+```
+
+Come nel caso del 't' di Student, abbiamo diversi tipi di test di chi quadro. In particolare, possiamo applicare o no la correzione per la continuità, che è necessaria quando il numero dei soggetti è piccolo (minore di 30, grosso modo). Nel nostro caso, non lo abbiamo ritenuto necessario ed abbiamo quindi aggiunto l'argomento 'correct = F'.
+
+## Conclusioni e riepilogo
+
+Abbiamo visto il P-level è lo strumento giusto per tirare conclusioni in presenza di incertezza sperimentale. Dovrebbe essere evidente che anche le nostre conclusioni sono incerte, in quanto soggette all'errore di campionamento. In particolare, abbiamo visto che esiste un rischio di errore di prima specie, cioè rifiutare erronamente l'ipotesi nulla (falso positivo). Allo stesso modo, esiste anche un rischio di errore di II specie, cioè accettare erroneamente l'ipotesi nulla (falso negativo). Insomma, per quanto possiamo affannarci, la ricerca scientifica non consente mai soluzioni certe, anche se rimane la certezza del metodo, che è largamente condiviso all'interno della comunità di scienziati.
+
+Concludiamo proprio ricordando questo metodo di lavoro:
+
+1. si formula l'ipotesi nulla.
+2. Si individua una statistica che descriva l'andamento dell'esperimento, in relazione all'ipotesi nulla.
+3. Si individua la *sampling distribution* per questa statistica, assumendo vera l'ipotesi nulla; la sampling distribution può essere empirica (ottenuta per simulazione Monte Carlo) o meglio teorica, scelta in base a considerazioni probabilistiche.
+4. Si calcola la probabilità che, essendo vera l'ipotesi nulla, si possa osservare una valore altrettanto estremo o più estremo di quello calcolato, per la statistica di riferimento.
+5. Se il livello di probabilità è inferiore ad una certa soglia $\alpha$ prefissata (generalmente 0.05), si rifiuta l'ipotesi nulla e si accetta l'ipotesi alternativa.
+
+---
+
+## Altre letture
 
 1. Hastie, T., Tibshirani, R., Friedman, J., 2009. The elements of statistical learning, Springer Series in Statistics. Springer Science + Business Media, California, USA.
 
@@ -3120,6 +2967,43 @@ Proviamo ad analizzare il dataset 'insects', disponibile nel package 'aomisc'. S
 
 ```r
 library(aomisc)
+## Loading required package: drc
+## Loading required package: MASS
+## 
+## Attaching package: 'MASS'
+## The following object is masked from 'package:dplyr':
+## 
+##     select
+## Loading required package: drcData
+## 
+## 'drc' has been loaded.
+## Please cite R and 'drc' if used for a publication,
+## for references type 'citation()' and 'citation('drc')'.
+## 
+## Attaching package: 'drc'
+## The following objects are masked from 'package:stats':
+## 
+##     gaussian, getInitial
+## Loading required package: plyr
+## --------------------------------------------------------------------
+## You have loaded plyr after dplyr - this is likely to cause problems.
+## If you need functions from both plyr and dplyr, please load plyr first, then dplyr:
+## library(plyr); library(dplyr)
+## --------------------------------------------------------------------
+## 
+## Attaching package: 'plyr'
+## The following objects are masked from 'package:dplyr':
+## 
+##     arrange, count, desc, failwith, id, mutate, rename,
+##     summarise, summarize
+## Loading required package: car
+## Loading required package: carData
+## 
+## Attaching package: 'car'
+## The following object is masked from 'package:dplyr':
+## 
+##     recode
+## Loading required package: multcompView
 data(insects)
 head(insects)
 ##   Insecticide Rep Count
@@ -5393,11 +5277,11 @@ I due coefficienti di determinazione (tradizionale e corretto) possono essere ot
 
 ```r
 R2nls(modNlin)
-## $R2
+## $PseudoR2
 ## [1] 0.9939126
 ## 
-## $R2adj
-## [1] 0.9936359
+## $R2
+## [1] 1.001821
 ```
 
 ## Funzioni lineari e nonlineari dei parametri
@@ -5510,7 +5394,7 @@ class(modNlin)
 modNlin2 <- boxcox(modNlin)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-180-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-171-1.png)<!-- -->
 
 ```r
 modNlin2
@@ -5548,7 +5432,7 @@ Invece che far scegliere alla funzione 'boxcox' il valore di $\lambda$ ottimale,
 modNlin3 <- boxcox(modNlin, lambda = 0.5)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-181-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-172-1.png)<!-- -->
 
 ```r
 summary(modNlin3)
@@ -5707,36 +5591,36 @@ Pur essendo entrambi gli approcci corretti, il secondo è certamente più elegan
 
 Vi è stata affidata una prova sperimentale per la taratura agronomica di un nuovo diserbante appartenente al gruppo chimico delle solfoniluree (AGRISULFURON), utilizzabile alla dose presumibile di 20 g/ha, per il diserbo di post-emergenza del mais. Gli obiettivi della prova sono:
 
-1. Valutare se è opportuno un certo aggiustamento della dose (incremento/diminuzione)
-2. Valutare se è opportuna l'aggiunta di un bagnante non-ionico
-3. Valutare se è opportuno splittare la dose di 20 g/ha in due distribuzioni
-4. Valutare l'efficacia del nuovo diserbante con gli opportuni controlli (testimoni)
+1.  Valutare se è opportuno un certo aggiustamento della dose (incremento/diminuzione)
+2.  Valutare se è opportuna l'aggiunta di un bagnante non-ionico
+3.  Valutare se è opportuno splittare la dose di 20 g/ha in due distribuzioni
+4.  Valutare l'efficacia del nuovo diserbante con gli opportuni controlli (testimoni)
 
 Coerentemente con questi obiettivi, scrivere un protocollo sperimentale sufficientemente dettagliato (una pagina) ed aggiungere lo schema della prova
+
+---
 
 ## Capitolo 3
 
 ### Esercizio 1
 
-Un'analisi chimica è stata eseguita i triplicato e i risultati sono stati i seguenti: 125,  169 and 142 ng/g. Calcolate la media e tutti gli indicatori di variabilità che conoscete.
+Un'analisi chimica è stata eseguita i triplicato e i risultati sono stati i seguenti: 125, 169 and 142 ng/g. Calcolate la media e tutti gli indicatori di variabilità che conoscete.
 
 ### Esercizio 2
 
-Scaricare il file EXCEL 'rimsulfuron.xlsx'. 
-In questo file sono riportati i risultati di un esperimento con 15 trattamenti e 4 repliche, nel quale sono stati posti a confronti diversi erbicidi e/o dosi per il diserbo nel mais. Calcolare le medie produttive ottenute con le diverse tesi sperimentali e riportarle su un grafico, includendo anche un'indicazione di variabilità. Verificare se la produzione è correlata con l'altezza delle piante e commentare i risultati ottenuti. Il file può essere scaricato [da questo link](https://www.casaonofri.it/_datasets/rimsulfuron.xlsx).
+Considerate il file EXCEL 'rimsulfuron.xlsx', che può essere scaricato [da questo link](https://www.casaonofri.it/_datasets/rimsulfuron.xlsx). In questo file sono riportati i risultati di un esperimento con 15 trattamenti e 4 repliche, nel quale sono stati posti a confronti diversi erbicidi e/o dosi per il diserbo nel mais. Calcolare le medie produttive ottenute con le diverse tesi sperimentali e riportarle su un grafico, includendo anche un'indicazione di variabilità. Verificare se la produzione è correlata con l'altezza delle piante e commentare i risultati ottenuti. Il file può essere scaricato
 
 ### Esercizio 3
 
-Caricare il datasets 'students' disponibile nel package 'aomisc'. In questo file potete trovare una database relativo alla valutazione degli studenti in alcune materie del primo anno di Agraria. Ogni record rappresenta un esame, con il relativo voto, la materia e la scuola di provenienza dello studente. Con un uso appropriato delle tabelle di contingenza e del chi quadro, valutare se il voto dipende dalla materia e dalla scuola di provenienza dello studente.
+Caricare il datasets 'students' disponibile al link: '<https://www.casaonofri.it/_datasets/students.csv>'. In questo file potete trovare una database relativo alla valutazione degli studenti in alcune materie del primo anno di Agraria. Ogni record rappresenta un esame, con il relativo voto, la materia e la scuola di provenienza dello studente. Con un uso appropriato delle tabelle di contingenza e del chi quadro, valutare se il voto dipende dalla materia e dalla scuola di provenienza dello studente.
 
 ---
 
 ## Capitolo 4
 
-
 ### Esercizio 1
 
-E’ data una distribuzione normale con $\mu$ = 23 e $\sigma$ = 1. Calcolare la probabilità di estrarre individui:
+E' data una distribuzione normale con $\mu$ = 23 e $\sigma$ = 1. Calcolare la probabilità di estrarre individui:
 
 1.  maggiori di 25
 2.  minori di 21
@@ -5744,14 +5628,23 @@ E’ data una distribuzione normale con $\mu$ = 23 e $\sigma$ = 1. Calcolare la 
 
 ### Esercizio 2
 
-E’ data una distribuzione normale con $\mu$ = 156 e $\sigma$ = 13. Calcolare la probabilità di estrarre individui:
+E' data una distribuzione normale con $\mu$ = 156 e $\sigma$ = 13. Calcolare la probabilità di estrarre individui:
 
 1.  maggiori di 170
 2.  minori di 140
 3.  compresi tra 140 e 170
 
-
 ### Esercizio 3
+
+Un erbicida si degrada nel terreno seguendo una cinetica del primo ordine:
+
+$$Y = 100 \, e^{-0.07 \, t}$$
+
+dove Y è la concentrazione al tempo t. Dopo aver spruzzato questo erbicida, che probabilità abbiamo di osservare, dopo 50 giorni, una concentrazione sotto la soglia di tossicità per i mammiferi (2 ng/g)? Tenere conto che lo strumento di misura produce un coefficiente di variabilità del 20%
+
+
+
+### Esercizio 4
 
 Un erbicida si degrada nel terreno seguendo una cinetica del primo ordine:
 
@@ -5761,8 +5654,7 @@ dove Y è la concentrazione al tempo t. Dopo aver spruzzato questo erbicida, che
 
 
 
-
-### Esercizio 4
+### Esercizio 5
 
 Una coltura produce in funzione della sua fittezza, secondo la seguente relazione:
 
@@ -5774,22 +5666,19 @@ Stabilire la fittezza necessaria per ottenere il massimo produttivo (graficament
 
 
 
-
-
-### Esercizio 5
+### Esercizio 6
 
 La tossicità di un insetticida varia con la dose, secondo la legge log-logistica:
 
-$$ Y = \frac{1}{1 + exp\left\{ -2 \, \left[log(X) - log(15)\right] \right\}}$$
-Dove Y è la proporzione di animali morti e X è la dose. Se trattiamo 150 insetti con una dose pari a 35 g, qual è la probabilità di trovare più di 120 morti? Considerare che la risposta è variabile da individuo ad individuo nella popolazione e questa variabilità può essere approssimata utilizzando una distribuzione gaussiana con un errore standard pari a 10.
+$$ Y = \frac{1}{1 + exp\left\{ -2 \, \left[log(X) - log(15)\right] \right\}}$$ Dove Y è la proporzione di animali morti e X è la dose. Se trattiamo 150 insetti con una dose pari a 35 g, qual è la probabilità di trovare più di 120 morti? Considerare che la risposta è variabile da individuo ad individuo nella popolazione e questa variabilità può essere approssimata utilizzando una distribuzione gaussiana con un errore standard pari a 10.
 
 
 
-### Esercizio 6
+### Esercizio 7
 
 Simulare i risultati di un esperimento varietale, con sette varietà di frumento e quattro repliche. Considerare che il modello deterministico è un modello ANOVA, nel quale vengono definite le medie delle sette varietà (valori attesi). Decidere autonomamente sui parametri da impiegare per la simulazione (da $\mu_1$ a $\mu_7$ e $\sigma$)
 
-### Esercizio 7
+### Esercizio 8
 
 Considerando il testo dell'esercizio 5, simulare un esperimento in cui l'insetticida viene utilizzato a cinque dosi crescenti, con quattro repliche.
 
@@ -5799,73 +5688,154 @@ Considerando il testo dell'esercizio 5, simulare un esperimento in cui l'insetti
 
 ### Esercizio 1
 
-Dati i tre individui con misure di altezza pari a 140, 170 e 155, stimare i limiti di confidenza di $\mu$ (p $<$ 0.05).
+In un campo di frumento sono state campionate trenta aree di saggio di un metro quadrato ciascuna, sulle quali è stata determinata la produzione. La media delle trenta aree è stata di 6.2 t/ha, con una varianza pari a 0.9. Stimare la produzione dell'intero appezzamento.
 
 ### Esercizio 2
 
+Siamo interessati a conoscere il contenuto medio di nitrati dei pozzi della media valle del Tevere. Per questo organizziamo un esperimento, durante il quale campioniamo 20 pozzi rappresentativi, riscontrando  le seguenti concentrazioni:
+
+38.3 38.6 38.1 39.9 36.3 41.6 37.0 39.8 39.1
+35.0 38.1 37.4 38.3 34.8 40.4 39.3 37.0 38.7
+38.2 38.4
+
+Stimare la concentrazione media per l'intera valle del Tevere
+
+### Esercizio 3
+
+E'stata impostata una prova sperimentale per confrontare due varietà di mais, con uno schema sperimentale a blocchi randomizzati con tre repliche. La prima varietà ha mostrato produzioni di 14, 12, 15 e 13 t/ha, mentre la seconda varietà ha mostrato produzioni pari a 12, 11, 10.5 e 13 t/ha. Stimare le produzioni medie delle due varietà, nell'ambiente di studio.
+
+### Esercizio 4
+
 Un campione di 400 insetti a cui è stato somministrato un certo insetticida mostra che 136 di essi sono sopravvissuti. Determinare un intervallo di confidenza con grado di fiducia del 95% per la proporzione della popolazione insensibile al trattamento.
+
+### Esercizio 5
+
+È stata studiata la risposta produttiva del sorgo alla concimazione azotata. I dati ottenuti sono:
+
+| Dose | Yield |
+|:----:|:----:|
+| 0   | 1.26 |
+| 30  | 2.50 |
+| 60  | 3.25 |
+| 90  | 4.31 |
+|120  | 5.50 |
+
+Assumendo che la relazione sia lineare (retta), stimare la pendenza e l'intercetta della popolazione di riferimento, dalla quale è stato estratto il campione in studio. Utilizzare la funzione `lm(Yield ~ Dose)` ed estrarre gli errori standard con il metodo `summary()`.
 
 ---
 
-## Chapter 6
+## Capitolo 6
 
 ### Esercizio 1
 
-Uno sperimentatore ha impostato un esperimento verificare l’effetto di un fungicida (A) in confronto al testimone non trattato (B), in base al numero di colonie fungine sopravvissute. Il numero delle colonie trattate è di 200, mentre il numero di quelle non trattate è di 100. Le risposte (frequenze) sono come segue:
+Uno sperimentatore ha impostato un esperimento verificare l'effetto di un fungicida (A) in confronto al testimone non trattato (B), in base al numero di colonie fungine sopravvissute. Il numero delle colonie trattate è di 200, mentre il numero di quelle non trattate è di 100. Le risposte (frequenze) sono come segue:
 
-       Morte   Sopravvissute
-  --- ------- ---------------
-   A    180         20
-   B    50          50
+|     | Morte | Sopravvissute |
+|-----|:-----:|:-------------:|
+| A   |  180  |      20       |
+| B   |  50   |      50       |
 
-Stabilire se i risultati possono essere considerati significativamente diversi, per un livello di probabilità del 5%
-
+Stabilire se i risultati possono essere considerati significativamente diversi, per un livello di probabilità del 5%.
 
 ### Esercizio 2
 
 Uno sperimentatore ha impostato un esperimento per confrontare due tesi sperimentali (A, B). I risultati sono i seguenti (in q/ha):
 
-    A      B
-  ------ ------
-   9.3    12.6
-   10.2   12.3
-   9.7    12.5
+|  A   |  B   |
+|:----:|:----:|
+| 9.3  | 12.6 |
+| 10.2 | 12.3 |
+| 9.7  | 12.5 |
 
-Stabilire se i risultati per le tre tesi sperimentali possono essere considerati significativamente diversi, per un livello di probabilità del 5%.
+Stabilire se i risultati per le due tesi sperimentali possono essere considerati significativamente diversi, per un livello di probabilità del 5%.
 
 ### Esercizio 3
 
-Uno sperimentatore ha impostato un esperimento per confrontare se l’effetto di un fungicida è significativo, in un disegno sperimentale con tre ripetizioni. Con ognuna delle due opzioni di trattamento i risultati produttivi sono i seguenti (in t/ha):
+Uno sperimentatore ha impostato un esperimento per confrontare se l'effetto di un fungicida è significativo, in un disegno sperimentale con tre ripetizioni. Con ognuna delle due opzioni di trattamento i risultati produttivi sono i seguenti (in t/ha):
 
-    A    NT
-  ----- ----
-   65    54
-   71    51
-   6.8   59
+|  A  | NT  |
+|:---:|:---:|
+| 65  | 54  |
+| 71  | 51  |
+| 68 | 59  |
 
-E’significativo l’effetto del trattamento fungicida sulla produzione, per un livello di probabilità di errore del 5%?
+E'significativo l'effetto del trattamento fungicida sulla produzione, per un livello di probabilità del 5%?
 
 ### Esercizio 4
 
-Immaginate di aver riscontrato che, in determinate condizioni ambientali, 60 olive su 75 sono attaccate da *Daucus olee* (mosca dell’olivo). Nelle stesse condizioni ambientali, diffondendo in campo un insetto predatore siamo riusciti a ridurre il numero di olive attaccate a 12 su 75. Si tratta di una oscillazione casuale del livello di attacco o possiamo concludere che l’insetto predatore è stato un mezzo efficace di lotta biologica alla mosca dell’olivo?
-
+Immaginate di aver riscontrato che, in determinate condizioni ambientali, 60 olive su 75 sono attaccate da *Daucus olee* (mosca dell'olivo). Nelle stesse condizioni ambientali, diffondendo in campo un insetto predatore siamo riusciti a ridurre il numero di olive attaccate a 12 su 75. Si tratta di una oscillazione casuale del livello di attacco o possiamo concludere che l'insetto predatore è stato un mezzo efficace di lotta biologica alla mosca dell'olivo?
 
 ### Esercizio 5
 
 In un ospedale, è stata misurata la concentrazione di colesterolo nel sangue di otto pazienti, prima e dopo un trattamento medico. Per ogni paziente, sono stati analizzati due campioni, ottenendo le seguenti concentrazioni:
 
-    Paziente      Prima      Dopo
-  ---------- ---------- ----------
-           1      167.3      166.7
-           2      186.7      184.2
-           3      107.0      104.9
-           4      214.5      205.3
-           5      149.5      148.5
-           6      171.5      157.3
-           7      161.5      149.4
-           8      243.6      241.5
+| Paziente | Prima | Dopo  |
+|---------:|------:|:-----:|
+|        1 | 167.3 | 166.7 |
+|        2 | 186.7 | 184.2 |
+|        3 | 107.0 | 104.9 |
+|        4 | 214.5 | 205.3 |
+|        5 | 149.5 | 148.5 |
+|        6 | 171.5 | 157.3 |
+|        7 | 161.5 | 149.4 |
+|        8 | 243.6 | 241.5 |
 
 Si può concludere che il trattamento medico è stato efficace?
+
+### Esercizio 6
+
+I Q.I. di 16 studenti provenienti da un quartiere di una certa città sono risultati pari a:
+
+
+```r
+QI1 <- c(90.31, 112.63, 101.93, 121.47, 111.37, 100.37, 106.80,
+         101.57, 113.25, 120.76,  88.58, 107.53, 102.62, 104.26,
+         95.06, 104.88)
+```
+
+Gli studenti provenienti da un'altra parte della stessa città hanno invece mostrato i seguenti Q.I.:
+
+
+```r
+QI2 <- c(90.66, 101.41, 104.61,  91.77, 107.06,  89.51,  87.91,
+         92.31, 112.96,  90.33,  99.86,  88.99,  98.97,  97.92)
+```
+
+Esiste una differenza significativa tra i Q.I. dei due gruppi?
+
+### Esercizio 7
+
+Viene estratto un campione di rondelle da una macchina in perfette condizioni di funzionamento. Lo spessore delle rondelle misurate è:
+
+
+```r
+S1 <- c(0.0451, 0.0511, 0.0478, 0.0477, 0.0458, 0.0509, 0.0446,
+        0.0516, 0.0458, 0.0490)
+```
+
+Dopo alcuni giorni, per determinare se la macchina sia ancora a punto, viene estratto un campione di 10 rondelle, il cui spessore medio risulta:
+
+
+```r
+S2 <- c(0.0502, 0.0528, 0.0492, 0.0556, 0.0501, 0.0500, 0.0498,
+        0.0526, 0.0517, 0.0550)
+```
+
+
+Verificare se la macchina sia ancora ben tarata, oppure necessiti di revisione.
+
+### Esercizio 8
+
+Sono stati osservati 153 calciatori registrando la dominanza della mano e quella del piede, ottenendo la tabella riportata qui di seguito.
+
+
+|         | piede.sx    | piede.dx    |
+|:-------:|:----:|:----:|
+| mano sx | 26  | 11 |
+| mano dx | 21  | 95 |
+
+
+Esiste dipendenza tra la dominanza della mano e del piede? 
 
 ---
 
@@ -5873,92 +5843,88 @@ Si può concludere che il trattamento medico è stato efficace?
 
 ### Esercizio 1
 
-Un esperimento a randomizzazione completa relativo ad una prova varietale di frumento ha l’obiettivo di porre a confronto la produzione di 5 varietà. Le produzioni (in bushels per acre) osservate siano le seguenti:
+Un esperimento a randomizzazione completa relativo ad una prova varietale di frumento ha l'obiettivo di porre a confronto la produzione di 5 varietà. Le produzioni (in bushels per acre) osservate siano le seguenti:
 
-  --------- ------ ------ ------
-   Variety    1      2      3
-      A      32.4   34.3   37.3
-      B      20.2   27.5   25.9
-      C      29.2   27.8   30.2
-      D      12.8   12.3   14.8
-      E      21.7   24.5   23.4
-  --------- ------ ------ ------
+| Variety |  1   |  2   |  3   |
+|:-------:|:----:|:----:|:----:|
+|    A    | 32.4 | 34.3 | 37.3 |
+|    B    | 20.2 | 27.5 | 25.9 |
+|    C    | 29.2 | 27.8 | 30.2 |
+|    D    | 12.8 | 12.3 | 14.8 |
+|    E    | 21.7 | 24.5 | 23.4 |
 
-Eseguire l’ANOVA, presentare i risultati e commentarli (esempio tratto da Le Clerg *et al*., 1962)
+Eseguire l'ANOVA, presentare i risultati e commentarli (esempio tratto da Le Clerg *et al*., 1962)
 
 ### Esercizio 2
 
 Colture di tessuto di pomodoro sono state allevate su capsule Petri trattate con una diversa concentrazione di zuccheri, utilizzando cinque repliche. La crescita colturale è riportata in tabella
 
-Control | Glucose | Fructose | Sucrose |
-|:----:|:----:|:----:|:----:|
-45 | 25 | 28 | 31 |
-39 | 28 | 31 | 37 |
-40 | 30 | 24 | 35 |
-45 | 29 | 28 | 33 |
-42 | 33 | 27 | 34 |
+| Control | Glucose | Fructose | Sucrose |
+|:-------:|:-------:|:--------:|:-------:|
+|   45    |   25    |    28    |   31    |
+|   39    |   28    |    31    |   37    |
+|   40    |   30    |    24    |   35    |
+|   45    |   29    |    28    |   33    |
+|   42    |   33    |    27    |   34    |
 
-Calcolare le medie ed eseguire l’ANOVA. Eseguire i test di confronto multiplo. Commentare i risultati.
-
-
+Calcolare le medie ed eseguire l'ANOVA. Eseguire i test di confronto multiplo. Commentare i risultati.
 
 ### Esercizio 3
 
-E’stato impostato un test di durata su un impianto di riscaldamento, per verificare come la temperatura di esercizio influenza la durata del riscaldatore. Sono state testate 4 temperature, con sei repliche e, per ciascun riscaldatore, è stato rilevato il numero di ore prima della rottura. I risultati sono i seguenti:
+E'stato impostato un test di durata su un impianto di riscaldamento, per verificare come la temperatura di esercizio influenza la durata del riscaldatore. Sono state testate 4 temperature, con sei repliche e, per ciascun riscaldatore, è stato rilevato il numero di ore prima della rottura. I risultati sono i seguenti:
 
-    Temp.   Hours to failure
-  ------- ------------------
-     1520               1953
-     1520               2135
-     1520               2471
-     1520               4727
-     1520               6134
-     1520               6314
-     1620               1190
-     1620               1286
-     1620               1550
-     1620               2125
-     1620               2557
-     1620               2845
-     1660                651
-     1660                837
-     1660                848
-     1660               1038
-     1660               1361
-     1660               1543
-     1708                511
-     1708                651
-     1708                651
-     1708                652
-     1708                688
-     1708                729
-     
-Valutare se la temperatura di esercizio infleunza significativamente la durata del riscaldatore     
+| Temp. | Hours to failure |
+|------:|-----------------:|
+|  1520 |             1953 |
+|  1520 |             2135 |
+|  1520 |             2471 |
+|  1520 |             4727 |
+|  1520 |             6134 |
+|  1520 |             6314 |
+|  1620 |             1190 |
+|  1620 |             1286 |
+|  1620 |             1550 |
+|  1620 |             2125 |
+|  1620 |             2557 |
+|  1620 |             2845 |
+|  1660 |              651 |
+|  1660 |              837 |
+|  1660 |              848 |
+|  1660 |             1038 |
+|  1660 |             1361 |
+|  1660 |             1543 |
+|  1708 |              511 |
+|  1708 |              651 |
+|  1708 |              651 |
+|  1708 |              652 |
+|  1708 |              688 |
+|  1708 |              729 |
+
+Valutare se la temperatura di esercizio infleunza significativamente la durata del riscaldatore
 
 ### Esercizio 4
 
 Un entomologo ha contato il numero di uova deposte da un lepidottero sulle foglie di tre varietà di tabacco, valutando 15 femmine per varietà. I risultati sono i seguenti:
 
-    Female   Field   Resistant   USDA
-  -------- ------- ----------- ------
-         1     211           0    448
-         2     276           9    906
-         3     415         143     28
-         4     787           1    277
-         5      18          26    634
-         6     118         127     48
-         7       1         161    369
-         8     151         294    137
-         9       0           0     29
-        10     253         348    522
-        11      61           0    319
-        12       0          14    242
-        13     275          21    261
-        14       0           0    566
-        15     153         218    734
+| Female | Field | Resistant | USDA |
+|-------:|------:|----------:|-----:|
+|      1 |   211 |         0 |  448 |
+|      2 |   276 |         9 |  906 |
+|      3 |   415 |       143 |   28 |
+|      4 |   787 |         1 |  277 |
+|      5 |    18 |        26 |  634 |
+|      6 |   118 |       127 |   48 |
+|      7 |     1 |       161 |  369 |
+|      8 |   151 |       294 |  137 |
+|      9 |     0 |         0 |   29 |
+|     10 |   253 |       348 |  522 |
+|     11 |    61 |         0 |  319 |
+|     12 |     0 |        14 |  242 |
+|     13 |   275 |        21 |  261 |
+|     14 |     0 |         0 |  566 |
+|     15 |   153 |       218 |  734 |
 
-Eseguite l’ANOVA. Quali sono le assunzioni necessarie per l’ANOVA? Sono rispettate? Vi sono outliers? Calcolate SEM e SED in modo attendibile.
-
+Eseguite l'ANOVA. Quali sono le assunzioni necessarie per l'ANOVA? Sono rispettate? Vi sono outliers? Calcolate SEM e SED in modo attendibile.
 
 ---
 
@@ -5966,55 +5932,55 @@ Eseguite l’ANOVA. Quali sono le assunzioni necessarie per l’ANOVA? Sono risp
 
 ### Esercizio 1
 
-E’ stato impostanto un esperimento a blocchi randomizzati per confrontare sei tipi di irrigazione, in un aranceto della Spagna. I risultati sono i seguenti (in pounds per parcella):
+E' stato impostanto un esperimento a blocchi randomizzati per confrontare sei tipi di irrigazione, in un aranceto della Spagna. I risultati sono i seguenti (in pounds per parcella):
 
-               Metodo     1     2     3     4     5
-  ------------------- ----- ----- ----- ----- -----
-               Goccia   438   413   375   127   320
-               Conche   413   398   348   112   297
-           Aspersione   346   334   281    43   231
-    Aspersione+goccia   335   321   267    33   219
-          Sommersione   403   380   336   101   293
+|            Metodo |   1 |   2 |   3 |   4 |   5 |
+|------------------:|----:|----:|----:|----:|----:|
+|            Goccia | 438 | 413 | 375 | 127 | 320 |
+|            Conche | 413 | 398 | 348 | 112 | 297 |
+|        Aspersione | 346 | 334 | 281 |  43 | 231 |
+| Aspersione+goccia | 335 | 321 | 267 |  33 | 219 |
+|       Sommersione | 403 | 380 | 336 | 101 | 293 |
 
-Eseguire l’ANOVA. Quali sono le assunzioni necessarie per l’ANOVA? Sono rispettate? Calcolate SEM e SED ed eseguite il confronto multiplo. Qual è il metodo di irrigazione migliore?
+Eseguire l'ANOVA. Quali sono le assunzioni necessarie per l'ANOVA? Sono rispettate? Calcolate SEM e SED ed eseguite il confronto multiplo. Qual è il metodo di irrigazione migliore?
 
 ### Esercizio 2
 
-E’ stato impostato un esperimento di fertilizzazione secondo uno schema a blocchi randomizzati. I dati ottenuti sono i contenuti percentuali (moltiplicati per 100) in fosforo, in un campione di tessuti vegetali prelevato per parcella:
+E' stato impostato un esperimento di fertilizzazione secondo uno schema a blocchi randomizzati. I dati ottenuti sono i contenuti percentuali (moltiplicati per 100) in fosforo, in un campione di tessuti vegetali prelevato per parcella:
 
-              Trattamento      1      2     3      4      5
-  ----------------------- ------ ------ ----- ------ ------
-         Non fertilizzato    5.6    6.1   5.3    5.9    7.4
-                  50 lb N    7.3     NA   7.7    7.7    7.0
-                 100 lb N    6.9      6   5.6    7.4    8.2
-     50 lb N + 75 lb P2O5   10.8   11.2   8.8   12.9   10.4
-    100 lb N + 75 lb P205    9.6    9.3    12   10.6   11.6
+|           Trattamento |    1 |    2 |   3 |    4 |    5 |
+|----------------------:|-----:|-----:|----:|-----:|-----:|
+|      Non fertilizzato |  5.6 |  6.1 | 5.3 |  5.9 |  7.4 |
+|               50 lb N |  7.3 |   NA | 7.7 |  7.7 |  7.0 |
+|              100 lb N |  6.9 |    6 | 5.6 |  7.4 |  8.2 |
+|  50 lb N + 75 lb P2O5 | 10.8 | 11.2 | 8.8 | 12.9 | 10.4 |
+| 100 lb N + 75 lb P205 |  9.6 |  9.3 |  12 | 10.6 | 11.6 |
 
-Eseguire l’ANOVA, considerando il dato mancante. Calcolare SEM e SED. Qual è il trattamento migliore? Aumentare il dosaggio di N senza P2O5 è conveniente? E in presenza di P2O5?
+Eseguire l'ANOVA, considerando il dato mancante. Calcolare SEM e SED. Qual è il trattamento migliore? Aumentare il dosaggio di N senza P2O5 è conveniente? E in presenza di P2O5?
 
 ### Esercizio 3
 
 È stato condotto un esperimento a quadrato latino per valutare l'effetto di quattro diversi metodi di fertilizzazione. Sono stati osservati i seguenti risultati:
 
-   Fertiliser   Row   Column      Yield
-  ----------- ------ --------- ------------
-      A          1        1         104
-      B          1        2         114
-      C          1        3          90
-      D          1        4         140
-      A          2        4         134
-      B          2        3         130
-      C          2        1         144
-      D          2        2         174
-      A          3        3         146
-      B          3        4         142
-      C          3        2         152
-      D          3        1         156
-      A          4        2         147
-      B          4        1         160
-      C          4        4         160
-      D          4        3         163
-      
+| Fertiliser | Row | Column | Yield |
+|-----------:|:---:|:------:|:-----:|
+|          A |  1  |   1    |  104  |
+|          B |  1  |   2    |  114  |
+|          C |  1  |   3    |  90   |
+|          D |  1  |   4    |  140  |
+|          A |  2  |   4    |  134  |
+|          B |  2  |   3    |  130  |
+|          C |  2  |   1    |  144  |
+|          D |  2  |   2    |  174  |
+|          A |  3  |   3    |  146  |
+|          B |  3  |   4    |  142  |
+|          C |  3  |   2    |  152  |
+|          D |  3  |   1    |  156  |
+|          A |  4  |   2    |  147  |
+|          B |  4  |   1    |  160  |
+|          C |  4  |   4    |  160  |
+|          D |  4  |   3    |  163  |
+
 Analizzate i dati e commentate i risultati ottenuti
 
 ---
@@ -6023,179 +5989,176 @@ Analizzate i dati e commentate i risultati ottenuti
 
 ### Esercizio 1
 
-La biologia di *Sorghum halepense* da rizoma mostra che il peso dei rizomi raggiunge un minimo intorno alla quarta foglia. Di conseguenza, eseguire un trattamento in quest’epoca dovrebbe minimizzare le possibilità di ripresa degli individui trattati, portando anche ad un certo risanamento del terreno. Tuttavia, ci si attende che gli effetti siano maggiori quando le piante provengono da rizomi più piccoli, con un minor contenuto di sostanze di riserva. Per affrontare questi argomenti è stata organizzata una prova in vaso, secondo un disegno a randomizzazione completa con quattro repliche. I risultati sono i seguenti:
+La biologia di *Sorghum halepense* da rizoma mostra che il peso dei rizomi raggiunge un minimo intorno alla quarta foglia. Di conseguenza, eseguire un trattamento in quest'epoca dovrebbe minimizzare le possibilità di ripresa degli individui trattati, portando anche ad un certo risanamento del terreno. Tuttavia, ci si attende che gli effetti siano maggiori quando le piante provengono da rizomi più piccoli, con un minor contenuto di sostanze di riserva. Per affrontare questi argomenti è stata organizzata una prova in vaso, secondo un disegno a randomizzazione completa con quattro repliche. I risultati sono i seguenti:
 
-| Sizes ↓ / Timing → | 2-3   | 4-5   | 6-7   | 8-9   | 3-4/8-9 | Untreated|
-|:----|:----:|:----:|:----:|:----:|:----:|:----:|
-| 2-nodes       | 34.03 | 0.10  | 30.91 | 33.21 | 2.89    | 41.63|
-|               | 22.31 | 6.08  | 35.34 | 43.44 | 19.06   | 22.96|
-|               | 21.70 | 3.73  | 24.23 | 44.06 | 0.10    | 52.14|
-|               | 14.90 | 9.15  | 28.27 | 35.34 | 0.68    | 59.81|
-| 4-nodes       | 42.19 | 14.86 | 52.34 | 39.06 | 8.62    | 68.15|
-|               | 51.06 | 36.03 | 43.17 | 61.59 | 0.05    | 42.75|
-|               | 43.77 | 21.85 | 57.28 | 48.89 | 0.10    | 57.77|
-|               | 31.74 | 8.71  | 29.71 | 49.14 | 9.65    | 44.85|
-| 6-nodes       | 20.84 | 11.37 | 55.00 | 41.77 | 9.80    | 43.20|
-|               | 26.12 | 2.24  | 28.46 | 37.38 | 0.10    | 40.68|
-|               | 35.24 | 14.17 | 21.81 | 39.55 | 1.42    | 34.11|
-|               | 13.32 | 23.93 | 60.72 | 48.37 | 6.83    | 32.21|
+| Sizes ↓ / Timing → |  2-3  |  4-5  |  6-7  |  8-9  | 3-4/8-9 | Untreated |
+|:-------------------|:-----:|:-----:|:-----:|:-----:|:-------:|:---------:|
+| 2-nodes            | 34.03 | 0.10  | 30.91 | 33.21 |  2.89   |   41.63   |
+|                    | 22.31 | 6.08  | 35.34 | 43.44 |  19.06  |   22.96   |
+|                    | 21.70 | 3.73  | 24.23 | 44.06 |  0.10   |   52.14   |
+|                    | 14.90 | 9.15  | 28.27 | 35.34 |  0.68   |   59.81   |
+| 4-nodes            | 42.19 | 14.86 | 52.34 | 39.06 |  8.62   |   68.15   |
+|                    | 51.06 | 36.03 | 43.17 | 61.59 |  0.05   |   42.75   |
+|                    | 43.77 | 21.85 | 57.28 | 48.89 |  0.10   |   57.77   |
+|                    | 31.74 | 8.71  | 29.71 | 49.14 |  9.65   |   44.85   |
+| 6-nodes            | 20.84 | 11.37 | 55.00 | 41.77 |  9.80   |   43.20   |
+|                    | 26.12 | 2.24  | 28.46 | 37.38 |  0.10   |   40.68   |
+|                    | 35.24 | 14.17 | 21.81 | 39.55 |  1.42   |   34.11   |
+|                    | 13.32 | 23.93 | 60.72 | 48.37 |  6.83   |   32.21   |
 
-Eseguite l’ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente.
-
+Eseguite l'ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente.
 
 ### Esercizio 2
 
-Un agronomo ha organizzato un confronto varietale in favino, considerando due epoche di semina: autunnale e primaverile. E’ stato utilizzato un disegno a blocchi randomizzati e a parcella suddivisa, con le epoche di semina nelle parcelle principali e le varietà nelle sub-parcelle. I risultati sono i seguenti:
+Un agronomo ha organizzato un confronto varietale in favino, considerando due epoche di semina: autunnale e primaverile. E' stato utilizzato un disegno a blocchi randomizzati e a parcella suddivisa, con le epoche di semina nelle parcelle principali e le varietà nelle sub-parcelle. I risultati sono i seguenti:
 
- |Sowing  Time| Genotype    |    1  |    2  |    3  |    4  |
-|:-----------|------------:|:-----:|:-----:|:-----:|:-----:|
-|Autum       |     Chiaro  | 4.36  | 4.00  | 4.23  | 3.83  |
-|            |  Collameno  | 3.01  | 3.32  | 3.27  | 3.40  |
-|            |  Palombino  | 3.85  | 3.85  | 3.68  | 3.98  |
-|            |      Scuro  | 4.97  | 3.98  | 4.39  | 4.14  |
-|            |    Sicania  | 4.38  | 4.01  | 3.94  | 2.99  |
-|            |    Vesuvio  | 3.94  | 4.47  | 3.93  | 4.21  |
-|Spring      |     Chiaro  | 2.76  | 2.64  | 2.25  | 2.38  |
-|            |  Collameno  | 2.50  | 1.79  | 1.57  | 1.77  |
-|            |  Palombino  | 2.24  | 2.21  | 2.50  | 2.05  |
-|            |      Scuro  | 3.45  | 2.94  | 3.12  | 2.69  |
-|            |    Sicania  | 3.24  | 3.60  | 3.16  | 3.08  |
-|            |    Vesuvio  | 2.34  | 2.44  | 1.71  | 2.00  |
+| Sowing Time |  Genotype |  1   |  2   |  3   |  4   |
+|:------------|----------:|:----:|:----:|:----:|:----:|
+| Autum       |    Chiaro | 4.36 | 4.00 | 4.23 | 3.83 |
+|             | Collameno | 3.01 | 3.32 | 3.27 | 3.40 |
+|             | Palombino | 3.85 | 3.85 | 3.68 | 3.98 |
+|             |     Scuro | 4.97 | 3.98 | 4.39 | 4.14 |
+|             |   Sicania | 4.38 | 4.01 | 3.94 | 2.99 |
+|             |   Vesuvio | 3.94 | 4.47 | 3.93 | 4.21 |
+| Spring      |    Chiaro | 2.76 | 2.64 | 2.25 | 2.38 |
+|             | Collameno | 2.50 | 1.79 | 1.57 | 1.77 |
+|             | Palombino | 2.24 | 2.21 | 2.50 | 2.05 |
+|             |     Scuro | 3.45 | 2.94 | 3.12 | 2.69 |
+|             |   Sicania | 3.24 | 3.60 | 3.16 | 3.08 |
+|             |   Vesuvio | 2.34 | 2.44 | 1.71 | 2.00 |
 
-Eseguite l’ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente.
+Eseguite l'ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente.
 
-
-### Exercise 3
+### Esercizio 3
 
 Gli erbicidi mostrano sempre un certo grado di persistenza nel terreno. Di conseguenza, se la coltura fallisce subito dopo il diserbo, la scelta delle colture di sostituzione può essere condizionata dal diserbo già eseguito. Per questo motivo, è stato impostato un esperimento di pieno campo volto a valutare se tre erbicidi del mais (rimsulfuron, imazethapyr and primisulfuron) erano in grado di danneggiare quattro colture (soia, girasole, rapa e sorgo) seminate 20 giorni dopo il trattamento. Gli erbicidi sono stati distribuiti su terreno nudo, seguendo un disegno a blocchi randomizzati, su parcelle di elevate dimensioni. Per ogni blocco, la semina è stata eseguita su strisce trasversali, perpendicolari ai trattamenti eseguiti (schema a strip-plot). I risultati sono i seguenti:
 
-|  Herbidicide     |Block| sorghum  | rape  | soyabean  | sunflower |
-|:-----------------|:---:|:--------:|:-----:|:---------:|:---------:|
-|  Untreated       | 1   |     180  |  157  |      199  |       201 |
-|                  | 2   |     236  |  111  |      257  |       358 |
-|                  | 3   |     287  |  217  |      346  |       435 |
-|                  | 4   |     350  |  170  |      211  |       327 |
-|  Imazethapyr     | 1   |      47  |   10  |      193  |        51 |
-|                  | 2   |      43  |    1  |      113  |         4 |
-|                  | 3   |       0  |   20  |      187  |        13 |
-|                  | 4   |       3  |   21  |      122  |        15 |
-|  primisulfuron   | 1   |     271  |    8  |      335  |       379 |
-|                  | 2   |     182  |    0  |      201  |       201 |
-|                  | 3   |     283  |   22  |      206  |       307 |
-|                  | 4   |     147  |   24  |      240  |       337 |
-|  rimsulfuron     | 1   |     403  |  238  |      226  |       290 |
-|                  | 2   |     227  |  169  |      195  |       494 |
-|                  | 3   |     400  |  364  |      257  |       397 |
-|                  | 4   |     171  |  134  |      137  |       180 |
-  
+| Herbidicide   | Block | sorghum | rape | soyabean | sunflower |
+|:--------------|:-----:|:-------:|:----:|:--------:|:---------:|
+| Untreated     |   1   |   180   | 157  |   199    |    201    |
+|               |   2   |   236   | 111  |   257    |    358    |
+|               |   3   |   287   | 217  |   346    |    435    |
+|               |   4   |   350   | 170  |   211    |    327    |
+| Imazethapyr   |   1   |   47    |  10  |   193    |    51     |
+|               |   2   |   43    |  1   |   113    |     4     |
+|               |   3   |    0    |  20  |   187    |    13     |
+|               |   4   |    3    |  21  |   122    |    15     |
+| primisulfuron |   1   |   271   |  8   |   335    |    379    |
+|               |   2   |   182   |  0   |   201    |    201    |
+|               |   3   |   283   |  22  |   206    |    307    |
+|               |   4   |   147   |  24  |   240    |    337    |
+| rimsulfuron   |   1   |   403   | 238  |   226    |    290    |
+|               |   2   |   227   | 169  |   195    |    494    |
+|               |   3   |   400   | 364  |   257    |    397    |
+|               |   4   |   171   | 134  |   137    |    180    |
 
-Eseguite l’ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente.
+Eseguite l'ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente.
 
 ### Esercizio 4
 
-E’ stato condotto un esperimento parcellare per valutare l’interazione tra il momento dell’applicazione dell’azoto al terreno (early, optimum, late) e due livelli di un inibitore della nitrificazione (none, 5 lb/acre). L’inibitore ritarda la nitrificazione e riduce le perdite per lisciviazione profonda. L’azoto è stato somministrato in forma marcata ($^{15}$N) e i dati raccolti riguardano la percentuale di azoto assorbito dalla pianta.
+E' stato condotto un esperimento parcellare per valutare l'interazione tra il momento dell'applicazione dell'azoto al terreno (early, optimum, late) e due livelli di un inibitore della nitrificazione (none, 5 lb/acre). L'inibitore ritarda la nitrificazione e riduce le perdite per lisciviazione profonda. L'azoto è stato somministrato in forma marcata ($^{15}$N) e i dati raccolti riguardano la percentuale di azoto assorbito dalla pianta.
 
-
-| Genotype | Block  |   Early |  Med  |  Late  |
-|:---------|:------:|:-------:|:-----:|:------:|
-| A        |    1   |   21.4  |  50.8 |  53.2  |
-|          |    2   |   11.3  |  42.7 |  44.8  |
-|          |    3   |   34.9  |  61.8 |  57.8  |
-| B        |    1   |   54.8  |  56.9 |  57.7  |
-|          |    2   |   47.9  |  46.8 |  54.0  |
-|          |    3   |   40.1  |  57.9 |  62.0  |
+| Genotype | Block | Early | Med  | Late |
+|:---------|:-----:|:-----:|:----:|:----:|
+| A        |   1   | 21.4  | 50.8 | 53.2 |
+|          |   2   | 11.3  | 42.7 | 44.8 |
+|          |   3   | 34.9  | 61.8 | 57.8 |
+| B        |   1   | 54.8  | 56.9 | 57.7 |
+|          |   2   | 47.9  | 46.8 | 54.0 |
+|          |   3   | 40.1  | 57.9 | 62.0 |
 
 Analizzare i dati e commentare i risultati
 
 ### Esercizio 5
 
-E’ stato organizzato un esperimento per valutare l’effetto della temperatura di lavaggio sulla riduzione di lunghezza di alcuni tessuti. I risultati sono espressi in percentuale di riduzione e sono stati ottenuti in un disegno sperimentale a randomizzazione completa, con quattro tessuti e altrettante temperature.
+E' stato organizzato un esperimento per valutare l'effetto della temperatura di lavaggio sulla riduzione di lunghezza di alcuni tessuti. I risultati sono espressi in percentuale di riduzione e sono stati ottenuti in un disegno sperimentale a randomizzazione completa, con quattro tessuti e altrettante temperature.
 
-  | Fabric  |     210 °F  |    215 °F  |    220 °F   |  225 °F   |
-  |:-------:|:-----------:|:----------:|:-----------:|:---------:|
-  |    A    |     1.8     |     2.0    |     4.6     |    7.5    |
-  |         |     2.1     |     2.1    |     5.0     |    7.9    |
-  |    B    |     2.2     |     4.2    |     5.4     |    9.8    |
-  |         |     2.4     |     4.0    |     5.6     |    9.2    |
-  |    C    |     2.8     |     4.4    |     8.7     |   13.2    |
-  |         |     3.2     |     4.8    |     8.4     |   13.0    |
-  |    D    |     3.2     |     3.3    |     5.7     |   10.9    |
-  |         |     3.6     |     3.5    |     5.8     |   11.1    |    
+| Fabric | 210 °F | 215 °F | 220 °F | 225 °F |
+|:------:|:------:|:------:|:------:|:------:|
+|   A    |  1.8   |  2.0   |  4.6   |  7.5   |
+|        |  2.1   |  2.1   |  5.0   |  7.9   |
+|   B    |  2.2   |  4.2   |  5.4   |  9.8   |
+|        |  2.4   |  4.0   |  5.6   |  9.2   |
+|   C    |  2.8   |  4.4   |  8.7   |  13.2  |
+|        |  3.2   |  4.8   |  8.4   |  13.0  |
+|   D    |  3.2   |  3.3   |  5.7   |  10.9  |
+|        |  3.6   |  3.5   |  5.8   |  11.1  |
 
 Analizzare i dati e commentare i risultati
 
 ### Esercizio 6
 
-Un processo di sintesi chimica prevede due reazioni, la prima richiede un alcool e la seconda richiede una base. Viene impostato un esperimento fattoriale 3 x 2, con tre alcools e due basi, con uno schema sperimentale completamente randomizzato a quattro repliche. Quali sono le vostre raccomandazioni per la prima e la seconda reazione, sulla base dei risultati dell’esperimento. La variabile rilevata mostra la produzione percentuale del processo.
+Un processo di sintesi chimica prevede due reazioni, la prima richiede un alcool e la seconda richiede una base. Viene impostato un esperimento fattoriale 3 x 2, con tre alcools e due basi, con uno schema sperimentale completamente randomizzato a quattro repliche. Quali sono le vostre raccomandazioni per la prima e la seconda reazione, sulla base dei risultati dell'esperimento. La variabile rilevata mostra la produzione percentuale del processo.
 
- | Base  | Alcohol 1 | Alcohol 2 | Alcohol 3 |
- |:-----:|:---------:|:---------:|:---------:|
- |   A   |  91.3     |    89.9   |     89.3  |
- |       |  88.1     |    89.5   |     87.6  |
- |       |  90.7     |    91.4   |     90.4  |
- |       |  91.4     |    88.3   |     90.3  |
- |   B   |  87.3     |    89.4   |     92.3  |
- |       |  91.5     |    93.1   |     90.7  |
- |       |  91.5     |    88.3   |     90.6  |
- |       |  94.7     |    91.5   |     89.8  |
+| Base | Alcohol 1 | Alcohol 2 | Alcohol 3 |
+|:----:|:---------:|:---------:|:---------:|
+|  A   |   91.3    |   89.9    |   89.3    |
+|      |   88.1    |   89.5    |   87.6    |
+|      |   90.7    |   91.4    |   90.4    |
+|      |   91.4    |   88.3    |   90.3    |
+|  B   |   87.3    |   89.4    |   92.3    |
+|      |   91.5    |   93.1    |   90.7    |
+|      |   91.5    |   88.3    |   90.6    |
+|      |   94.7    |   91.5    |   89.8    |
 
 Analizzare i dati e commentare i risultati
+
 
 ---
 
 ## Capitolo 13
 
-### Exercise 1
+### Esercizio 1
 
 È stato condotto uno studio per verificare l'effetto della concimazione azotata sulla lattuga, utilizzando uno schema a blocchi randomizzati. I risultat sono i seguenti:
 
-
-   N level   B1    B2    B3    B4
-  --------- ----- ----- ----- -----
-      0      124   114   109   124
-     50      134   120   114   134
-     100     146   132   122   146
-     150     157   150   140   163
-     200     163   156   156   171
+| N level | B1  | B2  | B3  | B4  |
+|:-------:|:---:|:---:|:---:|:---:|
+|    0    | 124 | 114 | 109 | 124 |
+|   50    | 134 | 120 | 114 | 134 |
+|   100   | 146 | 132 | 122 | 146 |
+|   150   | 157 | 150 | 140 | 163 |
+|   200   | 163 | 156 | 156 | 171 |
 
 Analizzare i dati e commentare i risultati
 
 ### Esercizio 2
 
-Per valutare la soglia economica d’intervento, è necessario definire la relazione tra la densità di una pianta infestante e la perdita produttiva della coltura. Ipotizziamo che, nel range di densità osservato, il modello di competizione sia una retta. Per parametrizzare questo modello e verificarne la validità, è stato organizzato un esperimento a blocchi randomizzati, dove sono stati inclusi sette diversi livelli di infestazione di *Sinapis arvensis* ed è stata rilevata la produzione di acheni del girasole. I risultati sono:
+Per valutare la soglia economica d'intervento, è necessario definire la relazione tra la densità di una pianta infestante e la perdita produttiva della coltura. Ipotizziamo che, nel range di densità osservato, il modello di competizione sia una retta. Per parametrizzare questo modello e verificarne la validità, è stato organizzato un esperimento a blocchi randomizzati, dove sono stati inclusi sette diversi livelli di infestazione di *Sinapis arvensis* ed è stata rilevata la produzione di acheni del girasole. I risultati sono:
 
-   density   Rep   yield
-  --------- ------- --------
-      0        1     36.63
-     14        1     29.73
-     19        1     32.12
-     28        1     30.61
-     32        1      27.7
-     38        1     27.43
-     54        1     24.79
-      0        2     36.11
-     14        2     34.72
-     19        2     30.12
-     28        2      30.8
-     32        2     26.53
-     38        2      27.6
-     54        2     23.31
-      0        3     38.35
-     14        3     32.16
-     19        3     31.72
-     28        3     28.69
-     32        3     25.88
-     38        3     28.43
-     54        3     30.26
-      0        4     36.74
-     14        4     32.566
-     19        4     29.57
-     28        4     33.663
-     32        4     28.751
-     38        4     27.114
-     54        4     24.664
+| density | Rep y | ield   |
+|:-------:|------:|:-------|
+|    0    |     1 | 36.63  |
+|   14    |     1 | 29.73  |
+|   19    |     1 | 32.12  |
+|   28    |     1 | 30.61  |
+|   32    |     1 | 27.7   |
+|   38    |     1 | 27.43  |
+|   54    |     1 | 24.79  |
+|    0    |     2 | 36.11  |
+|   14    |     2 | 34.72  |
+|   19    |     2 | 30.12  |
+|   28    |     2 | 30.8   |
+|   32    |     2 | 26.53  |
+|   38    |     2 | 27.6   |
+|   54    |     2 | 23.31  |
+|    0    |     3 | 38.35  |
+|   14    |     3 | 32.16  |
+|   19    |     3 | 31.72  |
+|   28    |     3 | 28.69  |
+|   32    |     3 | 25.88  |
+|   38    |     3 | 28.43  |
+|   54    |     3 | 30.26  |
+|    0    |     4 | 36.74  |
+|   14    |     4 | 32.566 |
+|   19    |     4 | 29.57  |
+|   28    |     4 | 33.663 |
+|   32    |     4 | 28.751 |
+|   38    |     4 | 27.114 |
+|   54    |     4 | 24.664 |
 
-Eseguire l’ANOVA e verificare il rispetto delle assunzioni di base. E’corretto eseguire un test di confronto multiplo e perchè? Eseguire l’analisi di regressione lineare, verificando la bontà di adattamento del modello. Definire il modello parametrizzato. Stabilire la soglia d’intervento, ipotizzando il costo del prodotto e dell’intervento diserbante.
+Eseguire l'ANOVA e verificare il rispetto delle assunzioni di base. E'corretto eseguire un test di confronto multiplo e perchè? Eseguire l'analisi di regressione lineare, verificando la bontà di adattamento del modello. Definire il modello parametrizzato. Stabilire la soglia d'intervento, ipotizzando il costo del prodotto e dell'intervento diserbante.
+
 
 ---
 
@@ -6203,18 +6166,18 @@ Eseguire l’ANOVA e verificare il rispetto delle assunzioni di base. E’corret
 
 ### Esercizio 1
 
-Due campioni di terreno sono stati trattati con due erbicidi diversi e sono stati posti in cella climatica alle medesime condizioni di temperatura ed umidità. In tempi diversi dopo l’inizio dell’esperimento sono state prelevate aliquote di ciascun terreno e ne è stata determinata la concentrazione residua di erbicida. I risultati ottenuti sono i seguenti:
+Due campioni di terreno sono stati trattati con due erbicidi diversi e sono stati posti in cella climatica alle medesime condizioni di temperatura ed umidità. In tempi diversi dopo l'inizio dell'esperimento sono state prelevate aliquote di ciascun terreno e ne è stata determinata la concentrazione residua di erbicida. I risultati ottenuti sono i seguenti:
 
-   Time   Herbicide A   Herbicide B
-  ------ ------------- -------------
-    0       100.00        100.00
-    10       50.00         60.00
-    20       25.00         40.00
-    30       15.00         23.00
-    40       7.00          19.00
-    50       3.50          11.00
-    60       2.00          5.10
-    70       1.00          3.00
+| Time | Herbicide A | Herbicide B |
+|:----:|:-----------:|:-----------:|
+|  0   |   100.00    |   100.00    |
+|  10  |    50.00    |    60.00    |
+|  20  |    25.00    |    40.00    |
+|  30  |    15.00    |    23.00    |
+|  40  |    7.00     |    19.00    |
+|  50  |    3.50     |    11.00    |
+|  60  |    2.00     |    5.10     |
+|  70  |    1.00     |    3.00     |
 
 Ipotizzando che la degradazione dei due erbicidi segue una cinetica del primo ordine, parametrizzare la relativa equazione e determinare la semivita dei due erbicidi. Quale sostanza degrada più velocemente?
 
@@ -6222,33 +6185,33 @@ Ipotizzando che la degradazione dei due erbicidi segue una cinetica del primo or
 
 Un popolazione microbica in condizioni non-limitanti di substrato cresce seguendo una cinetica del primo ordine. Un esperimento da i seguenti risultati:
 
-   Time   Cells
-  ------ -------
-    0       2
-    10      3
-    20      5
-    30      9
-    40     17
-    50     39
-    60     94
-    70     201
+| Time | Cells |
+|:----:|:-----:|
+|  0   |   2   |
+|  10  |   3   |
+|  20  |   5   |
+|  30  |   9   |
+|  40  |  17   |
+|  50  |  39   |
+|  60  |  94   |
+|  70  |  201  |
 
 Parametrizzare un modello esponenziale e calcolarne la bontà di adattamento.
 
 ### Esercizio 3
 
-E’ stato organizzato un esperimento per valutare il tasso di assorbimento radicale di azoto da parte di *Lemna minor* allevata in coltura idroponica. I risultati medi ottenuti sono i seguenti:
+E' stato organizzato un esperimento per valutare il tasso di assorbimento radicale di azoto da parte di *Lemna minor* allevata in coltura idroponica. I risultati medi ottenuti sono i seguenti:
 
-    conc     rate
-  -------- --------
-    2.86    14.58
-    5.00    24.74
-    7.52    31.34
-   22.10    72.97
-   27.77    77.50
-   39.20    96.09
-   45.48    96.97
-   203.78   108.88
+|  conc  |  rate  |
+|:------:|:------:|
+|  2.86  | 14.58  |
+|  5.00  | 24.74  |
+|  7.52  | 31.34  |
+| 22.10  | 72.97  |
+| 27.77  | 77.50  |
+| 39.20  | 96.09  |
+| 45.48  | 96.97  |
+| 203.78 | 108.88 |
 
 Parametrizzare il modello iperbolico di Michaelis-Menten:
 
@@ -6256,105 +6219,104 @@ $$y = \frac{a x} {b + x}$$
 
 Valutarne la bontà di adattamento.
 
-
 ### Esercizio 4
 
-E’ stato organizzato un esperimento di competizione per valutare l’effetto di densità crescenti di *Ammi majus* sulla produttività del girasole. I risultati ottenuti sono i seguenti:
+E' stato organizzato un esperimento di competizione per valutare l'effetto di densità crescenti di *Ammi majus* sulla produttività del girasole. I risultati ottenuti sono i seguenti:
 
-   Weed density   Yield
-  -------------- -------
-        0         3.52
-        23        2.89
-        31        2.76
-        39        2.75
-        61        2.48
+| Weed density | Yield |
+|:------------:|:-----:|
+|      0       | 3.52  |
+|      23      | 2.89  |
+|      31      | 2.76  |
+|      39      | 2.75  |
+|      61      | 2.48  |
 
-Parametrizzare l’iperbole di Cousens:
+Parametrizzare l'iperbole di Cousens:
 
 $$Y_W  = Y_{WF} \left( 1 - \frac{i \cdot x}{100\left( 1 + \frac{i \cdot x}{a} \right)} \right)$$
 
 Valutarne la bontà di adattamento. Determinare la soglia economica di intervento.
 
-### Exercise 5
+### Esercizio 5
 
-Uno degli aspetti fondamentali degli studi relativi alla diversità degli ambienti è la valutazione delle curve area-specie. E’ stato considerato un aranceto siciliano, del quale è stata valutata con un apposito campionamento ’innestato’ la curva area-specie.
+Uno degli aspetti fondamentali degli studi relativi alla diversità degli ambienti è la valutazione delle curve area-specie. E' stato considerato un aranceto siciliano, del quale è stata valutata con un apposito campionamento 'innestato' la curva area-specie.
 
-   Area   numSpecie
-  ------ -----------
-    1         4
-    2         5
-    4         7
-    8         8
-    16       10
-    32       14
-    64       19
-   128       22
-   256       22
+| Area | numSpecie |
+|:----:|:---------:|
+|  1   |     4     |
+|  2   |     5     |
+|  4   |     7     |
+|  8   |     8     |
+|  16  |    10     |
+|  32  |    14     |
+|  64  |    19     |
+| 128  |    22     |
+| 256  |    22     |
 
-Parametrizzare una curva ’di potenza’ (power curve):
+Parametrizzare una curva 'di potenza' (power curve):
 
 $$a \cdot x^b$$
 
-Valutarne la bontà di adattamento. Determinare l’area minima di campionamento.
+Valutarne la bontà di adattamento. Determinare l'area minima di campionamento.
 
-### Exercise 6
+### Esercizio 6
 
-Si ritiene che la crescita di una coltura possa essere descritta accuratamente con un’equazione di Gompertz. Si ritiene inoltre che la presenza delle piante infestanti possa modificare la crescita della coltura, alterando i valori dei parametri del modello anzidetto. Per questo motivo viene organizzato un esperimento a randomizzazione completa con tre repliche, 6 tempi di prelievo (DAE) e 2 stati di infestazione (infestato e libero). In ogni tempo di prelievo, le tre repliche vengono raccolte e viene determinato il peso della coltura. I risultati ottenuti sono i seguenti:
+Si ritiene che la crescita di una coltura possa essere descritta accuratamente con un'equazione di Gompertz. Si ritiene inoltre che la presenza delle piante infestanti possa modificare la crescita della coltura, alterando i valori dei parametri del modello anzidetto. Per questo motivo viene organizzato un esperimento a randomizzazione completa con tre repliche, 6 tempi di prelievo (DAE) e 2 stati di infestazione (infestato e libero). In ogni tempo di prelievo, le tre repliche vengono raccolte e viene determinato il peso della coltura. I risultati ottenuti sono i seguenti:
 
-   DAE   Infested   Weed Free
-  ----- ---------- -----------
-   21      0.06       0.07
-   21      0.06       0.07
-   21      0.11       0.07
-   27      0.20       0.34
-   27      0.20       0.40
-   27      0.21       0.25
-   38      2.13       2.32
-   38      3.03       1.72
-   38      1.27       1.22
-   49      6.13       11.78
-   49      5.76       13.62
-   49      7.78       12.15
-   65     17.05       33.11
-   65     22.48       24.96
-   65     12.66       34.66
-   186    21.51       38.83
-   186    26.26       27.84
-   186    27.68       37.72
+| DAE | Infested | Weed Free |
+|:---:|:--------:|:---------:|
+| 21  |   0.06   |   0.07    |
+| 21  |   0.06   |   0.07    |
+| 21  |   0.11   |   0.07    |
+| 27  |   0.20   |   0.34    |
+| 27  |   0.20   |   0.40    |
+| 27  |   0.21   |   0.25    |
+| 38  |   2.13   |   2.32    |
+| 38  |   3.03   |   1.72    |
+| 38  |   1.27   |   1.22    |
+| 49  |   6.13   |   11.78   |
+| 49  |   5.76   |   13.62   |
+| 49  |   7.78   |   12.15   |
+| 65  |  17.05   |   33.11   |
+| 65  |  22.48   |   24.96   |
+| 65  |  12.66   |   34.66   |
+| 186 |  21.51   |   38.83   |
+| 186 |  26.26   |   27.84   |
+| 186 |  27.68   |   37.72   |
 
 Parametrizzare il modello di Gompertz:
 
 $$a \cdot exp(-b \cdot exp(-c \cdot x))$$
 
-e verificarne la bontà di adattamento nelle due situazioni. Quali parametri del modello di Gompertz sono maggiormente influenzati dalle piante infestanti? Abbiamo elementi per ritenere che la crescita segua un’equazione di Gompertz piuttosto che una logistica simmetrica?
+e verificarne la bontà di adattamento nelle due situazioni. Quali parametri del modello di Gompertz sono maggiormente influenzati dalle piante infestanti? Abbiamo elementi per ritenere che la crescita segua un'equazione di Gompertz piuttosto che una logistica simmetrica?
 
 ### Esercizio 7
 
 Piante di *Tripleuspermum inodorum* in vaso sono state trattate con erbicida sulfonilureico (tribenuron-methyl) a dosi crescenti. Tre settimano deopo il trattamento è stato registrato il peso delle piante sopravvissute, ottenendo i risulti riportati nella tabella seguente:
 
-   Dose (g a.i. ha$^{-1}$)   Fresh weight (g pot $^{-1}$)
-  ------------------------- ------------------------------
-              0                         115.83
-              0                         102.90
-              0                         114.35
-            0.25                        91.60
-            0.25                        103.23
-            0.25                        133.97
-             0.5                        98.66
-             0.5                        92.51
-             0.5                        124.19
-              1                         93.92
-              1                         49.21
-              1                         49.24
-              2                         21.85
-              2                         23.77
-              2                         22.46
+| Dose (g a.i. ha$^{-1}$) | Fresh weight (g pot $^{-1}$) |
+|:-----------------------:|:----------------------------:|
+|            0            |            115.83            |
+|            0            |            102.90            |
+|            0            |            114.35            |
+|          0.25           |            91.60             |
+|          0.25           |            103.23            |
+|          0.25           |            133.97            |
+|           0.5           |            98.66             |
+|           0.5           |            92.51             |
+|           0.5           |            124.19            |
+|            1            |            93.92             |
+|            1            |            49.21             |
+|            1            |            49.24             |
+|            2            |            21.85             |
+|            2            |            23.77             |
+|            2            |            22.46             |
 
 Si ipotizza che la relazione dose-effetto possa essere descritta con un modello log-logistico:
 
 $$c + \frac{d - c}{1 + exp(b ( log (x) - log (a))}$$
 
-Parametrizzare questo modello e verificarne la bontà d’adattamento.
+Parametrizzare questo modello e verificarne la bontà d'adattamento.
 
 <!--chapter:end:16-Esercizi.Rmd-->
 
