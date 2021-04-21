@@ -3011,9 +3011,9 @@ Una strategia empirica, ma molto seguita in pratica e caratterizzata da un'effic
 Per i conteggi e per l’eterogeneità delle varianze di variabili continue, si consiglia la trasformazione in radice quadrata o in logaritmo, scegliendo in base a quella che consente la miglior distribuzione dei residui. Per evitare di scegliere la trasformazione 'al buio', si può impiegare la procedura suggerita da Box e Cox (1964), basata su una 'famiglia di trasformazioni', definita come segue:
 
 $$ W = \left\{ \begin{array}{ll}
-\frac{Y^\lambda}{\lambda - 1} & \quad \textrm{if} \,\,\, \lambda \neq 0 \\
+\frac{Y^\lambda - 1}{\lambda} & \quad \textrm{if} \,\,\, \lambda \neq 0 \\
 \log(Y) & \quad \textrm{if} \,\,\, \lambda = 0
-\end{array} \right. $$
+\end{array} \right.$$
 
 dove $W$ è la variabile trasformata, $Y$ è la variabile originale e $\lambda$ è il parametro che definisce la trasformazione. In particolare, osserviamo che se $\lambda$ è pari ad 1 i dati non sono, di fatto, trasformati, se è pari a 0.5 abbiamo una trasformazione equivalente alla radice quadrata, se è pari a 0 abbiamo la trasformazione logaritmica, se è pari a -1 abbiamo una trasformazione equivalente al reciproco.
 
@@ -3190,18 +3190,13 @@ Con questo abbiamo tutto quello che ci serve: stime ed errori standard, che, ovv
 # Contrasti e confronti multipli
 
 
+La scomposizione della varianza (ANOVA fisheriana) rappresenta frequentemente il primo passo nell'elaborazione statistica dei dati sperimentali. Essa consente di quantificare l'errore sperimentale e ci permette di sapere se l'effetto del trattamento (nel suo complesso) è risultato significativo. Tuttavia, con la sola ANOVA non possiamo ancora definire una graduatoria di merito tra i diversi trattamenti sperimentale e capire cosa è stato meglio di cosa.  Per questo motivo, dopo l'ANOVA, l'analisi dei dati prosegue, di solito, con il confronto tra medie o tra gruppi di medie, per capire se vi siano differenze significative tra un trattamento e l'altro. Ovviamente, La significatività di queste differenze è solo uno degli aspetti che più ci interessano, in quanto è anche molto importante valutare la loro rilevanza biologica. Infatti una differenza potrebbe essere significativa, ma irrilevante da un punto di vista agronomico o, viceversa, essa potrebbe essere non significativa, ma estremamente rilevante, quindi meritevole di ulteriori approfondimenti scientifici.
 
-La scomposizione della varianza (ANOVA fisheriana) rappresenta frequentemente il primo passo nell'elaborazione statistica dei dati sperimentali. Essa consente di quantificare l'errore sperimentale e ci permette di sapere se l'effetto del trattamento (nel suo complesso) è risultato significativo. Tuttavia, con la sola ANOVA non siamo ancora capaci di definire una graduatoria di merito tra i diversi livelli del trattamento sperimentale. Dopo l'ANOVA, è quindi logico chiedersi (in ordine crescente di importanza):
-
-1. Il generico trattamento A ha un effetto diverso dal trattamento B?
-2. Il trattamento A è migliore/uguale/peggiore di B?
-3. Quant'è la differenza tra A e B?
-
-La prima domanda è abbastanza sciocca, in quanto due trattamenti non sono quasi mai esattamente uguali. Le altre due domande sono invece più rilevanti, specialmente la seconda, in quanto conoscere l'entità della differenza, oltre che la sua significatività, è fondamentale per comprendere anche la sua rilevanza biologica. Infatti una differenza potrebbe essere significativa, ma irrilevante da un punto di vista agronomico o, viceversa, essa potrebbe essere non significativa, ma estremamente rilevante, quindi meritevole di ulteriori approfondimenti scientifici. Per rispondere alle domande precedenti, in genere, utilizziamo i **contrasti lineari**, che introdurremo utilizzando lo stesso dataset che abbiamo già iniziato ad analizzare nei due capitoli precedenti ('mixture.csv').
+Questa parte del lavoro viene usualmente eseguita utilizzando i **contrasti lineari**, che introdurremo utilizzando lo stesso dataset che abbiamo già iniziato ad analizzare nei due capitoli precedenti ('mixture.csv').
 
 ## Esempio
 
-Torniamo al nostro esperimento in cui abbiamo confrontato due erbicidi e la loro miscela con il testimone non trattato, in un disegno sperimentale completamente randomizzato con quattro repliche. Ricarichiamo il dataset ed eseguiamo l'ANOVA, come abbiamo visto nel capitolo 7. Ricordiamo anche che, nel capitolo 8, l'analisi grafica dei residui ha confermato che, per questo dataset, non vi sono problemi con le assunzioni di base per i modelli lineari.
+Torniamo al nostro esperimento in cui abbiamo confrontato due erbicidi e la loro miscela con il testimone non trattato, in un disegno sperimentale completamente randomizzato con quattro repliche. Ricarichiamo il dataset ed eseguiamo l'ANOVA, come abbiamo visto nel Capitolo 7. Ricordiamo anche che, nel Capitolo 8, l'analisi grafica dei residui ha confermato che, per questo dataset, non vi sono problemi con le assunzioni di base per i modelli lineari.
 
 
 
@@ -3222,9 +3217,7 @@ anova(model)
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-L'analisi della varianza ed il relativo test di F ci dicono che esiste una differenza significativa tra le medie, ma rimane il problema di classificare le soluzioni diserbanti in ordine di efficacia. Chi è migliore di chi?
-
-Per prima cosa, calcoliamo le medie dei trattamenti, utilizzando la funzione `emmeans()` del package 'emmeans':
+L'analisi della varianza ed il relativo test di F ci dicono che esiste una qualche differenza significativa tra i trattamenti, ma rimane il problema di classificare le soluzioni diserbanti in ordine di efficacia. Per prima cosa, calcoliamo le medie dei trattamenti, utilizzando la funzione `emmeans()` del package 'emmeans':
 
 
 ```r
@@ -3244,7 +3237,7 @@ Vediamo che l'output di R riporta anche gli errori standard delle medie (SEM) e 
 
 ## I contrasti
 
-Si definisce CONTRASTO una combinazione lineare dei parametri di un modello (ad esempio le medie dei trattamenti), in modo che i coefficienti sommati diano 0. Ad esempio, considerando i parametri del modello precedente, una combinazione lineare del tipo:
+Si definisce CONTRASTO una combinazione lineare delle medie dei trattamenti, in modo che i coefficienti sommati diano 0. Ad esempio, considerando i parametri del modello precedente, una combinazione lineare del tipo:
 
 
 $$k = \frac{1}{3} \cdot 9.18 + \frac{1}{3} \cdot 5.13 + \frac{1}{3} \cdot 16.86 - 1 \cdot 26.77  = -16.385$$
@@ -3255,23 +3248,14 @@ $$\frac{1}{3} + \frac{1}{3} + \frac{1}{3} - 1 = 0$$
 
 Al contrario una combinazione lineare del tipo:
 
-$$k = 1 \cdot 9.18 + 1 \cdot 5.13 + 1 \cdot 16.86 - 1 \cdot 26.77$$
+$$k2 = 1 \cdot 9.18 + 1 \cdot 5.13 + 1 \cdot 16.86 - 1 \cdot 26.77$$
 
 
-non è un contrasto valido, perché la somma dei coefficienti non è zero (1 + 1 + 1 - 1 = 2).
+non è un contrasto, perché la somma dei coefficienti non è zero (1 + 1 + 1 - 1 = 2).
 
-Il primo contrasto $k$, ha un preciso significato biologico, in quanto stima la differenza tra il non diserbato e la media dei diserbati. Il risultato è -16.39 e, con esso, possiamo rispondere a tutte e tre le domande elencate all'inizio:
+Il primo contrasto $k$, ha un preciso significato biologico, in quanto stima la differenza tra il non diserbato e la media dei diserbati. Il risultato è -16.39, il che farebbe pensare che, nei vasetti diserbati vi siano, mediamente, meno infestanti che non in quelli non trattati. Tuttavia, noi non siamo interessati ai soli vasetti impiegati in prova, ma vogliamo trarre conclusioni di carattere generale. Sappiamo già che l'errore sperimentale produce incertezza sulla stima delle medie delle popolazioni, che si propaga al contrasto, per il quale dovremmo cercare di calcolare la deviazione standard e l'intervallo di confidenza.
 
-1. Il diserbo (in media) ha un effetto diverso dal testimone non diserbato? Risposta: si, perché la differenza è non nulla
-2. Il diserbo, in media, è migliore/uguale/peggiore del testimone? Risposta: migliore, perché la differenza è negativa, quindi ci sono meno infestanti
-3. Quant'è la differenza tra il diserbato e il non-diserbato? Risposta: è pari a -16.39 grammi
-
-E' evidente, tuttavia, che l'errore sperimentale produce incertezza, che sarebbe bene includere nei risultati, sotto forma di deviazione standard (errore standard) del contrasto, oppure come intervallo di confidenza.
-
-
-### Varianza del contrasto e test d'ipotesi
-
-Ogni contrasto ha la sua varianza, ottenuta come combinazione lineare di varianze, attraverso il metodo di propagazione degli errori. Considerando che le medie sono, usualmente, indipendenti, la varianza di un contrasto tra medie è:
+La varianza di un contrasto può essere calcolata come combinazione lineare di varianze, attraverso il metodo di propagazione degli errori. Considerando che le medie sono, usualmente, indipendenti, la varianza di un contrasto tra medie è:
 
 
 $$\textrm{var}(A \mu_1 + B \mu_2) = (A \cdot \sigma_{\mu_1} )^{2}  + (B \cdot \sigma_{\mu_2} ) ^ 2$$
@@ -3285,9 +3269,9 @@ mentre la deviazione standard (cioè l'errore standard) del contrasto è pari a:
 
 $$ SE(k) = \sqrt{5.11604} = 2.261866$$
 
-Insomma, per il contrasto $k$ abbiamo una stima puntuale (-16.4) e un errore standard (2.26). Utilizzando questo errore standard possiamo calcolare l'intervallo di confidenza del contrasto, secondo le metodiche usuali che abbiamo gia visto in un capitolo precedente. Gli intervalli di confidenza dei contrasti sono trattati in modo più dettagliato in fondo al capitolo.
+Insomma, per il contrasto $k$ abbiamo una stima puntuale (-16.4) e un errore standard (2.26), che può essere utilizzato per calcolare l'intervallo di confidenza del contrasto, secondo le metodiche usuali che abbiamo gia visto in un capitolo precedente. Ovviamente, se l'intervallo di confidenza di un contrasto contiene lo 0, siamo portati, intuitivamente, a concludere che il contrasto stesso non è significativo.
 
-A questo punto potremmo chiederci: "E' possibile che il contrasto, nella realtà, sia uguale a 0?". Ovviamente è possibile: il nostro è solo un campione e, se ripetessimo il campionamento, potremmo ottenere valori di C totalmente diversi da quello effettivamente osservato. Poniamo l'ipotesi nulla in questi termini:
+In modo più formale, potremmo chiederci: "E' possibile che il contrasto, nella realtà, sia uguale a 0?". Ovviamente è possibile: il nostro è solo un campione e, se ripetessimo il campionamento, potremmo ottenere valori di $k$ totalmente diversi da quello effettivamente osservato. Poniamo l'ipotesi nulla in questi termini:
 
 $$H_0: \kappa = 0$$
 
@@ -3295,7 +3279,7 @@ dove $\kappa$ è il valore 'vero' del contrasto, per le popolazioni che hanno ge
 
 $$T = \frac{k}{ES(k)} = \frac{-16.385}{2.261866} = -7.244$$
 
-Se l'ipotesi nulla è vera, che probabilità abbiamo di osservare T = -7.244? In generale, il rapporto tra una stima ed il suo errore standard ha una distribuzione t di Student, con un numero di gradi di libertà pari a quelli del residuo dell'ANOVA. Di conseguenza possiamo saggiare l'ipotesi nulla che il contrasto è uguale a 0 calcolando la probabilità di trovare un valore di T pari o superiore (in valore assoluto) a quello da noi ottenuto. Nell'esempio sottostante abbiamo moltiplicato la probabilità trovata per 2, dato che si tratta di un test a due code:
+Se l'ipotesi nulla è vera, che probabilità abbiamo di osservare T = -7.244? Abbia già visto che il rapporto tra una stima ed il suo errore standard ha una distribuzione t di Student, con un numero di gradi di libertà pari a quelli del residuo dell'ANOVA. Di conseguenza possiamo saggiare l'ipotesi nulla che il contrasto è uguale a 0 calcolando la probabilità di trovare un valore di T pari o superiore (in valore assoluto) a quello da noi ottenuto. Nell'esempio sottostante abbiamo moltiplicato la probabilità trovata per 2, dato che si tratta di un test a due code:
 
 
 ```r
@@ -3305,14 +3289,10 @@ Tval <- -16.385 / 2.261866
 ```
 
 
-Con questo abbiamo risposto a tutte e tre le nostre domande di ricerca:
-
-1. Diserbare non produce lo stesso effetto che non diserbare;
-2. Diserbare permette di avere meno infestanti
-3. la differenza è pari a -16.34 g e ci sono elementi sufficienti per ritenere che essa sia diversa da 0.
+Possiamo quindi concludere che la differenza tra la media dei vasetti trattati e quella dei vasetti non trattati è pari a -16.34 g e ci sono elementi sufficienti per ritenere che essa sia diversa da 0.
 
 
-### I contrasti con R
+## I contrasti con R
 
 Nel caso in esempio, si potrebbero pianificare quattro contrasti (incluso quello già discusso):
 
@@ -3337,7 +3317,7 @@ k3 <- c(0, -1, 1, 0)
 k4 <- c(1, -1, 0, 0)
 ```
 
-Una volta definiti i coefficienti, possiamo utilizzare il package  ‘emmeans’, con la funzione `‘contrast()’`, passandole, come argomento, l'oggetto 'medie', ottenuto con la funzione `‘emmeans()’` (vedi sopra), ed una lista contenente i quattro vettori dei coefficienti (k1, k2, k3, k4).
+Una volta definiti i coefficienti, possiamo utilizzare il package  ‘emmeans’, con la funzione `contrast()`, passandole, come argomento, l'oggetto 'medie', ottenuto con la funzione `emmeans()` (vedi sopra), ed una lista contenente i quattro vettori dei coefficienti (k1, k2, k3, k4).
 
 \small
 
@@ -3354,18 +3334,17 @@ contrast(medie, method = K, adjust="none")
 
 \normalsize
 
-Il test mostra che il diserbo ha avuto, in media, un effetto significativo, che la miscela è più efficace dei trattamenti singoli, in media, che la miscela è più efficace di rimsulfuron da solo, ma non è più efficace di metribuzin da solo.
+Il test mostra che il diserbo ha avuto, in media, un effetto significativo, che la miscela è più efficace dei trattamenti singoli, che la miscela è più efficace di rimsulfuron da solo, ma non è significativamente più efficace di metribuzin da solo.
 
 ## I confronti multipli a coppie (pairwise comparisons)
 
 Non sempre le prove sperimentali consentono di saggiare pochi contrasti pre-stabiliti, ma spesso è necessario confrontare tutte le possibili coppie di trattamenti  (*pairwise comparisons*). In questo caso dovremmo definire un contrasto per ogni coppia di medie, anche se l'impiego del package ‘emmeans’ agevola, non di poco, il lavoro.
 
-In particolare, possiamo immaginare due situazioni di riferimento: tutti contro tutti (confronti tipo "Tukey") e tutti verso uno (confronti tipo "Dunnett"). Questo secondo tipo di contrasto può essere interessante, nel nostro caso, per verificare quale dei concimi consenta un incremento di produzione rispetto al testimone non concimato, qualora non sia necessario confrontare tra di loro le tesi concimanti.
+In particolare, possiamo immaginare due situazioni di riferimento: tutti contro tutti (confronti tipo "Tukey") e tutti verso uno (confronti tipo "Dunnett"). Questo secondo tipo di contrasto può essere interessante, quando sia importante confrantare tutti i trattamenti verso un riferimento prescelto, ad esempio la miscela tra i due erbicidi.
 
-Nell'esempio sottostante mostriamo un confronto tipo Tukey (tutti contro tutti), eseguito utilizzando la funzione `contrast()` (come sopra), passando il valore 'pairwise' all'argomento 'method'. Vediamo che ci sono sei contrasti a coppie.
+Nel quadro sottostante mostriamo un confronto tipo Tukey (tutti contro tutti), eseguito utilizzando la funzione `contrast()` (come sopra) e passando il valore 'pairwise' all'argomento 'method'. Vediamo che ci sono sei contrasti a coppie, tutti significativi, meno uno.
 
 \footnotesize
-
 
 ```r
 #Confronti multipli a coppie
@@ -3394,7 +3373,7 @@ contrast(medie, adjust="none", method="dunnett")
 ```
 \normalsize
 
-Purtroppo vediamo che R confronta tutte le tesi con metribuzin, che è il primo livello in ordine alfabetico, mentre noi volevamo confrontare tutte le tesi con la miscela. Per ottenere questo risultato basta aggiungere l'argomento 'ref' ed assgnare il valore '2', considerando che la miscela è la seconda tesi in ordine alfabetico:
+Così facendo vediamo che R confronta tutte le tesi con metribuzin, che è il primo livello in ordine alfabetico, mentre noi volevamo confrontare tutte le tesi con la miscela. Per ottenere questo risultato basta aggiungere l'argomento 'ref' ed assgnare il valore '2', considerando che la miscela è la seconda tesi in ordine alfabetico:
 
 \small
 
@@ -3409,8 +3388,9 @@ contrast(medie, adjust="none", method="dunnett", ref = 2)
 
 \normalsize
 
-Il risultato delle elaborazioni sovrastanti mostra i contrasti con il loro errore standard, mentre potrebbe essere interessante ottener un intervallo di confidenza per queste stime. Possiamo calcolarlo facilmente assegnando il risultato della funzione `contrast()` ad una variabile ed esplorando quest'ultima con il metodo `confint()`.
+Il risultato delle elaborazioni sovrastanti mostra i contrasti con il loro errore standard e potrebbe essere interessante calcolare anche l'intervallo di confidenza per le differenze stimate. Ciò può esser fatto facilmente assegnando il risultato della funzione `contrast()` ad una variabile ed esplorando quest'ultima con il metodo `confint()`.
 
+\small
 
 ```r
 # Confidence intervals
@@ -3427,20 +3407,20 @@ confint(con)
 ## 
 ## Confidence level used: 0.95
 ```
-
+\normalsize
 
 ## Display a lettere
 
-I risultati di un confronto multiplo a coppie (pairwise) possono essere presentati anche con un display a lettere, nel quale le medie seguite da lettere diverse sono significativamente diverse per un livello di probabilità di errore minore di quello dato. 
+I risultati di un confronto multiplo a coppie possono essere presentati anche con un display a lettere, nel quale le medie seguite da lettere diverse sono significativamente diverse per un livello di probabilità di errore minore di quello dato. 
 
-Realizzare un display a letter manualmente è piuttosto facile, utilizzando la seguente procedura:
+Realizzare un display a lettere manualmente è piuttosto facile, utilizzando la seguente procedura:
 
 1. ordinare le medie in senso crescente/decrescente
 2. partire dalla prima media e aggiungere la lettera A a tutte quelle che non sono significativamente diverse
 3. passare alla seconda media e aggiungere la lettera B a tutte quelle che non sono significativamente diverse
-4. procedere analogamente con tutte le medie successive
+4. procedere analogamente con tutte le medie successive, finche non vengono più individuate differenze significative.
 
-Con R si può sfruttare il package 'emmeans', con la sintassi sottostante.
+Con R si può sfruttare il package 'emmeans', utilizzando i comandi sottostanti.
 
 
 ```r
@@ -3457,9 +3437,9 @@ multcomp::cld(medie, adjust="none", Letters=LETTERS)
 
 
 
-## Problemi di molteplicità: tassi di errore per confronto e per esperimento
+## Tassi di errore per confronto e per esperimento
 
-Operando nel modo anzidetto, ogni contrasto/confronto ha una probabilità di errore del 5%. Se i contrasti/confronti sono più di uno (‘famiglia’ di *n* contrasti), la probabilità di sbagliarne almeno uno (*maximum experimentwise error rate*) è data da:
+Operando nel modo anzidetto, ogni contrasto/confronto ha una probabilità di errore del 5% ($\alpha_C = 0.05$). Se i contrasti/confronti sono più di uno (‘famiglia’ di *n* contrasti), la probabilità di sbagliarne almeno uno (*maximum experimentwise error rate*: $\alpha_E$) è data da:
 
 $$\alpha_E = 1 - (1 - \alpha_C)^n$$
 
@@ -3469,15 +3449,16 @@ Il numero di confronti a coppie per esperimento può essere anche molto elevato:
 
 Ad esempio, se ho 15 medie, ho $(15 \cdot 14)/2 = 105$ confronti possibili. Se uso $\alpha_C = 0.05$ per ogni confronto, la probabilità di sbagliarne almeno uno è pari (in caso di confronti indipendenti) a $1 - (1 - 0.05)^105 = 0.995$. Sostanzialmente, vi è pressoché la certezza che in questo esperimento qualcosa sia sbagliato!
 
-Per questo motivo, quando si elaborano i dati di un esperimento nel quale è necessario fare molti contrasti, o confronti, o, più in generale, molti test d'ipotesi simultanei, si potrebbe voler esprimere un giudizio globale (simultaneo) sull'intera famiglia di contrasti/confronti, minimizzando la possibilità che anche solo uno o pochi di essi siano sbagliati. Vediamo alcuni esempi di quando questo potrebbe capitare.
+Per questo motivo, quando si elaborano i dati di un esperimento nel quale è necessario fare molti contrasti, o confronti, o, più in generale, molti test d'ipotesi simultanei, si potrebbe voler esprimere un giudizio globale (simultaneo) sull'intera famiglia di contrasti/confronti, minimizzando la possibilità che anche solo uno o pochi di essi siano sbagliati. In particolare, ciò potrebbe capitare quando:
 
-1. Non vogliamo correre rischi di escludere erroneamente alcun trattamento dal lotto dei migliori. Infatti, poniamo di voler trovare i migliori di *k* trattamenti, intendendo con ciò quelli che non sono significativamente inferiori a nessun altro. In questa situazione, facendo ogni confronto con il 5% di probabilità di errore, la probabilità di escludere erroneamente anche solo un trattamento dal lotto dei migliori è molto più alta di quella prefissata, perché basta sbagliare anche uno solo dei *k - 1* confronti con il migliore.
+1. vogliamo trovare i migliori di *k* trattamenti, senza correre rischi di escluderne erroneamente qualcuno. In questa situazione, facendo ogni confronto con il 5% di probabilità di errore, la probabilità di escludere erroneamente anche solo un trattamento dal lotto dei migliori è molto più alta di quella prefissata, perché basta sbagliare anche uno solo dei *k - 1* confronti con il migliore.
 2. Abbiamo utilizzato un display a lettere e intendiamo affermare che 'i trattamenti seguiti da lettere diverse sono significativamente diversi'. In questo caso, stiamo tirando una conclusione basata sull'intera famiglia di confronti e non possiamo lecitamente riportare la probabilità di errore di un singolo confronto.
 
 ## Aggiustamento per la molteplicità
 
-In tutte le condizioni analoghe a quelle più sopra accennate si pone il problema di aggiustare il P-level di ogni contrasto in modo da rispettare un certo livello prestabilito di protezione per esperimento (e non per confronto). La prima possibilità che abbiamo è quella di aggiustare il P-level per ogni confronto, in modo da diminuire la probabilità di errore per l'intera famiglia di sei confronti. Utilizzando la formula che lega la probabilità d'errore per esperimento ($\alpha_E$) alla probabilità d'errore per confronto ($\alpha_C$; vedi sopra), possiamo prendere la sesta colonna del dataframe 'con', quella che contiene i P-levels non corretti, e trasformarla come segue:
+In tutte le condizioni analoghe a quelle più sopra accennate si pone il problema di applicare un aggiustamento per la molteplicità, in modo da rispettare un certo livello prestabilito di protezione per esperimento (e non per confronto). La prima possibilità che abbiamo è quella di aggiustare il P-level per ogni confronto, in modo da diminuire la probabilità di errore per l'intera famiglia di sei confronti. Utilizzando la formula che lega la probabilità d'errore per esperimento ($\alpha_E$) alla probabilità d'errore per confronto ($\alpha_C$; vedi sopra), possiamo prendere la sesta colonna del dataframe 'con', quella che contiene i P-levels non corretti, e trasformarla come segue:
 
+\scriptsize
 
 ```r
 alphaC <- as.data.frame(con)[,6]
@@ -3485,6 +3466,7 @@ alphaC <- as.data.frame(con)[,6]
 ## [1] 6.722991e-01 9.683462e-02 2.190543e-04 6.923077e-03 2.869757e-05
 ## [6] 2.255183e-02
 ```
+\normalsize
 
 Più facilmente, possiamo arrivare allo stesso risultato con il package 'emmeans':
 
@@ -3517,7 +3499,7 @@ Quest'ultima è un po' più conservativa della precedente, nel senso che fornisc
 
 
 ```r
-alphaC*6
+alphaC * 6
 ## [1] 1.018071e+00 1.009900e-01 2.190743e-04 6.943132e-03 2.869792e-05
 ## [6] 2.276671e-02
 ```
@@ -3539,9 +3521,9 @@ contrast(medie, method = "pairwise", adjust = "bonferroni")
 ```
 
 
-Sono possibili altre procedure di aggiustamento del p-level (metodi di Holm, Hochberg, Hommel), ma nessuna di queste tiene conto della correlazione eventualmente esistente tra i contrasti e tutte quindi sono da definirsi più o meno 'conservative'. Invece che aggiustare il P-level con uno dei metodi indicati più sopra è possibile considerare che, nel caso di contrasti e/o confronti, ogni singolo test d'ipotesi consiste in un rapporto tra una stima e il suo errore standard. Se l'ipotesi nulla di non-significatività è vera, la sampling distribution è la distribuzione t di Student univariata. Di conseguenza, l'intera famiglia di confronti/contrasti segue la distribuzione di t multivariato, con una matrice di correlazione che è deducibile dal contesto, come indicato da Bretz et al., (2011), pag. 73.
+Esistono altre procedure di aggiustamento del P-level (metodi di Holm, Hochberg, Hommel), ma nessuna di queste tiene conto della correlazione eventualmente esistente tra i contrasti e tutte quindi sono da definirsi più o meno 'conservative'.
 
-In altre parole, noto che sia il valore di t di ogni contrasto/confronto, posso desumere la relativa probabilità dalla distribuzione di t multivariata, invece che da quella univariata. Ovviamente il calcolo manuale è complesso e dovremo affidarci al software, come abbiamo già esemplificato più sopra:
+Oltre che aggiustare il P-level, possiamo anche utilizzare altre procedure di aggiustamento, basate sulla distribuzione multivariata di t e in grado di tener conto dell'eventuale correlazione esistente tra i contrasti stessi. Una di queste procedure viene impiegata di default nella funzione `contrast()` nel package 'emmeans':
 
 \small
 
@@ -3562,9 +3544,9 @@ contrast(medie, method="pairwise")
 
 \normalsize
 
-Possiamo notare che i p-levels sono leggermente più bassi di quelli ottenuti con Bonferroni, che conferma quindi di essere una procedura molto conservativa, mentre l'impiego del t multivariato consente di rispettare esattamente il tasso di errore 'per esperimento'.
+Possiamo notare che i P-levels sono leggermente più bassi di quelli ottenuti con Bonferroni, che conferma quindi di essere una procedura molto conservativa, mentre l'impiego del t multivariato consente di rispettare esattamente il tasso di errore 'per esperimento'.
 
-Questo tipo di correzione, così come le altre, tiene conto del numero di confronti che vengono effettuati. Se ad esempio, volessimo eseguire un set di confronti tipo 'dunnett', cioè tutti verso uno, avremmo meno confronti e quindi una correzione più 'leggera'.
+Ovviamente la correzione per la molteplicità ed il conseguente innalzamento del P-level sono fortemente dipendenti dal numero di contrasti effttuati; se utilizziamo un set di confronti tipo 'dunnett' invece che tipo 'pairwise', avremo meno confronti e quindi una correzione più 'leggera'.
 
 
 ```r
@@ -3593,7 +3575,7 @@ Il confronto multiplo tradizionale è basato sul calcolo di una differenza criti
 
 Il primo metodo corrisponde esattamente a quello che abbiamo utilizzato all'inizio, per fare confronti multipli 'tutti contro tutti', senza correzione per la molteplicità. Il secondo e il terzo metodo corrispondono rispettivamente al test di confronto 'tutti verso tutti' e 'uno verso tutti' indicati in precedenza, con correzione per la molteplicità.
 
-Non è necessario dettagliare gli altri test, in quanto, seppur siano ancora molto utilizzati, vengono ormai ritenuti obsoleti e sconsigliabili, da parecchi ricercatori. Chi vuole, trova altre informazioni in fondo al capitolo.
+Non è necessario dettagliare gli altri test, in quanto, seppur siano ancora molto utilizzati, vengono ormai ritenuti obsoleti e sconsigliabili, da parecchi ricercatori. Chi vuole, trova altre informazioni nella letteratura indicata in fondo al capitolo.
 
 ## Consigli pratici
 
@@ -3610,12 +3592,7 @@ La cosa fondamentale è muoversi in coerenza con le finalità dell'esperimento. 
 
 ## Altre letture
 
-Il riferimento definitivo è:   
-
-Hsu, J., 1996. Multiple comparisons. Theory and methods. Chapman and Hall.
-
-Altre letture:   
-
+1. Hsu, J., 1996. Multiple comparisons. Theory and methods. Chapman and Hall.
 1. Bretz, F., T. Hothorn, and P. Westfall. 2002, On Multiple Comparison Procedures in R. R News 2: 14-17.
 2. Calinsky, T. and L. C. A. Corsten. 1985, Clustering means in ANOVA by simultaneus testing. Biometrics, 41, 39-48.
 3. Cargnelutti, A. F., L. Storck, L. A. Dal'Col, L. Pisaroglo de Carvalho, and P. Machado dos Santos. 2003, A precisao experimental relacionada ao uso de bordaduras nas extremidades das fileiras em ensaios de milho. Ciencia Rural 33: 607-614.
@@ -5115,11 +5092,11 @@ I due coefficienti di determinazione (tradizionale e corretto) possono essere ot
 
 ```r
 R2nls(modNlin)
-## $R2
+## $PseudoR2
 ## [1] 0.9939126
 ## 
-## $R2adj
-## [1] 0.9936359
+## $R2
+## [1] 1.001821
 ```
 
 ## Funzioni lineari e nonlineari dei parametri
