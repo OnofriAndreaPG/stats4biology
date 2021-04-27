@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.0 (15/03/2021), compil. 2021-04-20"
+date: "Update: v. 1.0 (15/03/2021), compil. 2021-04-27"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -3067,6 +3067,7 @@ Proviamo ad analizzare il dataset 'insects', disponibile nella solita repository
 ```r
 fileName <- "https://www.casaonofri.it/_datasets/insects.csv"
 dataset <- read.csv(fileName, header = T)
+dataset$Insecticide <- factor(dataset$Insecticide)
 mod <- lm(Count ~ Insecticide, data = dataset)
 ```
 
@@ -3612,25 +3613,26 @@ La cosa fondamentale è muoversi in coerenza con le finalità dell'esperimento. 
 # Modelli ANOVA con fattori di blocco
 
 
-Nel capitolo 7 abbiamo visto come è possibile costruire modelli nei quali abbiamo una sola variabile dipendente quantitativa e una variabile indipendente categorica. Abbiamo anche visto che questo tipo di modelli lineari sono normalmente noti come modelli 'ANOVA' ad una via e presuppongono che le unità sperimentali siano totalmente indipendenti tra loro. Per questo motivo, essi possono essere utilizzati solo con disegni sperimentali a randomizzazione completa, dove non esistano raggruppamenti di alcun tipo, escluso quello dettato dal trattamento in studio.
+Nel capitolo 7 abbiamo impiegato un modello ANOVA con una sola variabile indipendente categorica, assumendo che le unità sperimentali, escluso l'effetto del trattamento, fossero totalmente indipendenti tra di loro. Questa assunzione era totalmente realistica, poiché si trattava di un disegno sperimentale a randomizzazione completa, dove non sussistevano raggruppamenti di alcun tipo, escluso quello dettato dal trattamento in studio.
 
-Ovviamente è possibile definire modelli analoghi, ma più complessi, nei quali introdurre anche l'effetto di eventuali *blocking factors*. Vediamo ora alcuni esempi
+Se invece l'esperimento include uno o più *blocking factors*, le osservazioni che appartengono allo stesso blocco sono più simila tra loro delle osservazioni che appartengono a blocchi diversi, proprio perché condividono le condizioni del blocco stesso. Per non invalidare l'indipendenza dei residui dobbiamo definire un modello ANOVA che tenga conto anche dei fattori di raggruppamento, in modo che il loro effetto non sia trascurato e, di conseguenza, si sommi agli effetti residui. Come al solito, affrontiamo questo tema partendo da alcuni esempi pratici.
 
 ## Caso-studio: confronto tra erbicidi in campo
 
-Abbiamo una prova di confronto tra erbicidi in mais, con 13 formulati, due testimoni inerbiti (che, per comodità, considereremo due trattamenti diversi) e un testimone scerbato. Date le dimensioni della prova, è lecito ipotizzare che, pur scegliendo un appezzamento il più omogeneo possibile, ci potrebbero essere differenze di infestazione tra un punto e l'altro del campo, con un presumibile gradiente procedendo dai lati (vicino alle fosse) verso il centro. In questa situazione, se l'esperimento fosse disegnato a randomizzazione completa, le differenze di infestazione tra una parte e l'altra del campo sarebbero trascurate e finirebbero per incrementare l'errore sperimentale, diminuendo l'efficienza dell'esperimento.
+Abbiamo una prova di confronto tra erbicidi in mais, con 13 formulati, due testimoni inerbiti (che, per comodità, considereremo due trattamenti diversi) e un testimone scerbato. Al momento di impiantare la prova, era lecito ipotizzare che, pur scegliendo un appezzamento il più omogeneo possibile, avremmo potuto riscontrare differenze di infestazione tra un punto e l'altro del campo, con un presumibile gradiente procedendo dai lati (vicino alle fosse) verso il centro. In questa situazione, se l'esperimento fosse stato disegnato a randomizzazione completa, le differenze di infestazione tra una parte e l'altra del campo sarebbero state trascurate e avrebbero finito per incrementare l'errore sperimentale, diminuendo l'efficienza dell'esperimento.
 
-Si impiega quindi un disegno a blocchi randomizzati con quattro repliche. Ricordiamo che, con questo disegno, il campo è suddiviso in tante sezioni (dette blocchi) quante sono le repliche (quattro), perpendicolarmente al gradiente di infestazione trasversale. In questo modo, l'ambiente è relativamente omogeneo all'interno di ciascun blocco, nel quale viene collocata una replica per trattamento.
+Abbiamo quindi impiegato un disegno a blocchi randomizzati con quattro repliche; il campo è stato suddiviso in tante sezioni (dette blocchi) quante erano le repliche (quattro), perpendicolarmente al gradiente di infestazione trasversale. In questo modo, l'ambiente era relativamente omogeneo all'interno di ciascun blocco, nel quale è stata collocata una replica per trattamento.
 
-Per questa lezione è necessario caricare il package 'aomisc', che deve essere preventivamente installato, facendo riferimento, se necessario, al capitolo introduttivo. Il dataset dei risultati ('rimsulfuron') è, appunto, contenuto in questo package.
+Il dataset dei risultati ('rimsulfuron.csv') è disponibile nella solita *repository* online. Nel box sottostante, carichiamo il file e trasformiamo le due variabili esplicative (blocco e trattamento) in fattori sperimentali. Più sotto, mostriamo la tabella in formato 'WIDE' (una riga per trattamento, con le repliche sulle colonne), con le medie di riga (trattamento) e di colonna (blocco)
 
 
 ```r
-library(aomisc)
-data(rimsulfuron)
+fileName <- "https://www.casaonofri.it/_datasets/rimsulfuron.csv"
+rimsulfuron <- read.csv(fileName)
+rimsulfuron$Code <- factor(rimsulfuron$Code)
+rimsulfuron$Herbicide <- factor(rimsulfuron$Herbicide)
+rimsulfuron$Block <- factor(rimsulfuron$Block)
 ```
-
-Più sotto, riportiamo l'output di R relativo ai dati tabulati, con le relative medie di riga (trattamento) e di colonna (blocco)
 
 \scriptsize
 
@@ -3664,146 +3666,154 @@ La produzione di ogni unità sperimentale (parcella) è condizionata da più di 
 
 1. il diserbante con cui essa è stata trattata;
 2. il blocco di cui essa fa parte;
-3. ogni altro effetto non conoscibile e puramente casuale.
+3. ogni altro effetto non conoscibile e puramente casuale (residuo).
 
 
 Il modello è quindi:
 
 $$ Y_{ij} = \mu + \gamma_i + \alpha_j + \varepsilon_{ij}$$
 
-dove $Y$ è la produzione nel blocco $i$ e con il diserbo $j$, $\mu$ è l'intercetta, $\gamma$ è l'effetto del blocco $i$, $\alpha$ è l'effetto del trattamento $j$ e $\varepsilon$ è l'errore sperimentale per ogni singola parcella, che si assume normalmente distribuito, con media 0 e deviazione standard $\sigma$. Per gli usuali problemi di stimabilità, poniamo i vincoli $\gamma_1 = 0$ e $\alpha_1 = 0$ (vincolo sul trattamento), in modo che $\mu$ rappresenta il valore atteso nel primo blocco e per il primo trattamento in ordine alfabetico. In totale, vi sono 19 parametri da stimare, più $\sigma$.
+dove $Y$ è la produzione nel blocco $i$ e con il diserbo $j$, $\mu$ è l'intercetta, $\gamma$ è l'effetto del blocco $i$, $\alpha$ è l'effetto del trattamento $j$ e $\varepsilon$ è l'errore sperimentale per ogni singola parcella, che si assume normalmente distribuito, con media 0 e deviazione standard $\sigma$. Anche in questo caso, come nel capitolo 7, poniamo un vincolo sulla somma degli effetti del trattamento e del blocco ($\sum \gamma_i = 0$ e $\sum \alpha_j = 0$), in modo che $\mu$ rappresenti la media generale. In totale, vi sono 19 parametri da stimare (un'intercetta, 15 effetti dei trattamenti e tre effetti dei blocchi, più $\sigma$).
 
 ## Stima dei parametri
 
 ### Coefficienti del modello
 
-La stima dei parametri viene eseguita con il metodo dei minimi quadrati. In questo caso l'esperimento è completamente bilanciato e la stima potrebbe essere fatta banalmente, considerando i valori osservati e le medie aritmetiche per gruppo. Infatti, se prendiamo la media generale, la media del primo blocco e la media del primo erbicida riportate nel codice sovrastante, vediamo che il primo erbicida, rispetto alla media generale, ha determinato un aumento di -44.729375 unità. D'altra parte, il primo blocco ha comportanto un aumento di -8.848125 unità. Di conseguenza, il valore atteso nel primo trattamento e nel primo blocco dovrebbe essere pari a:
+In questo caso l'esperimento è completamente bilanciato e la stima dei parametri può essere fatta banalmente, considerando i valori osservati e le medie aritmetiche per gruppo. Per prima cosa, calcoliamo tutte le medie (generale, dei blocchi e dei trattamenti), come mostrato nel box sottostante.
 
-$$ \bar{Y}_{11} = \mu = 74.56687 - 44.72937 - 8.848125 = 20.98937$$
-
-Analogamente, considerando che la media del secondo blocco è di 2.72625 unità più alta della media generale, il valore atteso per il primo trattamento nel secondo blocco è pari a:
-
-$$ \bar{Y}_{12} = 74.56687 - 44.72937 + 2.72625 = 32.56375$$
-Di conseguenza:
-
-$$ \gamma_2 = 32.56375 - 20.98937 = 11.57438$$
-
-Ancora, considerando che la media del secondo trattamento è di 14.403125 unità più alta della media generale, il valore atteso per il secondo trattamento nel primo blocco è pari a:
-
-$$ \bar{Y}_{21} = 74.56687 + 14.40313 - 8.848125 = 80.12188$$
-
-Di conseguenza:
-
-$$ \alpha_2 = 80.12188 - 20.98937 = 59.13251$$
-
-Ovviamente, continuare questi calcoli è abbastanza tedioso e quindi eseguiamo il 'model fitting' con R, osservando che esso produce gli stessi risultati già calcolati a mano.
-
-\scriptsize
-
-```r
-options(width = 170)
-mod <- lm(Yield ~ factor(Block) + factor(Herbicide), data = rimsulfuron)
-summary(mod)
-## 
-## Call:
-## lm(formula = Yield ~ factor(Block) + factor(Herbicide), data = rimsulfuron)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -26.539  -8.740   1.102   6.209  35.406 
-## 
-## Coefficients:
-##                                                             Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)                                                   20.989      6.886   3.048 0.003847 ** 
-## factor(Block)2                                                11.574      4.468   2.590 0.012874 *  
-## factor(Block)3                                                17.469      4.468   3.910 0.000309 ***
-## factor(Block)4                                                 6.349      4.468   1.421 0.162206    
-## factor(Herbicide)Hand-Weeded                                  59.133      8.936   6.617 3.78e-08 ***
-## factor(Herbicide)Metolachlor + terbuthylazine (pre)           17.163      8.936   1.921 0.061144 .  
-## factor(Herbicide)Pendimethalin (post) + rimsuulfuron (post)   66.795      8.936   7.474 2.03e-09 ***
-## factor(Herbicide)Pendimethalin (pre) + rimsulfuron (post)     53.198      8.936   5.953 3.67e-07 ***
-## factor(Herbicide)Rimsulfuron (40)                             65.555      8.936   7.336 3.25e-09 ***
-## factor(Herbicide)Rimsulfuron (45)                             61.728      8.936   6.907 1.40e-08 ***
-## factor(Herbicide)Rimsulfuron (50)                             68.130      8.936   7.624 1.22e-09 ***
-## factor(Herbicide)Rimsulfuron (50+30 split)                    59.413      8.936   6.648 3.39e-08 ***
-## factor(Herbicide)Rimsulfuron (60)                             58.540      8.936   6.551 4.74e-08 ***
-## factor(Herbicide)Rimsulfuron + Atred                          67.148      8.936   7.514 1.77e-09 ***
-## factor(Herbicide)Rimsulfuron + hoeing                         64.065      8.936   7.169 5.73e-09 ***
-## factor(Herbicide)Rimsulfuron + thyfensulfuron                 54.832      8.936   6.136 1.96e-07 ***
-## factor(Herbicide)Thifensulfuron                               22.075      8.936   2.470 0.017359 *  
-## factor(Herbicide)Unweeded 1                                   -7.982      8.936  -0.893 0.376473    
-## factor(Herbicide)Unweeded 2                                    5.880      8.936   0.658 0.513902    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 12.64 on 45 degrees of freedom
-## Multiple R-squared:  0.8664,	Adjusted R-squared:  0.8129 
-## F-statistic: 16.21 on 18 and 45 DF,  p-value: 4.916e-14
-```
-\normalsize
-
-### Residui e devianze
-
-Nel capitolo 7 abbiamo visto come si calcolano i residui, sia a mano che con R. Abbiamo anche visto che la devianza dei residui è la somma dei loro quadrati:
 
 
 ```r
-RSS <- sum( residuals(mod)^2 )
-RSS
-## [1] 7187.348
+mu <- mean(rimsulfuron$Yield)
+mu_bl <- with(rimsulfuron, tapply(Yield, Block, mean))
+mu_tr <- with(rimsulfuron, tapply(Yield, Code, mean))
+mu
+## [1] 74.56687
+mu_bl
+##        1        2        3        4 
+## 65.71875 77.29313 83.18750 72.06812
+mu_tr
+##       1       2       3       4       5       6       7       8       9      10      11      12      13      14      15      16 
+## 95.3925 91.5650 97.9675 88.3775 89.2500 84.6700 93.9025 83.0350 96.6325 96.9850 51.9125 47.0000 29.8375 88.9700 21.8550 35.7175
 ```
 
-Da questa possiamo ottenere la deviazione standard ($\sigma$), considerando che i gradi di libertà si calcolano partendo dallo stesso punto da cui siamo partiti per l'ANOVA ad una via: abbiamo 16 gruppi con quattro repliche, per cui la devianza, entro ogni gruppo, ha tre gradi di libertà. In totale abbiamo quindi $16 \times 3 = 48$ gradi di libertà anche se non dobbiamo dimenticare che, le repliche di ogni gruppo non differiscono solo per motivi casuali, ma anche perché appartengono a blocchi diversi. Abbiamo quattro blocchi, quindi tre gradi di libertà, che vanno dedotti dai 48 appena calcolati. Pertanto:
+
+L'effetto dei blocchi si calcola sottraendo dalle relative medie la media generale, mentre l'effetto dei trattamenti si calcola in modo analogo, sostituendo alla media dei blocchi la media dei trattamenti.
 
 
 ```r
+gamma <- mu_bl - mu
+alpha <- mu_tr - mu
+```
+
+A questo punto, per ogni osservazione, possiamo calcolare il valore atteso, sommando i valori $\mu$, $\gamma$ ed $\alpha$ corrispondenti; inoltre, possiamo calcolare i residui, come scostamenti tra i valori osservati e i valori attesi. La tabella sottostante schematizza i calcoli necessari per le prime otto osservazioni e mostra come la somma degli elementi del modello restituisca le osservazioni originali.
+
+
+```r
+gamma <- gamma[rimsulfuron$Block]
+alpha <- alpha[rimsulfuron$Code]
+res <- data.frame(Yield = rimsulfuron$Yield,
+                  mu = mu, gamma = gamma, alpha = alpha,
+                  Atteso = mu + gamma + alpha)
+res$Residuo = res$Yield - res$Atteso
+res$Verifica = res$Atteso + res$Residuo
+print(round(res, 2)[1:8,])
+##   Yield    mu gamma alpha Atteso Residuo Verifica
+## 1 85.91 74.57 -8.85 20.83  86.54   -0.63    85.91
+## 2 93.03 74.57 -8.85 17.00  82.72   10.31    93.03
+## 3 86.93 74.57 -8.85 23.40  89.12   -2.19    86.93
+## 4 52.99 74.57 -8.85 13.81  79.53  -26.54    52.99
+## 5 71.36 74.57 -8.85 14.68  80.40   -9.04    71.36
+## 6 75.28 74.57 -8.85 10.10  75.82   -0.54    75.28
+## 7 73.22 74.57 -8.85 19.34  85.05  -11.83    73.22
+## 8 65.51 74.57 -8.85  8.47  74.19   -8.68    65.51
+```
+
+
+### Stima di $\sigma$
+
+In primo luogo, calcoliamo la devianza dei residui, come somma dei loro quadrati; da questa, possiamo ottenere la deviazione standard ($\sigma$), considerando che abbiamo 16 gruppi con quattro repliche, quindi tre gradi di libertà per gruppo. Tuttavia, dobbiamo anche tener presente che le repliche di ogni gruppo non differiscono solo per motivi casuali, ma anche perché appartengono a blocchi diversi. Abbiamo quattro blocchi, quindi tre gradi di libertà, che vanno dedotti dai 48 (16 x 3) precedentemente calcolati.
+
+
+
+```r
+RSS <- sum( res$Residuo^2 )
 sigma <- sqrt(RSS/45)
-sigma
-## [1] 12.63799
-```
-
-Più facilmente:
-
-
-```r
-summary(mod)$sigma
+RSS; sigma
+## [1] 7187.348
 ## [1] 12.63799
 ```
 
 
-Da $\sigma$ possiamo ottenere SEM e SED, anche se questo calcolo ve lo lascio per esercizio.
+Da $\sigma$ possiamo ottenere anche SEM e SED, anche se questo calcolo ve lo lascio per esercizio (ricordate che abbiamo quattro repliche per trattamento).
 
 ## Scomposizione della varianza
 
-La scomposizione della varianza è sequenziale ed analoga a quella che abbiamo operato per l'ANOVA ad una via; tuttavia, dobbiamo tener presente che, in questo caso, la devianza totale delle osservazione deve essere decomposta in tre quote: una dovuta al trattamento, una dovuta al blocco ed una dovuta agli effetti stocastici.
+La scomposizione della varianza è analoga a quella che abbiamo operato per l'ANOVA ad una via; tuttavia, dobbiamo tener presente che, in questo caso, la devianza totale delle osservazione deve essere decomposta in tre quote: una dovuta al trattamento, una dovuta al blocco ed una dovuta agli effetti stocastici.
 
-La devianza totale dei dati, con R, potrebbe essere ottenuta considerando un modello lineare in cui esiste solo l'intercetta, il che equivale a dire che i residui rappresentano gli scostamenti rispetto alla media generale. La devianza dei residui (somma dei quadrati) è quindi la devianza totale delle osservazioni:
+La devianza dei residui l'abbiamo già calcolata, mentre la devianza dei trattamenti possiamo calcolarla come somma dei quadrati degli scarti del vettore 'alpha'. Analogamente, possiamo ottenere la devianza dei blocchi, considerando il vettore 'gamma'.
 
 
 ```r
-mod1 <- lm(Yield ~ 1, data = rimsulfuron)
-RSS1 <- sum( residuals(mod1)^2 )
-RSS1
+TSS <- sum(res$alpha^2)
+BSS <- sum(res$gamma^2)
+TSS; BSS
+## [1] 43931.23
+## [1] 2660.491
+```
+
+Verifichiamo che la devianza del trattamento, sommata alle devianze dei blocchi e dei residui restituisce la devianza totale delle osservazioni (somma dei quadrati degli scarti rispetto alla media generale).
+
+
+```r
+TSS + BSS + RSS
+## [1] 53779.07
+sum( (rimsulfuron$Yield - mu)^2 )
 ## [1] 53779.07
 ```
 
-In seconda battuta, inseriamo l'effetto del blocco:
+
+Ci chiediamo se gli effetti attribuibili ai blocchi e ai trattamenti siano significativamente più grandi degli effetti stocastici. Sappiamo già di non poter confrontare le devianze, ma possiamo calcolare e confrontare con un test di F le relative varianze. Basta tener conto che i gradi di libertà dei blocchi e dei trattamenti sono rispettivamente 3 e 15, cioè il numero dei blocchi meno uno e il numero dei trattamenti meno uno.
 
 
 ```r
-mod2 <- lm(Yield ~ factor(Block), data = rimsulfuron)
-RSS2 <- sum( residuals(mod2)^2 )
-RSS2
-## [1] 51118.58
+MSt <- TSS/15
+MSb <- BSS/3
+MSe <- RSS/45
 ```
 
-Vediamo che la devianza del residuo è calata di `RSS1 - RSS2` unità, che corrispondono all'effetto del blocco e alla sua introduzione nel modello.
+La significatività della differenza tra blocchi è poco rilevate, mentre siamo interessati a valutare la significatività della differenza tra trattamenti con un apposito test di F:
 
-Infine, inseriamo anche l'effetto del trattamento, tornando così al modello completo che abbiamo utilizzato più sopra. Considerando i paragrafi precedenti, notiamo che l'inserimento dell'effetto del trattamento ha determinato un calo della devianza dei residui pari `RSS2 - RSS`, che corrisponde appunto all'effetto del diserbo. Insomma, ogni effetto introdotto nel modello ha determinato un decremento della variabilità non spiegata, quantitativamente pari alla variabilità attribuibile all'effetto stesso. Alla fine del processo rimane comunque un certo residuo (RSS) non spiegato, corrispondente a $\varepsilon$.
 
-Ci chiediamo se gli effetti attribuibili al blocco e al trattamento sono significativamente più grandi del residuo. Sappiamo già di non poter confrontare le devianze, ma possiamo calcolare e confrontare con un test di F le relative varianze. Basta tener conto che i gradi di libertà dei blocchi e dei trattamenti sono rispettivamente 3 e 15, cioè il numero dei blocchi meno uno e il numero dei trattamenti meno uno.
+```r
+Fratio <- MSt/MSe
+Fratio
+## [1] 18.3369
+```
 
-La tabella ANOVA può essere facilmente ottenuta con R:
+Il valore osservato si mostra abbastanza discrepante rispetto all'ipotesi nulla, che possiamo porre nella forma $H_0: \mu_1 = \mu_2 = ... = \mu_{16} = \mu$. Notate come stiamo facendo riferimento alle medie delle 16 popolazioni che hanno generato i nostri campioni, assumendole uguali tra di loro, come se i 16 campioni fossero stati, nella realtà, estratti dalla stessa popolazione. Ancora una volta, come nel capitolo 7, vedete che stiamo anche assumendo che le varianze delle 16 popolazioni siano omogenee.
+
+Ci chiediamo, che possibilità esiste che, nonostante l'ipotesi nulla sia vera, noi osserviamo un valore di F così alto o più alto? Potremmo determinare la *sampling distribution* per F attraverso una simulazione di Monte Carlo, oppure, assumendo che i residui siano gaussiani, possiamo utilizzare la funzione di densità F di Fisher, con 15 gradi di libertà al numeratore e 45 gradi di libertà al denominatore.
+
+
+```r
+pf(Fratio, 15, 45, lower.tail = F)
+## [1] 2.328653e-14
+```
+
+Vediamo che la probabilità che l'ipotesi nulla sia vera è molto piccola e, pertanto, rifiutiamo l'ipotesi nulla, accettando l'alternativa: esiste in effetti una differenza significativa tra i trattamenti erbicidi.
+
+## Adattamento del modello con R
+
+Il model fitting può essere comodamente effettuato con R, utilizzando la funzione `lm()`, come mostrato nel box sottostante. Per brevità, utilizziamo il codice del trattamento erbicida invece che il nome.
+
+
+```r
+mod <- lm(Yield ~ Block + Code, data = rimsulfuron)
+```
+
+
+La tabella ANOVA può essere facilmente ottenuta con la funzione `anova()`:
 
 
 ```r
@@ -3811,15 +3821,15 @@ anova(mod)
 ## Analysis of Variance Table
 ## 
 ## Response: Yield
-##                   Df Sum Sq Mean Sq F value    Pr(>F)    
-## factor(Block)      3   2660  886.83  5.5524  0.002496 ** 
-## factor(Herbicide) 15  43931 2928.75 18.3369 2.329e-14 ***
-## Residuals         45   7187  159.72                      
+##           Df Sum Sq Mean Sq F value    Pr(>F)    
+## Block      3   2660  886.83  5.5524  0.002496 ** 
+## Code      15  43931 2928.75 18.3369 2.329e-14 ***
+## Residuals 45   7187  159.72                      
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-Ovviamente, prima di considerare questa tabella dovremo preoccuparci del fatto che le assunzioni di base siano rispettate, cosa che possiamo facilmente verificare con un'analisi grafica dei residui, utilizzando il codice sottostante. L'output è visibile in Figura \@ref(fig:figName121).
+Ovviamente, prima di considerare questa tabella dovremo preoccuparci del fatto che le assunzioni di base siano rispettate (vedi capitolo 8), cosa che possiamo facilmente verificare con un'analisi grafica dei residui, utilizzando il codice sottostante. L'output è visibile in Figura \@ref(fig:figName121).
 
 ```
 par(mfrow=c(1,2))
@@ -3834,34 +3844,34 @@ plot(mod, which = 2)
 </div>
 
 
-Dopo esserci rassicurati su questo importante aspetto, possiamo vedere che abbiamo due ipotesi nulle da testare (effetto del trattamento non significativo ed effetto del blocco non significativo), che possono essere entrambe rifiutate per P < 0.05.
+Dopo esserci rassicurati su questo importante aspetto, possiamo vedere che abbiamo due ipotesi nulle da testare (effetto dei trattamenti non significativo ed effetto dei blocchi non significativo), che possono essere entrambe rifiutate per P < 0.05.
 
-Da questo punto in avanti, l'analisi procede come usuale, calcolando le medie marginali attese ed, eventualmente, confrontandole tra loro con una procedura di confronto multiplo, come descritto nei capitoli precedenti. Tener presente che, in questo esperimento, abbiamo 16 trattamenti, cioè $16 \times 15 / 2 = 120$ confronti; di conseguenza, può essere opportuno operare la correzione per la molteplicità. Inoltre, dato che il trattamento più interessante è quello che rende massima la produzione, sarà opportuno ordinare le medie in senso decrescente, utilizzando l'argomento 'reverse = T'.
+Da questo punto in avanti, l'analisi procede come usuale, calcolando le medie marginali attese ed, eventualmente, confrontandole tra loro con una procedura di confronto multiplo, come descritto nei capitoli precedenti. Tener presente che, in questo esperimento, abbiamo 16 trattamenti, cioè $16 \times 15 / 2 = 120$ confronti; di conseguenza, è opportuno operare la correzione per la molteplicità. Inoltre, dato che il trattamento più interessante è quello che rende massima la produzione, sarà opportuno ordinare le medie in senso decrescente, utilizzando l'argomento 'reverse = T'.
 
 \scriptsize
 
 
 ```r
 library(emmeans)
-medie <- emmeans(mod, ~factor(Herbicide))
+medie <- emmeans(mod, ~Code)
 multcomp::cld(medie, Letters = LETTERS, reverse = T)
-##  Herbicide                                  emmean   SE df lower.CL upper.CL .group
-##  Rimsulfuron (50)                             98.0 6.32 45    85.24    110.7  A    
-##  Rimsulfuron + Atred                          97.0 6.32 45    84.26    109.7  A    
-##  Pendimethalin (post) + rimsuulfuron (post)   96.6 6.32 45    83.91    109.4  A    
-##  Rimsulfuron (40)                             95.4 6.32 45    82.67    108.1  A    
-##  Rimsulfuron + hoeing                         93.9 6.32 45    81.18    106.6  A    
-##  Rimsulfuron (45)                             91.6 6.32 45    78.84    104.3  A    
-##  Rimsulfuron (50+30 split)                    89.2 6.32 45    76.52    102.0  A    
-##  Hand-Weeded                                  89.0 6.32 45    76.24    101.7  A    
-##  Rimsulfuron (60)                             88.4 6.32 45    75.65    101.1  A    
-##  Rimsulfuron + thyfensulfuron                 84.7 6.32 45    71.94     97.4  A    
-##  Pendimethalin (pre) + rimsulfuron (post)     83.0 6.32 45    70.31     95.8  AB   
-##  Thifensulfuron                               51.9 6.32 45    39.19     64.6   BC  
-##  Metolachlor + terbuthylazine (pre)           47.0 6.32 45    34.27     59.7    C  
-##  Unweeded 2                                   35.7 6.32 45    22.99     48.4    C  
-##  Alachlor + terbuthylazine                    29.8 6.32 45    17.11     42.6    C  
-##  Unweeded 1                                   21.9 6.32 45     9.13     34.6    C  
+##  Code emmean   SE df lower.CL upper.CL .group
+##  3      98.0 6.32 45    85.24    110.7  A    
+##  10     97.0 6.32 45    84.26    109.7  A    
+##  9      96.6 6.32 45    83.91    109.4  A    
+##  1      95.4 6.32 45    82.67    108.1  A    
+##  7      93.9 6.32 45    81.18    106.6  A    
+##  2      91.6 6.32 45    78.84    104.3  A    
+##  5      89.2 6.32 45    76.52    102.0  A    
+##  14     89.0 6.32 45    76.24    101.7  A    
+##  4      88.4 6.32 45    75.65    101.1  A    
+##  6      84.7 6.32 45    71.94     97.4  A    
+##  8      83.0 6.32 45    70.31     95.8  AB   
+##  11     51.9 6.32 45    39.19     64.6   BC  
+##  12     47.0 6.32 45    34.27     59.7    C  
+##  16     35.7 6.32 45    22.99     48.4    C  
+##  13     29.8 6.32 45    17.11     42.6    C  
+##  15     21.9 6.32 45     9.13     34.6    C  
 ## 
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
@@ -3879,19 +3889,14 @@ A volte i fattori di blocco sono più di uno e danno origine ad un disegno speri
 
 ## Caso studio: confronto tra metodi costruttivi
 
-Immaginiamo di voler studiare il tempo necessario per costruire un componente elettronico, utilizzando quattro metodi diversi. E' evidente che il tempo di costruzione sarà influenzato dalla perizia del tecnico e, per questo, utilizziamo quattro tecnici diversi, ad ognuno dei quali facciamo utilizzare tutti e quattro i metodi. Un esperimento così disegnato sarebbe a blocchi randomizzati, con il tecnico che fa da blocco per i trattamenti. Tuttavia, dobbiamo anche riconoscere che i quattro tecnici saranno via via meno efficienti, e quindi il metodo che utilizzeranno per primo sarà avvantaggiato, mentre quello che utilizzeranno per ultimo sarà svantaggiato. E'vero che i metodi sono assegnati in ordine random ad ogni tecnico, ma non si può comunque evitare che un metodo venga avvantaggiato rispetto ad un altro, perché, ad esempio, non viene mai ad occupare l'ultima posizione (o meglio, l'ultimo turno).
+Immaginiamo di voler studiare il tempo necessario per costruire un componente elettronico, utilizzando quattro metodi diversi: è evidente che il tempo di costruzione sarà influenzato dalla perizia del tecnico e, per questo, utilizziamo quattro tecnici diversi, ad ognuno dei quali facciamo utilizzare tutti e quattro i metodi. Un esperimento così disegnato sarebbe a blocchi randomizzati, con il tecnico che fa da blocco per i trattamenti. Tuttavia, dobbiamo anche riconoscere che i quattro tecnici saranno via via meno efficienti, e quindi il metodo che utilizzeranno per primo sarà avvantaggiato, mentre quello che utilizzeranno per ultimo sarà svantaggiato. E'vero che i metodi sono assegnati in ordine random ad ogni tecnico, ma non si può comunque evitare che un metodo venga avvantaggiato rispetto ad un altro, perché, ad esempio, non viene mai ad occupare l'ultima posizione (o meglio, l'ultimo turno). Abbiamo già illustrato questa situazione in un capitolo precedente ed abbiamo visto come essa possa essere gestita imponendo un vincolo ulteriore alla randomizzazione e facendo in modo che ogni metodo occupi tutte e quattro i turni, in tecnici diversi. Il disegno è quindi a quadrato latino.
 
-Per evitare questo problema imponiamo un vincolo ulteriore alla randizzazione e facciamo in modo che ogni metodo occupi tutte e quattro i turni, in tecnici diversi. Il disegno è quindi a quadrato latino.
-
-Il dataset dei risultati è disponibile su gitHub:
+Il dataset dei risultati è disponibile online:
 
 
 ```r
-path1 <- "https://raw.githubusercontent.com/OnofriAndreaPG/"
-path2 <- "aomisc/master/data/"
-fileName <- "Technicians.csv"
-filePath <- paste(path1, path2, fileName, sep = "")
-dataset <- read.csv(filePath, header=T)
+fileName <- "https://www.casaonofri.it/_datasets/Technicians.csv"
+dataset <- read.csv(fileName, header=T)
 dataset
 ##    Shift Technician Method Time
 ## 1      I     Andrew      C   90
@@ -3920,7 +3925,7 @@ $$Y_{ijk} = \mu + \gamma_k + \beta_j + \alpha_i + \varepsilon_{ijk}$$
 
 dove $\mu$ è l'intercetta, $\gamma$ è l'effetto del turno k, $\beta$ è l'effetto del tecnico j e $\alpha$ è l'effetto del metodo i. L'elemento $\varepsilon_{ijk}$ rappresenta la componente random individuale, di ogni osservazione e si assume normalmente distribuita, con media 0 e deviazione standard $\sigma$.
 
-Avendo già illustrato il processo di stima dei parametri e di scomposizione della varianza e quindi utilizziamo subito R per il 'model fitting':
+Avendo già illustrato il processo di stima dei parametri e di scomposizione della varianza, quindi utilizziamo subito R per il 'model fitting':
 
 
 ```r
@@ -3954,9 +3959,9 @@ anova(mod)
 
 Vediamo che esiste una differenza significativa tra i metodi e l'ipotesi nulla può essere rifiutata con una bassissima probabilità di errore di prima specie.
 
-Ovviamente, dopo aver eseguito un'ANOVA a blocchi randomizzati o a quadrato latino, andremo eventualmente ad eseguire un test di confronto multiplo, seguendo le raccomandazioni esposte nel capitolo precedente. Anche questa parte ve la lascio per esercizio.
+Ovviamente, dopo aver eseguito un'ANOVA a blocchi randomizzati o a quadrato latino, andremo eventualmente ad eseguire un test di confronto multiplo, seguendo le raccomandazioni esposte nel capitolo precedente. Anche questa parte ve la lasciamo per esercizio.
 
-<!--chapter:end:12-MultiWayANOVAModels.Rmd-->
+<!--chapter:end:10-MultiWayANOVAModels.Rmd-->
 
 # Modelli ANOVA a due vie
 
@@ -5092,11 +5097,11 @@ I due coefficienti di determinazione (tradizionale e corretto) possono essere ot
 
 ```r
 R2nls(modNlin)
-## $PseudoR2
+## $R2
 ## [1] 0.9939126
 ## 
-## $R2
-## [1] 1.001821
+## $R2adj
+## [1] 0.9936359
 ```
 
 ## Funzioni lineari e nonlineari dei parametri
@@ -5209,7 +5214,7 @@ class(modNlin)
 modNlin2 <- boxcox(modNlin)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-162-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-166-1.png)<!-- -->
 
 ```r
 modNlin2
@@ -5247,7 +5252,7 @@ Invece che far scegliere alla funzione 'boxcox' il valore di $\lambda$ ottimale,
 modNlin3 <- boxcox(modNlin, lambda = 0.5)
 ```
 
-![](_main_files/figure-html/unnamed-chunk-163-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-167-1.png)<!-- -->
 
 ```r
 summary(modNlin3)
