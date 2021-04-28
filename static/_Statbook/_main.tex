@@ -16,7 +16,7 @@
 }
 
 \author{Andrea Onofri e Dario Sacco}
-\date{Update: v. 1.0 (15/03/2021), compil. 2021-04-27}
+\date{Update: v. 1.0 (15/03/2021), compil. 2021-04-28}
 \title{Metodologia sperimentale per le scienze agrarie}
 \subtitle{}
 
@@ -572,75 +572,13 @@ Placeholder
 \hypertarget{modelli-anova-con-fattori-di-blocco}{%
 \chapter{Modelli ANOVA con fattori di blocco}\label{modelli-anova-con-fattori-di-blocco}}
 
-Nel capitolo 7 abbiamo impiegato un modello ANOVA con una sola variabile indipendente categorica, assumendo che le unità sperimentali, escluso l'effetto del trattamento, fossero totalmente indipendenti tra di loro. Questa assunzione era totalmente realistica, poiché si trattava di un disegno sperimentale a randomizzazione completa, dove non sussistevano raggruppamenti di alcun tipo, escluso quello dettato dal trattamento in studio.
-
-Se invece l'esperimento include uno o più \emph{blocking factors}, le osservazioni che appartengono allo stesso blocco sono più simila tra loro delle osservazioni che appartengono a blocchi diversi, proprio perché condividono le condizioni del blocco stesso. Per non invalidare l'indipendenza dei residui dobbiamo definire un modello ANOVA che tenga conto anche dei fattori di raggruppamento, in modo che il loro effetto non sia trascurato e, di conseguenza, si sommi agli effetti residui. Come al solito, affrontiamo questo tema partendo da alcuni esempi pratici.
+Placeholder
 
 \hypertarget{caso-studio-confronto-tra-erbicidi-in-campo}{%
 \section{Caso-studio: confronto tra erbicidi in campo}\label{caso-studio-confronto-tra-erbicidi-in-campo}}
 
-Abbiamo una prova di confronto tra erbicidi in mais, con 13 formulati, due testimoni inerbiti (che, per comodità, considereremo due trattamenti diversi) e un testimone scerbato. Al momento di impiantare la prova, era lecito ipotizzare che, pur scegliendo un appezzamento il più omogeneo possibile, avremmo potuto riscontrare differenze di infestazione tra un punto e l'altro del campo, con un presumibile gradiente procedendo dai lati (vicino alle fosse) verso il centro. In questa situazione, se l'esperimento fosse stato disegnato a randomizzazione completa, le differenze di infestazione tra una parte e l'altra del campo sarebbero state trascurate e avrebbero finito per incrementare l'errore sperimentale, diminuendo l'efficienza dell'esperimento.
-
-Abbiamo quindi impiegato un disegno a blocchi randomizzati con quattro repliche; il campo è stato suddiviso in tante sezioni (dette blocchi) quante erano le repliche (quattro), perpendicolarmente al gradiente di infestazione trasversale. In questo modo, l'ambiente era relativamente omogeneo all'interno di ciascun blocco, nel quale è stata collocata una replica per trattamento.
-
-Il dataset dei risultati (`rimsulfuron.csv') è disponibile nella solita \emph{repository} online. Nel box sottostante, carichiamo il file e trasformiamo le due variabili esplicative (blocco e trattamento) in fattori sperimentali. Più sotto, mostriamo la tabella in formato `WIDE' (una riga per trattamento, con le repliche sulle colonne), con le medie di riga (trattamento) e di colonna (blocco)
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{fileName }\OtherTok{\textless{}{-}} \StringTok{"https://www.casaonofri.it/\_datasets/rimsulfuron.csv"}
-\NormalTok{rimsulfuron }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(fileName)}
-\NormalTok{rimsulfuron}\SpecialCharTok{$}\NormalTok{Code }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(rimsulfuron}\SpecialCharTok{$}\NormalTok{Code)}
-\NormalTok{rimsulfuron}\SpecialCharTok{$}\NormalTok{Herbicide }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(rimsulfuron}\SpecialCharTok{$}\NormalTok{Herbicide)}
-\NormalTok{rimsulfuron}\SpecialCharTok{$}\NormalTok{Block }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(rimsulfuron}\SpecialCharTok{$}\NormalTok{Block)}
-\end{Highlighting}
-\end{Shaded}
-
-\scriptsize
-
-\begin{verbatim}
-##                                                 1       2       3       4  Medie
-## Alachlor + terbuthylazine                  12.060  49.580  41.340  16.370 29.838
-## Hand-Weeded                                77.580  92.080  86.590  99.630 88.970
-## Metolachlor + terbuthylazine (pre)         51.770  52.100  49.460  34.670 47.000
-## Pendimethalin (post) + rimsuulfuron (post) 94.820  87.720 102.050 101.940 96.632
-## Pendimethalin (pre) + rimsulfuron (post)   65.510  88.720  95.520  82.390 83.035
-## Rimsulfuron (40)                           85.910  91.090 111.420  93.150 95.392
-## Rimsulfuron (45)                           93.030 105.000  89.190  79.040 91.565
-## Rimsulfuron (50)                           86.930 105.820 110.020  89.100 97.968
-## Rimsulfuron (50+30 split)                  71.360  77.570 115.910  92.160 89.250
-## Rimsulfuron (60)                           52.990 102.860 100.620  97.040 88.377
-## Rimsulfuron + Atred                        94.110  89.860 104.340  99.630 96.985
-## Rimsulfuron + hoeing                       73.220  86.060 118.010  98.320 93.903
-## Rimsulfuron + thyfensulfuron               75.280  82.590  94.960  85.850 84.670
-## Thifensulfuron                             78.470  42.320  62.520  24.340 51.913
-## Unweeded 1                                 10.880  31.770  23.920  20.850 21.855
-## Unweeded 2                                 27.580  51.550  25.130  38.610 35.718
-## Medie                                      65.719  77.293  83.188  72.068 74.567
-\end{verbatim}
-
-\normalsize
-
 \hypertarget{definizione-di-un-modello-lineare-1}{%
 \section{Definizione di un modello lineare}\label{definizione-di-un-modello-lineare-1}}
-
-La produzione di ogni unità sperimentale (parcella) è condizionata da più di un effetto:
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
-\item
-  il diserbante con cui essa è stata trattata;
-\item
-  il blocco di cui essa fa parte;
-\item
-  ogni altro effetto non conoscibile e puramente casuale (residuo).
-\end{enumerate}
-
-Il modello è quindi:
-
-\[ Y_{ij} = \mu + \gamma_i + \alpha_j + \varepsilon_{ij}\]
-
-dove \(Y\) è la produzione nel blocco \(i\) e con il diserbo \(j\), \(\mu\) è l'intercetta, \(\gamma\) è l'effetto del blocco \(i\), \(\alpha\) è l'effetto del trattamento \(j\) e \(\varepsilon\) è l'errore sperimentale per ogni singola parcella, che si assume normalmente distribuito, con media 0 e deviazione standard \(\sigma\). Anche in questo caso, come nel capitolo 7, poniamo un vincolo sulla somma degli effetti del trattamento e del blocco (\(\sum \gamma_i = 0\) e \(\sum \alpha_j = 0\)), in modo che \(\mu\) rappresenti la media generale. In totale, vi sono 19 parametri da stimare (un'intercetta, 15 effetti dei trattamenti e tre effetti dei blocchi, più \(\sigma\)).
 
 \hypertarget{stima-dei-parametri-1}{%
 \section{Stima dei parametri}\label{stima-dei-parametri-1}}
@@ -648,426 +586,360 @@ dove \(Y\) è la produzione nel blocco \(i\) e con il diserbo \(j\), \(\mu\) è 
 \hypertarget{coefficienti-del-modello}{%
 \subsection{Coefficienti del modello}\label{coefficienti-del-modello}}
 
-In questo caso l'esperimento è completamente bilanciato e la stima dei parametri può essere fatta banalmente, considerando i valori osservati e le medie aritmetiche per gruppo. Per prima cosa, calcoliamo tutte le medie (generale, dei blocchi e dei trattamenti), come mostrato nel box sottostante.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{mu }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(rimsulfuron}\SpecialCharTok{$}\NormalTok{Yield)}
-\NormalTok{mu\_bl }\OtherTok{\textless{}{-}} \FunctionTok{with}\NormalTok{(rimsulfuron, }\FunctionTok{tapply}\NormalTok{(Yield, Block, mean))}
-\NormalTok{mu\_tr }\OtherTok{\textless{}{-}} \FunctionTok{with}\NormalTok{(rimsulfuron, }\FunctionTok{tapply}\NormalTok{(Yield, Code, mean))}
-\NormalTok{mu}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## [1] 74.56687
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{mu\_bl}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-##        1        2        3        4 
-## 65.71875 77.29313 83.18750 72.06812
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{mu\_tr}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-##       1       2       3       4       5       6       7       8       9      10      11      12      13      14      15      16 
-## 95.3925 91.5650 97.9675 88.3775 89.2500 84.6700 93.9025 83.0350 96.6325 96.9850 51.9125 47.0000 29.8375 88.9700 21.8550 35.7175
-\end{verbatim}
-
-L'effetto dei blocchi si calcola sottraendo dalle relative medie la media generale, mentre l'effetto dei trattamenti si calcola in modo analogo, sostituendo alla media dei blocchi la media dei trattamenti.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{gamma }\OtherTok{\textless{}{-}}\NormalTok{ mu\_bl }\SpecialCharTok{{-}}\NormalTok{ mu}
-\NormalTok{alpha }\OtherTok{\textless{}{-}}\NormalTok{ mu\_tr }\SpecialCharTok{{-}}\NormalTok{ mu}
-\end{Highlighting}
-\end{Shaded}
-
-A questo punto, per ogni osservazione, possiamo calcolare il valore atteso, sommando i valori \(\mu\), \(\gamma\) ed \(\alpha\) corrispondenti; inoltre, possiamo calcolare i residui, come scostamenti tra i valori osservati e i valori attesi. La tabella sottostante schematizza i calcoli necessari e mostra come la somma degli elementi del modello restituisca le osservazioni originali.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{gamma }\OtherTok{\textless{}{-}}\NormalTok{ gamma[rimsulfuron}\SpecialCharTok{$}\NormalTok{Block]}
-\NormalTok{alpha }\OtherTok{\textless{}{-}}\NormalTok{ alpha[rimsulfuron}\SpecialCharTok{$}\NormalTok{Code]}
-\NormalTok{res }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{Yield =}\NormalTok{ rimsulfuron}\SpecialCharTok{$}\NormalTok{Yield,}
-                  \AttributeTok{mu =}\NormalTok{ mu, }\AttributeTok{gamma =}\NormalTok{ gamma, }\AttributeTok{alpha =}\NormalTok{ alpha,}
-                  \AttributeTok{Atteso =}\NormalTok{ mu }\SpecialCharTok{+}\NormalTok{ gamma }\SpecialCharTok{+}\NormalTok{ alpha)}
-\NormalTok{res}\SpecialCharTok{$}\NormalTok{Residuo }\OtherTok{=}\NormalTok{ res}\SpecialCharTok{$}\NormalTok{Yield }\SpecialCharTok{{-}}\NormalTok{ res}\SpecialCharTok{$}\NormalTok{Atteso}
-\NormalTok{res}\SpecialCharTok{$}\NormalTok{Verifica }\OtherTok{=}\NormalTok{ res}\SpecialCharTok{$}\NormalTok{Atteso }\SpecialCharTok{+}\NormalTok{ res}\SpecialCharTok{$}\NormalTok{Residuo}
-\NormalTok{res}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-##     Yield       mu     gamma      alpha    Atteso    Residuo Verifica
-## 1   85.91 74.56687 -8.848125  20.825625  86.54438  -0.634375    85.91
-## 2   93.03 74.56687 -8.848125  16.998125  82.71688  10.313125    93.03
-## 3   86.93 74.56687 -8.848125  23.400625  89.11938  -2.189375    86.93
-## 4   52.99 74.56687 -8.848125  13.810625  79.52938 -26.539375    52.99
-## 5   71.36 74.56687 -8.848125  14.683125  80.40188  -9.041875    71.36
-## 6   75.28 74.56687 -8.848125  10.103125  75.82188  -0.541875    75.28
-## 7   73.22 74.56687 -8.848125  19.335625  85.05438 -11.834375    73.22
-## 8   65.51 74.56687 -8.848125   8.468125  74.18688  -8.676875    65.51
-## 9   94.82 74.56687 -8.848125  22.065625  87.78437   7.035625    94.82
-## 10  94.11 74.56687 -8.848125  22.418125  88.13688   5.973125    94.11
-## 11  78.47 74.56687 -8.848125 -22.654375  43.06438  35.405625    78.47
-## 12  51.77 74.56687 -8.848125 -27.566875  38.15188  13.618125    51.77
-## 13  12.06 74.56687 -8.848125 -44.729375  20.98938  -8.929375    12.06
-## 14  77.58 74.56687 -8.848125  14.403125  80.12188  -2.541875    77.58
-## 15  10.88 74.56687 -8.848125 -52.711875  13.00688  -2.126875    10.88
-## 16  27.58 74.56687 -8.848125 -38.849375  26.86938   0.710625    27.58
-## 17  77.57 74.56687  2.726250  14.683125  91.97625 -14.406250    77.57
-## 18  86.06 74.56687  2.726250  19.335625  96.62875 -10.568750    86.06
-## 19  82.59 74.56687  2.726250  10.103125  87.39625  -4.806250    82.59
-## 20  88.72 74.56687  2.726250   8.468125  85.76125   2.958750    88.72
-## 21  91.09 74.56687  2.726250  20.825625  98.11875  -7.028750    91.09
-## 22 102.86 74.56687  2.726250  13.810625  91.10375  11.756250   102.86
-## 23 105.82 74.56687  2.726250  23.400625 100.69375   5.126250   105.82
-## 24 105.00 74.56687  2.726250  16.998125  94.29125  10.708750   105.00
-## 25  51.55 74.56687  2.726250 -38.849375  38.44375  13.106250    51.55
-## 26  49.58 74.56687  2.726250 -44.729375  32.56375  17.016250    49.58
-## 27  92.08 74.56687  2.726250  14.403125  91.69625   0.383750    92.08
-## 28  31.77 74.56687  2.726250 -52.711875  24.58125   7.188750    31.77
-## 29  42.32 74.56687  2.726250 -22.654375  54.63875 -12.318750    42.32
-## 30  89.86 74.56687  2.726250  22.418125  99.71125  -9.851250    89.86
-## 31  87.72 74.56687  2.726250  22.065625  99.35875 -11.638750    87.72
-## 32  52.10 74.56687  2.726250 -27.566875  49.72625   2.373750    52.10
-## 33  89.19 74.56687  8.620625  16.998125 100.18563 -10.995625    89.19
-## 34 100.62 74.56687  8.620625  13.810625  96.99813   3.621875   100.62
-## 35 111.42 74.56687  8.620625  20.825625 104.01313   7.406875   111.42
-## 36 110.02 74.56687  8.620625  23.400625 106.58813   3.431875   110.02
-## 37  94.96 74.56687  8.620625  10.103125  93.29063   1.669375    94.96
-## 38 118.01 74.56687  8.620625  19.335625 102.52313  15.486875   118.01
-## 39  95.52 74.56687  8.620625   8.468125  91.65563   3.864375    95.52
-## 40 115.91 74.56687  8.620625  14.683125  97.87063  18.039375   115.91
-## 41 104.34 74.56687  8.620625  22.418125 105.60563  -1.265625   104.34
-## 42  49.46 74.56687  8.620625 -27.566875  55.62063  -6.160625    49.46
-## 43 102.05 74.56687  8.620625  22.065625 105.25312  -3.203125   102.05
-## 44  62.52 74.56687  8.620625 -22.654375  60.53313   1.986875    62.52
-## 45  86.59 74.56687  8.620625  14.403125  97.59063 -11.000625    86.59
-## 46  23.92 74.56687  8.620625 -52.711875  30.47563  -6.555625    23.92
-## 47  25.13 74.56687  8.620625 -38.849375  44.33813 -19.208125    25.13
-## 48  41.34 74.56687  8.620625 -44.729375  38.45813   2.881875    41.34
-## 49  85.85 74.56687 -2.498750  10.103125  82.17125   3.678750    85.85
-## 50  82.39 74.56687 -2.498750   8.468125  80.53625   1.853750    82.39
-## 51  92.16 74.56687 -2.498750  14.683125  86.75125   5.408750    92.16
-## 52  98.32 74.56687 -2.498750  19.335625  91.40375   6.916250    98.32
-## 53  89.10 74.56687 -2.498750  23.400625  95.46875  -6.368750    89.10
-## 54  79.04 74.56687 -2.498750  16.998125  89.06625 -10.026250    79.04
-## 55  97.04 74.56687 -2.498750  13.810625  85.87875  11.161250    97.04
-## 56  93.15 74.56687 -2.498750  20.825625  92.89375   0.256250    93.15
-## 57  16.37 74.56687 -2.498750 -44.729375  27.33875 -10.968750    16.37
-## 58  99.63 74.56687 -2.498750  14.403125  86.47125  13.158750    99.63
-## 59  20.85 74.56687 -2.498750 -52.711875  19.35625   1.493750    20.85
-## 60  38.61 74.56687 -2.498750 -38.849375  33.21875   5.391250    38.61
-## 61 101.94 74.56687 -2.498750  22.065625  94.13375   7.806250   101.94
-## 62  34.67 74.56687 -2.498750 -27.566875  44.50125  -9.831250    34.67
-## 63  99.63 74.56687 -2.498750  22.418125  94.48625   5.143750    99.63
-## 64  24.34 74.56687 -2.498750 -22.654375  49.41375 -25.073750    24.34
-\end{verbatim}
-
 \hypertarget{stima-di-sigma-1}{%
 \subsection{\texorpdfstring{Stima di \(\sigma\)}{Stima di \textbackslash sigma}}\label{stima-di-sigma-1}}
-
-In primo luogo, calcoliamo la devianza dei residui, come somma dei loro quadrati; da questa, possiamo ottenere la deviazione standard (\(\sigma\)), considerando che abbiamo 16 gruppi con quattro repliche, quindi tre gradi di libertà per gruppo. Tuttavia, dobbiamo anche tener presente che le repliche di ogni gruppo non differiscono solo per motivi casuali, ma anche perché appartengono a blocchi diversi. Abbiamo quattro blocchi, quindi tre gradi di libertà, che vanno dedotti dai 48 (16 x 3) precedentemente calcolati.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{RSS }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{( res}\SpecialCharTok{$}\NormalTok{Residuo}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{ )}
-\NormalTok{sigma }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{(RSS}\SpecialCharTok{/}\DecValTok{45}\NormalTok{)}
-\NormalTok{RSS; sigma}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## [1] 7187.348
-\end{verbatim}
-
-\begin{verbatim}
-## [1] 12.63799
-\end{verbatim}
-
-Da \(\sigma\) possiamo ottenere anche SEM e SED, anche se questo calcolo ve lo lascio per esercizio (ricordate che abbiamo quattro repliche per trattamento).
 
 \hypertarget{scomposizione-della-varianza-1}{%
 \section{Scomposizione della varianza}\label{scomposizione-della-varianza-1}}
 
-La scomposizione della varianza è analoga a quella che abbiamo operato per l'ANOVA ad una via; tuttavia, dobbiamo tener presente che, in questo caso, la devianza totale delle osservazione deve essere decomposta in tre quote: una dovuta al trattamento, una dovuta al blocco ed una dovuta agli effetti stocastici.
-
-La devianza dei residui l'abbiamo già calcolata, mentre la devianza dei trattamenti possiamo calcolarla come somma dei quadrati degli scarti del vettore `alpha.' Analogamente, possiamo ottenere la devianza dei blocchi, considerando il vettore `gamma.'
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{TSS }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{(res}\SpecialCharTok{$}\NormalTok{alpha}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)}
-\NormalTok{BSS }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{(res}\SpecialCharTok{$}\NormalTok{gamma}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)}
-\NormalTok{TSS; BSS}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## [1] 43931.23
-\end{verbatim}
-
-\begin{verbatim}
-## [1] 2660.491
-\end{verbatim}
-
-Verifichiamo che la devianza del trattamento, sommata alle devianze dei blocchi e dei residui restituisce la devianza totale delle osservazioni (somma dei quadrati degli scarti rispetto alla media generale).
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{TSS }\SpecialCharTok{+}\NormalTok{ BSS }\SpecialCharTok{+}\NormalTok{ RSS}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## [1] 53779.07
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{sum}\NormalTok{( (rimsulfuron}\SpecialCharTok{$}\NormalTok{Yield }\SpecialCharTok{{-}}\NormalTok{ mu)}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{ )}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## [1] 53779.07
-\end{verbatim}
-
-Ci chiediamo se gli effetti attribuibili ai blocchi e ai trattamenti siano significativamente più grandi degli effetti stocastici. Sappiamo già di non poter confrontare le devianze, ma possiamo calcolare e confrontare con un test di F le relative varianze. Basta tener conto che i gradi di libertà dei blocchi e dei trattamenti sono rispettivamente 3 e 15, cioè il numero dei blocchi meno uno e il numero dei trattamenti meno uno.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{MSt }\OtherTok{\textless{}{-}}\NormalTok{ TSS}\SpecialCharTok{/}\DecValTok{15}
-\NormalTok{MSb }\OtherTok{\textless{}{-}}\NormalTok{ BSS}\SpecialCharTok{/}\DecValTok{3}
-\NormalTok{MSe }\OtherTok{\textless{}{-}}\NormalTok{ RSS}\SpecialCharTok{/}\DecValTok{45}
-\end{Highlighting}
-\end{Shaded}
-
-La significatività della differenza tra blocchi è poco rilevate, mentre siamo interessati a valutare la significatività della differenza tra trattamenti con un apposito test di F:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{Fratio }\OtherTok{\textless{}{-}}\NormalTok{ MSt}\SpecialCharTok{/}\NormalTok{MSe}
-\NormalTok{Fratio}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## [1] 18.3369
-\end{verbatim}
-
-Il valore osservato si mostra abbastanza discrepante rispetto all'ipotesi nulla, che possiamo porre nella forma \(H_0: \mu_1 = \mu_2 = ... = \mu_{16} = \mu\). Notate come stiamo facendo riferimento alle medie delle 16 popolazioni che hanno generato i nostri campioni, assumendole uguali tra di loro, come se i 16 campioni fossero stati, nella realtà, estratti dalla stessa popolazione. Ancora una volta, come nel capitolo 7, vedete che stiamo anche assumendo che le varianze delle 16 popolazioni siano omogenee.
-
-Ci chiediamo, che possibilità esiste che, nonostante l'ipotesi nulla sia vera, noi osserviamo un valore di F così alto o più alto? Potremmo determinare la \emph{sampling distribution} per F attraverso una simulazione di Monte Carlo, oppure, assumendo che i residui siano gaussiani, possiamo utilizzare la funzione di densità F di Fisher, con 15 gradi di libertà al numeratore e 45 gradi di libertà al denominatore.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{pf}\NormalTok{(Fratio, }\DecValTok{15}\NormalTok{, }\DecValTok{45}\NormalTok{, }\AttributeTok{lower.tail =}\NormalTok{ F)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## [1] 2.328653e-14
-\end{verbatim}
-
-Vediamo che la probabilità che l'ipotesi nulla sia vera è molto piccola e, pertanto, rifiutiamo l'ipotesi nulla, accettando l'alternativa: esiste in effetti una differenza significativa tra i trattamenti erbicidi.
-
 \hypertarget{adattamento-del-modello-con-r}{%
 \section{Adattamento del modello con R}\label{adattamento-del-modello-con-r}}
-
-Il model fitting può essere comodamente effettuato con R, utilizzando la funzione \texttt{lm()}, come mostrato nel box sottostante. Per brevità, utilizziamo il codice del trattamento erbicida invece che il nome.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{mod }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Yield }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Block }\SpecialCharTok{+}\NormalTok{ Code, }\AttributeTok{data =}\NormalTok{ rimsulfuron)}
-\end{Highlighting}
-\end{Shaded}
-
-La tabella ANOVA può essere facilmente ottenuta con la funzione \texttt{anova()}:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{anova}\NormalTok{(mod)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## Analysis of Variance Table
-## 
-## Response: Yield
-##           Df Sum Sq Mean Sq F value    Pr(>F)    
-## Block      3   2660  886.83  5.5524  0.002496 ** 
-## Code      15  43931 2928.75 18.3369 2.329e-14 ***
-## Residuals 45   7187  159.72                      
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-\end{verbatim}
-
-Ovviamente, prima di considerare questa tabella dovremo preoccuparci del fatto che le assunzioni di base siano rispettate (vedi capitolo 8), cosa che possiamo facilmente verificare con un'analisi grafica dei residui, utilizzando il codice sottostante. L'output è visibile in Figura \ref{fig:figName121}.
-
-\begin{verbatim}
-par(mfrow=c(1,2))
-plot(mod, which = 1)
-plot(mod, which = 2)
-\end{verbatim}
-
-\begin{figure}
-
-{\centering \includegraphics[width=0.9\linewidth]{_main_files/figure-latex/figName121-1} 
-
-}
-
-\caption{Analisi grafica dei residui per la prova di confronto erbicida}\label{fig:figName121}
-\end{figure}
-
-Dopo esserci rassicurati su questo importante aspetto, possiamo vedere che abbiamo due ipotesi nulle da testare (effetto dei trattamenti non significativo ed effetto dei blocchi non significativo), che possono essere entrambe rifiutate per P \textless{} 0.05.
-
-Da questo punto in avanti, l'analisi procede come usuale, calcolando le medie marginali attese ed, eventualmente, confrontandole tra loro con una procedura di confronto multiplo, come descritto nei capitoli precedenti. Tener presente che, in questo esperimento, abbiamo 16 trattamenti, cioè \(16 \times 15 / 2 = 120\) confronti; di conseguenza, è opportuno operare la correzione per la molteplicità. Inoltre, dato che il trattamento più interessante è quello che rende massima la produzione, sarà opportuno ordinare le medie in senso decrescente, utilizzando l'argomento `reverse = T.'
-
-\scriptsize
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{library}\NormalTok{(emmeans)}
-\NormalTok{medie }\OtherTok{\textless{}{-}} \FunctionTok{emmeans}\NormalTok{(mod, }\SpecialCharTok{\textasciitilde{}}\NormalTok{Code)}
-\NormalTok{multcomp}\SpecialCharTok{::}\FunctionTok{cld}\NormalTok{(medie, }\AttributeTok{Letters =}\NormalTok{ LETTERS, }\AttributeTok{reverse =}\NormalTok{ T)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-##  Code emmean   SE df lower.CL upper.CL .group
-##  3      98.0 6.32 45    85.24    110.7  A    
-##  10     97.0 6.32 45    84.26    109.7  A    
-##  9      96.6 6.32 45    83.91    109.4  A    
-##  1      95.4 6.32 45    82.67    108.1  A    
-##  7      93.9 6.32 45    81.18    106.6  A    
-##  2      91.6 6.32 45    78.84    104.3  A    
-##  5      89.2 6.32 45    76.52    102.0  A    
-##  14     89.0 6.32 45    76.24    101.7  A    
-##  4      88.4 6.32 45    75.65    101.1  A    
-##  6      84.7 6.32 45    71.94     97.4  A    
-##  8      83.0 6.32 45    70.31     95.8  AB   
-##  11     51.9 6.32 45    39.19     64.6   BC  
-##  12     47.0 6.32 45    34.27     59.7    C  
-##  16     35.7 6.32 45    22.99     48.4    C  
-##  13     29.8 6.32 45    17.11     42.6    C  
-##  15     21.9 6.32 45     9.13     34.6    C  
-## 
-## Results are averaged over the levels of: Block 
-## Confidence level used: 0.95 
-## P value adjustment: tukey method for comparing a family of 16 estimates 
-## significance level used: alpha = 0.05
-\end{verbatim}
-
-\normalsize
-
-Vi lascio il commento dei risultati come esercizio.
 
 \hypertarget{disegni-a-quadrato-latino-1}{%
 \section{Disegni a quadrato latino}\label{disegni-a-quadrato-latino-1}}
 
-A volte i fattori di blocco sono più di uno e danno origine ad un disegno sperimentale detto `quadrato latino' di cui abbiamo parlato nel capitolo 3. Qui, forniremo un esempio tratto dalla pratica sperimentale industriale.
-
 \hypertarget{caso-studio-confronto-tra-metodi-costruttivi}{%
 \section{Caso studio: confronto tra metodi costruttivi}\label{caso-studio-confronto-tra-metodi-costruttivi}}
-
-Immaginiamo di voler studiare il tempo necessario per costruire un componente elettronico, utilizzando quattro metodi diversi: è evidente che il tempo di costruzione sarà influenzato dalla perizia del tecnico e, per questo, utilizziamo quattro tecnici diversi, ad ognuno dei quali facciamo utilizzare tutti e quattro i metodi. Un esperimento così disegnato sarebbe a blocchi randomizzati, con il tecnico che fa da blocco per i trattamenti. Tuttavia, dobbiamo anche riconoscere che i quattro tecnici saranno via via meno efficienti, e quindi il metodo che utilizzeranno per primo sarà avvantaggiato, mentre quello che utilizzeranno per ultimo sarà svantaggiato. E'vero che i metodi sono assegnati in ordine random ad ogni tecnico, ma non si può comunque evitare che un metodo venga avvantaggiato rispetto ad un altro, perché, ad esempio, non viene mai ad occupare l'ultima posizione (o meglio, l'ultimo turno). Abbiamo già illustrato questa situazione in un capitolo precedente ed abbiamo visto come essa possa essere gestita imponendo un vincolo ulteriore alla randomizzazione e facendo in modo che ogni metodo occupi tutte e quattro i turni, in tecnici diversi. Il disegno è quindi a quadrato latino.
-
-Il dataset dei risultati è disponibile online:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{fileName }\OtherTok{\textless{}{-}} \StringTok{"https://www.casaonofri.it/\_datasets/Technicians.csv"}
-\NormalTok{dataset }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(fileName, }\AttributeTok{header=}\NormalTok{T)}
-\NormalTok{dataset}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-##    Shift Technician Method Time
-## 1      I     Andrew      C   90
-## 2     II     Andrew      B   90
-## 3    III     Andrew      A   89
-## 4     IV     Andrew      D  104
-## 5      I       Anna      D   96
-## 6     II       Anna      C   91
-## 7    III       Anna      B   97
-## 8     IV       Anna      A  100
-## 9      I    Michael      A   84
-## 10    II    Michael      D   96
-## 11   III    Michael      C   98
-## 12    IV    Michael      B  104
-## 13     I      Sarah      B   88
-## 14    II      Sarah      A   88
-## 15   III      Sarah      D   98
-## 16    IV      Sarah      C  106
-\end{verbatim}
 
 \hypertarget{definizione-di-un-modello-lineare-2}{%
 \section{Definizione di un modello lineare}\label{definizione-di-un-modello-lineare-2}}
 
-In questo caso abbiamo un trattamento (metodo) e due effetti `blocco' (tecnico e turno) da includere nel modello, che può essere così definito:
+\hypertarget{la-regressione-lineare-semplice}{%
+\chapter{La regressione lineare semplice}\label{la-regressione-lineare-semplice}}
 
-\[Y_{ijk} = \mu + \gamma_k + \beta_j + \alpha_i + \varepsilon_{ijk}\]
+Nei capitoli precedenti abbiamo parlato di modelli basati su una fattori sperimentali in forma di categorie, ad esempio diversi erbicidi o diverse varietà. Abbiamo visto che, con questi fattori sperimentali, si utilizzano i cosiddetti modelli ANOVA.
 
-dove \(\mu\) è l'intercetta, \(\gamma\) è l'effetto del turno k, \(\beta\) è l'effetto del tecnico j e \(\alpha\) è l'effetto del metodo i. L'elemento \(\varepsilon_{ijk}\) rappresenta la componente random individuale, di ogni osservazione e si assume normalmente distribuita, con media 0 e deviazione standard \(\sigma\).
+Nella sperimentazione agronomica e, in genere, biologica, la variabile indipendente (o le variabili indipendenti) può (possono) rappresentare una quantità, come, ad esempio, la dose di un farmaco, il tempo trascorso da un certo evento, la fittezza di semina e così via. In questa condizione, l'analisi dei dati richiede modelli diversi da qualli visti finora, di solito identificati con il nome di modelli di regressione. Questa classe di modelli è estremamente interessante e si presta a sviluppi potentissimi. In questo libro ci accontenteremo di trattare la regressione lineare semplice, cioè un modello lineare (retta) con una variabile dipendente ed un regressore. In un capitolo successivo estenderemo le considerazioni fatte ai modelli non-lineari.
 
-Avendo già illustrato il processo di stima dei parametri e di scomposizione della varianza, quindi utilizziamo subito R per il `model fitting':
+\hypertarget{caso-studio-effetto-della-concimazione-azotata-al-frumento}{%
+\section{Caso studio: effetto della concimazione azotata al frumento}\label{caso-studio-effetto-della-concimazione-azotata-al-frumento}}
+
+Per individuare la relazione tra la concimazione azotata e la produzione del frumento, è stato organizzato un esperimento a randomizzazione completa, con quattro dosi di azoto e quattro repliche. I risultati ottenuti sono riportati nella Tabella \ref{tab:tabName141} e possono essere caricati direttamente da gitHub, con il codice sottostante. A differenza dei capitoli precedenti, in questo caso il dataset non è ottenuto da una prova vera, ma è stato generato, con il codice riportato nel capitolo 4. Pertanto, l'esempio, pur essendo efficace da un punto di vista didattico, potrebbe non essere assolutamento realistico.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{mod }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Time }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Method }\SpecialCharTok{+}\NormalTok{ Technician}
-          \SpecialCharTok{+}\NormalTok{ Shift, }\AttributeTok{data =}\NormalTok{ dataset)}
+\NormalTok{fileName }\OtherTok{\textless{}{-}} \StringTok{"https://www.casaonofri.it/\_datasets/NWheat.csv"}
+\NormalTok{dataset }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(fileName, }\AttributeTok{header=}\NormalTok{T)}
 \end{Highlighting}
 \end{Shaded}
 
-Verifichiamo il rispetto delle assunzioni di base, con l'analisi grafica dei residui, riportata in Figura \ref{fig:figName122} (il codice è analogo a quello fornito più sopra).
+\begin{table}
+
+\caption{\label{tab:tabName141}Dataset relativo ad una prova di concimazione azotata su frumento}
+\centering
+\begin{tabular}[t]{rrrrr}
+\toprule{}
+Dose & 1 & 2 & 3 & 4\\
+\midrule{}
+0 & 21.98 & 25.69 & 27.71 & 19.14\\
+60 & 35.07 & 35.27 & 32.56 & 32.63\\
+120 & 41.59 & 40.77 & 41.81 & 40.50\\
+180 & 50.06 & 52.16 & 54.40 & 51.72\\
+\bottomrule{}
+\end{tabular}
+\end{table}
+
+\hypertarget{analisi-preliminari}{%
+\section{Analisi preliminari}\label{analisi-preliminari}}
+
+Questo esperimento è replicato ed è totalmente analogo a quello presentato nel capitolo 7, con l'unica differenza che, in questo caso, la variabile indipendente è quantitativa. Tuttavia, è del tutto logico considerare la dose di azoto come un predittore qualitativo (`factor') ed utilizzare un modello descrittivo ANOVA ad una via. Eseguiamo il `fitting' con R, ottenendo i risultati seguenti:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dataset}\SpecialCharTok{$}\NormalTok{DoseF }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(dataset}\SpecialCharTok{$}\NormalTok{Dose)}
+\NormalTok{model }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Yield }\SpecialCharTok{\textasciitilde{}}\NormalTok{ DoseF, }\AttributeTok{data =}\NormalTok{ dataset)}
+\FunctionTok{anova}\NormalTok{(model)}
+\DocumentationTok{\#\# Analysis of Variance Table}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# Response: Yield}
+\DocumentationTok{\#\#           Df  Sum Sq Mean Sq F value    Pr(\textgreater{}F)    }
+\DocumentationTok{\#\# DoseF      3 1725.96  575.32  112.77 4.668e{-}09 ***}
+\DocumentationTok{\#\# Residuals 12   61.22    5.10                      }
+\DocumentationTok{\#\# {-}{-}{-}}
+\DocumentationTok{\#\# Signif. codes:  0 \textquotesingle{}***\textquotesingle{} 0.001 \textquotesingle{}**\textquotesingle{} 0.01 \textquotesingle{}*\textquotesingle{} 0.05 \textquotesingle{}.\textquotesingle{} 0.1 \textquotesingle{} \textquotesingle{} 1}
+\end{Highlighting}
+\end{Shaded}
+
+Osserviamo che l'effetto del trattamento è significativo e il SEM è pari a \(\sqrt{5.10/4} = 1.129\). Prima di proseguire, verifichiamo che non ci siano problemi relativi alle assunzioni parametriche di base e che, quindi, la trasformazione dei dati non sia necessaria. I grafici dei residui, riportati in Figura \ref{fig:figName141}, non mostrano patologie rilevanti.
 
 \begin{figure}
 
-{\centering \includegraphics[width=0.9\linewidth]{_main_files/figure-latex/figName122-1} 
+{\centering \includegraphics[width=0.9\linewidth]{_main_files/figure-latex/figName141-1} 
 
 }
 
-\caption{Analisi grafica dei residui per la prova di confronto tra metodi costruttivi}\label{fig:figName122}
+\caption{Analisi grafica dei residui per una prova di concimazione azotata del frumento}\label{fig:figName141}
 \end{figure}
 
-Non essendovi evidenti problemi, valutiamo la significatività degli effetti nel modello, analogamente a quanto abbiamo fatto nel caso dell'ANOVA a blocchi randomizzati. L'unica differenza sta nel fatto che, nei disegni a quadrato latino, vi sono tre effetti da testare, anche se l'unico ad avere una certa rilevanza è l'effetto del metodo di lavoro.
+Da questo momento in avanti, diversamente a quanto abbiamo visto nei capitoli precedenti, l'analisi non prosegue con un test di confronto multiplo, che in questa situazione, se non del tutto errato, sarebbe comunque da considerare `improprio.' Infatti, quale senso avrebbe confrontare la risposta produttiva a 60 kg N ha\textsuperscript{-1} con quella a 120 kg N ha \textsuperscript{-1}? In realtà noi non siamo specificatamente interessati a queste due dosi, ma a qualunque altra dose nell'intervallo da 0 a 180 kg N ha\textsuperscript{-1}. Abbiamo selezionato quattro dosi per organizzare l'esperimento, ma resta il fatto che siamo interessati a definire una funzione di risposta per tutto l'intervallo delle dosi, non a confrontare le risposte a due dosi in particolare.
+
+Per questo motivo, quando la variabile indipendente è una dose, l'analisi dei dati dovrebbe essere basata sull'impiego di un modello di regressione, in quanto ciò è più coerente con le finalità dell'esperimento, rispetto all'adozione di una procedura di confronto multiplo.
+
+\hypertarget{definizione-del-modello-lineare}{%
+\section{Definizione del modello lineare}\label{definizione-del-modello-lineare}}
+
+Immaginiamo che, almeno nell'intervallo di dosi incluso nell'esperimento, l'effetto della concimazione azotata sulla produzione sia lineare. In effetti, l'andamento dei dati conferma questa impressione e, pertanto, poniamo il modello lineare nei termini usuali:
+
+\[Y_i = b_0 + b_1 X_i + \varepsilon_i\]
+
+dove \(Y\) è la produzione della parcella \(i\), trattata con la dose \(X_i\), \(b_0\) è l'intercetta (produzione a dose di azoto pari a 0) e \(b_1\) è la pendenza, cioè l'incremento di produzione per ogni incremento unitario della dose. La componente stocastica \(\varepsilon\) viene assunta omoscedastica e normalmente distribuita, con media 0 e deviazione standard \(\sigma\).
+
+\hypertarget{stima-dei-parametri-2}{%
+\section{Stima dei parametri}\label{stima-dei-parametri-2}}
+
+Dobbiamo a questo punto individuare i parametri \(b_0\) e \(b_1\) in modo tale che la retta ottenuta sia la più vicina ai dati, cioè in modo da minimizzare gli scostamenti tra i valori di produzione osservati e quelli stimati dal modello (soluzione dei minimi quadrati). La funzione dei minimi quadrati è:
+
+\[\begin{array}{l}
+Q = \sum\limits_{i = }^N {\left( {{Y_i} - \hat Y} \right)^2 = \sum\limits_{i = }^N {{{\left( {{Y_i} - {b_0} - {b_1}{X_i}} \right)}^2}}  = } \\
+ = \sum\limits_{i = }^N {\left( {Y_i^2 + b_0^2 + b_1^2X_i^2 - 2{Y_i}{b_0} - 2{Y_i}{b_1}{X_i} + 2{b_0}{b_1}{X_i}} \right)}  = \\
+ = \sum\limits_{i = }^N {Y_i^2 + Nb_0^2 + b_1^2\sum\limits_{i = }^N {X_i^2 - 2{b_0}\sum\limits_{i = }^N {Y_i^2 - 2{b_1}\sum\limits_{i = }^N {{X_i}{Y_i} + } } } } 2{b_0}{b_1}\sum\limits_{i = }^N {{X_i}} 
+\end{array}\]
+
+Calcolando le derivate parziali rispetto a \(b_0\) e \(b_1\) che, al momento, sono le nostre incognite, ed eguagliandole a 0 si ottengono le seguenti formule risolutive:
+
+\[{b_1} = \frac{{\sum\limits_{i = 1}^N {\left[ {\left( {{X_i} - {\mu _X}} \right)\left( {{Y_i} - {\mu _Y}} \right)} \right]} }}{{\sum\limits_{i = 1}^N {{{\left( {{X_i} - {\mu _X}} \right)}^2}} }}\]
+
+e:
+
+\[{b_0} = {\mu _Y} - {b_1}{\mu _X}\]
+
+Invece che svolgere i calcoli a mano, possiamo eseguire il fitting ai minimi quadrati con R. Possiamo notare che l'unica differenza tra questo modello di regressione e il modello ANOVA utilizzato poco sopra è che qui utilizziamo la variabile `Dose' come tale, senza prima trasformarla in un `factor.'
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{anova}\NormalTok{(mod)}
+\NormalTok{modelReg }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Yield }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Dose, }\AttributeTok{data =}\NormalTok{ dataset)}
+\FunctionTok{summary}\NormalTok{(modelReg)}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# Call:}
+\DocumentationTok{\#\# lm(formula = Yield \textasciitilde{} Dose, data = dataset)}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# Residuals:}
+\DocumentationTok{\#\#     Min      1Q  Median      3Q     Max }
+\DocumentationTok{\#\# {-}4.6537 {-}1.5350 {-}0.4637  1.9250  3.9163 }
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# Coefficients:}
+\DocumentationTok{\#\#              Estimate Std. Error t value Pr(\textgreater{}|t|)    }
+\DocumentationTok{\#\# (Intercept) 23.793750   0.937906   25.37 4.19e{-}13 ***}
+\DocumentationTok{\#\# Dose         0.154417   0.008356   18.48 3.13e{-}11 ***}
+\DocumentationTok{\#\# {-}{-}{-}}
+\DocumentationTok{\#\# Signif. codes:  0 \textquotesingle{}***\textquotesingle{} 0.001 \textquotesingle{}**\textquotesingle{} 0.01 \textquotesingle{}*\textquotesingle{} 0.05 \textquotesingle{}.\textquotesingle{} 0.1 \textquotesingle{} \textquotesingle{} 1}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# Residual standard error: 2.242 on 14 degrees of freedom}
+\DocumentationTok{\#\# Multiple R{-}squared:  0.9606, Adjusted R{-}squared:  0.9578 }
+\DocumentationTok{\#\# F{-}statistic: 341.5 on 1 and 14 DF,  p{-}value: 3.129e{-}11}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{verbatim}
-## Analysis of Variance Table
-## 
-## Response: Time
-##            Df Sum Sq Mean Sq F value    Pr(>F)    
-## Method      3 145.69  48.563 12.7377 0.0051808 ** 
-## Technician  3  17.19   5.729  1.5027 0.3065491    
-## Shift       3 467.19 155.729 40.8470 0.0002185 ***
-## Residuals   6  22.87   3.812                      
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-\end{verbatim}
+Ora sappiamo che la relazione tra la dose di azoto e la risposta produttiva del frumento è:
 
-Vediamo che esiste una differenza significativa tra i metodi e l'ipotesi nulla può essere rifiutata con una bassissima probabilità di errore di prima specie.
+\[ Y_i = 23.111 + 0.1544 \times X_i \]
 
-Ovviamente, dopo aver eseguito un'ANOVA a blocchi randomizzati o a quadrato latino, andremo eventualmente ad eseguire un test di confronto multiplo, seguendo le raccomandazioni esposte nel capitolo precedente. Anche questa parte ve la lasciamo per esercizio.
+L'elemento stocastico \(\varepsilon_i\) è normalmente distribuito, con media 0 e deviazione standard 2.029 (vedi la voce `Residual standard error' nell'output sovrstante).
+
+Come al solito, prima di qualunque altra considerazione, dobbiamo verificare la bontà del modello e il rispetto delle assunzioni di base, con una procedura che, per un modello di regressione, deve riguardare un maggior numero di aspetti rispetto ad un modello ANOVA.
+
+\hypertarget{valutazione-della-bontuxe0-del-modello}{%
+\section{Valutazione della bontà del modello}\label{valutazione-della-bontuxe0-del-modello}}
+
+In primo luogo, è necessario verificare il rispetto delle assunzioni di base di normalità e omoscedasticità dei residui. Per questo, possiamo utilizzare gli stessi metodi impiegati per i modelli ANOVA, vale a dire un grafico dei residui verso gli attesi ed un QQ-plot dei residui standardizzati. In realtà, abbiamo già eseguito questo controllo con il modello ANOVA corrispondente e non vi è la necessità di ripeterlo con questo modello.
+
+Dobbiamo invece assicurarci che i dati osservati siano ben descritti dal modello adottato, senza nessuna componente sistematica di mancanza d'adattamento. In altre parole, le osservazioni non debbono contraddire l'ipotesi che la risposta è lineare, salvo per le eventuali deviazioni casuali insite in qualunque esperimento. Per la verificà della \textbf{bontà di adattamento} possiamo utilizzare diverse procedure, che illustreremo di seguito.
+
+\hypertarget{valutazione-grafica}{%
+\subsection{Valutazione grafica}\label{valutazione-grafica}}
+
+Nel modo più semplice, la bontà di adattamento può essere valutata attraverso un grafico dei valori attesi e dei valori osservati, come quello in Figura \ref{fig:figName142}. Notiamo che non c'è alcun elemento che faccia pensare ad una sistematica deviazione rispetto alle previsioni fatte dal modello.
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.9\linewidth]{_main_files/figure-latex/figName142-1} 
+
+}
+
+\caption{Risposta produttiva del frumento alla concimazione azotata: dati osservati (simboli) e valori attesi (linea tratteggiata).}\label{fig:figName142}
+\end{figure}
+
+\hypertarget{errori-standard-dei-parametri}{%
+\subsection{Errori standard dei parametri}\label{errori-standard-dei-parametri}}
+
+In secondo luogo, possiamo valutare gli errori standard delle stime dei parametri, che non debbono mai essere superiori alla metà del valore del parametro stimato, cosa che in questo caso è pienamente verificata. Se così non fosse, l'intervallo di confidenza del parametro, usualmente stimato utilizzando il doppio dell'errore standard, conterrebbe lo zero, il che equivarebbe a dire che, ad esempio, la pendenza `vera' (cioè quella della popolazione da cui il nostro campione è estratto) potrebbe essere nulla. In altre parole, la retta potrebbe essere `piatta,' dimostrando l'inesistenza di relazione tra la dose di concimazione e la produzione della coltura. Si può notare che, nell'esempio in studio, questo dubbio non sembra sussistere.
+
+\hypertarget{test-f-per-la-mancanza-dadattamento}{%
+\subsection{Test F per la mancanza d'adattamento}\label{test-f-per-la-mancanza-dadattamento}}
+
+In terzo luogo, possiamo analizzare i residui della regressione, cioè gli scostamenti dei punti rispetto alla retta e, in particolare, la somma dei loro quadrati. Possiamo vedere che questo valore è pari a 70.37, ed è più alto di quello del corrispondente modello ANOVA, impiegato in precedenza (61.22):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{anova}\NormalTok{(modelReg)}
+\DocumentationTok{\#\# Analysis of Variance Table}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# Response: Yield}
+\DocumentationTok{\#\#           Df  Sum Sq Mean Sq F value    Pr(\textgreater{}F)    }
+\DocumentationTok{\#\# Dose       1 1716.80 1716.80  341.54 3.129e{-}11 ***}
+\DocumentationTok{\#\# Residuals 14   70.37    5.03                      }
+\DocumentationTok{\#\# {-}{-}{-}}
+\DocumentationTok{\#\# Signif. codes:  0 \textquotesingle{}***\textquotesingle{} 0.001 \textquotesingle{}**\textquotesingle{} 0.01 \textquotesingle{}*\textquotesingle{} 0.05 \textquotesingle{}.\textquotesingle{} 0.1 \textquotesingle{} \textquotesingle{} 1}
+\end{Highlighting}
+\end{Shaded}
+
+Il risultato è perfettamente normale, dato che il residuo del modello ANOVA contiene solo la misura dello scostamento di ogni dato rispetto alla media del suo gruppo, che si può considerare `errore puro,' mentre il residuo della regressione, oltre all'errore puro, contiene anche una componente detta `mancanza d'adattamento' (\emph{lack of fit}), misurabile con lo scostamento di ogni media dalla linea di regressione. In effetti, la regressione lineare è solo un'approssimazione della reale relazione biologica tra la concimazione e la produzione del frumento.
+
+Insomma, il modello di regressione è un modello che ha sempre minor capacità descrittiva rispetto ad un modello ANOVA. La differenza può essere quantificata utilizzando le devianze dei rispettivi residui:
+
+\[\textrm{Lack of fit} = 70.37 - 61.22 = 9.15\]
+
+Bisogna però anche dire che il modello di regressione è più parsimonioso, nel senso che ci ha costretto a stimare solo due parametri (\(b_0\) e \(b_1\)), mentre il modello ANOVA ce ne ha fatti stimare quattro (\(\mu\), \(\alpha_2\), \(\alpha_3\) e \(\alpha_4\), considerando che \(\alpha_1 = 0\)). Quindi il residuo del modello di regressione ha 14 gradi di libertà (16 dati meno due parametri stimati), mentre il residuo del modello ANOVA ne ha 12 (16 - 4). La componente di lack of fit ha quindi 14 - 12 = 2 gradi di libertà. Ci chiediamo, questa componente di lack of fit è significativamente più grande dell'errore puro?
+
+L'ipotesi nulla di assenza di lack of fit può essere testata con un test di F, per il confronto di due varianze: se questo è significativo allora la componente di mancanza d'adattamento non è trascurabile, ed il modello di regressione dovrebbe essere rifiutato. L'espressione è:
+
+\[ F_{lack} = \frac{\frac{RSS_r - RSS_a}{DF_r-DF_a} } {\frac{RSS_a}{DF_a}} = \frac{MS_{lack}}{MSE_a}\]
+
+dove RSS\textsubscript{r} è la devianza residua della regressione con i sui gradi di liberta DF\textsubscript{r} e RSS\textsubscript{a} è la devianza residua del modello ANOVA, con i suoi gradi di libertà DF\textsubscript{a}. In R, il test F per la mancanza d'adattamento può essere eseguito con la funzione \texttt{anova()}, confrontando i due modelli alternativi:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{anova}\NormalTok{(modelReg, model)}
+\DocumentationTok{\#\# Analysis of Variance Table}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# Model 1: Yield \textasciitilde{} Dose}
+\DocumentationTok{\#\# Model 2: Yield \textasciitilde{} DoseF}
+\DocumentationTok{\#\#   Res.Df    RSS Df Sum of Sq      F Pr(\textgreater{}F)}
+\DocumentationTok{\#\# 1     14 70.373                           }
+\DocumentationTok{\#\# 2     12 61.219  2    9.1542 0.8972 0.4334}
+\end{Highlighting}
+\end{Shaded}
+
+Vediamo che non otteniamo risultati significativi (P = 0.4334). Ciò supporta l'idea che non vi sia mancanza d'adattamento e quindi la regressione fornisca una descrizione altrettanto adeguata dei dati sperimentali rispetto al più `complesso' modello ANOVA. Scegliamo quindi il modello di regressione, in quanto più semplice, nel rispetto del principio del rasoio di Occam.
+
+\hypertarget{test-f-per-la-bontuxe0-di-adattamento-e-coefficiente-di-determinazione}{%
+\subsection{Test F per la bontà di adattamento e coefficiente di determinazione}\label{test-f-per-la-bontuxe0-di-adattamento-e-coefficiente-di-determinazione}}
+
+Abbiamo dimostrato che il modello di regressione non è significativamente peggiore del modello ANOVA corrispondente. Un approccio alternativo per dimostrare la bontà di adattamento è verificare se il modello di regressione è significativamente migliore di un modello `nullo.' Ricordiamo che con il modello `nullo' (\(Y_i = \mu + \varepsilon_i\)) si assume che la risposta sia costante e pari alla media di tutti i dati, escludendo così ogni effetto della dose di concimazione. La devianza del residuo di un modello nullo non è altro che la devianza totale dei dati, che risulta pari a 1787.178:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{modNull }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Yield }\SpecialCharTok{\textasciitilde{}} \DecValTok{1}\NormalTok{, }\AttributeTok{data =}\NormalTok{ dataset)}
+\FunctionTok{deviance}\NormalTok{(modNull)}
+\DocumentationTok{\#\# [1] 1787.178}
+\end{Highlighting}
+\end{Shaded}
+
+Abbiamo visto che la devianza del modello di regressione è pari a 70.37: la differenza (1716.81) rappresenta la `bontà di adattamento,' cioè una misura di quanto migliora il potere descrittivo del modello aggiungendo l'effetto `dose.' Quindi, un test di F per la bontà di adattamento può essere costruito come:
+
+\[ F_{good} = \frac{\frac{RSS_t - RSS_r}{DF_t - DF_r} } {\frac{RSS_r}{DF_r}} = \frac{MS_{good}}{MSE_r}\]
+
+dove RSS\textsubscript{t} è la devianza totale dei dati con i sui gradi di liberta DF\textsubscript{t}. In R, il test F per la bontà d'adattamento può essere eseguito con la funzione \texttt{anova()}, senza la necessità di includere come argomento il modello `nullo':
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{anova}\NormalTok{(modelReg)}
+\DocumentationTok{\#\# Analysis of Variance Table}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# Response: Yield}
+\DocumentationTok{\#\#           Df  Sum Sq Mean Sq F value    Pr(\textgreater{}F)    }
+\DocumentationTok{\#\# Dose       1 1716.80 1716.80  341.54 3.129e{-}11 ***}
+\DocumentationTok{\#\# Residuals 14   70.37    5.03                      }
+\DocumentationTok{\#\# {-}{-}{-}}
+\DocumentationTok{\#\# Signif. codes:  0 \textquotesingle{}***\textquotesingle{} 0.001 \textquotesingle{}**\textquotesingle{} 0.01 \textquotesingle{}*\textquotesingle{} 0.05 \textquotesingle{}.\textquotesingle{} 0.1 \textquotesingle{} \textquotesingle{} 1}
+\end{Highlighting}
+\end{Shaded}
+
+Vediamo che in questo caso l'ipotesi nulla deve essere rifiutata: la varianza spiegata dalla regressione è significativamente maggiore di quella del residuo.
+
+Più frequentemente, la devianza spiegata dalla regressione viene rapportata alla devianza totale, per individuare quanta parte della variabilità dei dati è spiegata dal modello prescelto. Questa proporzione definisce il cosidetto \textbf{coefficente di determinazione} o R\textsuperscript{2}:
+
+\[R^2 = \frac{SS_{reg}}{SS_{tot}} = \frac{1716.81}{1787.18} = 0.961\]
+
+Questa statistica varia da 0 ad 1 e la regressione è tanto migliore quanto più essa si avvicina ad 1. In realtà il coefficiente di determinazione è visibile nell'output della funzione \texttt{summary()} applicata all'oggetto `modelReg' (vedi più sopra).
+
+\hypertarget{previsioni}{%
+\section{Previsioni}\label{previsioni}}
+
+Dato che il modello ha mostrato di funzionare bene, con prudenza, possiamo utilizzarlo per effettuare due tipi di previsioni: diretta ed inversa. Nel primo caso, possiamo prevedere la risposta per una qualunque dose, nel secondo caso, possiamo prevedere la dose che ha indotto una data risposta (Figure \ref{fig:figName143}).
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.9\linewidth]{_main_files/figure-latex/figName143-1} 
+
+}
+
+\caption{Esempio di previsioni: a destra, previsione della risposta per una data dose, a sinistra previsione della dose per ottenere una data risposta}\label{fig:figName143}
+\end{figure}
+
+Per entrambi i tipi di previsione ci si dovrebbe mantenere entro i livelli di dosi e risposte massimi e minimi inclusi ed osservati in prova, per evitare pericolose estrapolazioni (la risposta ha mostrato di essere lineare solo nell'intervallo osservato, ma non sappiamo cosa potrebbe capitare fuori da questo).
+
+I parametri stimati possono essere facilmente utilizzati per fare previsioni dirette, come indicato nel box sottostante.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FloatTok{23.793750} \SpecialCharTok{+} \FloatTok{0.154417} \SpecialCharTok{*} \DecValTok{30}
+\DocumentationTok{\#\# [1] 28.42626}
+\FloatTok{23.793750} \SpecialCharTok{+} \FloatTok{0.154417} \SpecialCharTok{*} \DecValTok{80}
+\DocumentationTok{\#\# [1] 36.14711}
+\end{Highlighting}
+\end{Shaded}
+
+Anche queste stime, come tutte le altre, si riferiscono al campione in prova, mentre noi siamo interessati a fornire una previsione per l'intera popolazione da cui i nostri dati sono capionati. Per questo motivo, abbiamo la necessità di quantificare l'incertezza, attraverso un'opportuna stima dell'errore standard. In R, ciò è possibile utilizzando la funzione \texttt{predict()}, passando come argomento le dosi alle quali effettuare la previsione, organizzate in un data frame. Ad esempio, se si vuole prevedere la produzione a 30 e 80 kg N ha\textsuperscript{-1}, il codice è:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pred }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(modelReg, }\AttributeTok{newdata=}\FunctionTok{data.frame}\NormalTok{(}\AttributeTok{Dose=}\FunctionTok{c}\NormalTok{(}\DecValTok{30}\NormalTok{, }\DecValTok{80}\NormalTok{)), }\AttributeTok{se=}\NormalTok{T)}
+\NormalTok{pred}
+\DocumentationTok{\#\# $fit}
+\DocumentationTok{\#\#        1        2 }
+\DocumentationTok{\#\# 28.42625 36.14708 }
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# $se.fit}
+\DocumentationTok{\#\#         1         2 }
+\DocumentationTok{\#\# 0.7519981 0.5666999 }
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# $df}
+\DocumentationTok{\#\# [1] 14}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# $residual.scale}
+\DocumentationTok{\#\# [1] 2.242025}
+\end{Highlighting}
+\end{Shaded}
+
+E'anche possibile effettuare la previsione inversa, cioè chiedere ai dati qual è la dose a cui corrisponde una produzione di 45 q/ha. In questo caso dobbiamo tener presente che l'equazione inversa è:
+
+\[X = \frac{Y - b_0}{b_1}\]
+e la previsione corrispondente è:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(}\DecValTok{45} \SpecialCharTok{{-}} \FloatTok{23.793750}\NormalTok{)}\SpecialCharTok{/}\FloatTok{0.154417}
+\DocumentationTok{\#\# [1] 137.3311}
+\end{Highlighting}
+\end{Shaded}
+
+Per determinare l'errore standard possiamo utilizzare la funzione \texttt{deltaMethod()}, nel package `car,' che ci calcola anche gli errori standard con il metodo della propagazione degli errori:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{car}\SpecialCharTok{::}\FunctionTok{deltaMethod}\NormalTok{(modelReg, }\StringTok{"(45 {-} b0)/b1"}\NormalTok{, }
+                 \AttributeTok{parameterNames=}\FunctionTok{c}\NormalTok{(}\StringTok{"b0"}\NormalTok{, }\StringTok{"b1"}\NormalTok{))}
+\DocumentationTok{\#\#              Estimate       SE    2.5 \% 97.5 \%}
+\DocumentationTok{\#\# (45 {-} b0)/b1 137.3314   4.4424 128.6244 146.04}
+\end{Highlighting}
+\end{Shaded}
+
+Il procedimento sopra descritto è molto comune, per esempio nei laboratori chimici, dove viene utilizzato nella fase di calibrazione di uno strumento. Una volta che la retta di calibrazione è stata individuate, essa viene utilizzata per determinare le concentrazioni incognite di campioni per i quali sia stata misurata la risposta.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{altre-letture-9}{%
+\section{Altre letture}\label{altre-letture-9}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Draper, N.R., Smith, H., 1981. Applied Regression Analysis, in: Applied Regression. John Wiley \& Sons, Inc., IDA, pp.~224--241.
+\item
+  Faraway, J.J., 2002. Practical regression and Anova using R. \url{http://cran.r-project.org/doc/contrib/Faraway-PRA.pdf}, R.
+\end{enumerate}
 
 \hypertarget{modelli-anova-a-due-vie}{%
 \chapter{Modelli ANOVA a due vie}\label{modelli-anova-a-due-vie}}
@@ -1083,11 +955,11 @@ Placeholder
 \hypertarget{caso-studio-interazione-tra-lavorazioni-e-diserbo-chimico}{%
 \section{Caso-studio: interazione tra lavorazioni e diserbo chimico}\label{caso-studio-interazione-tra-lavorazioni-e-diserbo-chimico}}
 
-\hypertarget{definizione-del-modello-lineare}{%
-\section{Definizione del modello lineare}\label{definizione-del-modello-lineare}}
+\hypertarget{definizione-del-modello-lineare-1}{%
+\section{Definizione del modello lineare}\label{definizione-del-modello-lineare-1}}
 
-\hypertarget{stima-dei-parametri-2}{%
-\section{Stima dei parametri}\label{stima-dei-parametri-2}}
+\hypertarget{stima-dei-parametri-3}{%
+\section{Stima dei parametri}\label{stima-dei-parametri-3}}
 
 \hypertarget{verifica-delle-assunzioni-di-base}{%
 \section{Verifica delle assunzioni di base}\label{verifica-delle-assunzioni-di-base}}
@@ -1109,44 +981,6 @@ Placeholder
 
 \hypertarget{anova-a-due-vie-scomposizione-manuale-della-varianza}{%
 \subsection{Anova a due vie: scomposizione `manuale' della varianza}\label{anova-a-due-vie-scomposizione-manuale-della-varianza}}
-
-\hypertarget{la-regressione-lineare-semplice}{%
-\chapter{La regressione lineare semplice}\label{la-regressione-lineare-semplice}}
-
-Placeholder
-
-\hypertarget{caso-studio-effetto-della-concimazione-azotata-al-frumento}{%
-\section{Caso studio: effetto della concimazione azotata al frumento}\label{caso-studio-effetto-della-concimazione-azotata-al-frumento}}
-
-\hypertarget{analisi-preliminari}{%
-\section{Analisi preliminari}\label{analisi-preliminari}}
-
-\hypertarget{definizione-del-modello-lineare-1}{%
-\section{Definizione del modello lineare}\label{definizione-del-modello-lineare-1}}
-
-\hypertarget{stima-dei-parametri-3}{%
-\section{Stima dei parametri}\label{stima-dei-parametri-3}}
-
-\hypertarget{valutazione-della-bontuxe0-del-modello}{%
-\section{Valutazione della bontà del modello}\label{valutazione-della-bontuxe0-del-modello}}
-
-\hypertarget{valutazione-grafica}{%
-\subsection{Valutazione grafica}\label{valutazione-grafica}}
-
-\hypertarget{errori-standard-dei-parametri}{%
-\subsection{Errori standard dei parametri}\label{errori-standard-dei-parametri}}
-
-\hypertarget{test-f-per-la-mancanza-dadattamento}{%
-\subsection{Test F per la mancanza d'adattamento}\label{test-f-per-la-mancanza-dadattamento}}
-
-\hypertarget{test-f-per-la-bontuxe0-di-adattamento-e-coefficiente-di-determinazione}{%
-\subsection{Test F per la bontà di adattamento e coefficiente di determinazione}\label{test-f-per-la-bontuxe0-di-adattamento-e-coefficiente-di-determinazione}}
-
-\hypertarget{previsioni}{%
-\section{Previsioni}\label{previsioni}}
-
-\hypertarget{per-approfondire-un-po-1}{%
-\section{Per approfondire un po'\ldots{}}\label{per-approfondire-un-po-1}}
 
 \hypertarget{la-regressione-non-lineare}{%
 \chapter{La regressione non-lineare}\label{la-regressione-non-lineare}}
@@ -1204,14 +1038,14 @@ Placeholder
 \hypertarget{trasformazione-dei-dati}{%
 \subsection{Trasformazione dei dati}\label{trasformazione-dei-dati}}
 
-\hypertarget{per-approfondire-un-po-2}{%
-\section{Per approfondire un po'\ldots{}}\label{per-approfondire-un-po-2}}
+\hypertarget{per-approfondire-un-po-1}{%
+\section{Per approfondire un po'\ldots{}}\label{per-approfondire-un-po-1}}
 
 \hypertarget{riparametrizzazione-delle-funzioni-non-lineari}{%
 \subsection{Riparametrizzazione delle funzioni non-lineari}\label{riparametrizzazione-delle-funzioni-non-lineari}}
 
-\hypertarget{altre-letture-9}{%
-\subsection{Altre letture}\label{altre-letture-9}}
+\hypertarget{altre-letture-10}{%
+\subsection{Altre letture}\label{altre-letture-10}}
 
 \hypertarget{esercizi}{%
 \chapter{Esercizi}\label{esercizi}}
@@ -1484,8 +1318,8 @@ Placeholder
 \section*{Cenni sulle funzionalità grafiche in R}\label{cenni-sulle-funzionalituxe0-grafiche-in-r}}
 \addcontentsline{toc}{section}{Cenni sulle funzionalità grafiche in R}
 
-\hypertarget{altre-letture-10}{%
-\section*{Altre letture}\label{altre-letture-10}}
+\hypertarget{altre-letture-11}{%
+\section*{Altre letture}\label{altre-letture-11}}
 \addcontentsline{toc}{section}{Altre letture}
 
 
