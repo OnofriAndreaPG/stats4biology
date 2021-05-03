@@ -16,7 +16,7 @@
 }
 
 \author{Andrea Onofri e Dario Sacco}
-\date{Update: v. 1.0 (15/03/2021), compil. 2021-04-28}
+\date{Update: v. 1.0 (15/03/2021), compil. 2021-04-29}
 \title{Metodologia sperimentale per le scienze agrarie}
 \subtitle{}
 
@@ -607,342 +607,43 @@ Placeholder
 \hypertarget{la-regressione-lineare-semplice}{%
 \chapter{La regressione lineare semplice}\label{la-regressione-lineare-semplice}}
 
-Nei capitoli precedenti abbiamo parlato di modelli basati su una fattori sperimentali in forma di categorie, ad esempio diversi erbicidi o diverse varietà. Abbiamo visto che, con questi fattori sperimentali, si utilizzano i cosiddetti modelli ANOVA.
-
-Nella sperimentazione agronomica e, in genere, biologica, la variabile indipendente (o le variabili indipendenti) può (possono) rappresentare una quantità, come, ad esempio, la dose di un farmaco, il tempo trascorso da un certo evento, la fittezza di semina e così via. In questa condizione, l'analisi dei dati richiede modelli diversi da qualli visti finora, di solito identificati con il nome di modelli di regressione. Questa classe di modelli è estremamente interessante e si presta a sviluppi potentissimi. In questo libro ci accontenteremo di trattare la regressione lineare semplice, cioè un modello lineare (retta) con una variabile dipendente ed un regressore. In un capitolo successivo estenderemo le considerazioni fatte ai modelli non-lineari.
+Placeholder
 
 \hypertarget{caso-studio-effetto-della-concimazione-azotata-al-frumento}{%
 \section{Caso studio: effetto della concimazione azotata al frumento}\label{caso-studio-effetto-della-concimazione-azotata-al-frumento}}
 
-Per individuare la relazione tra la concimazione azotata e la produzione del frumento, è stato organizzato un esperimento a randomizzazione completa, con quattro dosi di azoto e quattro repliche. I risultati ottenuti sono riportati nella Tabella \ref{tab:tabName141} e possono essere caricati direttamente da gitHub, con il codice sottostante. A differenza dei capitoli precedenti, in questo caso il dataset non è ottenuto da una prova vera, ma è stato generato, con il codice riportato nel capitolo 4. Pertanto, l'esempio, pur essendo efficace da un punto di vista didattico, potrebbe non essere assolutamento realistico.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{fileName }\OtherTok{\textless{}{-}} \StringTok{"https://www.casaonofri.it/\_datasets/NWheat.csv"}
-\NormalTok{dataset }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(fileName, }\AttributeTok{header=}\NormalTok{T)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{table}
-
-\caption{\label{tab:tabName141}Dataset relativo ad una prova di concimazione azotata su frumento}
-\centering
-\begin{tabular}[t]{rrrrr}
-\toprule{}
-Dose & 1 & 2 & 3 & 4\\
-\midrule{}
-0 & 21.98 & 25.69 & 27.71 & 19.14\\
-60 & 35.07 & 35.27 & 32.56 & 32.63\\
-120 & 41.59 & 40.77 & 41.81 & 40.50\\
-180 & 50.06 & 52.16 & 54.40 & 51.72\\
-\bottomrule{}
-\end{tabular}
-\end{table}
-
 \hypertarget{analisi-preliminari}{%
 \section{Analisi preliminari}\label{analisi-preliminari}}
-
-Questo esperimento è replicato ed è totalmente analogo a quello presentato nel capitolo 7, con l'unica differenza che, in questo caso, la variabile indipendente è quantitativa. Tuttavia, è del tutto logico considerare la dose di azoto come un predittore qualitativo (`factor') ed utilizzare un modello descrittivo ANOVA ad una via. Eseguiamo il `fitting' con R, ottenendo i risultati seguenti:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{dataset}\SpecialCharTok{$}\NormalTok{DoseF }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(dataset}\SpecialCharTok{$}\NormalTok{Dose)}
-\NormalTok{model }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Yield }\SpecialCharTok{\textasciitilde{}}\NormalTok{ DoseF, }\AttributeTok{data =}\NormalTok{ dataset)}
-\FunctionTok{anova}\NormalTok{(model)}
-\DocumentationTok{\#\# Analysis of Variance Table}
-\DocumentationTok{\#\# }
-\DocumentationTok{\#\# Response: Yield}
-\DocumentationTok{\#\#           Df  Sum Sq Mean Sq F value    Pr(\textgreater{}F)    }
-\DocumentationTok{\#\# DoseF      3 1725.96  575.32  112.77 4.668e{-}09 ***}
-\DocumentationTok{\#\# Residuals 12   61.22    5.10                      }
-\DocumentationTok{\#\# {-}{-}{-}}
-\DocumentationTok{\#\# Signif. codes:  0 \textquotesingle{}***\textquotesingle{} 0.001 \textquotesingle{}**\textquotesingle{} 0.01 \textquotesingle{}*\textquotesingle{} 0.05 \textquotesingle{}.\textquotesingle{} 0.1 \textquotesingle{} \textquotesingle{} 1}
-\end{Highlighting}
-\end{Shaded}
-
-Osserviamo che l'effetto del trattamento è significativo e il SEM è pari a \(\sqrt{5.10/4} = 1.129\). Prima di proseguire, verifichiamo che non ci siano problemi relativi alle assunzioni parametriche di base e che, quindi, la trasformazione dei dati non sia necessaria. I grafici dei residui, riportati in Figura \ref{fig:figName141}, non mostrano patologie rilevanti.
-
-\begin{figure}
-
-{\centering \includegraphics[width=0.9\linewidth]{_main_files/figure-latex/figName141-1} 
-
-}
-
-\caption{Analisi grafica dei residui per una prova di concimazione azotata del frumento}\label{fig:figName141}
-\end{figure}
-
-Da questo momento in avanti, diversamente a quanto abbiamo visto nei capitoli precedenti, l'analisi non prosegue con un test di confronto multiplo, che in questa situazione, se non del tutto errato, sarebbe comunque da considerare `improprio.' Infatti, quale senso avrebbe confrontare la risposta produttiva a 60 kg N ha\textsuperscript{-1} con quella a 120 kg N ha \textsuperscript{-1}? In realtà noi non siamo specificatamente interessati a queste due dosi, ma a qualunque altra dose nell'intervallo da 0 a 180 kg N ha\textsuperscript{-1}. Abbiamo selezionato quattro dosi per organizzare l'esperimento, ma resta il fatto che siamo interessati a definire una funzione di risposta per tutto l'intervallo delle dosi, non a confrontare le risposte a due dosi in particolare.
-
-Per questo motivo, quando la variabile indipendente è una dose, l'analisi dei dati dovrebbe essere basata sull'impiego di un modello di regressione, in quanto ciò è più coerente con le finalità dell'esperimento, rispetto all'adozione di una procedura di confronto multiplo.
 
 \hypertarget{definizione-del-modello-lineare}{%
 \section{Definizione del modello lineare}\label{definizione-del-modello-lineare}}
 
-Immaginiamo che, almeno nell'intervallo di dosi incluso nell'esperimento, l'effetto della concimazione azotata sulla produzione sia lineare. In effetti, l'andamento dei dati conferma questa impressione e, pertanto, poniamo il modello lineare nei termini usuali:
-
-\[Y_i = b_0 + b_1 X_i + \varepsilon_i\]
-
-dove \(Y\) è la produzione della parcella \(i\), trattata con la dose \(X_i\), \(b_0\) è l'intercetta (produzione a dose di azoto pari a 0) e \(b_1\) è la pendenza, cioè l'incremento di produzione per ogni incremento unitario della dose. La componente stocastica \(\varepsilon\) viene assunta omoscedastica e normalmente distribuita, con media 0 e deviazione standard \(\sigma\).
-
 \hypertarget{stima-dei-parametri-2}{%
 \section{Stima dei parametri}\label{stima-dei-parametri-2}}
-
-Dobbiamo a questo punto individuare i parametri \(b_0\) e \(b_1\) in modo tale che la retta ottenuta sia la più vicina ai dati, cioè in modo da minimizzare gli scostamenti tra i valori di produzione osservati e quelli stimati dal modello (soluzione dei minimi quadrati). La funzione dei minimi quadrati è:
-
-\[\begin{array}{l}
-Q = \sum\limits_{i = }^N {\left( {{Y_i} - \hat Y} \right)^2 = \sum\limits_{i = }^N {{{\left( {{Y_i} - {b_0} - {b_1}{X_i}} \right)}^2}}  = } \\
- = \sum\limits_{i = }^N {\left( {Y_i^2 + b_0^2 + b_1^2X_i^2 - 2{Y_i}{b_0} - 2{Y_i}{b_1}{X_i} + 2{b_0}{b_1}{X_i}} \right)}  = \\
- = \sum\limits_{i = }^N {Y_i^2 + Nb_0^2 + b_1^2\sum\limits_{i = }^N {X_i^2 - 2{b_0}\sum\limits_{i = }^N {Y_i^2 - 2{b_1}\sum\limits_{i = }^N {{X_i}{Y_i} + } } } } 2{b_0}{b_1}\sum\limits_{i = }^N {{X_i}} 
-\end{array}\]
-
-Calcolando le derivate parziali rispetto a \(b_0\) e \(b_1\) che, al momento, sono le nostre incognite, ed eguagliandole a 0 si ottengono le seguenti formule risolutive:
-
-\[{b_1} = \frac{{\sum\limits_{i = 1}^N {\left[ {\left( {{X_i} - {\mu _X}} \right)\left( {{Y_i} - {\mu _Y}} \right)} \right]} }}{{\sum\limits_{i = 1}^N {{{\left( {{X_i} - {\mu _X}} \right)}^2}} }}\]
-
-e:
-
-\[{b_0} = {\mu _Y} - {b_1}{\mu _X}\]
-
-Invece che svolgere i calcoli a mano, possiamo eseguire il fitting ai minimi quadrati con R. Possiamo notare che l'unica differenza tra questo modello di regressione e il modello ANOVA utilizzato poco sopra è che qui utilizziamo la variabile `Dose' come tale, senza prima trasformarla in un `factor.'
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{modelReg }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Yield }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Dose, }\AttributeTok{data =}\NormalTok{ dataset)}
-\FunctionTok{summary}\NormalTok{(modelReg)}
-\DocumentationTok{\#\# }
-\DocumentationTok{\#\# Call:}
-\DocumentationTok{\#\# lm(formula = Yield \textasciitilde{} Dose, data = dataset)}
-\DocumentationTok{\#\# }
-\DocumentationTok{\#\# Residuals:}
-\DocumentationTok{\#\#     Min      1Q  Median      3Q     Max }
-\DocumentationTok{\#\# {-}4.6537 {-}1.5350 {-}0.4637  1.9250  3.9163 }
-\DocumentationTok{\#\# }
-\DocumentationTok{\#\# Coefficients:}
-\DocumentationTok{\#\#              Estimate Std. Error t value Pr(\textgreater{}|t|)    }
-\DocumentationTok{\#\# (Intercept) 23.793750   0.937906   25.37 4.19e{-}13 ***}
-\DocumentationTok{\#\# Dose         0.154417   0.008356   18.48 3.13e{-}11 ***}
-\DocumentationTok{\#\# {-}{-}{-}}
-\DocumentationTok{\#\# Signif. codes:  0 \textquotesingle{}***\textquotesingle{} 0.001 \textquotesingle{}**\textquotesingle{} 0.01 \textquotesingle{}*\textquotesingle{} 0.05 \textquotesingle{}.\textquotesingle{} 0.1 \textquotesingle{} \textquotesingle{} 1}
-\DocumentationTok{\#\# }
-\DocumentationTok{\#\# Residual standard error: 2.242 on 14 degrees of freedom}
-\DocumentationTok{\#\# Multiple R{-}squared:  0.9606, Adjusted R{-}squared:  0.9578 }
-\DocumentationTok{\#\# F{-}statistic: 341.5 on 1 and 14 DF,  p{-}value: 3.129e{-}11}
-\end{Highlighting}
-\end{Shaded}
-
-Ora sappiamo che la relazione tra la dose di azoto e la risposta produttiva del frumento è:
-
-\[ Y_i = 23.111 + 0.1544 \times X_i \]
-
-L'elemento stocastico \(\varepsilon_i\) è normalmente distribuito, con media 0 e deviazione standard 2.029 (vedi la voce `Residual standard error' nell'output sovrstante).
-
-Come al solito, prima di qualunque altra considerazione, dobbiamo verificare la bontà del modello e il rispetto delle assunzioni di base, con una procedura che, per un modello di regressione, deve riguardare un maggior numero di aspetti rispetto ad un modello ANOVA.
 
 \hypertarget{valutazione-della-bontuxe0-del-modello}{%
 \section{Valutazione della bontà del modello}\label{valutazione-della-bontuxe0-del-modello}}
 
-In primo luogo, è necessario verificare il rispetto delle assunzioni di base di normalità e omoscedasticità dei residui. Per questo, possiamo utilizzare gli stessi metodi impiegati per i modelli ANOVA, vale a dire un grafico dei residui verso gli attesi ed un QQ-plot dei residui standardizzati. In realtà, abbiamo già eseguito questo controllo con il modello ANOVA corrispondente e non vi è la necessità di ripeterlo con questo modello.
-
-Dobbiamo invece assicurarci che i dati osservati siano ben descritti dal modello adottato, senza nessuna componente sistematica di mancanza d'adattamento. In altre parole, le osservazioni non debbono contraddire l'ipotesi che la risposta è lineare, salvo per le eventuali deviazioni casuali insite in qualunque esperimento. Per la verificà della \textbf{bontà di adattamento} possiamo utilizzare diverse procedure, che illustreremo di seguito.
-
 \hypertarget{valutazione-grafica}{%
 \subsection{Valutazione grafica}\label{valutazione-grafica}}
-
-Nel modo più semplice, la bontà di adattamento può essere valutata attraverso un grafico dei valori attesi e dei valori osservati, come quello in Figura \ref{fig:figName142}. Notiamo che non c'è alcun elemento che faccia pensare ad una sistematica deviazione rispetto alle previsioni fatte dal modello.
-
-\begin{figure}
-
-{\centering \includegraphics[width=0.9\linewidth]{_main_files/figure-latex/figName142-1} 
-
-}
-
-\caption{Risposta produttiva del frumento alla concimazione azotata: dati osservati (simboli) e valori attesi (linea tratteggiata).}\label{fig:figName142}
-\end{figure}
 
 \hypertarget{errori-standard-dei-parametri}{%
 \subsection{Errori standard dei parametri}\label{errori-standard-dei-parametri}}
 
-In secondo luogo, possiamo valutare gli errori standard delle stime dei parametri, che non debbono mai essere superiori alla metà del valore del parametro stimato, cosa che in questo caso è pienamente verificata. Se così non fosse, l'intervallo di confidenza del parametro, usualmente stimato utilizzando il doppio dell'errore standard, conterrebbe lo zero, il che equivarebbe a dire che, ad esempio, la pendenza `vera' (cioè quella della popolazione da cui il nostro campione è estratto) potrebbe essere nulla. In altre parole, la retta potrebbe essere `piatta,' dimostrando l'inesistenza di relazione tra la dose di concimazione e la produzione della coltura. Si può notare che, nell'esempio in studio, questo dubbio non sembra sussistere.
-
 \hypertarget{test-f-per-la-mancanza-dadattamento}{%
 \subsection{Test F per la mancanza d'adattamento}\label{test-f-per-la-mancanza-dadattamento}}
-
-In terzo luogo, possiamo analizzare i residui della regressione, cioè gli scostamenti dei punti rispetto alla retta e, in particolare, la somma dei loro quadrati. Possiamo vedere che questo valore è pari a 70.37, ed è più alto di quello del corrispondente modello ANOVA, impiegato in precedenza (61.22):
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{anova}\NormalTok{(modelReg)}
-\DocumentationTok{\#\# Analysis of Variance Table}
-\DocumentationTok{\#\# }
-\DocumentationTok{\#\# Response: Yield}
-\DocumentationTok{\#\#           Df  Sum Sq Mean Sq F value    Pr(\textgreater{}F)    }
-\DocumentationTok{\#\# Dose       1 1716.80 1716.80  341.54 3.129e{-}11 ***}
-\DocumentationTok{\#\# Residuals 14   70.37    5.03                      }
-\DocumentationTok{\#\# {-}{-}{-}}
-\DocumentationTok{\#\# Signif. codes:  0 \textquotesingle{}***\textquotesingle{} 0.001 \textquotesingle{}**\textquotesingle{} 0.01 \textquotesingle{}*\textquotesingle{} 0.05 \textquotesingle{}.\textquotesingle{} 0.1 \textquotesingle{} \textquotesingle{} 1}
-\end{Highlighting}
-\end{Shaded}
-
-Il risultato è perfettamente normale, dato che il residuo del modello ANOVA contiene solo la misura dello scostamento di ogni dato rispetto alla media del suo gruppo, che si può considerare `errore puro,' mentre il residuo della regressione, oltre all'errore puro, contiene anche una componente detta `mancanza d'adattamento' (\emph{lack of fit}), misurabile con lo scostamento di ogni media dalla linea di regressione. In effetti, la regressione lineare è solo un'approssimazione della reale relazione biologica tra la concimazione e la produzione del frumento.
-
-Insomma, il modello di regressione è un modello che ha sempre minor capacità descrittiva rispetto ad un modello ANOVA. La differenza può essere quantificata utilizzando le devianze dei rispettivi residui:
-
-\[\textrm{Lack of fit} = 70.37 - 61.22 = 9.15\]
-
-Bisogna però anche dire che il modello di regressione è più parsimonioso, nel senso che ci ha costretto a stimare solo due parametri (\(b_0\) e \(b_1\)), mentre il modello ANOVA ce ne ha fatti stimare quattro (\(\mu\), \(\alpha_2\), \(\alpha_3\) e \(\alpha_4\), considerando che \(\alpha_1 = 0\)). Quindi il residuo del modello di regressione ha 14 gradi di libertà (16 dati meno due parametri stimati), mentre il residuo del modello ANOVA ne ha 12 (16 - 4). La componente di lack of fit ha quindi 14 - 12 = 2 gradi di libertà. Ci chiediamo, questa componente di lack of fit è significativamente più grande dell'errore puro?
-
-L'ipotesi nulla di assenza di lack of fit può essere testata con un test di F, per il confronto di due varianze: se questo è significativo allora la componente di mancanza d'adattamento non è trascurabile, ed il modello di regressione dovrebbe essere rifiutato. L'espressione è:
-
-\[ F_{lack} = \frac{\frac{RSS_r - RSS_a}{DF_r-DF_a} } {\frac{RSS_a}{DF_a}} = \frac{MS_{lack}}{MSE_a}\]
-
-dove RSS\textsubscript{r} è la devianza residua della regressione con i sui gradi di liberta DF\textsubscript{r} e RSS\textsubscript{a} è la devianza residua del modello ANOVA, con i suoi gradi di libertà DF\textsubscript{a}. In R, il test F per la mancanza d'adattamento può essere eseguito con la funzione \texttt{anova()}, confrontando i due modelli alternativi:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{anova}\NormalTok{(modelReg, model)}
-\DocumentationTok{\#\# Analysis of Variance Table}
-\DocumentationTok{\#\# }
-\DocumentationTok{\#\# Model 1: Yield \textasciitilde{} Dose}
-\DocumentationTok{\#\# Model 2: Yield \textasciitilde{} DoseF}
-\DocumentationTok{\#\#   Res.Df    RSS Df Sum of Sq      F Pr(\textgreater{}F)}
-\DocumentationTok{\#\# 1     14 70.373                           }
-\DocumentationTok{\#\# 2     12 61.219  2    9.1542 0.8972 0.4334}
-\end{Highlighting}
-\end{Shaded}
-
-Vediamo che non otteniamo risultati significativi (P = 0.4334). Ciò supporta l'idea che non vi sia mancanza d'adattamento e quindi la regressione fornisca una descrizione altrettanto adeguata dei dati sperimentali rispetto al più `complesso' modello ANOVA. Scegliamo quindi il modello di regressione, in quanto più semplice, nel rispetto del principio del rasoio di Occam.
 
 \hypertarget{test-f-per-la-bontuxe0-di-adattamento-e-coefficiente-di-determinazione}{%
 \subsection{Test F per la bontà di adattamento e coefficiente di determinazione}\label{test-f-per-la-bontuxe0-di-adattamento-e-coefficiente-di-determinazione}}
 
-Abbiamo dimostrato che il modello di regressione non è significativamente peggiore del modello ANOVA corrispondente. Un approccio alternativo per dimostrare la bontà di adattamento è verificare se il modello di regressione è significativamente migliore di un modello `nullo.' Ricordiamo che con il modello `nullo' (\(Y_i = \mu + \varepsilon_i\)) si assume che la risposta sia costante e pari alla media di tutti i dati, escludendo così ogni effetto della dose di concimazione. La devianza del residuo di un modello nullo non è altro che la devianza totale dei dati, che risulta pari a 1787.178:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{modNull }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Yield }\SpecialCharTok{\textasciitilde{}} \DecValTok{1}\NormalTok{, }\AttributeTok{data =}\NormalTok{ dataset)}
-\FunctionTok{deviance}\NormalTok{(modNull)}
-\DocumentationTok{\#\# [1] 1787.178}
-\end{Highlighting}
-\end{Shaded}
-
-Abbiamo visto che la devianza del modello di regressione è pari a 70.37: la differenza (1716.81) rappresenta la `bontà di adattamento,' cioè una misura di quanto migliora il potere descrittivo del modello aggiungendo l'effetto `dose.' Quindi, un test di F per la bontà di adattamento può essere costruito come:
-
-\[ F_{good} = \frac{\frac{RSS_t - RSS_r}{DF_t - DF_r} } {\frac{RSS_r}{DF_r}} = \frac{MS_{good}}{MSE_r}\]
-
-dove RSS\textsubscript{t} è la devianza totale dei dati con i sui gradi di liberta DF\textsubscript{t}. In R, il test F per la bontà d'adattamento può essere eseguito con la funzione \texttt{anova()}, senza la necessità di includere come argomento il modello `nullo':
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{anova}\NormalTok{(modelReg)}
-\DocumentationTok{\#\# Analysis of Variance Table}
-\DocumentationTok{\#\# }
-\DocumentationTok{\#\# Response: Yield}
-\DocumentationTok{\#\#           Df  Sum Sq Mean Sq F value    Pr(\textgreater{}F)    }
-\DocumentationTok{\#\# Dose       1 1716.80 1716.80  341.54 3.129e{-}11 ***}
-\DocumentationTok{\#\# Residuals 14   70.37    5.03                      }
-\DocumentationTok{\#\# {-}{-}{-}}
-\DocumentationTok{\#\# Signif. codes:  0 \textquotesingle{}***\textquotesingle{} 0.001 \textquotesingle{}**\textquotesingle{} 0.01 \textquotesingle{}*\textquotesingle{} 0.05 \textquotesingle{}.\textquotesingle{} 0.1 \textquotesingle{} \textquotesingle{} 1}
-\end{Highlighting}
-\end{Shaded}
-
-Vediamo che in questo caso l'ipotesi nulla deve essere rifiutata: la varianza spiegata dalla regressione è significativamente maggiore di quella del residuo.
-
-Più frequentemente, la devianza spiegata dalla regressione viene rapportata alla devianza totale, per individuare quanta parte della variabilità dei dati è spiegata dal modello prescelto. Questa proporzione definisce il cosidetto \textbf{coefficente di determinazione} o R\textsuperscript{2}:
-
-\[R^2 = \frac{SS_{reg}}{SS_{tot}} = \frac{1716.81}{1787.18} = 0.961\]
-
-Questa statistica varia da 0 ad 1 e la regressione è tanto migliore quanto più essa si avvicina ad 1. In realtà il coefficiente di determinazione è visibile nell'output della funzione \texttt{summary()} applicata all'oggetto `modelReg' (vedi più sopra).
-
 \hypertarget{previsioni}{%
 \section{Previsioni}\label{previsioni}}
-
-Dato che il modello ha mostrato di funzionare bene, con prudenza, possiamo utilizzarlo per effettuare due tipi di previsioni: diretta ed inversa. Nel primo caso, possiamo prevedere la risposta per una qualunque dose, nel secondo caso, possiamo prevedere la dose che ha indotto una data risposta (Figure \ref{fig:figName143}).
-
-\begin{figure}
-
-{\centering \includegraphics[width=0.9\linewidth]{_main_files/figure-latex/figName143-1} 
-
-}
-
-\caption{Esempio di previsioni: a destra, previsione della risposta per una data dose, a sinistra previsione della dose per ottenere una data risposta}\label{fig:figName143}
-\end{figure}
-
-Per entrambi i tipi di previsione ci si dovrebbe mantenere entro i livelli di dosi e risposte massimi e minimi inclusi ed osservati in prova, per evitare pericolose estrapolazioni (la risposta ha mostrato di essere lineare solo nell'intervallo osservato, ma non sappiamo cosa potrebbe capitare fuori da questo).
-
-I parametri stimati possono essere facilmente utilizzati per fare previsioni dirette, come indicato nel box sottostante.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FloatTok{23.793750} \SpecialCharTok{+} \FloatTok{0.154417} \SpecialCharTok{*} \DecValTok{30}
-\DocumentationTok{\#\# [1] 28.42626}
-\FloatTok{23.793750} \SpecialCharTok{+} \FloatTok{0.154417} \SpecialCharTok{*} \DecValTok{80}
-\DocumentationTok{\#\# [1] 36.14711}
-\end{Highlighting}
-\end{Shaded}
-
-Anche queste stime, come tutte le altre, si riferiscono al campione in prova, mentre noi siamo interessati a fornire una previsione per l'intera popolazione da cui i nostri dati sono capionati. Per questo motivo, abbiamo la necessità di quantificare l'incertezza, attraverso un'opportuna stima dell'errore standard. In R, ciò è possibile utilizzando la funzione \texttt{predict()}, passando come argomento le dosi alle quali effettuare la previsione, organizzate in un data frame. Ad esempio, se si vuole prevedere la produzione a 30 e 80 kg N ha\textsuperscript{-1}, il codice è:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{pred }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(modelReg, }\AttributeTok{newdata=}\FunctionTok{data.frame}\NormalTok{(}\AttributeTok{Dose=}\FunctionTok{c}\NormalTok{(}\DecValTok{30}\NormalTok{, }\DecValTok{80}\NormalTok{)), }\AttributeTok{se=}\NormalTok{T)}
-\NormalTok{pred}
-\DocumentationTok{\#\# $fit}
-\DocumentationTok{\#\#        1        2 }
-\DocumentationTok{\#\# 28.42625 36.14708 }
-\DocumentationTok{\#\# }
-\DocumentationTok{\#\# $se.fit}
-\DocumentationTok{\#\#         1         2 }
-\DocumentationTok{\#\# 0.7519981 0.5666999 }
-\DocumentationTok{\#\# }
-\DocumentationTok{\#\# $df}
-\DocumentationTok{\#\# [1] 14}
-\DocumentationTok{\#\# }
-\DocumentationTok{\#\# $residual.scale}
-\DocumentationTok{\#\# [1] 2.242025}
-\end{Highlighting}
-\end{Shaded}
-
-E'anche possibile effettuare la previsione inversa, cioè chiedere ai dati qual è la dose a cui corrisponde una produzione di 45 q/ha. In questo caso dobbiamo tener presente che l'equazione inversa è:
-
-\[X = \frac{Y - b_0}{b_1}\]
-e la previsione corrispondente è:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{(}\DecValTok{45} \SpecialCharTok{{-}} \FloatTok{23.793750}\NormalTok{)}\SpecialCharTok{/}\FloatTok{0.154417}
-\DocumentationTok{\#\# [1] 137.3311}
-\end{Highlighting}
-\end{Shaded}
-
-Per determinare l'errore standard possiamo utilizzare la funzione \texttt{deltaMethod()}, nel package `car,' che ci calcola anche gli errori standard con il metodo della propagazione degli errori:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{car}\SpecialCharTok{::}\FunctionTok{deltaMethod}\NormalTok{(modelReg, }\StringTok{"(45 {-} b0)/b1"}\NormalTok{, }
-                 \AttributeTok{parameterNames=}\FunctionTok{c}\NormalTok{(}\StringTok{"b0"}\NormalTok{, }\StringTok{"b1"}\NormalTok{))}
-\DocumentationTok{\#\#              Estimate       SE    2.5 \% 97.5 \%}
-\DocumentationTok{\#\# (45 {-} b0)/b1 137.3314   4.4424 128.6244 146.04}
-\end{Highlighting}
-\end{Shaded}
-
-Il procedimento sopra descritto è molto comune, per esempio nei laboratori chimici, dove viene utilizzato nella fase di calibrazione di uno strumento. Una volta che la retta di calibrazione è stata individuate, essa viene utilizzata per determinare le concentrazioni incognite di campioni per i quali sia stata misurata la risposta.
-
-\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
 \hypertarget{altre-letture-9}{%
 \section{Altre letture}\label{altre-letture-9}}
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
-\item
-  Draper, N.R., Smith, H., 1981. Applied Regression Analysis, in: Applied Regression. John Wiley \& Sons, Inc., IDA, pp.~224--241.
-\item
-  Faraway, J.J., 2002. Practical regression and Anova using R. \url{http://cran.r-project.org/doc/contrib/Faraway-PRA.pdf}, R.
-\end{enumerate}
-
-\hypertarget{modelli-anova-a-due-vie}{%
-\chapter{Modelli ANOVA a due vie}\label{modelli-anova-a-due-vie}}
+\hypertarget{modelli-anova-a-due-vie-con-interazione}{%
+\chapter{Modelli ANOVA a due vie con interazione}\label{modelli-anova-a-due-vie-con-interazione}}
 
 Placeholder
 
@@ -982,6 +683,61 @@ Placeholder
 \hypertarget{anova-a-due-vie-scomposizione-manuale-della-varianza}{%
 \subsection{Anova a due vie: scomposizione `manuale' della varianza}\label{anova-a-due-vie-scomposizione-manuale-della-varianza}}
 
+\hypertarget{appendice-3-split-plot-split-block-e-altro}{%
+\chapter{Appendice 3: Split-plot, split-block e altro}\label{appendice-3-split-plot-split-block-e-altro}}
+
+Placeholder
+
+\hypertarget{il-caso-studio}{%
+\subsection{Il caso-studio}\label{il-caso-studio}}
+
+\hypertarget{definizione-del-modello-lineare-2}{%
+\subsection{Definizione del modello lineare}\label{definizione-del-modello-lineare-2}}
+
+\hypertarget{la-natura-delleffetto-delle-main-plots}{%
+\subsection{La natura dell'effetto delle main-plots}\label{la-natura-delleffetto-delle-main-plots}}
+
+\hypertarget{scomposizione-della-varianza-2}{%
+\subsection{Scomposizione della varianza}\label{scomposizione-della-varianza-2}}
+
+\hypertarget{il-fitting-con-r}{%
+\subsection{Il fitting con R}\label{il-fitting-con-r}}
+
+\hypertarget{medie-e-sem}{%
+\subsection*{Medie e SEM}\label{medie-e-sem}}
+\addcontentsline{toc}{subsection}{Medie e SEM}
+
+\hypertarget{sed-e-confronti-multipli}{%
+\subsection{SED e confronti multipli}\label{sed-e-confronti-multipli}}
+
+\hypertarget{disegni-a-split-block}{%
+\section{Disegni a split-block}\label{disegni-a-split-block}}
+
+\hypertarget{definizione-del-modello-lineare-3}{%
+\subsection{Definizione del modello lineare}\label{definizione-del-modello-lineare-3}}
+
+\hypertarget{scomposizione-della-varianza-3}{%
+\subsection{Scomposizione della varianza}\label{scomposizione-della-varianza-3}}
+
+\hypertarget{sed-e-confronti-multipli-1}{%
+\subsection*{SED e confronti multipli}\label{sed-e-confronti-multipli-1}}
+\addcontentsline{toc}{subsection}{SED e confronti multipli}
+
+\hypertarget{disegni-gerarchici}{%
+\section{Disegni gerarchici}\label{disegni-gerarchici}}
+
+\hypertarget{definizione-di-un-modello-lineare-3}{%
+\subsection{Definizione di un modello lineare}\label{definizione-di-un-modello-lineare-3}}
+
+\hypertarget{stima-dei-parametri-4}{%
+\subsection{Stima dei parametri}\label{stima-dei-parametri-4}}
+
+\hypertarget{scomposizione-della-varianza-4}{%
+\subsection{Scomposizione della varianza}\label{scomposizione-della-varianza-4}}
+
+\hypertarget{medie-e-sem-1}{%
+\subsection{Medie e SEM}\label{medie-e-sem-1}}
+
 \hypertarget{la-regressione-non-lineare}{%
 \chapter{La regressione non-lineare}\label{la-regressione-non-lineare}}
 
@@ -993,8 +749,8 @@ Placeholder
 \hypertarget{scelta-della-funzione}{%
 \section{Scelta della funzione}\label{scelta-della-funzione}}
 
-\hypertarget{stima-dei-parametri-4}{%
-\section{Stima dei parametri}\label{stima-dei-parametri-4}}
+\hypertarget{stima-dei-parametri-5}{%
+\section{Stima dei parametri}\label{stima-dei-parametri-5}}
 
 \hypertarget{linearizzazione-della-funzione}{%
 \subsection{Linearizzazione della funzione}\label{linearizzazione-della-funzione}}
@@ -1050,13 +806,30 @@ Placeholder
 \hypertarget{esercizi}{%
 \chapter{Esercizi}\label{esercizi}}
 
-Placeholder
-
 \hypertarget{capitoli-1-e-2}{%
 \section{Capitoli 1 e 2}\label{capitoli-1-e-2}}
 
 \hypertarget{esercizio-1}{%
 \subsection{Esercizio 1}\label{esercizio-1}}
+
+Vi è stata affidata una prova sperimentale per la taratura agronomica di un nuovo diserbante appartenente al gruppo chimico delle solfoniluree (AGRISULFURON), utilizzabile alla dose presumibile di 20 g/ha, per il diserbo di post-emergenza del mais. Gli obiettivi della prova sono:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Valutare se è opportuno un certo aggiustamento della dose (incremento/diminuzione)
+\item
+  Valutare se è opportuna l'aggiunta di un bagnante non-ionico
+\item
+  Valutare se è opportuno splittare la dose di 20 g/ha in due distribuzioni
+\item
+  Valutare l'efficacia del nuovo diserbante con gli opportuni controlli (testimoni)
+\end{enumerate}
+
+Coerentemente con questi obiettivi, scrivere un protocollo sperimentale sufficientemente dettagliato (una pagina) ed aggiungere lo schema della prova
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
 \hypertarget{capitolo-3}{%
 \section{Capitolo 3}\label{capitolo-3}}
@@ -1064,11 +837,19 @@ Placeholder
 \hypertarget{esercizio-1-1}{%
 \subsection{Esercizio 1}\label{esercizio-1-1}}
 
+Un'analisi chimica è stata eseguita i triplicato e i risultati sono stati i seguenti: 125, 169 and 142 ng/g. Calcolate la media e tutti gli indicatori di variabilità che conoscete.
+
 \hypertarget{esercizio-2}{%
 \subsection{Esercizio 2}\label{esercizio-2}}
 
+Considerate il file EXCEL `rimsulfuron.xlsx,' che può essere scaricato \href{https://www.casaonofri.it/_datasets/rimsulfuron.xlsx}{da questo link}. In questo file sono riportati i risultati di un esperimento con 15 trattamenti e 4 repliche, nel quale sono stati posti a confronti diversi erbicidi e/o dosi per il diserbo nel mais. Calcolare le medie produttive ottenute con le diverse tesi sperimentali e riportarle su un grafico, includendo anche un'indicazione di variabilità. Verificare se la produzione è correlata con l'altezza delle piante e commentare i risultati ottenuti. Il file può essere scaricato
+
 \hypertarget{esercizio-3}{%
 \subsection{Esercizio 3}\label{esercizio-3}}
+
+Caricare il datasets `students' disponibile al link: `\url{https://www.casaonofri.it/_datasets/students.csv}.' In questo file potete trovare una database relativo alla valutazione degli studenti in alcune materie del primo anno di Agraria. Ogni record rappresenta un esame, con il relativo voto, la materia e la scuola di provenienza dello studente. Con un uso appropriato delle tabelle di contingenza e del chi quadro, valutare se il voto dipende dalla materia e dalla scuola di provenienza dello studente.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
 \hypertarget{capitolo-4}{%
 \section{Capitolo 4}\label{capitolo-4}}
@@ -1076,26 +857,80 @@ Placeholder
 \hypertarget{esercizio-1-2}{%
 \subsection{Esercizio 1}\label{esercizio-1-2}}
 
+E' data una distribuzione normale con \(\mu\) = 23 e \(\sigma\) = 1. Calcolare la probabilità di estrarre individui:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  maggiori di 25
+\item
+  minori di 21
+\item
+  compresi tra 21 e 25
+\end{enumerate}
+
 \hypertarget{esercizio-2-1}{%
 \subsection{Esercizio 2}\label{esercizio-2-1}}
+
+E' data una distribuzione normale con \(\mu\) = 156 e \(\sigma\) = 13. Calcolare la probabilità di estrarre individui:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  maggiori di 170
+\item
+  minori di 140
+\item
+  compresi tra 140 e 170
+\end{enumerate}
 
 \hypertarget{esercizio-3-1}{%
 \subsection{Esercizio 3}\label{esercizio-3-1}}
 
+Un erbicida si degrada nel terreno seguendo una cinetica del primo ordine:
+
+\[Y = 100 \, e^{-0.07 \, t}\]
+
+dove Y è la concentrazione al tempo t. Dopo aver spruzzato questo erbicida, che probabilità abbiamo di osservare, dopo 50 giorni, una concentrazione sotto la soglia di tossicità per i mammiferi (2 ng/g)? Tenere conto che lo strumento di misura produce un coefficiente di variabilità del 20\%
+
 \hypertarget{esercizio-4}{%
 \subsection{Esercizio 4}\label{esercizio-4}}
+
+Un erbicida si degrada nel terreno seguendo una cinetica del primo ordine:
+
+\[Y = 100 \, e^{-0.07 \, t}\]
+
+dove Y è la concentrazione al tempo t. Dopo aver spruzzato questo erbicida, che probabilità abbiamo che dopo 50 giorni la concentrazione si sia abbassata al disotto della soglia di tossicità per i mammiferi (2 ng/g)? Tenere conto che lo strumento di misura produce un coefficiente di variabilità del 20\%
 
 \hypertarget{esercizio-5}{%
 \subsection{Esercizio 5}\label{esercizio-5}}
 
+Una coltura produce in funzione della sua fittezza, secondo la seguente relazione:
+
+\[ Y = 8 + 8 \, X - 0.07 \, X^2\]
+
+Stabilire la fittezza necessaria per ottenere il massimo produttivo (graficamente o analiticamente). Valutare la probabilità di ottenere una produzione compresa tra 180 e 200 q/ha, seminando alla fittezza ottimale. Considerare che la variabilità stocastica è del 12\%.
+
 \hypertarget{esercizio-6}{%
 \subsection{Esercizio 6}\label{esercizio-6}}
+
+La tossicità di un insetticida varia con la dose, secondo la legge log-logistica:
+
+\[ Y = \frac{1}{1 + exp\left\{ -2 \, \left[log(X) - log(15)\right] \right\}}\] Dove Y è la proporzione di animali morti e X è la dose. Se trattiamo 150 insetti con una dose pari a 35 g, qual è la probabilità di trovare più di 120 morti? Considerare che la risposta è variabile da individuo ad individuo nella popolazione e questa variabilità può essere approssimata utilizzando una distribuzione gaussiana con un errore standard pari a 10.
 
 \hypertarget{esercizio-7}{%
 \subsection{Esercizio 7}\label{esercizio-7}}
 
+Simulare i risultati di un esperimento varietale, con sette varietà di frumento e quattro repliche. Considerare che il modello deterministico è un modello ANOVA, nel quale vengono definite le medie delle sette varietà (valori attesi). Decidere autonomamente sui parametri da impiegare per la simulazione (da \(\mu_1\) a \(\mu_7\) e \(\sigma\))
+
 \hypertarget{esercizio-8}{%
 \subsection{Esercizio 8}\label{esercizio-8}}
+
+Considerando il testo dell'esercizio 5, simulare un esperimento in cui l'insetticida viene utilizzato a cinque dosi crescenti, con quattro repliche.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
 \hypertarget{capitolo-5}{%
 \section{Capitolo 5}\label{capitolo-5}}
@@ -1103,17 +938,52 @@ Placeholder
 \hypertarget{esercizio-1-3}{%
 \subsection{Esercizio 1}\label{esercizio-1-3}}
 
+In un campo di frumento sono state campionate trenta aree di saggio di un metro quadrato ciascuna, sulle quali è stata determinata la produzione. La media delle trenta aree è stata di 6.2 t/ha, con una varianza pari a 0.9. Stimare la produzione dell'intero appezzamento.
+
 \hypertarget{esercizio-2-2}{%
 \subsection{Esercizio 2}\label{esercizio-2-2}}
+
+Siamo interessati a conoscere il contenuto medio di nitrati dei pozzi della media valle del Tevere. Per questo organizziamo un esperimento, durante il quale campioniamo 20 pozzi rappresentativi, riscontrando le seguenti concentrazioni:
+
+\begin{verbatim}
+38.3 38.6 38.1 39.9 36.3 41.6 37.0 39.8 39.1     
+35.0 38.1 37.4 38.3 34.8 40.4 39.3 37.0 38.7    
+38.2 38.4    
+\end{verbatim}
+
+Stimare la concentrazione media per l'intera valle del Tevere
 
 \hypertarget{esercizio-3-2}{%
 \subsection{Esercizio 3}\label{esercizio-3-2}}
 
+E'stata impostata una prova sperimentale per confrontare due varietà di mais, con uno schema sperimentale a blocchi randomizzati con tre repliche. La prima varietà ha mostrato produzioni di 14, 12, 15 e 13 t/ha, mentre la seconda varietà ha mostrato produzioni pari a 12, 11, 10.5 e 13 t/ha. Stimare le produzioni medie delle due varietà, nell'ambiente di studio.
+
 \hypertarget{esercizio-4-1}{%
 \subsection{Esercizio 4}\label{esercizio-4-1}}
 
+Un campione di 400 insetti a cui è stato somministrato un certo insetticida mostra che 136 di essi sono sopravvissuti. Determinare un intervallo di confidenza con grado di fiducia del 95\% per la proporzione della popolazione insensibile al trattamento.
+
 \hypertarget{esercizio-5-1}{%
 \subsection{Esercizio 5}\label{esercizio-5-1}}
+
+È stata studiata la risposta produttiva del sorgo alla concimazione azotata. I dati ottenuti sono:
+
+\begin{longtable}[]{@{}cc@{}}
+\toprule
+Dose & Yield \\
+\midrule
+\endhead
+0 & 1.26 \\
+30 & 2.50 \\
+60 & 3.25 \\
+90 & 4.31 \\
+120 & 5.50 \\
+\bottomrule
+\end{longtable}
+
+Assumendo che la relazione sia lineare (retta), stimare la pendenza e l'intercetta della popolazione di riferimento, dalla quale è stato estratto il campione in studio. Utilizzare la funzione \texttt{lm(Yield\ \textasciitilde{}\ Dose)} ed estrarre gli errori standard con il metodo \texttt{summary()}.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
 \hypertarget{capitolo-6}{%
 \section{Capitolo 6}\label{capitolo-6}}
@@ -1121,32 +991,209 @@ Placeholder
 \hypertarget{esercizio-1-4}{%
 \subsection{Esercizio 1}\label{esercizio-1-4}}
 
+Uno sperimentatore ha impostato un esperimento verificare l'effetto di un fungicida (A) in confronto al testimone non trattato (B), in base al numero di colonie fungine sopravvissute. Il numero delle colonie trattate è di 200, mentre il numero di quelle non trattate è di 100. Le risposte (frequenze) sono come segue:
+
+\begin{longtable}[]{@{}lcc@{}}
+\toprule
+& Morte & Sopravvissute \\
+\midrule
+\endhead
+A & 180 & 20 \\
+B & 50 & 50 \\
+\bottomrule
+\end{longtable}
+
+Stabilire se i risultati possono essere considerati significativamente diversi, per un livello di probabilità del 5\%.
+
 \hypertarget{esercizio-2-3}{%
 \subsection{Esercizio 2}\label{esercizio-2-3}}
+
+Uno sperimentatore ha impostato un esperimento per confrontare due tesi sperimentali (A, B). I risultati sono i seguenti (in q/ha):
+
+\begin{longtable}[]{@{}cc@{}}
+\toprule
+A & B \\
+\midrule
+\endhead
+9.3 & 12.6 \\
+10.2 & 12.3 \\
+9.7 & 12.5 \\
+\bottomrule
+\end{longtable}
+
+Stabilire se i risultati per le due tesi sperimentali possono essere considerati significativamente diversi, per un livello di probabilità del 5\%.
 
 \hypertarget{esercizio-3-3}{%
 \subsection{Esercizio 3}\label{esercizio-3-3}}
 
+Uno sperimentatore ha impostato un esperimento per confrontare se l'effetto di un fungicida è significativo, in un disegno sperimentale con tre ripetizioni. Con ognuna delle due opzioni di trattamento i risultati produttivi sono i seguenti (in t/ha):
+
+\begin{longtable}[]{@{}cc@{}}
+\toprule
+A & NT \\
+\midrule
+\endhead
+65 & 54 \\
+71 & 51 \\
+68 & 59 \\
+\bottomrule
+\end{longtable}
+
+E'significativo l'effetto del trattamento fungicida sulla produzione, per un livello di probabilità del 5\%?
+
 \hypertarget{esercizio-4-2}{%
 \subsection{Esercizio 4}\label{esercizio-4-2}}
+
+Immaginate di aver riscontrato che, in determinate condizioni ambientali, 60 olive su 75 sono attaccate da \emph{Daucus olee} (mosca dell'olivo). Nelle stesse condizioni ambientali, diffondendo in campo un insetto predatore siamo riusciti a ridurre il numero di olive attaccate a 12 su 75. Si tratta di una oscillazione casuale del livello di attacco o possiamo concludere che l'insetto predatore è stato un mezzo efficace di lotta biologica alla mosca dell'olivo?
 
 \hypertarget{esercizio-5-2}{%
 \subsection{Esercizio 5}\label{esercizio-5-2}}
 
+In un ospedale, è stata misurata la concentrazione di colesterolo nel sangue di otto pazienti, prima e dopo un trattamento medico. Per ogni paziente, sono stati analizzati due campioni, ottenendo le seguenti concentrazioni:
+
+\begin{longtable}[]{@{}rrc@{}}
+\toprule
+Paziente & Prima & Dopo \\
+\midrule
+\endhead
+1 & 167.3 & 166.7 \\
+2 & 186.7 & 184.2 \\
+3 & 107.0 & 104.9 \\
+4 & 214.5 & 205.3 \\
+5 & 149.5 & 148.5 \\
+6 & 171.5 & 157.3 \\
+7 & 161.5 & 149.4 \\
+8 & 243.6 & 241.5 \\
+\bottomrule
+\end{longtable}
+
+Si può concludere che il trattamento medico è stato efficace?
+
 \hypertarget{esercizio-6-1}{%
 \subsection{Esercizio 6}\label{esercizio-6-1}}
+
+I Q.I. di 16 studenti provenienti da un quartiere di una certa città sono risultati pari a:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{QI1 }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\FloatTok{90.31}\NormalTok{, }\FloatTok{112.63}\NormalTok{, }\FloatTok{101.93}\NormalTok{, }\FloatTok{121.47}\NormalTok{, }\FloatTok{111.37}\NormalTok{, }\FloatTok{100.37}\NormalTok{, }\FloatTok{106.80}\NormalTok{,}
+         \FloatTok{101.57}\NormalTok{, }\FloatTok{113.25}\NormalTok{, }\FloatTok{120.76}\NormalTok{,  }\FloatTok{88.58}\NormalTok{, }\FloatTok{107.53}\NormalTok{, }\FloatTok{102.62}\NormalTok{, }\FloatTok{104.26}\NormalTok{,}
+         \FloatTok{95.06}\NormalTok{, }\FloatTok{104.88}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Gli studenti provenienti da un'altra parte della stessa città hanno invece mostrato i seguenti Q.I.:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{QI2 }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\FloatTok{90.66}\NormalTok{, }\FloatTok{101.41}\NormalTok{, }\FloatTok{104.61}\NormalTok{,  }\FloatTok{91.77}\NormalTok{, }\FloatTok{107.06}\NormalTok{,  }\FloatTok{89.51}\NormalTok{,  }\FloatTok{87.91}\NormalTok{,}
+         \FloatTok{92.31}\NormalTok{, }\FloatTok{112.96}\NormalTok{,  }\FloatTok{90.33}\NormalTok{,  }\FloatTok{99.86}\NormalTok{,  }\FloatTok{88.99}\NormalTok{,  }\FloatTok{98.97}\NormalTok{,  }\FloatTok{97.92}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Esiste una differenza significativa tra i Q.I. dei due gruppi?
 
 \hypertarget{esercizio-7-1}{%
 \subsection{Esercizio 7}\label{esercizio-7-1}}
 
+Viene estratto un campione di rondelle da una macchina in perfette condizioni di funzionamento. Lo spessore delle rondelle misurate è:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{S1 }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\FloatTok{0.0451}\NormalTok{, }\FloatTok{0.0511}\NormalTok{, }\FloatTok{0.0478}\NormalTok{, }\FloatTok{0.0477}\NormalTok{, }\FloatTok{0.0458}\NormalTok{, }\FloatTok{0.0509}\NormalTok{, }\FloatTok{0.0446}\NormalTok{,}
+        \FloatTok{0.0516}\NormalTok{, }\FloatTok{0.0458}\NormalTok{, }\FloatTok{0.0490}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Dopo alcuni giorni, per determinare se la macchina sia ancora a punto, viene estratto un campione di 10 rondelle, il cui spessore medio risulta:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{S2 }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\FloatTok{0.0502}\NormalTok{, }\FloatTok{0.0528}\NormalTok{, }\FloatTok{0.0492}\NormalTok{, }\FloatTok{0.0556}\NormalTok{, }\FloatTok{0.0501}\NormalTok{, }\FloatTok{0.0500}\NormalTok{, }\FloatTok{0.0498}\NormalTok{,}
+        \FloatTok{0.0526}\NormalTok{, }\FloatTok{0.0517}\NormalTok{, }\FloatTok{0.0550}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Verificare se la macchina sia ancora ben tarata, oppure necessiti di revisione.
+
 \hypertarget{esercizio-8-1}{%
 \subsection{Esercizio 8}\label{esercizio-8-1}}
+
+Sono stati osservati 153 calciatori registrando la dominanza della mano e quella del piede, ottenendo la tabella riportata qui di seguito.
+
+\begin{longtable}[]{@{}ccc@{}}
+\toprule
+& piede.sx & piede.dx \\
+\midrule
+\endhead
+mano sx & 26 & 11 \\
+mano dx & 21 & 95 \\
+\bottomrule
+\end{longtable}
+
+Esiste dipendenza tra la dominanza della mano e del piede?
 
 \hypertarget{esercizio-9}{%
 \subsection{Esercizio 9}\label{esercizio-9}}
 
+Un agronomo ha organizzato un esperimento varietale, per confrontare tre varietà di frumento, cioè GUERCINO, ARNOVA e BOLOGNA. Per far questo ha individuato, in un campo uniforme dell'areale umbro, trenta parcelle da 18 m\textsuperscript{2} e ne ha selezionate dieci a caso, da coltivare con GUERCINO, altre dieci a caso sono state coltivate con ARNOVA e le ultime dieci sono state coltivate con BOLOGNA.
+
+Al termine dell'esperimento, le produttività osservate erano le seguenti:
+
+\begin{tabular}{c|c|c}
+\hline
+guercino & arnova & bologna\\
+\hline
+53.2 & 53.1 & 43.5\\
+\hline
+59.1 & 51.0 & 41.0\\
+\hline
+62.3 & 51.9 & 41.2\\
+\hline
+48.6 & 55.3 & 44.8\\
+\hline
+59.7 & 58.8 & 40.2\\
+\hline
+60.0 & 54.6 & 37.2\\
+\hline
+55.7 & 53.0 & 45.3\\
+\hline
+55.8 & 51.4 & 38.9\\
+\hline
+55.7 & 51.7 & 42.9\\
+\hline
+54.4 & 64.7 & 39.3\\
+\hline
+\end{tabular}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Descrivere i tre campioni, utilizzando opportunamente un indicatore di tendenza centrale ed un indicatore di variabilità
+\item
+  Inferire le medie delle tre popolazioni (cioè quelle che hanno generato i tre campioni), utilizzando opportunamente un intervallo di incertezza
+\item
+  Per ognuna delle tre coppie (guercino vs arnova, guercino vs bologna, arnova vs bologna), valutare la differenza tra le medie e il suo errore standard. Valutare la significatività della differenza tra le medie delle tre popolazioni, esplicitando l'ipotesi nulla e calcolando il livello di probabilità di errore nel rifiuto dell'ipotesi nulla.
+\end{enumerate}
+
 \hypertarget{esercizio-10}{%
 \subsection{Esercizio 10}\label{esercizio-10}}
+
+Un botanico ha valutato il numero di semi germinati per colza sottoposto a due diversi regimi termici dopo l'imbibizione (15 e 25°C). Per la temperatura più bassa, su 400 semi posti in prova, ne sono germinati 358. Alla temperatura più alta, su 380 semi in prova, ne sono germinati 286.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Descrivere i due campioni, in termini di proporzione di semi germinati
+\item
+  Inferire la proporzione di germinati nell'intera popolazione di semi da cui è stato estratto il nostro campione casuale di 780 semi. Utilizzare opportunamente un intervallo di incertezza, sapendo che la varianza di una proporzione è una quantità fissa, che si calcola come \(p ( 1- p)\).
+\item
+  Esiste una differenza significativa tra le proporzioni delle due popolazioni? Esplicitare l'ipotesi nulla e calcolare la probabilità di errore relativa al suo rifiuto.
+\end{enumerate}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
 \hypertarget{capitoli-da-7-a-9}{%
 \section{Capitoli da 7 a 9}\label{capitoli-da-7-a-9}}
@@ -1154,14 +1201,113 @@ Placeholder
 \hypertarget{esercizio-1-5}{%
 \subsection{Esercizio 1}\label{esercizio-1-5}}
 
+Un esperimento a randomizzazione completa relativo ad una prova varietale di frumento ha l'obiettivo di porre a confronto la produzione di 5 varietà. Le produzioni (in bushels per acre) osservate siano le seguenti:
+
+\begin{longtable}[]{@{}cccc@{}}
+\toprule
+Variety & 1 & 2 & 3 \\
+\midrule
+\endhead
+A & 32.4 & 34.3 & 37.3 \\
+B & 20.2 & 27.5 & 25.9 \\
+C & 29.2 & 27.8 & 30.2 \\
+D & 12.8 & 12.3 & 14.8 \\
+E & 21.7 & 24.5 & 23.4 \\
+\bottomrule
+\end{longtable}
+
+Eseguire l'ANOVA, presentare i risultati e commentarli (esempio tratto da Le Clerg \emph{et al}., 1962)
+
 \hypertarget{esercizio-2-4}{%
 \subsection{Esercizio 2}\label{esercizio-2-4}}
+
+Colture di tessuto di pomodoro sono state allevate su capsule Petri trattate con una diversa concentrazione di zuccheri, utilizzando cinque repliche. La crescita colturale è riportata in tabella
+
+\begin{longtable}[]{@{}cccc@{}}
+\toprule
+Control & Glucose & Fructose & Sucrose \\
+\midrule
+\endhead
+45 & 25 & 28 & 31 \\
+39 & 28 & 31 & 37 \\
+40 & 30 & 24 & 35 \\
+45 & 29 & 28 & 33 \\
+42 & 33 & 27 & 34 \\
+\bottomrule
+\end{longtable}
+
+Calcolare le medie ed eseguire l'ANOVA. Eseguire i test di confronto multiplo. Commentare i risultati.
 
 \hypertarget{esercizio-3-4}{%
 \subsection{Esercizio 3}\label{esercizio-3-4}}
 
+E'stato impostato un test di durata su un impianto di riscaldamento, per verificare come la temperatura di esercizio influenza la durata del riscaldatore. Sono state testate 4 temperature, con sei repliche e, per ciascun riscaldatore, è stato rilevato il numero di ore prima della rottura. I risultati sono i seguenti:
+
+\begin{longtable}[]{@{}rr@{}}
+\toprule
+Temp. & Hours to failure \\
+\midrule
+\endhead
+1520 & 1953 \\
+1520 & 2135 \\
+1520 & 2471 \\
+1520 & 4727 \\
+1520 & 6134 \\
+1520 & 6314 \\
+1620 & 1190 \\
+1620 & 1286 \\
+1620 & 1550 \\
+1620 & 2125 \\
+1620 & 2557 \\
+1620 & 2845 \\
+1660 & 651 \\
+1660 & 837 \\
+1660 & 848 \\
+1660 & 1038 \\
+1660 & 1361 \\
+1660 & 1543 \\
+1708 & 511 \\
+1708 & 651 \\
+1708 & 651 \\
+1708 & 652 \\
+1708 & 688 \\
+1708 & 729 \\
+\bottomrule
+\end{longtable}
+
+Valutare se la temperatura di esercizio infleunza significativamente la durata del riscaldatore. Quale/i temperatura/e consentono la maggior durata?
+
 \hypertarget{esercizio-4-3}{%
 \subsection{Esercizio 4}\label{esercizio-4-3}}
+
+Un entomologo ha contato il numero di uova deposte da un lepidottero sulle foglie di tre varietà di tabacco, valutando 15 femmine per varietà. I risultati sono i seguenti:
+
+\begin{longtable}[]{@{}rrrr@{}}
+\toprule
+Female & Field & Resistant & USDA \\
+\midrule
+\endhead
+1 & 211 & 0 & 448 \\
+2 & 276 & 9 & 906 \\
+3 & 415 & 143 & 28 \\
+4 & 787 & 1 & 277 \\
+5 & 18 & 26 & 634 \\
+6 & 118 & 127 & 48 \\
+7 & 1 & 161 & 369 \\
+8 & 151 & 294 & 137 \\
+9 & 0 & 0 & 29 \\
+10 & 253 & 348 & 522 \\
+11 & 61 & 0 & 319 \\
+12 & 0 & 14 & 242 \\
+13 & 275 & 21 & 261 \\
+14 & 0 & 0 & 566 \\
+15 & 153 & 218 & 734 \\
+\bottomrule
+\end{longtable}
+
+Eseguite l'ANOVA. Quali sono le assunzioni necessarie per l'ANOVA? Sono rispettate? Vi sono outliers? Calcolate SEM e SED in modo attendibile.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
 \hypertarget{capitolo-10}{%
 \section{Capitolo 10}\label{capitolo-10}}
@@ -1169,41 +1315,300 @@ Placeholder
 \hypertarget{esercizio-1-6}{%
 \subsection{Esercizio 1}\label{esercizio-1-6}}
 
+E' stato impostanto un esperimento a blocchi randomizzati per confrontare sei tipi di irrigazione, in un aranceto della Spagna. I risultati sono i seguenti (in pounds per parcella):
+
+\begin{longtable}[]{@{}rrrrrr@{}}
+\toprule
+Metodo & 1 & 2 & 3 & 4 & 5 \\
+\midrule
+\endhead
+Goccia & 438 & 413 & 375 & 127 & 320 \\
+Conche & 413 & 398 & 348 & 112 & 297 \\
+Aspersione & 346 & 334 & 281 & 43 & 231 \\
+Aspersione+goccia & 335 & 321 & 267 & 33 & 219 \\
+Sommersione & 403 & 380 & 336 & 101 & 293 \\
+\bottomrule
+\end{longtable}
+
+Eseguire l'ANOVA. Quali sono le assunzioni necessarie per l'ANOVA? Sono rispettate? Calcolate SEM e SED ed eseguite il confronto multiplo. Qual è il metodo di irrigazione migliore?
+
 \hypertarget{esercizio-2-5}{%
 \subsection{Esercizio 2}\label{esercizio-2-5}}
+
+E' stato impostato un esperimento di fertilizzazione secondo uno schema a blocchi randomizzati. I dati ottenuti sono i contenuti percentuali (moltiplicati per 100) in fosforo, in un campione di tessuti vegetali prelevato per parcella:
+
+\begin{longtable}[]{@{}rrrrrr@{}}
+\toprule
+Trattamento & 1 & 2 & 3 & 4 & 5 \\
+\midrule
+\endhead
+Non fertilizzato & 5.6 & 6.1 & 5.3 & 5.9 & 7.4 \\
+50 lb N & 7.3 & NA & 7.7 & 7.7 & 7.0 \\
+100 lb N & 6.9 & 6 & 5.6 & 7.4 & 8.2 \\
+50 lb N + 75 lb P2O5 & 10.8 & 11.2 & 8.8 & 12.9 & 10.4 \\
+100 lb N + 75 lb P205 & 9.6 & 9.3 & 12 & 10.6 & 11.6 \\
+\bottomrule
+\end{longtable}
+
+Eseguire l'ANOVA, considerando il dato mancante. Calcolare SEM e SED. Qual è il trattamento migliore? Aumentare il dosaggio di N senza P2O5 è conveniente? E in presenza di P2O5?
 
 \hypertarget{esercizio-3-5}{%
 \subsection{Esercizio 3}\label{esercizio-3-5}}
 
-\hypertarget{capitoli-11-e-12}{%
-\section{Capitoli 11 e 12}\label{capitoli-11-e-12}}
+È stato condotto un esperimento a quadrato latino per valutare l'effetto di quattro diversi metodi di fertilizzazione. Sono stati osservati i seguenti risultati:
+
+\begin{longtable}[]{@{}rccc@{}}
+\toprule
+Fertiliser & Row & Column & Yield \\
+\midrule
+\endhead
+A & 1 & 1 & 104 \\
+B & 1 & 2 & 114 \\
+C & 1 & 3 & 90 \\
+D & 1 & 4 & 140 \\
+A & 2 & 4 & 134 \\
+B & 2 & 3 & 130 \\
+C & 2 & 1 & 144 \\
+D & 2 & 2 & 174 \\
+A & 3 & 3 & 146 \\
+B & 3 & 4 & 142 \\
+C & 3 & 2 & 152 \\
+D & 3 & 1 & 156 \\
+A & 4 & 2 & 147 \\
+B & 4 & 1 & 160 \\
+C & 4 & 4 & 160 \\
+D & 4 & 3 & 163 \\
+\bottomrule
+\end{longtable}
+
+Analizzate i dati e commentate i risultati ottenuti
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{capitolo-11}{%
+\section{Capitolo 11}\label{capitolo-11}}
 
 \hypertarget{esercizio-1-7}{%
 \subsection{Esercizio 1}\label{esercizio-1-7}}
 
+È stato condotto uno studio per verificare l'effetto della concimazione azotata sulla lattuga, utilizzando uno schema a blocchi randomizzati. I risultat sono i seguenti:
+
+\begin{longtable}[]{@{}ccccc@{}}
+\toprule
+N level & B1 & B2 & B3 & B4 \\
+\midrule
+\endhead
+0 & 124 & 114 & 109 & 124 \\
+50 & 134 & 120 & 114 & 134 \\
+100 & 146 & 132 & 122 & 146 \\
+150 & 157 & 150 & 140 & 163 \\
+200 & 163 & 156 & 156 & 171 \\
+\bottomrule
+\end{longtable}
+
+Analizzare i dati e commentare i risultati
+
 \hypertarget{esercizio-2-6}{%
 \subsection{Esercizio 2}\label{esercizio-2-6}}
 
-\hypertarget{esercizio-3-6}{%
-\subsection{Esercizio 3}\label{esercizio-3-6}}
+Per valutare la soglia economica d'intervento, è necessario definire la relazione tra la densità di una pianta infestante e la perdita produttiva della coltura. Ipotizziamo che, nel range di densità osservato, il modello di competizione sia una retta. Per parametrizzare questo modello e verificarne la validità, è stato organizzato un esperimento a blocchi randomizzati, dove sono stati inclusi sette diversi livelli di infestazione di \emph{Sinapis arvensis} ed è stata rilevata la produzione di acheni del girasole. I risultati sono:
 
-\hypertarget{esercizio-4-4}{%
-\subsection{Esercizio 4}\label{esercizio-4-4}}
+\begin{longtable}[]{@{}crl@{}}
+\toprule
+density & Rep y & ield \\
+\midrule
+\endhead
+0 & 1 & 36.63 \\
+14 & 1 & 29.73 \\
+19 & 1 & 32.12 \\
+28 & 1 & 30.61 \\
+32 & 1 & 27.7 \\
+38 & 1 & 27.43 \\
+54 & 1 & 24.79 \\
+0 & 2 & 36.11 \\
+14 & 2 & 34.72 \\
+19 & 2 & 30.12 \\
+28 & 2 & 30.8 \\
+32 & 2 & 26.53 \\
+38 & 2 & 27.6 \\
+54 & 2 & 23.31 \\
+0 & 3 & 38.35 \\
+14 & 3 & 32.16 \\
+19 & 3 & 31.72 \\
+28 & 3 & 28.69 \\
+32 & 3 & 25.88 \\
+38 & 3 & 28.43 \\
+54 & 3 & 30.26 \\
+0 & 4 & 36.74 \\
+14 & 4 & 32.566 \\
+19 & 4 & 29.57 \\
+28 & 4 & 33.663 \\
+32 & 4 & 28.751 \\
+38 & 4 & 27.114 \\
+54 & 4 & 24.664 \\
+\bottomrule
+\end{longtable}
 
-\hypertarget{esercizio-5-3}{%
-\subsection{Esercizio 5}\label{esercizio-5-3}}
+Eseguire l'ANOVA e verificare il rispetto delle assunzioni di base. E'corretto eseguire un test di confronto multiplo e perchè? Eseguire l'analisi di regressione lineare, verificando la bontà di adattamento del modello. Definire il modello parametrizzato. Stabilire la soglia d'intervento, ipotizzando il costo del prodotto e dell'intervento diserbante.
 
-\hypertarget{esercizio-6-2}{%
-\subsection{Esercizio 6}\label{esercizio-6-2}}
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
-\hypertarget{capitolo-13}{%
-\section{Capitolo 13}\label{capitolo-13}}
+\hypertarget{capitoli-12-e-13}{%
+\section{Capitoli 12 e 13}\label{capitoli-12-e-13}}
 
 \hypertarget{esercizio-1-8}{%
 \subsection{Esercizio 1}\label{esercizio-1-8}}
 
+La biologia di \emph{Sorghum halepense} da rizoma mostra che il peso dei rizomi raggiunge un minimo intorno alla quarta foglia. Di conseguenza, eseguire un trattamento in quest'epoca dovrebbe minimizzare le possibilità di ripresa degli individui trattati, portando anche ad un certo risanamento del terreno. Tuttavia, ci si attende che gli effetti siano maggiori quando le piante provengono da rizomi più piccoli, con un minor contenuto di sostanze di riserva. Per affrontare questi argomenti è stata organizzata una prova in vaso, secondo un disegno a randomizzazione completa con quattro repliche. I risultati sono i seguenti:
+
+\begin{longtable}[]{@{}lcccccc@{}}
+\toprule
+Sizes ↓ / Timing → & 2-3 & 4-5 & 6-7 & 8-9 & 3-4/8-9 & Untreated \\
+\midrule
+\endhead
+2-nodes & 34.03 & 0.10 & 30.91 & 33.21 & 2.89 & 41.63 \\
+& 22.31 & 6.08 & 35.34 & 43.44 & 19.06 & 22.96 \\
+& 21.70 & 3.73 & 24.23 & 44.06 & 0.10 & 52.14 \\
+& 14.90 & 9.15 & 28.27 & 35.34 & 0.68 & 59.81 \\
+4-nodes & 42.19 & 14.86 & 52.34 & 39.06 & 8.62 & 68.15 \\
+& 51.06 & 36.03 & 43.17 & 61.59 & 0.05 & 42.75 \\
+& 43.77 & 21.85 & 57.28 & 48.89 & 0.10 & 57.77 \\
+& 31.74 & 8.71 & 29.71 & 49.14 & 9.65 & 44.85 \\
+6-nodes & 20.84 & 11.37 & 55.00 & 41.77 & 9.80 & 43.20 \\
+& 26.12 & 2.24 & 28.46 & 37.38 & 0.10 & 40.68 \\
+& 35.24 & 14.17 & 21.81 & 39.55 & 1.42 & 34.11 \\
+& 13.32 & 23.93 & 60.72 & 48.37 & 6.83 & 32.21 \\
+\bottomrule
+\end{longtable}
+
+Eseguite l'ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente.
+
 \hypertarget{esercizio-2-7}{%
 \subsection{Esercizio 2}\label{esercizio-2-7}}
+
+Un agronomo ha organizzato un confronto varietale in favino, considerando due epoche di semina: autunnale e primaverile. E' stato utilizzato un disegno a blocchi randomizzati e a parcella suddivisa, con le epoche di semina nelle parcelle principali e le varietà nelle sub-parcelle. I risultati sono i seguenti:
+
+\begin{longtable}[]{@{}lrcccc@{}}
+\toprule
+Sowing Time & Genotype & 1 & 2 & 3 & 4 \\
+\midrule
+\endhead
+Autum & Chiaro & 4.36 & 4.00 & 4.23 & 3.83 \\
+& Collameno & 3.01 & 3.32 & 3.27 & 3.40 \\
+& Palombino & 3.85 & 3.85 & 3.68 & 3.98 \\
+& Scuro & 4.97 & 3.98 & 4.39 & 4.14 \\
+& Sicania & 4.38 & 4.01 & 3.94 & 2.99 \\
+& Vesuvio & 3.94 & 4.47 & 3.93 & 4.21 \\
+Spring & Chiaro & 2.76 & 2.64 & 2.25 & 2.38 \\
+& Collameno & 2.50 & 1.79 & 1.57 & 1.77 \\
+& Palombino & 2.24 & 2.21 & 2.50 & 2.05 \\
+& Scuro & 3.45 & 2.94 & 3.12 & 2.69 \\
+& Sicania & 3.24 & 3.60 & 3.16 & 3.08 \\
+& Vesuvio & 2.34 & 2.44 & 1.71 & 2.00 \\
+\bottomrule
+\end{longtable}
+
+Eseguite l'ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente.
+
+\hypertarget{esercizio-3-6}{%
+\subsection{Esercizio 3}\label{esercizio-3-6}}
+
+Gli erbicidi mostrano sempre un certo grado di persistenza nel terreno. Di conseguenza, se la coltura fallisce subito dopo il diserbo, la scelta delle colture di sostituzione può essere condizionata dal diserbo già eseguito. Per questo motivo, è stato impostato un esperimento di pieno campo volto a valutare se tre erbicidi del mais (rimsulfuron, imazethapyr and primisulfuron) erano in grado di danneggiare quattro colture (soia, girasole, rapa e sorgo) seminate 20 giorni dopo il trattamento. Gli erbicidi sono stati distribuiti su terreno nudo, seguendo un disegno a blocchi randomizzati, su parcelle di elevate dimensioni. Per ogni blocco, la semina è stata eseguita su strisce trasversali, perpendicolari ai trattamenti eseguiti (schema a strip-plot). I risultati sono i seguenti:
+
+\begin{longtable}[]{@{}lccccc@{}}
+\toprule
+Herbidicide & Block & sorghum & rape & soyabean & sunflower \\
+\midrule
+\endhead
+Untreated & 1 & 180 & 157 & 199 & 201 \\
+& 2 & 236 & 111 & 257 & 358 \\
+& 3 & 287 & 217 & 346 & 435 \\
+& 4 & 350 & 170 & 211 & 327 \\
+Imazethapyr & 1 & 47 & 10 & 193 & 51 \\
+& 2 & 43 & 1 & 113 & 4 \\
+& 3 & 0 & 20 & 187 & 13 \\
+& 4 & 3 & 21 & 122 & 15 \\
+primisulfuron & 1 & 271 & 8 & 335 & 379 \\
+& 2 & 182 & 0 & 201 & 201 \\
+& 3 & 283 & 22 & 206 & 307 \\
+& 4 & 147 & 24 & 240 & 337 \\
+rimsulfuron & 1 & 403 & 238 & 226 & 290 \\
+& 2 & 227 & 169 & 195 & 494 \\
+& 3 & 400 & 364 & 257 & 397 \\
+& 4 & 171 & 134 & 137 & 180 \\
+\bottomrule
+\end{longtable}
+
+Eseguite l'ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente.
+
+\hypertarget{esercizio-4-4}{%
+\subsection{Esercizio 4}\label{esercizio-4-4}}
+
+E' stato condotto un esperimento parcellare per valutare l'interazione tra il momento dell'applicazione dell'azoto al terreno (early, optimum, late) e due livelli di un inibitore della nitrificazione (none, 5 lb/acre). L'inibitore ritarda la nitrificazione e riduce le perdite per lisciviazione profonda. L'azoto è stato somministrato in forma marcata (\(^{15}\)N) e i dati raccolti riguardano la percentuale di azoto assorbito dalla pianta.
+
+\begin{longtable}[]{@{}lcccc@{}}
+\toprule
+Genotype & Block & Early & Med & Late \\
+\midrule
+\endhead
+A & 1 & 21.4 & 50.8 & 53.2 \\
+& 2 & 11.3 & 42.7 & 44.8 \\
+& 3 & 34.9 & 61.8 & 57.8 \\
+B & 1 & 54.8 & 56.9 & 57.7 \\
+& 2 & 47.9 & 46.8 & 54.0 \\
+& 3 & 40.1 & 57.9 & 62.0 \\
+\bottomrule
+\end{longtable}
+
+Analizzare i dati e commentare i risultati
+
+\hypertarget{esercizio-5-3}{%
+\subsection{Esercizio 5}\label{esercizio-5-3}}
+
+E' stato organizzato un esperimento per valutare l'effetto della temperatura di lavaggio sulla riduzione di lunghezza di alcuni tessuti. I risultati sono espressi in percentuale di riduzione e sono stati ottenuti in un disegno sperimentale a randomizzazione completa, con quattro tessuti e altrettante temperature.
+
+\begin{longtable}[]{@{}ccccc@{}}
+\toprule
+Fabric & 210 °F & 215 °F & 220 °F & 225 °F \\
+\midrule
+\endhead
+A & 1.8 & 2.0 & 4.6 & 7.5 \\
+& 2.1 & 2.1 & 5.0 & 7.9 \\
+B & 2.2 & 4.2 & 5.4 & 9.8 \\
+& 2.4 & 4.0 & 5.6 & 9.2 \\
+C & 2.8 & 4.4 & 8.7 & 13.2 \\
+& 3.2 & 4.8 & 8.4 & 13.0 \\
+D & 3.2 & 3.3 & 5.7 & 10.9 \\
+& 3.6 & 3.5 & 5.8 & 11.1 \\
+\bottomrule
+\end{longtable}
+
+Analizzare i dati e commentare i risultati
+
+\hypertarget{esercizio-6-2}{%
+\subsection{Esercizio 6}\label{esercizio-6-2}}
+
+Un processo di sintesi chimica prevede due reazioni, la prima richiede un alcool e la seconda richiede una base. Viene impostato un esperimento fattoriale 3 x 2, con tre alcools e due basi, con uno schema sperimentale completamente randomizzato a quattro repliche. Quali sono le vostre raccomandazioni per la prima e la seconda reazione, sulla base dei risultati dell'esperimento. La variabile rilevata mostra la produzione percentuale del processo.
+
+\begin{longtable}[]{@{}cccc@{}}
+\toprule
+Base & Alcohol 1 & Alcohol 2 & Alcohol 3 \\
+\midrule
+\endhead
+A & 91.3 & 89.9 & 89.3 \\
+& 88.1 & 89.5 & 87.6 \\
+& 90.7 & 91.4 & 90.4 \\
+& 91.4 & 88.3 & 90.3 \\
+B & 87.3 & 89.4 & 92.3 \\
+& 91.5 & 93.1 & 90.7 \\
+& 91.5 & 88.3 & 90.6 \\
+& 94.7 & 91.5 & 89.8 \\
+\bottomrule
+\end{longtable}
+
+Analizzare i dati e commentare i risultati
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
 \hypertarget{capitolo-14}{%
 \section{Capitolo 14}\label{capitolo-14}}
@@ -1211,23 +1616,198 @@ Placeholder
 \hypertarget{esercizio-1-9}{%
 \subsection{Esercizio 1}\label{esercizio-1-9}}
 
+Due campioni di terreno sono stati trattati con due erbicidi diversi e sono stati posti in cella climatica alle medesime condizioni di temperatura ed umidità. In tempi diversi dopo l'inizio dell'esperimento sono state prelevate aliquote di ciascun terreno e ne è stata determinata la concentrazione residua di erbicida. I risultati ottenuti sono i seguenti:
+
+\begin{longtable}[]{@{}ccc@{}}
+\toprule
+Time & Herbicide A & Herbicide B \\
+\midrule
+\endhead
+0 & 100.00 & 100.00 \\
+10 & 50.00 & 60.00 \\
+20 & 25.00 & 40.00 \\
+30 & 15.00 & 23.00 \\
+40 & 7.00 & 19.00 \\
+50 & 3.50 & 11.00 \\
+60 & 2.00 & 5.10 \\
+70 & 1.00 & 3.00 \\
+\bottomrule
+\end{longtable}
+
+Ipotizzando che la degradazione dei due erbicidi segue una cinetica del primo ordine, parametrizzare la relativa equazione e determinare la semivita dei due erbicidi. Quale sostanza degrada più velocemente?
+
 \hypertarget{esercizio-2-8}{%
 \subsection{Esercizio 2}\label{esercizio-2-8}}
+
+Un popolazione microbica in condizioni non-limitanti di substrato cresce seguendo una cinetica del primo ordine. Un esperimento da i seguenti risultati:
+
+\begin{longtable}[]{@{}cc@{}}
+\toprule
+Time & Cells \\
+\midrule
+\endhead
+0 & 2 \\
+10 & 3 \\
+20 & 5 \\
+30 & 9 \\
+40 & 17 \\
+50 & 39 \\
+60 & 94 \\
+70 & 201 \\
+\bottomrule
+\end{longtable}
+
+Parametrizzare un modello esponenziale e calcolarne la bontà di adattamento.
 
 \hypertarget{esercizio-3-7}{%
 \subsection{Esercizio 3}\label{esercizio-3-7}}
 
+E' stato organizzato un esperimento per valutare il tasso di assorbimento radicale di azoto da parte di \emph{Lemna minor} allevata in coltura idroponica. I risultati medi ottenuti sono i seguenti:
+
+\begin{longtable}[]{@{}cc@{}}
+\toprule
+conc & rate \\
+\midrule
+\endhead
+2.86 & 14.58 \\
+5.00 & 24.74 \\
+7.52 & 31.34 \\
+22.10 & 72.97 \\
+27.77 & 77.50 \\
+39.20 & 96.09 \\
+45.48 & 96.97 \\
+203.78 & 108.88 \\
+\bottomrule
+\end{longtable}
+
+Parametrizzare il modello iperbolico di Michaelis-Menten:
+
+\[y = \frac{a x} {b + x}\]
+
+Valutarne la bontà di adattamento.
+
 \hypertarget{esercizio-4-5}{%
 \subsection{Esercizio 4}\label{esercizio-4-5}}
+
+E' stato organizzato un esperimento di competizione per valutare l'effetto di densità crescenti di \emph{Ammi majus} sulla produttività del girasole. I risultati ottenuti sono i seguenti:
+
+\begin{longtable}[]{@{}cc@{}}
+\toprule
+Weed density & Yield \\
+\midrule
+\endhead
+0 & 3.52 \\
+23 & 2.89 \\
+31 & 2.76 \\
+39 & 2.75 \\
+61 & 2.48 \\
+\bottomrule
+\end{longtable}
+
+Parametrizzare l'iperbole di Cousens:
+
+\[Y_W  = Y_{WF} \left( 1 - \frac{i \cdot x}{100\left( 1 + \frac{i \cdot x}{a} \right)} \right)\]
+
+Valutarne la bontà di adattamento. Determinare la soglia economica di intervento.
 
 \hypertarget{esercizio-5-4}{%
 \subsection{Esercizio 5}\label{esercizio-5-4}}
 
+Uno degli aspetti fondamentali degli studi relativi alla diversità degli ambienti è la valutazione delle curve area-specie. E' stato considerato un aranceto siciliano, del quale è stata valutata con un apposito campionamento `innestato' la curva area-specie.
+
+\begin{longtable}[]{@{}cc@{}}
+\toprule
+Area & numSpecie \\
+\midrule
+\endhead
+1 & 4 \\
+2 & 5 \\
+4 & 7 \\
+8 & 8 \\
+16 & 10 \\
+32 & 14 \\
+64 & 19 \\
+128 & 22 \\
+256 & 22 \\
+\bottomrule
+\end{longtable}
+
+Parametrizzare una curva `di potenza' (power curve):
+
+\[a \cdot x^b\]
+
+Valutarne la bontà di adattamento. Determinare l'area minima di campionamento.
+
 \hypertarget{esercizio-6-3}{%
 \subsection{Esercizio 6}\label{esercizio-6-3}}
 
+Si ritiene che la crescita di una coltura possa essere descritta accuratamente con un'equazione di Gompertz. Si ritiene inoltre che la presenza delle piante infestanti possa modificare la crescita della coltura, alterando i valori dei parametri del modello anzidetto. Per questo motivo viene organizzato un esperimento a randomizzazione completa con tre repliche, 6 tempi di prelievo (DAE) e 2 stati di infestazione (infestato e libero). In ogni tempo di prelievo, le tre repliche vengono raccolte e viene determinato il peso della coltura. I risultati ottenuti sono i seguenti:
+
+\begin{longtable}[]{@{}ccc@{}}
+\toprule
+DAE & Infested & Weed Free \\
+\midrule
+\endhead
+21 & 0.06 & 0.07 \\
+21 & 0.06 & 0.07 \\
+21 & 0.11 & 0.07 \\
+27 & 0.20 & 0.34 \\
+27 & 0.20 & 0.40 \\
+27 & 0.21 & 0.25 \\
+38 & 2.13 & 2.32 \\
+38 & 3.03 & 1.72 \\
+38 & 1.27 & 1.22 \\
+49 & 6.13 & 11.78 \\
+49 & 5.76 & 13.62 \\
+49 & 7.78 & 12.15 \\
+65 & 17.05 & 33.11 \\
+65 & 22.48 & 24.96 \\
+65 & 12.66 & 34.66 \\
+186 & 21.51 & 38.83 \\
+186 & 26.26 & 27.84 \\
+186 & 27.68 & 37.72 \\
+\bottomrule
+\end{longtable}
+
+Parametrizzare il modello di Gompertz:
+
+\[a \cdot exp(-b \cdot exp(-c \cdot x))\]
+
+e verificarne la bontà di adattamento nelle due situazioni. Quali parametri del modello di Gompertz sono maggiormente influenzati dalle piante infestanti? Abbiamo elementi per ritenere che la crescita segua un'equazione di Gompertz piuttosto che una logistica simmetrica?
+
 \hypertarget{esercizio-7-2}{%
 \subsection{Esercizio 7}\label{esercizio-7-2}}
+
+Piante di \emph{Tripleuspermum inodorum} in vaso sono state trattate con erbicida sulfonilureico (tribenuron-methyl) a dosi crescenti. Tre settimano deopo il trattamento è stato registrato il peso delle piante sopravvissute, ottenendo i risulti riportati nella tabella seguente:
+
+\begin{longtable}[]{@{}cc@{}}
+\toprule
+Dose (g a.i. ha\(^{-1}\)) & Fresh weight (g pot \(^{-1}\)) \\
+\midrule
+\endhead
+0 & 115.83 \\
+0 & 102.90 \\
+0 & 114.35 \\
+0.25 & 91.60 \\
+0.25 & 103.23 \\
+0.25 & 133.97 \\
+0.5 & 98.66 \\
+0.5 & 92.51 \\
+0.5 & 124.19 \\
+1 & 93.92 \\
+1 & 49.21 \\
+1 & 49.24 \\
+2 & 21.85 \\
+2 & 23.77 \\
+2 & 22.46 \\
+\bottomrule
+\end{longtable}
+
+Si ipotizza che la relazione dose-effetto possa essere descritta con un modello log-logistico:
+
+\[c + \frac{d - c}{1 + exp(b ( log (x) - log (a))}\]
+
+Parametrizzare questo modello e verificarne la bontà d'adattamento.
 
 \hypertarget{appendice-1-breve-introduzione-ad-r}{%
 \chapter{Appendice 1: breve introduzione ad R}\label{appendice-1-breve-introduzione-ad-r}}

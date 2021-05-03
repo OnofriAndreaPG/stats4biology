@@ -1,0 +1,256 @@
+---
+title: "Other useful functions for nonlinear regression: threshold models and all that"
+author: "Andrea Onofri"
+date: 2021-05-01
+slug: 'nonlinear_regression'
+categories:
+  - R
+  - 'nonlinear_regression'
+tags:
+  - R
+  - 'nonlinear_regression'
+  - 'drm'
+  - 'drcSeedGerm'
+  - 'seed_germination'
+archives:
+  - 2021
+---
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<p>In a recent post I presented several equations and just as many <a href="https://www.statforbiology.com/2020/stat_nls_usefulfunctions/">self-starting functions for nonlinear regression analyses in R</a>. Today, I would like to build upon that post and present some further equations, relating to the so-called threshold models.</p>
+<p>But, … what are threshold models? In some instances, we need to describe relationships where the response variable changes abruptly, following a small change in the predictor. A typical threshold model looks like that in the Figure below, where we see three threshold levels:</p>
+<ol style="list-style-type: decimal">
+<li><span class="math inline">\(X = 5.5\)</span>: at this threshold, the response changes abruptly from ‘flat’ to linearly increasing;</li>
+<li><span class="math inline">\(X = 23.1\)</span>: at this threshold, the response changes abruptly from linearly increasing to linearly decreasing;</li>
+<li><span class="math inline">\(X = 37.2\)</span>: at this threshold, the response changes abruptly from linearly decreasing to ‘flat’.</li>
+</ol>
+<p>You may recognise a ‘broken-stick’ pattern, although threshold models can also be curvilinear, as we will see later.</p>
+<p><img src="/post/Stat_SeedGermination_HTT2step_files/figure-html/unnamed-chunk-1-1.png" width="90%" /></p>
+<p>Threshold models are very common in biology, where they can be successfully used to describe the daily (or hourly) progress towards a certain developmental stage, as influenced by the environmental conditions, mainly humidity and temperature. In this post I will show examples relating to seed germination, but the very same concepts also apply to the growth of plants and other organisms. In biology, these models are often known as thermal-time or hydro-time models.</p>
+<p>Considering seed germination, the response variable is the Germination Rate (GR), that is the reciprocal of germination time; for example, if a seed takes 7 days to accomplish the germination process, the GR is equal to <span class="math inline">\(1/7 = 0.143\)</span> and it represents the fraction of germination that is accomplished in one day. The GR is a good measure of velocity: the higher the value the higher the speed. If we plot the GR against, e.g., temperature, we should very likely observe a response pattern as in Figure 1; the three thresholds are, respectively, the <em>base temperature</em> (T_b_), the <em>optimal temperature</em> (T_o_) and the <em>ceiling temperature</em> (T_c_). If we look at the effect of soil humidity on GR, we should expect a response pattern with only one threshold, i.e. the <em>base water potential</em> (e.g. the first half of Figure 1, up to the maximum response level).</p>
+<p>Although the equations I am going to introduce are commonly used in the seed science literature, I am confident that you might find them useful for a lot of other applications. For all those equations, I have built the related R functions, together with self-starting routines, which can be used for nonlinear regression analyses with the <code>drm()</code> function in the ‘drc’ package (Ritz et al., 2019). The availability of self-starting routines will free you from the hassle of having to provide initial guess for model parameters. All these R functions are available within the ‘drcSeedGerm’ package (Onofri, 2019).</p>
+<p>The post is rather long, but you do not need to read it all; have a look at the graph below to spot the shape you are interested in and use the link to reach the relevant part in this web page. But, first of all, do not forget to install (if necessary) and load the ‘drcSeedGerm’ package, by using the code below.</p>
+<pre class="r"><code>#installing package, if not yet available
+# library(devtools)
+# install_github(&quot;onofriandreapg/drcSeedGerm&quot;)
+
+# loading package
+library(drcSeedGerm)</code></pre>
+<div id="list-of-threshold-models" class="section level1">
+<h1>List of threshold models</h1>
+<p>In this post I will show the following threshold models:</p>
+<ol style="list-style-type: decimal">
+<li><a href="#one-threshold-linear-model">One-threshold linear</a></li>
+<li><a href="#one-threshold-polynomial">One-threshold polynomial - 1</a></li>
+<li><a href="#one-threshold-polynomial">One-threshold polynomial - 2</a></li>
+<li><a href="#one-threshold-exponential">One-threshold exponential</a></li>
+<li><a href="#broken-stick-model">Broken-stick model</a></li>
+<li><a href="#broken-curvilinear-model">Broken-curvilinear model</a></li>
+<li><a href="#polynomial-model">Polynomial model</a></li>
+<li><a href="#exponential-switch-off-model">Exponential switch-off model</a></li>
+<li><a href="#hyperbolic-model">Hyperbolic model</a></li>
+</ol>
+<p><img src="/post/Stat_SeedGermination_HTT2step_files/figure-html/unnamed-chunk-3-1.png" width="90%" /></p>
+</div>
+<div id="one-threshold-linear-model" class="section level1">
+<h1>One-threshold linear model</h1>
+<p>In some cases, we may need to model a process occurring only above a certain threshold level for the predictor variable. Models of this kind have been used to describe the effect of environmental humidity (<span class="math inline">\(\Psi\)</span>, in MPa) on germination rate (Bradford, 2002):</p>
+<p><span class="math display">\[GR = \frac{\max\left[\Psi, \Psi_b\right] - \Psi_b}{\theta_H} \quad \quad \quad \quad (1)\]</span></p>
+<p>The parameter <span class="math inline">\(\Psi_b\)</span> is the <em>base water potential</em> (in MPa), representing the minimum level of humidity in the substrate to trigger the germination process. The other parameter <span class="math inline">\(\theta_H\)</span> (in MPa day or MPa hour) is the hydro-time constant.</p>
+<p>A totally similar model has been used by Garcia-Huidobro et al (1982), to describe the effect of sub-optimal temperatures (T in °C) on the germination rate:</p>
+<p><span class="math display">\[GR = \frac{\max \left[T, T_b\right] - T_b}{\theta_T} \quad \quad \quad \quad (2)\]</span></p>
+<p>where <span class="math inline">\(T_b\)</span> is the base temperature and <span class="math inline">\(\theta_T\)</span> is the thermal time (in °C d).</p>
+<p>Both models can be fitted in R, by using the two functions <code>GRPsi.Lin()</code> and <code>GRT.GH()</code>; they are totally equivalent, apart from parameter names. In the example below I have fitted the second equation to a seed germination dataset; this type of data is usually heteroscedastic, thus, please note the use of a robust variance-covariance estimator for model parameters (Zeileis, 2006).</p>
+<pre class="r"><code>Tlev &lt;- c(2, 5, 10, 15, 20, 25)
+GR &lt;- c(0, 0, 0.21, 0.49, 0.68, 0.86)
+modGH &lt;- drm(GR ~ Tlev, fct = GRT.GH())
+library(sandwich); library(lmtest)
+coeftest(modGH, vcov = sandwich)
+## 
+## t test of coefficients:
+## 
+##                    Estimate Std. Error t value  Pr(&gt;|t|)    
+## Tb:(Intercept)      4.77160    0.31993  14.915 0.0001177 ***
+## ThetaT:(Intercept) 22.83118    0.62847  36.328 3.428e-06 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+plot(modGH, log=&quot;&quot;, xlim = c(0, 25), legendPos = c(5, 1.2),
+     xlab = &quot;Temperature (°C)&quot;)</code></pre>
+<p><img src="/post/Stat_SeedGermination_HTT2step_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+<div id="one-threshold-polynomial" class="section level1">
+<h1>One threshold polynomial</h1>
+<p>In my experience, I have found that the relationship between GR and water potential in the substrate may, sometimes, be curvilinear. For these situations, I have successfully used the following equations:</p>
+<p><span class="math display">\[GR = \frac{\max\left[\Psi,\Psi_b\right]^2 - \Psi^2_b}{\theta_H} \quad \quad \quad \quad (3)\]</span></p>
+<p>and:</p>
+<p><span class="math display">\[GR = \frac{\left(\max\left[\Psi, \Psi_b\right] - \Psi_b \right)^2}{ \theta_H } \quad \quad \quad \quad (4)\]</span></p>
+<p>Both models can be fitted in R, by using the two functions <code>GRPsi.Pol()</code> and <code>GRPsi.Pol2()</code>, as shown in the box below.</p>
+<pre class="r"><code># Observed data
+Psi &lt;- c(-2, -1.5, -1.2, -1, -0.8, -0.6, -0.4, -0.25,
+         -0.12, -0.06, -0.03, 0)
+GR &lt;- c(0, 0, 0, 0, 0.0585, 0.094, 0.1231, 0.1351,
+        0.1418, 0.1453, 0.1458, 0.1459)
+Psi2 &lt;- c(-0.5, -0.6, -0.7, -0.8, -0.9, -1, -1.1, -1.2,
+          -1.5)
+GR2 &lt;- c(1.4018, 1.0071, 0.5614, 0.3546, 0.2293, 0, 0,
+         0, 0)
+
+
+modHT &lt;- drm(GR ~ Psi, fct = GRPsiPol())
+modHT2 &lt;- drm(GR2 ~ Psi2, fct = GRPsiPol2())
+par(mfrow = c(1,2))
+
+plot(modHT, log=&quot;&quot;, legendPos = c(-1.5, 0.15), 
+     ylim = c(0, 0.20), xlab = &quot;Water potential (MPa)&quot;)
+plot(modHT2, log=&quot;&quot;, legendPos=c(-1.3, 1), 
+     xlab = &quot;Water potential (MPa)&quot;)</code></pre>
+<p><img src="/post/Stat_SeedGermination_HTT2step_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+</div>
+<div id="one-threshold-exponential" class="section level1">
+<h1>One threshold: exponential</h1>
+<p>All the previous models tend to go up to infinity when the predictor value (temperature or water potential) goes to infinity. In some instances, we may need an asymptotic model, for example, to describe the oxygen uptake kinetics during a walk test (see Baty et al., 2014, although their threshold model is more complex) or to describe the response of the maximum proportion of germinated seeds to soil humidity (Onofri et al., 2018).</p>
+<p>In practice, we could use a shifted exponential model:</p>
+<p><span class="math display">\[ \pi = G \, \left[ 1 - exp \left( \frac{ \max\left[\Psi, \Psi_b\right] - \Psi_b }{\sigma} \right) \right]  \quad \quad \quad \quad (5)\]</span></p>
+<p>where <span class="math inline">\(\pi\)</span> is the proportion of germinated seeds, <span class="math inline">\(G\)</span> is the fraction of non-germinable seeds (e.g., dormant seeds) and <span class="math inline">\(\sigma\)</span> describes how quickly the population of seeds responds to increased humidity in the substrate.</p>
+<p>If we reverse the sign of <span class="math inline">\(\sigma\)</span> in Eq. 5, we obtain a decreasing trend, which might be useful to describe the effect of super-optimal temperatures on the proportion of germinated seeds, going down to 0 at the ceiling temperature threshold.</p>
+<p>Both equations can be fitted using the self-starters <code>PmaxPsi1()</code> and <code>PmaxT1()</code>. The two R functions are totally equal, apart from parameters names.</p>
+<pre class="r"><code>par(mfrow = c(1,2))
+# Pmax vs Psi
+Psi &lt;- seq(-2.2, 0, by = 0.2)
+Pmax &lt;- c(0, 0, 0.076, 0.413, 0.514, 0.643, 0.712,
+          0.832, 0.865, 0.849, 0.89, 0.90)
+mod &lt;- drm(Pmax ~ Psi, fct = PmaxPsi1())
+plot(mod, log = &quot;&quot;, xlab = &quot;Water potential (MPa)&quot;, 
+     ylab = &quot;Proportion of germinating seeds&quot;)
+
+# Pmax vs temperture
+Tval &lt;- c(0, 2.5, 5, 7.5, 10, 12.5, 15, 17.5,
+          20, 22.5, 25, 27.5, 30, 32.5, 35)
+Pmax2 &lt;- c(0.79, 0.81, 0.807, 0.776, 0.83,
+           0.73, 0.744, 0.73, 0.828, 0.818,
+           0.805, 0.706, 0.41, 0.002, 0)
+mod2 &lt;- drm(Pmax2 ~ Tval, fct = PmaxT1())
+plot(mod2, log = &quot;&quot;, xlab = &quot;Temperature (°C)&quot;, 
+     ylab = &quot;Proportion of germinating seeds&quot;)</code></pre>
+<p><img src="/post/Stat_SeedGermination_HTT2step_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+</div>
+<div id="broken-stick-model" class="section level1">
+<h1>‘Broken-stick’ model</h1>
+<p>A broken-stick trend, as the one depicted in the Figure 1 was used by Alvarado and Bradford (2002) to model the effect of temperature on the germination rate. The equation is:</p>
+<p><span class="math display">\[GR = \frac{\min \left[T,T_o \right] - T_b}{\theta_{T}} \, \left\{ 1 - \frac {\min \left[\max \left[ T,T_o \right], T_c \right] - T_o}{T_c - T_o} \right\} \quad \quad (6)\]</span></p>
+<p>Base, optimal and ceiling temperatures (respectively <span class="math inline">\(T_b\)</span>, <span class="math inline">\(T_o\)</span> and <span class="math inline">\(T_c\)</span>) are included as parameters, together with the hydro-thermal time parameter (<span class="math inline">\(\theta_T\)</span>). Equation 6 can be easily fitted with the <code>GRT.BS()</code> function in the ‘drcSeedGerm’ package.</p>
+<pre class="r"><code>Tval &lt;- c(2, 5, 10, 15, 20, 25, 30, 35, 40)
+GR &lt;- c(0, 0, 0.209, 0.435, 0.759, 0.821, 0.417, 0.145, 0)
+
+modBS &lt;- drm(GR ~ Tval, fct = GRT.BS())
+plot(modBS, log=&quot;&quot;, xlim = c(0, 40), ylim=c(0,1.2),
+     legendPos = c(5, 1.0), xlab = &quot;Temperature (°C)&quot;)</code></pre>
+<p><img src="/post/Stat_SeedGermination_HTT2step_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<pre class="r"><code>coeftest(modBS, vcov = sandwich)
+## 
+## t test of coefficients:
+## 
+##                    Estimate Std. Error t value  Pr(&gt;|t|)    
+## Tc:(Intercept)     36.81971    0.41113  89.556 3.290e-09 ***
+## Tb:(Intercept)      6.49657    0.43146  15.057 2.340e-05 ***
+## To:(Intercept)     23.21649    0.29481  78.750 6.256e-09 ***
+## ThetaT:(Intercept) 18.18250    0.76345  23.816 2.431e-06 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+<div id="broken-curvilinear-model" class="section level1">
+<h1>Broken-curvilinear model</h1>
+<p>Broken-stick trends may not be reasonable for biological processes, which might be better described by curvilinear equations. Rowse and Finch-Savage (2003) proposed another equation with two components: the first one depicts a linear increase of the GR value with temperature, which is off-set by the second component, starting from <span class="math inline">\(T = T_d\)</span>, which is close to (but not coincident with) <span class="math inline">\(T_o\)</span>. The equation is:</p>
+<p><span class="math display">\[GR = \frac{ \max \left[ T, T_b \right] - T_b}{\theta_{T}} \left\{ 1 - \frac{\min \left[ \max \left[T,T_d\right], T_o \right] - T_d}{T_c - T_d}  \right\} \quad \quad (7)\]</span></p>
+<p>The optimal temperature can be derived as:</p>
+<p><span class="math display">\[ T_o = \frac{1 + kT_b + kT_d}{2k}\]</span></p>
+<p>where:</p>
+<p><span class="math display">\[ k = \frac{1}{T_c - T_d}\]</span></p>
+<p>For this equation, you will find the <code>GRT.RFb()</code> self-starter in the ‘drcSeedGerm’ package.</p>
+<pre class="r"><code>modRF &lt;- drm(GR ~ Tval, fct = GRT.RFb())
+plot(modRF, log=&quot;&quot;, xlim = c(0, 40), ylim=c(0,1.2),
+     legendPos = c(5, 1.0), xlab = &quot;Temperature (°C)&quot;)</code></pre>
+<p><img src="/post/Stat_SeedGermination_HTT2step_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+</div>
+<div id="polynomial-model" class="section level1">
+<h1>Polynomial model</h1>
+<p>According to Mesgaran et al (2017), the negative and positive effects of temperature coexist for all temperatures above <span class="math inline">\(T_b\)</span>. Their proposed equation can be parameterised as:</p>
+<p><span class="math display">\[GR = \frac{\max \left[ T, T_b \right] - T_b}{\theta_{T}} \left[ 1 - \frac{\min \left[ T, T_c \right] - T_b}{T_c - T_b}  \right] \quad \quad \quad \quad (8)\]</span></p>
+<p>It is easy to see that the GR value is a second-order polynomial function of <span class="math inline">\(T - T_b\)</span> and, therefore, the curve is symmetric around the optimal temperature value, which can be derived as:</p>
+<p><span class="math display">\[T_o = \frac{T_c - T_b}{2} + T_b\]</span></p>
+<p>For this equation, the self-starting function is <code>GRT.M()</code>.</p>
+<pre class="r"><code>modM &lt;- drm(GR ~ Tval, fct = GRT.M())
+plot(modM, log=&quot;&quot;, xlim = c(0, 40), ylim=c(0,1.2),
+     legendPos = c(5, 1.0), xlab = &quot;Temperature (°C)&quot;)</code></pre>
+<p><img src="/post/Stat_SeedGermination_HTT2step_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+</div>
+<div id="exponential-switch-off-model" class="section level1">
+<h1>Exponential switch-off model</h1>
+<p>Equations 6 to 8 use a product, wherein the first term represents the accumulation of thermal time and the second term may be seen as a switch-off term that is 1 either when <span class="math inline">\(T &lt; T_o\)</span> (Equation 6) or <span class="math inline">\(T &lt; T_d\)</span> (Equation 7) or <span class="math inline">\(T = T_b\)</span> (Equation 8) and decreases progressively as temperature increases. In all the above equations, the switch-off term is linear, although we can use other types of switch-off terms, to obtain more flexible models. One possibility is to use an exponential switch-off term, as in the equation below:</p>
+<p><span class="math display">\[ GR = \frac{\max \left[T, T_b \right] - T_b}{\theta_T} \left\{ \frac{1 - \exp \left[ k (\min \left[T, T_c \right] - T_c) \right]}{1 - \exp \left[ k (T_b - T_c) \right]}  \right\} \quad \quad \quad (9)\]</span></p>
+<p>where <span class="math inline">\(k\)</span> is the switch-off parameter: the lower the value, the higher the negative effect of temperature at super-optimal levels. The response of GR to temperature is highly asymmetric with a slow increase below <span class="math inline">\(T_o\)</span> and a steep drop afterwards.</p>
+<p>I have successfully used this model in Catara et al (2016) and Masin et al (2017). The self-starting function in R is <code>GRT.Exb()</code>.</p>
+<pre class="r"><code>Tval &lt;- c(2, 5, 10, 15, 20, 25, 30, 35, 40)
+GR &lt;- c(0, 0, 0.209, 0.435, 0.759, 0.821, 0.917, 0.445, 0)
+
+modExb &lt;- drm(GR ~ Tval, fct = GRT.Exb())
+summary(modExb)
+## 
+## Model fitted: Exponential effect of temperature on GR50 (Type II - Masin et al., 2017)
+## 
+## Parameter estimates:
+## 
+##                     Estimate Std. Error t-value   p-value    
+## Tb:(Intercept)      5.991778   1.205747  4.9693 0.0042141 ** 
+## ThetaT:(Intercept) 19.254345   2.795867  6.8867 0.0009881 ***
+## k:(Intercept)       0.181612   0.060564  2.9987 0.0301453 *  
+## Tc:(Intercept)     36.933370   0.501666 73.6214 8.758e-09 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error:
+## 
+##  0.04049231 (5 degrees of freedom)
+plot(modExb, log=&quot;&quot;, xlim = c(0, 40), ylim=c(0,1.2),
+     legendPos = c(5, 1.0), xlab = &quot;Temperature (°C)&quot;)</code></pre>
+<p><img src="/post/Stat_SeedGermination_HTT2step_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+</div>
+<div id="hyperbolic-model" class="section level1">
+<h1>Hyperbolic model</h1>
+<p>The following model was derived by the simple yield loss function devised by Kropff and van Laar (1993). It is very flexible, as it may depict different types of relationships between temperature and base water potential, according to the value taken by the parameter <span class="math inline">\(q\)</span>.</p>
+<p><span class="math display">\[GR(g, T) = \frac{\max \left[T, T_b\right] - T_b}{\theta_T} \left( 1 - \frac{q \frac{\min \left[T, T_c\right] -T_b}{T_c- T_b} }{1 + (q-1) \frac{T-T_b}{T_c- T_b}}  \right) \quad \quad \quad (10)\]</span></p>
+<p>In R, this model can be fitted by using the self-starter <code>GRT.YL()</code> and we see that, with our dataset, the fit is very much like that of the exponential switch-off function.</p>
+<pre class="r"><code>modYL &lt;- drm(GR ~ Tval, fct = GRT.YL())
+plot(modYL, log=&quot;&quot;, xlim = c(0, 40), ylim=c(0,1.2),
+     legendPos = c(5, 1.0), xlab = &quot;Temperature (°C)&quot;)</code></pre>
+<p><img src="/post/Stat_SeedGermination_HTT2step_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+</div>
+<div id="a-warning-message" class="section level1">
+<h1>A warning message</h1>
+<p>When we collect data about the response of germination rates to temperature and use them to parameterise nonlinear regression models by using nonlinear least squares, the basic assumption of homoscedasticity is rarely tenable. <strong>We should not forget this!</strong> in the above example I used a robust variance-covariance sandwich estimator, although other techniques can be successfully used to deal with this problem.</p>
+<p>Thanks for reading and happy coding!</p>
+<p>Andrea Onofri<br />
+Department of Agricultural, Food and Environmental Sciences<br />
+University of Perugia (Italy)<br />
+<a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<hr />
+</div>
+<div id="references" class="section level1">
+<h1>References</h1>
+<ol style="list-style-type: decimal">
+<li>Alvarado, V., Bradford, K.J., 2002. A hydrothermal time model explains the cardinal temperatures for seed germination. Plant, Cell and Environment 25, 1061–1069.</li>
+<li>Baty, F., Ritz, C., Charles, S., Brutsche, M., Flandrois, J. P., Delignette-Muller, M.-L., 2014. A toolbox for nonlinear regression in R: the package nlstools. Journal of Statistical Software, 65, 5, 1-21.</li>
+<li>Bradford, K.J., 2002. Applications of hydrothermal time to quantifying and modelling seed germination and dormancy. Weed Science 50, 248–260.</li>
+<li>Catara, S., Cristaudo, A., Gualtieri, A., Galesi, R., Impelluso, C., Onofri, A., 2016. Threshold temperatures for seed germination in nine species of Verbascum (Scrophulariaceae). Seed Science Research 26, 30–46.</li>
+<li>Garcia-Huidobro, J., Monteith, J.L., Squire, R., 1982. Time, temperature and germination of pearl millet (<em>Pennisetum typhoides</em> S &amp; H.). 1. Constant temperatures. Journal of Experimental Botany 33, 288–296.</li>
+<li>Kropff, M.J., van Laar, H.H. 1993. Modelling crop-weed interactions. CAB International, Books.</li>
+<li>Masin, R., Onofri, A., Gasparini, V., Zanin, G., 2017. Can alternating temperatures be used to estimate base temperature for seed germination? Weed Research 57, 390–398.</li>
+<li>Onofri A., 2019. DrcSeedGerm: Statistical approaches for data analyses in seed germination assays. R package version 0.98. <a href="https://www.statforbiology.com" class="uri">https://www.statforbiology.com</a></li>
+<li>Onofri, A., Benincasa, P., Mesgaran, M.B., Ritz, C., 2018. Hydrothermal-time-to-event models for seed germination. European Journal of Agronomy 101, 129–139.</li>
+<li>Ritz, C., Jensen, S. M., Gerhard, D., Streibig, J. C., 2019. Dose-Response Analysis Using R. CRC Press</li>
+<li>Rowse, H.R., Finch-Savage, W.E., 2003. Hydrothermal threshold models can describe the germination response of carrot (Daucus carota) and onion (Allium cepa) seed populations across both sub- and supra-optimal temperatures. New Phytologist 158, 101–108.</li>
+<li>Zeileis, A., 2006. Object-oriented computation of sandwich estimators. Journal of Statistical Software, 16, 9, 1-16.</li>
+</ol>
+</div>
