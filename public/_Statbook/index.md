@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.0 (15/03/2021), compil. 2021-04-28"
+date: "Update: v. 1.0 (15/03/2021), compil. 2021-05-03"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -3613,6 +3613,8 @@ La cosa fondamentale è muoversi in coerenza con le finalità dell'esperimento. 
 # Modelli ANOVA con fattori di blocco
 
 
+
+
 Nel capitolo 7 abbiamo impiegato un modello ANOVA con una sola variabile indipendente categorica, assumendo che le unità sperimentali, escluso l'effetto del trattamento, fossero totalmente indipendenti tra di loro. Questa assunzione era totalmente realistica, poiché si trattava di un disegno sperimentale a randomizzazione completa, dove non sussistevano raggruppamenti di alcun tipo, escluso quello dettato dal trattamento in studio.
 
 Se invece l'esperimento include uno o più *blocking factors*, le osservazioni che appartengono allo stesso blocco sono più simila tra loro delle osservazioni che appartengono a blocchi diversi, proprio perché condividono le condizioni del blocco stesso. Per non invalidare l'indipendenza dei residui dobbiamo definire un modello ANOVA che tenga conto anche dei fattori di raggruppamento, in modo che il loro effetto non sia trascurato e, di conseguenza, si sommi agli effetti residui. Come al solito, affrontiamo questo tema partendo da alcuni esempi pratici.
@@ -4267,35 +4269,20 @@ Il procedimento sopra descritto è molto comune, per esempio nei laboratori chim
 
 <!--chapter:end:11-LinearRegression.Rmd-->
 
-# Modelli ANOVA a due vie
+# Modelli ANOVA a due vie con interazione
+
 
 ## Il concetto di ’interazione’
 
-In alcuni casi potremmo essere interessati ad organizzare un esperimento per valutare l’effetto di due fattori sperimentali combinati (ad esempio la lavorazione del terreno ed il diserbo chimico), in modo da mettere in evidenza possibili "interazioni". Con questo termine intendiamo il fenomeno per cui l’effetto di un fattore (ad es. la lavorazione) cambia a seconda del livello dell’altro fattore (il diserbo chimico). Ad esempio, osserviamo la Tabella \@ref(tab:tabName131), dove sono risportate le medie per le quattro combinazioni risultati da un esperimento con due fattori (A e B) a due livelli ciascuno (A1 e A2, oltre a B1 e B2). Le medie per le quattro combinazioni sono dette 'medie di cella', mentre le medie delle medie, ad esempio la media delle due combinazioni che contengono A1, sono dette 'medie marginali', appunto perché si trovano ai margini della tabella. 
+In alcuni casi siamo interessati a valutare l’effetto combinato di due fattori sperimentali, ad esempio, la lavorazione del terreno ed il diserbo chimico, in modo da mettere in evidenza possibili "interazioni". Con questo termine, intendiamo il fenomeno per cui l’effetto di un fattore (ad es. la lavorazione) cambia a seconda del livello dell’altro fattore (il diserbo chimico).
 
-Osserviamo che, ad esempio, A2 da un risultato più elevato di A1, quando il secondo fattore sperimentale è B1, mentre la graduatoria è invertita con B2.
+Per comprendere meglio il concetto, osserviamo la Figura \@ref(fig:figName131), dove sono mostrate le medie di quattro trattamenti, ottenuti dalla combinazione fattoriale di un trattamento A con due livelli (A1 e A2) e di un trattamento B con altrettanti livelli (B1 e B2). Nel grafico, ogni combinazione è rappresentata da un simbolo.
 
+Concentriamoci un attimo sul grafico di sinistra e consideriamo la prima combinazione in ordine alfabetico (A1B1): per questa, la media è pari a 10. Se passiamo da A1 ad A2, fermo restando B1, l'incremento è + 4. Se invece passiamo da B1 a B2, fermo restando A1, l'incremento è + 5. Si deduce che, se gli effetti fossero puramente additivi, la media di A2B2 dovrebbe essere pari a 10 + 4 + 5 = 19, in quanto vengono modificati entrambi i livelli, da A1 ad A2 e da B1 a B2. Vediamo che l'osservazione conferma questa aspettativa di additività degli effetti e di mancanza di interazione.
 
-Table: (\#tab:tabName131)Interazione tra due fattori sperimentali
+Al contrario, nel grafico centrale vediamo che il risultato osservato di A2B2 non può essere ottenuto per semplice somma di effetti, perché, a fronte di un risultato atteso pari a 19 otteniamo invece 16. Evidentemente, vi è qualcosa in questa combinazione che altera l'effetto congiunto di A e B. Questo qualcosa può essere quantificato con il valore -3, così che la media A2B2 è pari a 10 + 4 + 5 - 3 = 16. Il valore -3 rappresenta la mancanza di additività o interazione; in questo caso si tratta di **interazione semplice**, in quanto la graduatoria dei trattamenti non cambia: A2 è sempre meglio di A1 e B2 è sempre meglio di B1, anche se gli effetti non sono quelli previsti.
 
-|      |  B1  |  B2  | Media |
-|:-----|:----:|:----:|:-----:|
-|A1    | 10.0 | 14.0 |  12   |
-|A2    | 15.0 | 9.0  |  12   |
-|Media | 12.5 | 11.5 |  12   |
-
-La presenza di interazione può influenzare notevolmente l'interpretazione dei risultati. Infatti, se guardassimo solo alle medie marginali del fattore A, saremmo portati a concludere che i due livelli A1 ed A2 forniscono, più o meno, gli stessi risultati. In realtà questo è falso, in quanto A1 ed A2 forniscono risultati molto diversi, ma le differenze sono di segno opposto, a seconda del livello di B.
-
-
-## Tipi di interazione
-
-In genere, abbiamo due tipi di interazione: quella in cui cambia la graduatoria tra i trattamenti (interazione crossover) e quella in cui vi è solo una modifica dell’entità dell’effetto (interazione semplice o non-crossover). I due tipi di interazione sono esemplificati in Figura \@ref(fig:figName131), che mostra, nel grafico di destra, gli stessi dati riportati nella Tabella \@ref(tab:tabName131).
-
-Concentriamoci un attimo sul grafico di sinistra e consideriamo la prima combinazione in ordine alfabetico (A1B1): per questa, la media è pari a 10. Se passiamo da A1 ad A2, fermo restando B1, l'incremento è + 4. Se invece passiamo da B1 a B2, fermo restando A1, l'incremento è + 5. Quindi l'effetto di A è pari a +4 e l'effetto di B è pari a +5 e i due effetti sono puramente addittivi. Infatti, ad esempio, A2B2 è pari a 10 + 4 + 5 = 19. Questa situazione riflette la totale mancanze di interazione.
-
-Al contrario, nel grafico centrale vediamo che il risultato di A2B2 non può essere ottenuto per semplice somma di effetti, perché, a fronte di un risultato atteso pari a 19 otteniamo invece 16. Evidentemente, vi è qualcosa in questa combinazione che altera l'effetto congiunto di A e B. Questo qualcosa può essere quantificato con il valore - 3, così che la media A2B2 è pari a 10 + 4 + 5 - 3 = 16. Il valore -3 rappresenta la mancanza di additività o interazione. Si tratta di interazione semplice in quanto essa non altera la graduatoria dei trattamenti: A2 è sempre meglio di A1 e B2 è sempre meglio di B1, anche se gli effetti non sono quelli previsti.
-
-Nel grafico di sinistra la situazione è analoga, ma più estrema: l'effetto dell'interazione è -10 e comporta un'inversione della graduatoria, già menzionata per la Tabella Tabella \@ref(tab:tabName131).
+Nel grafico di sinistra la situazione è analoga, ma più estrema: l'effetto dell'interazione è -10 e comporta un'inversione della graduatoria, per cui parliamo di **interazione cross-over**.
 
 
 <div class="figure" style="text-align: center">
@@ -4303,42 +4290,48 @@ Nel grafico di sinistra la situazione è analoga, ma più estrema: l'effetto del
 <p class="caption">(\#fig:figName131)Esempi di interazione tra fattori sperimentali</p>
 </div>
 
-Da un punto di vista dell'interpretazione dei risultati, l'interazione cross-over è particolarmente importante, perché non consente di raggiungere conclusioni generali per i due fattori sperimentali presi indipendentemente l'uno dall'altro. 
+Perchè siamo così interessati all'interazione e, in particolare, all'interazione cross-over? Esaminiamo più da vicino i valori nel grafico a destra in Figura \@ref(fig:figName131), riportandoli nella tabella \@ref(tab:tabName131), insieme alle medie dei quattro livelli A1, A2, B1 e B2. Le medie delle combinazioni sono dette **medie di cella**, mentre le medie dei livelli principali sono dette **medie marginali**, perché si trovano al margine della tabella.
 
-## Caso-studio: interazione tra lavorazioni e diserbo chimico
 
-Un ricercatore ha organizzato un esperimento fattoriale a blocchi randomizzati, dove ha valutato l’effetto di tre tipi di lavorazione del terreno (lavorazione minima = MIN; aratura superficiale = SUP; aratura profonda = PROF) e di due tipi di diserbo chimico (a pieno campo = TOT; localizzato sulla fila della coltura = PARZ). L’ipotesi scientifica è che, in caso di diserbo localizzato, il rovesciamento del terreno prodotto dall’aratura sia fondamentale, in quanto sotterra i semi prodotti dalle piante infestanti, impedendone l’emergenza nella coltura successiva e rendendo quindi necessario il diserbo a tutta superficie. La mappa di campo è presentata in Figura \@ref(fig:figName132); dobbiamo notare lo spazio lasciato tra una parcella e l'altra, per permettere l'uso e la circolazione delle macchine per la lavorazione.
+Table: (\#tab:tabName131)Interazione cross-over tra fattori sperimentali
 
-<div class="figure" style="text-align: center">
-<img src="_images/Mappa3FATT.png" alt="Mappa dell'esperimento fattoriale a blocchi randomizzati" width="45%" />
-<p class="caption">(\#fig:figName132)Mappa dell'esperimento fattoriale a blocchi randomizzati</p>
-</div>
+|      |   B1|   B2| Media|
+|:-----|----:|----:|-----:|
+|A1    | 10.0| 14.0|  12.0|
+|A2    | 15.0|  9.0|  12.0|
+|Media | 12.5| 11.5|  12.0|
 
-In totale, l’esperimento include sei tesi (le sei possibili combinazioni tra i due fattori sperimentali) e quattro repliche per un totale di 24 parcelle. Come consuetudine in pieno campo, l’esperimento è organizzato a blocchi randomizzati e le sei tesi sperimentali sono allocate a caso all’interno di ciascun blocco.
+Se guardassimo solo le medie marginali, avremmo l'impressione sbagliata che il fattore A, da solo, non ha alcun effetto (le medie A1 e A2 sono uguali) e che il fattore B ha solo un piccolissimo effetto. La realtà è invece che entrambi i fattori hanno un grande effetto, ma la presenza dell'interazione lo nasconde completamente, impedendoci di raggiungere conclusioni attendibili guardando ai due fattori, uno separatamente dall'altro. 
 
-I risultati ottenuti con questo esperimento sono disponibili nel file 'beet.csv', che può essere aperto direttamente da gitHub, con il codice sottostante.
+## Effetti incrociati: interazione tra lavorazioni e diserbo chimico
+
+Un ricercatore ha organizzato un esperimento fattoriale a blocchi randomizzati, dove ha valutato l’effetto di tre tipi di lavorazione del terreno (lavorazione minima = MIN; aratura superficiale = SP; aratura profonda = DP) e di due tipi di diserbo chimico (a pieno campo = TOT; localizzato sulla fila della coltura = PART). L’ipotesi scientifica è che, in caso di diserbo localizzato, il rovesciamento del terreno prodotto dall’aratura sia fondamentale, in quanto sotterra i semi prodotti dalle piante infestanti, impedendone l’emergenza nella coltura successiva.
+
+L'esperimento è completamente incrociato ed include, in totale, sei tratatmenti (tutte e sei le possibili combinazioni tra i due fattori sperimentali) e quattro repliche per un totale di 24 parcelle. Come consuetudine in pieno campo, l’esperimento è organizzato a blocchi randomizzati e le sei tesi sperimentali sono allocate a caso all’interno di ciascun blocco.
+
+I risultati ottenuti con questo esperimento sono disponibili nel file 'beet.csv', che si trova nella solita repository online. Col codice sottostante possiamo caricare il file e trasformare tutte le variabili indipendenti in 'factors'.
 
 
 ```r
-path1 <- "https://raw.githubusercontent.com/OnofriAndreaPG/"
-path2 <- "aomisc/master/data/"
-name <- "beet.csv"
-pathName <- paste(path1, path2, name, sep = "")
-dataset <- read.csv(pathName, header=T)
+fileName <- "https://www.casaonofri.it/_datasets/beet.csv"
+dataset <- read.csv(fileName, header=T)
+dataset$Tillage <- as.factor(dataset$Tillage)
+dataset$WeedControl <- as.factor(dataset$WeedControl)
+dataset$Block <- as.factor(dataset$Block)
 head(dataset)
-##   Lavorazione Diserbo Blocco   Prod
-## 1         MIN     tot      1 11.614
-## 2         MIN     tot      2  9.283
-## 3         MIN     tot      3  7.019
-## 4         MIN     tot      4  8.015
-## 5         MIN    parz      1  5.117
-## 6         MIN    parz      2  4.306
+##   Tillage WeedControl Block  Yield
+## 1     MIN         TOT     1 11.614
+## 2     MIN         TOT     2  9.283
+## 3     MIN         TOT     3  7.019
+## 4     MIN         TOT     4  8.015
+## 5     MIN        PART     1  5.117
+## 6     MIN        PART     2  4.306
 ```
 
 
 ## Definizione del modello lineare
 
-I risultati di questo esperimento sono determinati da quattro elementi 'deterministici':
+I risultati di questo esperimento sono determinati da quattro elementi:
 
 1. l'effetto del blocco
 2. l'effetto della lavorazione
@@ -4348,106 +4341,163 @@ I risultati di questo esperimento sono determinati da quattro elementi 'determin
 Un modello lineare con questi quattro effetti potrebbe essere scritto:
 
 $$Y_{ijk} = \mu + \gamma_k + \alpha_i + \beta_j + \alpha\beta_{ij} + \varepsilon_{ijk}$$
+dove $\gamma$ è l’effetto del blocco $k$, $\alpha$ è l’effetto della lavorazione $i$, $\beta$ è l’effetto del diserbo $j$, $\alpha\beta$ è l'effetto dell'interazione per la specifica combinazione della lavorazione $i$ e del diserbo $j$. Oltre a questi elementi 'deterministici', i risultati sono influenzati dall'elemento stocastico $\varepsilon$, associato ad ogni osservazione, che si assume normalmente distribuito con media 0 e deviazione standard pari a $\sigma$.
 
+## Calcoli manuali
 
-dove $\gamma$ è l’effetto del blocco $k$, $\alpha$ è l’effetto della lavorazione $i$, $\beta$ è l’effetto del diserbo $j$, $\alpha\beta$ è l'effetto dell'interazione per la specifica combinazione della lavorazione $i$ e del diserbo $j$. Oltre a questi elementi 'deterministici' i risultati sono influenzati dall'elemento stocastico $\varepsilon$, associato ad ogni osservazione, che si assume normalmente distribuito con media 0 e deviazione standard pari a $\sigma$.
+Per completezza d'informazione, illustriamo i calcoli necessari per la scomposizione 'manuale' della varianza. Il punto di partenza, come al solito, sono le medie per i livelli di ogni fattore sperimentale e per le loro combinazioni, che calcoliamo con l'usuale funzione `tapply()`.
 
-## Stima dei parametri
-
-Per rendere 'stimabili' i parametri, poniamo un vincolo sul trattamento, per cui $\gamma_1 = 0$, $\alpha_1 = 0$ (primo livello in ordine alfabetico, cioè MIN), $\beta_1 = 0$ (primo livello in ordine alfabetico, cioè PARZ). Per quanto riguarda l'interazione $\alpha\beta$, abbiamo 6 combinazioni possibili tra il primo e il secondo fattore (MIN - TOT, MIN - PARZ, SUP - TOT, SUP - PARZ, PROF - TOT, PROF - PARZ); di queste, dobbiamo vincolare tutte le combinazioni che contengono il primo livello in ordine alfabetico per uno dei due fattori (MIN - TOT, MIN - PARZ, SUP - PARZ, PROF - PARZ, corrispondenti ad $\alpha\beta_{1,1}$ = $\alpha\beta_{1,2}$ = $\alpha\beta_{2,1}$ = $\alpha\beta_{3,1}$ = 0).
-
-Con questi vincoli, $\mu$ è il valore atteso per la parcella localizzata nel primo blocco e trattata con il primo livello in ordine alfabetico per tutti i fattori sperimentali ($\bar{Y}_{111}$). I tre valori $\gamma$ rappresentano rispettivamente $\gamma_2 = \bar{Y}_{112} - \bar{Y}_{111}$, $\gamma_3 = \bar{Y}_{113} - \bar{Y}_{111}$ e $\gamma_4 = \bar{Y}_{114} - \bar{Y}_{111}$. Abbiamo invece che $\alpha_2 = \bar{Y}_{211} - \bar{Y}_{111}$ e $\alpha_3 = \bar{Y}_{311} - \bar{Y}_{111}$, mentre $\beta_2 = \bar{Y}_{121} - \bar{Y}_{111}$ e $\beta_3 = \bar{Y}_{131} - \bar{Y}_{111}$. Per quanto riguarda l'interazione, abbiamo due soli parametri da stimare, per i quali possiamo fare le seguenti considerazioni:
-
-$$\bar{Y}_{111} = \mu + \alpha_1 + \beta_1 + \alpha\beta_{11} = \mu$$
-
-$$\bar{Y}_{221} = \mu + \alpha_2 + \beta_2 + \alpha\beta_{22}$$
-
-quindi:
-
-$$\bar{Y}_{221} - \bar{Y}_{111} = \alpha_2 + \beta_2 + \alpha\beta_{22}$$
-
-da cui:
-
-$$\alpha\beta_{22} = \bar{Y}_{221} - \bar{Y}_{111} - \alpha_2 - \beta_2$$
-
-Analogamente:
-
-$$\alpha\beta_{32} = \bar{Y}_{321} - \bar{Y}_{111} - \alpha_3 - \beta_2$$
-
-
-
-
-
-
-Vediamo che, quando i modelli divengono appena appena più complessi, la parametrizzazione con vincolo sulla somma diventa abbastanza controintuitiva, e, inoltre, la stima dei parametri diventa abbastanza difficile da fare a mano. Al contrario, quest'operazione è piuttosto semplice e intuitiva quando si impieghi il vincolo sulla somma. Per chi volesse approfondire, ci sono alcune ulteriori informazioni in fondo al capitolo.
-
-In questa sede, per la stima dei parametri ci affidiamo ad R e al metodo dei minimi quadrati, confidando che le informazioni precedenti possano essere utili a capire l'output del programma.
-
-\footnotesize
 
 
 ```r
-mod <- lm(Prod ~ factor(Blocco) + Lavorazione + Diserbo +
-            Lavorazione:Diserbo, data=dataset)
-summary(mod)
-## 
-## Call:
-## lm(formula = Prod ~ factor(Blocco) + Lavorazione + Diserbo + 
-##     Lavorazione:Diserbo, data = dataset)
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -1.78329 -0.78754 -0.04437  0.31117  3.12546 
-## 
-## Coefficients:
-##                            Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)                  6.6422     0.8376   7.930 9.59e-07 ***
-## factor(Blocco)2             -1.0380     0.7897  -1.314 0.208431    
-## factor(Blocco)3             -0.8277     0.7897  -1.048 0.311179    
-## factor(Blocco)4             -0.7232     0.7897  -0.916 0.374267    
-## LavorazionePROF              4.6338     0.9671   4.791 0.000238 ***
-## LavorazioneSUP               2.4803     0.9671   2.565 0.021568 *  
-## Diserbotot                   2.9878     0.9671   3.089 0.007480 ** 
-## LavorazionePROF:Diserbotot  -4.4098     1.3677  -3.224 0.005677 ** 
-## LavorazioneSUP:Diserbotot   -2.3218     1.3677  -1.698 0.110246    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 1.368 on 15 degrees of freedom
-## Multiple R-squared:  0.641,	Adjusted R-squared:  0.4495 
-## F-statistic: 3.348 on 8 and 15 DF,  p-value: 0.02095
+medieComb <- with(dataset, tapply(Yield, 
+                                  list(WeedControl, Tillage), 
+                                  mean))
+medieComb
+##            DP     MIN      SP
+## PART 10.62875 5.99500 8.47525
+## TOT   9.20675 8.98275 9.14125
+medieLav <- with(dataset, tapply(Yield, Tillage, 
+                                  mean))
+medieLav
+##       DP      MIN       SP 
+## 9.917750 7.488875 8.808250
+medieWC <- with(dataset, tapply(Yield, WeedControl, 
+                                  mean))
+medieWC
+##     PART      TOT 
+## 8.366333 9.110250
+medieB <- with(dataset, tapply(Yield, Block, 
+                                  mean))
+medieB
+##        1        2        3        4 
+## 9.385500 8.347500 8.557833 8.662333
 ```
 
-\normalsize
-
-Una volta stimati i parametri, possiamo individuare la devianza residua, come somma dei quadrati degli scarti tra i valori attesi e i valori osservati. I residui, in R, possono essere ottenuti con la funzione 'residuals()'.
+La media generale è:
 
 
 ```r
-RSS <- sum( residuals(mod)^2 )
-RSS
-## [1] 28.06087
+mu <- mean(dataset$Yield)
+mu
+## [1] 8.738292
 ```
 
-Consideriamo che la devianza del residuo ha un numero di gradi di libertà pari alla differenza tra il numero dei dati è il numero dei parametri stimati (24 - 9 = 15). Di conseguenza, possiamo stimare $\sigma$, come:
+
+Per calcolare gli effetti principali (blocchi, lavorazioni e diserbi), sottraiamo da ogni media la media generale:
 
 
 ```r
-sqrt(RSS/15)
-## [1] 1.367744
+gamma <- medieB - mu
+alpha <- medieLav - mu
+beta <- medieWC - mu
+gamma; alpha; beta
+##           1           2           3           4 
+##  0.64720833 -0.39079167 -0.18045833 -0.07595833
+##          DP         MIN          SP 
+##  1.17945833 -1.24941667  0.06995833
+##       PART        TOT 
+## -0.3719583  0.3719583
 ```
 
-o, più velocemente, con l'apposito estrattore:
+
+Per l'interazione, dobbiamo considerare che la media di ogni combinazione è pari a:
+
+$$ \mu_{ij.} = \mu + \alpha_i + \beta_j + \alpha\beta_{ij}$$
+
+e quindi:
+
+$$ \alpha\beta_{ij} = \mu_{ij.} - \mu - \alpha_i - \beta_j$$
+
+Ora, siccome 
+
+$$\alpha_i = \mu_{i..} - \mu$$
+
+e 
+
+$$\beta_j = \mu_{.j.} - \mu$$
+
+possiamo scrivere:
+
+$$ \alpha\beta_{ij} = \mu_{ij.} - \mu - \mu_{i..} + \mu - \mu_{.j.} + \mu = \mu_{ij.} - \mu_{i..} - \mu_{.j.} + \mu$$
+
+Ad esempio:
+
+$$ \alpha\beta_{sp,part} = 5.995 - 7.488875 - 8.366333 + 8.738292 = - 1.121916$$
+Completando i calcoli, gli effetti dell'interazione sono pari a:
 
 
 ```r
-summary(mod)$sigma
-## [1] 1.367744
+alphaBeta <- medieComb - rbind(medieLav, medieLav) - 
+  cbind(medieWC, medieWC, medieWC) + mu
+alphaBeta
+##             DP       MIN          SP
+## PART  1.082958 -1.121917  0.03895833
+## TOT  -1.082958  1.121917 -0.03895833
 ```
 
-## Verifica delle assunzioni di base
+A questo punto possiamo calcolare i valori attesi e i residui, come scostamenti tra valori osservati e valori attesi, anche se questa parte ve la lasciamo per esercizio. 
 
-Dobbiamo quindi procedere con la verifica delle assunzioni di base, attraverso l'analisi grafica dei residui, come indicato in un capitolo precedente. Il grafico dei residui contro i valori attesi ed il QQ-plot sono riportati in Figura \@ref(fig:figName133).
+### Scomposizione della varianza
+
+Come abbiamo visto nei capitoli precedenti, le devianze di blocchi, lavorazioni e diserbo si calcolano come somme dei quadrati degli effetti, tenendo conto del numero di osservazioni per ogni blocco/lavorazione/diserbo. Ad esempio, in un blocco, abbiamo 6 osservazioni e quindi ognuno dei quattro effetti è ripetuto per sei volte; di conseguenza, la devianza dei blocchi è:
+
+
+```r
+SSb <- 6 * sum(gamma^2)
+SSb
+## [1] 3.65959
+```
+
+Le altre devianze si calcolano allo stesso modo:
+
+
+
+```r
+SStil <- 8 * sum(alpha^2)
+SStil
+## [1] 23.65647
+SSwc <- 12 * sum(beta^2)
+SSwc
+## [1] 3.320472
+SScomb <- 4 * sum(alphaBeta^2)
+SScomb
+## [1] 19.46411
+```
+
+Questi calcoli manuali possono essere utili per meglio comprendere il senso della scomposizione della varianza, ma sono da considerare obsoleti, in quanto, nell'uso comune, nessuno li esegue più senza l'aiuto di un computer.
+
+
+## Calcoli con R
+
+
+### Model fitting
+
+Nella pratica quotidiana, per la stima dei parametri ci affidiamo ad R e al metodo dei minimi quadrati. La definizione del modello è:
+
+```
+Yield ~ Block + Tillage + WeedControl + Tillage:WeedControl
+```
+
+e può essere abbreviata utilizzando l'operatore '*':
+
+```
+Yield ~ Block + Tillage * WeedControl
+```
+
+L'intero codice è mostrato nel box sottostante:
+
+
+
+```r
+mod <- lm(Yield ~ Block + Tillage * WeedControl,
+          data=dataset)
+```
+
+
+### Verifica delle assunzioni di base
+
+Prima di procedere, dobbiamo verificare il rispetto delle assunzioni di base, attraverso l'analisi grafica dei residui, come indicato in un capitolo precedente. Il grafico dei residui contro i valori attesi ed il QQ-plot sono riportati in Figura \@ref(fig:figName133).
 
 
 <div class="figure" style="text-align: center">
@@ -4457,43 +4507,9 @@ Dobbiamo quindi procedere con la verifica delle assunzioni di base, attraverso l
 
 Il grafico dei residui mostra un sospetto outlier (il settimo dato). Tuttavia, non abbiamo memoria di errori durante la sperimentazione e a parte questo outlier, non paiono esserci problemi di omogeneità delle varianze. Pertanto, decidiamo di ignorare questo potenziale dato aberrante e proseguire nell’analisi, in quanto non sussistono particolare elementi che facciano sospettare qualche patologia dei dati più o meno rilevante.
 
-## Scomposizione delle varianze
+### Scomposizione della varianza
 
-Se dovessimo scomporre le varianze manualmente, potremmo costruire il modello in modo sequenziale, il che è totalmente corretto con i disegni bilanciati come il nostro.
-
-
-```r
-mod0 <- lm(Prod ~ 1, data=dataset)
-mod1 <- lm(Prod ~ factor(Blocco), data=dataset)
-mod2 <- lm(Prod ~ factor(Blocco) + Lavorazione, data=dataset)
-mod3 <- lm(Prod ~ factor(Blocco) + Lavorazione + Diserbo, 
-            data=dataset)
-mod4 <- lm(Prod ~ factor(Blocco) + Lavorazione + Diserbo +
-            Lavorazione:Diserbo, data=dataset)
-RSS0 <- deviance(mod0)
-RSS1 <- deviance(mod1)
-RSS2 <- deviance(mod2)
-RSS3 <- deviance(mod3)
-RSS4 <- deviance(mod4)
-```
-
-Vediamo che il modello nullo ha un residuo pari a 78.161505, mentre il il modello con il solo effetto del blocco ha un residuo più basso e pari 74.5019152. Evidentemente, l'introduzione del blocco ha migliorato la capacità descrittiva del modello e l'effetto di questa variabile può essere quantificato  con la differenza tra le due devianze:
-
-
-```r
-RSS0 - RSS1
-## [1] 3.65959
-```
-
-Analogamente, l'effetto della lavorazione (devianza della lavorazione) è dato da:
-
-
-```r
-RSS1 - RSS2
-## [1] 23.65647
-```
-
-Ovviamente, possiamo evitare di procedere in questo modo, sfruttando le funzionalità di R e, in particolare, la funzione 'anova()':
+Sfruttando le funzionalità di R e, in particolare, la funzione `anova()`, otteniamo il seguente risultato:
 
 \footnotesize
 
@@ -4502,12 +4518,12 @@ Ovviamente, possiamo evitare di procedere in questo modo, sfruttando le funziona
 anova(mod)
 ## Analysis of Variance Table
 ## 
-## Response: Prod
+## Response: Yield
 ##                     Df  Sum Sq Mean Sq F value  Pr(>F)  
-## factor(Blocco)       3  3.6596  1.2199  0.6521 0.59389  
-## Lavorazione          2 23.6565 11.8282  6.3228 0.01020 *
-## Diserbo              1  3.3205  3.3205  1.7750 0.20266  
-## Lavorazione:Diserbo  2 19.4641  9.7321  5.2023 0.01922 *
+## Block                3  3.6596  1.2199  0.6521 0.59389  
+## Tillage              2 23.6565 11.8282  6.3228 0.01020 *
+## WeedControl          1  3.3205  3.3205  1.7750 0.20266  
+## Tillage:WeedControl  2 19.4641  9.7321  5.2023 0.01922 *
 ## Residuals           15 28.0609  1.8707                  
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
@@ -4515,68 +4531,106 @@ anova(mod)
 
 \normalsize
 
+Come abbiamo visto nei capitoli precedenti, i gradi di libertà degli effetti principali sono pari al numero dei livelli di ogni trattamento meno uno; per quanto riguarda l'interazione, il numero dei gradi di libertà è pari al prodotto dei gradi di libertà degli effetti principali interessati dalla combinazione. In questo caso, l'interazione 'lavorazione x diserbo' ha $2 \times 1 = 2$ gradi di libertà. I gradi di libertà dei residui si ottengono invece per differenza tra i gradi di libertà totali (per 24 dati abbiamo 23 gradi libertà) e i gradi di libertà di tutti gli altri effetti in gioco.
 
-La quantificazione dei gradi di libertà dovrebbe essere chiara; aggiungiamo solo che, in generale, i gradi di libertà di un'interazione sono pari al prodotto tra i gradi di libertà degli effetti da cui essa è composta e coincidono con il numero di parametri stimati (in questo caso due).
-
-Nel leggere una tabella ANOVA a due (o più) vie, è **fondamentale procedere dal basso verso l’alto**, in quanto la presenza di un’interazione significativa rende non-informative sia le significanze degli effetti principali, sia le medie marginali. Infatti, come abbiamo visto all'inizio, vi possono essere casi in cui le medie marginali sono simili, ma ciò è dovuto alla presenza di un’interazione cross-over. In questo caso, essendo significativa l'interazione tra lavorazione e diserbo, dovremo considerare e confrontare le sei medie per le combinazioni tra questi due fattori sperimentali.
+Nel leggere una tabella ANOVA a due (o più) vie, è **fondamentale procedere dal basso verso l’alto**, guardando subito se l'interazione sia significativa. Se fosse così, dovremmo considerare solo le medie per le combinazioni degli effetti in studio (medie di cella), trascurando invece le medie degli effetti principali (medie marginali), che potrebbero portare a una cattiva interpretazione dei risultati, come abbiamo visto all'inizio di questo capitolo. Se invece l'interazione fosse non significativa, allora potremmo considerare separatamente le medie marginali dei due fattori sperimentali, cosa che potrebbe semplificare notevolmente l'interpretazione.
 
 
-## Medie marginali attese
 
-Può essere interessante vedere come si costruiscono le medie marginale attese, con un attento uso dei contrasti. Ad esempio, le medie attese per le sei combinazioni 'lavorazione x diserbo' possono essere ottenute considerando che $\mu$ è il valore atteso per MIN-PARZ nel primo blocco, mentre $\mu + \gamma_2$ è il valore atteso per MIN-PARZ nel secondo blocco, e così via. Di conseguenza, la media per la combinazione MIN-PARZ sarà pari a:
+### Medie marginali attese e confronti multipli con R
 
-$$ \frac{\mu + (\mu + \gamma_2) + (\mu + \gamma_3) + (\mu + \gamma_4)}{4} = \mu + \frac{1}{4}\gamma_2 + \frac{1}{4}\gamma_3 + \frac{1}{4}\gamma_4$$
+In questo caso, l'interazione è significativa e, di conseguenza, dobbiamo determinare e confrontare le medie delle sei combinazioni tra lavorazioni e diserbi. In R, possiamo utilizzare la funzione 'emmeans()', come abbiamo fatto nei capitoli precedenti. Il codice sottostante permette di calcolare le medie per le combinazioni 'lavorazione x diserbo' e confrontare i diserbi a parità di lavorazione (notare l'operatore '|').
 
-I parametri stimati sono derivabili con la funzione 'coef()', quindi la combinazione lineare sopra indicata può essere ottenuta come segue:
 
 
 ```r
-coef(mod)[1] + 1/4*coef(mod)[2] + 1/4*coef(mod)[3] + 1/4*coef(mod)[4]
-## (Intercept) 
-##       5.995
+library(emmeans)
+medie <- emmeans(mod, ~WeedControl|Tillage)
+multcomp::cld(medie, Letters = LETTERS)
+## Tillage = DP:
+##  WeedControl emmean    SE df lower.CL upper.CL .group
+##  TOT           9.21 0.684 15     7.75    10.66  A    
+##  PART         10.63 0.684 15     9.17    12.09  A    
+## 
+## Tillage = MIN:
+##  WeedControl emmean    SE df lower.CL upper.CL .group
+##  PART          6.00 0.684 15     4.54     7.45  A    
+##  TOT           8.98 0.684 15     7.53    10.44   B   
+## 
+## Tillage = SP:
+##  WeedControl emmean    SE df lower.CL upper.CL .group
+##  PART          8.48 0.684 15     7.02     9.93  A    
+##  TOT           9.14 0.684 15     7.68    10.60  A    
+## 
+## Results are averaged over the levels of: Block 
+## Confidence level used: 0.95 
+## significance level used: alpha = 0.05
 ```
 
-Ovviamente, è più conveniente costruire una vettore con i coefficienti del contrasto, e moltiplicare per il vettore dei parametri stimati, come segue:
+Se volessimo confrontare le lavorazioni a parità di diserbo o tutte le combinazioni dovremmo utilizzare una sintassi leggermente diversa:
 
 
 ```r
-k1 <- c(1, 1/4, 1/4, 1/4, 0, 0, 0, 0, 0)
-sum( coef(mod) * k1 )
-## [1] 5.995
+medie <- emmeans(mod, ~Tillage|WeedControl)
+multcomp::cld(medie, Letters=LETTERS)
+## WeedControl = PART:
+##  Tillage emmean    SE df lower.CL upper.CL .group
+##  MIN       6.00 0.684 15     4.54     7.45  A    
+##  SP        8.48 0.684 15     7.02     9.93  AB   
+##  DP       10.63 0.684 15     9.17    12.09   B   
+## 
+## WeedControl = TOT:
+##  Tillage emmean    SE df lower.CL upper.CL .group
+##  MIN       8.98 0.684 15     7.53    10.44  A    
+##  SP        9.14 0.684 15     7.68    10.60  A    
+##  DP        9.21 0.684 15     7.75    10.66  A    
+## 
+## Results are averaged over the levels of: Block 
+## Confidence level used: 0.95 
+## P value adjustment: tukey method for comparing a family of 3 estimates 
+## significance level used: alpha = 0.05
+medie <- emmeans(mod, ~Tillage:WeedControl)
+multcomp::cld(medie, Letters=LETTERS)
+##  Tillage WeedControl emmean    SE df lower.CL upper.CL .group
+##  MIN     PART          6.00 0.684 15     4.54     7.45  A    
+##  SP      PART          8.48 0.684 15     7.02     9.93  AB   
+##  MIN     TOT           8.98 0.684 15     7.53    10.44  AB   
+##  SP      TOT           9.14 0.684 15     7.68    10.60   B   
+##  DP      TOT           9.21 0.684 15     7.75    10.66   B   
+##  DP      PART         10.63 0.684 15     9.17    12.09   B   
+## 
+## Results are averaged over the levels of: Block 
+## Confidence level used: 0.95 
+## P value adjustment: tukey method for comparing a family of 6 estimates 
+## significance level used: alpha = 0.05
 ```
 
-Le altre medie, possono essere ottenute analogamente.
+Le tre analisi (contronti tra lavorazioni a parità di diserbo, tra diserbi a parità di lavorazione e tutti verso tutti) portano a risultati leggermente diversi per il diverso numero di confronti effettuati: tre nel primo caso, sei nel secondo e 15 nel terzo, che richiedono una diversa correzione per la molteplicità.
+
+Per completezza di informazioni mostriamo anche il codice necessario per calcolare le medie marginali per le lavorazioni e per il diserbo, anche se non eseguiamo il confronto multiplo, per il motivo indicato in precedenza.
 
 
 ```r
-k2 <- c(1, 1/4, 1/4, 1/4, 1, 0, 0, 0, 0) #PROF - PARZ
-k3 <- c(1, 1/4, 1/4, 1/4, 0, 1, 0, 0, 0) #SUP - PARZ
-k4 <- c(1, 1/4, 1/4, 1/4, 0, 0, 1, 0, 0) #MIN - TOT
-k5 <- c(1, 1/4, 1/4, 1/4, 1, 0, 1, 1, 0) #PROF - TOT
-k6 <- c(1, 1/4, 1/4, 1/4, 0, 1, 1, 0, 1) #SUP - TOT
-sum( coef(mod) * k2 )
-## [1] 10.62875
-sum( coef(mod) * k3 )
-## [1] 8.47525
-sum( coef(mod) * k4 )
-## [1] 8.98275
-sum( coef(mod) * k5 )
-## [1] 9.20675
-sum( coef(mod) * k6 )
-## [1] 9.14125
+emmeans(mod, ~Tillage)
+##  Tillage emmean    SE df lower.CL upper.CL
+##  DP        9.92 0.484 15     8.89    10.95
+##  MIN       7.49 0.484 15     6.46     8.52
+##  SP        8.81 0.484 15     7.78     9.84
+## 
+## Results are averaged over the levels of: Block, WeedControl 
+## Confidence level used: 0.95
+emmeans(mod, ~WeedControl)
+##  WeedControl emmean    SE df lower.CL upper.CL
+##  PART          8.37 0.395 15     7.52     9.21
+##  TOT           9.11 0.395 15     8.27     9.95
+## 
+## Results are averaged over the levels of: Block, Tillage 
+## Confidence level used: 0.95
 ```
 
-Anche se  è comodo conoscere come eseguire queste operazioni, da un punto di vista pratico è certamente più comodo utilizzare la funzione 'emmeans()' del package 'emmeans', di cui daremo un esempio tra poco.
+Ci soffermiamo un attimo sugli errori standard delle medie, che sono diversi per lavorazioni, i diserbi o le loro combinazioni. Infatti, nonostante la varianza dei residui sia la stessa, il numero di dati che concorrono a formare una medie è diverso. Più precisamente, le medie di ogni combinazione 'diserbo x lavorazione' hanno quattro repliche, mentre le medie delle lavorazioni hanno otto repliche, cioè quattro per il numero dei diserbi. Analogamente, Le medie dei diserbi hanno dodici repliche, cioè quattro per il numero delle lavorazioni.
 
-
-## Calcolo degli errori standard (SEM e SED)
-
-Tutte le quantità ottenute più sopra sono state calcolate come combinazioni lineari di parametri del modello. Di conseguenza, le loro varianze sono derivabili con la legge di propagazione degli errori. In questo caso semplice (dati bilanciati), possiamo utilizzare la usuale formula per la quale l'errore standard di una media si ottiene dalla radice quadrata del rapporto tra la varianza del residuo e il numero delle repliche.
-
-Tuttavia, anche se la varianza del residuo è la stessa, il numero di dati che concorrono a formare le medie è diverso (diverso numero di repliche). Infatti, le medie di ogni combinazione 'diserbo x lavorazione' hanno un numero di repliche pari a quattro, mentre le lavorazioni hanno un numero di repliche pari a quattro per il numero dei livelli di diserbo (cioè 8). Il diserbo ha invece un numero di repliche pari a quattro per il numero dei livelli di lavorazione (cioè 12).
-
-Di conseguenza:
-
+Le formula per il calcolo degli errori standard sono le seguenti:
 
 $$SEM_A = \sqrt{\frac{1.87}{4 \cdot 2}} = 0.483$$
 
@@ -4587,208 +4641,140 @@ $$SEM_B = \sqrt{\frac{1.87}{4 \cdot 3}} = 0.395$$
 $$SEM_{AB} = \sqrt{\frac{1.87}{4}} = 0.684$$
 
 
-Possiamo notare che le medie degli effetti principali, grazie al numero di repliche più elevato, sono stimate con maggiore precisione delle medie delle combinazioni.
+Possiamo notare che le medie degli effetti principali, grazie al numero di repliche più elevato, sono stimate con maggiore precisione rispetto alle medie delle combinazioni.
 
-Per quanto riguarda gli errori standard delle differenze tra medie (SED), questi si ottengono dai SEM, moltiplicandoli per $\sqrt(2)$, come usuale. Dai SED, posso calcolare le Minime Differenze Significative, moltiplicandoli per il valore di t di Student, per il 5% di probabilità (test a due code) e 15 gradi di libertà, pari a 2.131.
 
-Dato che l’interazione è significativa, posso fare i confronti multipli solo tra le medie delle combinazioni 'diserbo x lavorazione', dato che confrontare le medie degli effetti principali potrebbe portare a risultati poco attendibili, per i motivi precedentemente esposti.
+## Effetti innestati: valutazione di ibridi di mais
 
-## Medie marginali attese e confronti multipli con R
+L'esempio precedente era relativo ad un disegno fattoriale completamente incrociato, dato che i livelli delle lavorazioni erano gli stessi per ogni livello di diserbo. In alcuni casi possiamo trovare disegni innestati, dove i livelli di un fattore cambiano al cambiare dei livelli dell'altro fattore. Nell'esempio seguente abbiamo considerato tre linee pure impollinanti di mais (A1, A2 ed A3), che abbiamo incrociato con tre linee pure portaseme, diverse per ogni impollinante (B1, B2, B3 per A1, B4, B5, B6 per A2 e B7, B8, B9 per A3). Alla fine abbiamo nove ibridi in tre gruppi, a seconda della linea impollinante.
 
-Per ottenere medie, confronti multipli o altre analisi routinarie, possiamo utilizzare il package 'emmeans'. Il codice sottostante calcola le medie per le combinazioni 'lavorazione x diserbo' e confronta i diserbi a parità di lavorazione.
+Il dataset 'crosses.csv' riporta i risultati ottenuti con un esperimento a blocchi randomizzati con quattro repliche  (36 dati in totale) e può essere caricato dalla solita repository online.
+
+
+
+
+
+
+```r
+fileName <- "https://www.casaonofri.it/_datasets/crosses.csv"
+dataset <- read.csv(fileName, header=T)
+head(dataset, 15)
+##    Male Female Block     Yield
+## 1    A1     B1     1  9.984718
+## 2    A1     B1     2 13.932663
+## 3    A1     B1     3 12.201312
+## 4    A1     B1     4  1.916661
+## 5    A1     B2     1  8.928465
+## 6    A1     B2     2 10.513908
+## 7    A1     B2     3 10.035964
+## 8    A1     B2     4  2.375822
+## 9    A1     B3     1 21.511028
+## 10   A1     B3     2 21.859852
+## 11   A1     B3     3 17.626284
+## 12   A1     B3     4 13.966646
+## 13   A2     B4     1 17.483089
+## 14   A2     B4     2 19.480893
+## 15   A2     B4     3 12.838792
+```
+
+
+## Definizione del modello lineare
+
+In questo esperimento, la produzione del mais dipende dal blocco e dall'effetto paterno, mentre l'effetto materno può essere solo determinato entro ogni linea impollinante. Si dice che l'effetto materno è innestato entro l'effetto paterno, come mostrato in Figura \@ref(fig:figNameA3113). Pertanto, il modello lineare risulta così definito:
+
+$$Y_{ijk} = \mu + \gamma_k + \alpha_i + \delta_{ij} + \varepsilon_{ijk}$$
+
+dove $\gamma_k$ è l'effetto del blocco $k$, $\alpha_i$ è l'effetto dell'impollinante $i$ e $\delta_{ij}$ è l'effetto del portaseme  $j$ entro ogni linea impollinante $i$. La componente random $\varepsilon$ viene assunta, come al solito, gaussiana e omoscedastica, con media 0 e deviazione standard uguale a $\sigma$.
+
+La differenza con un modello ANOVA completamente incrociato dovrebbe essere chiara: in quest'ultimo caso abbiamo due effetti, A, B e la loro interazione A:B, mentre in un modello innestato abbiamo solo l'effetto A e l'effetto B entro A (A/B), mentre l'effetto principale B manca, in quanto non esiste in pratica.
+
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figNameA3113-1.png" alt="Struttura di un disegno sperimentale gerarchico" width="70%" />
+<p class="caption">(\#fig:figNameA3113)Struttura di un disegno sperimentale gerarchico</p>
+</div>
+
+
+## Fitting del modello con R
+
+Il modello viene codificato senza l'effetto principale del portaseme, utilizando l'operatore '/'.
+
+\scriptsize
+
+
+```r
+mod <- lm(Yield ~ factor(Block) + Male + Male/Female,
+          data = dataset)
+```
+\normalsize
+
+L'ispezione dei residui viene fatta col metodo grafico usuale; la Figura \@ref(fig:figName137) non mostra problemi visibili e quindi si può procedere con la scomposizione della varianza.
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName137-1.png" alt="Analisi grafica dei residui per un modello ANOVA a due vie, con effetti innestati" width="90%" />
+<p class="caption">(\#fig:figName137)Analisi grafica dei residui per un modello ANOVA a due vie, con effetti innestati</p>
+</div>
+
+
+
+```r
+anova(mod)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##               Df Sum Sq Mean Sq F value    Pr(>F)    
+## factor(Block)  3 383.75 127.917  44.355 6.051e-10 ***
+## Male           2 134.76  67.378  23.363 2.331e-06 ***
+## Male:Female    6 575.16  95.860  33.239 1.742e-10 ***
+## Residuals     24  69.21   2.884                      
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+La tabella ANOVA mostra che tutti gli effetti sono significativi e, pertanto, possiamo esaminare e confrontare le medie dei diversi ibridi, anche considerando che l'effetto paterno è relativamente poco importante, dato che le linee impollinanti sono incrociate con linee portaseme diverse.
 
 
 
 ```r
 library(emmeans)
-medie <- emmeans(mod, ~Diserbo|Lavorazione)
-multcomp::cld(medie, adjust="none", Letters=LETTERS)
-## Lavorazione = MIN:
-##  Diserbo emmean    SE df lower.CL upper.CL .group
-##  parz      6.00 0.684 15     4.54     7.45  A    
-##  tot       8.98 0.684 15     7.53    10.44   B   
+mfMeans <- emmeans(mod, ~Female|Male)
+multcomp::cld(mfMeans, Letters = LETTERS)
+## Male = A1:
+##  Female emmean    SE df lower.CL upper.CL .group
+##  B2       7.96 0.849 24     6.21     9.72  A    
+##  B1       9.51 0.849 24     7.76    11.26  A    
+##  B3      18.74 0.849 24    16.99    20.49   B   
 ## 
-## Lavorazione = PROF:
-##  Diserbo emmean    SE df lower.CL upper.CL .group
-##  tot       9.21 0.684 15     7.75    10.66  A    
-##  parz     10.63 0.684 15     9.17    12.09  A    
+## Male = A2:
+##  Female emmean    SE df lower.CL upper.CL .group
+##  B6       8.72 0.849 24     6.97    10.47  A    
+##  B5      11.23 0.849 24     9.48    12.98  A    
+##  B4      15.18 0.849 24    13.43    16.93   B   
 ## 
-## Lavorazione = SUP:
-##  Diserbo emmean    SE df lower.CL upper.CL .group
-##  parz      8.48 0.684 15     7.02     9.93  A    
-##  tot       9.14 0.684 15     7.68    10.60  A    
+## Male = A3:
+##  Female emmean    SE df lower.CL upper.CL .group
+##  B9      10.11 0.849 24     8.35    11.86  A    
+##  B8      17.73 0.849 24    15.97    19.48   B   
+##  B7      20.12 0.849 24    18.36    21.87   B   
 ## 
-## Results are averaged over the levels of: Blocco 
+## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
+## Results are averaged over some or all of the levels of: Block 
+## P value adjustment: tukey method for comparing a family of 4.772 estimates 
 ## significance level used: alpha = 0.05
 ```
 
-Se volessimo confrontare le lavorazioni a parità di diserbo o tutte le combinazioni dovremmo utilizzare codice leggermente diverso:
+In conclusione, vediamo che l'analisi dei disegni con due fattori innestati è piuttosto simile a quella per due fattori incrociati, con l'unica eccezione che l'effetto principale per il fattore innestato non è incluso nel modello.
 
+<!--chapter:end:12-AnovaDueLivelli.Rmd-->
 
-```r
-medie <- emmeans(mod, ~Lavorazione|Diserbo)
-multcomp::cld(medie, adjust="none", Letters=LETTERS)
-## Diserbo = parz:
-##  Lavorazione emmean    SE df lower.CL upper.CL .group
-##  MIN           6.00 0.684 15     4.54     7.45  A    
-##  SUP           8.48 0.684 15     7.02     9.93   B   
-##  PROF         10.63 0.684 15     9.17    12.09    C  
-## 
-## Diserbo = tot:
-##  Lavorazione emmean    SE df lower.CL upper.CL .group
-##  MIN           8.98 0.684 15     7.53    10.44  A    
-##  SUP           9.14 0.684 15     7.68    10.60  A    
-##  PROF          9.21 0.684 15     7.75    10.66  A    
-## 
-## Results are averaged over the levels of: Blocco 
-## Confidence level used: 0.95 
-## significance level used: alpha = 0.05
-medie <- emmeans(mod, ~Lavorazione:Diserbo)
-multcomp::cld(medie, adjust="none", Letters=LETTERS)
-##  Lavorazione Diserbo emmean    SE df lower.CL upper.CL .group
-##  MIN         parz      6.00 0.684 15     4.54     7.45  A    
-##  SUP         parz      8.48 0.684 15     7.02     9.93   B   
-##  MIN         tot       8.98 0.684 15     7.53    10.44   BC  
-##  SUP         tot       9.14 0.684 15     7.68    10.60   BC  
-##  PROF        tot       9.21 0.684 15     7.75    10.66   BC  
-##  PROF        parz     10.63 0.684 15     9.17    12.09    C  
-## 
-## Results are averaged over the levels of: Blocco 
-## Confidence level used: 0.95 
-## significance level used: alpha = 0.05
-```
+# Split-plots, split-blocks e altri disegni sperimenatli in campo
 
-In questo caso non c'è nessuna differenza, dato che non abbiamo implementato nessuna correzione per la molteplicità. Altrimenti, le tre situazioni sarebbero diverse, in quanto nel primo caso avremmo fatto solo tre confronti, nel secondo caso ne avremmo fatti sei, nel terzo caso 15, con un diverso livello di correzione per la molteplicità.
-
----
-
-## Per approfondire un po'....
-
-
-### Anova a due vie: scomposizione 'manuale' della varianza
-
-Anche nel caso dell'ANOVA a due vie, illustriamo i calcoli necessari per la scomposizione 'manuale' della varianza. Il punto di partenza, come al solito, sono le medie per i livelli di ogni fattore sperimentale e per le loro combinazioni, che sono date più sotto, in forma di matrici (ma nessuna paura, è solo per comodità!).
+[Da aggiungere]
 
 
 
-
-Le medie delle combinazioni 'lavorazioni $\times$ diserbo' sono:
-
-$$ \bar{Y}_{ij.} = \left[ {\begin{array}{rr}
-5.99500 & 8.98275 \\
-10.62875 & 9.20675 \\
-8.47525  & 9.14125 \\
-\end{array}} \right]$$
-
-Per le lavorazioni e per i diserbi abbiamo:
-
-$$ \bar{Y}_{i..} = \left[ {\begin{array}{r}
-7.488875 \\
-9.917750 \\
-8.808250
-\end{array}} \right]$$
-
-$$ \bar{Y}_{.j.} = \left[ {\begin{array}{r}
-7.488875 \\
-9.917750 \\
-8.808250
-\end{array}} \right]$$
-
-
-Le medie dei blocchi, sono, invece:
-
-$$ \bar{Y}_{..k} = \left[ {\begin{array}{r}
-9.385500 \\
-8.347500 \\
-8.557833 \\
-8.662333
-\end{array}} \right]$$
-
-La media generale è $\bar{Y}_{...} = 8.738292$.
-
-Per calcolare le devianze degli effetti principali (blocchi, lavorazioni e diserbi), come primo passaggio, calcoliamo gli scostamenti tra le medie e la media generale e, quindi, sottraiamo da ogni media la media generale. Ricordiamo che questi scarti non sono altro che gli effetti dei trattamenti e, nel caso in cui si sia adottata un vincolo sulla somma, questi coincidono con i parametri di un modello lineare. Per cui:
-
-
-
-
-$$\bar{Y}_{i..} - \bar{Y}_{...} = \alpha_i = \left[ {\begin{array}{r}
--1.24941667 \\
-1.17945833 \\
-0.06995833
-\end{array}} \right]$$
-
-
-
-$$ \bar{Y}_{.j.} - \bar{Y}_{...} = \beta_j = \left[ {\begin{array}{r}
--0.3719583 \\
-0.3719583
-\end{array}} \right]$$
-
-
-
-$$ \bar{Y}_{..k} - \bar{Y}_{...} = \gamma_k = \left[ {\begin{array}{r}
-0.6472083\\
--0.3907917\\
--0.1804583\\
--0.07595833
-\end{array}} \right]$$
-
-
-
-Per quanto riguarda la devianza di blocchi, lavorazioni e diserbo, basta calcolare il quadrato degli scarti e sommare i valori ottenuti, moltiplicando per il numero di osservazioni che abbiamo per ogni blocco/lavorazione/diserbo. In questo modo, considerando che, in un blocco, abbiamo 6 osservazioni, la devianza dei blocchi è:
-
-$$SS_b = 6 \times \left( 0.6472083^2 + 0.3907917^2 + 0.1804583^2 + 0.07595833 ^ 2 \right) = 3.65959$$
-
-La devianza delle lavorazioni, considerando che, per ognuna, abbiamo 8 valori, è:
-
-$$ SS_l = 8 \times \left(1.24941667^2 + 1.17945833^2  + 0.06995833^2 \right) = 23.65647  $$
-
-Per il diserbo:
-
-$$ SS_l = 12 \times \left(0.3719583^2 + 0.3719583 ^ 2 \right) = 3.320472  $$
-
-Per l'interazione, non possiamo procedere nello stesso modo, in quanto la variabilità esistente tra le medie delle sei combinazioni è il risultato, non solo dell'eventuale interazione, ma anche degli effetti principali. Infatti, se ricordiamo il modello lineare per un disegno a due vie, risulta che il valore atteso per una combinazione è:
-
-$$ \bar{Y}_{ij.} = \mu + \alpha_i + \beta_j + \alpha\beta_{ij}$$
-
-Se abbiamo utilizzato il vincolo sulla somma, $\mu$ è la media generale, $\alpha_i$ sono gli effetti delle lavorazioni (l'ultima colonna della tabella sovrastante), $\beta_j$ sono gli effetti dei diserbi (ultima riga della tabella sovrastante). Di conseguenza, gli effetti dell'interazione sono:
-
-$$ \alpha\beta_{ij} = \bar{Y}_{ij.} - \bar{Y}_{...} - \alpha_i - \beta_j $$
-
-Ora, siccome 
-
-$$\alpha_i = \bar{Y}_{i..} - \bar{Y}_{...}$$
-e 
-
-$$\beta_j = \bar{Y}_{.j.} - \bar{Y}_{...}$$
-
-possiamo scrivere:
-
-$$ \alpha\beta_{ij} = \bar{Y}_{ij.} - \bar{Y}_{...} - \bar{Y}_{i..} + \bar{Y}_{...} - \bar{Y}_{.j.} + \bar{Y}_{...} = \bar{Y}_{ij.} - \bar{Y}_{i..} - \bar{Y}_{.j.} + \bar{Y}_{...}$$
-
-Ad esempio:
-
-$$ \alpha\beta_{11} = 5.995 - 7.488875 - 8.366333 + 8.738292 = - 1.121916$$
-
-
-
-Completando i calcoli:
-
-$$ \alpha\beta_{ij} = \left[ {\begin{array}{rr}
--1.1219 &  1.1219 \\
-1.0830 & -1.0830 \\
-0.0390 & -0.0390\\
-\end{array}} \right]$$
-
-Elevando al quadrato, sommando e moltiplicando per quattro otteniamo la devianza dell'interazione, pari a:
-
-$$ SS_{ld} = 4 \times \left(1.1219^2+ 1.1219^2 +1.0830^2 +1.0830^2 + 0.0390^2 +0.0390^2 \right)= 19.46456$$
-
-Questi calcoli manuali possono essere utili per meglio comprendere il senso della scomposizione della varianza, ma sono da considerare obsoleti, in quanto, nell'uso comune, nessuno li esegue più senza l'aiuto di un computer.
-
-
-<!--chapter:end:13-AnovaDueLivelli.Rmd-->
+<!--chapter:end:13-SplitNested.Rmd-->
 
 # La regressione non-lineare
 
@@ -5116,11 +5102,11 @@ I due coefficienti di determinazione (tradizionale e corretto) possono essere ot
 
 ```r
 R2nls(modNlin)
-## $R2
+## $PseudoR2
 ## [1] 0.9939126
 ## 
-## $R2adj
-## [1] 0.9936359
+## $R2
+## [1] 1.001821
 ```
 
 ## Funzioni lineari e nonlineari dei parametri
@@ -5420,9 +5406,10 @@ Pur essendo entrambi gli approcci corretti, il secondo è certamente più elegan
 5. Ritz, C., Streibig, J.C., 2008. Nonlinear regression with R. Springer-Verlag New York Inc., Books.
 
 
-<!--chapter:end:15-NonLineare.Rmd-->
+<!--chapter:end:14-NonLineare.Rmd-->
 
 # Esercizi
+
 
 ## Capitoli 1 e 2
 
@@ -5533,9 +5520,12 @@ In un campo di frumento sono state campionate trenta aree di saggio di un metro 
 
 Siamo interessati a conoscere il contenuto medio di nitrati dei pozzi della media valle del Tevere. Per questo organizziamo un esperimento, durante il quale campioniamo 20 pozzi rappresentativi, riscontrando  le seguenti concentrazioni:
 
-38.3 38.6 38.1 39.9 36.3 41.6 37.0 39.8 39.1
-35.0 38.1 37.4 38.3 34.8 40.4 39.3 37.0 38.7
-38.2 38.4
+```
+38.3 38.6 38.1 39.9 36.3 41.6 37.0 39.8 39.1     
+35.0 38.1 37.4 38.3 34.8 40.4 39.3 37.0 38.7    
+38.2 38.4    
+```
+
 
 Stimare la concentrazione media per l'intera valle del Tevere
 
@@ -5776,7 +5766,7 @@ E'stato impostato un test di durata su un impianto di riscaldamento, per verific
 |  1708 |              688 |
 |  1708 |              729 |
 
-Valutare se la temperatura di esercizio infleunza significativamente la durata del riscaldatore
+Valutare se la temperatura di esercizio infleunza significativamente la durata del riscaldatore. Quale/i temperatura/e consentono la maggior durata?
 
 ### Esercizio 4
 
@@ -6195,7 +6185,7 @@ $$c + \frac{d - c}{1 + exp(b ( log (x) - log (a))}$$
 
 Parametrizzare questo modello e verificarne la bontà d'adattamento.
 
-<!--chapter:end:16-Esercizi.Rmd-->
+<!--chapter:end:15-Esercizi.Rmd-->
 
 # Appendice 1: breve introduzione ad R
 
