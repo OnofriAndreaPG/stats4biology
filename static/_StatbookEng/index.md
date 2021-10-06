@@ -11,6 +11,10 @@ link-citations: yes
 description: "Experimental methods in agriculture: a tutorial book with R"
 delete_merged_file: true
 always_allow_html: yes
+cover-image: _images/cover.jpeg
+# description: "Efficient R Programming is about increasing the amount of work you can do with R in a given amount of time. It's about both computational and programmer efficiency."
+# github-repo: csgillespie/efficientR
+# url: 'https\://csgillespie.github.io/efficientR/'
 ---
 
 
