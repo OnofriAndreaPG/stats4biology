@@ -11,9 +11,9 @@ link-citations: yes
 delete_merged_file: true
 always_allow_html: yes
 twitter-handle: onofriandreapg
-cover-image: _images/cover.png
+cover-image: coversmall.png
 description: "Experimental methods in agriculture: a tutorial book with R"
-url: 'https\://www.statforbiology/stabookeng'
+url: 'http\://www.casaonofri.it/images'
 ---
 
 
