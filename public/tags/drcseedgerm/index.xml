@@ -5,10 +5,405 @@
     <description>Recent content in drcSeedGerm on The broken bridge between biologists and statisticians</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2018, @AndreaOnofri</copyright>
-    <lastBuildDate>Sat, 01 May 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 09 Oct 2021 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://www.statforbiology.com/tags/drcseedgerm/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Analysing seed germination and emergence data with R (a tutorial). Part 2</title>
+      <link>https://www.statforbiology.com/2021/stat_drcte_2-methods/</link>
+      <pubDate>Sat, 09 Oct 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.statforbiology.com/2021/stat_drcte_2-methods/</guid>
+      <description>
+&lt;script src=&#34;https://www.statforbiology.com/rmarkdown-libs/header-attrs/header-attrs.js&#34;&gt;&lt;/script&gt;
+
+
+&lt;div id=&#34;survival-analysis-and-germinationemergence-data-an-overlooked-connection&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Survival analysis and germination/emergence data: an overlooked connection&lt;/h1&gt;
+&lt;p&gt;Seed germination and emergence data describe the time until the event of interest occurs and, therefore, they can be put together in the wide group of &lt;strong&gt;time-to-event data&lt;/strong&gt;. You may wonder: what’s the matter with time-to-event data? Do they have anything special that needs our attention? The answer is, definitely, yes!&lt;/p&gt;
+&lt;p&gt;Indeed, with very few exceptions, time-to-event data are affected by a peculiar form of uncertainty, which takes the name of &lt;strong&gt;censoring&lt;/strong&gt;. It relates to the fact that, due to the typical monitoring schedule, the exact time-to-event may not always be determined. Think about a germination assay, where we put, e.g., 100 seeds in a Petri dish and make daily inspections. At each inspection, we count the number of germinated seeds. In the end, what have we learnt about the germination time of each seed? It is easy to note that we do not have exact values, we only have a set of intervals. Let’s consider three possible situations.&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;If we found a germinated seed at the first inspection time, we only know that germination took place before the inspection (left-censoring).&lt;/li&gt;
+&lt;li&gt;If we find a germinated seed at the second (or later) inspection time, we only know that germination took place somewhere between the previous and the present inspection (interval-censoring).&lt;/li&gt;
+&lt;li&gt;If we find an ungerminated seed at the end of the experiment, we only know that its germination time, if any, is higher than the duration of the experiment (right-censoring).&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Censoring implies a lot of uncertainty, which is additional to other more common sources of uncertainty, such as the individual-to-individual variability or random errors in the manipulation process. The problem of censoring has been widely recognised in other disciplines, such as medicine, in relation to survival data (time-to-death data). In order to address that problem, a vast body of methods has developed, which goes under the name of ‘survival analysis’.&lt;/p&gt;
+&lt;p&gt;In principle, time-to-germination and time-to-emergence data are totally similar to time-to-death data, apart from the fact that we usually deal with different (and less sad) events. Unfortunately, such a connection has been largely overlooked by plant biologists and, as the consequence, the problem of censoring has been most often neglected. In order to understand why this is not a good think, it is important that we become aware about the possible consequences of neglecting censoring during data analyses. That is why I decided to sit and write this post.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;motivating-example-a-simulated-dataset&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Motivating example: a simulated dataset&lt;/h1&gt;
+&lt;p&gt;It may be useful to think about a possible mechanism by which time-to-event data arise. Let’s imagine that we have a population with 85% of germinable seeds (the other ones are dormant and, therefore, they are not immediately able to germinate). The germinable fraction is composed by seeds with variables germination times, as dictated by their genotypes and environmental conditions. Let’s assume that such a variability can be described by using a log-logistic distribution, with a median germination time &lt;span class=&#34;math inline&#34;&gt;\(e = 4.5\)&lt;/span&gt; days and a shape parameter &lt;span class=&#34;math inline&#34;&gt;\(b = 1.6\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;If we sample 100 seeds from that population, the sample will not necessarily reflect the characteristics of the whole population. We can do this sampling in R, by using a three-steps approach.&lt;/p&gt;
+&lt;div id=&#34;step-1-the-ungerminated-fraction&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Step 1: the ungerminated fraction&lt;/h2&gt;
+&lt;p&gt;First, let’s simulate the number of germinated seeds, assuming a binomial distribution with a proportion of successes equal to 0.85. We use the random number generator &lt;code&gt;rbinom()&lt;/code&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#Monte Carlo simulation - Step 1
+d &amp;lt;- 0.85
+set.seed(1234)
+nGerm &amp;lt;- rbinom(1, 100, d)
+nGerm
+## [1] 89&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We see that, in this instance, 89 seeds germinated out of 100, which is not the expected 85%. This may be regarded as an expression of the typical random sampling variability.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;step-2-germination-times-for-the-germinated-fraction&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Step 2: germination times for the germinated fraction&lt;/h2&gt;
+&lt;p&gt;Second, let’s simulate the germination times for these 89 germinable seeds, by drawing from a log-logistic distribution with &lt;span class=&#34;math inline&#34;&gt;\(b = 1.6\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(e = 4.5\)&lt;/span&gt;. To this aim, we use the &lt;code&gt;rllogis()&lt;/code&gt; function in the &lt;code&gt;actuar&lt;/code&gt; package (Dutang et al., 2008):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#Monte Carlo simulation - Step 2
+library(actuar)
+b &amp;lt;- 1.6; e &amp;lt;- 4.5 
+Gtimes &amp;lt;- rllogis(nGerm, shape = b, scale = e)
+Gtimes &amp;lt;- c(Gtimes, rep(NA, 100 - nGerm))
+Gtimes
+##   [1]  3.2936708  3.4089762  3.2842199  1.4401630  3.1381457 82.1611955
+##   [7]  9.4906364  2.9226745  4.3424551  2.7006042  4.0202158  8.0519663
+##  [13]  0.9492013  7.8199588  1.6163588  7.9661485  8.4641154 11.2879041
+##  [19]  9.5014360  7.2786264  7.5809838 12.7421713 32.7999661  9.9691944
+##  [25]  1.8137333  4.2197542  1.0218849  1.6604417 30.0352308  5.0235265
+##  [31]  8.5085067  7.5367739  4.4185382 11.5555259  2.1919263 10.6509339
+##  [37]  8.6857151  0.2185902  1.8377033  3.9362727  3.0864702  7.3804164
+##  [43]  3.2978782  7.0100360  4.4775843  2.8328842  4.6721090  9.1258796
+##  [49]  2.1485568 21.8749808  7.4265984  2.5148724  4.4491466 13.1132301
+##  [55]  4.4559642  4.5684584  2.2556488 11.8783556  1.5338755  1.4106592
+##  [61] 31.8419420  7.2666641 65.0154287  9.2798476  2.5988399  7.4612907
+##  [67]  4.4048509 27.7439121  3.8257187 15.4967751  1.1960785 62.5152642
+##  [73]  2.0169970 19.1134899  4.2891084  6.0420938 22.6521417  7.1946293
+##  [79]  2.9028993  0.9241876  4.8277336 13.8068124  4.0273655 10.8651761
+##  [85]  1.1509735  5.9593534  7.4009589 12.6839405  1.1698335         NA
+##  [91]         NA         NA         NA         NA         NA         NA
+##  [97]         NA         NA         NA         NA&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now, we have a vector hosting 100 germination times (‘Gtimes’). Please, note that I also added 11 NA values, to represent non-germinable seeds.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;step-3-counts-of-germinated-seeds&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Step 3: counts of germinated seeds&lt;/h2&gt;
+&lt;p&gt;Unfortunately, due to the monitoring schedule, we cannot observe the exact germination time for each single seed in the sample; we can only count the seeds which have germinated between two assessment times. Therefore, as the third step, we simulate the observed counts, by assuming daily monitoring for 40 days; what we do, is a sort of ‘binning’ process, where we assign each seed to the time interval during which it germinated.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;obsT &amp;lt;- seq(1, 40, by=1) #Observation schedule
+count &amp;lt;- table( cut(Gtimes, breaks = c(0, obsT)) )
+count
+## 
+##   (0,1]   (1,2]   (2,3]   (3,4]   (4,5]   (5,6]   (6,7]   (7,8]   (8,9]  (9,10] 
+##       3      11      10       8      13       2       1      12       4       5 
+## (10,11] (11,12] (12,13] (13,14] (14,15] (15,16] (16,17] (17,18] (18,19] (19,20] 
+##       2       3       2       2       0       1       0       0       0       1 
+## (20,21] (21,22] (22,23] (23,24] (24,25] (25,26] (26,27] (27,28] (28,29] (29,30] 
+##       0       1       1       0       0       0       0       1       0       0 
+## (30,31] (31,32] (32,33] (33,34] (34,35] (35,36] (36,37] (37,38] (38,39] (39,40] 
+##       1       1       1       0       0       0       0       0       0       0&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We can see that, e.g., 11 germinated seeds were counted at day 2; therefore they germinated between day 1 and day 2 and their real germination time is unknown, but included in the range between 1 and 2 (left-open and right-closed). This is a typical example of interval-censoring (see above).&lt;/p&gt;
+&lt;p&gt;We can also see that, in total, we counted 86 germinated seeds and, therefore, 14 seeds were still ungerminated at the end of the assay. For this simulation exercise, we know that 11 seeds were non-germinable and three seeds were germinable, but they were not allowed enough time to germinate (look at the table above: there are 3 seeds with germination times higher than 40). In real life, this is another source of uncertainty: we might be able to ascertain whether these 14 seeds are viable or not (e.g. by using a tetrazolium test), but, if they are viable, we would never be able to tell whether they are dormant or their germination time is simply longer than the duration of the assay. In real life, we can only reach an uncertain conclusion: the germination time of the 14 ungerminated seeds is comprised between 40 days to infinity; this is an example of right-censoring.&lt;/p&gt;
+&lt;p&gt;The above uncertainty affects our capability of describing the germination time-course from the observed data. We can try to picture the situation in the graph below.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_drcte_2-Methods_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;576&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;What is the real germination time-course? The red one? The blue one? Something in between? We cannot really say this from our dataset, we are uncertain. The grey areas represent the uncertainty due to censoring. Do you think that we can reasonably neglect it?&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;neglecting-censoring&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Neglecting censoring&lt;/h1&gt;
+&lt;p&gt;For a moment, let’s forget about those grey uncertainty areas. Let’s forget about censoring; this is what it is often done in literature for germination data: we associate the observed proportion of germinated seeds to the exact time when it was observed. It is, indeed, an abuse, as the observed data tell us a different story: the observed proportion of germinated seeds might have been attained before the moment of inspection (and not necessarily at the moment of inspection). But we disregard this and fit a nonlinear regression model, i.e. a log-logistic function:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[
+G(t) = \frac{d}{ 1 + exp \left\{ - b \right[ \log(t) - \log(e) \left] \right\}}
+\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(G\)&lt;/span&gt; is the fraction of germinated seeds at time &lt;span class=&#34;math inline&#34;&gt;\(t\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; is the germinable fraction, &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt; is the median germination time for the germinable fraction and &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; is the slope around the inflection point. The above model is sygmoidally shaped and it is symmetric on a log-time scale. The three parameters are biologically relevant, as they describe the three main features of seed germination, i.e. capability (&lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt;), speed (&lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt;) and uniformity (&lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt;).&lt;/p&gt;
+&lt;p&gt;In order to fit a nonlinear regression model, we need to transform the observed data, as follows:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;counts &amp;lt;- as.numeric( table( cut(Gtimes, breaks = c(0, obsT)) ) )
+propCum &amp;lt;- cumsum(counts)/100
+df &amp;lt;- data.frame(time = obsT, counts = counts, propCum = propCum) 
+df
+##    time counts propCum
+## 1     1      3    0.03
+## 2     2     11    0.14
+## 3     3     10    0.24
+## 4     4      8    0.32
+## 5     5     13    0.45
+## 6     6      2    0.47
+## 7     7      1    0.48
+## 8     8     12    0.60
+## 9     9      4    0.64
+## 10   10      5    0.69
+## 11   11      2    0.71
+## 12   12      3    0.74
+## 13   13      2    0.76
+## 14   14      2    0.78
+## 15   15      0    0.78
+## 16   16      1    0.79
+## 17   17      0    0.79
+## 18   18      0    0.79
+## 19   19      0    0.79
+## 20   20      1    0.80
+## 21   21      0    0.80
+## 22   22      1    0.81
+## 23   23      1    0.82
+## 24   24      0    0.82
+## 25   25      0    0.82
+## 26   26      0    0.82
+## 27   27      0    0.82
+## 28   28      1    0.83
+## 29   29      0    0.83
+## 30   30      0    0.83
+## 31   31      1    0.84
+## 32   32      1    0.85
+## 33   33      1    0.86
+## 34   34      0    0.86
+## 35   35      0    0.86
+## 36   36      0    0.86
+## 37   37      0    0.86
+## 38   38      0    0.86
+## 39   39      0    0.86
+## 40   40      0    0.86&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In practice, we determine the cumulative proportion (or percentage) of germinated seeds (‘propCum’), which is used as the response variable, while the observation time (‘time’) is used as the independent variable. Then, we fit the log-logistic function by non-linear least squares regression. I’ll say this again: &lt;strong&gt;you can clearly see that, by doing so, we totally neglect the grey areas in the figure above, we only look at the observed points&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Let’s use the ‘drm’ function, in the ‘drc’ package (Ritz et al., 2015). The argument ‘fct’ is used to set the fitted function to log-logistic with three parameters (the equation above).&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;plot()&lt;/code&gt; and &lt;code&gt;summary()&lt;/code&gt; methods can be used to plot a graph and to retrieve the estimated parameters.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(drc)
+mod &amp;lt;- drm(propCum ~ time, data = df,
+           fct = LL.3() )
+plot(mod, log = &amp;quot;&amp;quot;,
+      xlab = &amp;quot;Time (days)&amp;quot;,
+      ylab = &amp;quot;Proportion of germinated seeds&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_drcte_2-Methods_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(mod)
+## 
+## Model fitted: Log-logistic (ED50 as parameter) with lower limit at 0 (3 parms)
+## 
+## Parameter estimates:
+## 
+##                 Estimate Std. Error t-value   p-value    
+## b:(Intercept) -1.8497771  0.0702626 -26.327 &amp;lt; 2.2e-16 ***
+## d:(Intercept)  0.8768793  0.0070126 125.044 &amp;lt; 2.2e-16 ***
+## e:(Intercept)  5.2691575  0.1020457  51.635 &amp;lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error:
+## 
+##  0.01762168 (37 degrees of freedom)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We see that our estimates are very close to the real values (&lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; = 1.85 vs. 1.6; &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt; = 5.27 vs. 4.5; &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; = 0.88 vs. 0.86) and we also see that standard errors are rather small (the coefficient of variability goes from 1 to 4%). There is a difference in sign for &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt;, which relates to the fact that the &lt;code&gt;LL.3()&lt;/code&gt; function in ‘drc’ removes the minus sign in the equation above. Please, disregard this aspect, which stems from the fact that the ‘drc’ package is rooted in pesticide bioassays.&lt;/p&gt;
+&lt;p&gt;Do you think that this analysis is not that bad? Wait a moment. Let’s see what happens if we account for censoring.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;accounting-for-censoring&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Accounting for censoring&lt;/h1&gt;
+&lt;p&gt;How can we account for censoring? The answer is simple: we should use fitting methods which are specifically devised to incorporate the uncertainty due to censoring. We said that, in medicine, the body of these methods goes under the name of survival analysis and, from this framework, we can borrow a parametric survival model. However, I will not use the name ‘survival model’ as we are not dealing with a survival process. Instead, I will use the name &lt;strong&gt;parametric time-to-event model&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;My colleagues and I have extensively talked about parametric time-to-event models in two of our recent papers and related appendices (Onofri et al., 2019; Onofri et al., 2018). Therefore, I will not go into detail, now. I will just say that time-to-event models directly consider the observed counts as the response variable. As the independent variable, they consider the extremes of each time interval (‘timeBef’ and ‘timeAf’; see below). We immediately see two differences with nonlinear regression: (1) we do not need to transform the observed counts into cumulative proportions, and (2) by using an interval as the independent variable, we inject into the model the uncertainty due to censoring (the grey areas in the figure above). Let’s reshape the dataset as shown below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;df &amp;lt;- data.frame(timeBef = c(0, obsT), timeAf = c(obsT, Inf), counts = c(as.numeric(counts), 100 - sum(counts)) )
+df
+##    timeBef timeAf counts
+## 1        0      1      3
+## 2        1      2     11
+## 3        2      3     10
+## 4        3      4      8
+## 5        4      5     13
+## 6        5      6      2
+## 7        6      7      1
+## 8        7      8     12
+## 9        8      9      4
+## 10       9     10      5
+## 11      10     11      2
+## 12      11     12      3
+## 13      12     13      2
+## 14      13     14      2
+## 15      14     15      0
+## 16      15     16      1
+## 17      16     17      0
+## 18      17     18      0
+## 19      18     19      0
+## 20      19     20      1
+## 21      20     21      0
+## 22      21     22      1
+## 23      22     23      1
+## 24      23     24      0
+## 25      24     25      0
+## 26      25     26      0
+## 27      26     27      0
+## 28      27     28      1
+## 29      28     29      0
+## 30      29     30      0
+## 31      30     31      1
+## 32      31     32      1
+## 33      32     33      1
+## 34      33     34      0
+## 35      34     35      0
+## 36      35     36      0
+## 37      36     37      0
+## 38      37     38      0
+## 39      38     39      0
+## 40      39     40      0
+## 41      40    Inf     14&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Can you see the difference? Please, note that we also added the ungerminated seeds at the end, with an uncertainty interval going from 40 days to infinity.&lt;/p&gt;
+&lt;p&gt;Time-to-event models can be easily fitted by using the &lt;code&gt;drm()&lt;/code&gt; function in the ‘drc’ package, although we should specify that we want to use a time-to-event method, by setting the &lt;code&gt;type = &#34;event&#34;&lt;/code&gt; argument. More simply, we can use the &lt;code&gt;drmte()&lt;/code&gt; function in the ‘drcte’ package, that is a specific package for time-to-event methods. Both the functions use the same syntax and, with respect to nonlinear regression, there are some important differences in the model call. In particular, a nonlinear regression model is defined as:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;CumulativeProportion ~ timeAf&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;On the other hand, a time-to-event model is defined as:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Count ~ timeBef + timeAf&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The full model call is shown below, both with &lt;code&gt;drm()&lt;/code&gt; and with &lt;code&gt;drmte()&lt;/code&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#Time-to-event model
+library(drcte)
+# modTE &amp;lt;- drm(counts ~ timeBef + timeAf, data = df, 
+#            fct = LL.3(), type = &amp;quot;event&amp;quot;)
+modTE &amp;lt;- drmte(counts ~ timeBef + timeAf, data = df, 
+           fct = LL.3())
+summary(modTE)
+## 
+## Model fitted: Log-logistic (ED50 as parameter) with lower limit at 0
+## 
+## Robust estimation: no 
+## 
+## Parameter estimates:
+## 
+##                Estimate Std. Error t-value   p-value    
+## b:(Intercept) -1.826006   0.194579 -9.3844 &amp;lt; 2.2e-16 ***
+## d:(Intercept)  0.881476   0.036928 23.8701 &amp;lt; 2.2e-16 ***
+## e:(Intercept)  5.302109   0.565273  9.3797 &amp;lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;With respect to the nonlinear regression fit, the estimates from a time-to-event fit are very similar, but the standard errors are much higher (the coefficient of variability now goes from 4 to 11%). That was expected: we have added the uncertainty due to censoring.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;neglecting-or-accounting-for-censoring&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Neglecting or accounting for censoring?&lt;/h1&gt;
+&lt;p&gt;You may wonder which of the two analysis is right and which is wrong. We cannot say this from just one dataset. However, we can repeat the Monte Carlo simulation above to extract 1000 samples, fit the model by using the two methods and retrieve parameter estimates and standard errors for each sample and method. We do this by using the code below (please, be patient… it may take some time).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;GermSampling &amp;lt;- function(nSeeds, timeLast, stepOss, e, b, d){
+    
+    #Draw a sample as above
+    nGerm &amp;lt;- rbinom(1, nSeeds, d)
+    Gtimes &amp;lt;- rllogis(nGerm, shape = b, scale = e)
+    Gtimes &amp;lt;- c(Gtimes, rep(Inf, 100 - nGerm))
+
+    
+    #Generate the observed data
+    obsT &amp;lt;- seq(1, timeLast, by=stepOss) 
+    counts &amp;lt;- as.numeric( table( cut(Gtimes, breaks = c(0, obsT)) ) )
+    propCum &amp;lt;- cumsum(counts)/nSeeds
+    timeBef &amp;lt;- c(0, obsT)
+    timeAf &amp;lt;- c(obsT, Inf)
+    counts &amp;lt;- c(counts, nSeeds - sum(counts))
+    
+    #Calculate the T50 with two methods
+    mod &amp;lt;- drm(propCum ~ obsT, fct = LL.3() )
+    modTE &amp;lt;- drm(counts ~ timeBef + timeAf, 
+           fct = LL.3(), type = &amp;quot;event&amp;quot;)
+    c(b1 = summary(mod)[[3]][1,1],
+      ESb1 = summary(mod)[[3]][1,2],
+      b2 = summary(modTE)[[3]][1,1],
+      ESb2 = summary(modTE)[[3]][1,2],
+      d1 = summary(mod)[[3]][2,1],
+      ESd1 = summary(mod)[[3]][2,2],
+      d2 = summary(modTE)[[3]][2,1],
+      ESd2 = summary(modTE)[[3]][2,2],
+      e1 = summary(mod)[[3]][3,1],
+      ESe1 = summary(mod)[[3]][3,2],
+      e2 = summary(modTE)[[3]][3,1],
+      ESe2 = summary(modTE)[[3]][3,2] )
+}
+
+set.seed(1234)
+result &amp;lt;- data.frame()
+for (i in 1:1000) {
+  res &amp;lt;- GermSampling(100, 40, 1, 4.5, 1.6, 0.85)
+  result &amp;lt;- rbind(result, res)
+} 
+names(result) &amp;lt;- c(&amp;quot;b1&amp;quot;, &amp;quot;ESb1&amp;quot;, &amp;quot;b2&amp;quot;, &amp;quot;ESb2&amp;quot;,
+                   &amp;quot;d1&amp;quot;, &amp;quot;ESd1&amp;quot;, &amp;quot;d2&amp;quot;, &amp;quot;ESd2&amp;quot;,
+                   &amp;quot;e1&amp;quot;, &amp;quot;ESe1&amp;quot;, &amp;quot;e2&amp;quot;, &amp;quot;ESe2&amp;quot;)
+result &amp;lt;- result[result$d2 &amp;gt; 0,]&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We have stored our results in the data frame ‘result’. The means of estimates obtained for both methods should be equal to the real values that we used for the simulation, which will ensure that estimators are unbiased. The means of standard errors (in brackets, below) should represent the real sample-to-sample variability, which may be obtained from the Monte Carlo standard deviation, i.e. from the standard deviation of the 1000 estimates for each parameter and method.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;left&#34;&gt;&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;&lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt;&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;&lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt;&lt;/th&gt;
+&lt;th align=&#34;left&#34;&gt;&lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Nonlinear regression&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;1.63 (0.051)&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;0.85 (0.006)&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;4.55 (0.086)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Time-to-event method&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;1.62 (0.187)&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;0.85 (0.041)&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;4.55 (0.579)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Real values&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;1.60 (0.188)&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;0.85 (0.041)&lt;/td&gt;
+&lt;td align=&#34;left&#34;&gt;4.55 (0.593)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;We clearly see that both nonlinear regression and the time-to-event method lead to unbiased estimates of model parameters. However, standard errors from nonlinear regression are severely biased and underestimated. On the contrary, standard errors from time-to-event method are unbiased.&lt;/p&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;take-home-message&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Take-home message&lt;/h1&gt;
+&lt;p&gt;Censoring is peculiar to germination assays and other time-to-event studies. It may have a strong impact on the reliability of our standard errors and, consequently, on hypotheses testing. Therefore, censoring should never be neglected and time-to-event methods should necessarily be used for data analyses. The body of time-to-event methods often goes under the name of ‘survival analysis’, which creates a direct connection between survival data and germination/emergence data.&lt;/p&gt;
+&lt;p&gt;Thanks for reading&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;C. Dutang, V. Goulet and M. Pigeon (2008). actuar: An R Package for Actuarial Science. Journal of Statistical Software, vol. 25, no. 7, 1-37.&lt;/li&gt;
+&lt;li&gt;Onofri, Andrea, Paolo Benincasa, M B Mesgaran, and Christian Ritz. 2018. Hydrothermal-Time-to-Event Models for Seed Germination. European Journal of Agronomy 101: 129–39.&lt;/li&gt;
+&lt;li&gt;Onofri, Andrea, Hans Peter Piepho, and Marcin Kozak. 2019. Analysing Censored Data in Agricultural Research: A Review with Examples and Software Tips. Annals of Applied Biology, 174, 3-13.&lt;/li&gt;
+&lt;li&gt;Ritz, C., F. Baty, J. C. Streibig, and D. Gerhard. 2015. Dose-Response Analysis Using R. PLOS ONE, 10 (e0146021, 12).&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Analysing seed germination and emergence data with R (a tutorial). Part 1</title>
+      <link>https://www.statforbiology.com/2021/stat_drcte_1-intro/</link>
+      <pubDate>Thu, 07 Oct 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.statforbiology.com/2021/stat_drcte_1-intro/</guid>
+      <description>
+&lt;script src=&#34;https://www.statforbiology.com/rmarkdown-libs/header-attrs/header-attrs.js&#34;&gt;&lt;/script&gt;
+
+
+&lt;div id=&#34;introduction-to-the-tutorial&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Introduction to the tutorial&lt;/h1&gt;
+&lt;p&gt;Germination/emergence assays are relatively easy to perform, by following standardised procedures, as described, e.g., by the International Seed Testing Association (&lt;a href=&#34;https://www.ingentaconnect.com/content/ista/rules/2019/00002019/00000001&#34;&gt;see here&lt;/a&gt; ). In short, we take a sample of seeds and we put them in an appropriate container. We put the container in the right environmental conditions (e.g., relating to humidity content and temperature) and we inspect the seeds according to a regular schedule (e.g., daily). At each inspection, we count the number of germinated/emerged seeds and remove them from the containers; inspections are performed until no new germinations/emergences are observed for a sufficient amount of time.&lt;/p&gt;
+&lt;p&gt;We see that these assays are rather simple, but, in spite of such simplicity, the process of data analysis still presents several grey areas. How should we quantify the germination/emergence process? How should we compare the germination/emergence of different seed lots?&lt;/p&gt;
+&lt;p&gt;A brief survey of literature shows that a plethora of methods is used, which is certainly encouraged by the wide availability of computer packages. Some of these methods have been around for quite a while (e.g., the use of germination indices or nonlinear regression), some others are relatively new (e.g., methods from survival analysis). It is clear that not all these methods are efficient or reliable, especially when they are used with little concern about the basic assumptions that each method makes.&lt;/p&gt;
+&lt;p&gt;Furthermore, the use of a lot of different methods of data analysis by different research groups may serve the purpose of creativity, but are we really sure that it also serves the purpose of advancing science? Wouldn’t it be better if we could use the same reliable methods of data analysis, so that we could better understand each other, compare our results and pool them together?&lt;/p&gt;
+&lt;p&gt;Therefore, together with some collegues, we decided to start defining a framework for the analysis of germination and emergence data, which might help the readers to select efficient and reliable methods and, lately, improve comparisons and communication of results within the scientific community. We decided to structure this framework as the combination of (i) a step-by-step procedure (ii) the methods to accomplish it and (iii) a user friendly software interface, based on a new R package.&lt;/p&gt;
+&lt;p&gt;This is the first of a coming series of webpages, aimed at presenting the framework and related methods, provide examples together with commented R code and datasets. The webpages can be found by using the following link: &lt;a href=&#34;https://www.statforbiology.com/tags/drcte/&#34;&gt;https://www.statforbiology.com/tags/drcte/&lt;/a&gt;:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;the-r-package&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;The R package&lt;/h1&gt;
+&lt;p&gt;The analyses we propose for seed germination/emergence assays can be performed by using our new R package, namely &lt;code&gt;drcte&lt;/code&gt;. This package is heavily based on the ‘drc’ package (Ritz et al., 2015), that is a very flexible software for general model fitting purposes. Although &lt;code&gt;drc&lt;/code&gt; contains, already, several basic functions for time-to-event analyses, we felt that, in order to meet the specific needs of germination and emergence assays, it would be useful to make some further customisation and develop some additional functions.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;drcte&lt;/code&gt; package can be downloaded and installed from gitHub, by using the code proposed in the box below. It requires the ‘devtools’ package, that needs to be as well installed, if it is not already included in the system.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;install.packages(&amp;quot;devtools&amp;quot;)
+library(devtools)
+install_github(&amp;quot;OnofriAndreaPG/drcte&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We do hope you may find the package and tutorial useful to your purposes.&lt;/p&gt;
+&lt;p&gt;Please, stay tuned for further posts.&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Ritz, C., Baty, F., Streibig, J. C., Gerhard, D. (2015) Dose-Response Analysis Using R PLOS ONE, 10(12), e0146021&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Other useful functions for nonlinear regression: threshold models and all that</title>
