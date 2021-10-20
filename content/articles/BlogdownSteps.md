@@ -113,3 +113,19 @@ I wanted my RSS feed to contain the whole post and not only a description. I did
 # Step 11 - Further info on Google Analytics (10/12/2020)
 
 A very kind reader (Emma) emailed me that there have been some relevant updates for Google analytics (v4). She pointed me to the following guide: [https://www.websiteplanet.com/blog/ultimate-beginners-guide-google-analytics/](https://www.websiteplanet.com/blog/ultimate-beginners-guide-google-analytics/). This is useful, to have a better comprehension of the whole Google Analytics platform, just in case someone is interested.
+
+# Step 12 - Adding an image to a blog post (19/10/2021)
+
+It took me awhile to figure out how to include a figure in a blog post. Lately I also discovered that there is a blogdown add-in to help with this job ([see this post here](https://lcolladotor.github.io/2018/03/07/blogdown-insert-image-addin/#.YW8HJC8RpTY)), but I wanted to master the whole process. I solved the problem like this:
+
+1. created an 'img' folder within the 'static' folder in my blogdown project directory.
+2. Put all the images I wanted to include in blog posts in that folder
+3. Use the markdown code: ![caption](/img/figFileName.png)
+
+Be careful: the 'slash' character at the beginning of file path is fundamental, otherwise the code does not work. Of course, you can use html tags to center your figure:
+
+```
+<p style="text-align:center">
+![](/_Figures/Stat_drcte_3-method-data.png){width=90%}
+</p>
+```

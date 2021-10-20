@@ -1,7 +1,7 @@
 ---
 title: "Experimental methods in agriculture"
 author: "Andrea Onofri and Dario Sacco"
-date: "Update: v. 0.9 (2021-10-06), compil. 2021-10-06"
+date: "Update: v. 0.9 (2021-10-06), compil. 2021-10-20"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -654,7 +654,560 @@ In this chapter we have seen the fundamental elements of a research and we have 
 
 # Describing the observations
 
-To be done....
+The final outcome of every manipulative/comparative experiment is a **dataset**, consisting of a set of measures/observations taken on several experimental subjects, in relation to one or more properties (e.g., height, weight, concentration, sex, color). We have seen that the list of values for one of those properties is called a variable; our first task is to describe that variable, by using the most appropriate descriptive stats. In this respect, the different types of variables (see Chapter 2) will require different approaches, as we will see in this chapter.
+
+## Quantitative data
+
+For a quantitative variable, we need to describe:
+
+1. location
+2. spread
+3. shape
+
+The three statistics respond, respectively, to the following questions: (1) where are the values located, along the measurement scale? (2) how close are the values to one another? (3) are the values symmetrically distributed around the central value, or are they skewed to the right or to the left?
+
+In this chapter, we will only consider the statistics of location and spread, as the statistics of shape are not commonly reported in agriculture and biology.
+
+### Statistics of location
+
+The most widely known statistic of location is the **mean**, that is obtained as the sum of data, divided by the number of values:
+
+$$\mu = \frac{\sum\limits_{i = 1}^n x_i}{n}$$
+
+For example, let us consider the following variable, listing the heights of four maize plants: $x = [178, 175, 158, 153]$
+
+The mean is easily calculated as:
+
+$$\mu = \frac{178 + 175 + 158 + 153}{4} = 166$$
+
+The mean can be regarded as the central value in terms of Euclidean distances; indeed, by definition, the sum of the Euclidean distances between the values and the group mean is always zero. In other words, the values above the mean and those below the mean, on average, are equally distant from the mean. That does not imply that the number of values above the mean is the same as the number of values  below the mean. For example, if we look at the following values:
+
+1 - 4 - 7 - 9 - 10
+
+we see that the mean is 6.2. If we change the highest value into 100, the new mean is moved upwards to 24.2 and it is no longer in central positioning, with respect to the sorted list of data values.
+
+Another important statistic of location is the **median**, i.e. the central value in a sorted variable. The calculation is easy: first of all, we sort the values in increasing order. If the number of values is odd, the median is given by the value in the $(n + 1)/2$ position ($n$ is the number of values). Otherwise, if the number of values is even, we take the two values in the $n/2$ and $n/2 + 1$ positions and average them. 
+
+The median is always the central value in terms of positioning, i.e., the number of values above the median is always equal to the number of values below the median. For example if we take the same values as above (1 - 4 - 7 - 9 - 10), the median is equal to 7 and it is not affected when we change the highest value into 100. Considering that extreme values (very high or very low) are usually known as *outliers*, we say that the median is more **robust** than the mean with respect to outliers.
+
+### Statistics of spread
+
+Knowing the location of a variable is not enough for our purpose as we miss an important information: how close are the values to the mean? The simplest statistic to express the spread is the **range**, that is the difference between the highest and lowest value. This is a very rough indicator, though, as it is extremely sensitive to outliers.
+
+In the presence of a few outliers, the median is used as a statistic of location and, in that case, it can be associated, as a statistic of spread, to the interval defined by the 25^th^ and 75^th^ percentiles. In general, the **percentiles**, are the values below which a given percentage of observations falls. More specifically, the 25^th^ percentile is the value below which 25% of the observations falls and the 75^th^ percentile is the value below which 75% of the observations falls (you may have understood that the median corresponds to the 50^th^ percentile). The interval between the 25^th^ and 75^th^ percentile, consequently, contains 50% of all the observed values and, therefore, it is a good statistic of spread.
+
+If we prefer to use the mean as a statistic of location, we can use several other important statistics od spread; the first one, in order of calculation, is the **deviance**, that is also known as the **sum of squares**. It is the sum of squared differences between each value and the mean:
+
+$$SS = \sum\limits_{i = 1}^n {(x_i  - \mu)^2 }$$
+
+In the above expression, the amounts $x_i  - \mu$ (differences between each value and the group mean) are known as **residuals**. For our sample, the deviance is:
+
+$$SS = \left(178 - 166 \right)^2 + \left(175 - 166 \right)^2 + \left(158 - 166 \right)^2  + \left(153 - 166 \right)^2= 458$$
+
+
+A high deviance corresponds to a high spread; however, we can have a high deviance also when we have low spread and a lot of values. Therefore, the deviance should not be used to compare the spread of two groups with different sizes. Another problem with the deviance is that the measurement unit is also squared with respect to the mean: for our example, if the original variable (height) is measured in cm, the deviance is measured in cm^2^, which is not very logical.
+
+A second important measure of spread is the **variance**, that is usually obtained dividing the deviance by the number of observations minus one:
+
+$$\sigma^2  = \frac{SS}{n - 1}$$
+
+For our group:
+
+$$\sigma^2  = \frac{458}{3} = 152.67$$
+
+The variance can be used to compare the spread of two groups with different sizes, but the measurement unit is still squared, with respect to the original variable. 
+
+The most important measure of spread is the **standard deviation**, that is the square root of the variance:
+ 
+$$\sigma = \sqrt{\sigma^2} = \sqrt{152.67} = 12.36$$
+
+The measurement unit is the same as the data and, for this reason, the standard deviation is the most important statistic of spread and it is usually associated to the mean to summarise a set of measurements. In particular, the interval $l = \mu \pm \sigma$ is often used to describe the **absolute uncertainty** of replicated measurements.
+
+Sometimes, the standard deviation is expressed as a percentage of the mean (**coefficient of variability**), which is often used to describe the **relative uncertainty** of measurement instruments:
+
+$$CV = \frac{\sigma }{\mu } \times 100$$
+
+### Summing the uncertainty
+
+In some cases, we measure two quantities and sum them to obtain a derived quantity. For example, we might have made replicated measurements to determine the sucrose content in a certain growth substrate, that was equal to $22 \pm 2$ (mean and standard deviation). Likewise, another independent set of measures showed that the fructose content in the same substrate was $14 \pm 3$. Total sugar content is equal to the sum of $22 + 14 = 36$. The absolute uncertainty for the sum is given by the square root of the sum of the squared absolute uncertainties, that is $36 \pm \sqrt{4 + 9}$. The absolute uncertainty for a difference is calculated in the very same way.
+
+
+### Relationship between quantitative variables
+
+Very frequently, we may have recorded, on each subject, two, or more, quantitative traits, so that, in the end, we have two, or more, response variables. We might be interested in assessing whether, for each pair of variables, when one changes, the other one changes, too (**joint variation**). The *Pearson correlation coefficient* is a measure of joint variation and it is equal to the codeviance of the two variables divided by the square root of the product of their deviances:
+
+$$r = \frac{ \sum_{i=1}^{n}(x_i - \mu_x)(y_i-\mu_y) }{\sqrt{\sum_{i=1}^{n}(x_i-\mu_x)^2 \sum_{i=1}^{n}(y_i-\mu_y)^2}}$$
+
+We know about the deviance, already. The codeviance is a statistic that consists of the product of the residuals for the two variables: it is positive, when the residuals for the two variables have the same signs, otherwise it is negative. Consequently, the $r$ coefficient ranges from $+1$ to $-1$: a value of $+1$ implies that, when $x$ increases, $y$ increases by a proportional amount, so that the points on a scatterplot lie on a straight line, with positive slope. On the other hand, a value of $-1$ implies that when $x$ increases, $y$ decreases by a proportional amount, so that the points on a scatterplot lie on a straight line, with negative slope. A value of 0 indicates that there is no joint variability, while intermediate values indicate a more or less high degree of joint variability, although the points on a scatterplot do not exactly lie on a straight line (Figure 3.1).
+
+<div class="figure" style="text-align: center">
+<img src="_images/CorrelationExample.png" alt="Example of positive (left) and negative (right) correlation" width="75%" />
+<p class="caption">(\#fig:figName311)Example of positive (left) and negative (right) correlation</p>
+</div>
+
+For example, if we have measured the oil content in sunflower seeds by using two different methods, we may be interested in describing the correlation between the results of the two methods. The observed data are shown in the box below.
+
+
+```r
+A <- c(45, 47, 49, 51, 44, 37, 48, 42, 53)
+B <- c(44, 44, 49, 53, 48, 34, 47, 39, 51)
+```
+
+In order to calculate the correlation coefficient, we need to organise our calculations as follows:
+
+1. calculate the residuals for A ($z_A$)
+2. calculate the residuals for B ($z_B$)
+3. calculate the deviances and codeviance
+
+First of all, we calculate the two means, that are, respectively, 46.22 and 45.44. Secondly, we can calculate the residuals for both variables, as shown in Table 3.1. From the residuals, we can calculate the deviances and the codeviance, by using the equation above.
+
+
+
+
+
+
+Table: (\#tab:unnamed-chunk-3)Example of the hand calculations that are used to calculate the correlation coefficient
+
+|  A|  B|  $z_A$|   $z_B$| $z_A^2$| $z_B^2$| $z_A \times z_B$|
+|--:|--:|------:|-------:|-------:|-------:|----------------:|
+| 45| 44| -1.222|  -1.444|   1.494|   2.086|            1.765|
+| 47| 44|  0.778|  -1.444|   0.605|   2.086|           -1.123|
+| 49| 49|  2.778|   3.556|   7.716|  12.642|            9.877|
+| 51| 53|  4.778|   7.556|  22.827|  57.086|           36.099|
+| 44| 48| -2.222|   2.556|   4.938|   6.531|           -5.679|
+| 37| 34| -9.222| -11.444|  85.049| 130.975|          105.543|
+| 48| 47|  1.778|   1.556|   3.160|   2.420|            2.765|
+| 42| 39| -4.222|  -6.444|  17.827|  41.531|           27.210|
+| 53| 51|  6.778|   5.556|  45.938|  30.864|           37.654|
+
+
+The deviances for $A$ and $B$ are, respectively, 189.55 and 286.22, while the codeviance is 214.11. Accordingly, the correlation coefficient is:
+
+$$r = \frac{214.11}{\sqrt{189.55 \times 286.22}} = 0.919$$
+
+
+It is close to 1, so we conclude that there was quite a good agreement between the two methods.
+
+## Nominal data
+
+
+### Distributions of frequencies
+
+With nominal data, we can only assign the individuals to one of a number of categories. In the end, the only description we can give of such a dataset is based on the counts (**absolute frequencies**) of individuals in each category, producing the so called **distribution of frequencies**. 
+
+As an example of nominal data we can take the 'mtcars' dataset, that was extracted from the 1974 Motor Trend US magazine and comprises 32 old automobiles. The dataset is available in R and we show part of it in  table 3.2.
+
+
+
+Table: (\#tab:unnamed-chunk-4)Dataset 'mtcars' in R, representing the characteristics of 32 old automobiles; 'cs' is the type of engine and 'gear' is the number of forward gears. More detail is given in the text.
+
+|                    | vs| gear|
+|:-------------------|--:|----:|
+|Mazda RX4           |  0|    4|
+|Mazda RX4 Wag       |  0|    4|
+|Datsun 710          |  1|    4|
+|Hornet 4 Drive      |  1|    3|
+|Hornet Sportabout   |  0|    3|
+|Valiant             |  1|    3|
+|Duster 360          |  0|    3|
+|Merc 240D           |  1|    4|
+|Merc 230            |  1|    4|
+|Merc 280            |  1|    4|
+|Merc 280C           |  1|    4|
+|Merc 450SE          |  0|    3|
+|Merc 450SL          |  0|    3|
+|Merc 450SLC         |  0|    3|
+|Cadillac Fleetwood  |  0|    3|
+|Lincoln Continental |  0|    3|
+|Chrysler Imperial   |  0|    3|
+|Fiat 128            |  1|    4|
+|Honda Civic         |  1|    4|
+|Toyota Corolla      |  1|    4|
+|Toyota Corona       |  1|    3|
+|Dodge Challenger    |  0|    3|
+|AMC Javelin         |  0|    3|
+|Camaro Z28          |  0|    3|
+|Pontiac Firebird    |  0|    3|
+|Fiat X1-9           |  1|    4|
+|Porsche 914-2       |  0|    5|
+|Lotus Europa        |  1|    5|
+|Ford Pantera L      |  0|    5|
+|Ferrari Dino        |  0|    5|
+|Maserati Bora       |  0|    5|
+|Volvo 142E          |  1|    4|
+
+The variable 'vs' in 'mtcars' takes the values 0 for V-shaped engine and 1 for straight engine. Obviously, the two values 0 and 1 are just used to name the two categories and the resulting variable is purely nominal. The absolute frequencies of cars in the two categories are, respectively 18 and 14 and they are easily obtained by a counting process.
+
+We can also calculate the relative frequencies, dividing the absolute frequencies by the total number of observations. These frequencies are, respectively, 0.5625 and 0.4375.
+
+If we consider a variable where the classes can be logically ordered, we can also calculate the **cumulative frequencies**, by summing up the frequency for one class with the frequencies for all previous classes. As an example we take the 'gear' variable in the 'mtcars' dataset, showing the number of forward gears for each car. We can easily see that 15 cars have 3 gears and 27 cars have 4 gears or less.
+
+In some circumstances, it may be convenient to 'bin' a continuous variable into a set of intervals. For example, if we have recorded the ages of a big group of people, we can divide the scale into intervals of five years (e.g., from 10 to 15, from 15 to 20 and so on) and, eventually, assign each individual to the appropriate age class. Such a technique is called **binning** or **bucketing** and we will see an example later on in this chapter.
+
+
+### Descriptive stats for distributions of frequencies
+
+For categorical data, we can retrieve the **mode**, which is the class with the highest frequency. For ordinal data, wherever distances between classes are meaningful, and for discrete data, we can also calculate the median and other percentiles, as well as the mean and other statistics of spread (e.g., variance, standard deviation). The mean is calculated as:
+
+$$ \mu = \frac{\sum\limits_{i = 1}^n f_i x_i}{\sum\limits_{i = 1}^n f_i}$$
+
+where $x_i$ is the value for the i-th class, and $f_i$ is the frequency for the same class. Likewise, the deviance, is calculated as:
+
+$$ SS = \sum\limits_{i = 1}^n f_i (x_i - \mu)^2 $$
+
+For example, considerin the 'gear' variable in Table 3.2, the average number of forward gears is:
+
+$$\frac{ 15 \times 3 + 12 \times 4 + 5 \times 5}{15 + 12 + 5} = 3.6875$$
+
+while the deviance is:
+
+$$SS = 15 \times (3 - 3.6875)^2 + 12 \times (4 - 3.6875)^2 + 5 \times (5 - 3.l875)^2 = 16.875$$
+
+With interval data (binned data), descriptive statistics should be calculated by using the raw data, if they are available. If they are not,  we can use the frequency distribution obtained from binning, by assigning to each individual the central value of the interval class to which it belongs. As an example, we can consider the distribution of frequencies in Table 3.3, relating to the time (in minutes) taken to complete a statistic assignment for a group of students in biotechnology. We can see that the mean is equal to:
+
+$$ \frac{7.5 \times 1 + 12.5 \times 4 + 17.5 \times 3 + 22.5 \times 2}{10} = 15.5$$
+
+
+Table: (\#tab:unnamed-chunk-5)Distribution of frequency for the time (in minutes) taken to complete a statistic assignment for a group of students in biotechnology
+
+| Time interval | Central value | Count |
+|:-------------:|:-------------:|:-----:|
+|    5 - 10     |      7.5      |   1   |
+|    10 - 15    |     12.5      |   4   |
+|    15 - 20    |     17.5      |   3   |
+|    20 - 25    |     22.5      |   2   |
+
+
+The calculation of the deviance is left as an exercise.
+
+
+### Contingency tables
+
+When we have more than one cataegorical variable, we can summarise the distribution of frequency by using two-way tables, usually known as **contingency tables**  or crosstabs. For example, we can consider the 'HairEyeColor' dataset, in the 'datasets' package, which is part of the base R installation. It shows the contingency tables of hair and eye color in 592 statistics students, depending on sex; both characters are expressed in four classes, i.e. black, brown, red and blond hair and brown, blue, hazel and green eyes. Considering females, the contingency table is reported in Table 3.4 and it is augmented with row and column sums (see later).
+
+
+
+Table: (\#tab:unnamed-chunk-6)Distribution of hair and eye color for 313 female statistics students, augmented with row and column sums. Dataset taken from R package 'datasets'
+
+|            | Brown eye | Blue eye | Hazel eye | Green eye | ROW SUMS |
+|:-----------|:---------:|:--------:|:---------:|:---------:|:--------:|
+|Black hair  |    36     |    9     |     5     |     2     |    52    |
+|Brown hair  |    66     |    34    |    29     |    14     |   143    |
+|Red hair    |    16     |    7     |     7     |     7     |    37    |
+|Blond hair  |     4     |    64    |     5     |     8     |    81    |
+|COLUMN SUMS |    122    |   114    |    46     |    31     |   313    |
+
+
+### Independence
+
+With a contingency table, we may be interested in assessing whether the two variables show some sort of dependency relationship. In the previous example, is there any relationship between the color of the eyes and the color of the hair? If not, we say that the two variables are independent. Independency is assessed by using the $\chi^2$ statistic.
+
+As the first step, we need to calculate the *marginal frequencies*, i.e. the sums of frequencies by row and by column (please note that the entries of a contingency table are called *joint frequencies*). These sums are reported in Table 3.4.
+
+
+
+
+Let's consider black hair: in total there are 52 women with black air, that is $52/313 \times 100 = 16.6$% of the total. If the two characters were independent, the above proportion should not change, depending on the color of eyes. For example, we have 122 women with brown eyes and 16.6% of those should be black haired, which makes up an expected value of 20.26837 black haired and brown eyed women (much lower than the observed 36). Another example: the expected value of blue eyed and black haired women is $114 \times 0.166 = 18.9$ (much higher than the observed). A third example may be useful: in total, there is $143/313 = 45.7$% of brown haired women and, in case of independence, we would expect $46 \times 0.457 =  21.02$ brown haired and hazel eyed woman. Keeping on with the calculations, we could derive a table of expected frequency, in the case of complete independence between the two characters. All the expected values in case of independency are reported in Table 3.5.
+
+
+Table: (\#tab:unnamed-chunk-8)Expected values of hair and eye color for 313 female statistics students, augmented with row and column sums. Expectations assume total lack of dependency between the two variables.
+
+|            | Brown eye | Blue eye  | Hazel eye | Green eye | ROW SUMS |
+|:-----------|:---------:|:---------:|:---------:|:---------:|:--------:|
+|Black hair  | 20.26837  | 18.93930  | 7.642173  | 5.150160  |    52    |
+|Brown hair  | 55.73802  | 52.08307  | 21.015974 | 14.162939 |   143    |
+|Red hair    | 14.42173  | 13.47604  | 5.437700  | 3.664537  |    37    |
+|Blond hair  | 31.57189  | 29.50160  | 11.904153 | 8.022364  |    81    |
+|COLUMN SUMS | 122.00000 | 114.00000 | 46.000000 | 31.000000 |   313    |
+
+
+The observed (table 3.4) and expected (Table 3.5) values are different, which might indicate a some sort of relationship between the two variables; for example, having red hair might imply that we are more likely to have eyes of a certain color. In order to quantify the discrepancy between the two tables, we calculate the $\chi^2$ stat, that is:
+
+$$\chi ^2  = \sum \left[ \frac{\left( {f_o  - f_e } \right)^2 }{f_e } \right]$$
+
+where $f_o$ are the observed frequencies and $f_e$ are the expected frequencies. For example, for the first value we have:
+
+$$\chi^2_1  = \left[ \frac{\left( {36  - 20.26837 } \right)^2 }{20.26837 } \right]$$
+
+In all, we should calculate 16 ratios and sum them to each other. The final $\chi^2$ value should be equal to 0 in case of independence and it should increase as the relationship between the two variables increases, up to:
+
+$$\max \chi ^2  = n \cdot \min (r - 1,\,c - 1)$$
+
+i.e. the product between the number of subjects ($n$) and the minimum value between the number of rows minus one and the number of columns minus one (in our case, it is $313 \times 3 = 939$).
+
+The observed value is 106.66 and it suggests that the two variables are not independent.
+
+
+## Descriptive stats with R
+
+Before reading this part, please make sure that you already have some basic knowledge about the R environment. Otherwise, please go and read the Appendix 1 to this book.
+
+Relating to quantitative variables, we can use the dataset 'heights.csv', that is available in an online repository and refers to the height of 20 maize plants. In R, the mean is calculated by the function `mean()`, as shown in the box below.
+
+
+```r
+filePath <- "https://www.casaonofri.it/_datasets/heights.csv"
+dataset <- read.csv(filePath, header = T)
+mean(dataset$height)
+## [1] 164
+```
+
+
+The median is obtained by using the function `median()`:
+ 
+
+
+```r
+median(dataset$height)
+## [1] 162.5
+```
+
+The other percentiles are calculated with the function `quantile()`, passing the selected probabilities as fractions in a vector:
+
+
+```r
+quantile(dataset$height, probs = c(0.25, 0.75))
+##    25%    75% 
+## 152.75 174.25
+```
+
+ 
+The deviance function is not immediately available in R and we should resort to using the following expression:
+
+
+```r
+sum( (dataset$height - mean(dataset$height))^2 )
+## [1] 4050
+```
+
+The other variability stats are straightforward to obtain, as well as the correlation coefficient:
+
+
+```r
+# Variance and standard deviation
+var(dataset$height)
+## [1] 213.1579
+sd(dataset$height)
+## [1] 14.59993
+# Coefficient of variability
+sd(dataset$height)/mean(dataset$height) * 100
+## [1] 8.902395
+# Correlation
+cor(A, B)
+## [1] 0.9192196
+```
+
+We have just listed some of the main stats that can be used to describe the properties of a quaantitative variable. In our research work we usually deal with several groups of observations, each one including the different replicates of one of a series of experimental treatments. Therefore, we need to be able to obtain the descriptive stats for all groups at the same time. The very basic method to do this, is by using the function `tapply()`, which takes three arguments, i.e. the vector of observations, the vector of groups and the function to be calculated by groups. The vector of groups is the typical accessory variable, which labels the observations according to the group they belong to.
+
+
+```r
+options(width = 60)
+dataset$var
+##  [1] "N" "S" "V" "V" "C" "N" "C" "C" "V" "N" "N" "N" "S" "C"
+## [15] "N" "C" "V" "S" "C" "C"
+mu.height <- tapply(dataset$height, dataset$var, FUN = mean)
+mu.height
+##      C      N      S      V 
+## 165.00 164.00 160.00 165.25
+```
+
+Obviously, the argument `FUN` can be used to pass any other R function, such as `median` and `sd`. In particular, we can get the standard deviations by using the following code:
+
+
+```r
+sigma.height <- tapply(dataset$height, dataset$var, sd)
+sigma.height
+##        C        N        S        V 
+## 14.36431 16.19877 12.16553 19.51709
+```
+
+Now, we can combine the two newly created vectors into a summary dataframe. In the box below, we use the function `data.frame()` to combine the vector of group names and the two vectors of stats to create the 'descStat' dataframe, which is handy to create a table or a graph, as we will see later.
+
+
+```r
+descStat <- data.frame(group = names(mu.height),
+                       mu = mu.height, 
+                       sigma = sigma.height)
+descStat
+##   group     mu    sigma
+## C     C 165.00 14.36431
+## N     N 164.00 16.19877
+## S     S 160.00 12.16553
+## V     V 165.25 19.51709
+```
+
+
+With nominal data, the absolute frequencies of individuals in the different classes can be retrieved by using the `table()` function, as we show below for the 'vs' variable in the 'mtcars' dataset.
+
+
+
+```r
+data(mtcars)
+table(mtcars$vs)
+## 
+##  0  1 
+## 18 14
+```
+
+We can also calculate the relative frequencies, dividing by the total number of observations.
+
+
+```r
+table(mtcars$vs)/length(mtcars$vs)
+## 
+##      0      1 
+## 0.5625 0.4375
+```
+
+
+Cumulative frequencies can be calculated by the `cumsum()` function, as shown below for the 'gear' variable in the 'mtcars' dataset.
+
+
+
+```r
+cumsum(table(mtcars$gear))
+##  3  4  5 
+## 15 27 32
+```
+
+Ragarding to binning, we can consider the 'co2' dataset, that is included in the base R installation. It contains 468 values of CO_2_ atmospheric concentrations, expressed in parts per million, as observed at monthly intervals in the US. With such a big dataset, the mean and standard deviation are not sufficient to get a good feel for the data and it would be important to have an idea of the shape of the dataset. Therefore we can split the continuous scale into a series of intervals, from 310 ppm to 370 ppm, with breaks every 10 ppm and count the observations in each interval. In the box below, the function `cut()` assigns each value to the corresponding interval (please note the 'breaks' argument, which sets the margins of each interval. Intervals are, by default, left open and right-closed), while the function `table()` calculates the frequencies.
+
+
+```r
+data(co2)
+co2 <- as.vector(co2)
+mean(co2)
+## [1] 337.0535
+min(co2)
+## [1] 313.18
+max(co2)
+## [1] 366.84
+# discretization
+classes <- cut(co2, breaks = c(310,320,330,340,350,360,370))
+freq <- table(classes)
+freq
+## classes
+## (310,320] (320,330] (330,340] (340,350] (350,360] (360,370] 
+##        70       117        86        76        86        33
+```
+
+
+The `table()` function is also used to create contingency tables, with two (or more) classification factors. The resulting table represent a peculiar class, which is different from other tabular classes, such as arrays and dataframes. This class has methods on its own, as we will see below. In the case of the 'HairEyeColor' dataset, this is already defined as a contingency table of class 'table'.
+
+
+
+```r
+data(HairEyeColor)
+tab <- HairEyeColor[,,2]
+class(tab)
+## [1] "table"
+tab
+##        Eye
+## Hair    Brown Blue Hazel Green
+##   Black    36    9     5     2
+##   Brown    66   34    29    14
+##   Red      16    7     7     7
+##   Blond     4   64     5     8
+```
+
+
+With such a class, we can calculate the $\chi^2$ value by using the `summary()` method, as shown in the box below.
+
+
+
+```r
+summary( tab )
+## Number of cases in table: 313 
+## Number of factors: 2 
+## Test for independence of all factors:
+## 	Chisq = 106.66, df = 9, p-value = 7.014e-19
+## 	Chi-squared approximation may be incorrect
+```
+
+The above function returns several results, which we will examine in further detail in a following chapter.
+
+
+## Graphical representations
+
+Apart from tables, also graphs can be used to visualise our descriptive stats. Several types of graphs are possible, and we would like to mention a few possibilities.
+
+A barplot is very useful to visualise the properties of groups, e.g. their means or absolute frequencies. For example, if we consider the 'descStat' dataframe we have created above at 3.1.3, we could draw a barplot, where the height of bars indicate the mean for each group and we could augment such a barplot by adding error bars to represent the standard deviations ($\mu \pm \sigma$).
+
+In the box below, we use the function `barplot`, which needs two arguments and an optional third one: the first one is the height of bars, the second one is the name of groups, the third one specifies the limits for the y-axis. We see that the function is used to return the object 'coord', a vector including the abscissas for the central point of each bar. We can use this vector inside the function `arrows()` to superimpose the error bars (Figure \@ref(fig:figName242)); the first four arguments of the `arrows()` function are, respectively, the coordinates of points from which (abscissa and ordinate) and to which (abscissa and ordinate) to draw the error bars, while the other arguments permit to fine tune the type of arrow.
+
+
+```r
+coord <- barplot(descStat$mu, names.arg = descStat$group, 
+                 ylim = c(0, 200), ylab = "Height (cm)")
+arrows(coord, descStat$mu - descStat$sigma, 
+       coord, descStat$mu + descStat$sigma, 
+       length = 0.05, angle = 90, code = 3)
+```
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName242-1.png" alt="Example of a simple barplot in R" width="90%" />
+<p class="caption">(\#fig:figName242)Example of a simple barplot in R</p>
+</div>
+
+The graph is rather basic, but, with little exercise, we can improve it very much.
+
+When the number of replicates is high (e.g., > 15), we can jointly use  the 25^th^, 50^th^ (median) and 75^th^ percentiles to draw the so-called *boxplot* (Box-Whisker plot; Figure \@ref(fig:figName241)). I will describe it by using an example: let's assume we have made an experiment with three treatments (A, B and C) and 20 replicates. We can use the code below to draw a boxplot.
+
+
+```r
+rm(list = ls())
+A <- c(2, 31, 12, 12, 17, 13, 0, 5, 13, 10,
+       14, 11, 6, 18, 6, 17,  6, 5, 4, 5)
+B <- c(8, 8, 5, 3, 6, 18, 13, 20, 19, 3,
+       11, 7, 8, 12, 6, 17, 6, 7,  22, 18)
+C <- c(12, 12, 9, 7, 10, 22, 17, 24, 23, 7,
+       15, 11, 12, 16, 10, 21, 10, 11, 26, 22)
+series <- rep(c("A", "B", "C"), each = 20)
+values <- c(A, B, C)
+boxplot(values ~ series)
+```
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName241-1.png" alt="A boxplot in R" width="90%" />
+<p class="caption">(\#fig:figName241)A boxplot in R</p>
+</div>
+
+In this boxplot, each group is represented by a box, where the uppermost side is the 75^th^ percentile, the lowermost side is the 25^th^ percentile, while a line is drawn to indicate the median (50^th^ percentile). Two vertical arrows (whiskers) start from the 25^th and 75^th percentile and reach the maximum and minimum values for each group. In the case of treatment A, the maximum value is 31, which is 20.5 units above the median. As this difference is higher than 1.5 times the difference from the median and the 75^th^ percentile, this value is excluded, it is regarded as an outlier and it is represented by an empty circle.
+
+For the case when we have a pair of quantitative variables, we can draw a **scatterplot**, by using the two variables as the co-ordinates. The simplest R plotting function is `plot()` and an example of its usage is given in Figure \@ref(fig:figName244)), with reference to the correlation data at 3.1.5.
+
+
+```r
+plot(A ~ B, xlab = "b", ylab = "a",
+     pch = 21, col = "blue", cex = 2, bg = "blue")
+```
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName244-1.png" alt="Scatterplot showing the correlation between two variables" width="90%" />
+<p class="caption">(\#fig:figName244)Scatterplot showing the correlation between two variables</p>
+</div>
+
+A distribution of frequency can also be represented by using a **pie chart**, as shown in Figure \@ref(fig:figName243)), for the 'gear' variable in the 'mtcars' dataset. 
+
+
+```r
+pie(table(mtcars$gear))
+```
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName243-1.png" alt="Representation of a distribution of frequencies by using a pie chart" width="65%" />
+<p class="caption">(\#fig:figName243)Representation of a distribution of frequencies by using a pie chart</p>
+</div>
+
+---
+
+## Further reading
+
+1. Holcomb Z.C. (2017). Fundamentals of descriptive statistics. Routledge (Taylor and Francis Group), USA
+
+
+
+
 
 <!--chapter:end:03-Eng_StatisticaDescrittiva.Rmd-->
 
@@ -727,13 +1280,992 @@ To be done ...
 
 # Exercises
 
-To be done ...
+## Chapter 3
+
+### Exercise 1
+
+A chemical analysis was performed in triplicate, with the following results: 125,  169 and 142 ng/g. Calculate mean, sum of squares, mean square, standard deviation and coefficient of variation.
+
+### Exercise 2
+
+Download the Excel file 'rimsulfuron.csv' from [https://www.casaonofri.it/_datasets/rimsulfuron.csv](https://www.casaonofri.it/_datasets/rimsulfuron.csv). This is a dataset relating to a field experiment to compare 15 herbicides with 4 replicates. The response variables are maize yield and height. Describe the dataset and show the results on a barplot, including some measure of variability. Check whether yield correlates to height and comment on the results.
+
+### Exercise 3
+
+Load the csv file 'students.csv' from [https://www.casaonofri.it/_datasets/students.csv](https://www.casaonofri.it/_datasets/students.csv). This dataset relates to a number of students, their votes in several undergraduate exams and information on high school. Determine whether (i) the average votes depend on the exam subject and (ii) the average votes depend on high school type.
+
+---
+
+## Chapter 4
+
+### Exercise 1
+
+A xenobiotic substance degrades in soil following a first-order kinetic, which is described by the following equation:
+
+$$Y = 100 \, e^{-0.07 \, t}$$
+
+where Y is the concentration at time $t$. After spraying this substance in soil, what is the probability that 50 days later we observe a concentration below the toxicity threshold for mammalians (2 ng/g)? Please, consider that all the unknown sources of experimental error can be regarded as gaussian, with a coefficient of variability equal to 20%.
+
+
+
+### Exercise 2
+
+Crop yield is a function of its density, according to the following function:
+
+$$ Y = 8 + 8 \, X - 0.07 \, X^2$$
+
+
+
+Draw the graph and find the required density to obtain the highest yield (use a simple graphical method). What is the probability of obtaining a yield level between 2.5 and 3 t/ha, by using the optimal density? Consider that random variability is 12%. 
+
+
+
+
+### Exercise 3
+
+The toxicity of a compound changes with the dose, according to the following expression:
+
+$$ Y = \frac{1}{1 + exp\left\{ -2 \, \left[log(X) - log(15)\right] \right\}}$$
+
+where $Y$ is the proportion of dead animals and $X$ is the dose. If we treat 150 animals with a dose of 35 g, what is the probability of finding more than 120 dead animals? The individual variability can be approximated by using a gaussian distribution, with a standard error equal to 10.
+
+
+
+
+### Exercise 4
+
+Consider the sample C = [140 - 170 - 155], which was drawn by a gaussian distribution. Calculate the probability of drawing an individual value from the same pupulation in the following intervals:
+
+1.  higher than 170
+2.  lower than 140
+3.  within the range from 170 and 140
+
+### Exercise 5
+
+Consider a gaussian population with $\mu$ = 23 and $\sigma$ = 1. Calculate the probability of drawing three individuals with a mean
+
+1. higher than 25
+2. lower than 21
+3. between 21 and 25
+
+---
+
+## Chapter 5
+
+### Exercise 1
+
+A chemical analysis was repeated three times, with the following results: 125, 169 and 142 ng/g. Calculate mean, deviance, variance, standard deviation, standard errors and confidence intervals (P = 0.95).
+
+### Exercise 2
+
+A sample of 400 insects was sprayed with an insecticide and 136 individuals survived the treatment. Determine the efficacy of the insecticide, in terms of proportion of dead insects, together with 95% confidence limits.
+
+---
+
+## Chapter 6
+
+### Exercise 1
+
+We have made an experiment to compare two fungicides A and B. The first fungicide was used to treat 200 fungi colonies and the number of surviving colonies was 180. B was used to treat 100 colonies and 50 survived. Is there a significant difference between A and B?
+
+### Exercise 2
+
+We have compared two experimental treatments and, with the first one, we observed the following results: 9.3, 10.2, 9.7. With the second treatment, we obtained: 12.6, 12.3 e 12.5. Are the means significantly different?
+
+### Exercise 3
+
+A plant pathologist studied the crop performancies with (A) and without (NT) a fungicide treatment. The results are as follows:
+
+    A    NT
+  ----- ----
+   65    54
+   71    51
+   6.8   59
+
+Was the treatment effect significant (P < 0.05)?
+
+### Exercise 4
+
+In this year, an assay showed that 600 olive drupes out of 750 were attacked by  *Daucus olee*. In a close field, under the same environmental conditions, the count of attacked drupes was 120 on 750. Is such a difference significant or is it just a random fluctuation?
+
+### Exercise 5
+
+In a hospital, blood cholesterol level was measured for eight patients, before and after a three months terapy. The observed values were:
+
+    Patient   Before    After
+  ---------- ---------- ----------
+           1      167.3      126.7
+           2      186.7      154.2
+           3      105.0      107.9
+           4      214.5      209.3
+           5      148.5      138.5
+           6      171.5      121.3
+           7      161.5      112.4
+           8      243.6      190.5
+
+Can we say that this terapy is effective, or not?
+
+---
+
+## Chapters 7 to 9
+
+### Exercise 1
+
+An experiment was conducted with a completely randomised design to compare the yield of 5 wheat genotypes. The results (in bushels per acre) are as follows:
+
+  
+   Variety  |  1   |   2    |  3 |
+  |:-----:|:-----:|:-----: |:-----:|
+      A     | 32.4 |  34.3  | 37.3 |
+      B     | 20.2 |  27.5  | 25.9 |
+      C     | 29.2 |  27.8  | 30.2 |
+      D     | 12.8 |  12.3  | 14.8 |
+      E     | 21.7 |  24.5  | 23.4 |
+
+
+1. Write the linear model for this study and explain the model components
+2. Compute the ANOVA
+3. Check for the basic assumptions
+4. Compare the means
+5. Present the results and comment on them
+
+The example is taken from: Le Clerg *et al*. (1962)
+
+### Exercise 2
+
+Cell cultures of tomato were grown by using three types of media, based on glucose, fructose and sucrose. The experiment was conducted with a completely randomised design with 5 replicates and a control was also added to the design. Cell growths are reported in the table below:
+
+Control | Glucose | Fructose | Sucrose |
+|:----:|:----:|:----:|:----:|
+45 | 25 | 28 | 31 |
+39 | 28 | 31 | 37 |
+40 | 30 | 24 | 35 |
+45 | 29 | 28 | 33 |
+42 | 33 | 27 | 34 |
+
+1. Write the linear model for this study and explain the model components
+2. Compute the ANOVA
+3. Check for the basic assumptions
+4. Compare the means
+5. Present the results and comment on them
+
+
+### Exercise 3
+
+The failure time for a heating system was assessed, to discover the effect of the operating temperature. Four temperatures were tested with 6 replicates, according to a completely randomised design and the number of hours before failure were measured.
+The results are as follows:
+
+    Temp.   Hours to failure
+  ------- ------------------
+     1520               1953
+     1520               2135
+     1520               2471
+     1520               4727
+     1520               6134
+     1520               6314
+     1620               1190
+     1620               1286
+     1620               1550
+     1620               2125
+     1620               2557
+     1620               2845
+     1660                651
+     1660                837
+     1660                848
+     1660               1038
+     1660               1361
+     1660               1543
+     1708                511
+     1708                651
+     1708                651
+     1708                652
+     1708                688
+     1708                729
+
+Please, note that these are the only possible values for temperature. Determine the best operating temperature, in order to delay failure.
+
+### Exercise 4
+
+An entomologist counted the number of eggs laid from a lepidopter on three tobacco genotypes. 15 females were tested for each genotype and the results are as follows:
+
+    Female   Field   Resistant   USDA
+  -------- ------- ----------- ------
+         1     211           0    448
+         2     276           9    906
+         3     415         143     28
+         4     787           1    277
+         5      18          26    634
+         6     118         127     48
+         7       1         161    369
+         8     151         294    137
+         9       0           0     29
+        10     253         348    522
+        11      61           0    319
+        12       0          14    242
+        13     275          21    261
+        14       0           0    566
+        15     153         218    734
+
+Which is the most resistant genotype?
+
+---
+
+## Chapter 10
+
+### Exercise 1
+
+Data were collected about 5 types of irrigation on orange trees in Spain. The experiment was laid down as complete randomised blocks with 5 replicates and the results are as follows:
+
+
+|              Method   |  1  |   2   |  3   |  4   |  5    |
+|:-----|:----:|:----:|:----:|:----:|:----:|
+|            Localised  | 438 |  413  | 375  | 127  | 320   |
+|              Surface  | 413 |  398  | 348  | 112  | 297   |
+|            Sprinkler  | 346 |  334  | 281  |  43  | 231   |
+|Sprinkler + localised  | 335 |  321  | 267  |  33  | 219   |
+|           Submersion  | 403 |  380  | 336  | 101  | 293   |
+
+
+1. Write the linear model for this study and explain the model components
+2. Compute the ANOVA
+3. Check for the basic assumptions
+4. Compare the means
+5. Present the results and comment on them
+
+### Exercise 2
+
+A fertilisation trial was conducted according to a RCBD with five replicates. One value is missing for the second treatment in the fifth block. The observed data are percentage contents in P~2~ O~5~ in leaf samples:
+
+              Treatment       1      2     3      4      5
+  ----------------------- ------ ------ ----- ------ ------
+             Unfertilised    5.6    6.1   5.3    5.9    9.4
+                  50 lb N    7.3    6.0   7.7    7.7    NA
+                 100 lb N    6.9    6.0   5.6    7.4    8.2
+     50 lb N + 75 lb P2O5   10.8   11.2   8.8   10.4   12.9
+    100 lb N + 75 lb P205    9.6    9.3    12   10.6   11.6
+
+1. Calculate arithmetic means
+2. Calculate the ANOVA
+3. Check for the basic assumptions
+4. Calculate expected marginal means and compare to arithmetic means
+5. The addition of P~2~ O~5~ is a convenient practice, in terms of agronomic effect?
+
+### Exercise 3
+
+A latin square experiment was planned to assess effect of four different fertilisers on lettuce yield. The observed data are as follows:
+
+   Fertiliser   Row   Column      Yield
+  ----------- ------ --------- ------------
+      A          1        1         104
+      B          1        2         114
+      C          1        3          90
+      D          1        4         140
+      A          2        4         134
+      B          2        3         130
+      C          2        1         144
+      D          2        2         174
+      A          3        3         146
+      B          3        4         142
+      C          3        2         152
+      D          3        1         156
+      A          4        2         147
+      B          4        1         160
+      C          4        4         160
+      D          4        3         163
+      
+1. Write the linear model for this study and explain the model components
+2. Compute the ANOVA
+3. Check for the basic assumptions
+4. Compare the means
+5. Present the results and comment on them: what is the best fertiliser?
+
+---
+
+## Chapters 11 and 12
+
+### Exercise 1
+
+A pot experiment was planned to evaluate the best timing for herbicide application against rhizome *Sorghum halepense*. Five timings were compared (2-3, 4-5, 6-7 and 8-9 leaves), including a splitted treatment in two timings (3-4/8-9 leaves) and the untreated control. In order to understand whether the application is effective against plants coming from rhizomes of different sizes, a second factor was included in the experiment, i.e. rhizome size (2, 4, six nodes). The design was a fully crossed two-way factorial, laid down as completely randomised with four replicates. The results (plant weights three weeks after the herbicide application) are as follows:
+
+
+| Sizes ↓ / Timing → | 2-3   | 4-5   | 6-7   | 8-9   | 3-4/8-9 | Untreated|
+|:----|:----:|:----:|:----:|:----:|:----:|:----:|
+| 2-nodes       | 34.03 | 0.10  | 30.91 | 33.21 | 2.89    | 41.63|
+|               | 22.31 | 6.08  | 35.34 | 43.44 | 19.06   | 22.96|
+|               | 21.70 | 3.73  | 24.23 | 44.06 | 0.10    | 52.14|
+|               | 14.90 | 9.15  | 28.27 | 35.34 | 0.68    | 59.81|
+| 4-nodes       | 42.19 | 14.86 | 52.34 | 39.06 | 8.62    | 68.15|
+|               | 51.06 | 36.03 | 43.17 | 61.59 | 0.05    | 42.75|
+|               | 43.77 | 21.85 | 57.28 | 48.89 | 0.10    | 57.77|
+|               | 31.74 | 8.71  | 29.71 | 49.14 | 9.65    | 44.85|
+| 6-nodes       | 20.84 | 11.37 | 55.00 | 41.77 | 9.80    | 43.20|
+|               | 26.12 | 2.24  | 28.46 | 37.38 | 0.10    | 40.68|
+|               | 35.24 | 14.17 | 21.81 | 39.55 | 1.42    | 34.11|
+|               | 13.32 | 23.93 | 60.72 | 48.37 | 6.83    | 32.21|
+
+1. Write the linear model for this study and explain the model components
+2. Compute the ANOVA
+3. Check for the basic assumptions
+4. Calculate marginal means and cell means
+5. Present the results and comment on them: what type of means should you report?
+
+
+### Exercise 2
+
+Six faba bean genotypes were tested in two sowing times, according to a plit-plot design in 4 complete blocks. Sowing times were randomised to main-plots within blocks and genotypes were randomised to sub-plots within main-plots and blocks. Results are:
+
+
+|Sowing  Time| Genotype    |    1  |    2  |    3  |    4  |
+|:-----------|------------:|:-----:|:-----:|:-----:|:-----:|
+|Autum       |     Chiaro  | 4.36  | 4.00  | 4.23  | 3.83  |
+|            |  Collameno  | 3.01  | 3.32  | 3.27  | 3.40  |
+|            |  Palombino  | 3.85  | 3.85  | 3.68  | 3.98  |
+|            |      Scuro  | 4.97  | 3.98  | 4.39  | 4.14  |
+|            |    Sicania  | 4.38  | 4.01  | 3.94  | 2.99  |
+|            |    Vesuvio  | 3.94  | 4.47  | 3.93  | 4.21  |
+|Spring      |     Chiaro  | 2.76  | 2.64  | 2.25  | 2.38  |
+|            |  Collameno  | 2.50  | 1.79  | 1.57  | 1.77  |
+|            |  Palombino  | 2.24  | 2.21  | 2.50  | 2.05  |
+|            |      Scuro  | 3.45  | 2.94  | 3.12  | 2.69  |
+|            |    Sicania  | 3.24  | 3.60  | 3.16  | 3.08  |
+|            |    Vesuvio  | 2.34  | 2.44  | 1.71  | 2.00  |
+
+
+1. Write the linear model for this study and explain the model components
+2. Compute the ANOVA
+3. Check for the basic assumptions
+4. Calculate marginal means and cell means
+5. Present the results and comment on them: what type of means should you report?
+
+### Exercise 3
+
+Four crops were sown in soil 20 days after the application of three herbicide treatments, in order to evaluate possible carry-over effects of residuals. The untreated control was also added for comparison and the weight of plants was assessed four weeks after sowing. The experiment was laid down as strip-plot and, within each block, the herbicide were randomised to rows and crops to columns. The weight of plants is reported below:
+
+|  Herbidicide     |Block| sorghum  | rape  | soyabean  | sunflower |
+|:-----------------|:---:|:--------:|:-----:|:---------:|:---------:|
+|  Untreated       | 1   |     180  |  157  |      199  |       201 |
+|                  | 2   |     236  |  111  |      257  |       358 |
+|                  | 3   |     287  |  217  |      346  |       435 |
+|                  | 4   |     350  |  170  |      211  |       327 |
+|  Imazethapyr     | 1   |      47  |   10  |      193  |        51 |
+|                  | 2   |      43  |    1  |      113  |         4 |
+|                  | 3   |       0  |   20  |      187  |        13 |
+|                  | 4   |       3  |   21  |      122  |        15 |
+|  primisulfuron   | 1   |     271  |    8  |      335  |       379 |
+|                  | 2   |     182  |    0  |      201  |       201 |
+|                  | 3   |     283  |   22  |      206  |       307 |
+|                  | 4   |     147  |   24  |      240  |       337 |
+|  rimsulfuron     | 1   |     403  |  238  |      226  |       290 |
+|                  | 2   |     227  |  169  |      195  |       494 |
+|                  | 3   |     400  |  364  |      257  |       397 |
+|                  | 4   |     171  |  134  |      137  |       180 |
+  
+
+1. Write the linear model for this study and explain the model components
+2. Compute the ANOVA
+3. Check for the basic assumptions
+4. Calculate marginal means and cell means
+5. Present the results and comment on them: what type of means should you report?
+
+
+### Exercise 4
+
+A field experiment was conducted to evaluate the effect of fertilisation timing (early, medium, late) on two genotypes. The experiment was designed as a randomised complete block design and the data represent the amount of absorbed nitrogen by the plant:
+
+| Genotype | Block  |   Early |  Med  |  Late  |
+|:---------|:------:|:-------:|:-----:|:------:|
+| A        |    1   |   21.4  |  50.8 |  53.2  |
+|          |    2   |   11.3  |  42.7 |  44.8  |
+|          |    3   |   34.9  |  61.8 |  57.8  |
+| B        |    1   |   54.8  |  56.9 |  57.7  |
+|          |    2   |   47.9  |  46.8 |  54.0  |
+|          |    3   |   40.1  |  57.9 |  62.0  |
+
+1. Write the linear model for this study and explain the model components
+2. Compute the ANOVA
+3. Check for the basic assumptions
+4. Calculate marginal means and cell means
+5. Present the results and comment on them: what type of means should you report?
+
+### Exercise 5
+
+A study was carried out to evaluate the effect of washing temperature on the reduction of length for four types of fabric. Results are expressed as percentage reduction and the experiment was completely randomised, with two replicates:
+
+  | Fabric  |     210 °F  |    215 °F  |    220 °F   |  225 °F   |
+  |:-------:|:-----------:|:----------:|:-----------:|:---------:|
+  |    A    |     1.8     |     2.0    |     4.6     |    7.5    |
+  |         |     2.1     |     2.1    |     5.0     |    7.9    |
+  |    B    |     2.2     |     4.2    |     5.4     |    9.8    |
+  |         |     2.4     |     4.0    |     5.6     |    9.2    |
+  |    C    |     2.8     |     4.4    |     8.7     |   13.2    |
+  |         |     3.2     |     4.8    |     8.4     |   13.0    |
+  |    D    |     3.2     |     3.3    |     5.7     |   10.9    |
+  |         |     3.6     |     3.5    |     5.8     |   11.1    |    
+
+Consider the temperature as a factor and:
+
+1. Write the linear model for this study and explain the model components
+2. Compute the ANOVA
+3. Check for the basic assumptions
+4. Calculate marginal means and cell means
+5. Present the results and comment on them: what type of means should you report?
+
+### Exercise 6
+
+A chemical process requires one alcohol and one base. A study is organised to evaluate the factorial combinations of three alcohols and two bases on the efficiency of the process, expressed as a percentage. The experiment is designd as completely randomised.
+
+ | Base  | Alcohol 1 | Alcohol 2 | Alcohol 3 |
+ |:-----:|:---------:|:---------:|:---------:|
+ |   A   |  91.3     |    89.9   |     89.3  |
+ |       |  88.1     |    89.5   |     87.6  |
+ |       |  90.7     |    91.4   |     90.4  |
+ |       |  91.4     |    88.3   |     90.3  |
+ |   B   |  87.3     |    89.4   |     92.3  |
+ |       |  91.5     |    93.1   |     90.7  |
+ |       |  91.5     |    88.3   |     90.6  |
+ |       |  94.7     |    91.5   |     89.8  |
+
+1. Write the linear model for this study and explain the model components
+2. Compute the ANOVA
+3. Check for the basic assumptions
+4. Calculate marginal means and cell means
+5. Present the results and comment on them: what type of means should you report?
+
+---
+
+## Chapter 13
+
+### Exercise 1
+
+A study was conducted to evaluate the effect of nitrogen fertilisation in lettuce. The experiment is completely randomised with 4 replicates and the yield results are as follows:
+
+   N level   B1    B2    B3    B4
+  --------- ----- ----- ----- -----
+      0      124   114   109   124
+     50      134   120   114   134
+     100     146   132   122   146
+     150     157   150   140   163
+     200     163   156   156   171
+
+1. Write the linear model for this study and explain the model components
+2. Estimate model parameters
+3. Check for the basic assumptions
+4. What yield might be obtained by using 120 kg N ha^-1^?
+5. Present the results and comment on them?
+
+### Exercise 2
+
+A study was conducted to evaluate the effect of increasing densities of a weed (*Sinapis arvensis*) on sunflower yield. The experiment was completely randomised. Assuming that the yield response is linear, parameterise the model, check the goodness of fit and find the economical threshold level of weed density, considering that the yield worths 150 Euros per ton and the herbicide treatment costs 40 Euros per hectar. The observed results are:
+
+   density   Rep   yield
+  --------- ------- --------
+      0        1     36.63
+     14        1     29.73
+     19        1     32.12
+     28        1     30.61
+     32        1      27.7
+     38        1     27.43
+     54        1     24.79
+      0        2     36.11
+     14        2     34.72
+     19        2     30.12
+     28        2      30.8
+     32        2     26.53
+     38        2      27.6
+     54        2     23.31
+      0        3     38.35
+     14        3     32.16
+     19        3     31.72
+     28        3     28.69
+     32        3     25.88
+     38        3     28.43
+     54        3     30.26
+      0        4     36.74
+     14        4     32.566
+     19        4     29.57
+     28        4     33.663
+     32        4     28.751
+     38        4     27.114
+     54        4     24.664
+
+---
+
+## Chapter 14
+
+### Exercise 1
+
+Two soil samples were treated with two herbicides and put in a climatic chamber at 20°C. Sub-samples were collected from both samples in different times and the concentration of herbicide residues was measured. The results are as follows:
+
+   Time   Herbicide A   Herbicide B
+  ------ ------------- -------------
+    0       100.00        100.00
+    10       50.00         60.00
+    20       25.00         40.00
+    30       15.00         23.00
+    40       7.00          19.00
+    50       3.50          11.00
+    60       2.00          5.10
+    70       1.00          3.00
+
+Assuming that the degradation follows an exponential decay trend, determine the half-life for both herbicides.
+
+
+### Exercise 2
+
+A microbial population grows exponentially over time. Considering the following data, determine the relative rate of growth, by fitting the exponential growth model.
+
+   Time   Cells
+  ------ -------
+    0       2
+    10      3
+    20      5
+    30      9
+    40     17
+    50     39
+    60     94
+    70     201
+
+### Exercise 3
+
+An experiment was conducted to determine the absorption of nitrogen by roots of *Lemna minor* in hydroponic colture. Results (N content) are the following:
+
+    Conc     Rate
+  -------- --------
+    2.86    14.58
+    5.00    24.74
+    7.52    31.34
+   22.10    72.97
+   27.77    77.50
+   39.20    96.09
+   45.48    96.97
+   203.78   108.88
+
+Use nonlinear least squares to estimate the parameters for the rectangular hyperbola (Michaelis-Menten model):
+
+$$Y = \frac{a X} {b + X}$$
+
+and make sure that model fit is good enough.
+
+### Exercise 4
+
+An experiment was conducted to determine the yield of sunflower at increasing densities of a weed (*Ammi majus*). Based on the following results, parameterise a rectangular hyperbola ($Y = (a \, X)/(b + X)$ and test for possible lack of fit. The results are:
+
+   Weed density   Yield Loss (%)
+  -------------- ---------------
+        0         0
+        23        17.9
+        31        21.6
+        39        26.9
+        61        29.5
+
+
+### Exercise 5
+
+An experiment was conducted in a pasture, to determine the effect of sampling area on the number of plant species (in general, the higher the sampling area and the higher the number of sampled species). The results are as follows:.
+
+   Area   N. of species
+  ------ --------------
+    1         4
+    2         5
+    4         7
+    8         8
+    16       10
+    32       14
+    64       19
+   128       22
+   256       22
+
+By using the above data, parameterise a power curve $Y = a \, X^b$ and test for lack of fit.
+
+### Exercise 6
+
+Crop growth can be often described by using a Gompertz model. The data below refer to an experiment were sugarbeet was grown either weed free, or weed infested; the weight of the crop per unit area was measured after six different numbers of Days After Emergence (DAE). The experiment was conducted by using a completely randomised design with three replicates and the results are reported below:
+
+   DAE   Infested   Weed Free
+  ----- ---------- -----------
+   21      0.06       0.07
+   21      0.06       0.07
+   21      0.11       0.07
+   27      0.20       0.34
+   27      0.20       0.40
+   27      0.21       0.25
+   38      2.13       2.32
+   38      3.03       1.72
+   38      1.27       1.22
+   49      6.13       11.78
+   49      5.76       13.62
+   49      7.78       12.15
+   65     17.05       33.11
+   65     22.48       24.96
+   65     12.66       34.66
+   186    21.51       38.83
+   186    26.26       27.84
+   186    27.68       37.72
+
+Parameterise two Gompertz growth models (one for the weed-free crop and one for the infested crop) and evalaute which of the parameters are most influenced by the competition. The Gompertz growth model is:
+
+$$Y = d \cdot exp\left\{- exp \left[ - b (X - e)\right] \right\}$$
+
+### Exercise 7
+
+Plants of *Tripleuspermum inodorum* in pots were treated with a sulphonylurea herbicide  (tribenuron-methyl) at increasing rates. Three weeks after the treatment the weight per pot was recorded, with the following results:
+
+   Dose (g a.i. ha$^{-1}$)   Fresh weight (g pot $^{-1}$)
+  ------------------------- ------------------------------
+              0                         115.83
+              0                         102.90
+              0                         114.35
+            0.25                        91.60
+            0.25                        103.23
+            0.25                        133.97
+             0.5                        98.66
+             0.5                        92.51
+             0.5                        124.19
+              1                         93.92
+              1                         49.21
+              1                         49.24
+              2                         21.85
+              2                         23.77
+              2                         22.46
+
+Assuming that the dose-response relationship can be described by using the following log-logistic model:
+
+$$Y = c + \frac{d - c}{1 + exp \left\{ - b \left[ log (X) - log (e) \right] \right\}}$$
+
+Parameterise the model and evaluate the goodnes of fit.
+
 
 <!--chapter:end:16-Eng_Exercises.Rmd-->
 
 # APPENDIX: A very gentle introduction to R
 
-To be done ...
+## What is R?
+
+R is a statistical software; it is open source and it works under a freeware GNU licence. It is very powerful, but it has no graphical interface and, thus, we need to write a few lines of cod, which is something we may not be used to do.
+
+## Installing R and moving the first steps
+
+In order to get started, please, follow these basic steps:
+
+1. Install R from: [https://cran.r-project.org](https://cran.r-project.org). Follow the link to CRAN (uppermost right side), select one of the available mirrors (you can simply select the first link on top), select your Operating System (OS) and download the base version. Install it by using all default options.
+2. Install RStudio from: [https://rstudio.com/products/rstudio/](https://rstudio.com/products/rstudio/). Select RStudio Desktop version, open source edition and download. Install it by using all default options.
+3. Launch RStudio.
+
+You will see that RStudio consists of four panes, even hough, at the beginning, we will only use two of them, named: (1) SOURCE and (2) CONSOLE. The basic principle is to write code in the SOURCE pane and send it to the CONSOLE pane, by hitting 'ctrl-R' or 'ctrl-Return' ('cmd-Return' in Mac OSx). The SOURCE pane is a text editor and we can save script files, by using the '.R' extension. The CONSOLE pane is where the code is processed, to return the results.
+
+Before we start, there are a few important suggestions that we should keep into consideration, in order to save a few headackes:
+
+1. unlike most programs in WINDOWS, R is case-sensitive and, e.g., 'A' is not the same as 'a'. Please, note that most errors in R are due to small typos, which may take very long to be spotted!
+2. Code written in the SOURCE pane **MUST BE** sent to the console pane, otherwise it is not executed. It's like writing a WhatsApp message: our mate cannot read our message until we send it away to him!
+3. Spaces can be used to write clearer code and they are usually allowed, except within variable names, function names and some operators composed by more than one character. 
+4. It is useful to comment the code, so that, in future times, we can remember what we intended to do, when we wrote that code. Every line preceded by a hash symbol (#) is not executed and it is regarded as a comment.
+
+## Assignments
+
+In R, we work with objects, that must be assigned a name, so that they can be stored in memory and easily recalled. The name is a **variable** and it is assigned by the assignment operator '<-' (Less-then sign + dash sign). For example, the following code assigns the value of 3 to the 'y' variable. The content of a variable can be visualised by simply writing its names and sending it to the console.
+
+
+```r
+y  <-  3
+y
+## [1] 3
+```
+
+
+## Data types and data objects
+
+In R, as in most programming languages, we have different data types that can be assigned to a variable:
+
+1. numeric (real numbers)
+2. integer (natural numbers)
+3. character (use quotation marks: "andrea" or "martina")
+4. factor
+5. logic (boolean): TRUE or FALSE
+
+Depending on their type, data can be stored in specific objects. The most important object is the **vector**, that is a uni-dimensional array, storing data of the same type (either numeric, or integer, or logic... you can't mix!). For example, the following box shows a vector of character strings and a vector of numeric values: we see that the vector is created by the `c()` function and the elements are separated by commas.
+
+
+```r
+sentence <- c("this", "is", "an", "array", "of", "characters")
+x <- c(12, 13, 14)
+```
+
+The factor vector is different from a character vector, as it is used to store character values belonging to a predefined set of levels; the experimental treatment variables (experimental factors, as we called them in Chapter 2) are usually stored as R factors. The code below shows a character vector that is transformed into a factor, by using the `factor()` function.
+
+
+```r
+treat  <-  c("A", "A", "B", "B", "C", "C")
+treat
+## [1] "A" "A" "B" "B" "C" "C"
+factor(treat)
+## [1] A A B B C C
+## Levels: A B C
+```
+
+By now, we have already used a couple of functions ad we have noted that they are characterised by a name followed by a pair of round brackets (e.g., `c()` or `factor()`). The arguments go inside the brackets, but we will give more detail later on.
+
+
+## Matrices
+
+Vectors are uni-dimensional arrays, while matrices are bi-dimensional arrays, with rows and columns. The matrix object can be used to store only data of the same type (like a vector) and it is created by using the `matrix()` function. The first argument to this function is a vector of values, the second argument is the number of rows and the third one is the number of columns. The fourth argument is logical and it specifies whether the matrix is to be populated by row ('byrow = TRUE') or by column ('byrow = FALSE'). 
+
+
+
+```r
+z  <-  matrix(c(1, 2, 3, 4, 5, 6, 7, 8),
+              2, 4, byrow=TRUE)
+z
+##      [,1] [,2] [,3] [,4]
+## [1,]    1    2    3    4
+## [2,]    5    6    7    8
+```
+
+## Dataframes
+
+The dataframe is also a table (like a matrix), but columns can contain data of different types. It is the most common way to store the experimental data and it should be orginised in a 'tidy' way: with one experimental unit per row and all the traits of each unit in different columns. In the box below we create three vectors and combine them in a dataframe. 
+
+\scriptsize
+
+```r
+plot  <-  c(1, 2, 3, 4, 5, 6)
+treat  <-  factor(c("A", "A", "B", "B", "C", "C"))
+yield  <-  c(12, 15, 16, 13, 11, 19)
+dataset  <-  data.frame("Plot" = plot,
+  "Treatment" = treat, "Yield" = yield)
+dataset
+##   Plot Treatment Yield
+## 1    1         A    12
+## 2    2         A    15
+## 3    3         B    16
+## 4    4         B    13
+## 5    5         C    11
+## 6    6         C    19
+```
+
+\normalsize
+
+## Working with objects
+
+If we have created a number of objects and stored them in memory, we might be interested in viewing them or accessing some of their elements. Objects can be simply viewed by using their name, as shown below.
+
+
+```r
+z
+##      [,1] [,2] [,3] [,4]
+## [1,]    1    2    3    4
+## [2,]    5    6    7    8
+```
+
+With objects containing more than one value (vectors, matrices or dataframes) we can use indexing to retreive an element in a specific position. Indexing is performed by using square brackets, containing the index or a list of indices, for multi-dimensional objects.
+
+
+```r
+x[1] # First element in a vector
+## [1] 12
+z[1, 3] # Element in first row and third column, in a dataframe or matrix
+## [1] 3
+dataset[ ,1] # First Column
+## [1] 1 2 3 4 5 6
+dataset[1, ] # First Row
+##   Plot Treatment Yield
+## 1    1         A    12
+```
+
+Column vectors in dataframes can also be accessed by using their name and the 'dollar' sign, as shown below.
+
+
+```r
+dataset$Plot
+## [1] 1 2 3 4 5 6
+```
+
+It is also useful to ask for infos about objects, which can be done by using two functions:
+
+1. `str()`: tells us the structure of an object
+2. `summary()` - summarizes the main traits of an object
+
+
+
+```r
+str(dataset)
+## 'data.frame':	6 obs. of  3 variables:
+##  $ Plot     : num  1 2 3 4 5 6
+##  $ Treatment: Factor w/ 3 levels "A","B","C": 1 1 2 2 3 3
+##  $ Yield    : num  12 15 16 13 11 19
+summary(dataset)
+##       Plot      Treatment     Yield      
+##  Min.   :1.00   A:2       Min.   :11.00  
+##  1st Qu.:2.25   B:2       1st Qu.:12.25  
+##  Median :3.50   C:2       Median :14.00  
+##  Mean   :3.50             Mean   :14.33  
+##  3rd Qu.:4.75             3rd Qu.:15.75  
+##  Max.   :6.00             Max.   :19.00
+```
+
+## Expressions, functions and arguments
+
+Expressions can be used to return results or store them in new variables.
+
+
+```r
+2 * y
+## [1] 6
+f  <-  2 * y
+f
+## [1] 6
+```
+
+
+As we anticipated above, functions are characterised by a name and a list of arguments in brackets.
+
+
+```r
+log(5)
+## [1] 1.609438
+```
+
+Very often, there are multiple arguments and we have to pay some attention on how to supply them. We can either:
+
+1. supply them in the exact order with which R expects them
+2. use argument names
+
+We can see the required list of arguments and their order by using the R help, that is invoked by a question mark followed by the function name, as shown in the example below.
+
+
+```r
+?log #Getting help
+# The two arguments are the value and the base for logarithm
+log(100, 2) # Supplied in order
+## [1] 6.643856
+log(100, base = 2) # Supplied with names
+## [1] 6.643856
+log(base=2, 100) # Different order, but correct syntax
+## [1] 6.643856
+log(2, 100) # Wrong!!!
+## [1] 0.150515
+```
+
+
+## A few useful functions
+
+A few functions are useful to analyse the experimental data. For example, it is important to be able to create sequences of values, as shown below.
+
+
+```r
+plot  <-  seq(1, 10,1)
+plot
+##  [1]  1  2  3  4  5  6  7  8  9 10
+```
+
+Likewise, we need to be able to save time by repeating vectors or vector elements, as shown below.
+
+
+```r
+treat <- c("A", "B", "C")
+rep(treat, 3) #Repeating whole vector
+## [1] "A" "B" "C" "A" "B" "C" "A" "B" "C"
+rep(treat, each = 3) #Repeating each element
+## [1] "A" "A" "A" "B" "B" "B" "C" "C" "C"
+```
+
+Several vectors can be combined in one vector by using the `c()` function:
+
+
+```r
+y <- c(1,2,3)
+z <- c(4,5,6)
+c(y, z)
+## [1] 1 2 3 4 5 6
+```
+
+
+During our R session, objects are created and written to the workspace (environment). At the end of a session (or at the beginning of a new one) we might like to clean the workspace, by using the `rm()` function as shown below.
+
+
+```r
+rm(y, z) # remove specific objects
+rm(list=ls()) # remove all objects
+```
+
+## Extractors
+
+In some cases, functions return several objects, which are allocated to different slots. To extract such objects, we use the '$' operator. For example, the `eigen()` function calculates the eigenvector and eigenvalues of a matrix and these results are saved into the same variable, but in different slots. We can extract the results as shown below.
+
+
+```r
+MAT  <-  matrix(c(2,1,3,4),2,2)
+MAT
+##      [,1] [,2]
+## [1,]    2    3
+## [2,]    1    4
+ev  <-  eigen(MAT)
+ev
+## eigen() decomposition
+## $values
+## [1] 5 1
+## 
+## $vectors
+##            [,1]       [,2]
+## [1,] -0.7071068 -0.9486833
+## [2,] -0.7071068  0.3162278
+ev$values
+## [1] 5 1
+ev$vectors
+##            [,1]       [,2]
+## [1,] -0.7071068 -0.9486833
+## [2,] -0.7071068  0.3162278
+```
+
+
+## Reading external data
+
+R is not always the right tool to enter the experimental data and, most often, we enter the data by using a spreadsheet, such as EXCEL. This data can be stored as '.xls' or '.xlsx' files, or, as it is often the case in this book, as '.csv' file. While the former file types are specific to EXCEL, CSV files are a type of cross-platform text data, which does not store information about formatting (bold, italic or lines and background colors...), but it can be opened by all programmes and operating systems.
+
+To open '.csv' data, we can use the `read.csv()` function, while, for EXCEL files, we need to dowload, install and load an additional package ('readxl'), which is accomplished by using the following code:
+
+
+```r
+# install.packages("readxl") #install the package: only at first instance
+library(readxl) # Load the library: at the beginning of each session
+```
+
+Loading the file is straightforward: if we know where the file is located, we use the commands:
+
+```
+dataset  <-  read.csv("fileName", header=TRUE) # Open CSV file
+dataset  <-  read_xls("fileName", sheet = "nameOfSheet") # Open XLS file
+dataset  <-  read_xlss("fileName", sheet = "nameOfSheet") # Open XLSX file
+```
+
+If we know the filename and its path, we can use it in place of 'fileName', or, more easily, we can use the `file.choose()` function, which shows a selection windows, from where we can select the file to be opened.
+
+```
+dataset  <-  read.csv(file.choose()", header=TRUE) # Open CSV file
+```
+
+
+## Simple R graphics
+
+This is a huge topic, that we do not intend to develop here. We would just like to show a couple of examples of how simple graphs can be created with R. The code shown below can be used to draw an x-y scatterplot and to superimpose a curve, by using its equation. This will suffice, so far, but we would like to emphasize that, whit some training, R can be used to draw very professional graphs.
+
+
+
+```r
+x  <-  c(1, 2, 3, 4)
+y  <-  c(10, 11, 13, 17)
+plot(y ~ x)
+curve(7.77 * exp(0.189 * x), add = T, col = "red")
+```
+
+<img src="_main_files/figure-html/unnamed-chunk-45-1.png" width="90%" />
+
+---
+
+## Further readings 
+
+
+1. Maindonald J. Using R for Data Analysis and Graphics - Introduction, Examples and Commentary. (PDF, data sets and scripts are available at [JM's homepage](https://cran.r-project.org/doc/contrib/usingR.pdff).
+2. Oscar Torres Reina, 2013. Introductio to RStudio (v. 1.3). [This homepage](https://dss.princeton.edu/training/RStudio101.pdf)
 
 <!--chapter:end:17-Eng_IntroduzioneR.Rmd-->
 
