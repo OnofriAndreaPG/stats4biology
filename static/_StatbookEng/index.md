@@ -1,7 +1,7 @@
 ---
 title: "Experimental methods in agriculture"
 author: "Andrea Onofri and Dario Sacco"
-date: "Update: v. 0.9 (2021-10-06), compil. 2021-10-20"
+date: "Update: v. 0.9 (2021-10-06), compil. 2021-10-31"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -1213,13 +1213,728 @@ pie(table(mtcars$gear))
 
 # Modeling the experimental data
 
-To be done ...
+
+In the previous chapter we have seen that we can use simple stats to describe, summarise and present our experimental data, which is usually the very first step of data analyses. However, we are more ambitious: we want to model our experimental data. Perhaps this term sounds unfamiliar to some of you and, therefore, we should better start by defining the terms 'model' and 'modeling'.
+
+A mathematical model is the description of a system using the mathematical language and the process of developing a model is named mathematical modeling. In practice, we want to write an equation where our experimental observations are obtained as the result of a set of predictors and operators.
+
+Writing mathematical models for natural processes has been one of the greatest scientific challenges, since the 19th century and it may be appropriately introduced by using a very famous quote from Pierre-Simon Laplace (1749-1827): "*We ought to regard the present state of the universe as the effect of its antecedent state and as the cause of the state that is to follow. An intelligence knowing all the forces acting in nature at a given instant, as well as the momentary positions of all things in the universe, would be able to comprehend in one single formula the motions of the largest bodies as well as the lightest atoms in the world, provided that its intellect were sufficiently powerful to subject all data to analysis; to it nothing would be uncertain, the future as well as the past would be present to its eyes. The perfection that the human mind has been able to give to astronomy affords but a feeble outline of such an intelligence.*"
+
+Working in biology and agriculture, we need to recognise that we are very far away from Laplace's ambition; indeed, the systems which we work with are very complex and they are under the influence of a high number of external forces in strong interaction with one another. The truth is that we know too little to be able to predict the future state of the agricultural systems; think about the yield of a certain wheat genotype: in spite of our research effort, we are not yet able to forecast future yield levels, because, e.g., we are not yet able to forecast the weather for future seasons.
+
+In this book, we will not try to write models to predict future outcomes for very complex systems; we will only write simple models to describe the responses obtained from controlled experiments, where the number of external forces has been reduced to a minimum level. You might say that modeling the past is rather a humble aim, but we argue that this is challenging enough...
+
+One first problem we have to solve is that our experimental observations are always affected by:
+
+1. deterministic effects, working under a cause-effect relationship;
+2. stochastic effects, of purely random nature, which induce more or less visible differences among the replicates of the same measurement.
+
+Clearly, every good descriptive model should contain two components, one for each of the above mentioned groups of effects. Models containing a random component are usually named 'statistical models', as opposed to 'mathematical models', which tend to disregard the stochastic effects.
+
+## Deterministic models
+
+Based on the Galileian scientific approach, our hypothesis is that all biological phoenomena are based on an underlying mechanism, which we describe by using a deterministic (cause-effect) model, where:
+
+$$ Y_E = f(X, \theta) $$
+
+In words, the expected outcome $Y_E$ is obtained as a result of the *stimulus* $X$, according to the function $f$, based on a number of parameters $\theta$; this simple cause-effect model, with loose language, can be called a dose-response model.
+
+Let's look at model components in more detail. In a previous chapter we have seen that the expected response $Y_E$ can take several forms, i.e. it can be either a quantity, or a count, or a ratio or a quality. The expected response can be represented by one single variable (univariate response) or by several variables (multivariate response) and, in this book, we will only consider the simplest situation (univariate response). 
+
+The experimental stimulus ($X$) is represented by one or more quantitative/categorical variables, usually called predictors, while the response function $f$ is a linear/non-linear equation, that is usually selected according to the biological mechanism of the process under investigation. Very often, equations are selected in a purely empirical fashion: we look at the data and select a suitable curve shape.
+
+Every equation is based on a number of parameters, which are generally indicated by using Greek or Latin letters. In this book we will use $\theta$ to refer to the whole set of parameters in a deterministic model.
+
+Let's see a few examples of deterministic models. The simplest model is the so-called *model of the mean*, that is expressed as:
+
+$$ Y = \mu $$
+
+According to this simple model, the observations should be equal to some pre-determined value ($\mu$); $f$ is the identity function with only one parameter ($\theta = \mu$) and no predictors. In this case, we do not need predictors, as the experiment is not comparative, but, simply, mensurative. For a comparative experiment, where we have two or more stimula, the previous model can be expanded as follows:
+
+\vspace{12pt}
+$$
+Y = \left\{ {\begin{array}{ll}
+\mu_A \quad \textrm{if} \,\, X = A \\
+\mu_B \quad \textrm{if} \,\, X = B
+\end{array}} \right.
+$$
+
+This is a simple example of the so-called *ANOVA models*, where the response depends on the stimulus and subjects treated with A return a response equal to $\mu_A$, while subjects treated with B return a response equal to $\mu_B$. The response is quantitative, but the predictor represents the experimental treatments and it is described by using a categorical variable, with two levels. We can make it more general by writing:
+
+$$Y = \mu_j$$ 
+
+where $j$ represents the experimental treatment.
+
+Another important example is the *simple linear regression model*, where the relationship between the predictor and the response is described by using a 'straight line':
+
+$$ Y = \beta_0 + \beta_1 \times X $$
+
+In this case, both $Y$ and $X$ are quantitative variables and we have two parameters, i.e. $\theta = [\beta_0, \beta_1]$.
+
+We can also describe curvilinear relationships by using other models, such as a second order polynomial (three parameters):
+
+$$ Y = \beta_0 + \beta_1 \, X + \beta_2 \, X^2$$
+
+or the exponential function (two parameters, $e$ is the Nepero operator):
+
+$$ Y = \beta_0 \, e^{\beta_1 X} $$
+
+We will see some more examples of curvilinear functions near to the end of this book.
+
+Whatever it is, the function $f$ needs to be fully specified, i.e. we need to give a value to all unknown parameters. Consider the following situation: we have a well that is polluted by herbicide residues to a concentration of 120 mg/L. If we analyse a water sample from that well, we should expect that the concentration is $Y_E = 120$ (model of the mean). Likewise, if we have two genotypes (A and B), their yield in a certain pedo-climatic condition could be described by an ANOVA model, where we specify that, e.g.,
+
+$$
+Y = \left\{ {\begin{array}{ll}
+27 \quad \textrm{if} \,\, X = A \\
+32 \quad \textrm{if} \,\, X = B
+\end{array}} \right.
+$$
+
+As a third example of a fully specified model, we could assume that the yield response of wheat in some specific environmental conditions is related to N fertilisation, by way of a linear function $Y = \beta_0 + \beta_1 \times X$, where $\beta_0 = 20$ e $\beta_1 = 0.3$ (i.e. $\theta = [20, 0.3]$). In this case, the model is $Y = 20 + 0.3 \times X$ and we can use it to predict the yield response to, e.g., 0, 30, 60, 90, 120 and 150 kg N ha^-1^, as shown below:
+
+
+```r
+X <- c(0, 30, 60, 90, 120, 150)
+Ye <- 20 + 0.3 * X
+Ye
+## [1] 20 29 38 47 56 65
+```
+
+You may argue that this latter example is not realistic, as the relationship between N fertilisation and yield can never be linear, but, presumably, asymptotic. You are right, but that does not matter at this moment; our point is that **we can postulate the existence of an underlying, unknown mechanism that produces our experimental outcomes, by following a fully specified deterministic cause-effect model**. 
+
+
+## Stochastic models
+
+In practice, reality is more complex than our expectations and, due to experimental errors, we do never observe the expected outcome. Therefore, modelling the observations requires that we introduce the effect of unknown entities. It would seem a nonsense... how can we predict the effects of something we do not even know? 
+
+Let's go back to the example of the polluted well, where we would expect that the concentration is $Y_E = 120$ mg/L. It is very easy to imagine that the above mechanism is overly simplistic, due to the fact that our chemical instrument is not free from measurement errors. Indeed, if we measure the concentration of several water samples from the same well, we will not always obtain exactly 120 mg/L, but we will obtain a set of values more or less different from each other. We could model this by writing that the observed values $Y_O \neq Y_E$ is: 
+
+$$Y_O = 120 + \varepsilon$$
+
+where $\varepsilon$ is an individual random component that brings our measure away from the expected value. Do we have any hints on how to determine $\varepsilon$? If we had enough knowledge to understand the exact cause for the effect $\varepsilon$ we could incorporate it into the deterministic model. As we do not have enough knowledge at the moment, we need to find another way to model this stochastic component.
+
+Indeed, although we cannot precisely determine $\varepsilon$ for each single water sample, we can make some reasonable assumptions. If the expected value is 120 mg/L (this is indeed the underlying mechanism we postulate), we should expect that it is likely to find a cooncentration of 119 or 121 mg/L ($\varepsilon = \pm 1$), less likely to find a concentration of 100 or 140 mg/L ($\varepsilon = \pm 20$), very unlikely to find a concentration of 80 or 160 mg/L ($\varepsilon = \pm 40$). Consequently, it should be possible to assign a value of probability to each possible $\varepsilon$ value (and thus to each possible $Y_O$ value), by using some sort of probability function.
+
+
+### Probability functions
+
+How do we assign the probability to a stochastic experimental outcome? This is rather easy when the outcome $Y_O$ is categorical and can only take one of a finite list of possible values $y$. For example, let's consider an experiment where we sample a wheat plant from a population and count the number of lateral tillers, so that $Y_O$ can only take an integer value from, e.g., 0 to 3. The probability of finding a plant with, e.g., one lateral tiller ($Y_O$ = 1) is equal to the number of subjects with one lateral tiller divided by the total number of subjects within the population (frequentist definition of probability). If the population consists of 20 plants and, among those, 4 plants have no lateral tillers, 6 plants have one tiller, 8 plants have 2 tillers and 2 plants have three tillers, the probabilities for all the possible outcomes are:
+
+$$P(Y_O = y) = \left\{ \begin{array}{l}
+ 4/20 = 0.2 \,\,\,\,\,\,\textrm{if}\,\,\,\,\,\, y = 0 \\ 
+ 6/20 = 0.3 \,\,\,\,\,\,\textrm{if}\,\,\,\,\,\, y = 1 \\ 
+ 8/20 = 0.4\,\,\,\,\,\, \textrm{if}\,\,\,\,\,\, y = 2 \\ 
+ 2/20 = 0.1 \,\,\,\,\,\,\textrm{if}\,\,\,\,\,\, y = 3 \\ 
+ \end{array} \right.$$
+
+In the above equation, P is a **Probability Mass Function** (PMF) or, more simply a **Probability Function** and it takes the form of a distribution of relative frequencies. It does not help us to predict the outcome of our sampling experiment, but it gives us an idea of what it is more likely to happen.
+ 
+What are the main characteristics of a probability function? Two rules are fundamental:
+
+1. $P(Y_O = y)$ must always be positive, for every possible $y$ value;
+2. the probabilities for all possible events $y$ must sum up to one, i.e. $\sum{P \left(Y_O = y \right)} = 1$
+
+With ordinal classes (as in our example), we can also define the **Cumulative Distribution Function** (CDFs), as the sum of the probabilities of one event with all the 'previous' ones, i.e.:
+
+$$P(Y_O \le y) = \sum_{y_k \le y}{P(Y_O = y_k)}$$
+
+For our wheat tillers example, we have:
+
+$$P(Y_O \le y) = \left\{ \begin{array}{l}
+ 0.2\,\,\,\,\,\,\textrm{if}\,\,\,\,\,\, y \leq 0 \\ 
+ 0.5\,\,\,\,\,\,\textrm{if}\,\,\,\,\,\, y \leq 1 \\ 
+ 0.9\,\,\,\,\,\,\textrm{if}\,\,\,\,\,\, y \leq 2 \\ 
+ 1.0\,\,\,\,\,\,\textrm{if}\,\,\,\,\,\, y \leq 3 \\ 
+ \end{array} \right.$$
+
+For these PDFs, using the information given in Chapter 3, we can calculate descriptive statistics, such as the mean (expected value) and the variance:
+ 
+$$\mu  = \sum{\left[ y_k \cdot P(Y_O = y_k ) \right]}$$
+ 
+$$\sigma ^2  = \sum{ \left[ {\left( {y_k  - \mu } \right)^2 \cdot P(Y_O = y_k)} \right]}$$
+
+In our example, it is:
+
+
+```r
+mu <- 0 * 0.2 + 1 * 0.3 + 2 * 0.4 + 3 * 0.1
+mu
+## [1] 1.4
+```
+
+and:
+
+
+```r
+sigma2 <- (0 - mu)^2 * 0.2 + (1 - mu)^2 * 0.3 + (2 - mu)^2 * 
+  0.3 + (3 - mu)^2 * 0.2
+sigma2  
+## [1] 1.06
+```
+
+On average, our plants have 1.4 lateral tillers, with a variance of 1.06.
+
+### Density functions
+
+For quantitative variables, the outcome may take any value within a certain interval. Is it sensible to ask what probability we have to measure a concentration value that is exactly, e.g., 120 mg/L (not 120.0000001 or 119.99999 mg/L)? We do understand that such a probability is infinitesimal. In general, we cannot calculate the probability of a 'point-event' for continuous variables.
+
+We can think of dividing the concentration scale into a finite number of intervals, e.g. < 100 mg/L, from 100 to 110 mg/L, from 110 to 120 mg/L and so on (binning; we spoke about this in Chapter 3), so that all individuals in the population can be assigned to one and only one interval. It is intuitively clear that we can always calculate the probability of one interval as the ratio between the number of individuals in that interval and the total number of individuals in the population. However, a new problem arises when we try to define a probability function: how should we select the width of intervals?
+
+A possible solution is that we calculate the so-called **probability density**, i.e. the ratio of the probability mass in one interval to the interval width. For example, if we have a probability mass of 0.3 in the interval between 110 to 130 $mg/L$, the probability density is:
+
+$$D([110, 130]) = \frac{P([110,130])}{20} = \frac{0.3}{20}$$
+
+Why do we talk about 'density'? Because this is, indeed, a probability mass per unit interval (do you remember? the usual density is a mass per unit volume). 
+
+Now we can wonder: what happens with the density, when the interval becomes smaller and smaller? This is shown in Figure \@ref(fig:figName50b); we can see that when the interval width tends to 0, the density tends to assume a finite value, according to the red function in Figure \@ref(fig:figName50b) (bottom right). 
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName50b-1.png" alt="Probability density function, depending on the width of the interval"  />
+<p class="caption">(\#fig:figName50b)Probability density function, depending on the width of the interval</p>
+</div>
+
+
+In the end, dealing with a continuous variable, we cannot calculate the probability of a 'point-event', but we can calculate its density. Therefore, instead of defining a probability function, we can define a **Probability Density Function** (PDF), depicting the density of all possible events.
+
+The most common PDF is the Gaussian PDF, that is also known as the **normal curve**; it is represented in the bottom right panel of Figure \@ref(fig:figName50b) and it is introduced in the following section.
+
+### The Gaussian PDF and CDF
+
+The Gaussian PDF is defined as: 
+
+$$\phi(y) = \frac{1}{{\sigma \sqrt {2\pi } }}\exp \left[{\frac{\left( {y - \mu } \right)^2 }{2\sigma ^2 }} \right]$$
+
+where $\phi(y)$ is the probability density that the observed outcome assume the value $y$, while $\mu$ and $\sigma$ are the parameters. The gassian PDF is continuous and it is defined from $-\infty$ to $\infty$.
+
+The density in itself is not very much useful for our task; how can we use the density to calculate the probability for an outcome $Y_O$ that is comprised between any two values $y_1$ and $y_2$?. Let's recall that the density is the probability mass per unit interval width; therefore, if we multiply the density by the interval width, we get the probability for that interval. We can imagine that the area under the gaussian curve in Figure \@ref(fig:figName50b) (bottom right) is composed by a dense comb of tiny rectangles with very small widths; the area of each rectangle is obtained as the product of a density (height) by the interval width and, therefore, it represents a probability. Consequently, if we take any two values $y_1$ and $y_2$, the probability of the corresponding interval can be obtained as the sum of the areas of all the tiny rectangles between $y_1$ and $y_2$. In other words, the probability of an interval can be obtained as the Area Under the Curve (AUC). You may recall from high school that the AUC is, indeed, the integral of the gaussian curve from $y_1$ and $y_2$:
+
+$$P(y_1 \le Y_O < y_2) = \int\limits_{ y_1 }^{y_2} {\phi(y)} dy$$
+
+Analogously, we can obtain the corresponding CDF, by:
+
+$$P(Y_O \le y) = \int\limits_{ -\infty }^{y} {f(y)} dy$$
+
+You may have noted that this is totally the same as the PDF for a discrete variable, although the summation has become an integral.
+
+If the PDF is the defined as the function $\phi(y)$, the mean and variance for $\phi$ can also be calculated as shown above for the probability functions, by replacing summations with integrals:
+
+$$\begin{array}{l}
+\mu  = \int\limits_{ - \infty }^{ + \infty } {y f(y)} dy \\ 
+\sigma ^2  = \int\limits_{ - \infty }^{ + \infty } {\left( {y - \mu } \right)^2 f(y)} dy
+\end{array}$$
+ 
+I will not go into much mathematical detail, but it is useful to note that, with a Gaussian CDF:
+
+1. the curve shape depends only on the values of $\mu$ and $\sigma$ (Figure \@ref(fig:figName51) ). It means that if we start from the premise that a population of measures is Gaussian distributed (normally distributed), knowing the mean and the standard deviation is enough to characterise the whole population. Such a premise is usually called **parametric assumption**.
+2. The curve has two asymptotes and the limits when $y$ goes to $\pm \infty$ are 0. It is implied that every $y$ values is a possible outcome for our experiment, although the probabilities of very small and very high values are negligible.
+3. The integral of the Gauss curve from $- \infty$ to $+ \infty$ is 1, as this is the sum of the probability densities for all possible outcomes.
+4. The area under the Gaussian curve between two points (integral) represents the probability of obtaining values within the corresponding interval. For example, Figure \@ref(fig:figName52) shows that 80% of the individuals lie within the interval from $-\infty$ to, roughly, 1;
+5. The curve is symmetrical around the mode, that is equal to the median and the mean. That is, the probability density of values above the mean and below the mean is equal.
+6. We can calculate that, for given $\mu$ and $\sigma$, the probability density of individuals within the interval from $\mu$ to $\mu + \sigma$ is 15.87\% and it is equal to the probability density of the individuals within the interval from $\mu - \sigma$ to $\mu$.
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName51-1.png" alt="The shape of the gaussian function, depending on the mean and standard deviation (left: mean = 5 and SD = 1; right: mean = 6 and SD = 3)" width="90%" />
+<p class="caption">(\#fig:figName51)The shape of the gaussian function, depending on the mean and standard deviation (left: mean = 5 and SD = 1; right: mean = 6 and SD = 3)</p>
+</div>
+
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName52-1.png" alt="Getting the 80th percentile as the area under the PDF curve (left) and from the CDF (right)" width="90%" />
+<p class="caption">(\#fig:figName52)Getting the 80th percentile as the area under the PDF curve (left) and from the CDF (right)</p>
+</div>
+
+
+## A model with two components
+
+Let's go back to our example with the polluted well. We said that, on average, the measure should be 120 mg/L, but we also said that each individual measure has its own random component $\epsilon$, so that $Y_O = 120 + \varepsilon$. The stochastic element cannot be predicted, but we can use the Gaussian to calculate the probability of any outcome $Y_O$.
+
+Now we are ready to write a two-components model for our herbicide concentrations, in relation to each possible water sample $i$:
+
+$$y_i = \mu + \varepsilon_i$$
+
+where the stochastic element $\varepsilon$ is:
+
+$$ \varepsilon \sim \textrm{Norm}(0, \sigma) $$
+
+The above equation means that the stochastic element is gaussian distributed with mean equal to 0 and standard deviation equal to $\sigma$. Another equivalent form is:
+
+$$Y_i \sim \textrm{Norm}(\mu, \sigma)$$
+
+which says that the concentration is gaussian distributed with mean $\mu = 120$ (the deterministic part) and standard deviation equal to $\sigma$.
+
+In our example, if we assume that $\sigma = 12$ (the stochastic part), we can give the best possible description of all concentration values for all possible water samples from our polluted well. For example, we can answer the following questions:
+
+1. What is the most likely concentration value? 
+2. What is the probability density of finding a water sample with a concentration of 100 mg/L?
+3. What is the probability of finding a water sample with a concentration lower than 100 mg/L?
+4. What is the probability of finding a water sample with a concentration higher than 140 mg/L?
+5. What is the probability of finding a water sample with a concentration within the interval from 100 to 140 mg/L?
+6. What is the 80th percentile, i.e. the concentration which is higher than 80% of all possible water samples?
+7. What are the two values, symmetrical around the mean, which contain the concentrations of 95% of all possible water samples?
+
+
+Question 1 is obvious. In order to answer all the above questions from 2 on, we need to use the available R function for gaussian distribution. For every distribution, we have a PDF (the prefix is always 'd'), a CDF (the prefix is 'p') and a quantile function (the prefix is 'q'), that is the inverse CDF, giving the value corresponding to a given percentile. For the Gaussian function, the name is 'norm', so that we have the R functions `dnorm()`, `pnorm()` and `qnorm()`. The use of these functions is straightforward: 
+
+
+```r
+# Question 2
+dnorm(100, mean = 120, sd = 12)
+## [1] 0.008289762
+```
+
+
+
+```r
+# Question 3
+pnorm(100, mean = 120, sd = 12)
+## [1] 0.04779035
+```
+
+For the 4th question we should consider that cumulative probabilities are given for the lower curve tail, while we were asked to determine the higher tail. Therefore, we have two possible solutions, as shown below:
+
+
+```r
+# Question 4
+1 - pnorm(140, mean = 120, sd = 12)
+## [1] 0.04779035
+pnorm(140, mean = 120, sd = 12, lower.tail = F)
+## [1] 0.04779035
+```
+
+
+
+```r
+# Question 5
+pnorm(140, mean = 120, sd = 12) - pnorm(100, mean = 120, sd = 12)
+## [1] 0.9044193
+```
+
+In order to calculate the percentiles we use the `qnorm()` function:
+
+
+```r
+# Question 6
+qnorm(0.8, mean = 120, sd = 12)
+## [1] 130.0995
+```
+
+
+
+```r
+# Question 7
+qnorm(0.025, mean = 120, sd = 12)
+## [1] 96.48043
+qnorm(0.975, mean = 120, sd = 12)
+## [1] 143.5196
+```
+
+
+## And so what?
+
+Let's summarise:
+
+1. we use deterministic cause-effect models to predict the average behavior in a population
+2. we cannot predict the exact outcome of each single experiment, but we can calculate the probability of obtaining one of several possible outcomes by using stochastic models, in the form of PDFs
+
+In order to do so, we need to be able to assume what the form is for the PDF within the population (**parametric assumption**). Indeed, such a form can only be assumed, unless we know the whole population, which is impossible as long as we are making an experiment to know the population itself.
+
+## Monte Carlo methods to simulate an experiment
+
+
+Considering the above process, the results of every experiment can be simulated by using the so-called Monte Carlo methods, which can reproduce the mechanisms of natural phenomena. These methods are based on random number generators; for example, in R, it is possible to produce random numbers from a given PDF, by using several functions prefixed by 'r'. For example, the gaussian random number generator is `rnorm()`.
+
+Let's go back to our polluted well. If we know that the concentration is exactly 120 mg/L, we can reproduce the results of an experiment where we analyse three replicated water samples, by using an instrument with 10% coefficient of variability (that is $\sigma = 12$).
+
+With R, the process is as follows:
+
+
+```r
+set.seed(1234)
+Y_E <- 120
+epsilon <- rnorm(3, 0, 12)
+Y_O <- Y_E + epsilon
+Y_O
+## [1] 105.5152 123.3292 133.0133
+```
+
+We need to note that, at the very beginning, we set the seed to the value of '1234'. Indeed, random numbers are, by definition, random and, therefore, we should all obtain different values at each run. However, random number generators are based on an initial 'seed' and, if you and I set the same seed, we can obtain the same random values, which is handy, for the sake of reproducibility. Please, also note that the first argument to the `rnorm()` function is the required number of random values.
+
+The very same approach can be used with more complex experiments:
+
+1. simulate the expected results by using the selected deterministic model,
+2. attached random variability to the expected outcome, by sampling from the appropriate probability density function, usually by a gaussian.
+
+In the box below we show how to simulate the results of an experiment where we compare the yield of wheat treated with four different nitrogen rates (0, 60, 120 e 180 kg/ha), on an experiment with four replicates (sixteen data in all).
+
+
+```r
+set.seed(1234)
+Dose <- rep(c(0, 60, 120, 180), each=4) 
+Yield_E <- 25 + 0.15 * Dose
+epsilon <- rnorm(16, 0, 2.5)
+Yield <- Yield_E + epsilon
+dataset <- data.frame(Dose, Yield)
+dataset
+##    Dose    Yield
+## 1     0 21.98234
+## 2     0 25.69357
+## 3     0 27.71110
+## 4     0 19.13576
+## 5    60 35.07281
+## 6    60 35.26514
+## 7    60 32.56315
+## 8    60 32.63342
+## 9   120 41.58887
+## 10  120 40.77491
+## 11  120 41.80702
+## 12  120 40.50403
+## 13  180 50.05937
+## 14  180 52.16115
+## 15  180 54.39874
+## 16  180 51.72429
+```
+
+
+## Data analysis and model fitting
+
+So far, we have shown how we can model the outcome of scientific experiments. In practise, we have assumed that we knew the function $f$, the parameters $\theta$, the predictors $X$ the PDF type and $\sigma$. With such knowledge, we have produced the response $y_i$. In an experimental setting the situation is the reverse: we know the predictors $X$, the measured response $y_i$ and we can assume a certain form for $f$ and for the PDF, but we do not know $\theta$ and $\sigma$.
+
+Therefore, we use the observed data to estimate $\theta$ and $\sigma$. We see that we are totally following the Galileian process, by posing our initial hypothesis in the form of a mathematical model. This process is named **model fitting**  and we will see that, most of the times, analyzing the data can be considered as a process of model fitting. We will also see that once the unknown parameters have been retrieved from the data, we will have to assess whether the fitted model represents an accurate description of our data (**model evaluation**). Likewise, comparing different hypothesis about the data can be seen as a process of **model comparison**. Those are the tasks that will keep us busy in the following chapters.
+
+## Some words of warning
+
+In this chapter we have only considered one stochastic model, that is the Gaussian PDF. Of course, this is not the only possibility and there are several other probability density functions which can be used to achieve the same aim, i.e. describing random variability. For example, in Chapter 5 we will see the Student's t distribution and, in Chapter 7, we will see the Fisher-Snedecor distribution. For those who are interested further information about non-gaussian PDFs can easily be found in the existing literature (see the great Bolker's book, that is cited below).
+
+
+---
+
+
+## Further readings
+
+1. Bolker, B.M., 2008. Ecological models and data in R. Princeton University Press, Books.
+2. Schabenberger, O., Pierce, F.J., 2002. Contemporary statistical models for the plant and soil sciences. Taylor & Francis, CRC Press, Books.
+
+
+
+
 
 <!--chapter:end:04-Eng_ModelliSperimentazione.Rmd-->
 
 # Estimation of model parameters
 
-To be done ...
+In chapter 4 we have shown that the experimental data can be regarded as the outcome of a deterministic cause-effect process, where a given stimulus is expected to produce a well defined response. Unfortunately, the stochastic effects of experimental errors (random noise) 'distort' the response, so that the observed result does not fully reflect the expected outcome of the cause-effect relationship. We have also shown (Chapter 1) that a main part of such noise relates to the fact that the experimental units are sampled from a wider population and the characteristics of such sample do not necessarily match the characteristics of the whole population. Consequently, all samples are different from one another and we always obtain different results, even if we repeat the same experiment in the same conditions.
+
+How should we cope with such a variability? We should always bear in mind that, usually, although we look at a sample, our primary interest is to retrieve information about the whole population, by using a process named **statistical inference**, as summarised in Figure \@ref(fig:figName61). This process is based on the theories by Karl Pearson (1857-1936), his son Egon Pearson (1895-1980) and Jarzy Neyman (1894-1981), as well as Ronald Fisher, about whom we spoke at the beginning of this book.
+
+<div class="figure" style="text-align: center">
+<img src="_images/ExperimentalError.png" alt="The process of experimental research: inferring the characteristics of a population by looking at a sample" width="75%" />
+<p class="caption">(\#fig:figName61)The process of experimental research: inferring the characteristics of a population by looking at a sample</p>
+</div>
+
+In this chapter we will offer an overview about statistical inference, by using two real-life examples; the first one deals with a quantitative variable, while the second one deals with a proportion.
+
+## Example 1: a concentration value
+
+Let's consider again the situation we have examined in Chapter 4: a well is polluted by herbicide residues and we want to know the concentration of those residues. We plan a Monte Carlo experiment where we collect three water samples and make chromatographic analyses.
+
+As this is a Monte Carlo experiment, we can imagine that we know the real truth: the unknown concentration is 120 mg/L and the analytic instrument is characterised by a coefficient of variability of 10%, corresponding to a standard deviation of 12 mg/L. Consequently, our observations ($Y_i$, with $i$ going from 1 to 3 replicates) will not match the real unknown concentration value, but they will be a random realisation, from the following Gaussian distribution (see Chapter 4):
+
+$$Y_i \sim \textrm{Norm}(120, 12)$$,
+
+Accordingly, we can simulate the results of our experiment:
+
+
+
+```r
+set.seed(1234)
+Ye <- 120
+Y <- rnorm(3, Ye, 12)
+Y
+## [1] 105.5152 123.3292 133.0133
+```
+
+Now, let's put ourselves in the usual conditions: we have seen the results and we know nothing about the real truth. What can we learn from the data, about the concentration in the whole well?
+
+First of all, we postulate a possible model, such as the usual model of the mean:
+
+$$Y_i \sim \textrm{Norm}(\mu, \sigma)$$
+
+This is the same model we used to simulate the experiment, but, in the real world, we do not know the values of $\mu$ and $\sigma$ and we need to estimate them from the observed data. We know that $\mu$ and $\sigma$ are, respectively, the mean and the standard deviation of the whole population and, therefore, we calculate these two descriptive stats for our sample and name them, respectively, $m$ and $s$.
+
+
+```r
+m <- mean(Y)
+s <- sd(Y)
+m; s
+## [1] 120.6192
+## [1] 13.9479
+```
+
+Now the question is: having seen $m$ and $s$, can we infere the values of $\mu$ and $\sigma$? Assuming that the sample is representative (we should not question this, as long as the experiment is valid), our best guess is that $\mu = m$ and $\sigma = s$. This process by which we assign the observed sample values to the population values is known as **point estimation**.
+
+Although point estimation is totally legitimate, we clearly see that it leads to wrong conclusions: due to sampling errors, $m$ is not exactly equal to $\mu$ and $s$ is not exactly equal to $\sigma$! Therefore, a more prudential attitude is recommended: instead of expressing our best guess as a single value, we would be much better off if we could use some sort of uncertainty interval. We need a heuristic to build such an interval.
+
+
+### The empirical sampling distribution
+
+In this book we will use the popular heuristic proposed by Jarzy Neyman, although we need to clearly state that this is not the only one and it is not free from some conceptual inconsistencies (See Morey et al., 2016). Such a heuristic is based on trying to guess what should happen if we repeat the experiment for a very high number of times. Shall we obtain similar results or different? Instead of guessing, we exploit Monte Carlo simulation to make true repeats. Therefore:
+
+1. we repeat the sampling process 100,000 times (i.e., we collect three water samples for 100,000 times and analyse their concentrations)
+2. we get 100,000 average concentration values
+3. we describe this population of means.
+
+In R, we can use the code below. Please, note the iterative procedure, based on the `for()` statement, by which all instructions between curly brackets are repeated, while the counter $i$ is updated at each cycle, from 1 to 100,000.
+
+
+```r
+# Monte Carlo simulation
+set.seed(1234)
+result <- rep(0, 100000)
+for (i in 1:100000){
+  sample <- rnorm(3, 120, 12)
+  result[i] <- mean(sample)
+}
+mean(result)
+## [1] 120.0341
+sd(result)
+## [1] 6.939063
+```
+
+Now, we have a population of sample means and we see that:
+
+1.  the mean of this population is equal to the mean of the original population. It is, therefore, confirmed that the only way to obtain a perfect estimate of the population mean $\mu$ is to repeat the experiment an infinite number of times;
+2. the standard deviation of the population of means is equal to 6.94 and it is called **standard error** (SE); this value is smaller than $\sigma$.
+
+In order to more thouroughly describe the variability of sample means, we can bin the concentration values into a series of intervals (from 80 to 160 mg/L with a 2.5 step) and calculate the proportion of means in each interval. In this way, we build an empirical distribution of probabilities for the sample means (Figure \@ref(fig:figName62)), which is called **sampling distribution**. Indeed, this term has a more general importance and it is used to name the distribution of probabilities for every possible sample statistics. 
+
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName62-1.png" alt="Empirical distribution of 100,000 sample means (n = 3) from a Gaussian population with mean = 120 and SD = 12. The solid line shows a Gaussian PDF, with mean = 120 and SD = 6.94" width="90%" />
+<p class="caption">(\#fig:figName62)Empirical distribution of 100,000 sample means (n = 3) from a Gaussian population with mean = 120 and SD = 12. The solid line shows a Gaussian PDF, with mean = 120 and SD = 6.94</p>
+</div>
+
+The sampling distribution and its standard error are two very important objects in research, as they are used to describe the precision of estimates: **when the standard error is big, the sampling distribution is flat and our estimates are tend to be rather uncertain and highly variable across repeated experiments. Otherwise, when the standard error is small, our estimates are very reliable and precise.**
+
+
+### A theoretical sampling distribution
+
+Building an empirical sampling distribution by Monte Carlo simulation is always possible, but it may often be impractical. Looking at Figure \@ref(fig:figName62), we see that our sampling distribution looks very much like a Gaussian PDF with mean equal to 120 and standard deviation close to 6.94. 
+
+Indeed, such an empirical observation has a theoretical support: the **central limit theorem** states that the sampling distribution of whatever statistic obtained from random and independent samples is approximately gaussian, whatever it is the PDF of the original population where we sampled from ^[The central limit theorem holds for very large samples. With small samples, the approximation is good only with more than 15-20 units]. The same theorem proves that, if the population mean is $\mu$, the mean of the sampling distribution is $\mu$.
+
+The standard deviation of the sampling distribution, in this case, can be derived by the law of propagation of errors, based on three main rules:  
+
+1. the sum of gaussian variables is also gaussian. Besides, the product of a gaussian variable for a constant value is also gaussian.
+2. For independent gaussian variables, the mean of the sum is equal to the sum of the means and the variance of the sum is equal to the sum of the variances.
+3. If we take a gaussian variable with mean equal to $\mu$ and variance equal to $\sigma^2$ and multiply all individuals by a constant value  $k$, the mean of the product is equal to $k \times \mu$, while the variance is $k^2 \times \sigma^2$. 
+
+In our experiment, we have three individuals coming from a gaussian distribution and each individual inherits the variance of the population from which it was sampled, which is $\sigma^2 = 12^2 = 144$. When we calculate the mean, we sum the three values as the first step and the variance of the sum is $144 + 144 + 144 = 3 \times 144 = 432$. As the second step, we divide by three and the variance of this ratio (see #3 above) is 432 divided by $3^2$, i.e.  $432/9  = 48$. The standard error is, therefore, $\sqrt{48} = 6.928$; it is not exactly equal to the empirical value of 9.94, but this is only due to the fact that we did not make an infinite number of repeated sampling.
+
+In general, the standard error of a mean (SEM) is:
+
+$$\sigma_m  = \frac{\sigma}{\sqrt n}$$
+
+Now, we can make our first conclusion: **if we repeat an experiment a very high number of times, the variability of results across replicates can be described by a sampling distribution, that is (approximately) gaussian, with mean equal to the true result of our experiment and standard deviation equal to the standard error.**
+
+### The frequentist confidence interval
+
+If the sampling distribution is gaussian, we could take a value $k$, so that the following expression holds:
+
+$$P \left[ \mu - k \times \frac{\sigma}{\sqrt{n} } \leq m \leq \mu + k \times \frac{\sigma}{\sqrt{n} } \right] = 0.95$$
+
+It means that we can build an interval around $\mu$ that contains 95% of the sample means ($m$) from repeated experiments (Figure \@ref(fig:figName62b)).
+
+<div class="figure" style="text-align: center">
+<img src="_images/ConfidenceInterval.png" alt="Building a confidence interval (P = 0.95): if we sample from a population with a mean of 120, 95 of our sample means out of 100 will be in the above interval" width="90%" />
+<p class="caption">(\#fig:figName62b)Building a confidence interval (P = 0.95): if we sample from a population with a mean of 120, 95 of our sample means out of 100 will be in the above interval</p>
+</div>
+
+
+
+
+With simple math, we get to the following expression, that is of extreme importance:
+
+$$P \left[ m - k \times \frac{\sigma}{\sqrt{n} } \leq \mu \leq m + k \times \frac{\sigma}{\sqrt{n} } \right] = 0.95$$
+
+It says that, **when we make an experiment and get an estimate $m$, by an appropriate selection of $k$, we can build an interval around $m$ that is equal to $k$ times the standard error, and contains the population value $\mu$ with 95% probability**. Here is the heuristic we were looking for!
+
+For our example:
+
+1. we calculate the sample mean. We conclude that $\mu = m = 120.6192$ mg/L and this is our point estimate;
+2. we calculate the standard error as $\sigma/\sqrt{n}$. As we do not know $\sigma$, we plug-in our best guess, that is $s = 13.95$, so that $SE = 13.95 / \sqrt{3} = 8.053$;
+3. we express our uncertainty about the population mean by replacing the point estimate with an interval, given by $\mu = 120.6192 \pm k \times 8.053$. This process is known as **interval estimation**.
+
+The interval $\mu = 120.6192 \pm k \times 8.053$ is called **confidence interval** and it is supposed to give us a better confidence that we are not reporting a wrong mean for the population (be careful to this: we are in doubt about the population, not about the sample!).
+
+But, how do we select a value for the multiplier $k$? Let's go by trial and error. We set $k = 1$ and repeat our Monte Carlo simulations, as we did before. At this time, we calculate 100,000 confidence intervals and count the number of cases where we hit the population mean. The code is shown below and it is very similar to the code we previously used to build our sampling distribution.
+
+
+```r
+# Monte Carlo simulation - 2
+set.seed(1234)
+result <- rep(0, 100000)
+for (i in 1:100000){
+  sample <- rnorm(3, 120, 12)
+  m <- mean(sample)
+  se <- sd(sample)/sqrt(3)
+  limInf <- m - se
+  limSup <- m + se
+  if(limInf < 120 & limSup > 120) result[i] <- 1
+}
+sum(result)/100000
+## [1] 0.57749
+```
+
+Indeed, we hit the real population mean only in less than 60 cases out of 100, which is very far away from 95%; we'd better widen our interval. If we use twice the standard error ($k = 2$), the probability becomes slightly higher than 81% (try to run the code below).
+
+
+```r
+# Monte Carlo simulation - 3
+set.seed(1234)
+result <- rep(0, 100000)
+for (i in 1:100000){
+  sample <- rnorm(3, 120, 12)
+  m <- mean(sample)
+  se <- sd(sample)/sqrt(3)
+  limInf <- m - 2 * se
+  limSup <- m + 2 * se
+  if(limInf < 120 & limSup > 120) result[i] <- 1
+}
+sum(result)/100000
+## [1] 0.81708
+```
+
+Using twice the standard error could be a good approximation when we have a high number of degrees of freedom. For example, running the code below shows that, with 20 replicates, a confidence interval obtained as $m \pm 2 \times s/\sqrt{3}$ hits the population mean in more than 94% of the cases. Therefore, such a confidence interval ('naive' confidence interval) is simple and it is a good approximation to the 95% confidence interval when the number of observations is sufficiently high.
+
+
+```r
+# Monte Carlo simulation - 4
+set.seed(1234)
+result <- rep(0, 100000)
+for (i in 1:100000){
+  n <- 20
+  sample <- rnorm(n, 120, 12)
+  m <- mean(sample)
+  se <- sd(sample)/sqrt(n)
+  limInf <- m - 2 * se
+  limSup <- m + 2 * se
+  if(limInf < 120 & limSup > 120) result[i] <- 1
+}
+sum(result)/100000
+## [1] 0.94099
+```
+
+For our small sample case, we can get an exact 95% coverage by using the 97.5-th percentile of a Student's t distribution, that is calculated by using the `qt()` function in R:
+
+
+
+```r
+qt(0.975, 2)
+## [1] 4.302653
+```
+
+The first argument is the desired percentile, while the second argument represents the number of degrees of freedom for the standard deviation of the sample, that is $n - 1$. The value of 4.303 can be used as the multiplier for the standard error, leading to the following confidence limits:
+
+
+```r
+m + qt(0.025, 2) * s/sqrt(3)
+## [1] 85.33977
+m + qt(0.975, 2) * s/sqrt(3)
+## [1] 154.6368
+```
+
+A further Monte Carlo simulation (see below) shows that this is a good heuristic, as it gives us a confidence interval with a real 95% coverage.
+
+
+```r
+# Monte Carlo simulation - 4
+set.seed(1234)
+result <- rep(0, 100000)
+for (i in 1:100000){
+  sample <- rnorm(3, 120, 12)
+  m <- mean(sample)
+  se <- sd(sample)/sqrt(3)
+  limInf <- m - qt(0.975, 2) * se
+  limSup <- m + qt(0.975, 2) * se
+  if(limInf < 120 & limSup > 120) result[i] <- 1
+}
+sum(result)/100000
+## [1] 0.94936
+```
+
+Obviously, we can also build a 99% or whatever else confidence interval, we only have to select the right percentile from a Student's t distribution. In general, if $\alpha$ is the confidence level (e.g. 0.95 or 0.99), the percentile is $1 - (1 - \alpha)/2$ (e.g., $1 - (1 - 0.95)/2 = 0.975$ or $1 - (1 - 0.99)/2 = 0.995$).
+
+## Example 2: a proportion
+
+For the previous example, we have sampled from a gaussian population, but this is not always true. Let's imagine we have a population of seeds, which are 77.5% germinable and 22.5% dormant. If we take a sample of 40 seeds and measure their germinability, we should not necessarily obtain 31 (40 $\times$ 0.775) germinated seeds, due to random sample-to-sample fluctuations.
+
+Analogously to the previous example, we could think that the number of germinated seeds might show random variability, according to a gaussian PDF with $\mu$ = 31 and a certain standard deviation $\sigma$. However, such an assumption is not reasonable: the count of germinated seeds is a discrete variable going from 0 to 40, while the gaussian PDF is continuous from $-\infty$ to $\infty$. A survey of literature shows that the random variability in the number of germinated seeds can be described by using a binomial PDF (Snedecor and Cochran, 1989); accordingly, we can simulate our germination experiment by using a binomial random number generator, that is the `rbinom(s, n, p)` function. The first argument represents the number of experiments we intend to request, the second represents the number of seeds under investigation in each experiment, while the third one represents the proportion of successes in the population (we can take the germination as a success). Let's simulate the results of an experiment: 
+
+
+```r
+set.seed(1234)
+nGerm <- rbinom(1, 40, 0.775)
+nGerm
+## [1] 34
+nGerm/40
+## [1] 0.85
+```
+
+We see that we get 34 germinated seeds, corresponding to a proportion $p = 34/40 = 0.85$. Looking at the observed data, what can we conclude about the proportion of germinable seeds for the whole population? Our point estimate, as usual, is $\pi = p = 0.85$, but we see that this is expectedly wrong; how could we calculate a confidence interval around this point estimate? Can we use the same heuristic as we did before for concentration data?
+
+Let's use Monte Carlo simulation to explore the empirical sampling distribution. We repeat the experiment 100,000 times and we obtain 100,000 proportions with which we build an empirical sampling distribution (see the code below, showing the sampled proportions for the first six experiment). How does the sampling distribution look like?
+
+
+```r
+res <- rbinom(100000, 40, 0.775)/40
+head(res)
+## [1] 0.750 0.750 0.750 0.700 0.750 0.925
+mean(res)
+## [1] 0.7749263
+sd(res)
+## [1] 0.06611151
+```
+
+Unsurprisingly, Monte Carlo simulation leads us to an approximately normal sampling distribution for $p$, as implied by the central limit theorem (Figure \@ref(fig:figName62c)). Furthermore, the mean of the sampling distribution is 0.775 and the standard deviation is 0.066.
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName62c-1.png" alt="Monte Carlo sampling distribution for the proportion of germinable seeds, when the population proportion is 0.775" width="90%" />
+<p class="caption">(\#fig:figName62c)Monte Carlo sampling distribution for the proportion of germinable seeds, when the population proportion is 0.775</p>
+</div>
+
+We can conclude that the confidence interval for an estimated proportion can be calculated in the very same way as for the mean, with the only difference that the standard error is obtained as $\sigma_p = \sqrt{p \times (1 - p)}/\sqrt(n)$ (Snedecor and Cochran, 1989). Consequently, using the observed data, $p = 0.85$ and $s = \sqrt{0.85 \times 0.15} = 0.357$; our confidence interval is $0.85 \pm 2 \times 0.357/sqrt(40)$ and we can see that, by reporting such an interval, we have correctly hit our population proportion. In this case the size of our sample was big enough (40) to use $k = 2$ as the multiplier.
+
+
+## Conclusions
+
+The examples we used are rather simple, but they should help to understand the process: 
+
+1. we have a population, from which we sampled the observed data;
+2. we used the observed data to calculate a statistic (mean or proportion);
+3. we inferred that the population statistic was equal to the sample statistic (e.g., $\mu = m$ or $\pi = p$);
+4. we estimated a standard error for our sample statistic, by using either Monte Carlo simulation, or by using some simple function, depending on the selected statistic (e.g. $\sigma/\sqrt{n}$ for the mean and $\sqrt{p \times (1 - p)}/\sqrt(n)$ for the proportion);
+5. we used a multiple of the standard error to build a confidence interval around our point estimate.
+
+We will use the same process throughout this book, although the sample statistics and related standard errors will become slightly more complex, as we progress towards the end. **Please, do not forget that the standard error and confidence interval are fundamental components of science and should always be reported along with every point estimate**.
+
+Last, but not least, it is important to put our attention on the meaning of the so-called 'frequentist' confidence interval:
+
+1. it is a measure of precision
+2. it relates to the sampling distribution; i.e. we say that, if we repeat the experiment a high number of times and, at any times, we calculate the confidence interval as shown above, we 'capture' the real unknown parameter value in 95% of the cases
+3. it does not refer to a single sampling effort
+
+Points 2 and 3 above imply that confidence intervals protect ourselves from the risk of reaching wrong conclusions only in the long run. In other words, the idea is that, if we use such a heuristic, we will not make too many mistakes in our research life, but that does not imply that we are 95% correct in each experimental effort. Indeed, a single confidence interval may contain or not the true population mean, but we have no hint to understand whether we hit it or not. Therefore, please, remember that such expressions as: "there is 95% probability that the true population parameter is within the confidence interval" are just abused and they should never find their way in any scientific manuscripts or reports.
+
+
+---
+
+## Further readings
+
+1. Hastie, T., Tibshirani, R., Friedman, J., 2009. The elements of statistical learning, Springer Series in Statistics. Springer Science + Business Media, California, USA.
+2. Morey, RD, R Hoekstra, JN Rouder, MD Lee, E-J Wagenmakers, 2016. The fallacy of placing confidence in confidence intervals. Psychonomic Bulletin & Review 23, 103–123
+3. Snedecor G.W. and Cochran W.G., 1989. Statistical Methods. Ames: Iowa State University Press (1989).
+
+
 
 <!--chapter:end:05-Eng_InferenzaStatistica.Rmd-->
 
@@ -2257,7 +2972,7 @@ plot(y ~ x)
 curve(7.77 * exp(0.189 * x), add = T, col = "red")
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-45-1.png" width="90%" />
+<img src="_main_files/figure-html/unnamed-chunk-68-1.png" width="90%" />
 
 ---
 
