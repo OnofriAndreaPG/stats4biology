@@ -1,7 +1,7 @@
 ---
 title: "Experimental methods in agriculture"
 author: "Andrea Onofri and Dario Sacco"
-date: "Update: v. 0.9 (2021-10-06), compil. 2021-10-31"
+date: "Update: v. 0.9 (2021-10-06), compil. 2021-11-02"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -2073,6 +2073,32 @@ A chemical analysis was repeated three times, with the following results: 125, 1
 
 ### Exercise 2
 
+An experiment was carried out, comparing the yield of four wheat genotypes (in tons per hectar). The results are as follows:
+
+
+|Genotype |    A|    B|    C|    D|
+|:--------|----:|----:|----:|----:|
+|A        | 5.30| 7.19| 4.84| 5.87|
+|B        | 5.10| 6.70| 5.42| 6.10|
+|C        | 5.04| 4.43| 5.21| 5.67|
+|D        | 6.14| 5.62| 6.95| 6.83|
+
+For each genotype, calculate the mean, deviance, variance, standard deviation, standard error and confidence interval (P = 0.95).
+
+### Exercise 4
+
+We have measured the length of 30 maize seedling, treated with selenium in water solution. The observed lengths are:
+
+```
+length <- c(2.07, 2.23, 2.04, 2.16, 2.12, 2.33, 2.21, 2.22, 2.29, 2.28, 
+2.44, 2.04, 2.02, 1.49, 2.12, 2.38, 2.51, 2.27, 2.55, 2.44, 2.28, 
+2.2, 2.03, 2.35, 2.34, 2.34, 1.99, 2.44, 2.44, 1.91)
+```
+
+For the above sample, calculate the mean, deviance, variance, standard deviation, standard error and confidence interval (P = 0.95).
+
+### Exercise 5
+
 A sample of 400 insects was sprayed with an insecticide and 136 individuals survived the treatment. Determine the efficacy of the insecticide, in terms of proportion of dead insects, together with 95% confidence limits.
 
 ---
@@ -2972,7 +2998,7 @@ plot(y ~ x)
 curve(7.77 * exp(0.189 * x), add = T, col = "red")
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-68-1.png" width="90%" />
+<img src="_main_files/figure-html/unnamed-chunk-69-1.png" width="90%" />
 
 ---
 
