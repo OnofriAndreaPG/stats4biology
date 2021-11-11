@@ -15,7 +15,7 @@
 }
 
 \author{Andrea Onofri and Dario Sacco}
-\date{Update: v. 0.9 (2021-10-06), compil. 2021-10-31}
+\date{Update: v. 0.9 (2021-10-06), compil. 2021-11-11}
 \title{Experimental methods in agriculture}
 \subtitle{}
 
@@ -2461,12 +2461,1030 @@ Points 2 and 3 above imply that confidence intervals protect ourselves from the 
 \hypertarget{making-decisions-under-uncertainty}{%
 \chapter{Making Decisions under uncertainty}\label{making-decisions-under-uncertainty}}
 
-To be done \ldots{}
+In Chapter 5 we have seen that experimental errors and, above all, sampling errors, produce uncertainty in the estimation process, which we have to account for by determining and displaying standard errors and confidence intervals. In the very same fashion, we need to be able to make decisions in presence of uncertainty; is the effect of a treatment statistically significant? Is the effect of a treatment higher/lower than the effect of another treatment?
+
+Making such decisions is called \textbf{Formal Hypothesis Testing} (FHT) and we will see that this is mainly based on the so-called \textbf{P-value}. As usual, I will introduce the problem by using an example.
+
+\hypertarget{comparing-sample-means-the-students-t-test}{%
+\section{Comparing sample means: the Student's t-test}\label{comparing-sample-means-the-students-t-test}}
+
+\hypertarget{the-dataset}{%
+\subsection{The dataset}\label{the-dataset}}
+
+We have planned an experiment where we have compared the yield of genotype A with the yield of the genotype P and the experiment is laid down according to a completely randomised design with five replicates. This is a small-plot experiment with 10 plots, which need to be regarded as sampled from a wider population of plots; as we mentioned in the previous chapter, our interest is not in the sample, but it is in the population of plots, which means that we are looking for conclusions of general validity.
+
+The results (in quintals per hectare) are the following:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{A }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\DecValTok{65}\NormalTok{, }\DecValTok{68}\NormalTok{, }\DecValTok{69}\NormalTok{, }\DecValTok{71}\NormalTok{, }\DecValTok{78}\NormalTok{)}
+\NormalTok{P }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\DecValTok{80}\NormalTok{, }\DecValTok{81}\NormalTok{, }\DecValTok{84}\NormalTok{, }\DecValTok{88}\NormalTok{, }\DecValTok{94}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+As usual we calculate the descriptive statistics (mean and standard deviation) for each sample:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mA }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(A)}
+\NormalTok{mP }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(P)}
+\NormalTok{sA }\OtherTok{\textless{}{-}} \FunctionTok{sd}\NormalTok{(A)}
+\NormalTok{sP }\OtherTok{\textless{}{-}} \FunctionTok{sd}\NormalTok{(P)}
+\NormalTok{mA; sA}
+\DocumentationTok{\#\# [1] 70.2}
+\DocumentationTok{\#\# [1] 4.868265}
+\NormalTok{mP; sP}
+\DocumentationTok{\#\# [1] 85.4}
+\DocumentationTok{\#\# [1] 5.727128}
+\end{Highlighting}
+\end{Shaded}
+
+We see that the mean for the genotype P is higher than the mean for the genotype A, but such descriptive statistics are not sufficient to our aims. Therefore, we calculate standard errors, to express our uncertainty about the population means, as we have shown in the previous chapter.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{seA }\OtherTok{\textless{}{-}}\NormalTok{ sA}\SpecialCharTok{/}\FunctionTok{sqrt}\NormalTok{(}\DecValTok{5}\NormalTok{); seA}
+\DocumentationTok{\#\# [1] 2.177154}
+\NormalTok{seP }\OtherTok{\textless{}{-}}\NormalTok{ sP}\SpecialCharTok{/}\FunctionTok{sqrt}\NormalTok{(}\DecValTok{5}\NormalTok{); seP}
+\DocumentationTok{\#\# [1] 2.56125}
+\end{Highlighting}
+\end{Shaded}
+
+Consequently, we can produce interval estimates for the population means, i.e., 85.4 \(\pm\) 5.12 and 70.2 \(\pm\) 4.35. We note that the confidence intervals do not overlap, which supports the idea that P is better than A, but we would like to reach a more formal decision.
+
+First of all, we can see that the observed difference between \(m_A\) and \(m_P\) is equal to:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mA }\SpecialCharTok{{-}}\NormalTok{ mP}
+\DocumentationTok{\#\# [1] {-}15.2}
+\end{Highlighting}
+\end{Shaded}
+
+However, we are not interested in the above difference, but we are interested in the population difference, i.e.~\(\mu_A - \mu_P\). We know that both the means have a certain degree of uncertainty, which propagates to the difference. In the previous chapter, we have seen that the variance of the sum/difference of independent samples is equal to the sum of variances; therefore, the standard error of the difference (SED) is equal to:
+
+\[SED = \sqrt{ SEM_1^2 + SEM_2^2 }\]
+
+In our example, the SED is:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{SED }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{(seA}\SpecialCharTok{\^{}}\DecValTok{2} \SpecialCharTok{+}\NormalTok{ seP}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)}
+\NormalTok{SED}
+\DocumentationTok{\#\# [1] 3.361547}
+\end{Highlighting}
+\end{Shaded}
+
+It is intuitively clear that the difference (in quintals per hectare) should be regarded as significant when it is much higher than its standard error; indeed, this would mean that the difference is stronger than the uncertainty with which we have estimated it. We can formalise such an intuition by defining the \(T\) statistic for the sample difference:
+
+\[T = \frac{m_A - m_P}{SED}\]
+
+which is equal to:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Ti }\OtherTok{\textless{}{-}}\NormalTok{ (mA }\SpecialCharTok{{-}}\NormalTok{ mP)}\SpecialCharTok{/}\NormalTok{SED}
+\NormalTok{Ti}
+\DocumentationTok{\#\# [1] {-}4.521727}
+\end{Highlighting}
+\end{Shaded}
+
+If T is big, the difference is likely to be significant (not due to random effects); however, \(T\) is a sample statistic and it is expected to change whenever we repeat the experiment. How is the sampling distribution for \(T\)? To answer this question, we should distinguish two possible hypotheses about the data:
+
+\begin{itemize}
+\tightlist
+\item
+  Hypothesis 1. There is no difference between the two genotypes (\textbf{null hypothesis}: \(H_0\)) and, consequently, we have only one population and the two samples A and P are extracted from this population.
+\item
+  Hypothesis 2. The two genotypes are different (\textbf{alternative hypothesis}: \(H_1\)) and, consequently, the two samples are extracted from two different populations, one for the A genotype and the other one for the P genotype.
+\end{itemize}
+
+In mathematical terms, the null hypothesis is:
+
+\[H_0: \mu_1 = \mu_2 = \mu\]
+
+The alternative hypothesis is:
+
+\[H_1 :\mu_1  \neq \mu_2\]
+
+More complex alternative hypotheses are also possible, such as \(H_1 :\mu _1 > \mu _2\), or \(H_1 :\mu _1 < \mu _2\). However, hypotheses should be set before looking at the data (according to the Galilean principle) and, in this case, we have no prior knowledge to justify the selection of one of such complex hypotheses. Therefore, we select the simple alternative hypothesis.
+
+Which of the two hypotheses is more reasonable, by considering the observed data? We have seen that, \textbf{according to the Popperian falsification principle, experiments should be planned to falsify hypotheses. Therefore, we take the null hypothesis and see whether we can falsify it.}
+
+This is one hint: if the null hypothesis were true, we should observe \(T = 0\), while we have observed \(T = -4.521727\). Is this enough to reject the null? Not at all, obviously. Indeed, the sample means can change from one experiment to the other and it is possible to obtain \(T \neq 0\) also when the experimental treatments are, indeed, the same treatment. Therefore, we need to ask ourselves: \textbf{what is the sampling distribution for \(T\) under the null hypothesis?}
+
+\hypertarget{monte-carlo-simulation}{%
+\subsection{Monte Carlo simulation}\label{monte-carlo-simulation}}
+
+We can easily build an empirical sampling distribution for \(T\) by using Monte Carlo simulation. Look at the code in the box below: we use the \texttt{for()} statement to repeat the experiment 100,000 times. Each experiment consists of getting two samples of five individuals from the same population, with mean and standard deviation equal to the overall mean/standard deviation of the two original samples A and P. For each of the 100,000 couples of samples, we calculate T and store the result in the `result' vector, which, in the end, represents the sampling distribution we were looking for.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# We assume a single population}
+\NormalTok{mAP }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(}\FunctionTok{c}\NormalTok{(A, P))}
+\NormalTok{devStAP }\OtherTok{\textless{}{-}} \FunctionTok{sd}\NormalTok{(}\FunctionTok{c}\NormalTok{(A, P))}
+
+\CommentTok{\# we repeatedly sample from this common population}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{34}\NormalTok{)}
+\NormalTok{result }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{100000}\NormalTok{)}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{100000}\NormalTok{)\{}
+\NormalTok{  sample1 }\OtherTok{\textless{}{-}} \FunctionTok{rnorm}\NormalTok{(}\DecValTok{5}\NormalTok{, mAP, devStAP)}
+\NormalTok{  sample2 }\OtherTok{\textless{}{-}} \FunctionTok{rnorm}\NormalTok{(}\DecValTok{5}\NormalTok{, mAP, devStAP)}
+\NormalTok{  SED }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{( (}\FunctionTok{sd}\NormalTok{(sample1)}\SpecialCharTok{/}\FunctionTok{sqrt}\NormalTok{(}\DecValTok{5}\NormalTok{))}\SpecialCharTok{\^{}}\DecValTok{2} \SpecialCharTok{+}
+\NormalTok{                 (}\FunctionTok{sd}\NormalTok{(sample2)}\SpecialCharTok{/}\FunctionTok{sqrt}\NormalTok{(}\DecValTok{5}\NormalTok{))}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{ )}
+\NormalTok{  result[i] }\OtherTok{\textless{}{-}}\NormalTok{ (}\FunctionTok{mean}\NormalTok{(sample1) }\SpecialCharTok{{-}} \FunctionTok{mean}\NormalTok{(sample2)) }\SpecialCharTok{/}\NormalTok{ SED}
+\NormalTok{\}}
+\FunctionTok{mean}\NormalTok{(result) }
+\DocumentationTok{\#\# [1] {-}0.001230418}
+\FunctionTok{min}\NormalTok{(result)}
+\DocumentationTok{\#\# [1] {-}9.993187}
+\FunctionTok{max}\NormalTok{(result)}
+\DocumentationTok{\#\# [1] 9.988315}
+\end{Highlighting}
+\end{Shaded}
+
+What values did we obtain for \(T\)? On average, the values are close to 0, as we expected, considering that both samples were always obtained from the same population. However, we also note pretty high and low values (close to 10 and -10), which proves that random sampling fluctuations can also bring to very `odd' results. For our real experiment we obtained \(T = -4.521727\), although the negative sign is just an artifact, relating to how we sorted the two means: we could have as well obtained \(T = 4.521727\).
+
+\textbf{Ronald Fisher proposed that we should reject the null, based on the probability of obtaining values as extreme or more extreme than those we observed, when the null is true}. Looking at the vector `result' we see that the proportion of values lower than -4.521727 and higher than 4.521727 is \(0.00095 + 0.00082 = 0.00177\). This is the so called \textbf{P-value} (see the code below).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{length}\NormalTok{(result[result }\SpecialCharTok{\textless{}}\NormalTok{ Ti]) }\SpecialCharTok{/} \DecValTok{100000}
+\DocumentationTok{\#\# [1] 0.00095}
+\FunctionTok{length}\NormalTok{(result[result }\SpecialCharTok{\textgreater{}} \SpecialCharTok{{-}}\NormalTok{ Ti]) }\SpecialCharTok{/}\DecValTok{100000}
+\DocumentationTok{\#\# [1] 0.00082}
+\end{Highlighting}
+\end{Shaded}
+
+Let's summarise. We have seen that, when the null is true, the sampling distribution for \(T\) contains a very low proportion of values outside the interval from -4.521727 to 4.521727. Therefore, our observation fell in a very unlikely range, corresponding to a probability of 0.00177 (P-value = 0.00177); the usual yardstick for decision is 0.05, thus we reject the null. We do so, because, if the null were true, we would have obtained a very unlikely result; in other words, our scientific evidence against the null is strong enough to reject it.
+
+\hypertarget{a-formal-solution}{%
+\subsection{A formal solution}\label{a-formal-solution}}
+
+A new question: is there any formal PDF, which we can use in place of our empirical, Monte-Carlo based sampling distribution for T? Let's give a closer look at the `result' vector. In particular, we can bin this continuous variable and plot the empirical distribution of frequencies (see Figure \ref{fig:figName71})
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Sampling distribution per T }
+
+\NormalTok{b }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{10}\NormalTok{, }\DecValTok{10}\NormalTok{, }\AttributeTok{by=}\FloatTok{0.25}\NormalTok{)}
+\FunctionTok{hist}\NormalTok{(result, }\AttributeTok{breaks =}\NormalTok{ b, }\AttributeTok{freq=}\NormalTok{F, }
+  \AttributeTok{xlab =} \FunctionTok{expression}\NormalTok{(}\FunctionTok{paste}\NormalTok{(m)), }\AttributeTok{ylab=}\StringTok{"Density"}\NormalTok{, }
+  \AttributeTok{xlim=}\FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{10}\NormalTok{,}\DecValTok{10}\NormalTok{), }\AttributeTok{ylim=}\FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\FloatTok{0.45}\NormalTok{), }\AttributeTok{main=}\StringTok{""}\NormalTok{)}
+\FunctionTok{curve}\NormalTok{(}\FunctionTok{dnorm}\NormalTok{(x), }\AttributeTok{add=}\ConstantTok{TRUE}\NormalTok{, }\AttributeTok{col=}\StringTok{"blue"}\NormalTok{, }\AttributeTok{n =} \DecValTok{10001}\NormalTok{)}
+\FunctionTok{curve}\NormalTok{(}\FunctionTok{dt}\NormalTok{(x, }\DecValTok{8}\NormalTok{), }\AttributeTok{add=}\ConstantTok{TRUE}\NormalTok{, }\AttributeTok{col=}\StringTok{"red"}\NormalTok{, }\AttributeTok{n =} \DecValTok{10001}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.85\linewidth]{_main_files/figure-latex/figName71-1} 
+
+}
+
+\caption{Empirical sampling distribution for the T statistic, compared to a standardised gaussian (blue line) and a Student's t distribution with 8 degree of freedom (red line)}\label{fig:figName71}
+\end{figure}
+
+We see that the empirical distribution is not exactly standardised gaussian, but it can be described by using another type of distribution, that is the Student's t distribution, with eight degrees of freedom (i.e.~the sum of the degrees of freedom for the two samples). Now that we know this, instead of making a time consuming Monte Carlo simulation, we can use the Student's t CDF to calculate the P-value, as shown in the box below.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{pt}\NormalTok{(Ti, }\AttributeTok{df=}\DecValTok{8}\NormalTok{) }\CommentTok{\# probability that T \textgreater{} 4.5217}
+\DocumentationTok{\#\# [1] 0.0009727349}
+\FunctionTok{pt}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{Ti, }\AttributeTok{df=}\DecValTok{8}\NormalTok{, }\AttributeTok{lower.tail =}\NormalTok{ F) }\CommentTok{\# probability that T \textless{} {-}4.5217}
+\DocumentationTok{\#\# [1] 0.0009727349}
+\DecValTok{2} \SpecialCharTok{*} \FunctionTok{pt}\NormalTok{(Ti, }\AttributeTok{df=}\DecValTok{8}\NormalTok{) }\CommentTok{\#P{-}value}
+\DocumentationTok{\#\# [1] 0.00194547}
+\end{Highlighting}
+\end{Shaded}
+
+We see that the P-value is very close to that obtained by using simulation.
+
+\hypertarget{the-t-test-with-r}{%
+\subsection{The t test with R}\label{the-t-test-with-r}}
+
+What we have just described is known as the Student's t-test and it is often used to compare the means of two samples. The null hypothesis is that the two samples are drawn from the same populations and, therefore, their means are not significantly different. In practice, what we do is:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Calculate the means and standard errors for the two samples
+\item
+  Calculate the difference between the means
+\item
+  Calculate the SED
+\item
+  Calculate the observed \(T\) value
+\item
+  Use the Student's t CDF to retrieve the probabilities \(P(t < -T)\) and \(P(t > T)\)
+\item
+  Reject the null hypothesis if the sum of the above probabilities is lower than 0.05.
+\end{enumerate}
+
+More simply, we can reach the same solution by using the \texttt{t.test()} function in R, as shown in the box below.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{t.test}\NormalTok{(A, P, }\AttributeTok{paired =}\NormalTok{ F, }\AttributeTok{var.equal =}\NormalTok{ T)}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\#  Two Sample t{-}test}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# data:  A and P}
+\DocumentationTok{\#\# t = {-}4.5217, df = 8, p{-}value = 0.001945}
+\DocumentationTok{\#\# alternative hypothesis: true difference in means is not equal to 0}
+\DocumentationTok{\#\# 95 percent confidence interval:}
+\DocumentationTok{\#\#  {-}22.951742  {-}7.448258}
+\DocumentationTok{\#\# sample estimates:}
+\DocumentationTok{\#\# mean of x mean of y }
+\DocumentationTok{\#\#      70.2      85.4}
+\end{Highlighting}
+\end{Shaded}
+
+Perhaps, it is worth to discuss the meaning of the two arguments `paired' and `var.equal,' which were set, respectively, to FALSE and TRUE. In some cases two measures are taken on the same subject and we are interested in knowing whether there is a significant difference between the first and the second measure. For example, let's imagine that we have given a group of five cows a certain drug and we have measured some blood parameter before and after the treatment. We would have a dataset composed by ten values, but we would only have five subjects, which would make a big difference with respect to our previous example.
+
+In such a condition we talk about a paired t-test, which is performed by setting the argument `paired' to TRUE, as shown in the box below.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{t.test}\NormalTok{(A, P, }\AttributeTok{paired =}\NormalTok{ T, }\AttributeTok{var.equal =}\NormalTok{ T)}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\#  Paired t{-}test}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# data:  A and P}
+\DocumentationTok{\#\# t = {-}22.915, df = 4, p{-}value = 2.149e{-}05}
+\DocumentationTok{\#\# alternative hypothesis: true difference in means is not equal to 0}
+\DocumentationTok{\#\# 95 percent confidence interval:}
+\DocumentationTok{\#\#  {-}17.04169 {-}13.35831}
+\DocumentationTok{\#\# sample estimates:}
+\DocumentationTok{\#\# mean of the differences }
+\DocumentationTok{\#\#                   {-}15.2}
+\end{Highlighting}
+\end{Shaded}
+
+The calculations are totally different and, therefore, the significance is, as well, different. In particular, we consider the five pairwise differences, their mean and their standard error, as shown below:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{diff }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(A }\SpecialCharTok{{-}}\NormalTok{ P)}
+\NormalTok{SED }\OtherTok{\textless{}{-}} \FunctionTok{sd}\NormalTok{(A }\SpecialCharTok{{-}}\NormalTok{ P)}\SpecialCharTok{/}\FunctionTok{sqrt}\NormalTok{(}\DecValTok{5}\NormalTok{) }
+\NormalTok{diff}\SpecialCharTok{/}\NormalTok{SED}
+\DocumentationTok{\#\# [1] {-}22.91486}
+\end{Highlighting}
+\end{Shaded}
+
+One further difference is that, as we have five subjects instead of ten, we only have four degrees of freedom.
+
+In relation to the argument `var.equal,' you have perhaps noted that we made our Monte Carlo simulation by drawing samples from one gaussian distribution. However, the two samples might come from two gaussian distributions with the same mean and different standard deviations, which would modify our sampling distribution for \(T\), so that our P-level would become invalid. We talk about \textbf{heteroscedasticity} when the populations, and therefore the two samples, have different standard deviations. Otherwise we talk about \textbf{homoscedasticity}.
+
+If we have reasons to suppose that the two samples come from populations with different standard deviations, we should use a heteroscedastic t-test (better known as Welch test). We can set the `var.equal' argument to FALSE, as shown in the box below.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{t.test}\NormalTok{(A, P, }\AttributeTok{paired =}\NormalTok{ F, }\AttributeTok{var.equal =}\NormalTok{ F)}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\#  Welch Two Sample t{-}test}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# data:  A and P}
+\DocumentationTok{\#\# t = {-}4.5217, df = 7.7977, p{-}value = 0.002076}
+\DocumentationTok{\#\# alternative hypothesis: true difference in means is not equal to 0}
+\DocumentationTok{\#\# 95 percent confidence interval:}
+\DocumentationTok{\#\#  {-}22.986884  {-}7.413116}
+\DocumentationTok{\#\# sample estimates:}
+\DocumentationTok{\#\# mean of x mean of y }
+\DocumentationTok{\#\#      70.2      85.4}
+\end{Highlighting}
+\end{Shaded}
+
+We see that the test is slightly less powerful (lower P-value), due to a reduced number of degrees of freedom, that is approximated by using the Satterthwaite formula:
+
+\[DF_s \simeq \frac{ \left( s^2_1 + s^2_2 \right)^2 }{ \frac{(s^2_1)^2}{DF_1} + \frac{(s^2_2)^2}{DF_2} }\]
+
+which reduces to:
+
+\[DF_s = 2 \times DF\]
+
+when the two samples are homoscedastic (\(s_1 = s_2\)).
+
+in our example:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dfS }\OtherTok{\textless{}{-}}\NormalTok{ (}\FunctionTok{var}\NormalTok{(A) }\SpecialCharTok{+} \FunctionTok{var}\NormalTok{(P))}\SpecialCharTok{\^{}}\DecValTok{2} \SpecialCharTok{/} 
+\NormalTok{  ((}\FunctionTok{var}\NormalTok{(A)}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)}\SpecialCharTok{/}\DecValTok{4} \SpecialCharTok{+}\NormalTok{ (}\FunctionTok{var}\NormalTok{(P)}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)}\SpecialCharTok{/}\DecValTok{4}\NormalTok{)}
+\NormalTok{dfS}
+\DocumentationTok{\#\# [1] 7.79772}
+\end{Highlighting}
+\end{Shaded}
+
+How do we decide whether the two samples have the same standard deviation and thus we can use a homoscedastic t-test? In general, we use a heteroscedastic t-test whenever the standard deviation for one sample is twice or three times as much with respect to the other, although some statisticians suggest that we should better use a heteroscedastic t-test in all cases, in order to increase our protection level against wrong rejections.
+
+\hypertarget{comparing-proportions-the-chi2-test}{%
+\section{\texorpdfstring{Comparing proportions: the \(\chi^2\) test}{Comparing proportions: the \textbackslash chi\^{}2 test}}\label{comparing-proportions-the-chi2-test}}
+
+The t-test is very useful, but we can only use it with quantitative variables. What if we have a nominal response, e.g.~death/alive, germinated/ungerminated? Let's imagine an experiment where we have sprayed two populations of insects with an insecticide, respectively with or without an adjuvant. From one population (with adjuvant), we get a random sample of 75 insects and record 56 deaths, while from the other population (without adjuvant) we get a random sample of 50 insects and record 48 deaths.
+
+In this case the sample efficacies are \(p_1 = 56/75 = 0.747\) and \(p_2 = 0.96\), but we are not interested in the samples, but in the whole populations, from where we sampled our insects.
+
+If we remember Chapter 3, we may recall that the results of such an experiment reduce to a contingency table, as shown in the box below:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{counts }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\DecValTok{56}\NormalTok{, }\DecValTok{19}\NormalTok{, }\DecValTok{48}\NormalTok{, }\DecValTok{2}\NormalTok{)}
+\NormalTok{tab }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(counts, }\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{, }\AttributeTok{byrow =}\NormalTok{ T)}
+\FunctionTok{row.names}\NormalTok{(tab) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"I"}\NormalTok{, }\StringTok{"IA"}\NormalTok{)}
+\FunctionTok{colnames}\NormalTok{(tab) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"D"}\NormalTok{, }\StringTok{"A"}\NormalTok{)}
+\NormalTok{tab }\OtherTok{\textless{}{-}} \FunctionTok{as.table}\NormalTok{(tab)}
+\NormalTok{tab}
+\DocumentationTok{\#\#     D  A}
+\DocumentationTok{\#\# I  56 19}
+\DocumentationTok{\#\# IA 48  2}
+\end{Highlighting}
+\end{Shaded}
+
+For such a table, we already know how to calculate a \(\chi^2\), which measures the dependency among the two traits (insecticide treatment and deaths); the observed value, for our sample, is 9.768 (see below).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(tab)}
+\DocumentationTok{\#\# Number of cases in table: 125 }
+\DocumentationTok{\#\# Number of factors: 2 }
+\DocumentationTok{\#\# Test for independence of all factors:}
+\DocumentationTok{\#\#  Chisq = 9.768, df = 1, p{-}value = 0.001776}
+\end{Highlighting}
+\end{Shaded}
+
+Clearly, like any other sample based statistic, the value of \(\chi^2\) changes any time we repeat the sampling effort. Therefore, the null hypothesis is:
+
+\[H_o :\pi_1  = \pi_2  = \pi\]
+
+Please, note that we make a reference to the populations, not to the samples. If this is true, what is the sampling distribution for \(\chi^2\)? And, what is the probability of obtaining a value of 9.768, or higher?
+
+Although it is possible to set up a Monte Carlo simulation to derive an empirical distribution, we will not do so, for the sake of brevity. We anticipate that the sampling distribution for \(\chi^2\) can be described by using the \(\chi^2\) density function, with the appropriate number of degrees of freedom (the minimum between the number of columns and the number of rows, minus 1). In our case, we have only one degree of freedom and we can use the cumulative \(\chi^2\) distribution function to derive the probability of obtaining a value of 9.768, or higher:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{pchisq}\NormalTok{(}\FloatTok{9.76801}\NormalTok{, }\DecValTok{1}\NormalTok{, }\AttributeTok{lower.tail=}\NormalTok{F)}
+\DocumentationTok{\#\# [1] 0.001775746}
+\end{Highlighting}
+\end{Shaded}
+
+The P-value is much lower than 0.05 and thus we can reject the null. We can get to the same result by using the \texttt{chisq.test()} function:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{chisq.test}\NormalTok{(tab, }\AttributeTok{correct =}\NormalTok{ F)}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\#  Pearson\textquotesingle{}s Chi{-}squared test}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# data:  tab}
+\DocumentationTok{\#\# X{-}squared = 9.768, df = 1, p{-}value = 0.001776}
+\end{Highlighting}
+\end{Shaded}
+
+Please, note the argument `correct = F.' A chi-square test is appropriate only when the number of subjects is high enough, e.g.~higher than 30 subjects, or so. If not, we should improve our result by applying the so-called continuity correction, by using the argument `correct = T,' that is the default option in R.
+
+\hypertarget{correct-interpretation-of-the-p-value}{%
+\section{Correct interpretation of the P-value}\label{correct-interpretation-of-the-p-value}}
+
+We use the P-value as the tool to decide whether we should accept or reject the null, i.e.~we use it as an heuristic tool, which was exactly Ronald Fisher's original intention. Later work by Jarzy Neyman and Egon Pearson, around 1930, gave the P-value a slightly different meaning, i.e.~the probability of wrongly rejecting the null (so-called type I error rate: false positive). However, we should interpret such a probability with reference to the sampling distribution, not with reference to a single experiment. It means that we can say that: \emph{if the null is true and we repeat the experiment an infinite number of times, we have less than 5\% probability of obtaining such a high T or \(\chi^2\) value}. On the other hand, we cannot legitimately conclude our experiment by saying that: \emph{there is less then 5\% probability that we have reached wrong conclusions}. Indeed, we do not (and will never) know whether we have reached correct conclusions in our specific experiment, while our `false-positive' probability is only valid on the long run.
+
+\hypertarget{conclusions-3}{%
+\section{Conclusions}\label{conclusions-3}}
+
+The intrinsic uncertainty in all experimental data does not allow us to reach conclusions and make decisions with no risk of error. As our aim is to reject hypotheses, we protect ourself as much as possible against the possibility of wrong rejection. To this aim, we use the P-value for the null hypothesis: if this is lower than the predefined yardstick level (usually \(\alpha = 0.05\)) we reject the null and we can be confident that such an heuristic, in the long run, will result in less than 5\% of wrong rejections.
+
+Before concluding, we should point out that we do not only run the risk of committing a false-positive error (type I error), we also run the risk of committing a false negative error (type II error), whenever we fail to reject a false null hypothesis. These two type of errors are nicely put in Figure \ref{fig:figName72}, that is commonly available in the web.
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.85\linewidth]{_images/statisticalErrors} 
+
+}
+
+\caption{The two types of statistical errors}\label{fig:figName72}
+\end{figure}
+
+Please, also note that the two error types are interrelated and the highest the protection against the false-positive error, the highest the risk of committing a false negative error. In general, we should be always careful to decide which of the two errors might be more dangerous for our specific aim.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{further-readings-4}{%
+\section{Further readings}\label{further-readings-4}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Hastie, T., Tibshirani, R., Friedman, J., 2009. The elements of statistical learning, Springer Series in Statistics. Springer Science + Business Media, California, USA.
+\end{enumerate}
 
 \hypertarget{one-way-anova-models}{%
 \chapter{One-way ANOVA models}\label{one-way-anova-models}}
 
-To be done \ldots{}
+In Chapter 4 we have seen that the experimental observations can be described by way of models with both a deterministic and a stochastic component. With specific reference to the former component, we have already introduced an example of an ANOVA model, belonging to a very important class of linear models, where the response variable is quantitative, while the predictors are represented by one or several nominal explanatory factors. It is necessary to state that, strictly speaking, the term `ANOVA model' is slightly imprecise; indeed, ANOVA stands for ANalysis Of VAriance and it is a method for decomposing the variance of a group of observations, which was invented by Ronald Fisher, almost one century ago. However, the models we are discussing here are strongly connected to the Fisherian ANOVA, which motivates their name.
+
+In this Chapter we will use a simple (but realistic) example to introduce the ANOVA models with only one predictor (one-way ANOVA models).
+
+\hypertarget{comparing-herbicides-in-a-pot-experiment}{%
+\section{Comparing herbicides in a pot-experiment}\label{comparing-herbicides-in-a-pot-experiment}}
+
+We have designed a pot-experiment to compare weed control efficacy of two herbicides used alone and in mixture. A control was also added as a reference and, thus, the four treatments were:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Metribuzin
+\item
+  Rimsulfuron
+\item
+  Metribuzin + rimsulfuron
+\item
+  Untreated control
+\end{enumerate}
+
+Sixteen uniform pots were prepared and sown with \emph{Solanum nigrum}; when the plants were at the stage of 4-true-leaves, the pots were randomly sprayed with the above herbicide solution, according to a completely randomised design with four replicates. Three weeks after the treatment, the plants in each pot were harvested and weighted: the lower the weight the higher the efficacy of herbicides.
+
+The results of this experiment are reported in a `csv' file, that is available in a web repository. First of all, let's load the data into R.
+
+\vspace{12pt}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{repo }\OtherTok{\textless{}{-}} \StringTok{"https://www.casaonofri.it/\_datasets/"}
+\NormalTok{file }\OtherTok{\textless{}{-}} \StringTok{"mixture.csv"}
+\NormalTok{pathData }\OtherTok{\textless{}{-}} \FunctionTok{paste}\NormalTok{(repo, file, }\AttributeTok{sep =} \StringTok{""}\NormalTok{)}
+
+\NormalTok{dataset }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(pathData, }\AttributeTok{header =}\NormalTok{ T)}
+\FunctionTok{head}\NormalTok{(dataset)}
+\DocumentationTok{\#\#             Treat Weight}
+\DocumentationTok{\#\# 1 Metribuzin\_\_348  15.20}
+\DocumentationTok{\#\# 2 Metribuzin\_\_348   4.38}
+\DocumentationTok{\#\# 3 Metribuzin\_\_348  10.32}
+\DocumentationTok{\#\# 4 Metribuzin\_\_348   6.80}
+\DocumentationTok{\#\# 5     Mixture\_378   6.14}
+\DocumentationTok{\#\# 6     Mixture\_378   1.95}
+\end{Highlighting}
+\end{Shaded}
+
+Please, note that the dataset is in a `tidy' format, with one row per observation and one column per variable. The first row contains the names of variables. i.e., `Treat,' representing the factor level and `Weight,' representing the response variable. While other data formats might be more suitable for visualisation, the `tidy' format is the base of every statistical analyses with most software tools and it can be easily transformed into other formats, whenever necessary (Wichkam, 2014).
+
+\hypertarget{data-description}{%
+\section{Data description}\label{data-description}}
+
+The first step is the description of the observed data. In particular, we calculate:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  sample means for each treatment level
+\item
+  sample standard deviations for each treatment level
+\end{enumerate}
+
+To do so, we use the \texttt{tapply()} function, as shown in the box below and we also use the \texttt{data.frame()} function to create a data table for visualisation purposes.
+
+\vspace{12pt}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{treatMeans }\OtherTok{\textless{}{-}} \FunctionTok{tapply}\NormalTok{(dataset}\SpecialCharTok{$}\NormalTok{Weight, dataset}\SpecialCharTok{$}\NormalTok{Treat, mean)}
+\NormalTok{SDs }\OtherTok{\textless{}{-}} \FunctionTok{tapply}\NormalTok{(dataset}\SpecialCharTok{$}\NormalTok{Weight, dataset}\SpecialCharTok{$}\NormalTok{Treat, sd)}
+\NormalTok{descrit }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(treatMeans, SDs)}
+\NormalTok{descrit}
+\DocumentationTok{\#\#                 treatMeans      SDs}
+\DocumentationTok{\#\# Metribuzin\_\_348     9.1750 4.699089}
+\DocumentationTok{\#\# Mixture\_378         5.1275 2.288557}
+\DocumentationTok{\#\# Rimsulfuron\_30     16.8600 4.902353}
+\DocumentationTok{\#\# Unweeded           26.7725 3.168673}
+\end{Highlighting}
+\end{Shaded}
+
+What do we learn, from the above table of means? We learn that:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  the mixture is slightly more effective than the herbicides used alone;
+\item
+  the standard deviations are rather similar, for all treatments.
+\end{enumerate}
+
+Now, we ask ourselves: is there any significant difference between the efficacy of herbicides? If we look at the data, the answer is yes; indeed, the four means are different. However, we do not want to reach conclusions about our dataset; we want to reach general conclusions. We observed the four means \(m_1\), \(m_2\), \(m_3\) and \(m_4\), but we are interested in \(\mu_1\), \(\mu_2\), \(\mu_3\) and \(\mu_4\), i.e.~the means of the populations from where our samples were drawn. What are the populations, in this case? They consist of all possible pots that we could have treated with each herbicide, in our same environmental conditions.
+
+\hypertarget{model-definition}{%
+\section{Model definition}\label{model-definition}}
+
+In order to answer the above question, we need to define a suitable model to describe our dataset. A possible candidate model is:
+
+\[Y_i = \mu + \alpha_j + \varepsilon_i\]
+
+This model postulates that each observation \(Y_i\) derives from the value \(\mu\) (so called intercept and common to all observations) plus the amount \(\alpha_j\), that depends on the treatment group \(j\), plus the stochastic effect \(\varepsilon_i\), which is specific to each observation and represents the experimental error. This stochastic element is regarded as gaussian distributed, with mean equal to 0 and standard deviation equal to \(\sigma\). In mathematical terms:
+
+\[\varepsilon_i \sim N(0, \sigma)\]
+
+The expected value for each observation, depending on the treatment group, is
+
+\[\bar{Y_i} = \mu + \alpha_j = \mu_j\]
+
+and corresponds to the group mean. In order to understand the biological meaning of \(\mu\) and \(\alpha\) values we need to go a little bit more into the mathematical detail.
+
+\hypertarget{parameterisation}{%
+\subsection{Parameterisation}\label{parameterisation}}
+
+Let's consider the first observation \(Y_1 = 15.20\); we need to estimate three values (\(\mu\), \(\alpha_1\) and \(\varepsilon_1\)) which return 15.20, by summation. Clearly, there is an infinite number of such triplets and, therefore, the estimation problem is undetermined, unless we put constraints on some model parameters. There are several ways to put such constraints, corresponding to different \textbf{model parameterisations}; in the following section, we will list two of them: the treatment constraint and the sum-to-zero constraint.
+
+\hypertarget{treatment-constraint}{%
+\subsection{Treatment constraint}\label{treatment-constraint}}
+
+A very common constraint is \(\alpha_1 = 0\). As the consequence:
+
+\[\left\{ {\begin{array}{l}
+\mu_1 = \mu + \alpha_1 = \mu + 0\\
+\mu_2 = \mu + \alpha_2 \\
+\mu_3 = \mu + \alpha_3 \\
+\mu_4 = \mu + \alpha_4
+\end{array}} \right.\]
+
+With such a constraint, \(\mu\) is the mean for the first treatment level (in R, it is the first in alphabetical order), while \(\alpha_2\), \(\alpha_3\) and \(\alpha_4\) are the differences between, respectively, the second, third and fourth treatment level means, with respect to the first one.
+
+In general, with this parameterisation, model parameters are means or differences between means.
+
+\hypertarget{sum-to-zero-constraint}{%
+\subsection{Sum-to-zero constraint}\label{sum-to-zero-constraint}}
+
+Another possible constraint is \(\sum{\alpha_j} = 0\). If we take the previous equation and sum all members we get:
+
+\[\mu_1 + \mu_2 + \mu_3 + \mu_4 = 4 \mu + \sum{\alpha_j}\]
+
+Imposing the sum-to-zero constraint we get to:
+
+\[\mu_1 + \mu_2 + \mu_3 + \mu_4 = 4 \mu\]
+
+and then to:
+
+\[\mu = \frac{\mu_1 + \mu_2 + \mu_3 + \mu_4}{4}\]
+
+Therefore, with this parameterisation \(\mu\) is the overall mean, while the \(\alpha_j\) values represent the differences between each treatment mean and the overall mean (\textbf{treatment effects}). A very effective herbicide will have low negative \(\alpha\) values, while a bad herbicide will have high positive \(\alpha\) values.
+
+In general, with this parameterisation, model parameters represent the overall mean and the effects of the different treatments.
+
+The selection of constraints is up to the user, depending on the aims of the experiment. In this book, we will use the sum-to-zero constraint for our hand-calculations, as parameter estimates are easier to obtain and have a clearer biological meaning. In R, the treatment constraint is used by default, although the sum-to-zero constraint can be easily obtained, by using the appropriate coding. Independent on model parameterisation, the expected values, the residuals and all the other statistics are totally equal.
+
+\hypertarget{basic-assumptions}{%
+\section{Basic assumptions}\label{basic-assumptions}}
+
+The ANOVA model above makes a number of \textbf{basic assumptions}:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  the effects are purely additive;
+\item
+  there are no other effects apart from the treatment and random noise. In particular, there are no components of systematic error;
+\item
+  errors are independently sampled from a gaussian distribution;
+\item
+  error variances are homogeneous, independent from the experimental treatments (indeed, we only have one \(\sigma\) value, common to all treatment groups)
+\end{enumerate}
+
+\textbf{We need to always make sure that the above assumptions are tenable, otherwise our model will be invalid, as well as all inferences therein}. We will discuss this aspect in the next chapter.
+
+\hypertarget{fitting-anova-models-by-hand}{%
+\section{Fitting ANOVA models by hand}\label{fitting-anova-models-by-hand}}
+
+Model fitting is the process by which we take the general model defined above and use the data to find the most appropriate values for the unknown parameters. In general, linear models are fitted by using the least squares approach, i.e.~we look for the parameter values that minimise the squared difference between the observed data and model predictions. Nowadays, such minimisation is always carried out by using a computer, although we think that, once in life, fitting ANOVA models by hand may be very helpful, to understand the fundamental meaning of such a brilliant technique. In order to ease the process, we will not use the least squares method, but we will use the arithmetic means and the method of moments. Please, remember that this method is only appropriate when the data are balanced, i.e.~when the number of replicates is the same for all treatment groups.
+
+\hypertarget{parameter-estimation}{%
+\subsection{Parameter estimation}\label{parameter-estimation}}
+
+According to the sum-to-zero constraint, we calculate the overall mean (m) as:
+
+\vspace{12pt}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{m }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(dataset}\SpecialCharTok{$}\NormalTok{Weight)}
+\NormalTok{mu }\OtherTok{\textless{}{-}}\NormalTok{ m}
+\end{Highlighting}
+\end{Shaded}
+
+and our point estimate is \(\mu = m = 14.48375\). Next, we can estimate the \(\alpha\) effects by subtracting the overall mean from the group means:
+
+\vspace{12pt}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{alpha }\OtherTok{\textless{}{-}}\NormalTok{ treatMeans }\SpecialCharTok{{-}}\NormalTok{ mu}
+\NormalTok{alpha}
+\DocumentationTok{\#\# Metribuzin\_\_348     Mixture\_378  Rimsulfuron\_30 }
+\DocumentationTok{\#\#        {-}5.30875        {-}9.35625         2.37625 }
+\DocumentationTok{\#\#        Unweeded }
+\DocumentationTok{\#\#        12.28875}
+\end{Highlighting}
+\end{Shaded}
+
+Please, note that the last parameter \(\alpha_4\) was not `freely' selected, as it was implicitly constrained to be:
+
+\[\alpha_4 = - \left( \alpha_1 + \alpha_2 + \alpha_3 \right)\]
+
+Now, to proceed with our hand-calculations, we need to repeat each \(\alpha\) value four times, so that each original observation is matched to the correct \(\alpha\) value, depending on the treatment group (see later).
+
+\vspace{12pt}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{alpha }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(alpha, }\AttributeTok{each =} \DecValTok{4}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{residuals}{%
+\subsection{Residuals}\label{residuals}}
+
+After deriving \(\mu\) and \(\alpha\) values, we can calculate the expected values by using the equation above and, lately, the residuals, as:
+
+\[ \varepsilon_i = Y_i - \left( \mu - \alpha_j \right)\]
+
+The results are shown in the following prospect:
+
+\vspace{12pt}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Expected }\OtherTok{\textless{}{-}}\NormalTok{ mu }\SpecialCharTok{+}\NormalTok{ alpha}
+\NormalTok{Residuals }\OtherTok{\textless{}{-}}\NormalTok{ dataset}\SpecialCharTok{$}\NormalTok{Weight }\SpecialCharTok{{-}}\NormalTok{ Expected}
+\NormalTok{tab }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(dataset}\SpecialCharTok{$}\NormalTok{Treat, dataset}\SpecialCharTok{$}\NormalTok{Weight, mu,}
+\NormalTok{             alpha, Expected, Residuals)}
+\FunctionTok{names}\NormalTok{(tab)[}\DecValTok{1}\NormalTok{] }\OtherTok{\textless{}{-}} \StringTok{"Herbicide"}
+\FunctionTok{print}\NormalTok{(tab, }\AttributeTok{digits =} \DecValTok{3}\NormalTok{)}
+\DocumentationTok{\#\#          Herbicide dataset.Weight   mu alpha Expected}
+\DocumentationTok{\#\# 1  Metribuzin\_\_348          15.20 14.5 {-}5.31     9.18}
+\DocumentationTok{\#\# 2  Metribuzin\_\_348           4.38 14.5 {-}5.31     9.18}
+\DocumentationTok{\#\# 3  Metribuzin\_\_348          10.32 14.5 {-}5.31     9.18}
+\DocumentationTok{\#\# 4  Metribuzin\_\_348           6.80 14.5 {-}5.31     9.18}
+\DocumentationTok{\#\# 5      Mixture\_378           6.14 14.5 {-}9.36     5.13}
+\DocumentationTok{\#\# 6      Mixture\_378           1.95 14.5 {-}9.36     5.13}
+\DocumentationTok{\#\# 7      Mixture\_378           7.27 14.5 {-}9.36     5.13}
+\DocumentationTok{\#\# 8      Mixture\_378           5.15 14.5 {-}9.36     5.13}
+\DocumentationTok{\#\# 9   Rimsulfuron\_30          10.50 14.5  2.38    16.86}
+\DocumentationTok{\#\# 10  Rimsulfuron\_30          20.70 14.5  2.38    16.86}
+\DocumentationTok{\#\# 11  Rimsulfuron\_30          20.74 14.5  2.38    16.86}
+\DocumentationTok{\#\# 12  Rimsulfuron\_30          15.50 14.5  2.38    16.86}
+\DocumentationTok{\#\# 13        Unweeded          24.62 14.5 12.29    26.77}
+\DocumentationTok{\#\# 14        Unweeded          30.94 14.5 12.29    26.77}
+\DocumentationTok{\#\# 15        Unweeded          24.02 14.5 12.29    26.77}
+\DocumentationTok{\#\# 16        Unweeded          27.51 14.5 12.29    26.77}
+\DocumentationTok{\#\#    Residuals}
+\DocumentationTok{\#\# 1     6.0250}
+\DocumentationTok{\#\# 2    {-}4.7950}
+\DocumentationTok{\#\# 3     1.1450}
+\DocumentationTok{\#\# 4    {-}2.3750}
+\DocumentationTok{\#\# 5     1.0125}
+\DocumentationTok{\#\# 6    {-}3.1775}
+\DocumentationTok{\#\# 7     2.1425}
+\DocumentationTok{\#\# 8     0.0225}
+\DocumentationTok{\#\# 9    {-}6.3600}
+\DocumentationTok{\#\# 10    3.8400}
+\DocumentationTok{\#\# 11    3.8800}
+\DocumentationTok{\#\# 12   {-}1.3600}
+\DocumentationTok{\#\# 13   {-}2.1525}
+\DocumentationTok{\#\# 14    4.1675}
+\DocumentationTok{\#\# 15   {-}2.7525}
+\DocumentationTok{\#\# 16    0.7375}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{standard-deviation-sigma}{%
+\subsection{\texorpdfstring{Standard deviation \(\sigma\)}{Standard deviation \textbackslash sigma}}\label{standard-deviation-sigma}}
+
+In order to get an estimate for \(\sigma\), we calculate the Residual Sum of Squares (RSS):
+
+\vspace{12pt}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{RSS }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{(Residuals}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)}
+\NormalTok{RSS}
+\DocumentationTok{\#\# [1] 184.1774}
+\end{Highlighting}
+\end{Shaded}
+
+In order to obtain the residual variance, we need to divide the RSS by the appropriate number of Degrees of Freedom (DF); the question is: what is this number? We need to consider that the residuals represent the differences between each observed value and the group mean; therefore, those residuals must sum up to zero within all treatment groups, so that we have 16 residuals, but only three per group are `freely' selected, while the fourth one must be equal to the opposite of the sum of the other three. Hence, the number of degrees of freedom is \(3 \times 4 = 12\).
+
+In more general terms, the number of degrees of freedom for the RSS is \(p (k -1)\), where \(p\) is the number of treatments and \(k\) is the number of replicates (assuming that this number is constant across treatments). The residual variance is:
+
+\[MS_{e}  = \frac{184.178}{12} = 15.348\]
+
+Consequently, our best point estimate for \(\sigma\) is:
+
+\[sigma =  \sqrt{15.348} = 3.9177\]
+
+Now, we can use our point estimates for model parameters to calculate point estimates for the group means (e.g.: \(\mu_1 = \mu + \alpha_1\)), which, in this instance, are equal to the arithmetic means, although this is not generally true. However, we know that point estimates are not sufficient to draw general conclusions and we need to provide the appropriate confidence intervals.
+
+\hypertarget{sem-and-sed}{%
+\subsection{SEM and SED}\label{sem-and-sed}}
+
+The standard errors for the four means are easily obtained, by the usual rule (\(k\) is the number of replicates):
+
+\[SEM = \frac{s}{ \sqrt{k}} =  \frac{3.918}{ \sqrt{4}}\]
+
+You may have noted that, for all experiments, there are two ways to calculate standard errors for the group means:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  by taking the standard deviations for each treatment group, as shown in Chapter 3. With \(k\) treatments, this method results in \(k\) different standard errors;
+\item
+  by taking the pooled standard deviation estimate \(s\). In this case, we have only one common SEM value, for all group means.
+\end{enumerate}
+
+You may wonder which method is the best. Indeed, if the basic assumption of variance homogeneity is tenable, the second method is better, as the pooled SEM is estimated with higher precision, with respect to the SEs for each group mean (12 degrees of freedom, instead of 3).
+
+The standard error for the difference between any possible pairs of means is:
+
+\[SED = \sqrt{ MS_{1} + MS_{2} } = \sqrt{ 2 \cdot \frac{MS_e}{n} } =  \sqrt{2}  \cdot \frac{3.9177}{\sqrt{4}} = \sqrt{2} \cdot SEM\]
+
+\hypertarget{variance-partitioning}{%
+\subsection{Variance partitioning}\label{variance-partitioning}}
+
+Fitting the above model is prodromic to the Fisherian ANalysis Of VAriance, i.e.~the real ANOVA technique. The aim is to partition the total variability of all observations into two components: the first one is due to treatment effects and the other one is due to all other effects of random nature.
+
+In practice, we start our hand calculations from the total sum of squares (SS), that is the squared sum of residuals for each value against the overall mean (see Chapter 3):
+
+\[\begin{array}{c}
+SS = \left(24.62 - 14.48375\right)^2 + \left(30.94 - 14.48375\right)^2 + ... \\
+... + \left(15.50 - 14.48375\right)^2 = 1273.706
+\end{array}\]
+
+Total deviance relates to the all the effects, both from known and unknown sources (treatment + random effects). With R:
+
+\vspace{12pt}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{SS }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{( (dataset}\SpecialCharTok{$}\NormalTok{Weight }\SpecialCharTok{{-}}\NormalTok{ mu)}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{ )}
+\end{Highlighting}
+\end{Shaded}
+
+Second, we can consider that the RSS represents the amount of data variability produced by random effects. Indeed, the variability of data within each treatment group cannot be due to treatment effects.
+
+Finally, we can consider that variability produced by treatment effects is measured by the \(\alpha\) values and, therefore, the treatment sum of squares (TSS) is given by the sum of squared \(\alpha\) values:
+
+\vspace{12pt}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{TSS }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{(tab}\SpecialCharTok{$}\NormalTok{alpha}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)}
+\NormalTok{TSS}
+\DocumentationTok{\#\# [1] 1089.529}
+\end{Highlighting}
+\end{Shaded}
+
+Please, note that the sum of the residual sum of squares (RSS) and the treatment sum of squares (TSS) is exactly equal to the total sum of squares:
+
+\vspace{12pt}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{TSS }\SpecialCharTok{+}\NormalTok{ RSS}
+\DocumentationTok{\#\# [1] 1273.706}
+\end{Highlighting}
+\end{Shaded}
+
+The partitioning of total variance shows that random variability is much lower than treatment variability, although we know that we cannot directly compare two deviances, when they are based on a different number of DFs (see Chapter 3).
+
+Therefore, we calculate the corresponding variances: we have seen that the RSS has 12 degrees of freedom and the related variance is \(MS_e = 15.348\). The TSS has 3 degrees of freedom, that is the number of treatment levels minus one; the related variance is:
+
+\[MS_t = \frac{1089.529}{3} = 363.1762\]
+
+These two variances (treatment and residual) can be directly compared. Fisher, in 1920, proposed the following F-ratio:
+
+\[F = \frac{MS_t}{MS_e} = \frac{363.18}{15.348} = 23.663\]
+
+It shows that the variability imposed by the experimental treatment is more than 23 times higher than the variability due to random noise, which supports the idea that the treatment effect is significant. However, we need a formal statistical test to support such a statement.
+
+\hypertarget{hypothesis-testing}{%
+\subsection{Hypothesis testing}\label{hypothesis-testing}}
+
+Let me recall a basic concept that has already appeared before and it is going to return rather often in this book (apologies for this). We have observed a set of 16 data, coming from a pot-experiment, but these data represent only a sample of an infinite number of replicated experiments that we could perform. Therefore, the observed F value is just an instance of an infinite number of possible F values, which define a sampling distribution. How does such sampling distribution look like?
+
+In order to determine the sampling distribution for the F-ratio, we need to make some hypotheses. The null hypothesis is that the treatments have no effects and, thus:
+
+\[H_0: \mu_1 = \mu_2 = \mu_3 = \mu_4\]
+
+Analogously:
+
+\[H_0: \alpha_1 = \alpha_2 = \alpha_3 = \alpha_4 = 0\]
+
+In other words, if \(H_0\) were true, the four samples would be drawn from the same gaussian population. What would become of the F-ratio? We could see this by using Monte Carlo simulation, but, for the sake of simplicity, let's exploit literature information: the American mathematician George Snedecor demonstrated that, when the null is true, the sample based F-ratio is distributed according to the F-distribution (Fisher-Snedecor distribution). In more detail, Snedecor defined a family of F-distributions, whose elements are selected, depending on the number of degrees of freedom at the numerator and denominator. For our example (three degrees of freedom at the numerator and 12 at the denominator), the F distribution is shown in Figure \ref{fig:figNameF}. We see that the mode is between 0 and 1, while the expected value is around 1. We also see that values above 6 are very unlikely.
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.9\linewidth]{_main_files/figure-latex/figNameF-1} 
+
+}
+
+\caption{Probabilty density function for F distribution with three and twelve degrees of freedom}\label{fig:figNameF}
+\end{figure}
+
+Now, we can use the cumulative distribution function in R to calculate the probability of obtaining values as high as 23.663 (the observed value) or higher:
+
+\vspace{12pt}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{pf}\NormalTok{(}\FloatTok{23.663}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{12}\NormalTok{, }\AttributeTok{lower.tail =}\NormalTok{ F)}
+\DocumentationTok{\#\# [1] 2.508789e{-}05}
+\end{Highlighting}
+\end{Shaded}
+
+We can see that, if the hull is true and we repeat the experiment a very high humber of times, there is only one chance in 250,000 that we observe such a high F-value. As the consequence, we reject the null and accept the alternative, i.e.~there is at least one treatment level that produced a significant effect.
+
+\hypertarget{fitting-anova-models-with-r}{%
+\section{Fitting ANOVA models with R}\label{fitting-anova-models-with-r}}
+
+Fitting models with R is very straightforward, by way of a very consistent platform for most types of models. For linear models, we use the \texttt{lm()} function, according to the following syntax:
+
+\begin{verbatim}
+mod <- lm(Weight ~ factor(Treat), data = dataset)
+\end{verbatim}
+
+The first argument is the equation we want to fit: on the left side, we specified the name of the response variable, the `tilde' means `is a function of and replaces the = sign and, on the right side, we specified the name of the factor variable. We did not specify the intercept and the stochastic term \(\varepsilon\), which are included by default. Please, also note that, prior to analysis, we transformed the 'Treat' variable into a factor, by using the \texttt{factor()} function. Such a transformation is not strictly necessary with character variables, but becomes fundamental with numeric variables, representing numbers and not classes.
+
+\vspace{12pt}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dataset}\SpecialCharTok{$}\NormalTok{Treat }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(dataset}\SpecialCharTok{$}\NormalTok{Treat)}
+\NormalTok{mod }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Weight }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Treat, }\AttributeTok{data =}\NormalTok{ dataset)}
+\end{Highlighting}
+\end{Shaded}
+
+After fitting the model, results are written into the `mod' variable and can be read by using the appropriate extractor (\$ sign) or by using some of the available methods. For example, the \texttt{summary()} method returns parameter estimates, according to the treatment constraint, that is the default in R.
+
+\vspace{12pt}
+\scriptsize
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(mod)}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# Call:}
+\DocumentationTok{\#\# lm(formula = Weight \textasciitilde{} Treat, data = dataset)}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# Residuals:}
+\DocumentationTok{\#\#    Min     1Q Median     3Q    Max }
+\DocumentationTok{\#\# {-}6.360 {-}2.469  0.380  2.567  6.025 }
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# Coefficients:}
+\DocumentationTok{\#\#                     Estimate Std. Error t value Pr(\textgreater{}|t|)}
+\DocumentationTok{\#\# (Intercept)            9.175      1.959   4.684 0.000529}
+\DocumentationTok{\#\# TreatMixture\_378      {-}4.047      2.770  {-}1.461 0.169679}
+\DocumentationTok{\#\# TreatRimsulfuron\_30    7.685      2.770   2.774 0.016832}
+\DocumentationTok{\#\# TreatUnweeded         17.598      2.770   6.352 3.65e{-}05}
+\DocumentationTok{\#\#                        }
+\DocumentationTok{\#\# (Intercept)         ***}
+\DocumentationTok{\#\# TreatMixture\_378       }
+\DocumentationTok{\#\# TreatRimsulfuron\_30 *  }
+\DocumentationTok{\#\# TreatUnweeded       ***}
+\DocumentationTok{\#\# {-}{-}{-}}
+\DocumentationTok{\#\# Signif. codes:  }
+\DocumentationTok{\#\# 0 \textquotesingle{}***\textquotesingle{} 0.001 \textquotesingle{}**\textquotesingle{} 0.01 \textquotesingle{}*\textquotesingle{} 0.05 \textquotesingle{}.\textquotesingle{} 0.1 \textquotesingle{} \textquotesingle{} 1}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# Residual standard error: 3.918 on 12 degrees of freedom}
+\DocumentationTok{\#\# Multiple R{-}squared:  0.8554, Adjusted R{-}squared:  0.8193 }
+\DocumentationTok{\#\# F{-}statistic: 23.66 on 3 and 12 DF,  p{-}value: 2.509e{-}05}
+\end{Highlighting}
+\end{Shaded}
+
+\normalsize
+
+For the sake of completeness, it might be useful to show that we can change the parameterisation, by setting the argument `contrasts' and passing a list of factors associated to the requested parameterisation (Treat = ``contr.sum,'' in this case). There are other methods to change the parameterisation, either globally (for the whole R session) or at the factor level; further information can be found in literature.
+
+\vspace{12pt}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mod2 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Weight }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Treat, }\AttributeTok{data =}\NormalTok{ dataset,}
+           \AttributeTok{contrasts =} \FunctionTok{list}\NormalTok{(}\AttributeTok{Treat =} \StringTok{"contr.sum"}\NormalTok{))}
+\FunctionTok{summary}\NormalTok{(mod2)}\SpecialCharTok{$}\NormalTok{coef}
+\DocumentationTok{\#\#             Estimate Std. Error   t value     Pr(\textgreater{}|t|)}
+\DocumentationTok{\#\# (Intercept) 14.48375  0.9794169 14.788135 4.572468e{-}09}
+\DocumentationTok{\#\# Treat1      {-}5.30875  1.6963999 {-}3.129421 8.701206e{-}03}
+\DocumentationTok{\#\# Treat2      {-}9.35625  1.6963999 {-}5.515356 1.329420e{-}04}
+\DocumentationTok{\#\# Treat3       2.37625  1.6963999  1.400761 1.866108e{-}01}
+\end{Highlighting}
+\end{Shaded}
+
+Regardless of the parameterisation, fitted values and residuals can be obtained by using the \texttt{fitted()} and \texttt{residuals()} methods:
+
+\vspace{12pt}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{expected }\OtherTok{\textless{}{-}} \FunctionTok{fitted}\NormalTok{(mod)}
+\NormalTok{epsilon }\OtherTok{\textless{}{-}} \FunctionTok{residuals}\NormalTok{(mod)}
+\end{Highlighting}
+\end{Shaded}
+
+The residual deviance is:
+
+\vspace{12pt}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{deviance}\NormalTok{(mod)}
+\DocumentationTok{\#\# [1] 184.1774}
+\end{Highlighting}
+\end{Shaded}
+
+while the residual standard deviation needs to be extracted from the slot `sigma,' from the output of the \texttt{summary()} method:
+
+\vspace{12pt}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(mod)}\SpecialCharTok{$}\NormalTok{sigma}
+\DocumentationTok{\#\# [1] 3.917668}
+\end{Highlighting}
+\end{Shaded}
+
+The ANOVA table is obtained by using the \texttt{anova()} method:
+
+\vspace{12pt}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{anova}\NormalTok{(mod)}
+\DocumentationTok{\#\# Analysis of Variance Table}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# Response: Weight}
+\DocumentationTok{\#\#           Df  Sum Sq Mean Sq F value    Pr(\textgreater{}F)    }
+\DocumentationTok{\#\# Treat      3 1089.53  363.18  23.663 2.509e{-}05 ***}
+\DocumentationTok{\#\# Residuals 12  184.18   15.35                      }
+\DocumentationTok{\#\# {-}{-}{-}}
+\DocumentationTok{\#\# Signif. codes:  }
+\DocumentationTok{\#\# 0 \textquotesingle{}***\textquotesingle{} 0.001 \textquotesingle{}**\textquotesingle{} 0.01 \textquotesingle{}*\textquotesingle{} 0.05 \textquotesingle{}.\textquotesingle{} 0.1 \textquotesingle{} \textquotesingle{} 1}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{expected-marginal-means}{%
+\section{Expected marginal means}\label{expected-marginal-means}}
+
+At the beginning of this chapter we have used the arithmetic means to describe the central tendency of each group. We have also seen that the sums \(\mu + \alpha_j\) return the group means, taking the name \textbf{Expected Marginal Means} (EMMs), which can also be used as measures of central tendency. When the experiment is balanced (same number of replicates for all groups), EMMs are equal to the arithmetic means, while, when the experiment is unbalanced, they differ and provide better estimators of population means.
+
+In order to obtain expected marginal means with R, we need to install the add-in package `emmeans' (Lenth, 2016) and use the \texttt{emmeans()} function therein.
+
+\vspace{12pt}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Install the package (only at the very first instance)}
+\CommentTok{\# install.packages("emmeans") }
+\FunctionTok{library}\NormalTok{(emmeans) }\CommentTok{\# Load the package}
+\NormalTok{muj }\OtherTok{\textless{}{-}} \FunctionTok{emmeans}\NormalTok{(mod, }\SpecialCharTok{\textasciitilde{}}\NormalTok{Treat)}
+\NormalTok{muj}
+\DocumentationTok{\#\#  Treat           emmean   SE df lower.CL upper.CL}
+\DocumentationTok{\#\#  Metribuzin\_\_348   9.18 1.96 12     4.91     13.4}
+\DocumentationTok{\#\#  Mixture\_378       5.13 1.96 12     0.86      9.4}
+\DocumentationTok{\#\#  Rimsulfuron\_30   16.86 1.96 12    12.59     21.1}
+\DocumentationTok{\#\#  Unweeded         26.77 1.96 12    22.50     31.0}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# Confidence level used: 0.95}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{conclusions-4}{%
+\section{Conclusions}\label{conclusions-4}}
+
+Fitting ANOVA models is the subject of several chapters in this book. In practice, we are interested in assessing whether the effect of treatments produces a bigger data variability than all other unknown stochastic effects. We do so by using the F ratio that, under the null hypothesis, has a Fisher-Snedecor F distribution. If the observed F value and higher values are very unlikely to occur under the null, we reject it and conclude that the treatment effect was significant.
+
+Finally, it is very important to point out that \textbf{all the above reasoning is only valid when the basic assumptions for linear models are met}. Therefore, it is always important to make the necessary inspections to ensure that there are no evident deviations, as we will see in the next chapter.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{further-readings-5}{%
+\section{Further readings}\label{further-readings-5}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Faraway, J.J., 2002. Practical regression and Anova using R. \url{http://cran.r-project.org/doc/contrib/Faraway-PRA.pdf}.
+\item
+  Fisher, Ronald (1918). ``Studies in Crop Variation. I. An examination of the yield of dressed grain from Broadbalk'' (PDF). Journal of Agricultural Science. 11 (2): 107--135.
+\item
+  Kuehl, R. O., 2000. Design of experiments: statistical principles of research design and analysis. Duxbury Press (CHAPTER 2)
+\item
+  Lenth, R.V., 2016. Least-Squares Means: The R Package lsmeans. Journal of Statistical Software 69. \url{https://doi.org/10.18637/jss.v069.i01}
+\item
+  Wickham, H (2014) Tidy Data. J Stat Soft 59
+\end{enumerate}
 
 \hypertarget{checking-for-the-basic-assumptions}{%
 \chapter{Checking for the basic assumptions}\label{checking-for-the-basic-assumptions}}
@@ -2596,10 +3614,44 @@ Consider a gaussian population with \(\mu\) = 23 and \(\sigma\) = 1. Calculate t
 \hypertarget{exercise-1-2}{%
 \subsection{Exercise 1}\label{exercise-1-2}}
 
-A chemical analysis was repeated three times, with the following results: 125, 169 and 142 ng/g. Calculate mean, deviance, variance, standard deviation, standard errors and confidence intervals (P = 0.95).
+A chemical analysis was repeated three times, with the following results: 125, 169 and 142 ng/g. Calculate mean, deviance, variance, standard deviation, standard error and confidence intervals (P = 0.95 and P = 0.99).
 
 \hypertarget{exercise-2-2}{%
 \subsection{Exercise 2}\label{exercise-2-2}}
+
+An experiment was carried out, comparing the yield of four wheat genotypes (in tons per hectar). The results are as follows:
+
+\begin{tabular}{l|r|r|r|r}
+\hline
+Genotype & A & B & C & D\\
+\hline
+A & 5.22 & 6.02 & 5.08 & 6.67\\
+\hline
+B & 6.08 & 6.86 & 7.07 & 6.57\\
+\hline
+C & 4.42 & 5.63 & 4.49 & 4.89\\
+\hline
+D & 6.14 & 6.50 & 5.27 & 6.02\\
+\hline
+\end{tabular}
+
+For each genotype, calculate the mean, deviance, variance, standard deviation, standard error and confidence interval (P = 0.95).
+
+\hypertarget{exercise-3-2}{%
+\subsection{Exercise 3}\label{exercise-3-2}}
+
+We have measured the length of 30 maize seedlings, treated with selenium in water solution. The observed lengths are:
+
+\begin{verbatim}
+length <- c(2.07, 2.23, 2.04, 2.16, 2.12, 2.33, 2.21, 2.22, 2.29, 2.28, 
+2.44, 2.04, 2.02, 1.49, 2.12, 2.38, 2.51, 2.27, 2.55, 2.44, 2.28, 
+2.2, 2.03, 2.35, 2.34, 2.34, 1.99, 2.44, 2.44, 1.91)
+\end{verbatim}
+
+For the above sample, calculate the mean, deviance, variance, standard deviation, standard error and confidence interval (P = 0.95).
+
+\hypertarget{exercise-4-1}{%
+\subsection{Exercise 4}\label{exercise-4-1}}
 
 A sample of 400 insects was sprayed with an insecticide and 136 individuals survived the treatment. Determine the efficacy of the insecticide, in terms of proportion of dead insects, together with 95\% confidence limits.
 
@@ -2611,17 +3663,17 @@ A sample of 400 insects was sprayed with an insecticide and 136 individuals surv
 \hypertarget{exercise-1-3}{%
 \subsection{Exercise 1}\label{exercise-1-3}}
 
-We have made an experiment to compare two fungicides A and B. The first fungicide was used to treat 200 fungi colonies and the number of surviving colonies was 180. B was used to treat 100 colonies and 50 survived. Is there a significant difference between A and B?
+We have compared two herbicides for weed control in maize. With the first herbicide (A), we observed the following weed coverings: 9.3, 10.2, 9.7 \%. With the second herbicide, we observedd: 12.6, 12.3 e 12.5 \%. Are the means for the two herbicides significantly different (P \textless{} 0.05)?
 
 \hypertarget{exercise-2-3}{%
 \subsection{Exercise 2}\label{exercise-2-3}}
 
-We have compared two experimental treatments and, with the first one, we observed the following results: 9.3, 10.2, 9.7. With the second treatment, we obtained: 12.6, 12.3 e 12.5. Are the means significantly different?
+We have made an experiment to compare two fungicides A and B. The first fungicide was used to treat 200 fungi colonies and the number of surviving colonies was 180. B was used to treat 100 colonies and 50 of those survived. Is there a significant difference between the efficiacies of A and B (P \textless{} 0.05)?
 
-\hypertarget{exercise-3-2}{%
-\subsection{Exercise 3}\label{exercise-3-2}}
+\hypertarget{exercise-3-3}{%
+\subsection{Exercise 3}\label{exercise-3-3}}
 
-A plant pathologist studied the crop performancies with (A) and without (NT) a fungicide treatment. The results are as follows:
+A plant pathologist studied the crop performances with (A) and without (NT) a fungicide treatment. The results are as follows:
 
 \begin{longtable}[]{@{}cc@{}}
 \toprule
@@ -2630,16 +3682,16 @@ A & NT \\
 \endhead
 65 & 54 \\
 71 & 51 \\
-6.8 & 59 \\
+68 & 59 \\
 \bottomrule
 \end{longtable}
 
 Was the treatment effect significant (P \textless{} 0.05)?
 
-\hypertarget{exercise-4-1}{%
-\subsection{Exercise 4}\label{exercise-4-1}}
+\hypertarget{exercise-4-2}{%
+\subsection{Exercise 4}\label{exercise-4-2}}
 
-In this year, an assay showed that 600 olive drupes out of 750 were attacked by \emph{Daucus olee}. In a close field, under the same environmental conditions, the count of attacked drupes was 120 on 750. Is such a difference significant or is it just a random fluctuation?
+In this year, an assay showed that 600 olive drupes out of 750 were attacked by \emph{Daucus olee}. In a close field, under the same environmental conditions, the count of attacked drupes was 120 on 750. Is the the observed difference statistically significant (P \textless{} 0.05) or is it just due to random fluctuation?
 
 \hypertarget{exercise-5-1}{%
 \subsection{Exercise 5}\label{exercise-5-1}}
@@ -2663,6 +3715,64 @@ Patient & Before & After \\
 \end{longtable}
 
 Can we say that this terapy is effective, or not?
+
+\hypertarget{exercise-6}{%
+\subsection{Exercise 6}\label{exercise-6}}
+
+A plant breeder organised an experiment to compare three wheat genotypes, i.e.~GUERCINO, ARNOVA and BOLOGNA, according to a completely randomised design with 10 replicates. The observed yields are:
+
+\begin{tabular}{c|c|c}
+\hline
+guercino & arnova & bologna\\
+\hline
+53.2 & 53.1 & 43.5\\
+\hline
+59.1 & 51.0 & 41.0\\
+\hline
+62.3 & 51.9 & 41.2\\
+\hline
+48.6 & 55.3 & 44.8\\
+\hline
+59.7 & 58.8 & 40.2\\
+\hline
+60.0 & 54.6 & 37.2\\
+\hline
+55.7 & 53.0 & 45.3\\
+\hline
+55.8 & 51.4 & 38.9\\
+\hline
+55.7 & 51.7 & 42.9\\
+\hline
+54.4 & 64.7 & 39.3\\
+\hline
+\end{tabular}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Describe the three samples, by using the appropriate statistics of central tendency and spread
+\item
+  Infere the means of the pupulations from where the samples were drawn
+\item
+  For each of the three possible couples (GUERCINO vs ARNOVA, GUERCINO vs BOLOGNA and ARNOVA vs BOLOGNA), test the hypothesis that the two means are significantly different.
+\end{enumerate}
+
+\hypertarget{exercise-7}{%
+\subsection{Exercise 7}\label{exercise-7}}
+
+A botanist counted the number of germinated seeds for oilseed rape at two different temperatures (15 and 25°C). At 15°C, 358 germinations were counted out of 400 seeds. At 25°C, 286 germinations were counted out of 380 seeds.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Describe the proportions of germination for the three samples
+\item
+  Infere the proportion of germinated seeds in the two populations, from where the samples of seeds were extracted (remember that the variance for a proportion is calculated as \(p \times (1- p)\).
+\item
+  Test the hypothesis that temperature had a significant effect on the germinability of oilseed rape seeds.
+\end{enumerate}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
@@ -2737,8 +3847,8 @@ Control & Glucose & Fructose & Sucrose \\
   Present the results and comment on them
 \end{enumerate}
 
-\hypertarget{exercise-3-3}{%
-\subsection{Exercise 3}\label{exercise-3-3}}
+\hypertarget{exercise-3-4}{%
+\subsection{Exercise 3}\label{exercise-3-4}}
 
 The failure time for a heating system was assessed, to discover the effect of the operating temperature. Four temperatures were tested with 6 replicates, according to a completely randomised design and the number of hours before failure were measured.
 The results are as follows:
@@ -2777,8 +3887,8 @@ Temp. & Hours to failure \\
 
 Please, note that these are the only possible values for temperature. Determine the best operating temperature, in order to delay failure.
 
-\hypertarget{exercise-4-2}{%
-\subsection{Exercise 4}\label{exercise-4-2}}
+\hypertarget{exercise-4-3}{%
+\subsection{Exercise 4}\label{exercise-4-3}}
 
 An entomologist counted the number of eggs laid from a lepidopter on three tobacco genotypes. 15 females were tested for each genotype and the results are as follows:
 
@@ -2878,8 +3988,8 @@ Unfertilised & 5.6 & 6.1 & 5.3 & 5.9 & 9.4 \\
   The addition of P\textsubscript{2} O\textsubscript{5} is a convenient practice, in terms of agronomic effect?
 \end{enumerate}
 
-\hypertarget{exercise-3-4}{%
-\subsection{Exercise 3}\label{exercise-3-4}}
+\hypertarget{exercise-3-5}{%
+\subsection{Exercise 3}\label{exercise-3-5}}
 
 A latin square experiment was planned to assess effect of four different fertilisers on lettuce yield. The observed data are as follows:
 
@@ -3007,8 +4117,8 @@ Spring & Chiaro & 2.76 & 2.64 & 2.25 & 2.38 \\
   Present the results and comment on them: what type of means should you report?
 \end{enumerate}
 
-\hypertarget{exercise-3-5}{%
-\subsection{Exercise 3}\label{exercise-3-5}}
+\hypertarget{exercise-3-6}{%
+\subsection{Exercise 3}\label{exercise-3-6}}
 
 Four crops were sown in soil 20 days after the application of three herbicide treatments, in order to evaluate possible carry-over effects of residuals. The untreated control was also added for comparison and the weight of plants was assessed four weeks after sowing. The experiment was laid down as strip-plot and, within each block, the herbicide were randomised to rows and crops to columns. The weight of plants is reported below:
 
@@ -3051,8 +4161,8 @@ rimsulfuron & 1 & 403 & 238 & 226 & 290 \\
   Present the results and comment on them: what type of means should you report?
 \end{enumerate}
 
-\hypertarget{exercise-4-3}{%
-\subsection{Exercise 4}\label{exercise-4-3}}
+\hypertarget{exercise-4-4}{%
+\subsection{Exercise 4}\label{exercise-4-4}}
 
 A field experiment was conducted to evaluate the effect of fertilisation timing (early, medium, late) on two genotypes. The experiment was designed as a randomised complete block design and the data represent the amount of absorbed nitrogen by the plant:
 
@@ -3123,8 +4233,8 @@ Consider the temperature as a factor and:
   Present the results and comment on them: what type of means should you report?
 \end{enumerate}
 
-\hypertarget{exercise-6}{%
-\subsection{Exercise 6}\label{exercise-6}}
+\hypertarget{exercise-6-1}{%
+\subsection{Exercise 6}\label{exercise-6-1}}
 
 A chemical process requires one alcohol and one base. A study is organised to evaluate the factorial combinations of three alcohols and two bases on the efficiency of the process, expressed as a percentage. The experiment is designd as completely randomised.
 
@@ -3287,8 +4397,8 @@ Time & Cells \\
 \bottomrule
 \end{longtable}
 
-\hypertarget{exercise-3-6}{%
-\subsection{Exercise 3}\label{exercise-3-6}}
+\hypertarget{exercise-3-7}{%
+\subsection{Exercise 3}\label{exercise-3-7}}
 
 An experiment was conducted to determine the absorption of nitrogen by roots of \emph{Lemna minor} in hydroponic colture. Results (N content) are the following:
 
@@ -3314,8 +4424,8 @@ Use nonlinear least squares to estimate the parameters for the rectangular hyper
 
 and make sure that model fit is good enough.
 
-\hypertarget{exercise-4-4}{%
-\subsection{Exercise 4}\label{exercise-4-4}}
+\hypertarget{exercise-4-5}{%
+\subsection{Exercise 4}\label{exercise-4-5}}
 
 An experiment was conducted to determine the yield of sunflower at increasing densities of a weed (\emph{Ammi majus}). Based on the following results, parameterise a rectangular hyperbola (\(Y = (a \, X)/(b + X)\) and test for possible lack of fit. The results are:
 
@@ -3356,8 +4466,8 @@ Area & N. of species \\
 
 By using the above data, parameterise a power curve \(Y = a \, X^b\) and test for lack of fit.
 
-\hypertarget{exercise-6-1}{%
-\subsection{Exercise 6}\label{exercise-6-1}}
+\hypertarget{exercise-6-2}{%
+\subsection{Exercise 6}\label{exercise-6-2}}
 
 Crop growth can be often described by using a Gompertz model. The data below refer to an experiment were sugarbeet was grown either weed free, or weed infested; the weight of the crop per unit area was measured after six different numbers of Days After Emergence (DAE). The experiment was conducted by using a completely randomised design with three replicates and the results are reported below:
 
@@ -3391,8 +4501,8 @@ Parameterise two Gompertz growth models (one for the weed-free crop and one for 
 
 \[Y = d \cdot exp\left\{- exp \left[ - b (X - e)\right] \right\}\]
 
-\hypertarget{exercise-7}{%
-\subsection{Exercise 7}\label{exercise-7}}
+\hypertarget{exercise-7-1}{%
+\subsection{Exercise 7}\label{exercise-7-1}}
 
 Plants of \emph{Tripleuspermum inodorum} in pots were treated with a sulphonylurea herbicide (tribenuron-methyl) at increasing rates. Three weeks after the treatment the weight per pot was recorded, with the following results:
 
@@ -3804,12 +4914,12 @@ This is a huge topic, that we do not intend to develop here. We would just like 
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics[width=0.9\linewidth]{_main_files/figure-latex/unnamed-chunk-68-1}
+\includegraphics[width=0.9\linewidth]{_main_files/figure-latex/unnamed-chunk-109-1}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
-\hypertarget{further-readings-4}{%
-\section{Further readings}\label{further-readings-4}}
+\hypertarget{further-readings-6}{%
+\section{Further readings}\label{further-readings-6}}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}

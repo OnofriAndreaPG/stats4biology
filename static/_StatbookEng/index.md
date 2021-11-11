@@ -1,7 +1,7 @@
 ---
 title: "Experimental methods in agriculture"
 author: "Andrea Onofri and Dario Sacco"
-date: "Update: v. 0.9 (2021-10-06), compil. 2021-11-02"
+date: "Update: v. 0.9 (2021-10-06), compil. 2021-11-11"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -1940,13 +1940,908 @@ Points 2 and 3 above imply that confidence intervals protect ourselves from the 
 
 # Making Decisions under uncertainty
 
-To be done ...
+In Chapter 5 we have seen that experimental errors and, above all, sampling errors, produce uncertainty in the estimation process, which we have to account for by determining and displaying standard errors and confidence intervals. In the very same fashion, we need to be able to make decisions in presence of uncertainty; is the effect of a treatment statistically significant? Is the effect of a treatment higher/lower than the effect of another treatment?
+
+Making such decisions is called **Formal Hypothesis Testing** (FHT) and we will see that this is mainly based on the so-called **P-value**. As usual, I will introduce the problem by using an example.
+
+## Comparing sample means: the Student's t-test
+
+### The dataset
+
+We have planned an experiment where we have compared the yield of genotype A with the yield of the genotype P and the experiment is laid down according to a completely randomised design with five replicates. This is a small-plot experiment with 10 plots, which need to be regarded as sampled from a wider population of plots; as we mentioned in the previous chapter, our interest is not in the sample, but it is in the population of plots, which means that we are looking for conclusions of general validity.
+
+The results (in quintals per hectare) are the following:
+
+
+
+```r
+A <- c(65, 68, 69, 71, 78)
+P <- c(80, 81, 84, 88, 94)
+```
+
+
+As usual we calculate the descriptive statistics (mean and standard deviation) for each sample:
+
+
+
+```r
+mA <- mean(A)
+mP <- mean(P)
+sA <- sd(A)
+sP <- sd(P)
+mA; sA
+## [1] 70.2
+## [1] 4.868265
+mP; sP
+## [1] 85.4
+## [1] 5.727128
+```
+
+
+We see that the mean for the genotype P is higher than the mean for the genotype A, but such descriptive statistics are not sufficient to our aims. Therefore, we calculate standard errors, to express our uncertainty about the population means, as we have shown in the previous chapter.
+
+
+
+```r
+seA <- sA/sqrt(5); seA
+## [1] 2.177154
+seP <- sP/sqrt(5); seP
+## [1] 2.56125
+```
+
+Consequently, we can produce interval estimates for the population means, i.e., 85.4 $\pm$ 5.12 and 70.2 $\pm$ 4.35. We note that the confidence intervals do not overlap, which supports the idea that P is better than A, but we would like to reach a more formal decision. 
+
+First of all, we can see that the observed difference between $m_A$ and $m_P$ is equal to:
+
+
+```r
+mA - mP
+## [1] -15.2
+```
+
+However, we are not interested in the above difference, but we are interested in the population difference, i.e. $\mu_A - \mu_P$. We know that both the means have a certain degree of uncertainty, which propagates to the difference. In the previous chapter, we have seen that the variance of the sum/difference of independent samples is equal to the sum of variances; therefore, the standard error of the difference (SED) is equal to:
+
+$$SED = \sqrt{ SEM_1^2 + SEM_2^2 }$$
+
+In our example, the SED is:
+
+
+```r
+SED <- sqrt(seA^2 + seP^2)
+SED
+## [1] 3.361547
+```
+
+It is intuitively clear that the difference (in quintals per hectare) should be regarded as significant when it is much higher than its standard error; indeed, this would mean that the difference is stronger than the uncertainty with which we have estimated it. We can formalise such an intuition by defining the $T$ statistic for the sample difference:
+
+$$T = \frac{m_A - m_P}{SED}$$
+
+which is equal to:
+
+
+```r
+Ti <- (mA - mP)/SED
+Ti
+## [1] -4.521727
+```
+
+If T is big, the difference is likely to be significant (not due to random effects); however, $T$ is a sample statistic and it is expected to change whenever we repeat the experiment. How is the sampling distribution for $T$? To answer this question, we should distinguish two possible hypotheses about the data:
+
+* Hypothesis 1. There is no difference between the two genotypes (**null hypothesis**: $H_0$) and, consequently, we have only one population and the two samples A and P are extracted from this population.
+* Hypothesis 2. The two genotypes are different (**alternative hypothesis**: $H_1$) and, consequently, the two samples are extracted from two different populations, one for the A genotype and the other one for the P genotype.
+
+In mathematical terms, the null hypothesis is:
+
+$$H_0: \mu_1 = \mu_2 = \mu$$
+
+The alternative hypothesis is:
+
+$$H_1 :\mu_1  \neq \mu_2$$
+
+More complex alternative hypotheses are also possible, such as $H_1 :\mu _1  > \mu _2$, or $H_1 :\mu _1  < \mu _2$. However, hypotheses should be set before looking at the data (according to the Galilean principle) and, in this case, we have no prior knowledge to justify the selection of one of such complex hypotheses. Therefore, we select the simple alternative hypothesis.
+
+Which of the two hypotheses is more reasonable, by considering the observed data? We have seen that, **according to the Popperian falsification principle, experiments should be planned to falsify hypotheses. Therefore, we take the null hypothesis and see whether we can falsify it.**
+
+This is one hint: if the null hypothesis were true, we should observe $T = 0$, while we have observed $T = -4.521727$. Is this enough to reject the null? Not at all, obviously. Indeed, the sample means can change from one experiment to the other and it is possible to obtain $T \neq 0$ also when the experimental treatments are, indeed, the same treatment. Therefore, we need to ask ourselves: **what is the sampling distribution for $T$ under the null hypothesis?**
+
+
+### Monte Carlo simulation
+
+We can easily build an empirical sampling distribution for $T$ by using Monte Carlo simulation. Look at the code in the box below: we use the `for()` statement to repeat the experiment 100,000 times. Each experiment consists of getting two samples of five individuals from the same population, with mean and standard deviation equal to the overall mean/standard deviation of the two original samples A and P. For each of the 100,000 couples of samples, we calculate T and store the result in the 'result' vector, which, in the end, represents the sampling distribution we were looking for.
+
+
+
+```r
+# We assume a single population
+mAP <- mean(c(A, P))
+devStAP <- sd(c(A, P))
+
+# we repeatedly sample from this common population
+set.seed(34)
+result <- rep(0, 100000)
+for (i in 1:100000){
+  sample1 <- rnorm(5, mAP, devStAP)
+  sample2 <- rnorm(5, mAP, devStAP)
+  SED <- sqrt( (sd(sample1)/sqrt(5))^2 +
+                 (sd(sample2)/sqrt(5))^2 )
+  result[i] <- (mean(sample1) - mean(sample2)) / SED
+}
+mean(result) 
+## [1] -0.001230418
+min(result)
+## [1] -9.993187
+max(result)
+## [1] 9.988315
+```
+
+
+What values did we obtain for $T$? On average, the values are close to 0, as we expected, considering that both samples were always obtained from the same population. However, we also note pretty high and low values (close to 10 and -10), which proves that random sampling fluctuations can also bring to very 'odd' results. For our real experiment we obtained $T = -4.521727$, although the negative sign is just an artifact, relating to how we sorted the two means: we could have as well obtained $T = 4.521727$.
+
+**Ronald Fisher proposed that we should reject the null, based on the probability of obtaining values as extreme or more extreme than those we observed, when the null is true**. Looking at the vector 'result' we see that the proportion of values lower than -4.521727 and higher than 4.521727 is  $0.00095 + 0.00082 = 0.00177$. This is the so called **P-value** (see the code below). 
+
+
+```r
+length(result[result < Ti]) / 100000
+## [1] 0.00095
+length(result[result > - Ti]) /100000
+## [1] 0.00082
+```
+
+Let's summarise. We have seen that, when the null is true, the sampling distribution for $T$ contains a very low proportion of values outside the interval from -4.521727 to 4.521727. Therefore, our observation fell in a very unlikely range, corresponding to a probability of 0.00177 (P-value = 0.00177); the usual yardstick for decision is 0.05, thus we reject the null. We do so, because, if the null were true, we would have obtained a very unlikely result; in other words, our scientific evidence against the null is strong enough to reject it.
+
+### A formal solution
+
+A new question: is there any formal PDF, which we can use in place of our empirical, Monte-Carlo based sampling distribution for T? Let's give a closer look at the 'result' vector. In particular, we can bin this continuous variable and plot the empirical distribution of frequencies (see Figure \@ref(fig:figName71))
+
+
+
+```r
+#Sampling distribution per T 
+
+b <- seq(-10, 10, by=0.25)
+hist(result, breaks = b, freq=F, 
+  xlab = expression(paste(m)), ylab="Density", 
+  xlim=c(-10,10), ylim=c(0,0.45), main="")
+curve(dnorm(x), add=TRUE, col="blue", n = 10001)
+curve(dt(x, 8), add=TRUE, col="red", n = 10001)
+```
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName71-1.png" alt="Empirical sampling distribution for the T statistic, compared to a standardised gaussian (blue line) and a Student's t distribution with 8 degree of freedom (red line)" width="85%" />
+<p class="caption">(\#fig:figName71)Empirical sampling distribution for the T statistic, compared to a standardised gaussian (blue line) and a Student's t distribution with 8 degree of freedom (red line)</p>
+</div>
+
+We see that the empirical distribution is not exactly standardised gaussian, but it can be described by using another type of distribution, that is the Student's t distribution, with eight degrees of freedom (i.e. the sum of the degrees of freedom for the two samples). Now that we know this, instead of making a time consuming Monte Carlo simulation, we can use the Student's t CDF to calculate the P-value, as shown in the box below.
+
+
+
+```r
+pt(Ti, df=8) # probability that T > 4.5217
+## [1] 0.0009727349
+pt(-Ti, df=8, lower.tail = F) # probability that T < -4.5217
+## [1] 0.0009727349
+2 * pt(Ti, df=8) #P-value
+## [1] 0.00194547
+```
+
+
+We see that the P-value is very close to that obtained by using simulation.
+
+### The t test with R
+
+What we have just described is known as the Student's t-test and it is often used to compare the means of two samples. The null hypothesis is that the two samples are drawn from the same populations and, therefore, their means are not significantly different. In practice, what we do is:
+
+1. Calculate the means and standard errors for the two samples
+2. Calculate the difference between the means
+3. Calculate the SED
+3. Calculate the observed $T$ value
+4. Use the Student's t CDF to retrieve the probabilities $P(t < -T)$ and $P(t > T)$
+5. Reject the null hypothesis if the sum of the above probabilities is lower than 0.05.
+
+More simply, we can reach the same solution by using the `t.test()` function in R, as shown in the box below.
+
+
+
+```r
+t.test(A, P, paired = F, var.equal = T)
+## 
+## 	Two Sample t-test
+## 
+## data:  A and P
+## t = -4.5217, df = 8, p-value = 0.001945
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -22.951742  -7.448258
+## sample estimates:
+## mean of x mean of y 
+##      70.2      85.4
+```
+
+Perhaps, it is worth to discuss the meaning of the two arguments 'paired' and 'var.equal', which were set, respectively, to FALSE and TRUE. In some cases two measures are taken on the same subject and we are interested in knowing whether there is a significant difference between the first and the second measure. For example, let's imagine that we have given a group of five cows a certain drug and we have measured some blood parameter before and after the treatment. We would have a dataset composed by ten values, but we would only have five subjects, which would make a big difference with respect to our previous example.
+
+In such a condition we talk about a paired t-test, which is performed by setting the argument 'paired' to TRUE, as shown in the box below.
+
+
+```r
+t.test(A, P, paired = T, var.equal = T)
+## 
+## 	Paired t-test
+## 
+## data:  A and P
+## t = -22.915, df = 4, p-value = 2.149e-05
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -17.04169 -13.35831
+## sample estimates:
+## mean of the differences 
+##                   -15.2
+```
+
+The calculations are totally different and, therefore, the significance is, as well, different. In particular, we consider the five pairwise differences, their mean and their standard error, as shown below:
+
+
+```r
+diff <- mean(A - P)
+SED <- sd(A - P)/sqrt(5) 
+diff/SED
+## [1] -22.91486
+```
+
+One further difference is that, as we have five subjects instead of ten, we only have four degrees of freedom.
+
+In relation to the argument 'var.equal', you have perhaps noted that we made our Monte Carlo simulation by drawing samples from one gaussian distribution. However, the two samples might come from two gaussian distributions with the same mean and different standard deviations, which would modify our sampling distribution for $T$, so that our P-level would become invalid. We talk about **heteroscedasticity** when the populations, and therefore the two samples, have different standard deviations. Otherwise we talk about **homoscedasticity**. 
+
+If we have reasons to suppose that the two samples come from populations with different standard deviations, we should use a heteroscedastic t-test (better known as Welch test). We can set the 'var.equal' argument to FALSE, as shown in the box below.
+
+
+```r
+t.test(A, P, paired = F, var.equal = F)
+## 
+## 	Welch Two Sample t-test
+## 
+## data:  A and P
+## t = -4.5217, df = 7.7977, p-value = 0.002076
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -22.986884  -7.413116
+## sample estimates:
+## mean of x mean of y 
+##      70.2      85.4
+```
+
+We see that the test is slightly less powerful (lower P-value), due to a reduced number of degrees of freedom, that is approximated by using the Satterthwaite formula:
+
+$$DF_s \simeq \frac{ \left( s^2_1 + s^2_2 \right)^2 }{ \frac{(s^2_1)^2}{DF_1} + \frac{(s^2_2)^2}{DF_2} }$$
+
+which reduces to:
+
+$$DF_s = 2 \times DF$$
+
+when the two samples are homoscedastic ($s_1 = s_2$).
+
+in our example:
+
+
+```r
+dfS <- (var(A) + var(P))^2 / 
+  ((var(A)^2)/4 + (var(P)^2)/4)
+dfS
+## [1] 7.79772
+```
+
+
+How do we decide whether the two samples have the same standard deviation and thus we can use a homoscedastic t-test? In general, we use a heteroscedastic t-test whenever the standard deviation for one sample is twice or three times as much with respect to the other, although some statisticians suggest that we should better use a heteroscedastic t-test in all cases, in order to increase our protection level against wrong rejections.
+
+## Comparing proportions: the $\chi^2$ test
+
+The t-test is very useful, but we can only use it with quantitative variables. What if we have a nominal response, e.g. death/alive, germinated/ungerminated? Let's imagine an experiment where we have sprayed two populations of insects with an insecticide, respectively with or without an adjuvant. From one population (with adjuvant), we get a random sample of 75 insects and record 56 deaths, while from the other population (without adjuvant) we get a random sample of 50 insects and record 48 deaths.
+
+In this case the sample efficacies are $p_1 = 56/75 = 0.747$ and $p_2 = 0.96$, but we are not interested in the samples, but in the whole populations, from where we sampled our insects.
+
+If we remember Chapter 3, we may recall that the results of such an experiment reduce to a contingency table, as shown in the box below:
+
+
+
+```r
+counts <- c(56, 19, 48, 2)
+tab <- matrix(counts, 2, 2, byrow = T)
+row.names(tab) <- c("I", "IA")
+colnames(tab) <- c("D", "A")
+tab <- as.table(tab)
+tab
+##     D  A
+## I  56 19
+## IA 48  2
+```
+
+
+For such a table, we already know how to calculate a $\chi^2$, which measures the dependency among the two traits (insecticide treatment and deaths); the observed value, for our sample, is 9.768 (see below).
+
+
+```r
+summary(tab)
+## Number of cases in table: 125 
+## Number of factors: 2 
+## Test for independence of all factors:
+## 	Chisq = 9.768, df = 1, p-value = 0.001776
+```
+
+Clearly, like any other sample based statistic, the value of $\chi^2$ changes any time we repeat the sampling effort. Therefore, the null hypothesis is:
+
+$$H_o :\pi_1  = \pi_2  = \pi$$
+
+Please, note that we make a reference to the populations, not to the samples. If this is true, what is the sampling distribution for $\chi^2$? And, what is the probability of obtaining a value of 9.768, or higher?
+
+Although it is possible to set up a Monte Carlo simulation to derive an empirical distribution, we will not do so, for the sake of brevity. We anticipate that the sampling distribution for $\chi^2$ can be described by using the $\chi^2$ density function, with the appropriate number of degrees of freedom (the minimum between the number of columns and the number of rows, minus 1). In our case, we have only one degree of freedom and we can use the cumulative $\chi^2$ distribution function to derive the probability of obtaining a value of 9.768, or higher:
+
+
+
+```r
+pchisq(9.76801, 1, lower.tail=F)
+## [1] 0.001775746
+```
+
+The P-value is much lower than 0.05 and thus we can reject the null. We can get to the same result by using the `chisq.test()` function:
+
+
+
+```r
+chisq.test(tab, correct = F)
+## 
+## 	Pearson's Chi-squared test
+## 
+## data:  tab
+## X-squared = 9.768, df = 1, p-value = 0.001776
+```
+
+Please, note the argument 'correct = F'. A chi-square test is appropriate only when the number of subjects is high enough, e.g. higher than 30 subjects, or so. If not, we should improve our result by applying the so-called continuity correction, by using the argument 'correct = T', that is the default option in R.
+
+
+## Correct interpretation of the P-value
+
+We use the P-value as the tool to decide whether we should accept or reject the null, i.e. we use it as an heuristic tool, which was exactly Ronald Fisher's original intention. Later work by Jarzy Neyman and Egon Pearson, around 1930, gave the P-value a slightly different meaning, i.e. the probability of wrongly rejecting the null (so-called type I error rate: false positive). However, we should interpret such a probability with reference to the sampling distribution, not with reference to a single experiment. It means that we can say that: *if the null is true and we repeat the experiment an infinite number of times, we have less than 5% probability of obtaining such a high T or $\chi^2$ value*.  On the other hand, we cannot legitimately conclude our experiment by saying that: *there is less then 5% probability that we have reached wrong conclusions*. Indeed, we do not (and will never) know whether we have reached correct conclusions in our specific experiment, while our 'false-positive' probability is only valid on the long run.
+
+
+## Conclusions
+
+The intrinsic uncertainty in all experimental data does not allow us to reach conclusions and make decisions with no risk of error. As our aim is to reject hypotheses, we protect ourself as much as possible against the possibility of wrong rejection. To this aim, we use the P-value for the null hypothesis: if this is lower than the predefined yardstick level (usually $\alpha = 0.05$) we reject the null and we can be confident that such an heuristic, in the long run, will result in less than 5% of wrong rejections.
+
+Before concluding, we should point out that we do not only run the risk of committing a false-positive error (type I error), we also run the risk of committing a false negative error (type II error), whenever we fail to reject a false null hypothesis. These two type of errors are nicely put in Figure \@ref(fig:figName72), that is commonly available in the web.
+
+<div class="figure" style="text-align: center">
+<img src="_images/statisticalErrors.jpeg" alt="The two types of statistical errors" width="85%" />
+<p class="caption">(\#fig:figName72)The two types of statistical errors</p>
+</div>
+
+Please, also note that the two error types are interrelated and the highest the protection against the false-positive error, the highest the risk of committing a false negative error. In general, we should be always careful to decide which of the two errors might be more dangerous for our specific aim.
+
+
+---
+
+
+## Further readings
+
+1. Hastie, T., Tibshirani, R., Friedman, J., 2009. The elements of statistical learning, Springer Series in Statistics. Springer Science + Business Media, California, USA.
+
 
 <!--chapter:end:06-Eng_TestIpotesi.Rmd-->
 
 # One-way ANOVA models
 
-To be done ...
+In Chapter 4 we have seen that the experimental observations can be described by way of models with both a deterministic and a stochastic component. With specific reference to the former component, we have already introduced an example of an ANOVA model, belonging to a very important class of linear models, where the response variable is quantitative, while the predictors are represented by one or several nominal explanatory factors. It is necessary to state that, strictly speaking, the term 'ANOVA model' is slightly imprecise; indeed, ANOVA stands for ANalysis Of VAriance and it is a method for decomposing the variance of a group of observations, which was invented by Ronald Fisher, almost one century ago. However, the models we are discussing here are strongly connected to the Fisherian ANOVA, which motivates their name.
+
+In this Chapter we will use a simple (but realistic) example to introduce the ANOVA models with only one predictor (one-way ANOVA models).
+
+## Comparing herbicides in a pot-experiment
+
+We have designed a pot-experiment to compare weed control efficacy of two herbicides used alone and in mixture. A control was also added as a reference and, thus, the four treatments were:
+
+1. Metribuzin
+2. Rimsulfuron
+3. Metribuzin + rimsulfuron
+4. Untreated control
+
+
+Sixteen uniform pots were prepared and sown with *Solanum nigrum*; when the plants were at the stage of 4-true-leaves, the pots were randomly sprayed with the above herbicide solution, according to a completely randomised design with four replicates. Three weeks after the treatment, the plants in each pot were harvested and weighted: the lower the weight the higher the efficacy of herbicides.
+
+The results of this experiment are reported in a 'csv' file, that is available in a web repository. First of all, let's load the data into R.
+
+\vspace{12pt}
+
+```r
+repo <- "https://www.casaonofri.it/_datasets/"
+file <- "mixture.csv"
+pathData <- paste(repo, file, sep = "")
+
+dataset <- read.csv(pathData, header = T)
+head(dataset)
+##             Treat Weight
+## 1 Metribuzin__348  15.20
+## 2 Metribuzin__348   4.38
+## 3 Metribuzin__348  10.32
+## 4 Metribuzin__348   6.80
+## 5     Mixture_378   6.14
+## 6     Mixture_378   1.95
+```
+
+Please, note that the dataset is in a 'tidy' format, with one row per observation and one column per variable. The first row contains the names of variables. i.e., 'Treat', representing the factor level and 'Weight', representing the response variable. While other data formats might be more suitable for visualisation, the 'tidy' format is the base of every statistical analyses with most software tools and it can be easily transformed into other formats, whenever necessary (Wichkam, 2014).
+
+## Data description
+
+The first step is the description of the observed data. In particular, we calculate:
+
+1. sample means for each treatment level
+2. sample standard deviations for each treatment level
+
+To do so, we use the `tapply()` function, as shown in the box below and we also use the `data.frame()` function to create a data table for visualisation purposes.
+
+\vspace{12pt}
+
+```r
+treatMeans <- tapply(dataset$Weight, dataset$Treat, mean)
+SDs <- tapply(dataset$Weight, dataset$Treat, sd)
+descrit <- data.frame(treatMeans, SDs)
+descrit
+##                 treatMeans      SDs
+## Metribuzin__348     9.1750 4.699089
+## Mixture_378         5.1275 2.288557
+## Rimsulfuron_30     16.8600 4.902353
+## Unweeded           26.7725 3.168673
+```
+
+
+What do we learn, from the above table of means? We learn that:
+
+1. the mixture is slightly more effective than the herbicides used alone;
+2. the standard deviations are rather similar, for all treatments.
+
+Now, we ask ourselves: is there any significant difference between the efficacy of herbicides? If we look at the data, the answer is yes; indeed, the four means are different. However, we do not want to reach conclusions about our dataset; we want to reach general conclusions. We observed the four means $m_1$, $m_2$, $m_3$ and $m_4$, but we are interested in $\mu_1$, $\mu_2$, $\mu_3$ and $\mu_4$, i.e. the means of the populations from where our samples were drawn. What are the populations, in this case? They consist of all possible pots that we could have treated with each herbicide, in our same environmental conditions.
+
+
+## Model definition
+
+In order to answer the above question, we need to define a suitable model to describe our dataset. A possible candidate model is:
+
+$$Y_i = \mu + \alpha_j + \varepsilon_i$$
+
+This model postulates that each observation $Y_i$ derives from the value $\mu$ (so called intercept and common to all observations) plus the amount $\alpha_j$, that depends on the treatment group $j$, plus the stochastic effect $\varepsilon_i$, which is specific to each observation and represents the experimental error. This stochastic element is regarded as gaussian distributed, with mean equal to 0 and standard deviation equal to $\sigma$. In mathematical terms:
+
+$$\varepsilon_i \sim N(0, \sigma)$$
+
+The expected value for each observation, depending on the treatment group, is
+
+$$\bar{Y_i} = \mu + \alpha_j = \mu_j$$
+
+and corresponds to the group mean. In order to understand the biological meaning of $\mu$ and $\alpha$ values we need to go a little bit more into the mathematical detail.
+
+
+### Parameterisation
+
+Let's consider the first observation $Y_1 = 15.20$; we need to estimate three values ($\mu$, $\alpha_1$ and $\varepsilon_1$) which return 15.20, by summation. Clearly, there is an infinite number of such triplets and, therefore, the estimation problem is undetermined, unless we put constraints on some model parameters. There are several ways to put such constraints, corresponding to different **model parameterisations**; in the following section, we will list two of them: the treatment constraint and the sum-to-zero constraint.
+
+### Treatment constraint
+
+A very common constraint is $\alpha_1 = 0$. As the consequence:
+
+$$\left\{ {\begin{array}{l}
+\mu_1 = \mu + \alpha_1 = \mu + 0\\
+\mu_2 = \mu + \alpha_2 \\
+\mu_3 = \mu + \alpha_3 \\
+\mu_4 = \mu + \alpha_4
+\end{array}} \right.$$
+
+With such a constraint, $\mu$ is the mean for the first treatment level (in R, it is the first in alphabetical order), while $\alpha_2$, $\alpha_3$ and $\alpha_4$ are the differences between, respectively, the second, third and fourth treatment level means, with respect to the first one.
+
+In general, with this parameterisation, model parameters are means or differences between means.
+
+### Sum-to-zero constraint
+
+Another possible constraint is $\sum{\alpha_j} = 0$. If we take the previous equation and sum all members we get:
+
+$$\mu_1 + \mu_2 + \mu_3 + \mu_4 = 4 \mu + \sum{\alpha_j}$$
+
+Imposing the sum-to-zero constraint we get to:
+
+$$\mu_1 + \mu_2 + \mu_3 + \mu_4 = 4 \mu$$
+
+and then to:
+
+$$\mu = \frac{\mu_1 + \mu_2 + \mu_3 + \mu_4}{4}$$
+
+Therefore, with this parameterisation $\mu$ is the overall mean, while the $\alpha_j$ values represent the differences between each treatment mean and the overall mean (**treatment effects**). A very effective herbicide will have low negative $\alpha$ values, while a bad herbicide will have high positive $\alpha$ values.
+
+In general, with this parameterisation, model parameters represent the overall mean and the effects of the different treatments.
+
+The selection of constraints is up to the user, depending on the aims of the experiment. In this book, we will use the sum-to-zero constraint for our hand-calculations, as parameter estimates are easier to obtain and have a clearer biological meaning. In R, the treatment constraint is used by default, although the sum-to-zero constraint can be easily obtained, by using the appropriate coding. Independent on model parameterisation, the expected values, the residuals and all the other statistics are totally equal.
+
+
+## Basic assumptions
+
+The ANOVA model above makes a number of **basic assumptions**:
+
+1. the effects are purely additive;
+2. there are no other effects apart from the treatment and random noise. In particular, there are no components of systematic error;
+3. errors are independently sampled from a gaussian distribution;
+4. error variances are homogeneous, independent from the experimental treatments (indeed, we only have one $\sigma$ value, common to all treatment groups)
+
+**We need to always make sure that the above assumptions are tenable, otherwise our model will be invalid, as well as all inferences therein**. We will discuss this aspect in the next chapter.
+
+## Fitting ANOVA models by hand
+
+Model fitting is the process by which we take the general model defined above and use the data to find the most appropriate values for the unknown parameters. In general, linear models are fitted by using the least squares approach, i.e. we look for the parameter values that minimise the squared difference between the observed data and model predictions. Nowadays, such minimisation is always carried out by using a computer, although we think that, once in life, fitting ANOVA models by hand may be very helpful, to understand the fundamental meaning of such a brilliant technique. In order to ease the process, we will not use the least squares method, but we will use the arithmetic means and the method of moments. Please, remember that this method is only appropriate when the data are balanced, i.e. when the number of replicates is the same for all treatment groups.
+
+### Parameter estimation
+
+According to the sum-to-zero constraint, we calculate the overall mean (m) as:
+
+\vspace{12pt}
+
+```r
+m <- mean(dataset$Weight)
+mu <- m
+```
+
+and our point estimate is $\mu = m = 14.48375$. Next, we can estimate the $\alpha$ effects by subtracting the overall mean from the group means:
+
+\vspace{12pt}
+
+```r
+alpha <- treatMeans - mu
+alpha
+## Metribuzin__348     Mixture_378  Rimsulfuron_30 
+##        -5.30875        -9.35625         2.37625 
+##        Unweeded 
+##        12.28875
+```
+
+
+Please, note that the last parameter $\alpha_4$ was not 'freely' selected, as it was implicitly constrained to be:
+
+$$\alpha_4 = - \left( \alpha_1 + \alpha_2 + \alpha_3 \right)$$
+
+Now, to proceed with our hand-calculations, we need to repeat each $\alpha$ value four times, so that each original observation is matched to the correct $\alpha$ value, depending on the treatment group (see later).
+
+\vspace{12pt}
+
+```r
+alpha <- rep(alpha, each = 4)
+```
+
+
+### Residuals
+
+After deriving $\mu$ and $\alpha$ values, we can calculate the expected values by using the equation above and, lately, the residuals, as:
+
+$$ \varepsilon_i = Y_i - \left( \mu - \alpha_j \right)$$
+
+The results are shown in the following prospect:
+
+\vspace{12pt}
+
+```r
+Expected <- mu + alpha
+Residuals <- dataset$Weight - Expected
+tab <- data.frame(dataset$Treat, dataset$Weight, mu,
+             alpha, Expected, Residuals)
+names(tab)[1] <- "Herbicide"
+print(tab, digits = 3)
+##          Herbicide dataset.Weight   mu alpha Expected
+## 1  Metribuzin__348          15.20 14.5 -5.31     9.18
+## 2  Metribuzin__348           4.38 14.5 -5.31     9.18
+## 3  Metribuzin__348          10.32 14.5 -5.31     9.18
+## 4  Metribuzin__348           6.80 14.5 -5.31     9.18
+## 5      Mixture_378           6.14 14.5 -9.36     5.13
+## 6      Mixture_378           1.95 14.5 -9.36     5.13
+## 7      Mixture_378           7.27 14.5 -9.36     5.13
+## 8      Mixture_378           5.15 14.5 -9.36     5.13
+## 9   Rimsulfuron_30          10.50 14.5  2.38    16.86
+## 10  Rimsulfuron_30          20.70 14.5  2.38    16.86
+## 11  Rimsulfuron_30          20.74 14.5  2.38    16.86
+## 12  Rimsulfuron_30          15.50 14.5  2.38    16.86
+## 13        Unweeded          24.62 14.5 12.29    26.77
+## 14        Unweeded          30.94 14.5 12.29    26.77
+## 15        Unweeded          24.02 14.5 12.29    26.77
+## 16        Unweeded          27.51 14.5 12.29    26.77
+##    Residuals
+## 1     6.0250
+## 2    -4.7950
+## 3     1.1450
+## 4    -2.3750
+## 5     1.0125
+## 6    -3.1775
+## 7     2.1425
+## 8     0.0225
+## 9    -6.3600
+## 10    3.8400
+## 11    3.8800
+## 12   -1.3600
+## 13   -2.1525
+## 14    4.1675
+## 15   -2.7525
+## 16    0.7375
+```
+
+
+### Standard deviation $\sigma$
+
+In order to get an estimate for $\sigma$, we calculate the Residual Sum of Squares (RSS):
+
+\vspace{12pt}
+
+```r
+RSS <- sum(Residuals^2)
+RSS
+## [1] 184.1774
+```
+
+In order to obtain the residual variance, we need to divide the RSS by the appropriate number of Degrees of Freedom (DF); the question is: what is this number? We need to consider that the residuals represent the differences between each observed value and the group mean; therefore, those residuals must sum up to zero within all treatment groups, so that we have 16 residuals, but only three per group are 'freely' selected, while the fourth one must be equal to the opposite of the sum of the other three. Hence, the number of degrees of freedom is $3 \times 4 = 12$.
+
+In more general terms, the number of degrees of freedom for the RSS is $p (k -1)$, where $p$ is the number of treatments and $k$ is the number of replicates (assuming that this number is constant across treatments). The residual variance is:
+
+$$MS_{e}  = \frac{184.178}{12} = 15.348$$
+
+Consequently, our best point estimate for $\sigma$ is:
+
+$$sigma =  \sqrt{15.348} = 3.9177$$
+
+Now, we can use our point estimates for model parameters to calculate point estimates for the group means (e.g.: $\mu_1 = \mu + \alpha_1$), which, in this instance, are equal to the arithmetic means, although this is not generally true. However, we know that point estimates are not sufficient to draw general conclusions and we need to provide the appropriate confidence intervals.
+
+### SEM and SED
+
+The standard errors for the four means are easily obtained, by the usual rule ($k$ is the number of replicates):
+
+$$SEM = \frac{s}{ \sqrt{k}} =  \frac{3.918}{ \sqrt{4}}$$
+
+You may have noted that, for all experiments, there are two ways to calculate standard errors for the group means:
+
+1. by taking the standard deviations for each treatment group, as shown in Chapter 3. With $k$ treatments, this method results in $k$ different standard errors;
+2. by taking the pooled standard deviation estimate $s$. In this case, we have only one common SEM value, for all group means. 
+
+You may wonder which method is the best. Indeed, if the basic assumption of variance homogeneity is tenable, the second method is better, as the pooled SEM is estimated with higher precision, with respect to the SEs for each group mean (12 degrees of freedom, instead of 3).
+
+The standard error for the difference between any possible pairs of means is:
+
+$$SED = \sqrt{ MS_{1} + MS_{2} } = \sqrt{ 2 \cdot \frac{MS_e}{n} } =  \sqrt{2}  \cdot \frac{3.9177}{\sqrt{4}} = \sqrt{2} \cdot SEM$$
+
+
+### Variance partitioning
+
+Fitting the above model is prodromic to the Fisherian ANalysis Of VAriance, i.e. the real ANOVA technique. The aim is to partition the total variability of all observations into two components: the first one is due to treatment effects and the other one is due to all other effects of random nature.
+
+In practice, we start our hand calculations from the total sum of squares (SS), that is the squared sum of residuals for each value against the overall mean (see Chapter 3):
+
+$$\begin{array}{c}
+SS = \left(24.62 - 14.48375\right)^2 + \left(30.94 - 14.48375\right)^2 + ... \\
+... + \left(15.50 - 14.48375\right)^2 = 1273.706
+\end{array}$$
+
+Total deviance relates to the all the effects, both from known and unknown sources (treatment + random effects). With R:
+
+\vspace{12pt}
+
+```r
+SS <- sum( (dataset$Weight - mu)^2 )
+```
+
+Second, we can consider that the RSS represents the amount of data variability produced by random effects. Indeed, the variability of data within each treatment group cannot be due to treatment effects.
+
+Finally, we can consider that variability produced by treatment effects is measured by the $\alpha$ values and, therefore, the treatment sum of squares (TSS) is given by the sum of squared $\alpha$ values:
+
+\vspace{12pt}
+
+```r
+TSS <- sum(tab$alpha^2)
+TSS
+## [1] 1089.529
+```
+
+Please, note that the sum of the residual sum of squares (RSS) and the treatment sum of squares (TSS) is exactly equal to the total sum of squares:
+
+\vspace{12pt}
+
+```r
+TSS + RSS
+## [1] 1273.706
+```
+
+The partitioning of total variance shows that random variability is much lower than treatment variability, although we know that we cannot directly compare two deviances, when they are based on a different number of DFs (see Chapter 3).
+
+Therefore, we calculate the corresponding variances: we have seen that the RSS has 12 degrees of freedom and the related variance is $MS_e = 15.348$. The TSS has 3 degrees of freedom, that is the number of treatment levels minus one; the related variance is:
+
+$$MS_t = \frac{1089.529}{3} = 363.1762$$
+
+These two variances (treatment and residual) can be directly compared. Fisher, in 1920, proposed the following F-ratio:
+
+$$F = \frac{MS_t}{MS_e} = \frac{363.18}{15.348} = 23.663$$
+
+It shows that the variability imposed by the experimental treatment is more than 23 times higher than the variability due to random noise, which supports the idea that the treatment effect is significant. However, we need a formal statistical test to support such a statement.
+
+### Hypothesis testing
+
+Let me recall a basic concept that has already appeared before and it is going to return rather often in this book (apologies for this). We have observed a set of 16 data, coming from a pot-experiment, but these data represent only a sample of an infinite number of replicated experiments that we could perform. Therefore, the observed F value is just an instance of an infinite number of possible F values, which define a sampling distribution. How does such sampling distribution look like?
+
+In order to determine the sampling distribution for the F-ratio, we need to make some hypotheses. The null hypothesis is that the treatments have no effects and, thus:
+
+$$H_0: \mu_1 = \mu_2 = \mu_3 = \mu_4$$
+
+Analogously:
+
+$$H_0: \alpha_1 = \alpha_2 = \alpha_3 = \alpha_4 = 0$$
+
+In other words, if $H_0$ were true, the four samples would be drawn from the same gaussian population. What would become of the F-ratio? We could see this by using Monte Carlo simulation, but, for the sake of simplicity, let's exploit literature information: the American mathematician George Snedecor demonstrated that, when the null is true, the sample based F-ratio is distributed according to the F-distribution (Fisher-Snedecor distribution). In more detail, Snedecor defined a family of F-distributions, whose elements are selected, depending on the number of degrees of freedom at the numerator and denominator. For our example (three degrees of freedom at the numerator and 12 at the denominator), the F distribution is shown in Figure \@ref(fig:figNameF). We see that the mode is between 0 and 1, while the expected value is around 1. We also see that values above 6 are very unlikely.
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figNameF-1.png" alt="Probabilty density function for F distribution with three and twelve degrees of freedom" width="90%" />
+<p class="caption">(\#fig:figNameF)Probabilty density function for F distribution with three and twelve degrees of freedom</p>
+</div>
+
+
+Now, we can use the cumulative distribution function in R to calculate the probability of obtaining values as high as 23.663 (the observed value) or higher:
+
+\vspace{12pt}
+
+```r
+pf(23.663, 3, 12, lower.tail = F)
+## [1] 2.508789e-05
+```
+
+We can see that, if the hull is true and we repeat the experiment a very high humber of times, there is only one chance in 250,000 that we observe such a high F-value. As the consequence, we reject the null and accept the alternative, i.e. there is at least one treatment level that produced a significant effect.
+
+## Fitting ANOVA models with R
+
+Fitting models with R is very straightforward, by way of a very consistent platform for most types of models. For linear models, we use the `lm()` function, according to the following syntax:
+
+```
+mod <- lm(Weight ~ factor(Treat), data = dataset)
+```
+
+The first argument is the equation we want to fit: on the left side, we specified the name of the response variable, the 'tilde' means 'is a function of and replaces the = sign and, on the right side, we specified the name of the factor variable. We did not specify the intercept and the stochastic term $\varepsilon$, which are included by default. Please, also note that, prior to analysis, we transformed the 'Treat' variable into a factor, by using the `factor()` function. Such a transformation is not strictly necessary with character variables, but becomes fundamental with numeric variables, representing numbers and not classes.
+
+\vspace{12pt}
+
+```r
+dataset$Treat <- factor(dataset$Treat)
+mod <- lm(Weight ~ Treat, data = dataset)
+```
+
+
+After fitting the model, results are written into the 'mod' variable and can be read by using the appropriate extractor ($ sign) or by using some of the available methods. For example, the `summary()` method returns parameter estimates, according to the treatment constraint, that is the default in R.
+
+\vspace{12pt}
+\scriptsize
+
+```r
+summary(mod)
+## 
+## Call:
+## lm(formula = Weight ~ Treat, data = dataset)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -6.360 -2.469  0.380  2.567  6.025 
+## 
+## Coefficients:
+##                     Estimate Std. Error t value Pr(>|t|)
+## (Intercept)            9.175      1.959   4.684 0.000529
+## TreatMixture_378      -4.047      2.770  -1.461 0.169679
+## TreatRimsulfuron_30    7.685      2.770   2.774 0.016832
+## TreatUnweeded         17.598      2.770   6.352 3.65e-05
+##                        
+## (Intercept)         ***
+## TreatMixture_378       
+## TreatRimsulfuron_30 *  
+## TreatUnweeded       ***
+## ---
+## Signif. codes:  
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 3.918 on 12 degrees of freedom
+## Multiple R-squared:  0.8554,	Adjusted R-squared:  0.8193 
+## F-statistic: 23.66 on 3 and 12 DF,  p-value: 2.509e-05
+```
+
+\normalsize
+
+For the sake of completeness, it might be useful to show that we can change the parameterisation, by setting the argument 'contrasts' and passing a list of factors associated to the requested parameterisation (Treat = "contr.sum", in this case). There are other methods to change the parameterisation, either globally (for the whole R session) or at the factor level; further information can be found in literature. 
+
+\vspace{12pt}
+
+```r
+mod2 <- lm(Weight ~ Treat, data = dataset,
+           contrasts = list(Treat = "contr.sum"))
+summary(mod2)$coef
+##             Estimate Std. Error   t value     Pr(>|t|)
+## (Intercept) 14.48375  0.9794169 14.788135 4.572468e-09
+## Treat1      -5.30875  1.6963999 -3.129421 8.701206e-03
+## Treat2      -9.35625  1.6963999 -5.515356 1.329420e-04
+## Treat3       2.37625  1.6963999  1.400761 1.866108e-01
+```
+
+Regardless of the parameterisation, fitted values and residuals can be obtained by using the `fitted()` and `residuals()` methods:
+
+\vspace{12pt}
+
+```r
+expected <- fitted(mod)
+epsilon <- residuals(mod)
+```
+
+The residual deviance is:
+
+\vspace{12pt}
+
+```r
+deviance(mod)
+## [1] 184.1774
+```
+
+while the residual standard deviation needs to be extracted from the slot 'sigma', from the output of the `summary()` method:
+
+\vspace{12pt}
+
+```r
+summary(mod)$sigma
+## [1] 3.917668
+```
+
+The ANOVA table is obtained by using the `anova()` method:
+
+\vspace{12pt}
+
+```r
+anova(mod)
+## Analysis of Variance Table
+## 
+## Response: Weight
+##           Df  Sum Sq Mean Sq F value    Pr(>F)    
+## Treat      3 1089.53  363.18  23.663 2.509e-05 ***
+## Residuals 12  184.18   15.35                      
+## ---
+## Signif. codes:  
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+
+## Expected marginal means
+
+At the beginning of this chapter we have used the arithmetic means to describe the central tendency of each group. We have also seen that the sums $\mu + \alpha_j$ return the group means, taking the name **Expected Marginal Means** (EMMs), which can also be used as measures of central tendency. When the experiment is balanced (same number of replicates for all groups), EMMs are equal to the arithmetic means, while, when the experiment is unbalanced, they differ and provide better estimators of population means.
+
+In order to obtain expected marginal means with R, we need to install the add-in package 'emmeans' (Lenth, 2016) and use the `emmeans()` function therein.
+
+\vspace{12pt}
+
+```r
+# Install the package (only at the very first instance)
+# install.packages("emmeans") 
+library(emmeans) # Load the package
+muj <- emmeans(mod, ~Treat)
+muj
+##  Treat           emmean   SE df lower.CL upper.CL
+##  Metribuzin__348   9.18 1.96 12     4.91     13.4
+##  Mixture_378       5.13 1.96 12     0.86      9.4
+##  Rimsulfuron_30   16.86 1.96 12    12.59     21.1
+##  Unweeded         26.77 1.96 12    22.50     31.0
+## 
+## Confidence level used: 0.95
+```
+
+
+## Conclusions
+
+Fitting ANOVA models is the subject of several chapters in this book. In practice, we are interested in assessing whether the effect of treatments produces a bigger data variability than all other unknown stochastic effects. We do so by using the F ratio that, under the null hypothesis, has a Fisher-Snedecor F distribution. If the observed F value and higher values are very unlikely to occur under the null, we reject it and conclude that the treatment effect was significant.
+
+Finally, it is very important to point out that **all the above reasoning is only valid when the basic assumptions for linear models are met**. Therefore, it is always important to make the necessary inspections to ensure that there are no evident deviations, as we will see in the next chapter.
+
+---
+
+## Further readings
+
+1. Faraway, J.J., 2002. Practical regression and Anova using R. http://cran.r-project.org/doc/contrib/Faraway-PRA.pdf.
+2. Fisher, Ronald (1918). "Studies in Crop Variation. I. An examination of the yield of dressed grain from Broadbalk" (PDF). Journal of Agricultural Science. 11 (2): 107–135.
+3. Kuehl, R. O., 2000. Design of experiments: statistical principles of research design and analysis. Duxbury Press (CHAPTER 2)
+4. Lenth, R.V., 2016. Least-Squares Means: The R Package lsmeans. Journal of Statistical Software 69. https://doi.org/10.18637/jss.v069.i01
+5. Wickham, H (2014) Tidy Data. J Stat Soft 59
+
 
 <!--chapter:end:07-Eng_oneWayANOVA.Rmd-->
 
@@ -2069,7 +2964,7 @@ Consider a gaussian population with $\mu$ = 23 and $\sigma$ = 1. Calculate the p
 
 ### Exercise 1
 
-A chemical analysis was repeated three times, with the following results: 125, 169 and 142 ng/g. Calculate mean, deviance, variance, standard deviation, standard errors and confidence intervals (P = 0.95).
+A chemical analysis was repeated three times, with the following results: 125, 169 and 142 ng/g. Calculate mean, deviance, variance, standard deviation, standard error and confidence intervals (P = 0.95 and P = 0.99).
 
 ### Exercise 2
 
@@ -2078,16 +2973,16 @@ An experiment was carried out, comparing the yield of four wheat genotypes (in t
 
 |Genotype |    A|    B|    C|    D|
 |:--------|----:|----:|----:|----:|
-|A        | 5.30| 7.19| 4.84| 5.87|
-|B        | 5.10| 6.70| 5.42| 6.10|
-|C        | 5.04| 4.43| 5.21| 5.67|
-|D        | 6.14| 5.62| 6.95| 6.83|
+|A        | 5.22| 6.02| 5.08| 6.67|
+|B        | 6.08| 6.86| 7.07| 6.57|
+|C        | 4.42| 5.63| 4.49| 4.89|
+|D        | 6.14| 6.50| 5.27| 6.02|
 
 For each genotype, calculate the mean, deviance, variance, standard deviation, standard error and confidence interval (P = 0.95).
 
-### Exercise 4
+### Exercise 3
 
-We have measured the length of 30 maize seedling, treated with selenium in water solution. The observed lengths are:
+We have measured the length of 30 maize seedlings, treated with selenium in water solution. The observed lengths are:
 
 ```
 length <- c(2.07, 2.23, 2.04, 2.16, 2.12, 2.33, 2.21, 2.22, 2.29, 2.28, 
@@ -2097,7 +2992,7 @@ length <- c(2.07, 2.23, 2.04, 2.16, 2.12, 2.33, 2.21, 2.22, 2.29, 2.28,
 
 For the above sample, calculate the mean, deviance, variance, standard deviation, standard error and confidence interval (P = 0.95).
 
-### Exercise 5
+### Exercise 4
 
 A sample of 400 insects was sprayed with an insecticide and 136 individuals survived the treatment. Determine the efficacy of the insecticide, in terms of proportion of dead insects, together with 95% confidence limits.
 
@@ -2107,27 +3002,29 @@ A sample of 400 insects was sprayed with an insecticide and 136 individuals surv
 
 ### Exercise 1
 
-We have made an experiment to compare two fungicides A and B. The first fungicide was used to treat 200 fungi colonies and the number of surviving colonies was 180. B was used to treat 100 colonies and 50 survived. Is there a significant difference between A and B?
+We have compared two herbicides for weed control in maize. With the first herbicide (A), we observed the following weed coverings: 9.3, 10.2, 9.7 %. With the second herbicide, we observedd: 12.6, 12.3 e 12.5 %. Are the means for the two herbicides significantly different (P < 0.05)?
+
 
 ### Exercise 2
 
-We have compared two experimental treatments and, with the first one, we observed the following results: 9.3, 10.2, 9.7. With the second treatment, we obtained: 12.6, 12.3 e 12.5. Are the means significantly different?
+We have made an experiment to compare two fungicides A and B. The first fungicide was used to treat 200 fungi colonies and the number of surviving colonies was 180. B was used to treat 100 colonies and 50 of those survived. Is there a significant difference between the efficiacies of A and B (P < 0.05)?
+
 
 ### Exercise 3
 
-A plant pathologist studied the crop performancies with (A) and without (NT) a fungicide treatment. The results are as follows:
+A plant pathologist studied the crop performances with (A) and without (NT) a fungicide treatment. The results are as follows:
 
     A    NT
   ----- ----
    65    54
    71    51
-   6.8   59
+   68    59
 
 Was the treatment effect significant (P < 0.05)?
 
 ### Exercise 4
 
-In this year, an assay showed that 600 olive drupes out of 750 were attacked by  *Daucus olee*. In a close field, under the same environmental conditions, the count of attacked drupes was 120 on 750. Is such a difference significant or is it just a random fluctuation?
+In this year, an assay showed that 600 olive drupes out of 750 were attacked by  *Daucus olee*. In a close field, under the same environmental conditions, the count of attacked drupes was 120 on 750. Is the the observed difference statistically significant (P < 0.05) or is it just due to random fluctuation?
 
 ### Exercise 5
 
@@ -2145,6 +3042,42 @@ In a hospital, blood cholesterol level was measured for eight patients, before a
            8      243.6      190.5
 
 Can we say that this terapy is effective, or not?
+
+### Exercise 6
+
+A plant breeder organised an experiment to compare three wheat genotypes, i.e. GUERCINO, ARNOVA and BOLOGNA, according to a completely randomised design with 10 replicates. The observed yields are:
+
+
+| guercino | arnova | bologna |
+|:--------:|:------:|:-------:|
+|   53.2   |  53.1  |  43.5   |
+|   59.1   |  51.0  |  41.0   |
+|   62.3   |  51.9  |  41.2   |
+|   48.6   |  55.3  |  44.8   |
+|   59.7   |  58.8  |  40.2   |
+|   60.0   |  54.6  |  37.2   |
+|   55.7   |  53.0  |  45.3   |
+|   55.8   |  51.4  |  38.9   |
+|   55.7   |  51.7  |  42.9   |
+|   54.4   |  64.7  |  39.3   |
+
+1. Describe the three samples, by using the appropriate statistics of central tendency and spread
+2. Infere the means of the pupulations from where the samples were drawn
+3. For each of the three possible couples (GUERCINO vs ARNOVA, GUERCINO vs BOLOGNA and ARNOVA vs BOLOGNA), test the hypothesis that the two means are significantly different.
+
+
+
+
+### Exercise 7
+
+A botanist counted the number of germinated seeds for oilseed rape at two different temperatures (15 and 25°C). At 15°C, 358 germinations were counted out of 400 seeds. At 25°C, 286 germinations were counted out of 380 seeds.
+
+1. Describe the proportions of germination for the three samples
+2. Infere the proportion of germinated seeds in the two populations, from where the samples of seeds were extracted (remember that the variance for a proportion is calculated as $p \times (1- p)$.
+3. Test the hypothesis that temperature had a significant effect on the germinability of oilseed rape seeds.
+
+
+
 
 ---
 
@@ -2998,7 +3931,7 @@ plot(y ~ x)
 curve(7.77 * exp(0.189 * x), add = T, col = "red")
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-69-1.png" width="90%" />
+<img src="_main_files/figure-html/unnamed-chunk-109-1.png" width="90%" />
 
 ---
 
