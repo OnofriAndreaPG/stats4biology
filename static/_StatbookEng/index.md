@@ -1,7 +1,7 @@
 ---
 title: "Experimental methods in agriculture"
 author: "Andrea Onofri and Dario Sacco"
-date: "Update: v. 0.9 (2021-10-06), compil. 2021-11-11"
+date: "Update: v. 0.9 (2021-10-06), compil. 2021-11-23"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -2847,13 +2847,950 @@ Finally, it is very important to point out that **all the above reasoning is onl
 
 # Checking for the basic assumptions
 
-... 
+Let's take a further look at the ANOVA model we fitted in the previous chapter:
+
+$$Y_i = \mu + \alpha_j + \varepsilon_i$$
+
+with:
+
+$$ \varepsilon_i \sim N(0, \sigma) $$
+
+The above equations imply that the random components $\varepsilon_i$ (residuals) are the differences between observed and predicted data:
+
+$$\varepsilon_i = Y_i - Y_{Ei}$$
+
+where:
+
+$$Y_{Ei} = \mu + \alpha_j$$
+
+By definition, the mean of residuals is always 0, while the standard deviation $\sigma$ is to be estimated.
+
+As all the other linear models, ANOVA models make a number of important assumptions, which we have already listed in the previous chapter. We repeat them here:
+
+1. the deterministic model is linear and additive ($\mu + \alpha_j$);
+2. there are no other effects apart from the treatment and random noise. In particular, there are no components of systematic error;
+3. residuals are independently sampled from a gaussian distribution;
+4. the variance of residuals is homogeneous and independent from the experimental treatments (homoscedasticity assumption)
+
+The independence of residuals and the absence of systematic sources of experimental errors are ensured by the adoption of a valid experimental design and, therefore, they do not need to be checked after the analyses. On the contrary, we need to check that the residuals are gaussian and homoscedastic: if the residuals do not conform to such assumptions, the sampling distribution for the F-ratio is no longer the Fisher-Snedecor distribution and our P-values are invalid.
+
+In this respect, we should be particularly concerned about strong deviations, as the F-test is rather robust and can tolerate slight deviations with no dramatic changes of P-values.
+
+## Outlying observations
+
+In some instances, deviations from  the basic assumptions can be related to the presence of **outliers**, i.e. 'odd' observations, very far away from all other observations in the sample. For example, if the residuals are gaussian with mean equal to zero and standard deviation equal to 5, finding a residual of -20 or lower should be rather unlikely (32 cases in one million observations), as shown by the `pnorm()` function in the box below:
+
+
+```r
+pnorm(-20, 0, 5)
+## [1] 3.167124e-05
+```
+
+The presence of such an unlikely residual in a lot of, e.g., 50 residuals should be considered as highly suspicious: either we were rather unlucky, or there is something wrong with that residual. This is not irrelevant: indeed, such an 'odd' observation may have a great impact on the estimation of model parameters (means and variances) and hypothesis testing. This would be a so-called *influential observation* and we should not let it go unnoticed. We suggest that, before checking for the basic assumptions, a careful search for the presence of outliers should never be forgotten.
+
+## The inspection of residuals
+ 
+The residuals of linear models can be inspected either by graphical methods, or by formal hypothesis testing. Graphical methods are simple, but they are powerful enough to reveal strong deviations from the basic assumptions (as we said, slight deviations are usually tolerated). We suggest that these graphical inspection methods are routinely used with all linear models, while the support of formal hypothesis testing is left to the most dubious cases. 
+
+Residuals can be plotted in various ways, but, in this section, we will present the two main plot types, which are widely accepted as valid methods to check for the basic assumptions.
+
+### Plot of residuals against expected values
+
+First of all, it is useful to plot the residuals against the expected values. If there are no components of systematic error and if variances are homogeneous across treatments, the points in this graph should be randomly scattered (Figure \@ref(fig:figName101) ), with no visible systematic patterns.
+
+Every possible deviation from such a random pattern should be carefully inspected. For example, the presence of outliers is indicated by a few 'isolated points', as shown in Figure \@ref(fig:figName102). 
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName101-1.png" alt="Plot of residuals against expected values: there is no visible deviation from basic assumptions for linear model" width="85%" />
+<p class="caption">(\#fig:figName101)Plot of residuals against expected values: there is no visible deviation from basic assumptions for linear model</p>
+</div>
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName102-1.png" alt="Plot of residuals against expected values: an outlying observation is clearly visible" width="85%" />
+<p class="caption">(\#fig:figName102)Plot of residuals against expected values: an outlying observation is clearly visible</p>
+</div>
+
+When the cloud of points takes the form of a 'fennel' (Figure \@ref(fig:figName103)), the variances are proportional to the expected values and, therefore, they are not homogeneous across treatments (**heteroscedasticity**).
+
+In some other cases, the residuals tend to be systematically negative/positive for small expected values and systematically positive/negative for high expected values (Figure \@ref(fig:figName104)). Such a behaviour may be due to some unknown sources of systematic error, which is not accounted for in the deterministic part of the model (**lack of fit**). Such a behaviour is not very common with ANOVA models and we postpone further detail until the final two book chapters.
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName103-1.png" alt="Plot of residuals against expected values: heteroscedastic data." width="85%" />
+<p class="caption">(\#fig:figName103)Plot of residuals against expected values: heteroscedastic data.</p>
+</div>
+
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName104-1.png" alt="Plot of residuals against expected values: lack of fit" width="85%" />
+<p class="caption">(\#fig:figName104)Plot of residuals against expected values: lack of fit</p>
+</div>
+
+### QQ-plot
+
+Plotting the residuals against the expected values let us discover the outliers and gives us evidence of heteroscedastic errors; however, it does not suggest whether the residuals are gaussian distributed or not. Therefore, we need to draw the so-called QQ-plot (quantile-quantile plot), where the standardised residuals are plotted against the respective percentiles of a normal distribution. But, what are the respective percentiles of a gaussian distribution?
+
+I will not go into detail about this (you can find information in my blog, [at this link](https://www.statforbiology.com/2020/stat_general_percentiles/)), but I will give you an example. Let's imagine we have 11 standardised residuals sorted in increasing order: how do we know whether such residuals are drawn from a gaussian distribution? The simplest answer is that we should compare them with 11 values that are, for sure, drawn from a standardised gaussian distribution.
+
+With eleven values, we know that the sixth value is the median (50^th^ percentile), while we can associate to all other values the respective percentage point by using the `ppoints()` function, as shown in the box below:
+
+
+```r
+pval <- ppoints(1:11)
+pval
+##  [1] 0.04545455 0.13636364 0.22727273 0.31818182 0.40909091
+##  [6] 0.50000000 0.59090909 0.68181818 0.77272727 0.86363636
+## [11] 0.95454545
+```
+
+We see that the first observation corresponds the 4.5^th^ percentile, the second observation is the 13.63^th^ percentile and so on, until the final observation that is the 95.45^th^ percentile. What are these percentiles in a standardised gaussian distribution? We can calculate them by using the `qnorm()` function:
+
+
+```r
+perc <- qnorm(pval)
+perc
+##  [1] -1.6906216 -1.0968036 -0.7478586 -0.4727891 -0.2298841
+##  [6]  0.0000000  0.2298841  0.4727891  0.7478586  1.0968036
+## [11]  1.6906216
+```
+
+If our 11 standardised residuals are gaussian, they should match the behaviour of the respective percentiles in a gaussian population: the central residual should be close to 0, the smallest one should be close to -1.691, the second one should be close to -1.097 and so on. Furthermore, the number of negative values should be approximately equal to the number of positive values and the median should be approximately equal to the mean. 
+
+Hence, if we plot our standardised residuals against the respective percentiles of a standardised gaussian distribution, the points should lie approximately along the diagonal, as shown in Figure \@ref(fig:figName105), for a series of residuals which were randomly sampled from a gaussian distribution.
+
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName105-1.png" alt="QQ-plot for a series of gaussian residuals" width="85%" />
+<p class="caption">(\#fig:figName105)QQ-plot for a series of gaussian residuals</p>
+</div>
+
+Any deviations from the diagonal suggests that the residuals do not come from a normal distribution, but they come from other distributions with different shapes. For example, we know that the gaussian distribution is symmetric, while residuals might come from a right-skewed distribution (leaning to the left).  In such asymmetric distribution, the mean is higher than the median and negative residuals are more numerous, but lower in absolute value than positive residuals (see Figure \@ref(fig:figName106), left). Therefore, the QQ-plot looks like the one in Figure \@ref(fig:figName106)(right).
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName106-1.png" alt="QQ-plot for residuals coming from a right-skewed distribution (e.g., log-normal)" width="85%" />
+<p class="caption">(\#fig:figName106)QQ-plot for residuals coming from a right-skewed distribution (e.g., log-normal)</p>
+</div>
+
+Otherwise, when the residuals come from a left-skewed distribution (asymmetric and leaning to the right), their mean is lower than the median and there are a lot of positive residuals with low absolute values (Figure \@ref(fig:figName107), left). Therefore, the QQ-plot looks like that in Figure \@ref(fig:figName107) (right).
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName107-1.png" alt="QQ-plot for residuals coming from a left-skewed distribution (e.g., a type of beta distribution)" width="85%" />
+<p class="caption">(\#fig:figName107)QQ-plot for residuals coming from a left-skewed distribution (e.g., a type of beta distribution)</p>
+</div>
+
+Apart from symmetry, the deviations from a gaussian distribution may also concern the density in both the tails of the distribution. In this respect, the residuals may come from a platicurtic distribution, where the number of observations far away from the mean (outliers) is rather high, with respect to a gaussian distribution (Figure \@ref(fig:figName108), left). Therefore, the QQ-plot looks like the one in Figure  \@ref(fig:figName108) (right). Otherwise, when the residuals come from a leptocurtic distribution, the number of observations far away from the mean is rather low (see Figure \@ref(fig:figName109) and the QQ-plot looks like that in Figure \@ref(fig:figName109) (right).
+
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName108-1.png" alt="QQ-plot for residuals coming from a platicurtic distribution (e.g., the Student's t distribution with few degrees of freedom)" width="85%" />
+<p class="caption">(\#fig:figName108)QQ-plot for residuals coming from a platicurtic distribution (e.g., the Student's t distribution with few degrees of freedom)</p>
+</div>
+
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName109-1.png" alt="QQ-plot for residuals coming from a leptocurtic distribution (e.g., a uniform distribution)" width="85%" />
+<p class="caption">(\#fig:figName109)QQ-plot for residuals coming from a leptocurtic distribution (e.g., a uniform distribution)</p>
+</div>
+
+
+## Formal hypotesis testing
+
+Graphical methods usually reveal the outliers and the most important deviations from basic assumptions. However, we might be interested in formally testing the hypothesis that there are no deviations from basic assumptions (null hypothesis), by using some appropriate statistic. Nowadays, a very widespread test for variance homogeneity is the Levene's test, which consists of fitting an ANOVA model to the residuals as absolute values. The rationale is that the residuals sum up to zero within each treatment group; if we remove the signs, the residuals become positive, but the group means tend to become higher when the variances are higher. For example, we can take two samples with means equal to zero and variances respectively equal to 1 and 4.
+
+
+```r
+A <- c(0.052, 0.713, 1.94, 0.326, 0.019, -2.168, 0.388,
+       -0.217, 0.028, -0.801, -0.281)
+B <- c(3.025, -0.82, 1.716, -0.089, -2.566, -1.394,
+       0.59, -1.853, -2.069, 3.255, 0.205)
+mean(A); mean(B)
+## [1] -9.090909e-05
+## [1] 1.006214e-17
+var(A); var(B)
+## [1] 1.000051
+## [1] 4.000271
+mean(abs(A))
+## [1] 0.6302727
+mean(abs(B))
+## [1] 1.598364
+```
+
+Taking the absolute values, the mean for A is 0.63, while the mean for B is 1.60. We see that the second mean is higher than the first, which is a sign that the two variances might not be homogeneous. If we submit to ANOVA the absolute values, the difference between groups is significant, which leads to the rejection of the homoscedasticity assumption. In R, the Levene's test can also be performed by using the `leveneTest()` function in the 'car' package.
+
+
+```r
+res <- c(A, B)
+treat <- rep(c("A", "B"), each = 11)
+model <- lm(abs(res) ~ factor(treat))
+anova(model)
+## Analysis of Variance Table
+## 
+## Response: abs(res)
+##               Df  Sum Sq Mean Sq F value Pr(>F)  
+## factor(treat)  1  5.1546  5.1546  5.8805 0.0249 *
+## Residuals     20 17.5311  0.8766                 
+## ---
+## Signif. codes:  
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+car::leveneTest(res ~ factor(treat), center = mean)
+## Levene's Test for Homogeneity of Variance (center = mean)
+##       Df F value Pr(>F)  
+## group  1  5.8803 0.0249 *
+##       20                 
+## ---
+## Signif. codes:  
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+The Levene's test can also be performed by considering the medians of groups instead of the means ('center = median'), which gives us a more robust test, i.e. less sensible to possible outliers.
+
+Possible deviances with respect to the gaussian assumption can be tested by using the Shapiro-Wilks' test. For example, taking 100 residuals from a uniform distribution (i.e. a non-gaussian distribution) and submitting them to the Shapiro-Wilks' test, the null hypothesis is rejected with P = 0.0004.
+
+
+
+```r
+set.seed(1234)
+shapiro.test(runif(100, min = -2, max = 2))
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  runif(100, min = -2, max = 2)
+## W = 0.94504, p-value = 0.0003966
+```
+
+## What do we do, in practice?
+
+Now, it's time to take a decision: do our data meet the basic assumptions for ANOVA? A wide experience in the field suggests that a decision is hard to take in most situations. Based on experience, our recommendations are:
+
+1. a thorough check of the residuals should never be neglected;
+2. be very strict when the data come as counts or ratios: for this type of data the basic assumptions are very rarely met and, therefore, you should consider them as non-normal and heteroscedastic whenever you have even a small sign to support this;
+3. be very strict with quantitative data, when the differences between group means are very high (higher than one order of magnitude); for this data, variances are usually proportional to means and heteroscedasticity is the norm and not the exception;
+4. for all other data, you can be slightly more liberal, without neglecting visible deviations from basic assumptions.
+
+
+## Correcting measures
+
+Whenever our checks suggest important deviations from basic assumptions, we are supposed to take correcting measures, otherwise our analyses are invalid. Of course, correcting measures change according to the problem we have found in our data.
+
+
+### Removing outliers
+
+If we have found an outlier, the simplest correcting strategy is to remove it. However, we should refrain from this behaviour as much as possible, especially when sample size is small. Before removing an outlier we should be reasonably sure that it came as the consequence of some random error or intrusion, without being, anyhow, related to the effect of some treatments.
+
+For example, if we are making a genotype experiment and one of the genotypes is not resistant to a certain fungi disease, in the presence of such disease we might expect that yield variability for the sensible genotypes increases and, therefore, the presence of occasional plots with very low yield levels becomes more likely. In this case, outliers are not independent on the treatment and removing them is wrong, because relevant information is hidden.
+
+In all cases, please, remember that removing data points to produce a statistically significant result is regarded as a terribly bad practice! Furthermore, by definition, outliers should be rare: if the number of outliers is rather high, we should really think about discarding the whole experiment and making a new one.
+
+
+### Stabilising transformations
+
+After having considered and managed the presence possible outliers, the most traditional method to deal with data that do not conform to the basic assumptions for linear models is to transform the response into a metric that is more amenable to linear model fitting. In particular, the logarithmic transformation is often used for counts and proportions, the square root transformation is also used for counts and the arcsin-square root transformation is very common with proportions.
+
+Instead of making an arbitrary selection, we suggest the procedure proposed by Box and Cox (1964), that is based on the following family of transformations:
+
+$$ W = \left\{ \begin{array}{ll}
+\frac{Y^\lambda -1}{\lambda} & \quad \textrm{if} \,\,\, \lambda \neq 0 \\
+\log(Y) & \quad \textrm{if} \,\,\, \lambda = 0
+\end{array} \right.$$
+
+where $W$ is the transformed variable, $Y$ is the original variable and $\lambda$ is the transformation parameter. We may note that, apart from a linear shift (subtracting 1 and dividing by $\lambda$, which does not change the distribution of data), if $\lambda = 1$ we do not transform at all. If $\lambda = 0.5$ we make a square-root transformation, while if $\lambda = 0$[^note] we make a logarithmic transformation; furthermore, if $\lambda = -1$ we transform into the reciprocal value.
+
+[^note]: Note that the limit of $(Y^\lambda -1)/\lambda$ for $\lambda \rightarrow 0$ is $\log(y)$  
+
+Box and Cox (1964) gave a method to calculate the likelihood of the data under a specific $\lambda$ value, so that we can try several $\lambda$ values and see which one corresponds to the maximum likelihood value. Accordingly, we can select this maximum likelihood $\lambda$ value and use it for our transformation. We'll give an example of such an approach later on.
+
+## Examples with R
+
+
+## Example 1
+
+First of all, let's check the dataset we have used in the previous chapter ('mixture.csv'). We load the file and re-fit the ANOVA model, by using the 'Weight' as the response and the herbicide treatment 'Treat' as the treatment factor.
+
+
+```r
+repo <- "https://www.casaonofri.it/_datasets/"
+file <- "mixture.csv"
+pathData <- paste(repo, file, sep = "")
+
+dataset <- read.csv(pathData, header = T)
+head(dataset)
+##             Treat Weight
+## 1 Metribuzin__348  15.20
+## 2 Metribuzin__348   4.38
+## 3 Metribuzin__348  10.32
+## 4 Metribuzin__348   6.80
+## 5     Mixture_378   6.14
+## 6     Mixture_378   1.95
+dataset$Treat <- factor(dataset$Treat)
+mod <- lm(Weight ~ Treat, data = dataset)
+```
+
+After fitting, we can get the graphical analyses of residuals by using the `plot()` method on the model object; the argument 'which' can be set to 1 or 2: the former value produces a plot of residuals against expected values, while the latter value produces a QQ-plot of residuals. The syntax is as follows:
+
+```
+plot(mod, which = 1)
+plot(mod, which = 2)
+```
+
+The output is shown in Figure \@ref(fig:figName110a).
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName110a-1.png" alt="Graphical analyses of residuals for the 'mixture.csv' dataset" width="85%" />
+<p class="caption">(\#fig:figName110a)Graphical analyses of residuals for the 'mixture.csv' dataset</p>
+</div>
+
+None of the two graphs suggests deviations from the basic assumptions. Considering that we have a quantitative variable with small differences (less than one order of magnitude) between group means, we skip all formal analyses and conclude that we have no reasons to fear about the basic assumptions for linear models.
+
+## Example 2
+
+Let's consider the dataset in the 'insects.csv' file. Fifteen plants were treated with three different insecticides (five plants per insecticide) according to a completely randomised design. A few weeks after the treatment, we counted the eggs of insects over the leaf surface. In the box below we load the dataset and fit an ANOVA model, considering the variables 'Count' as the response and 'Insecticide' as the experimental factor.
+
+
+
+```r
+file <- "insects.csv"
+pathData <- paste(repo, file, sep = "")
+dataset <- read.csv(pathData, header = T)
+head(dataset)
+##   Insecticide Rep Count
+## 1          T1   1   448
+## 2          T1   2   906
+## 3          T1   3   484
+## 4          T1   4   477
+## 5          T1   5   634
+## 6          T2   1   211
+mod <- lm(Count ~ Insecticide, data = dataset)
+```
+
+Now we plot the residuals, by using the 'plot' method, as shown above, The output is reported in Figure \@ref(fig:figName110).
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName110-1.png" alt="Graphical analyses of residuals for the 'insects.csv' dataset" width="85%" />
+<p class="caption">(\#fig:figName110)Graphical analyses of residuals for the 'insects.csv' dataset</p>
+</div>
+
+In this case we see clear signs of heteroscedastic (left plot) and right-skewed residuals (right plot). Furthermore, the fact that we are working with counts encourages a more formal analysis. The Levene's test confirms our fears and permits to reject the null hypothesis of homoscedasticity (P = 0.043). Likewise, the hypothesis of normality is rejected (P = 0.048), by using a Shapiro-Wilks test. The adoption of some correcting measures is, therefore, in order.
+
+
+```r
+car::leveneTest(mod, center = mean )
+## Warning in leveneTest.default(y = y, group = group, ...):
+## group coerced to factor.
+## Levene's Test for Homogeneity of Variance (center = mean)
+##       Df F value  Pr(>F)  
+## group  2   3.941 0.04834 *
+##       12                  
+## ---
+## Signif. codes:  
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+shapiro.test(residuals(mod))
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  residuals(mod)
+## W = 0.87689, p-value = 0.04265
+```
+
+We decide to use a stabilising transformation and run the `boxcox()` function to select the maximum likelihood value for $\lambda$; the syntax below results in the output shown in Figure \@ref(fig:figName111).
+
+```
+library(MASS)
+boxcox(mod)
+```
+
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName111-1.png" alt="Selecting the maximum likelihood value for the transformation parameter lambda, according to Box and Cox (1964)" width="85%" />
+<p class="caption">(\#fig:figName111)Selecting the maximum likelihood value for the transformation parameter lambda, according to Box and Cox (1964)</p>
+</div>
+
+The graph shows that the maximum likelihood value is $\lambda = 0.14$, although the confidence limits go from slightly below zero to roughly 0.5. In conclusion, every $\lambda$ value within the interval $-0.1 < \lambda < 0.5$ can be used for the transformation. We select $\lambda = 0$, that corresponds to a logarithmic transformation, which is very widely known and understood.
+
+In practice, we transform the data into their logarithms, re-fit the model and re-analyse the new residuals.
+
+
+```r
+modt <- lm(log(Count) ~ Insecticide, data = dataset)
+par(mfrow = c(1,2))
+plot(modt, which = 1)
+plot(modt, which = 2)
+```
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName112-1.png" alt="Graphical analyses of residuals for the 'insects.csv' dataset, following logarithmic transformation of the response variable" width="85%" />
+<p class="caption">(\#fig:figName112)Graphical analyses of residuals for the 'insects.csv' dataset, following logarithmic transformation of the response variable</p>
+</div>
+
+The situation has sensibly improved and, therefore, we go ahead with the analyses and request the ANOVA table.
+
+
+```r
+anova(modt)
+## Analysis of Variance Table
+## 
+## Response: log(Count)
+##             Df  Sum Sq Mean Sq F value    Pr(>F)    
+## Insecticide  2 15.8200  7.9100  50.122 1.493e-06 ***
+## Residuals   12  1.8938  0.1578                      
+## ---
+## Signif. codes:  
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+The above table suggests that there are significant differences among insecticides (P = 1.493e-06). It may be interesting to compare the above output with the output obtained from the analysis of untransformed data:
+
+
+```r
+anova(mod)
+## Analysis of Variance Table
+## 
+## Response: Count
+##             Df Sum Sq Mean Sq F value    Pr(>F)    
+## Insecticide  2 714654  357327  18.161 0.0002345 ***
+## Residuals   12 236105   19675                      
+## ---
+## Signif. codes:  
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+Apart from the fact that this latter analysis is wrong, because the basic assumptions of linear models are not respected, we can see that the analysis on transformed data is more powerful, in the sense that it results in a lower P-value. In this example, the null hypothesis is rejected both with transformed and with untransformed data, but in other situations, whenever the P-value is close to the borderline of significance, making a wise selection of the transformation becomes fundamental.
+
+
+## Other possible approaches
+
+Stabilising transformations were very much in fashion until the '80s of the previous century. At that time, computing power was limiting and widening the field of application for ANOVA models used to be compulsory. Nowadays, R and other software permit the use of alternative methods of data analysis, that allow for non-gaussian errors. These methods belong to the classes of Generalised Linear Models (GLM) and Generalised Linear Least squares models (GLS), which are two very flexible classes of models to deal with non-normal and heteroscedastic residuals. 
+
+In other cases, when we have no hints to understand what type of frequency distribution our residuals are sampled from, we can use nonparametric methods, which make little or no assumptions about the distribution of residuals.
+
+GLM, GLS and non-parametric methods are pretty advanced and they are not considered in this introductory book.
+
+---
+
+## Further readings
+
+
+1. Ahrens, W. H., D. J. Cox, and G. Budwar. 1990, Use of the arcsin and square root trasformation for subjectively determined percentage data. Weed science 452-458.
+2. Anscombe, F. J. and J. W. Tukey. 1963, The examination and analysis of residuals. Technometrics 5: 141-160.
+3. Box, G. E. P. and D. R. Cox. 1964, An analysis of transformations. Journal of the Royal Statistical Society, B-26, 211-243, discussion 244-252.
+4. D’Elia, A. 2001, Un metodo grafico per la trasformazione di Box-Cox: aspetti esplorativi ed inferenziali. STATISTICA LXI: 630-648.
+5. Saskia, R. M. 1992, The Box-Cox transformation technique: a review. Statistician 41: 169-178.
+6. Weisberg, S., 2005. Applied linear regression, 3rd ed. John Wiley & Sons Inc. (per il metodo 'delta')
 
 <!--chapter:end:08-Eng_AssunzioniBase.Rmd-->
 
 # Contrasts and multiple comparison testing
 
-To be done ...
+
+In Chapter 7 we have shown how to fit an ANOVA model to the observed data, which is very often the first step of data analysis, with two fundamental aims:
+
+1. determining the variance of the residual (unexplained) effects, that is the basis of statistical inference;
+2. test the hypothesis of no treatment effects (test of homogeneity), by using the F-ratio.
+
+In Chapter 8, we sow that, before trusting the results of every linear model fit, we need to make sure that the basic assumptions for linear models are valid, by a thorough inspection of residuals. This is a fundamental step and should never, ever be neglected.
+
+After the inspection of model residuals and after the adoption of possible correcting measures, wherever necessary, the process of data analysis must go ahead. Indeed, rejecting the null hypothesis of no treatment effects implies accepting the alternative, i.e. that there is, at least, one treatment level that produced a significant effect on the experimental units. Such conclusion is important, but it very rarely answers all our research questions; indeed, taking whatever pair of treatments A and B, we might ask:
+ 
+1. is the effect of A different from the effect of B?
+2. is A better/worse than B?
+3. what is the difference between A and B?
+
+In other words, for any pairs of treatments, we might be willing to assess the existence of significant differences (question 1), their sign (positive/negative; question 2) and their size (**effect size**; question 3). According to the English scientist John Tukey, the first question is 'foolish' as there are no two treatments whose effects can be regarded as totally equal^[All we know about the world teaches us that the effects of A and B are always different in some decimal place for any A and B. Thus asking "are the effects different?" is foolish (John Tukey).], while the other two questions, particularly the third one, are much more relevant.
+
+In order to ask the above questions, we can apply **linear contrasts** or **Multiple Comparison Procedures** (MCP). We will explore these methods by using the 'mixture.csv' dataset, which we have started analysing in Chapters 7 and 8.
+
+## Back to the 'mixture' example
+
+Let me remind once more that we are dealing with a pot experiment, where we compared four herbicide treatments in terms of their activity against an important weed species (*Solanum nigrum*). The experiment is completely randomised, with four replicates and the observed response is the weight of treated plants in each pot, four weeks after the treatment. One of the four treatments is the untreated control, while the other three treatments consist of two herbicides used either alone or in mixture.
+
+Let's load the data, fit an ANOVA model and get the least squares means, as we did in Chapter 7. In Chapter 8, we have demonstrated that this model is valid and there are no evident deviations from the basic assumptions for linear models.
+
+\vspace{12pt}
+
+```r
+repo <- "https://www.casaonofri.it/_datasets/"
+file <- "mixture.csv"
+pathData <- paste(repo, file, sep = "")
+dataset <- read.csv(pathData, header = T)
+model <- lm(Weight ~ Treat, data=dataset)
+
+library(emmeans)
+treat.means <- emmeans(model, ~Treat)
+treat.means
+##  Treat           emmean   SE df lower.CL upper.CL
+##  Metribuzin__348   9.18 1.96 12     4.91     13.4
+##  Mixture_378       5.13 1.96 12     0.86      9.4
+##  Rimsulfuron_30   16.86 1.96 12    12.59     21.1
+##  Unweeded         26.77 1.96 12    22.50     31.0
+## 
+## Confidence level used: 0.95
+```
+
+
+## Linear contrasts
+
+In statistics, a **contrast** is a linear combination of means or, more generally, model parameters, where the coefficients add up to zero. In the following example, I have built a linear contrast with the means of our example:
+
+$$k = \frac{1}{3} \cdot 9.18 + \frac{1}{3} \cdot 5.13 + \frac{1}{3} \cdot 16.86 - 1 \cdot 26.77  = -16.385$$
+
+
+
+As we see, the sum of coefficients is 0:
+
+$$\frac{1}{3} + \frac{1}{3} + \frac{1}{3} - 1 = 0$$
+
+This contrast has a very clear biological meaning, as it provides an estimate for the difference between the mean weight for treated pots and the mean weight for untreated pots. The result is -16.39; it provides the answers for all the three questions above. Indeed:
+
+1. there is a difference between herbicide treatments (on average) and the untreated control;
+2. the difference is negative, meaning that the weight of the weed in treated pots is lower than the weight in untreated pots;
+3. the effect size is -16.39 grams per pot.
+
+However, we should never forget that the uncertainty about population means propagates to contrasts. The observed value of -16.39 is a point estimator of the population difference, but we need to quantify the uncertainty by using interval estimation.
+
+
+### The variance of contrasts
+
+We have already mentioned how the errors propagate when we 'combine' random variables; the basic principle is that the variance of a linear combination of independent estimates is equal to a linear combination of their variances, according to:
+
+
+$$\textrm{var}(A \mu_1 + B \mu_2) = A ^2 \cdot \textrm{var}(\mu_1)  + B ^2 \cdot \textrm{var}(\mu_2)$$
+
+where A and B are contrast coefficients, $\mu_1$ and $\mu_2$ are the estimates (means, in this case). The standard errors of the four means are equal to 1.9588 and, therefore, the variances are $1.9588^2 = 3.83703$, which are combined as shown below:
+
+
+$$\textrm{var}(k) = \left( \frac{1}{3} \right)^2 \cdot 3.83703  +  \left( \frac{1}{3}\right)^2 \cdot 3.83703 + \left( \frac{1}{3}  \right)^2 \cdot 3.83703 + \left( - 1 \right)^2 \cdot 3.83703  = 5.11604$$
+
+
+
+The standard deviation for the contrast (i.e. the standard error) is:
+
+$$SE(k) = \sqrt{5.11604} = 2.261866$$
+
+Here we go. We have a point estimate for the contrast (-16.4) and a standard error (2.26), which we can use to build a confidence interval, as shown in Chapter 5. However, we might also like to answer the following question: is it possible that the population contrast is 0 (no difference between treated and untreated pots) and the observed value was just due to random sampling fluctuations?
+
+Of course, this is possible: we have already seen that sample-to-sample variation can be rather high. We can translate our question into a null hypothesis:
+
+
+$$H_0: \kappa = 0$$
+
+we use the greek letter $\kappa$ to refer to the real population value for the contrast, which we estimate by using the observed value $k$. In order to decide whether the null is true, in spite of the observed $k \neq 0$, we should contemporarily consider the estimate and its uncertainty. As we did in a previous chapter, we use the T statistics, i.e. the ratio between the estimate and its standard error:
+
+$$T = \frac{k}{ES(k)} = \frac{-16.385}{2.261866} = -7.244$$
+Let's assume that the null is true; the observed T values should 'fluctuate' around 0, by following a Student's t distribution with a number of degrees of freedom equal to that of the residual error in ANOVA. We could empirically see this by using Monte Carlo simulation, but we will not do so, for the sake of brevity.
+
+Therefore, we can use the `pt()` function to find the probability that $t < -7.244$ and $t > 7.244$. We have:
+
+
+```r
+Tval <- -16.385 / 2.261866
+2 * pt(Tval, 12, lower.tail = T)
+## [1] 1.023001e-05
+```
+
+We see that, if the null is true and we repeat the experiment for a high number of times, we have only one possibility out of 100,000 to obtain such a high T, in absolute value. Thus we reject the null and conclude that:
+
+1. on average, herbicide treatments produce a significant effect;
+2. such an effects results in the suppression of weed growth (the sign is negative);
+3. the difference in weight is -16.385 (SE = 2.26) and the evidence is strong enough to support the conclusion that such a difference, at the population level, is not 0.
+
+
+### Testing linear contrasts with R
+
+The main challenge for a scientist is to translate research questions into a set of appropriate contrasts. For our example, we might consider the following contrasts:
+
+1. untreated vs. treated (on average)
+2. mixture vs. single herbicides (on average)
+3. mixture vs. rimsulfuron
+4. mixture vs. metribuzin
+
+Writing the above contrasts by hand is very tedious and, thus, we use R. First of all, we need to prepare one vector of coefficients for each contrast. For the first contrast, the vector is as above:
+
+
+```r
+k1 <- c(1/3, 1/3, 1/3, -1)
+```
+
+For the other three contrasts, the vectors are:
+
+
+```r
+k2 <- c(1/2, -1, 1/2, 0)
+k3 <- c(0, -1, 1, 0)
+k4 <- c(1, -1, 0, 0)
+```
+
+With these coefficients, we prepare a list:
+
+
+```r
+K <- list(k1, k2, k3, k4)
+```
+
+In the end, we use the `contrast()` function in the 'emmeans' package and pass the following arguments:
+
+1. the means, obtained by using the 'emmeans()' function (see above)
+2. the list of contrasts, as the 'method' argument
+3. the type of adjustment (we will talk about this later, so far, please, simply use the command as shown in the box below)
+
+\small
+
+
+```r
+contrast(treat.means, method = K, adjust="none")
+##  contrast                                                     
+##  c(0.333333333333333, 0.333333333333333, 0.333333333333333, -1
+##  c(0.5, -1, 0.5, 0)                                           
+##  c(0, -1, 1, 0)                                               
+##  c(1, -1, 0, 0)                                               
+##  estimate   SE df t.ratio p.value
+##    -16.39 2.26 12 -7.244  <.0001 
+##      7.89 2.40 12  3.289  0.0065 
+##     11.73 2.77 12  4.235  0.0012 
+##      4.05 2.77 12  1.461  0.1697
+```
+
+\normalsize
+
+We see that all contrasts are significantly different from zero, except the fourth one.
+
+
+## Pairwise comparisons
+
+Translating research questions into contrasts may be sort of an art and, very often, it marks the difference between ordinary and excellent papers. However, there are some sets of contrasts that are repeatedly used (and often abused) in several circumstances, such as the so-called *pairwise comparisons*. These contrasts consist of testing the differences between pairs of means, according to two possible situations:
+
+1. all pairwise-comparisons (Tukey's method)
+2. comparisons with a control (Dunnett's method)
+
+The first situation implies a very high number of contrasts that is equal to $k = n \times (n - 1) /2$, where $n$ is the number of means. Accordingly, with four means we have six contrasts and, luckily, R provides the predefined list of coefficients, by assigning the value "pairwise" to the argument 'method', as shown below:
+
+
+\footnotesize
+
+
+```r
+# Pairwise contrasts
+contrast(treat.means, adjust="none", method="pairwise")
+##  contrast                         estimate   SE df t.ratio
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461 
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774 
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352 
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235 
+##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813 
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578 
+##  p.value
+##  0.1697 
+##  0.0168 
+##  <.0001 
+##  0.0012 
+##  <.0001 
+##  0.0038
+```
+\normalsize
+
+The second situation implies a lower number of contrasts and we can set the 'method' argument to "dunnett". However, we need to be careful, because R compares all means against the first in alphabetical order, which may not be what we are looking for. For example, in our case, we might like to compare all treatments with the herbicide mixture, which is the second in alphabetical order. Therefore, we set the argument 'ref' to 2.
+
+\footnotesize
+
+
+```r
+# Dunnett contrasts
+contrast(treat.means, adjust="none", method="dunnett", ref = 2)
+##  contrast                      estimate   SE df t.ratio
+##  Metribuzin__348 - Mixture_378     4.05 2.77 12 1.461  
+##  Rimsulfuron_30 - Mixture_378     11.73 2.77 12 4.235  
+##  Unweeded - Mixture_378           21.64 2.77 12 7.813  
+##  p.value
+##  0.1697 
+##  0.0012 
+##  <.0001
+```
+\normalsize
+
+We may have noted that the above contrasts do not fully answer our questions about the effect sizes; indeed, we have a point estimate with standard error, but we do not have explicit confidence intervals. To get them, we can assign the result of the `contrast()` function to a variable and explore it by using the 'confint' method.
+
+
+```r
+# Confidence intervals
+con <- contrast(treat.means, adjust="none", 
+                method="dunnett", ref = 2)
+confint(con)
+##  contrast                      estimate   SE df lower.CL
+##  Metribuzin__348 - Mixture_378     4.05 2.77 12    -1.99
+##  Rimsulfuron_30 - Mixture_378     11.73 2.77 12     5.70
+##  Unweeded - Mixture_378           21.64 2.77 12    15.61
+##  upper.CL
+##      10.1
+##      17.8
+##      27.7
+## 
+## Confidence level used: 0.95
+```
+
+
+## Letter display
+
+We mentioned that effect sizes provide full information about the results of contrasts, by which we can answer all questions above. However, reporting effects sizes for pairwise comparisons with a high number of means may be impractical. Therefore, we can use the so-called **letter display**, that consists of augmenting the table of means with significance letters, so that means followed by different letters are significantly different from each other, for a certain predefined protection level $\alpha$, usually equal to 0.05.
+
+A letter display can be easily added by hand, according to the following procedure:
+
+1. sort the means in increasing/decreasing order
+2. start from the uppermost mean and add the A letter to this mean and to all the following means, when the difference with the first one is not significant
+3. go on to the second mean and add the B letter to this mean and to all the following means, when the difference with the second one is not significant
+4. go on like this, until all means have got their letters
+
+The above procedure works well with balanced experiments, although we might prefer using the more general procedure in R, as implemented in the 'multcomp' package, which we need to install, together with the 'multcompView' package. The function is named `cld()` and requires the means and the method of adjustment (see next section). We also provide a third argument, that is 'Letters = LETTERS' (be careful with the syntax, relating to small and capital letters) to use capital letters display instead of the default number display
+
+
+```r
+multcomp::cld(treat.means, adjust="none", Letters=LETTERS)
+##  Treat           emmean   SE df lower.CL upper.CL .group
+##  Mixture_378       5.13 1.96 12     0.86      9.4  A    
+##  Metribuzin__348   9.18 1.96 12     4.91     13.4  A    
+##  Rimsulfuron_30   16.86 1.96 12    12.59     21.1   B   
+##  Unweeded         26.77 1.96 12    22.50     31.0    C  
+## 
+## Confidence level used: 0.95 
+## significance level used: alpha = 0.05 
+## NOTE: Compact letter displays are a misleading way to display comparisons
+##       because they show NON-findings rather than findings.
+##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+```
+
+The letter display is handy, but it can only answer questions about the significance of differences, while it gives no hints about the direction and size of differences. For this reason, using the letter display is often regarded as a poor practice in the presentation of experimental results. 
+
+
+## Multiplicity correction
+
+Experiments may involve a very high number of contrasts and, therefore, a high number of hypotheses is simultaneously tested. Let's consider one of those hypotheses and imagine that the null is rejected with $P = 0.04$, which would be the **comparisonwise error rate** ($P_c$), i.e. the probability of wrong rejection. If we have a family of *n* such simultaneous contrasts where the null is always rejected at $P = 0.04$, we could define the probability of wrong rejection for at least one of those hypotheses, the so-called **familywise error rate** ($P_f$). We can get a sense that the familywise error rate is higher than the comparisonwise error rate, especially when $n$ is high.
+
+It is important to know the relationship between $P_c$ and $P_f$. We should consider that the probability of correct rejection for each hypothesis is $1 - P_c$ and, for $n$ hypotheses, the probability of no wrong rejections is $(1 - P_c)^n$ (joint probability of independent events). The probability of having, at least, one wrong rejection (complementary event) is calculated as:
+
+$$P_f = 1 - (1 - P_c)^n$$
+What does this mean? In practice, if we have $n = 10$ contrasts, and each one in rejected at $P_c = 0.04$, the probability that we make at least one wrong decision is:
+
+
+```r
+1 - (1 - 0.04)^10
+## [1] 0.3351674
+```
+
+This is generally known as the **multiplicity problem**: whenever we make a high number of simultaneous inferences, the probability that we make at least one mistake (wrong rejection) is much higher than the error rate for each single test. In some cases, the multiplicity problem can be particularly concerning, for example, when:
+
+1. we want to avoid that one treatment is wrongly excluded from the group of the best ones. In this case, we take the highest ranking treatment and compare it to all the others (Dunnett type contrast); when the number of treatments is high, the probability that at least one treatment is wrongly excluded from the lot of the best ones may be very high;
+2. we want to avoid false positives. Wrong rejections are false positives and their number may be high if we do not consider the multiplicity problem;
+3. we want to draw conclusions for all the simultaneous set of contrasts. For example, we have used a letter display and want to state that 'treatments followed by different letters are significantly different (P < 0.05)'. In this case, the conclusion relates to the whole set of comparisons and the comparisonwise error rate is clearly invalid.
+
+There is rather a wide consensus in literature that we should always account for the multiplicity problem in our pairwise comparisons, which means that we should take decisions based on the familywise error rate, instead of the comparisonwise error rate. That means that we should reject the null when $P_f < 0.05$ and not when $P_c < 0.05$, which implies that we correct the observed P-value, based on the number of simultaneous inferences.
+
+And, how do we correct? The most natural method is to use the above mentioned relationship between $P_c$ and $P_f$, which is know as the Sidak's correction. In the box below, we perfom this correction either by hand, or by using the appropriate argument to the `contrast()` function in R. Please, remember that, four our example, the number of simultaneous contrasts is six.
+
+\scriptsize
+
+
+```r
+# Correction by hand (six simultaneous contrasts)
+con <- contrast(treat.means, method = "pairwise", adjust = "none")
+Pc <- as.data.frame(con)[,6]
+Pf <- 1 - (1 - Pc)^6
+Pf
+## [1] 6.722991e-01 9.683462e-02 2.190543e-04 6.923077e-03
+## [5] 2.869757e-05 2.255183e-02
+# With R
+contrast(treat.means, method = "pairwise", adjust = "sidak")
+##  contrast                         estimate   SE df t.ratio
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461 
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774 
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352 
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235 
+##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813 
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578 
+##  p.value
+##  0.6723 
+##  0.0968 
+##  0.0002 
+##  0.0069 
+##  <.0001 
+##  0.0226 
+## 
+## P value adjustment: sidak method for 6 tests
+```
+
+\normalsize
+
+We see that, applying this type of multiplicity correction, the second contrast is no longer significant. An alternative, simpler and much more widespread correction procedure is the so-called Bonferroni's correction, that is based on the following heuristic:
+
+$$\alpha_E = \alpha_C \cdot k$$
+
+
+
+```r
+Pc * 6
+## [1] 1.018071e+00 1.009900e-01 2.190743e-04 6.943132e-03
+## [5] 2.869792e-05 2.276671e-02
+contrast(treat.means, method = "pairwise", adjust = "bonferroni")
+##  contrast                         estimate   SE df t.ratio
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461 
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774 
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352 
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235 
+##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813 
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578 
+##  p.value
+##  1.0000 
+##  0.1010 
+##  0.0002 
+##  0.0069 
+##  <.0001 
+##  0.0228 
+## 
+## P value adjustment: bonferroni method for 6 tests
+```
+
+Both the procedures, particularly the second one, are rather conservative, in the sense that they do not account for the fact that contrasts are always correlated and, therefore, overestimated $P_f$ values are furnished. Other correcting procedures exist (e.g., Holm, Hochberg, Hommel), but they are all more or less conservative.
+
+In recent times, a group of American scientists has found the way of accounting for the correlation between contrasts, based on the multivariate Student's t distribution (Bretz et al., 2011). Their method is the default one in R and it is incorporated in the `contrast()` function; we simply need to remove the 'correct' argument:
+
+\small
+
+
+```r
+contrast(treat.means, method="pairwise")
+##  contrast                         estimate   SE df t.ratio
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461 
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774 
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352 
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235 
+##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813 
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578 
+##  p.value
+##  0.4885 
+##  0.0698 
+##  0.0002 
+##  0.0055 
+##  <.0001 
+##  0.0173 
+## 
+## P value adjustment: tukey method for comparing a family of 4 estimates
+contrast(treat.means, method="dunnett")
+##  contrast                         estimate   SE df t.ratio
+##  Mixture_378 - Metribuzin__348       -4.05 2.77 12 -1.461 
+##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12  2.774 
+##  Unweeded - Metribuzin__348          17.60 2.77 12  6.352 
+##  p.value
+##  0.3711 
+##  0.0442 
+##  0.0001 
+## 
+## P value adjustment: dunnettx method for 3 tests
+```
+
+\normalsize
+
+Before concluding this part, I would like to put forward the idea that also confidence intervals may be appropriately enlarged to respect familywise error rates. However, we will not explore such an issue in this book.
+
+## Multiple comparisons with transformed data
+
+In the previous chapter, we have seen that, sometimes, we need to transform the data to respect the basic assumptions for linear models. For example, with the 'insects.csv' dataset in the previous chapter we have performed a logarithmic transformation, which we show again here.
+
+
+```r
+repo <- "https://www.casaonofri.it/_datasets/"
+file <- "insects.csv"
+pathData <- paste(repo, file, sep = "")
+dataset <- read.csv(pathData, header = T)
+modt <- lm(log(Count) ~ Insecticide, data = dataset)
+```
+
+When we use the `emmeans()` function in the 'emmeans' package, we get the means in the logarithmic scale.
+
+
+```r
+library(emmeans)
+treatMeans <- emmeans(modt, ~Insecticide)
+treatMeans
+##  Insecticide emmean    SE df lower.CL upper.CL
+##  T1            6.34 0.178 12     5.96     6.73
+##  T2            5.81 0.178 12     5.43     6.20
+##  T3            3.95 0.178 12     3.56     4.34
+## 
+## Results are given on the log (not the response) scale. 
+## Confidence level used: 0.95
+```
+
+In some instances, this may not be a problem, although there might be cases where we seek for the exact number of insect eggs in each leaf. Clearly, such an information is missing in the above analysis.
+
+The best suggestion is to back-transform the above means by using the inverse transformation, e.g.:
+
+
+$$e^{6.34} = 566.7963$$
+
+Getting the back-trasfomed means for all treatments is easy, by using the `emmeans()` function and setting the 'transform' argument to "response", as shown below.
+
+
+```r
+retroMedie <- emmeans(modt, ~Insecticide, transform = "response")
+retroMedie
+##  Insecticide response     SE df lower.CL upper.CL
+##  T1             568.6 101.01 12    348.5      789
+##  T2             335.1  59.54 12    205.4      465
+##  T3              51.9   9.22 12     31.8       72
+## 
+## Confidence level used: 0.95
+```
+
+What are these back-transformed means? Expectedly, we can see that they are different from the arithmetic means on the original (untrasformed) scale:
+
+
+```r
+emmeans(mod, ~Insecticide)
+##  Insecticide emmean   SE df lower.CL upper.CL
+##  T1           589.8 62.7 12    453.1      726
+##  T2           357.4 62.7 12    220.7      494
+##  T3            56.6 62.7 12    -80.1      193
+## 
+## Confidence level used: 0.95
+```
+
+Indeed, back-transformed means are lower than arithmetic means and they are regarded as estimators of the medians in the original scale, which are not influenced by the transformation. Indeed, we should think that monotonic transformations do not alter the ordering of observations and, thus, the central value remains the same. Consequently, when we report back-transformed means we are indeed reporting an estimate of the medians of the populations that generated our samples. However, estimating the medians instead of the means may not be a bad idea, considering that the populations are non-normal and might be asymmetric.
+
+## What about the traditional MCPs?
+
+We have seen that the best practice to compare means is:
+
+1. express the relevant differences by using contrasts
+2. estimate those differences and their standard errors
+3. test the null hypothesis that differences are zero and express the result by using familywise error rates.
+
+This process is conceptually different from the traditional multiple comparison procedures, which were very much in fashion before the 90s of the 20th century. MCPs were based on the determination of critical differences: whenever the observed difference was higher than the critical difference it was deemed significant. We can list the following MCPs:
+
+1. Fisher's Least Significant Difference (LSD)
+2. Tukey's Honest Significant Difference (HSD)
+3. Dunnett's test
+4. Duncan's test
+5. Newman-Keuls' test
+6. Tukey's MCP
+
+For balanced experiments, the Fisher's LSD corresponds to pairwise contrasts with no multiplicity correction, while the Tukey's HSD and Dunnett's test involve the multiplicity correction respectively for all pairwise comparisons and for the comparisons against a control. Therefore, while the Fisher's LSD adopts a comparisonwise error rate, the HSD and Dunnett's test adopt a familywise protection rate.
+
+All the other tests adopt some mechanism by which the critical difference is increased to account for a certain degree of multiplicity, but they do not adopt either a comparisonwise or a familywise error rate. They stay in the middle and, for this reason, their usage should be discouraged, although they are very much used in practice.
+
+## Some practical suggestions
+
+Pairwise contrasts and MCPs have been often abused in previous years and, still today, debates with editors and reviewers are very common. We would like to put forward a few suggestions, which might be useful in the way to scientific publication.
+
+1. It is strongly advised that pairwise contrasts are never used when the experimental treatment is represented by a quantitative series of rates, doses, times or whatever. In this case, asking whether there is a significant difference between the response at different doses may be illogical: indeed, even though we selected a few doses to include in the experiment, we are usually interested in the responses across the whole range of possible doses. In this setting, fitting a response curve is much more respectful of our aims and data (see later, in this book).
+2. Consider if you want to control the comparisonwise or the familywise error rate. The former might be preferred when only a few comparisons or contrasts are to be tested, each having a strong biological relevance (single-contrast problems), while the latter should be preferred in the case of a relatively high number of simultaneous tests, especially when an overall conclusion tends to be wrong when at least one single test is wrong.
+3. If you just want to control comparisonwise protection rate, do not apply any multiplicity correction. For balanced data, such an approach corresponds to using the Fisher's LSD in the traditional MCP setting.
+4. If you want to control the familywise error rate, apply the appropriate multiplicity correcting measure and adjust the P-values accordingly. For balanced data, such an approach corresponds to using the Tukey HSD for all paairwise comparisons and to the Dunnett's test for the comparisons against a control.
+5. Do not use Student–Newman–Keuls or Duncans' MRT, because they do not control either the familywise error rate, or the familywise error rate and do not yield a single critical difference for balanced data.
+
+
+---
+
+## Further readings
+
+1. Hsu, J., 1996. Multiple comparisons. Theory and methods. Chapman and Hall.
+2. Bretz, F., T. Hothorn, and P. Westfall. 2002, On Multiple Comparison Procedures in R. R News 2: 14-17.
+3. Chew, V. 1976, Comparing treatment means: a compendium. Hortscience, 11(4), 348-357.
+4. Cousens, R. 1988, Misinterpretetion of results in weed research through inappropriate use of statistics. Weed Research, 28, 281-289.
 
 <!--chapter:end:09-Eng_ConfrontoMultiplo.Rmd-->
 
@@ -2971,12 +3908,12 @@ A chemical analysis was repeated three times, with the following results: 125, 1
 An experiment was carried out, comparing the yield of four wheat genotypes (in tons per hectar). The results are as follows:
 
 
-|Genotype |    A|    B|    C|    D|
-|:--------|----:|----:|----:|----:|
-|A        | 5.22| 6.02| 5.08| 6.67|
-|B        | 6.08| 6.86| 7.07| 6.57|
-|C        | 4.42| 5.63| 4.49| 4.89|
-|D        | 6.14| 6.50| 5.27| 6.02|
+|Genotype | Rep-1| Rep-2| Rep-3| Rep4|
+|:--------|-----:|-----:|-----:|----:|
+|A        |  4.72|  5.45|  5.13| 5.19|
+|B        |  6.29|  6.79|  7.55| 5.86|
+|C        |  5.54|  4.44|  5.16| 5.92|
+|D        |  6.68|  6.30|  6.70| 7.77|
 
 For each genotype, calculate the mean, deviance, variance, standard deviation, standard error and confidence interval (P = 0.95).
 
@@ -3931,7 +4868,7 @@ plot(y ~ x)
 curve(7.77 * exp(0.189 * x), add = T, col = "red")
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-109-1.png" width="90%" />
+<img src="_main_files/figure-html/unnamed-chunk-140-1.png" width="90%" />
 
 ---
 

@@ -1,0 +1,503 @@
+---
+title: "Biplots are everywhere: where do they come from?"
+author: "Andrea Onofri"
+date: 2021-11-24
+slug: 'Multivariate'
+categories:
+  - R
+  - 'Multivariate_stat'
+tags:
+  - R
+  - 'Multivariate_stat'
+  - 'PCA'
+  - 'biplot'
+archives:
+  - 2021
+---
+
+
+```{r setup, cache = F, echo = F}
+#Put at the beginning
+knitr::opts_chunk$set(echo = TRUE, message = F, warning = F)
+knitr::knit_hooks$set(document = function(x){ 
+  gsub("```\n*```r*\n*", "", x) 
+})
+```
+
+
+Principal Component Analysis (PCA) is perhaps the most widespread multivariate technique in biology and it is used to summarise the results of experiments in a wide range of disciplines, from agronomy to botany, from entomology to plant pathology. Whenever possible, the results are presented by way of a biplot, an ubiquitous type of graph with a formidable descriptive value. Indeed, carefully drawn biplots can be used to represent, altogether, the experimental subjects, the experimental variables and their reciprocal relationships (distances and correlations).
+
+However, biplots are not created equal and the interpretational rules may change dramatically, depending on how the data were processed. As a reviewer/editor, I often feel that the authors have perfomed their Principal Component Analyses by using the default options in their favourite R function, but they are not totally aware of how the data were processed to reach the final published result. Therefore, their interpretation of biplots is, sometimes, more or less abused.
+
+I thought that it might be helpful to offer a 'user-friendly' explanation of the basic interpretational rules for biplots, with no overwhelming mathematical detail.
+
+
+# A simple example
+
+Let's look at a simple (perhaps too simple), but realistic example. This is an herbicide trial, where we compared weed control ability of nine sugarbeet herbicides. Ground covering for six weed species was recorded; the weed species were *Polygonum lapathyfolium*, *Chenopodium polyspermum*, *Echinochloa crus-galli*, *Amaranthus retroflexus*, *Xanthium strumarium* and *Polygonum aviculare*; they were identified by using their BAYER code (the first three letters of the genus name and the first two letters of the species name). The aim of the experiment was to ordinate herbicide treatments in terms of their weed control spectra.
+
+The dataset is available in an online repository (see below). It is a dataframe, although we'd better convert it into the matrix $X$ for further analyses. 
+
+```{r}
+WeedPop <- read.csv("https://www.statforbiology.com/_data/WeedPop.csv",
+                    header = T)
+X <- WeedPop[,2:7]
+row.names(X) <- WeedPop[,1]
+X
+```  
+
+Now, let's submit the matrix **X** to a PCA, by using the default options in the `prcomp()` function. In this case, the data is centered prior to analyses, but it is not standardised to unit variance.
+
+As the results, we obtain two matrices, that we will call **G** and **E**; they respectively contain the *subject-scores* (or principal component scores) and the *trait-scores* (this is the rotation matrix). These two matrices, by multiplication, return the original centered data matrix.
+
+```{r}
+pcaMod <- prcomp(X)
+G <- pcaMod$x
+E <- pcaMod$rotation
+print(G, digits = 3)
+print(E, digits = 3)
+print(G %*% t(E), digits = 3)
+```
+
+# Biplot and interpretational rules
+
+We can draw a biplot by using the first two columns in **G** for the markers and the first two columns in **E** for the arrowtips. In the box below I used the `biplot.default()` method in R; I decided not to use the `biplot.prcomp()` method, in order to avoid any further changes in **G** and **E**.
+
+```{r}
+biplot(G[,1:2], E[,1:2], xlab="PC1 (64%)", 
+       ylab="PC2 (16%)", main = "Default biplot \n\n")
+```
+
+Yes, I know, the biplot does not look nice for publication (but, better solutions with 'ggplot' exist! Google for them!). Please, note that the markers are the experimental subjects and the arrows are the observed variables, which is the most common choice.
+
+The interpretational rules are based on:
+
+1. the distances between markers;
+2. the distances from markers to the origin of axes;
+3. the lengths of arrows;
+4. the angles between arrows;
+5. the relative positions of arrows;
+6. the relative positions of arrows and markers.
+
+By looking at those six characteristics, we should be able to derive information on:
+
+1. the similarity of objects;
+2. the existence of groupings;
+3. the contribution of the experimental variables to the observed groupings;
+4. the relationship between experimental variables;
+5. the original value of each subject in each variable.
+
+What is the problem, then? The problem is that, depending on how the data were processed during the PCA, we obtain different types of biplots, conveying different information. Therefore, the interpretational rules muxt change according to the type of biplot.
+
+# The possible options for PCA
+
+During my lecturing activities I have noted that most PhD students are perfectly aware that, prior to PCA, we have the options of either:
+
+1. centering the data, or
+2. standardising them.
+
+In general, students are also aware that such a first decision impacts on the results of a PCA and on their interpretation.
+
+What it is less known is that, independent on data transformation, the results of a PCA are not unique, but they may change, depending on how the calculations are performed. Indeed, with a PCA, we look for two appropriate matrices, which:
+
+1. allow for the best description of our dataset in reduced rank space and
+2. by multiplication return the original centered or standardised data matrix (i.e. $Y = G \, E^T$).
+
+By using the default options in `prcomp()`, we have found **G** and **E**, but there is an infinite number of matrix couples that obey the two requirements above. These couples can be found by 'scaling' **G** and **E**, according to our specific research needs. What does 'scaling' mean? It is easy: the columns of **G** and **E** can be, respectively, multiplied and divided by some selected constant values, to obtain two new matrices, that also represent an acceptable solution to a PCA, as long as their product returns the original data matrix.
+
+Let's see the most common types of scalings.
+
+
+## Scaling 1
+
+If we take **G** and **E** the way they are, with no changes, we say that we are using the so called **Scaling 1**, that is, by far, the the most common type of scaling and it is also know as **Principal Component Scaling** or **row-scaling**. Let's have a closer look at the columns of **G** and **E** and, for each column, we calculate the norm (sum of squared elements):
+
+```{r}
+# norms of column-vectors in G
+normsG <- sqrt(diag(crossprod(G)))
+normsG
+
+# norms of column-vectors in E
+normsE <- sqrt(diag(crossprod(E)))
+normsE
+```
+
+
+We see that, with scaling 1, the column-vectors in **E** have unit norms, while the column-vectors in **G** have positive and decreasing norms.
+
+```{r eval=FALSE, include=FALSE}
+# Scaling 1 with SVD
+p <- svd(scale(X, scale = F))
+D <- diag(p$d)
+Gx <- p$u %*% D
+Ex <- p$v
+Gx; Ex
+
+# Con vegan
+vegMod <- vegan::rda(scale(X, scale = F), scale = F)
+summary(vegMod, scaling = 1)$species / 7.404975
+summary(vegMod, scaling = 1)$sites * 7.404975
+
+# HILL factor
+eigenvals <- pcaMod$sdev^2
+sqrt(sqrt((9 - 1)* sum(eigenvals)))
+```
+
+
+## Scaling 2
+
+
+If we divide each column in **G** for the respective column-norm, we obtain a new **G2** matrix, with column-norms equal to unity. At the same time, if we multiply each column in **E** for the same amount, we obtain a new **E2** matrix, where the column norms are the same as the column norms of **G**. We do this scaling, by using the `sweep()` function and we also show that **G2** and **E2**, by matrix multiplication, return the original centered data matrix (and so, they are an acceptable solution for a PCA).
+
+This second scaling is known as **Scaling 2** or **column-scaling**; it is less common, but, nonetheless, it is the default in the `summary.rda()` method in the 'vegan' package.
+
+
+```{r}
+# Scaling 2
+G2 <- sweep(G, 2, normsG, "/")
+E2 <- sweep(E, 2, normsG, "*")
+round(G2, digits = 3)
+round(E2, digits = 3)
+sqrt(diag(crossprod(G2)))
+sqrt(diag(crossprod(E2)))
+round(G2 %*% t(E2), digits = 3)
+```
+
+
+```{r eval=FALSE, include=FALSE}
+# Scaling 2 with SVD
+Gx <- p$u 
+Ex <- p$v %*% D
+Gx; Ex
+Gx %*% t(Ex)
+# Con vegan
+vegMod <- vegan::rda(X, scale = F)
+summary(vegMod, scaling = 2)$species * 7.404975
+summary(vegMod, scaling = 2)$sites / 7.404975
+```
+
+
+## Scaling 3
+
+With scaling 1, the the values in **G** were, on average, much higher than the values in **E**; otherwise, with scaling 2, the situation was reversed. In order to have the two matrices in comparable scales, we could think of dividing each column in **G** for the square root of the respective column-norm and, at the same time, multiply each column in **E** for the same amount. The two new matrices **G3** and **E3** have the same column norms (they are now in comparable scales) and, by multiplication, they return the original centered data matrix.
+
+This scaling is known as **symmetrical-scaling**; it is common in several applications of PCA, such as AMMI and GGE analyses for the evaluation of the stability of genotypes.
+
+
+```{r}
+# Scaling 3
+G3 <- sweep(G, 2, sqrt(normsG), "/")
+E3 <- sweep(E, 2, sqrt(normsG), "*")
+round(G3, digits = 3)
+round(E3, digits = 3)
+sqrt(diag(crossprod(G3)))
+sqrt(diag(crossprod(E3)))
+round(G3 %*% t(E3), digits = 3)
+```
+
+
+```{r eval=FALSE, include=FALSE}
+# Scaling 3 with SVD
+Gx <- p$u %*% diag(sqrt(p$d))
+Ex <- p$v %*% diag(sqrt(p$d))
+Gx; Ex
+Gx %*% t(Ex)
+
+# Con vegan
+vegMod <- vegan::rda(X, scale = F)
+summary(vegMod, scaling = 3)$species
+summary(vegMod, scaling = 3)$sites
+```
+
+
+## Scaling 4
+
+Scaling  4 is similar to scaling 2, but the matrix **G**, instead of to unit norm, is scaled to unit variance, by dividing each column by the corresponding standard deviation. Likewise, **E** is multiplied by the same amounts, so that **E4** has column norms equal to the standard deviations of **G**. The two matrices **G4** and **E4**, by multiplication, return the original centered matrix.
+
+This scaling is rather common in some applications of PCA, such as factor analysis; the elements in **G4** are known as **factor scores**, while those in **E4** are the so-called **loadings**. It is available, e.g., in the `dudi.pca()` function in the 'ade4' package.
+
+
+```{r}
+# Scaling 4
+G4 <- sweep(G, 2, apply(G, 2, sd), "/")
+E4 <- sweep(E, 2, apply(G, 2, sd), "*")
+round(G4, digits = 3)
+round(E4, digits = 3)
+apply(X, 2, var)
+sqrt(diag(crossprod(G4)))
+sqrt(diag(crossprod(E4)))
+round(G4 %*% t(E4), digits = 3)
+```
+
+
+
+```{r eval=FALSE, include=FALSE}
+# Scaling 4 with SVD is not used
+
+# Con dudi.pca (standardisation by population sd)
+pcaAde <- ade4::dudi.pca(X, nf = 5, scannf = FALSE, scale = F)
+pcaAde$co * sqrt(9/8) # loadings
+pcaAde$l1 / sqrt(9/8) # Factor scores
+```
+
+In conclusion to this section, although we might think that two plus two is always four, unfortunately, this is not true for a PCA and we need to be aware that there are, at least, four types of possible results, depending on which type of scaling has been used for the PC scores in **G** and the rotation matrix **E**. Consequently, there are four types of biplots, as we will see in the next section.
+
+# Four types of biplots
+
+We have at hand four matrices for the subject-scors (**G**, **G2**. **G3** and **G4**) and four matrices for the trait-scores (**E**, **E2**, **E3** and **E4**). If we draw a biplot by using the scores in **G** for the markers and the scores in **E** for the arrowtips, we obtain the so-called **distance biplot**.
+
+Otherwise, if we use **G2** and **E2**, we get the so-called **correlation biplot**. Again, If we use **G3** and **E3** we obtain a **symmetrical biplot**, while,if we use **G4** and **E4** we obtain a further type of biplot, which we could name **type 4 biplot**.
+
+The four types of biplots are drawn in the following graph.
+
+```{r eval=FALSE, include=FALSE}
+
+#Crea grafico high res
+png(filename="fourBiplots.png", 
+    units="in", 
+    width=8, 
+    height=8, 
+    pointsize=12, 
+    res=300)
+
+    par(mfrow = c(2,2))
+    biplot(G[,1:2], E[,1:2], xlab="PC1 (64%)", 
+           ylab="PC2 (16%)", main = "Distance biplot\n\n")
+    biplot(G2[,1:2], E2[,1:2], xlab="PC1 (64%)", 
+           ylab="PC2 (16%)", main = "Correlation biplot\n\n")
+    biplot(G3[,1:2], E3[,1:2], xlab="PC1 (64%)", 
+           ylab="PC2 (16%)", main = "Symmetrical biplot\n\n")
+    biplot(G4[,1:2], E4[,1:2], xlab="PC1 (64%)", 
+           ylab="PC2 (16%)", main = "Type 4 biplot\n\n")
+dev.off()
+```
+
+
+![](https://www.casaonofri.it/_Figures/fourBiplots.png){width=90%}
+
+
+Let's see how we can interpret the above biplots, depending on the scaling. For those of you who would not like to wait 'till the end of this post to grasp the interpretational rules, I have decided to anticipate the table below.
+
+![](https://www.casaonofri.it/_Figures/Summary.png){width=100%}
+
+
+# Some preliminary knowledge
+
+At the beginning I promised no overwhelming math detail, but there is one thing that cannot be avoided. If you are totally allergic to math, you can skip this section and only read the final sentence. However, I suggest that you sit back, relax and patiently read through this part.
+
+The whole interpretation of biplots depends from the concept of *inner product*, which I will try to explain below. We have seen that the results of a PCA come in the form of the two matrices **G** and **E**; each row of **G** corresponds to a marker, while each row of **E** corresponds to an arrow. We talk about **row-vectors**. Obviously, as we have to plot in 2D we only take the first two elements in each row-vector, but, if we could plot in 6D, we could draw markers and arrows by taking all six elements in each row-vector.
+
+Now, let's imagine two row-vectors, named $u$ and $v$, with, respectively, co-ordinates equal to [1, 0.25] and [0.25, 1]. I have reported these two vectors as arrows in the graph below and I have highlighted the angle between the two arrows, that is $\theta$. Furthermore, I have drawn the projection of $v$ on $u$, as the segment OA.
+
+```{r eval=FALSE, include=FALSE}
+#Crea grafico high res
+png(filename="innerProduct.png", 
+    units="in", 
+    width=5, 
+    height=5, 
+    pointsize=8, 
+    res=300)
+
+  plot(0, type = "n", xlim = c(-0.1, 1.2), ylim = c(-0.1, 1.2),
+       axes = F, xlab = "", ylab = "")
+  abline(v = 0, lwd = 0.7)
+  abline(h = 0, lwd = 0.7)
+  arrows(0,0,1,0.25, col = "red")
+  arrows(0,0,0.25,1, col = "red")
+  text(1.1, 0.30, labels = "u")
+  text(0.30, 1.1, labels = "v")
+  text(0.10, 0.10, labels = expression(theta))
+  # retta per u ha slope = 0.25
+  # perpendicolare a v ha slope = -1/0.25 = -4
+  # parpendicolare a v: y = -4x + 4*0.25 + 1
+  # intersezione con u: x = 2/4.25 = 0.471; y = 0.25 * 0.471 = 0.118
+  segments(0.25, 1, 0.471, 0.118, col = "blue", lty = 2)
+  text(-0.05, -0.05, labels = "O")
+  text(0.5, 0.05, labels = "A")
+
+dev.off()
+```
+
+![](https://www.casaonofri.it/_Figures/innerProduct.png){width=60%}
+
+Now, we can use the co-ordinates of $u$ and $v$ as row-vectors in the matrix **M**, so that we have a connection between the graph and the matrix.
+
+```{r}
+M <- matrix(c(0.25, 1, 1, 0.25), 2, 2, byrow = T)
+row.names(M) <- c("u", "v")
+M
+```
+
+The *inner product* $u \cdot v$ is defined as the sum of the products of coordinates:
+
+$$u \cdot v = (0.25 \times 1) + (1 \times 0.25) = 0.5$$
+
+Obviously, the inner product of a vector with itself is:
+
+$$u \cdot u = |u|^2 = 0.25^2 + 1^2 = 1.0625$$
+
+If we think of the Pythagorean theorem, we immediatly see that such a 'self inner product' corresponds to the squared 'length' of the arrow (that is the squared norm of the vector). With R, we can obtain the inner products for rows, in a pairwise fashion, by using the `tcrossprod()` function:
+
+```{r}
+tcrossprod(M)
+```
+
+Please, note that the squared norms of the two row-vectors are found along the diagonal. Please, also note that the inner products for column-vectors could be obtained by using the `crossprod()` function.
+
+Now, how do we visualize the inner product on the graph? By using the cosine inequality, it is possible to demonstrate that:
+
+$$u \cdot v = |u| \, |v| \, cos \theta$$
+
+In words: the inner product of two vectors $u$ and $v$ is equal to the product of their lengths $u$ and $v$ by the cosine of the angle between them. For an explanation of this, you can [follow this link to a nice YouTube tutorial](https://www.youtube.com/watch?v=NMl_dD9zPCI).
+
+This is a very useful property; look at the plot above: you may remember from high school that, in a rectangular triangle, the length of OA (one cathetus) can be obtained by multiplying the length of $v$ (the hypothenus) by the cosine of $\theta$.
+
+Therefore:
+
+$$u \cdot v = \overline{OA} \, |v|$$
+
+In words: the inner product between two arrows can be visualised by multiplying the length of one arrow for the length of the projection of the other arrow on the first arrow.
+
+The inner product is also useful to calculate the angle between two vectors; indeed, considering the equation above, we can also write:
+
+$$\cos \theta = \frac{u \cdot v}{|u| \, |v|}$$
+
+Therefore, if we take the matrix M, we can calculate the cosines of the angles between the row-vectors, by using the following code:
+
+```{r}
+cosAngles <- function(mat){
+  innerProd <- tcrossprod(mat)
+  norms <- apply(mat, 1, norm, type = "2")
+  sweep(sweep(innerProd, 2, norms, "/"), 1, norms, "/") 
+}
+cosAngles(M)
+```
+
+Obviously, the angle of a vector with itself is 0 and its cosine is 1.
+
+As conclusions to this section, please note the following. 
+
+1. **The inner product between two arrows (or between an arrow and a subject-marker) can be visualised by multiplying the length of one arrow for the length of the projection of the other arrow on the first arrow**
+2. **The squared length of an arrow, or the squared distance from a marker and the origin of axes, is obtained by summing the squares of its co-ordinates**
+
+# Interpretational rules for biplots
+
+## Rule 1: Distances between markers
+
+The Euclidean distances between subjects in the original **X** matrix can be regarded as measures of dissimilarity. They can be calculated by using the following code:
+
+```{r}
+dist(X)
+```
+
+If we consider the matrices **G**, **G2**, **G3** and **G4**, we see that only the first one preserves the Euclidean inter-object distances (the box below shows only the distances between the subject 'I' and all other subjects, for the sake of brevity):
+
+```{r}
+as.matrix(dist(G))[9,]
+as.matrix(dist(G2))[9,] # Proportional to mahalanobis
+as.matrix(dist(G3))[9,] # Not proportional
+as.matrix(dist(G4))[9,] # Mahlanobis
+```
+
+
+```{r eval=FALSE, include=FALSE}
+library(distances)
+one <- distances(X, normalize = "mahalanobis") 
+two <- as.matrix(dist(G4, diag = T, upper = T))
+one
+one[9,]/two[9,]
+mahalanobis(x = scale(X, scale = F) , center = X[1,], cov = cov(X))
+```
+
+This leads us to the first interpretational rule: **starting from a column-centered matrix, with a distance biplot (scaling 1), the Euclidean distances between markers approximate the Euclidean distances between subjects in the original centered matrix. Instead, with scaling 2 and 4 the Euclidean distances between markers approximate the Mahalanobis distances of subjects**, which represent a totally different measure of dissimilarity.
+
+## Rule 2: Distances from markers to the origin of axes
+
+Let's now consider the distance of each marker from the origin of the axes. We need to consider that a hypothetical subject with average values for all original variables would be located exactly on the origin of axes, independent on the scaling. Therefore, the distance from the origin of axes shows how far is that subject from the hypothetical 'average subject': the farthest the distance, the most 'notable' the subject (very high or very low), in relation to one or more of the original variables.
+
+Therefore, the second interpretational rule is: **starting from a column-centered matrix, independent from scaling, the Euclidean distance between a marker and the origin approximate the dissimilarity between a subject and a hypothetical subject that has average value for all original variables. With scaling 1, such dissimilarity is measured by the Euclidean distance, while with scalings 2 and 4, it is measured by the Mahalanobis distance.**
+
+## Rule 3 and 4: Lengths of arrows and inner products
+
+We have seen that the pairwise inner products of row vectors in a matrix can be obtained by using the `tcrossprod()` function. In this respect, the inner products of row-vectors **E1** and **E3** (scaling 1 and 3) are totally meaningless. On the other hand, the inner products for row vectors in **E2** and **E4** represent, respectively, the deviances-codeviances and variance-covariances of the original observations in X.  
+
+```{r}
+tcrossprod(E2)
+tcrossprod(E4)
+cov(X)
+```
+
+Consequently, the lengths of arrows (norms) are given by the square-roots of the diagonal elements in the matrix of inner products. These lengths, are proportional (scaling 2) and equal (scaling 4) to the standard deviations of the original variables. 
+
+```{r}
+apply(X, 2, sd)
+sqrt(apply(E, 1, function(x) sum(x^2)))
+sqrt(apply(E2, 1, function(x) sum(x^2)))
+sqrt(apply(E3, 1, function(x) sum(x^2)))
+sqrt(apply(E4, 1, function(x) sum(x^2)))
+```
+
+
+This leads us to the third interpretational rule: **starting from a column-centered matrix, the lengths of arrows approximate the standard deviations of the original variables only with a correlation biplot (scaling 2) or with a type 4 biplot.**. Furthermore, **the inner products of two arrows, approximate the codeviances (Scaling 2) and the covariances (Scaling 4)**.
+
+## Rule 5: Angles between arrows
+
+We have seen that the cosines of the angles between the row-vectors in the matrices **E** to **E4** can be calculated by taking, for each pair of rows, the inner product and the respective norms. By using the functione defined above, it is easy to see that the angles between arrows in **E** and **E3** are totally meaningless. Otherwise, the cosines of the angles between row-vectors in **E2** and **E4** are equal to the correlations between the original variables.
+
+```{r}
+cosAngles(E2)
+cosAngles(E4)
+```
+
+This leads to the fourth interpretational rule: **starting from a column-centered matrix, scaling 2 and scaling 4 result in biplots where the cosines of the angles between arrows approximate the correlation of original variables**. Consequently, right angles indicate no correlation, acute angles indicate positive correlatione (the smaller the angle the higher the correlation), while obtuse angles (up to 180°) indicate a negative correlation. 
+
+## Rule 6: Inner products between markers and arrows
+
+We have seen that, by multiplication, the subject-scores and trait-scores return the original centered matrix and this is totally independent from scaling. Accordingly, we can also say that the observed value for each subject in each variable can be obtained by using the inner product of a subject-vector and a trait-vector.
+
+For example, let's calculate the inner product between the first row in **G** (subject A) and the first row in **E**:
+
+```{r}
+crossprod(G[1,], E[1,])
+```
+
+That is the exact value shown by A on POLLA, in the original centered data matrix. 
+
+Therefore, the fifth interpretational rule is that: **independent on scaling, we can approximate the value of one subject in one specific variable, by considering how long are the respective trait-arrow and the projection of the subject-marker on the trait-arrow.** If the projection is on the same direction of the trait-arrow, the original value is positive (i.e., above the mean), while if the projection is in the opposite direction, the original value is negative (i.e., below the mean).
+
+
+# What if we standardise the original data?
+
+Sometimes we need to standardise our data, for example because we want to avoid that a few of the original variables (the ones with largest values) assume a preminent role in the ordination of subjects. From a practical point of view, this is very simple: we only have to add the option `scale = T` to the selected R function for PCA.
+
+What does it change, with the interpretation of a biplot? The main thing to remember is that the starting point is a standardised matrix where each value represents the difference with respect to the column mean in standard deviation units. Furthermore, all the original columns, after standardisation, have unit standard deviation. Accordingly, there are some changes to the interpretational rules, which I have listed in the table above.
+
+
+# Conclusions
+
+I'd like to conclude with a couple of take-home messages, to be kept in mind when publishing a biplot. Please, note that they are taken from Onofri et al., (2010): 
+
+1. Always mention what kind of pre-manipulation has been performed on the original dataset (centering, normalisation, standardisation).
+2. Always mention what sort of rescaling on PCs has been used. Remember that the selection of one particular scaling option strongly affects the interpretation of the biplot, in terms of distances and angles. For example, one scaling may allow Euclidean distances between objects to be interpreted, but not those between variables, while another scaling does not permit either.
+3. Never drag and pull a PCA plot so that it fits the page layout. Remember that axes need to be equally scaled for any geometric interpretations of distances and angles.
+
+Thanks for reading!
+
+Prof. Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences    
+University of Perugia (Italy)    
+Send comments to: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)
+
+<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow @onofriandreapg</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+---
+
+# References
+
+1. Borcard, D., Gillet, F., Legendre, P., 2011. Numerical Ecology with R. Springer Science+Business Media, LLC 2011, New York.
+2. Gower, J.C., 1966. Some distance properties of latent root and vector methods used in multivariate analysis. Biometrika 53, 325–338.
+3. Legendre, P., Legendre, L., 2012. Numerical ecology. Elsevier, Amsterdam (The Netherlands).
+4. Kroonenberg, P.M., 1995. Introduction to biplots for GxE tables. The University of Queensland. Research Report #51, Brisbane, Australia.
+5. Onofri, A., Carbonell, E.A., Piepho, H.-P., Mortimer, A.M., Cousens, R.D., 2010. Current statistical issues in Weed Research. Weed Research 50, 5–24.
+
+

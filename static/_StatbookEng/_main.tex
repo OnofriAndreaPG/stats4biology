@@ -15,7 +15,7 @@
 }
 
 \author{Andrea Onofri and Dario Sacco}
-\date{Update: v. 0.9 (2021-10-06), compil. 2021-11-11}
+\date{Update: v. 0.9 (2021-10-06), compil. 2021-11-23}
 \title{Experimental methods in agriculture}
 \subtitle{}
 
@@ -3489,12 +3489,1148 @@ Finally, it is very important to point out that \textbf{all the above reasoning 
 \hypertarget{checking-for-the-basic-assumptions}{%
 \chapter{Checking for the basic assumptions}\label{checking-for-the-basic-assumptions}}
 
-\ldots{}
+Let's take a further look at the ANOVA model we fitted in the previous chapter:
+
+\[Y_i = \mu + \alpha_j + \varepsilon_i\]
+
+with:
+
+\[ \varepsilon_i \sim N(0, \sigma) \]
+
+The above equations imply that the random components \(\varepsilon_i\) (residuals) are the differences between observed and predicted data:
+
+\[\varepsilon_i = Y_i - Y_{Ei}\]
+
+where:
+
+\[Y_{Ei} = \mu + \alpha_j\]
+
+By definition, the mean of residuals is always 0, while the standard deviation \(\sigma\) is to be estimated.
+
+As all the other linear models, ANOVA models make a number of important assumptions, which we have already listed in the previous chapter. We repeat them here:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  the deterministic model is linear and additive (\(\mu + \alpha_j\));
+\item
+  there are no other effects apart from the treatment and random noise. In particular, there are no components of systematic error;
+\item
+  residuals are independently sampled from a gaussian distribution;
+\item
+  the variance of residuals is homogeneous and independent from the experimental treatments (homoscedasticity assumption)
+\end{enumerate}
+
+The independence of residuals and the absence of systematic sources of experimental errors are ensured by the adoption of a valid experimental design and, therefore, they do not need to be checked after the analyses. On the contrary, we need to check that the residuals are gaussian and homoscedastic: if the residuals do not conform to such assumptions, the sampling distribution for the F-ratio is no longer the Fisher-Snedecor distribution and our P-values are invalid.
+
+In this respect, we should be particularly concerned about strong deviations, as the F-test is rather robust and can tolerate slight deviations with no dramatic changes of P-values.
+
+\hypertarget{outlying-observations}{%
+\section{Outlying observations}\label{outlying-observations}}
+
+In some instances, deviations from the basic assumptions can be related to the presence of \textbf{outliers}, i.e.~`odd' observations, very far away from all other observations in the sample. For example, if the residuals are gaussian with mean equal to zero and standard deviation equal to 5, finding a residual of -20 or lower should be rather unlikely (32 cases in one million observations), as shown by the \texttt{pnorm()} function in the box below:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{pnorm}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{20}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{5}\NormalTok{)}
+\DocumentationTok{\#\# [1] 3.167124e{-}05}
+\end{Highlighting}
+\end{Shaded}
+
+The presence of such an unlikely residual in a lot of, e.g., 50 residuals should be considered as highly suspicious: either we were rather unlucky, or there is something wrong with that residual. This is not irrelevant: indeed, such an `odd' observation may have a great impact on the estimation of model parameters (means and variances) and hypothesis testing. This would be a so-called \emph{influential observation} and we should not let it go unnoticed. We suggest that, before checking for the basic assumptions, a careful search for the presence of outliers should never be forgotten.
+
+\hypertarget{the-inspection-of-residuals}{%
+\section{The inspection of residuals}\label{the-inspection-of-residuals}}
+
+The residuals of linear models can be inspected either by graphical methods, or by formal hypothesis testing. Graphical methods are simple, but they are powerful enough to reveal strong deviations from the basic assumptions (as we said, slight deviations are usually tolerated). We suggest that these graphical inspection methods are routinely used with all linear models, while the support of formal hypothesis testing is left to the most dubious cases.
+
+Residuals can be plotted in various ways, but, in this section, we will present the two main plot types, which are widely accepted as valid methods to check for the basic assumptions.
+
+\hypertarget{plot-of-residuals-against-expected-values}{%
+\subsection{Plot of residuals against expected values}\label{plot-of-residuals-against-expected-values}}
+
+First of all, it is useful to plot the residuals against the expected values. If there are no components of systematic error and if variances are homogeneous across treatments, the points in this graph should be randomly scattered (Figure \ref{fig:figName101} ), with no visible systematic patterns.
+
+Every possible deviation from such a random pattern should be carefully inspected. For example, the presence of outliers is indicated by a few `isolated points,' as shown in Figure \ref{fig:figName102}.
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.85\linewidth]{_main_files/figure-latex/figName101-1} 
+
+}
+
+\caption{Plot of residuals against expected values: there is no visible deviation from basic assumptions for linear model}\label{fig:figName101}
+\end{figure}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.85\linewidth]{_main_files/figure-latex/figName102-1} 
+
+}
+
+\caption{Plot of residuals against expected values: an outlying observation is clearly visible}\label{fig:figName102}
+\end{figure}
+
+When the cloud of points takes the form of a `fennel' (Figure \ref{fig:figName103}), the variances are proportional to the expected values and, therefore, they are not homogeneous across treatments (\textbf{heteroscedasticity}).
+
+In some other cases, the residuals tend to be systematically negative/positive for small expected values and systematically positive/negative for high expected values (Figure \ref{fig:figName104}). Such a behaviour may be due to some unknown sources of systematic error, which is not accounted for in the deterministic part of the model (\textbf{lack of fit}). Such a behaviour is not very common with ANOVA models and we postpone further detail until the final two book chapters.
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.85\linewidth]{_main_files/figure-latex/figName103-1} 
+
+}
+
+\caption{Plot of residuals against expected values: heteroscedastic data.}\label{fig:figName103}
+\end{figure}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.85\linewidth]{_main_files/figure-latex/figName104-1} 
+
+}
+
+\caption{Plot of residuals against expected values: lack of fit}\label{fig:figName104}
+\end{figure}
+
+\hypertarget{qq-plot}{%
+\subsection{QQ-plot}\label{qq-plot}}
+
+Plotting the residuals against the expected values let us discover the outliers and gives us evidence of heteroscedastic errors; however, it does not suggest whether the residuals are gaussian distributed or not. Therefore, we need to draw the so-called QQ-plot (quantile-quantile plot), where the standardised residuals are plotted against the respective percentiles of a normal distribution. But, what are the respective percentiles of a gaussian distribution?
+
+I will not go into detail about this (you can find information in my blog, \href{https://www.statforbiology.com/2020/stat_general_percentiles/}{at this link}), but I will give you an example. Let's imagine we have 11 standardised residuals sorted in increasing order: how do we know whether such residuals are drawn from a gaussian distribution? The simplest answer is that we should compare them with 11 values that are, for sure, drawn from a standardised gaussian distribution.
+
+With eleven values, we know that the sixth value is the median (50\textsuperscript{th} percentile), while we can associate to all other values the respective percentage point by using the \texttt{ppoints()} function, as shown in the box below:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pval }\OtherTok{\textless{}{-}} \FunctionTok{ppoints}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{11}\NormalTok{)}
+\NormalTok{pval}
+\DocumentationTok{\#\#  [1] 0.04545455 0.13636364 0.22727273 0.31818182 0.40909091}
+\DocumentationTok{\#\#  [6] 0.50000000 0.59090909 0.68181818 0.77272727 0.86363636}
+\DocumentationTok{\#\# [11] 0.95454545}
+\end{Highlighting}
+\end{Shaded}
+
+We see that the first observation corresponds the 4.5\textsuperscript{th} percentile, the second observation is the 13.63\textsuperscript{th} percentile and so on, until the final observation that is the 95.45\textsuperscript{th} percentile. What are these percentiles in a standardised gaussian distribution? We can calculate them by using the \texttt{qnorm()} function:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{perc }\OtherTok{\textless{}{-}} \FunctionTok{qnorm}\NormalTok{(pval)}
+\NormalTok{perc}
+\DocumentationTok{\#\#  [1] {-}1.6906216 {-}1.0968036 {-}0.7478586 {-}0.4727891 {-}0.2298841}
+\DocumentationTok{\#\#  [6]  0.0000000  0.2298841  0.4727891  0.7478586  1.0968036}
+\DocumentationTok{\#\# [11]  1.6906216}
+\end{Highlighting}
+\end{Shaded}
+
+If our 11 standardised residuals are gaussian, they should match the behaviour of the respective percentiles in a gaussian population: the central residual should be close to 0, the smallest one should be close to -1.691, the second one should be close to -1.097 and so on. Furthermore, the number of negative values should be approximately equal to the number of positive values and the median should be approximately equal to the mean.
+
+Hence, if we plot our standardised residuals against the respective percentiles of a standardised gaussian distribution, the points should lie approximately along the diagonal, as shown in Figure \ref{fig:figName105}, for a series of residuals which were randomly sampled from a gaussian distribution.
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.85\linewidth]{_main_files/figure-latex/figName105-1} 
+
+}
+
+\caption{QQ-plot for a series of gaussian residuals}\label{fig:figName105}
+\end{figure}
+
+Any deviations from the diagonal suggests that the residuals do not come from a normal distribution, but they come from other distributions with different shapes. For example, we know that the gaussian distribution is symmetric, while residuals might come from a right-skewed distribution (leaning to the left). In such asymmetric distribution, the mean is higher than the median and negative residuals are more numerous, but lower in absolute value than positive residuals (see Figure \ref{fig:figName106}, left). Therefore, the QQ-plot looks like the one in Figure \ref{fig:figName106}(right).
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.85\linewidth]{_main_files/figure-latex/figName106-1} 
+
+}
+
+\caption{QQ-plot for residuals coming from a right-skewed distribution (e.g., log-normal)}\label{fig:figName106}
+\end{figure}
+
+Otherwise, when the residuals come from a left-skewed distribution (asymmetric and leaning to the right), their mean is lower than the median and there are a lot of positive residuals with low absolute values (Figure \ref{fig:figName107}, left). Therefore, the QQ-plot looks like that in Figure \ref{fig:figName107} (right).
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.85\linewidth]{_main_files/figure-latex/figName107-1} 
+
+}
+
+\caption{QQ-plot for residuals coming from a left-skewed distribution (e.g., a type of beta distribution)}\label{fig:figName107}
+\end{figure}
+
+Apart from symmetry, the deviations from a gaussian distribution may also concern the density in both the tails of the distribution. In this respect, the residuals may come from a platicurtic distribution, where the number of observations far away from the mean (outliers) is rather high, with respect to a gaussian distribution (Figure \ref{fig:figName108}, left). Therefore, the QQ-plot looks like the one in Figure \ref{fig:figName108} (right). Otherwise, when the residuals come from a leptocurtic distribution, the number of observations far away from the mean is rather low (see Figure \ref{fig:figName109} and the QQ-plot looks like that in Figure \ref{fig:figName109} (right).
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.85\linewidth]{_main_files/figure-latex/figName108-1} 
+
+}
+
+\caption{QQ-plot for residuals coming from a platicurtic distribution (e.g., the Student's t distribution with few degrees of freedom)}\label{fig:figName108}
+\end{figure}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.85\linewidth]{_main_files/figure-latex/figName109-1} 
+
+}
+
+\caption{QQ-plot for residuals coming from a leptocurtic distribution (e.g., a uniform distribution)}\label{fig:figName109}
+\end{figure}
+
+\hypertarget{formal-hypotesis-testing}{%
+\section{Formal hypotesis testing}\label{formal-hypotesis-testing}}
+
+Graphical methods usually reveal the outliers and the most important deviations from basic assumptions. However, we might be interested in formally testing the hypothesis that there are no deviations from basic assumptions (null hypothesis), by using some appropriate statistic. Nowadays, a very widespread test for variance homogeneity is the Levene's test, which consists of fitting an ANOVA model to the residuals as absolute values. The rationale is that the residuals sum up to zero within each treatment group; if we remove the signs, the residuals become positive, but the group means tend to become higher when the variances are higher. For example, we can take two samples with means equal to zero and variances respectively equal to 1 and 4.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{A }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\FloatTok{0.052}\NormalTok{, }\FloatTok{0.713}\NormalTok{, }\FloatTok{1.94}\NormalTok{, }\FloatTok{0.326}\NormalTok{, }\FloatTok{0.019}\NormalTok{, }\SpecialCharTok{{-}}\FloatTok{2.168}\NormalTok{, }\FloatTok{0.388}\NormalTok{,}
+       \SpecialCharTok{{-}}\FloatTok{0.217}\NormalTok{, }\FloatTok{0.028}\NormalTok{, }\SpecialCharTok{{-}}\FloatTok{0.801}\NormalTok{, }\SpecialCharTok{{-}}\FloatTok{0.281}\NormalTok{)}
+\NormalTok{B }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\FloatTok{3.025}\NormalTok{, }\SpecialCharTok{{-}}\FloatTok{0.82}\NormalTok{, }\FloatTok{1.716}\NormalTok{, }\SpecialCharTok{{-}}\FloatTok{0.089}\NormalTok{, }\SpecialCharTok{{-}}\FloatTok{2.566}\NormalTok{, }\SpecialCharTok{{-}}\FloatTok{1.394}\NormalTok{,}
+       \FloatTok{0.59}\NormalTok{, }\SpecialCharTok{{-}}\FloatTok{1.853}\NormalTok{, }\SpecialCharTok{{-}}\FloatTok{2.069}\NormalTok{, }\FloatTok{3.255}\NormalTok{, }\FloatTok{0.205}\NormalTok{)}
+\FunctionTok{mean}\NormalTok{(A); }\FunctionTok{mean}\NormalTok{(B)}
+\DocumentationTok{\#\# [1] {-}9.090909e{-}05}
+\DocumentationTok{\#\# [1] 1.006214e{-}17}
+\FunctionTok{var}\NormalTok{(A); }\FunctionTok{var}\NormalTok{(B)}
+\DocumentationTok{\#\# [1] 1.000051}
+\DocumentationTok{\#\# [1] 4.000271}
+\FunctionTok{mean}\NormalTok{(}\FunctionTok{abs}\NormalTok{(A))}
+\DocumentationTok{\#\# [1] 0.6302727}
+\FunctionTok{mean}\NormalTok{(}\FunctionTok{abs}\NormalTok{(B))}
+\DocumentationTok{\#\# [1] 1.598364}
+\end{Highlighting}
+\end{Shaded}
+
+Taking the absolute values, the mean for A is 0.63, while the mean for B is 1.60. We see that the second mean is higher than the first, which is a sign that the two variances might not be homogeneous. If we submit to ANOVA the absolute values, the difference between groups is significant, which leads to the rejection of the homoscedasticity assumption. In R, the Levene's test can also be performed by using the \texttt{leveneTest()} function in the `car' package.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{res }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(A, B)}
+\NormalTok{treat }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"A"}\NormalTok{, }\StringTok{"B"}\NormalTok{), }\AttributeTok{each =} \DecValTok{11}\NormalTok{)}
+\NormalTok{model }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}\FunctionTok{abs}\NormalTok{(res) }\SpecialCharTok{\textasciitilde{}} \FunctionTok{factor}\NormalTok{(treat))}
+\FunctionTok{anova}\NormalTok{(model)}
+\DocumentationTok{\#\# Analysis of Variance Table}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# Response: abs(res)}
+\DocumentationTok{\#\#               Df  Sum Sq Mean Sq F value Pr(\textgreater{}F)  }
+\DocumentationTok{\#\# factor(treat)  1  5.1546  5.1546  5.8805 0.0249 *}
+\DocumentationTok{\#\# Residuals     20 17.5311  0.8766                 }
+\DocumentationTok{\#\# {-}{-}{-}}
+\DocumentationTok{\#\# Signif. codes:  }
+\DocumentationTok{\#\# 0 \textquotesingle{}***\textquotesingle{} 0.001 \textquotesingle{}**\textquotesingle{} 0.01 \textquotesingle{}*\textquotesingle{} 0.05 \textquotesingle{}.\textquotesingle{} 0.1 \textquotesingle{} \textquotesingle{} 1}
+\NormalTok{car}\SpecialCharTok{::}\FunctionTok{leveneTest}\NormalTok{(res }\SpecialCharTok{\textasciitilde{}} \FunctionTok{factor}\NormalTok{(treat), }\AttributeTok{center =}\NormalTok{ mean)}
+\DocumentationTok{\#\# Levene\textquotesingle{}s Test for Homogeneity of Variance (center = mean)}
+\DocumentationTok{\#\#       Df F value Pr(\textgreater{}F)  }
+\DocumentationTok{\#\# group  1  5.8803 0.0249 *}
+\DocumentationTok{\#\#       20                 }
+\DocumentationTok{\#\# {-}{-}{-}}
+\DocumentationTok{\#\# Signif. codes:  }
+\DocumentationTok{\#\# 0 \textquotesingle{}***\textquotesingle{} 0.001 \textquotesingle{}**\textquotesingle{} 0.01 \textquotesingle{}*\textquotesingle{} 0.05 \textquotesingle{}.\textquotesingle{} 0.1 \textquotesingle{} \textquotesingle{} 1}
+\end{Highlighting}
+\end{Shaded}
+
+The Levene's test can also be performed by considering the medians of groups instead of the means (`center = median'), which gives us a more robust test, i.e.~less sensible to possible outliers.
+
+Possible deviances with respect to the gaussian assumption can be tested by using the Shapiro-Wilks' test. For example, taking 100 residuals from a uniform distribution (i.e.~a non-gaussian distribution) and submitting them to the Shapiro-Wilks' test, the null hypothesis is rejected with P = 0.0004.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{1234}\NormalTok{)}
+\FunctionTok{shapiro.test}\NormalTok{(}\FunctionTok{runif}\NormalTok{(}\DecValTok{100}\NormalTok{, }\AttributeTok{min =} \SpecialCharTok{{-}}\DecValTok{2}\NormalTok{, }\AttributeTok{max =} \DecValTok{2}\NormalTok{))}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\#  Shapiro{-}Wilk normality test}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# data:  runif(100, min = {-}2, max = 2)}
+\DocumentationTok{\#\# W = 0.94504, p{-}value = 0.0003966}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{what-do-we-do-in-practice}{%
+\section{What do we do, in practice?}\label{what-do-we-do-in-practice}}
+
+Now, it's time to take a decision: do our data meet the basic assumptions for ANOVA? A wide experience in the field suggests that a decision is hard to take in most situations. Based on experience, our recommendations are:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  a thorough check of the residuals should never be neglected;
+\item
+  be very strict when the data come as counts or ratios: for this type of data the basic assumptions are very rarely met and, therefore, you should consider them as non-normal and heteroscedastic whenever you have even a small sign to support this;
+\item
+  be very strict with quantitative data, when the differences between group means are very high (higher than one order of magnitude); for this data, variances are usually proportional to means and heteroscedasticity is the norm and not the exception;
+\item
+  for all other data, you can be slightly more liberal, without neglecting visible deviations from basic assumptions.
+\end{enumerate}
+
+\hypertarget{correcting-measures}{%
+\section{Correcting measures}\label{correcting-measures}}
+
+Whenever our checks suggest important deviations from basic assumptions, we are supposed to take correcting measures, otherwise our analyses are invalid. Of course, correcting measures change according to the problem we have found in our data.
+
+\hypertarget{removing-outliers}{%
+\subsection{Removing outliers}\label{removing-outliers}}
+
+If we have found an outlier, the simplest correcting strategy is to remove it. However, we should refrain from this behaviour as much as possible, especially when sample size is small. Before removing an outlier we should be reasonably sure that it came as the consequence of some random error or intrusion, without being, anyhow, related to the effect of some treatments.
+
+For example, if we are making a genotype experiment and one of the genotypes is not resistant to a certain fungi disease, in the presence of such disease we might expect that yield variability for the sensible genotypes increases and, therefore, the presence of occasional plots with very low yield levels becomes more likely. In this case, outliers are not independent on the treatment and removing them is wrong, because relevant information is hidden.
+
+In all cases, please, remember that removing data points to produce a statistically significant result is regarded as a terribly bad practice! Furthermore, by definition, outliers should be rare: if the number of outliers is rather high, we should really think about discarding the whole experiment and making a new one.
+
+\hypertarget{stabilising-transformations}{%
+\subsection{Stabilising transformations}\label{stabilising-transformations}}
+
+After having considered and managed the presence possible outliers, the most traditional method to deal with data that do not conform to the basic assumptions for linear models is to transform the response into a metric that is more amenable to linear model fitting. In particular, the logarithmic transformation is often used for counts and proportions, the square root transformation is also used for counts and the arcsin-square root transformation is very common with proportions.
+
+Instead of making an arbitrary selection, we suggest the procedure proposed by Box and Cox (1964), that is based on the following family of transformations:
+
+\[ W = \left\{ \begin{array}{ll}
+\frac{Y^\lambda -1}{\lambda} & \quad \textrm{if} \,\,\, \lambda \neq 0 \\
+\log(Y) & \quad \textrm{if} \,\,\, \lambda = 0
+\end{array} \right.\]
+
+where \(W\) is the transformed variable, \(Y\) is the original variable and \(\lambda\) is the transformation parameter. We may note that, apart from a linear shift (subtracting 1 and dividing by \(\lambda\), which does not change the distribution of data), if \(\lambda = 1\) we do not transform at all. If \(\lambda = 0.5\) we make a square-root transformation, while if \(\lambda = 0\)\footnote{Note that the limit of \((Y^\lambda -1)/\lambda\) for \(\lambda \rightarrow 0\) is \(\log(y)\)} we make a logarithmic transformation; furthermore, if \(\lambda = -1\) we transform into the reciprocal value.
+
+Box and Cox (1964) gave a method to calculate the likelihood of the data under a specific \(\lambda\) value, so that we can try several \(\lambda\) values and see which one corresponds to the maximum likelihood value. Accordingly, we can select this maximum likelihood \(\lambda\) value and use it for our transformation. We'll give an example of such an approach later on.
+
+\hypertarget{examples-with-r}{%
+\section{Examples with R}\label{examples-with-r}}
+
+\hypertarget{example-1}{%
+\section{Example 1}\label{example-1}}
+
+First of all, let's check the dataset we have used in the previous chapter (`mixture.csv'). We load the file and re-fit the ANOVA model, by using the `Weight' as the response and the herbicide treatment `Treat' as the treatment factor.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{repo }\OtherTok{\textless{}{-}} \StringTok{"https://www.casaonofri.it/\_datasets/"}
+\NormalTok{file }\OtherTok{\textless{}{-}} \StringTok{"mixture.csv"}
+\NormalTok{pathData }\OtherTok{\textless{}{-}} \FunctionTok{paste}\NormalTok{(repo, file, }\AttributeTok{sep =} \StringTok{""}\NormalTok{)}
+
+\NormalTok{dataset }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(pathData, }\AttributeTok{header =}\NormalTok{ T)}
+\FunctionTok{head}\NormalTok{(dataset)}
+\DocumentationTok{\#\#             Treat Weight}
+\DocumentationTok{\#\# 1 Metribuzin\_\_348  15.20}
+\DocumentationTok{\#\# 2 Metribuzin\_\_348   4.38}
+\DocumentationTok{\#\# 3 Metribuzin\_\_348  10.32}
+\DocumentationTok{\#\# 4 Metribuzin\_\_348   6.80}
+\DocumentationTok{\#\# 5     Mixture\_378   6.14}
+\DocumentationTok{\#\# 6     Mixture\_378   1.95}
+\NormalTok{dataset}\SpecialCharTok{$}\NormalTok{Treat }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(dataset}\SpecialCharTok{$}\NormalTok{Treat)}
+\NormalTok{mod }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Weight }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Treat, }\AttributeTok{data =}\NormalTok{ dataset)}
+\end{Highlighting}
+\end{Shaded}
+
+After fitting, we can get the graphical analyses of residuals by using the \texttt{plot()} method on the model object; the argument `which' can be set to 1 or 2: the former value produces a plot of residuals against expected values, while the latter value produces a QQ-plot of residuals. The syntax is as follows:
+
+\begin{verbatim}
+plot(mod, which = 1)
+plot(mod, which = 2)
+\end{verbatim}
+
+The output is shown in Figure \ref{fig:figName110a}.
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.85\linewidth]{_main_files/figure-latex/figName110a-1} 
+
+}
+
+\caption{Graphical analyses of residuals for the 'mixture.csv' dataset}\label{fig:figName110a}
+\end{figure}
+
+None of the two graphs suggests deviations from the basic assumptions. Considering that we have a quantitative variable with small differences (less than one order of magnitude) between group means, we skip all formal analyses and conclude that we have no reasons to fear about the basic assumptions for linear models.
+
+\hypertarget{example-2}{%
+\section{Example 2}\label{example-2}}
+
+Let's consider the dataset in the `insects.csv' file. Fifteen plants were treated with three different insecticides (five plants per insecticide) according to a completely randomised design. A few weeks after the treatment, we counted the eggs of insects over the leaf surface. In the box below we load the dataset and fit an ANOVA model, considering the variables `Count' as the response and `Insecticide' as the experimental factor.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{file }\OtherTok{\textless{}{-}} \StringTok{"insects.csv"}
+\NormalTok{pathData }\OtherTok{\textless{}{-}} \FunctionTok{paste}\NormalTok{(repo, file, }\AttributeTok{sep =} \StringTok{""}\NormalTok{)}
+\NormalTok{dataset }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(pathData, }\AttributeTok{header =}\NormalTok{ T)}
+\FunctionTok{head}\NormalTok{(dataset)}
+\DocumentationTok{\#\#   Insecticide Rep Count}
+\DocumentationTok{\#\# 1          T1   1   448}
+\DocumentationTok{\#\# 2          T1   2   906}
+\DocumentationTok{\#\# 3          T1   3   484}
+\DocumentationTok{\#\# 4          T1   4   477}
+\DocumentationTok{\#\# 5          T1   5   634}
+\DocumentationTok{\#\# 6          T2   1   211}
+\NormalTok{mod }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Count }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Insecticide, }\AttributeTok{data =}\NormalTok{ dataset)}
+\end{Highlighting}
+\end{Shaded}
+
+Now we plot the residuals, by using the `plot' method, as shown above, The output is reported in Figure \ref{fig:figName110}.
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.85\linewidth]{_main_files/figure-latex/figName110-1} 
+
+}
+
+\caption{Graphical analyses of residuals for the 'insects.csv' dataset}\label{fig:figName110}
+\end{figure}
+
+In this case we see clear signs of heteroscedastic (left plot) and right-skewed residuals (right plot). Furthermore, the fact that we are working with counts encourages a more formal analysis. The Levene's test confirms our fears and permits to reject the null hypothesis of homoscedasticity (P = 0.043). Likewise, the hypothesis of normality is rejected (P = 0.048), by using a Shapiro-Wilks test. The adoption of some correcting measures is, therefore, in order.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{car}\SpecialCharTok{::}\FunctionTok{leveneTest}\NormalTok{(mod, }\AttributeTok{center =}\NormalTok{ mean )}
+\DocumentationTok{\#\# Warning in leveneTest.default(y = y, group = group, ...):}
+\DocumentationTok{\#\# group coerced to factor.}
+\DocumentationTok{\#\# Levene\textquotesingle{}s Test for Homogeneity of Variance (center = mean)}
+\DocumentationTok{\#\#       Df F value  Pr(\textgreater{}F)  }
+\DocumentationTok{\#\# group  2   3.941 0.04834 *}
+\DocumentationTok{\#\#       12                  }
+\DocumentationTok{\#\# {-}{-}{-}}
+\DocumentationTok{\#\# Signif. codes:  }
+\DocumentationTok{\#\# 0 \textquotesingle{}***\textquotesingle{} 0.001 \textquotesingle{}**\textquotesingle{} 0.01 \textquotesingle{}*\textquotesingle{} 0.05 \textquotesingle{}.\textquotesingle{} 0.1 \textquotesingle{} \textquotesingle{} 1}
+\FunctionTok{shapiro.test}\NormalTok{(}\FunctionTok{residuals}\NormalTok{(mod))}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\#  Shapiro{-}Wilk normality test}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# data:  residuals(mod)}
+\DocumentationTok{\#\# W = 0.87689, p{-}value = 0.04265}
+\end{Highlighting}
+\end{Shaded}
+
+We decide to use a stabilising transformation and run the \texttt{boxcox()} function to select the maximum likelihood value for \(\lambda\); the syntax below results in the output shown in Figure \ref{fig:figName111}.
+
+\begin{verbatim}
+library(MASS)
+boxcox(mod)
+\end{verbatim}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.85\linewidth]{_main_files/figure-latex/figName111-1} 
+
+}
+
+\caption{Selecting the maximum likelihood value for the transformation parameter lambda, according to Box and Cox (1964)}\label{fig:figName111}
+\end{figure}
+
+The graph shows that the maximum likelihood value is \(\lambda = 0.14\), although the confidence limits go from slightly below zero to roughly 0.5. In conclusion, every \(\lambda\) value within the interval \(-0.1 < \lambda < 0.5\) can be used for the transformation. We select \(\lambda = 0\), that corresponds to a logarithmic transformation, which is very widely known and understood.
+
+In practice, we transform the data into their logarithms, re-fit the model and re-analyse the new residuals.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{modt }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}\FunctionTok{log}\NormalTok{(Count) }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Insecticide, }\AttributeTok{data =}\NormalTok{ dataset)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{))}
+\FunctionTok{plot}\NormalTok{(modt, }\AttributeTok{which =} \DecValTok{1}\NormalTok{)}
+\FunctionTok{plot}\NormalTok{(modt, }\AttributeTok{which =} \DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.85\linewidth]{_main_files/figure-latex/figName112-1} 
+
+}
+
+\caption{Graphical analyses of residuals for the 'insects.csv' dataset, following logarithmic transformation of the response variable}\label{fig:figName112}
+\end{figure}
+
+The situation has sensibly improved and, therefore, we go ahead with the analyses and request the ANOVA table.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{anova}\NormalTok{(modt)}
+\DocumentationTok{\#\# Analysis of Variance Table}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# Response: log(Count)}
+\DocumentationTok{\#\#             Df  Sum Sq Mean Sq F value    Pr(\textgreater{}F)    }
+\DocumentationTok{\#\# Insecticide  2 15.8200  7.9100  50.122 1.493e{-}06 ***}
+\DocumentationTok{\#\# Residuals   12  1.8938  0.1578                      }
+\DocumentationTok{\#\# {-}{-}{-}}
+\DocumentationTok{\#\# Signif. codes:  }
+\DocumentationTok{\#\# 0 \textquotesingle{}***\textquotesingle{} 0.001 \textquotesingle{}**\textquotesingle{} 0.01 \textquotesingle{}*\textquotesingle{} 0.05 \textquotesingle{}.\textquotesingle{} 0.1 \textquotesingle{} \textquotesingle{} 1}
+\end{Highlighting}
+\end{Shaded}
+
+The above table suggests that there are significant differences among insecticides (P = 1.493e-06). It may be interesting to compare the above output with the output obtained from the analysis of untransformed data:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{anova}\NormalTok{(mod)}
+\DocumentationTok{\#\# Analysis of Variance Table}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# Response: Count}
+\DocumentationTok{\#\#             Df Sum Sq Mean Sq F value    Pr(\textgreater{}F)    }
+\DocumentationTok{\#\# Insecticide  2 714654  357327  18.161 0.0002345 ***}
+\DocumentationTok{\#\# Residuals   12 236105   19675                      }
+\DocumentationTok{\#\# {-}{-}{-}}
+\DocumentationTok{\#\# Signif. codes:  }
+\DocumentationTok{\#\# 0 \textquotesingle{}***\textquotesingle{} 0.001 \textquotesingle{}**\textquotesingle{} 0.01 \textquotesingle{}*\textquotesingle{} 0.05 \textquotesingle{}.\textquotesingle{} 0.1 \textquotesingle{} \textquotesingle{} 1}
+\end{Highlighting}
+\end{Shaded}
+
+Apart from the fact that this latter analysis is wrong, because the basic assumptions of linear models are not respected, we can see that the analysis on transformed data is more powerful, in the sense that it results in a lower P-value. In this example, the null hypothesis is rejected both with transformed and with untransformed data, but in other situations, whenever the P-value is close to the borderline of significance, making a wise selection of the transformation becomes fundamental.
+
+\hypertarget{other-possible-approaches}{%
+\section{Other possible approaches}\label{other-possible-approaches}}
+
+Stabilising transformations were very much in fashion until the '80s of the previous century. At that time, computing power was limiting and widening the field of application for ANOVA models used to be compulsory. Nowadays, R and other software permit the use of alternative methods of data analysis, that allow for non-gaussian errors. These methods belong to the classes of Generalised Linear Models (GLM) and Generalised Linear Least squares models (GLS), which are two very flexible classes of models to deal with non-normal and heteroscedastic residuals.
+
+In other cases, when we have no hints to understand what type of frequency distribution our residuals are sampled from, we can use nonparametric methods, which make little or no assumptions about the distribution of residuals.
+
+GLM, GLS and non-parametric methods are pretty advanced and they are not considered in this introductory book.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{further-readings-6}{%
+\section{Further readings}\label{further-readings-6}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Ahrens, W. H., D. J. Cox, and G. Budwar. 1990, Use of the arcsin and square root trasformation for subjectively determined percentage data. Weed science 452-458.
+\item
+  Anscombe, F. J. and J. W. Tukey. 1963, The examination and analysis of residuals. Technometrics 5: 141-160.
+\item
+  Box, G. E. P. and D. R. Cox. 1964, An analysis of transformations. Journal of the Royal Statistical Society, B-26, 211-243, discussion 244-252.
+\item
+  D'Elia, A. 2001, Un metodo grafico per la trasformazione di Box-Cox: aspetti esplorativi ed inferenziali. STATISTICA LXI: 630-648.
+\item
+  Saskia, R. M. 1992, The Box-Cox transformation technique: a review. Statistician 41: 169-178.
+\item
+  Weisberg, S., 2005. Applied linear regression, 3rd ed.~John Wiley \& Sons Inc.~(per il metodo `delta')
+\end{enumerate}
 
 \hypertarget{contrasts-and-multiple-comparison-testing}{%
 \chapter{Contrasts and multiple comparison testing}\label{contrasts-and-multiple-comparison-testing}}
 
-To be done \ldots{}
+In Chapter 7 we have shown how to fit an ANOVA model to the observed data, which is very often the first step of data analysis, with two fundamental aims:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  determining the variance of the residual (unexplained) effects, that is the basis of statistical inference;
+\item
+  test the hypothesis of no treatment effects (test of homogeneity), by using the F-ratio.
+\end{enumerate}
+
+In Chapter 8, we sow that, before trusting the results of every linear model fit, we need to make sure that the basic assumptions for linear models are valid, by a thorough inspection of residuals. This is a fundamental step and should never, ever be neglected.
+
+After the inspection of model residuals and after the adoption of possible correcting measures, wherever necessary, the process of data analysis must go ahead. Indeed, rejecting the null hypothesis of no treatment effects implies accepting the alternative, i.e.~that there is, at least, one treatment level that produced a significant effect on the experimental units. Such conclusion is important, but it very rarely answers all our research questions; indeed, taking whatever pair of treatments A and B, we might ask:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  is the effect of A different from the effect of B?
+\item
+  is A better/worse than B?
+\item
+  what is the difference between A and B?
+\end{enumerate}
+
+In other words, for any pairs of treatments, we might be willing to assess the existence of significant differences (question 1), their sign (positive/negative; question 2) and their size (\textbf{effect size}; question 3). According to the English scientist John Tukey, the first question is `foolish' as there are no two treatments whose effects can be regarded as totally equal\footnote{All we know about the world teaches us that the effects of A and B are always different in some decimal place for any A and B. Thus asking ``are the effects different?'' is foolish (John Tukey).}, while the other two questions, particularly the third one, are much more relevant.
+
+In order to ask the above questions, we can apply \textbf{linear contrasts} or \textbf{Multiple Comparison Procedures} (MCP). We will explore these methods by using the `mixture.csv' dataset, which we have started analysing in Chapters 7 and 8.
+
+\hypertarget{back-to-the-mixture-example}{%
+\section{Back to the `mixture' example}\label{back-to-the-mixture-example}}
+
+Let me remind once more that we are dealing with a pot experiment, where we compared four herbicide treatments in terms of their activity against an important weed species (\emph{Solanum nigrum}). The experiment is completely randomised, with four replicates and the observed response is the weight of treated plants in each pot, four weeks after the treatment. One of the four treatments is the untreated control, while the other three treatments consist of two herbicides used either alone or in mixture.
+
+Let's load the data, fit an ANOVA model and get the least squares means, as we did in Chapter 7. In Chapter 8, we have demonstrated that this model is valid and there are no evident deviations from the basic assumptions for linear models.
+
+\vspace{12pt}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{repo }\OtherTok{\textless{}{-}} \StringTok{"https://www.casaonofri.it/\_datasets/"}
+\NormalTok{file }\OtherTok{\textless{}{-}} \StringTok{"mixture.csv"}
+\NormalTok{pathData }\OtherTok{\textless{}{-}} \FunctionTok{paste}\NormalTok{(repo, file, }\AttributeTok{sep =} \StringTok{""}\NormalTok{)}
+\NormalTok{dataset }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(pathData, }\AttributeTok{header =}\NormalTok{ T)}
+\NormalTok{model }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Weight }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Treat, }\AttributeTok{data=}\NormalTok{dataset)}
+
+\FunctionTok{library}\NormalTok{(emmeans)}
+\NormalTok{treat.means }\OtherTok{\textless{}{-}} \FunctionTok{emmeans}\NormalTok{(model, }\SpecialCharTok{\textasciitilde{}}\NormalTok{Treat)}
+\NormalTok{treat.means}
+\DocumentationTok{\#\#  Treat           emmean   SE df lower.CL upper.CL}
+\DocumentationTok{\#\#  Metribuzin\_\_348   9.18 1.96 12     4.91     13.4}
+\DocumentationTok{\#\#  Mixture\_378       5.13 1.96 12     0.86      9.4}
+\DocumentationTok{\#\#  Rimsulfuron\_30   16.86 1.96 12    12.59     21.1}
+\DocumentationTok{\#\#  Unweeded         26.77 1.96 12    22.50     31.0}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# Confidence level used: 0.95}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{linear-contrasts}{%
+\section{Linear contrasts}\label{linear-contrasts}}
+
+In statistics, a \textbf{contrast} is a linear combination of means or, more generally, model parameters, where the coefficients add up to zero. In the following example, I have built a linear contrast with the means of our example:
+
+\[k = \frac{1}{3} \cdot 9.18 + \frac{1}{3} \cdot 5.13 + \frac{1}{3} \cdot 16.86 - 1 \cdot 26.77  = -16.385\]
+
+As we see, the sum of coefficients is 0:
+
+\[\frac{1}{3} + \frac{1}{3} + \frac{1}{3} - 1 = 0\]
+
+This contrast has a very clear biological meaning, as it provides an estimate for the difference between the mean weight for treated pots and the mean weight for untreated pots. The result is -16.39; it provides the answers for all the three questions above. Indeed:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  there is a difference between herbicide treatments (on average) and the untreated control;
+\item
+  the difference is negative, meaning that the weight of the weed in treated pots is lower than the weight in untreated pots;
+\item
+  the effect size is -16.39 grams per pot.
+\end{enumerate}
+
+However, we should never forget that the uncertainty about population means propagates to contrasts. The observed value of -16.39 is a point estimator of the population difference, but we need to quantify the uncertainty by using interval estimation.
+
+\hypertarget{the-variance-of-contrasts}{%
+\subsection{The variance of contrasts}\label{the-variance-of-contrasts}}
+
+We have already mentioned how the errors propagate when we `combine' random variables; the basic principle is that the variance of a linear combination of independent estimates is equal to a linear combination of their variances, according to:
+
+\[\textrm{var}(A \mu_1 + B \mu_2) = A ^2 \cdot \textrm{var}(\mu_1)  + B ^2 \cdot \textrm{var}(\mu_2)\]
+
+where A and B are contrast coefficients, \(\mu_1\) and \(\mu_2\) are the estimates (means, in this case). The standard errors of the four means are equal to 1.9588 and, therefore, the variances are \(1.9588^2 = 3.83703\), which are combined as shown below:
+
+\[\textrm{var}(k) = \left( \frac{1}{3} \right)^2 \cdot 3.83703  +  \left( \frac{1}{3}\right)^2 \cdot 3.83703 + \left( \frac{1}{3}  \right)^2 \cdot 3.83703 + \left( - 1 \right)^2 \cdot 3.83703  = 5.11604\]
+
+The standard deviation for the contrast (i.e.~the standard error) is:
+
+\[SE(k) = \sqrt{5.11604} = 2.261866\]
+
+Here we go. We have a point estimate for the contrast (-16.4) and a standard error (2.26), which we can use to build a confidence interval, as shown in Chapter 5. However, we might also like to answer the following question: is it possible that the population contrast is 0 (no difference between treated and untreated pots) and the observed value was just due to random sampling fluctuations?
+
+Of course, this is possible: we have already seen that sample-to-sample variation can be rather high. We can translate our question into a null hypothesis:
+
+\[H_0: \kappa = 0\]
+
+we use the greek letter \(\kappa\) to refer to the real population value for the contrast, which we estimate by using the observed value \(k\). In order to decide whether the null is true, in spite of the observed \(k \neq 0\), we should contemporarily consider the estimate and its uncertainty. As we did in a previous chapter, we use the T statistics, i.e.~the ratio between the estimate and its standard error:
+
+\[T = \frac{k}{ES(k)} = \frac{-16.385}{2.261866} = -7.244\]
+Let's assume that the null is true; the observed T values should `fluctuate' around 0, by following a Student's t distribution with a number of degrees of freedom equal to that of the residual error in ANOVA. We could empirically see this by using Monte Carlo simulation, but we will not do so, for the sake of brevity.
+
+Therefore, we can use the \texttt{pt()} function to find the probability that \(t < -7.244\) and \(t > 7.244\). We have:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Tval }\OtherTok{\textless{}{-}} \SpecialCharTok{{-}}\FloatTok{16.385} \SpecialCharTok{/} \FloatTok{2.261866}
+\DecValTok{2} \SpecialCharTok{*} \FunctionTok{pt}\NormalTok{(Tval, }\DecValTok{12}\NormalTok{, }\AttributeTok{lower.tail =}\NormalTok{ T)}
+\DocumentationTok{\#\# [1] 1.023001e{-}05}
+\end{Highlighting}
+\end{Shaded}
+
+We see that, if the null is true and we repeat the experiment for a high number of times, we have only one possibility out of 100,000 to obtain such a high T, in absolute value. Thus we reject the null and conclude that:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  on average, herbicide treatments produce a significant effect;
+\item
+  such an effects results in the suppression of weed growth (the sign is negative);
+\item
+  the difference in weight is -16.385 (SE = 2.26) and the evidence is strong enough to support the conclusion that such a difference, at the population level, is not 0.
+\end{enumerate}
+
+\hypertarget{testing-linear-contrasts-with-r}{%
+\subsection{Testing linear contrasts with R}\label{testing-linear-contrasts-with-r}}
+
+The main challenge for a scientist is to translate research questions into a set of appropriate contrasts. For our example, we might consider the following contrasts:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  untreated vs.~treated (on average)
+\item
+  mixture vs.~single herbicides (on average)
+\item
+  mixture vs.~rimsulfuron
+\item
+  mixture vs.~metribuzin
+\end{enumerate}
+
+Writing the above contrasts by hand is very tedious and, thus, we use R. First of all, we need to prepare one vector of coefficients for each contrast. For the first contrast, the vector is as above:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{k1 }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\SpecialCharTok{/}\DecValTok{3}\NormalTok{, }\DecValTok{1}\SpecialCharTok{/}\DecValTok{3}\NormalTok{, }\DecValTok{1}\SpecialCharTok{/}\DecValTok{3}\NormalTok{, }\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+For the other three contrasts, the vectors are:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{k2 }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\SpecialCharTok{/}\DecValTok{2}\NormalTok{, }\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{, }\DecValTok{1}\SpecialCharTok{/}\DecValTok{2}\NormalTok{, }\DecValTok{0}\NormalTok{)}
+\NormalTok{k3 }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{)}
+\NormalTok{k4 }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+With these coefficients, we prepare a list:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{K }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{(k1, k2, k3, k4)}
+\end{Highlighting}
+\end{Shaded}
+
+In the end, we use the \texttt{contrast()} function in the `emmeans' package and pass the following arguments:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  the means, obtained by using the `emmeans()' function (see above)
+\item
+  the list of contrasts, as the `method' argument
+\item
+  the type of adjustment (we will talk about this later, so far, please, simply use the command as shown in the box below)
+\end{enumerate}
+
+\small
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{contrast}\NormalTok{(treat.means, }\AttributeTok{method =}\NormalTok{ K, }\AttributeTok{adjust=}\StringTok{"none"}\NormalTok{)}
+\DocumentationTok{\#\#  contrast                                                     }
+\DocumentationTok{\#\#  c(0.333333333333333, 0.333333333333333, 0.333333333333333, {-}1}
+\DocumentationTok{\#\#  c(0.5, {-}1, 0.5, 0)                                           }
+\DocumentationTok{\#\#  c(0, {-}1, 1, 0)                                               }
+\DocumentationTok{\#\#  c(1, {-}1, 0, 0)                                               }
+\DocumentationTok{\#\#  estimate   SE df t.ratio p.value}
+\DocumentationTok{\#\#    {-}16.39 2.26 12 {-}7.244  \textless{}.0001 }
+\DocumentationTok{\#\#      7.89 2.40 12  3.289  0.0065 }
+\DocumentationTok{\#\#     11.73 2.77 12  4.235  0.0012 }
+\DocumentationTok{\#\#      4.05 2.77 12  1.461  0.1697}
+\end{Highlighting}
+\end{Shaded}
+
+\normalsize
+
+We see that all contrasts are significantly different from zero, except the fourth one.
+
+\hypertarget{pairwise-comparisons}{%
+\section{Pairwise comparisons}\label{pairwise-comparisons}}
+
+Translating research questions into contrasts may be sort of an art and, very often, it marks the difference between ordinary and excellent papers. However, there are some sets of contrasts that are repeatedly used (and often abused) in several circumstances, such as the so-called \emph{pairwise comparisons}. These contrasts consist of testing the differences between pairs of means, according to two possible situations:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  all pairwise-comparisons (Tukey's method)
+\item
+  comparisons with a control (Dunnett's method)
+\end{enumerate}
+
+The first situation implies a very high number of contrasts that is equal to \(k = n \times (n - 1) /2\), where \(n\) is the number of means. Accordingly, with four means we have six contrasts and, luckily, R provides the predefined list of coefficients, by assigning the value ``pairwise'' to the argument `method,' as shown below:
+
+\footnotesize
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Pairwise contrasts}
+\FunctionTok{contrast}\NormalTok{(treat.means, }\AttributeTok{adjust=}\StringTok{"none"}\NormalTok{, }\AttributeTok{method=}\StringTok{"pairwise"}\NormalTok{)}
+\DocumentationTok{\#\#  contrast                         estimate   SE df t.ratio}
+\DocumentationTok{\#\#  Metribuzin\_\_348 {-} Mixture\_378        4.05 2.77 12  1.461 }
+\DocumentationTok{\#\#  Metribuzin\_\_348 {-} Rimsulfuron\_30    {-}7.68 2.77 12 {-}2.774 }
+\DocumentationTok{\#\#  Metribuzin\_\_348 {-} Unweeded         {-}17.60 2.77 12 {-}6.352 }
+\DocumentationTok{\#\#  Mixture\_378 {-} Rimsulfuron\_30       {-}11.73 2.77 12 {-}4.235 }
+\DocumentationTok{\#\#  Mixture\_378 {-} Unweeded             {-}21.64 2.77 12 {-}7.813 }
+\DocumentationTok{\#\#  Rimsulfuron\_30 {-} Unweeded           {-}9.91 2.77 12 {-}3.578 }
+\DocumentationTok{\#\#  p.value}
+\DocumentationTok{\#\#  0.1697 }
+\DocumentationTok{\#\#  0.0168 }
+\DocumentationTok{\#\#  \textless{}.0001 }
+\DocumentationTok{\#\#  0.0012 }
+\DocumentationTok{\#\#  \textless{}.0001 }
+\DocumentationTok{\#\#  0.0038}
+\end{Highlighting}
+\end{Shaded}
+
+\normalsize
+
+The second situation implies a lower number of contrasts and we can set the `method' argument to ``dunnett.'' However, we need to be careful, because R compares all means against the first in alphabetical order, which may not be what we are looking for. For example, in our case, we might like to compare all treatments with the herbicide mixture, which is the second in alphabetical order. Therefore, we set the argument `ref' to 2.
+
+\footnotesize
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Dunnett contrasts}
+\FunctionTok{contrast}\NormalTok{(treat.means, }\AttributeTok{adjust=}\StringTok{"none"}\NormalTok{, }\AttributeTok{method=}\StringTok{"dunnett"}\NormalTok{, }\AttributeTok{ref =} \DecValTok{2}\NormalTok{)}
+\DocumentationTok{\#\#  contrast                      estimate   SE df t.ratio}
+\DocumentationTok{\#\#  Metribuzin\_\_348 {-} Mixture\_378     4.05 2.77 12 1.461  }
+\DocumentationTok{\#\#  Rimsulfuron\_30 {-} Mixture\_378     11.73 2.77 12 4.235  }
+\DocumentationTok{\#\#  Unweeded {-} Mixture\_378           21.64 2.77 12 7.813  }
+\DocumentationTok{\#\#  p.value}
+\DocumentationTok{\#\#  0.1697 }
+\DocumentationTok{\#\#  0.0012 }
+\DocumentationTok{\#\#  \textless{}.0001}
+\end{Highlighting}
+\end{Shaded}
+
+\normalsize
+
+We may have noted that the above contrasts do not fully answer our questions about the effect sizes; indeed, we have a point estimate with standard error, but we do not have explicit confidence intervals. To get them, we can assign the result of the \texttt{contrast()} function to a variable and explore it by using the `confint' method.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Confidence intervals}
+\NormalTok{con }\OtherTok{\textless{}{-}} \FunctionTok{contrast}\NormalTok{(treat.means, }\AttributeTok{adjust=}\StringTok{"none"}\NormalTok{, }
+                \AttributeTok{method=}\StringTok{"dunnett"}\NormalTok{, }\AttributeTok{ref =} \DecValTok{2}\NormalTok{)}
+\FunctionTok{confint}\NormalTok{(con)}
+\DocumentationTok{\#\#  contrast                      estimate   SE df lower.CL}
+\DocumentationTok{\#\#  Metribuzin\_\_348 {-} Mixture\_378     4.05 2.77 12    {-}1.99}
+\DocumentationTok{\#\#  Rimsulfuron\_30 {-} Mixture\_378     11.73 2.77 12     5.70}
+\DocumentationTok{\#\#  Unweeded {-} Mixture\_378           21.64 2.77 12    15.61}
+\DocumentationTok{\#\#  upper.CL}
+\DocumentationTok{\#\#      10.1}
+\DocumentationTok{\#\#      17.8}
+\DocumentationTok{\#\#      27.7}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# Confidence level used: 0.95}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{letter-display}{%
+\section{Letter display}\label{letter-display}}
+
+We mentioned that effect sizes provide full information about the results of contrasts, by which we can answer all questions above. However, reporting effects sizes for pairwise comparisons with a high number of means may be impractical. Therefore, we can use the so-called \textbf{letter display}, that consists of augmenting the table of means with significance letters, so that means followed by different letters are significantly different from each other, for a certain predefined protection level \(\alpha\), usually equal to 0.05.
+
+A letter display can be easily added by hand, according to the following procedure:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  sort the means in increasing/decreasing order
+\item
+  start from the uppermost mean and add the A letter to this mean and to all the following means, when the difference with the first one is not significant
+\item
+  go on to the second mean and add the B letter to this mean and to all the following means, when the difference with the second one is not significant
+\item
+  go on like this, until all means have got their letters
+\end{enumerate}
+
+The above procedure works well with balanced experiments, although we might prefer using the more general procedure in R, as implemented in the `multcomp' package, which we need to install, together with the `multcompView' package. The function is named \texttt{cld()} and requires the means and the method of adjustment (see next section). We also provide a third argument, that is `Letters = LETTERS' (be careful with the syntax, relating to small and capital letters) to use capital letters display instead of the default number display
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{multcomp}\SpecialCharTok{::}\FunctionTok{cld}\NormalTok{(treat.means, }\AttributeTok{adjust=}\StringTok{"none"}\NormalTok{, }\AttributeTok{Letters=}\NormalTok{LETTERS)}
+\DocumentationTok{\#\#  Treat           emmean   SE df lower.CL upper.CL .group}
+\DocumentationTok{\#\#  Mixture\_378       5.13 1.96 12     0.86      9.4  A    }
+\DocumentationTok{\#\#  Metribuzin\_\_348   9.18 1.96 12     4.91     13.4  A    }
+\DocumentationTok{\#\#  Rimsulfuron\_30   16.86 1.96 12    12.59     21.1   B   }
+\DocumentationTok{\#\#  Unweeded         26.77 1.96 12    22.50     31.0    C  }
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# Confidence level used: 0.95 }
+\DocumentationTok{\#\# significance level used: alpha = 0.05 }
+\DocumentationTok{\#\# }\AlertTok{NOTE}\DocumentationTok{: Compact letter displays are a misleading way to display comparisons}
+\DocumentationTok{\#\#       because they show NON{-}findings rather than findings.}
+\DocumentationTok{\#\#       Consider using \textquotesingle{}pairs()\textquotesingle{}, \textquotesingle{}pwpp()\textquotesingle{}, or \textquotesingle{}pwpm()\textquotesingle{} instead.}
+\end{Highlighting}
+\end{Shaded}
+
+The letter display is handy, but it can only answer questions about the significance of differences, while it gives no hints about the direction and size of differences. For this reason, using the letter display is often regarded as a poor practice in the presentation of experimental results.
+
+\hypertarget{multiplicity-correction}{%
+\section{Multiplicity correction}\label{multiplicity-correction}}
+
+Experiments may involve a very high number of contrasts and, therefore, a high number of hypotheses is simultaneously tested. Let's consider one of those hypotheses and imagine that the null is rejected with \(P = 0.04\), which would be the \textbf{comparisonwise error rate} (\(P_c\)), i.e.~the probability of wrong rejection. If we have a family of \emph{n} such simultaneous contrasts where the null is always rejected at \(P = 0.04\), we could define the probability of wrong rejection for at least one of those hypotheses, the so-called \textbf{familywise error rate} (\(P_f\)). We can get a sense that the familywise error rate is higher than the comparisonwise error rate, especially when \(n\) is high.
+
+It is important to know the relationship between \(P_c\) and \(P_f\). We should consider that the probability of correct rejection for each hypothesis is \(1 - P_c\) and, for \(n\) hypotheses, the probability of no wrong rejections is \((1 - P_c)^n\) (joint probability of independent events). The probability of having, at least, one wrong rejection (complementary event) is calculated as:
+
+\[P_f = 1 - (1 - P_c)^n\]
+What does this mean? In practice, if we have \(n = 10\) contrasts, and each one in rejected at \(P_c = 0.04\), the probability that we make at least one wrong decision is:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{{-}} \FloatTok{0.04}\NormalTok{)}\SpecialCharTok{\^{}}\DecValTok{10}
+\DocumentationTok{\#\# [1] 0.3351674}
+\end{Highlighting}
+\end{Shaded}
+
+This is generally known as the \textbf{multiplicity problem}: whenever we make a high number of simultaneous inferences, the probability that we make at least one mistake (wrong rejection) is much higher than the error rate for each single test. In some cases, the multiplicity problem can be particularly concerning, for example, when:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  we want to avoid that one treatment is wrongly excluded from the group of the best ones. In this case, we take the highest ranking treatment and compare it to all the others (Dunnett type contrast); when the number of treatments is high, the probability that at least one treatment is wrongly excluded from the lot of the best ones may be very high;
+\item
+  we want to avoid false positives. Wrong rejections are false positives and their number may be high if we do not consider the multiplicity problem;
+\item
+  we want to draw conclusions for all the simultaneous set of contrasts. For example, we have used a letter display and want to state that `treatments followed by different letters are significantly different (P \textless{} 0.05).' In this case, the conclusion relates to the whole set of comparisons and the comparisonwise error rate is clearly invalid.
+\end{enumerate}
+
+There is rather a wide consensus in literature that we should always account for the multiplicity problem in our pairwise comparisons, which means that we should take decisions based on the familywise error rate, instead of the comparisonwise error rate. That means that we should reject the null when \(P_f < 0.05\) and not when \(P_c < 0.05\), which implies that we correct the observed P-value, based on the number of simultaneous inferences.
+
+And, how do we correct? The most natural method is to use the above mentioned relationship between \(P_c\) and \(P_f\), which is know as the Sidak's correction. In the box below, we perfom this correction either by hand, or by using the appropriate argument to the \texttt{contrast()} function in R. Please, remember that, four our example, the number of simultaneous contrasts is six.
+
+\scriptsize
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Correction by hand (six simultaneous contrasts)}
+\NormalTok{con }\OtherTok{\textless{}{-}} \FunctionTok{contrast}\NormalTok{(treat.means, }\AttributeTok{method =} \StringTok{"pairwise"}\NormalTok{, }\AttributeTok{adjust =} \StringTok{"none"}\NormalTok{)}
+\NormalTok{Pc }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(con)[,}\DecValTok{6}\NormalTok{]}
+\NormalTok{Pf }\OtherTok{\textless{}{-}} \DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ Pc)}\SpecialCharTok{\^{}}\DecValTok{6}
+\NormalTok{Pf}
+\DocumentationTok{\#\# [1] 6.722991e{-}01 9.683462e{-}02 2.190543e{-}04 6.923077e{-}03}
+\DocumentationTok{\#\# [5] 2.869757e{-}05 2.255183e{-}02}
+\CommentTok{\# With R}
+\FunctionTok{contrast}\NormalTok{(treat.means, }\AttributeTok{method =} \StringTok{"pairwise"}\NormalTok{, }\AttributeTok{adjust =} \StringTok{"sidak"}\NormalTok{)}
+\DocumentationTok{\#\#  contrast                         estimate   SE df t.ratio}
+\DocumentationTok{\#\#  Metribuzin\_\_348 {-} Mixture\_378        4.05 2.77 12  1.461 }
+\DocumentationTok{\#\#  Metribuzin\_\_348 {-} Rimsulfuron\_30    {-}7.68 2.77 12 {-}2.774 }
+\DocumentationTok{\#\#  Metribuzin\_\_348 {-} Unweeded         {-}17.60 2.77 12 {-}6.352 }
+\DocumentationTok{\#\#  Mixture\_378 {-} Rimsulfuron\_30       {-}11.73 2.77 12 {-}4.235 }
+\DocumentationTok{\#\#  Mixture\_378 {-} Unweeded             {-}21.64 2.77 12 {-}7.813 }
+\DocumentationTok{\#\#  Rimsulfuron\_30 {-} Unweeded           {-}9.91 2.77 12 {-}3.578 }
+\DocumentationTok{\#\#  p.value}
+\DocumentationTok{\#\#  0.6723 }
+\DocumentationTok{\#\#  0.0968 }
+\DocumentationTok{\#\#  0.0002 }
+\DocumentationTok{\#\#  0.0069 }
+\DocumentationTok{\#\#  \textless{}.0001 }
+\DocumentationTok{\#\#  0.0226 }
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# P value adjustment: sidak method for 6 tests}
+\end{Highlighting}
+\end{Shaded}
+
+\normalsize
+
+We see that, applying this type of multiplicity correction, the second contrast is no longer significant. An alternative, simpler and much more widespread correction procedure is the so-called Bonferroni's correction, that is based on the following heuristic:
+
+\[\alpha_E = \alpha_C \cdot k\]
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Pc }\SpecialCharTok{*} \DecValTok{6}
+\DocumentationTok{\#\# [1] 1.018071e+00 1.009900e{-}01 2.190743e{-}04 6.943132e{-}03}
+\DocumentationTok{\#\# [5] 2.869792e{-}05 2.276671e{-}02}
+\FunctionTok{contrast}\NormalTok{(treat.means, }\AttributeTok{method =} \StringTok{"pairwise"}\NormalTok{, }\AttributeTok{adjust =} \StringTok{"bonferroni"}\NormalTok{)}
+\DocumentationTok{\#\#  contrast                         estimate   SE df t.ratio}
+\DocumentationTok{\#\#  Metribuzin\_\_348 {-} Mixture\_378        4.05 2.77 12  1.461 }
+\DocumentationTok{\#\#  Metribuzin\_\_348 {-} Rimsulfuron\_30    {-}7.68 2.77 12 {-}2.774 }
+\DocumentationTok{\#\#  Metribuzin\_\_348 {-} Unweeded         {-}17.60 2.77 12 {-}6.352 }
+\DocumentationTok{\#\#  Mixture\_378 {-} Rimsulfuron\_30       {-}11.73 2.77 12 {-}4.235 }
+\DocumentationTok{\#\#  Mixture\_378 {-} Unweeded             {-}21.64 2.77 12 {-}7.813 }
+\DocumentationTok{\#\#  Rimsulfuron\_30 {-} Unweeded           {-}9.91 2.77 12 {-}3.578 }
+\DocumentationTok{\#\#  p.value}
+\DocumentationTok{\#\#  1.0000 }
+\DocumentationTok{\#\#  0.1010 }
+\DocumentationTok{\#\#  0.0002 }
+\DocumentationTok{\#\#  0.0069 }
+\DocumentationTok{\#\#  \textless{}.0001 }
+\DocumentationTok{\#\#  0.0228 }
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# P value adjustment: bonferroni method for 6 tests}
+\end{Highlighting}
+\end{Shaded}
+
+Both the procedures, particularly the second one, are rather conservative, in the sense that they do not account for the fact that contrasts are always correlated and, therefore, overestimated \(P_f\) values are furnished. Other correcting procedures exist (e.g., Holm, Hochberg, Hommel), but they are all more or less conservative.
+
+In recent times, a group of American scientists has found the way of accounting for the correlation between contrasts, based on the multivariate Student's t distribution (Bretz et al., 2011). Their method is the default one in R and it is incorporated in the \texttt{contrast()} function; we simply need to remove the `correct' argument:
+
+\small
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{contrast}\NormalTok{(treat.means, }\AttributeTok{method=}\StringTok{"pairwise"}\NormalTok{)}
+\DocumentationTok{\#\#  contrast                         estimate   SE df t.ratio}
+\DocumentationTok{\#\#  Metribuzin\_\_348 {-} Mixture\_378        4.05 2.77 12  1.461 }
+\DocumentationTok{\#\#  Metribuzin\_\_348 {-} Rimsulfuron\_30    {-}7.68 2.77 12 {-}2.774 }
+\DocumentationTok{\#\#  Metribuzin\_\_348 {-} Unweeded         {-}17.60 2.77 12 {-}6.352 }
+\DocumentationTok{\#\#  Mixture\_378 {-} Rimsulfuron\_30       {-}11.73 2.77 12 {-}4.235 }
+\DocumentationTok{\#\#  Mixture\_378 {-} Unweeded             {-}21.64 2.77 12 {-}7.813 }
+\DocumentationTok{\#\#  Rimsulfuron\_30 {-} Unweeded           {-}9.91 2.77 12 {-}3.578 }
+\DocumentationTok{\#\#  p.value}
+\DocumentationTok{\#\#  0.4885 }
+\DocumentationTok{\#\#  0.0698 }
+\DocumentationTok{\#\#  0.0002 }
+\DocumentationTok{\#\#  0.0055 }
+\DocumentationTok{\#\#  \textless{}.0001 }
+\DocumentationTok{\#\#  0.0173 }
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# P value adjustment: tukey method for comparing a family of 4 estimates}
+\FunctionTok{contrast}\NormalTok{(treat.means, }\AttributeTok{method=}\StringTok{"dunnett"}\NormalTok{)}
+\DocumentationTok{\#\#  contrast                         estimate   SE df t.ratio}
+\DocumentationTok{\#\#  Mixture\_378 {-} Metribuzin\_\_348       {-}4.05 2.77 12 {-}1.461 }
+\DocumentationTok{\#\#  Rimsulfuron\_30 {-} Metribuzin\_\_348     7.68 2.77 12  2.774 }
+\DocumentationTok{\#\#  Unweeded {-} Metribuzin\_\_348          17.60 2.77 12  6.352 }
+\DocumentationTok{\#\#  p.value}
+\DocumentationTok{\#\#  0.3711 }
+\DocumentationTok{\#\#  0.0442 }
+\DocumentationTok{\#\#  0.0001 }
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# P value adjustment: dunnettx method for 3 tests}
+\end{Highlighting}
+\end{Shaded}
+
+\normalsize
+
+Before concluding this part, I would like to put forward the idea that also confidence intervals may be appropriately enlarged to respect familywise error rates. However, we will not explore such an issue in this book.
+
+\hypertarget{multiple-comparisons-with-transformed-data}{%
+\section{Multiple comparisons with transformed data}\label{multiple-comparisons-with-transformed-data}}
+
+In the previous chapter, we have seen that, sometimes, we need to transform the data to respect the basic assumptions for linear models. For example, with the `insects.csv' dataset in the previous chapter we have performed a logarithmic transformation, which we show again here.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{repo }\OtherTok{\textless{}{-}} \StringTok{"https://www.casaonofri.it/\_datasets/"}
+\NormalTok{file }\OtherTok{\textless{}{-}} \StringTok{"insects.csv"}
+\NormalTok{pathData }\OtherTok{\textless{}{-}} \FunctionTok{paste}\NormalTok{(repo, file, }\AttributeTok{sep =} \StringTok{""}\NormalTok{)}
+\NormalTok{dataset }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(pathData, }\AttributeTok{header =}\NormalTok{ T)}
+\NormalTok{modt }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(}\FunctionTok{log}\NormalTok{(Count) }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Insecticide, }\AttributeTok{data =}\NormalTok{ dataset)}
+\end{Highlighting}
+\end{Shaded}
+
+When we use the \texttt{emmeans()} function in the `emmeans' package, we get the means in the logarithmic scale.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(emmeans)}
+\NormalTok{treatMeans }\OtherTok{\textless{}{-}} \FunctionTok{emmeans}\NormalTok{(modt, }\SpecialCharTok{\textasciitilde{}}\NormalTok{Insecticide)}
+\NormalTok{treatMeans}
+\DocumentationTok{\#\#  Insecticide emmean    SE df lower.CL upper.CL}
+\DocumentationTok{\#\#  T1            6.34 0.178 12     5.96     6.73}
+\DocumentationTok{\#\#  T2            5.81 0.178 12     5.43     6.20}
+\DocumentationTok{\#\#  T3            3.95 0.178 12     3.56     4.34}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# Results are given on the log (not the response) scale. }
+\DocumentationTok{\#\# Confidence level used: 0.95}
+\end{Highlighting}
+\end{Shaded}
+
+In some instances, this may not be a problem, although there might be cases where we seek for the exact number of insect eggs in each leaf. Clearly, such an information is missing in the above analysis.
+
+The best suggestion is to back-transform the above means by using the inverse transformation, e.g.:
+
+\[e^{6.34} = 566.7963\]
+
+Getting the back-trasfomed means for all treatments is easy, by using the \texttt{emmeans()} function and setting the `transform' argument to ``response,'' as shown below.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{retroMedie }\OtherTok{\textless{}{-}} \FunctionTok{emmeans}\NormalTok{(modt, }\SpecialCharTok{\textasciitilde{}}\NormalTok{Insecticide, }\AttributeTok{transform =} \StringTok{"response"}\NormalTok{)}
+\NormalTok{retroMedie}
+\DocumentationTok{\#\#  Insecticide response     SE df lower.CL upper.CL}
+\DocumentationTok{\#\#  T1             568.6 101.01 12    348.5      789}
+\DocumentationTok{\#\#  T2             335.1  59.54 12    205.4      465}
+\DocumentationTok{\#\#  T3              51.9   9.22 12     31.8       72}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# Confidence level used: 0.95}
+\end{Highlighting}
+\end{Shaded}
+
+What are these back-transformed means? Expectedly, we can see that they are different from the arithmetic means on the original (untrasformed) scale:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{emmeans}\NormalTok{(mod, }\SpecialCharTok{\textasciitilde{}}\NormalTok{Insecticide)}
+\DocumentationTok{\#\#  Insecticide emmean   SE df lower.CL upper.CL}
+\DocumentationTok{\#\#  T1           589.8 62.7 12    453.1      726}
+\DocumentationTok{\#\#  T2           357.4 62.7 12    220.7      494}
+\DocumentationTok{\#\#  T3            56.6 62.7 12    {-}80.1      193}
+\DocumentationTok{\#\# }
+\DocumentationTok{\#\# Confidence level used: 0.95}
+\end{Highlighting}
+\end{Shaded}
+
+Indeed, back-transformed means are lower than arithmetic means and they are regarded as estimators of the medians in the original scale, which are not influenced by the transformation. Indeed, we should think that monotonic transformations do not alter the ordering of observations and, thus, the central value remains the same. Consequently, when we report back-transformed means we are indeed reporting an estimate of the medians of the populations that generated our samples. However, estimating the medians instead of the means may not be a bad idea, considering that the populations are non-normal and might be asymmetric.
+
+\hypertarget{what-about-the-traditional-mcps}{%
+\section{What about the traditional MCPs?}\label{what-about-the-traditional-mcps}}
+
+We have seen that the best practice to compare means is:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  express the relevant differences by using contrasts
+\item
+  estimate those differences and their standard errors
+\item
+  test the null hypothesis that differences are zero and express the result by using familywise error rates.
+\end{enumerate}
+
+This process is conceptually different from the traditional multiple comparison procedures, which were very much in fashion before the 90s of the 20th century. MCPs were based on the determination of critical differences: whenever the observed difference was higher than the critical difference it was deemed significant. We can list the following MCPs:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Fisher's Least Significant Difference (LSD)
+\item
+  Tukey's Honest Significant Difference (HSD)
+\item
+  Dunnett's test
+\item
+  Duncan's test
+\item
+  Newman-Keuls' test
+\item
+  Tukey's MCP
+\end{enumerate}
+
+For balanced experiments, the Fisher's LSD corresponds to pairwise contrasts with no multiplicity correction, while the Tukey's HSD and Dunnett's test involve the multiplicity correction respectively for all pairwise comparisons and for the comparisons against a control. Therefore, while the Fisher's LSD adopts a comparisonwise error rate, the HSD and Dunnett's test adopt a familywise protection rate.
+
+All the other tests adopt some mechanism by which the critical difference is increased to account for a certain degree of multiplicity, but they do not adopt either a comparisonwise or a familywise error rate. They stay in the middle and, for this reason, their usage should be discouraged, although they are very much used in practice.
+
+\hypertarget{some-practical-suggestions}{%
+\section{Some practical suggestions}\label{some-practical-suggestions}}
+
+Pairwise contrasts and MCPs have been often abused in previous years and, still today, debates with editors and reviewers are very common. We would like to put forward a few suggestions, which might be useful in the way to scientific publication.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  It is strongly advised that pairwise contrasts are never used when the experimental treatment is represented by a quantitative series of rates, doses, times or whatever. In this case, asking whether there is a significant difference between the response at different doses may be illogical: indeed, even though we selected a few doses to include in the experiment, we are usually interested in the responses across the whole range of possible doses. In this setting, fitting a response curve is much more respectful of our aims and data (see later, in this book).
+\item
+  Consider if you want to control the comparisonwise or the familywise error rate. The former might be preferred when only a few comparisons or contrasts are to be tested, each having a strong biological relevance (single-contrast problems), while the latter should be preferred in the case of a relatively high number of simultaneous tests, especially when an overall conclusion tends to be wrong when at least one single test is wrong.
+\item
+  If you just want to control comparisonwise protection rate, do not apply any multiplicity correction. For balanced data, such an approach corresponds to using the Fisher's LSD in the traditional MCP setting.
+\item
+  If you want to control the familywise error rate, apply the appropriate multiplicity correcting measure and adjust the P-values accordingly. For balanced data, such an approach corresponds to using the Tukey HSD for all paairwise comparisons and to the Dunnett's test for the comparisons against a control.
+\item
+  Do not use Student--Newman--Keuls or Duncans' MRT, because they do not control either the familywise error rate, or the familywise error rate and do not yield a single critical difference for balanced data.
+\end{enumerate}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{further-readings-7}{%
+\section{Further readings}\label{further-readings-7}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Hsu, J., 1996. Multiple comparisons. Theory and methods. Chapman and Hall.
+\item
+  Bretz, F., T. Hothorn, and P. Westfall. 2002, On Multiple Comparison Procedures in R. R News 2: 14-17.
+\item
+  Chew, V. 1976, Comparing treatment means: a compendium. Hortscience, 11(4), 348-357.
+\item
+  Cousens, R. 1988, Misinterpretetion of results in weed research through inappropriate use of statistics. Weed Research, 28, 281-289.
+\end{enumerate}
 
 \hypertarget{multi-way-anova-models}{%
 \chapter{Multi-way ANOVA models}\label{multi-way-anova-models}}
@@ -3623,15 +4759,15 @@ An experiment was carried out, comparing the yield of four wheat genotypes (in t
 
 \begin{tabular}{l|r|r|r|r}
 \hline
-Genotype & A & B & C & D\\
+Genotype & Rep-1 & Rep-2 & Rep-3 & Rep4\\
 \hline
-A & 5.22 & 6.02 & 5.08 & 6.67\\
+A & 4.72 & 5.45 & 5.13 & 5.19\\
 \hline
-B & 6.08 & 6.86 & 7.07 & 6.57\\
+B & 6.29 & 6.79 & 7.55 & 5.86\\
 \hline
-C & 4.42 & 5.63 & 4.49 & 4.89\\
+C & 5.54 & 4.44 & 5.16 & 5.92\\
 \hline
-D & 6.14 & 6.50 & 5.27 & 6.02\\
+D & 6.68 & 6.30 & 6.70 & 7.77\\
 \hline
 \end{tabular}
 
@@ -4914,12 +6050,12 @@ This is a huge topic, that we do not intend to develop here. We would just like 
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics[width=0.9\linewidth]{_main_files/figure-latex/unnamed-chunk-109-1}
+\includegraphics[width=0.9\linewidth]{_main_files/figure-latex/unnamed-chunk-140-1}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
-\hypertarget{further-readings-6}{%
-\section{Further readings}\label{further-readings-6}}
+\hypertarget{further-readings-8}{%
+\section{Further readings}\label{further-readings-8}}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}

@@ -1,0 +1,518 @@
+---
+title: 'Principal Component Analysis: a brief intro for biologists'
+author: "Andrea Onofri"
+date: 2021-11-23
+slug: 'Multivariate'
+categories:
+  - R
+  - 'Multivariate_stat'
+tags:
+  - R
+  - 'Multivariate_stat'
+  - 'PCA'
+  - 'biplot'
+archives:
+  - 2021
+---
+
+In this post I am revisiting the concept of Principal Component Analysis (PCA). You might say that there is no need for that, as the Internet is full with posts relating to such a rather old technique. However, I feel that, in those posts, the theoretical aspects are either too deeply rooted in maths or they are skipped altogether, so that the main emphasis is on interpreting the output of an R function. I think that both approaches may not be suitable for biologists: the first one may be too difficult to understand, while skipping altogether the theoretical aspects promotes the use of R as a black-box, which is dangerouse for teaching purposes. That's why I wrote this post... I wanted to make my attempt to create a useful lesson. You will tell me whether I suceeded or not.
+
+
+# What is Principal Component Analysis?
+
+A main part of field experiments is multivariate, in the sense that several traits are measured in each experimental unit. For example, think about yield quality in genotype experiments or about the composition of weed flora in herbicide trials: in both cases, it is very important to consider several variables altogether, otherwise, we lose all information about the relationships among the observed variables and we lose the ability of producing a convincing summary of results. 
+
+Multivariate methods can help us to deal with multivariate datasets. One main task of multivariate analysis is **ordination**, i.e. organising the observations so that similar subjects are near to each other, while dissimilar subjects are further away. Clearly, ordination is connected to 'representation' and it is aided by techniques that permit a reduction in the number of variables, with little loss in terms of descriptive ability.
+
+Principal Component Analysis (PCA) is one of these techniques. How can we reduce the number of variables? How can we use, say, two variables instead of six, without losing relevant information? One possibility is to exploit the correlations between pairs of variables: whenever this is high, both variables carry a similar amount of information and there may be no need of using both of them.
+
+Let's make a trivial example: think about four subjects where we measured two variables (X1 and X2), with the second one being exactly twice as much the first one. As we know, these four subjects and their characteristics take the form of a 4 x 2 matrix, which is shown below.
+
+
+```{r setup, cache = F, echo = F}
+#Put at the beginning
+knitr::knit_hooks$set(document = function(x){
+  gsub("```\n*```r*\n*", "", x)
+})
+library(knitr)
+```
+
+
+```{r}
+rm(list=ls())
+X <- c(12, 15, 17, 19)
+Y <- c(24, 30, 34, 38)
+dataMat <- data.frame(X, Y, row.names=letters[1:4])
+print(dataMat)
+```
+
+As I said, this example is trivial: it is indeed totally clear that the second variable does not add any additional information with respect to the first one, and thus we could as well drop it without hindering the ordination of the four subjects. Nevertheless, naively dropping a variable may not be optimal whenever the correlation is less then perfect! What should we do, then?
+
+First of all, we should note that the two variables have different means and standard deviations. Thus, we might like to center and, possibly, standardise them. The first practice is necessary, while the second one is optional and it may dramatically change the interpretation of results. Therefore, when you write your paper, please always inform the readers whether you have standardised or not! When we work on centered (not standardised) data, we usually talk about PCA on covariance matrix, while, when we work on standardised data, we talk abot PCA on correlation matrix. The reason for these namings will be clear later on.
+
+Let's standardise the data, and represent them in the Euclidean space: in this specific case the points (subjects) lie along the bisector of first and third quadrant (all points have equal co-ordinates).
+
+```{r}
+Z <- scale(dataMat, scale=T, center=T)[1:4,1:2]
+Z
+```
+
+
+
+```{r echo=FALSE, out.width = "80%"}
+plot(Z[,1], Z[,2], cex=1.5, pch=21, bg="red")
+abline(h=0, lty=1)
+curve(1*x, lty=2, add=T, col="blue")
+abline(v=0, lty=1)
+curve(-1*x, lty=2, add=T, col="blue")
+diagram::curvedarrow(c(0.75, 0), c(0.75, 0.65), lwd = 2, lty = 1, lcol = "blue", arr.pos = 1, curve = 0.2)
+diagram::curvedarrow(c(0, 0.75), c(-0.75, 0.85), lwd = 2, lty = 1, lcol = "blue", arr.pos = 1, curve = 0.4)
+```
+
+## PCA: a 'rotation' procedure
+
+From the previous graph we may note that it would be useful to rotate the axes by an angle of 45°; in this case, the points will lie along the x-axis and they would all have a null co-ordinate on the y-axis. As the consequence, this second dimension would be totally useless.
+
+Rotating the axes is a matrix multiplication problem: we have to take the $Z$ and multiply it by a rotation matrix, to get the co-ordinates of subjects in the new reference system. We do not need the details: if we want to rotate by an angle $\alpha$, the rotation matrix is:
+
+$$V = \left[\begin{array}{cc} \cos \alpha &  - \sin \alpha \\
+\sin \alpha & \cos \alpha \end{array} \right]$$
+
+In our case ($\alpha = 45° = \pi/4$), it is:
+
+$$V = \left[\begin{array}{cc} \frac{\sqrt{2}}{2} &  - \frac{\sqrt{2}}{2} \\
+\frac{\sqrt{2}}{2} & \frac{\sqrt{2}}{2} \end{array} \right]$$
+
+
+## PCA: a eigenvalue decomposition procedure
+
+How do we get the rotation matrix, in general? We take the correlation matrix and submit it to eigenvalue decomposition:
+
+```{r}
+corX <- cor(dataMat)
+eig <- eigen(corX)
+eig
+V <- eig$vectors
+```
+
+We see that the eigenvectors of this decomposition correspond to the aforementioned rotation matrix. We can now use $V$ to rotate the original matrix $Z$ and calculate the coordinates of the original observations in the new, rotated space. We store the subject scores in the matrix $U$:
+
+```{r}
+U <- Z %*% V
+print(round(U, 3) )
+```
+
+We have seen that:
+
+
+$$U = Z V$$
+
+Therefore:
+
+$$Z = U V^T$$
+
+In words, we have decomposed our original standardised matrix $Z$ into the product of two matrices, $U$ and $V$. That is, we have made a **factor decomposition** of our dataset.
+
+## PCA: a linear combination procedure
+
+Look at the $Z$ and $V$ matrices above. Matrix multiplication consists of a row-column operation, such as:
+
+$$ -1.256 \times 0.707 + (-1.256 \times 0.707) = -1.776 $$
+
+We see that what we are doing is indeed a linear combination of the observed variables, by using the coefficients in $V$. 
+
+Whatever way we look at our PCA, we can now plot the subjects in the new, rotated space:
+
+
+```{r figR_rotated, width='90%'}
+#Plot
+plot(U[,1], U[,2], cex=1.5, pch=21, bg="red", 
+     xlim=c(-2,2), ylim=c(-2,2))
+abline(h=0, lty=1)
+abline(v=0, lty=1)
+arrows(0, 0, V[1,1], V[1,2])
+arrows(0, 0, V[2,1], V[2,2])
+text(0.8, -0.8, "Z1")
+text(0.8, 0.8, "Z2")
+```
+
+The arrows represent the row-vectors of the rotation matrix: they are the directions of the original axes on the rotated space. We clearly see that the second dimension is totally unnecessary, as we already have a perfect ordination in one dimension. We have performed a rank reduction in our dataset.
+
+# Some preliminary conclusions
+
+1. PCA consists of a rotation of the original space
+2. In the new space, the first dimension (first principal component) is selected so that it preserves the maximum amount of the original data variability, the second principal component one so that it preserves the maximum amount of the residual data variability
+3. Therefore, I can select a subspace of dimensions (components) and have the objects projected in reduced rank space
+
+
+# A more realistic example
+
+Let's look at a simple (perhaps too simple), but real example. This is an herbicide trial, where we compared the weed control ability of nine sugarbeet herbicides. Ground covering for six weed species was recorded; the weed species were *Polygonum lapathyfolium*, *Chenopodium polyspermum*, *Echinochloa crus-galli*, *Amaranthus retroflexus*, *Xanthium strumarium* and *Polygonum aviculare*; they were identified by using their BAYER code (the first three letters of the genus name and the first two letters of the species name). The aim of the experiment was to ordinate herbicide treatments in terms of their weed control spectra.
+
+The dataset is online available (see below). It is a dataframe, although we'd better convert it into the matrix $X$ for further analyses. 
+
+```{r}
+rm(list=ls())
+WeedPop <- read.csv("https://www.statforbiology.com/_data/WeedPop.csv", header = T)
+X <- WeedPop[,2:7]
+row.names(X) <- WeedPop[,1]
+X
+```  
+
+The dataset is rather small, although a graphical representation would be very difficult with six weed species. However, there must be some correlation between one weed species and the others, as herbicides may have similar weed control spectra. Therefore, PCA might be the right tool for rank reduction and ordination.
+
+
+## Preliminary actions
+
+First of all, we need to decide whether we want to standardise the data. In this case, some variables have higher variances with respect to others. Therefore, they might end up having higher weight in the ordination, with respect to those with lower variances. We store the standardised data into the matrix $Z$: 
+
+```{r}
+Z <- as.matrix( scale(X, scale=T) )
+print(Z, digits=3)
+```
+
+What does this standardised matrix represent? A few hints:
+
+1. negative values indicate weed coverings below column-average
+2. positive values indicate weed coverings above column-average
+3. weed coverings are expressed as standard deviation units: a value of 1 indicate that we are one standard deviation above the column-average.
+
+## Eigenvalue decomposition
+
+Let's get the eigenvalues and eigenvectors of the correlation matrix:
+
+```{r}
+pca <- eigen( cor(X) )
+d <- pca$values
+V <- pca$vectors
+row.names(V) <- colnames(WeedPop[,2:7])
+colnames(V) <- paste("PC", 1:6, sep="")
+print(V, digits=3)
+print(d)
+```
+
+Now, we can use the rotation matrix V to get the coordinates of our subjects in the new rotated space ($U$):
+
+```{r}
+U <- Z %*% V
+row.names(U) <- LETTERS[1:9]
+colnames(U) <- paste("PC", 1:6, sep="")
+print(U, digits=3)
+```
+
+We now have the three ingredients of a PCA, i.e.:
+
+1. the original standardised matrix ($Z$)
+2. the matrix of 'subject-scores' ($U$)
+3. the matrix of 'trait-scores' ($V$: rotation matrix)
+
+## What are the characteristics of subject-scores (U)?
+
+We have said that subject-scores in $U$ represent our subjects in the new, rotated space. We have six original variables and six PCs (indeeed, the number of PCs is equal to the lowest between the number of rows and the number of columns in the original matrix X). Let's see some characteristics of subject scores:
+
+
+```{r}
+apply(U, 2, mean)
+apply(U, 2, var)
+cor(U)
+
+#Distances
+dist(U)
+dist(Z)
+```
+
+
+Thus:
+
+1. The PCs for subject-scores have means equal to 0
+2. The PCs for subject scores have variances equal to the corresponding eigenvalue
+2. The sum of variances for the PCs is equal to the sum of variances for the original standardised variables (i.e. 6)
+3. the first PC has the highest variance, while the following PCs have progressively decreasing variances
+4. Euclidean distances among subjects are preserved in the new rotated space
+5. PCs are uncorrelated
+
+
+
+## What are the characteristics of trait-scores (V)?
+
+The rotation matrix $V$ has one row for each of the original variables and six columns. It gives one relevant information: the scores are proportional to the correlation between the PC scores in U and the original variables. This may need an explanation.
+
+When we look at $U$ we do not have any hints on how the components relate to the original matrix $Z$. For example, we see that the subject 'A' has a score on PC1 equal to $-3.15$; what does this mean in terms of weed infestation? There were a lot of weeds or a few weeds? One way to ascertain this is to look at the correlation between the principal components in $U$ and the original variables in $X$:
+
+```{r}
+print( cor(X, U), digits = 3)
+```
+
+We see that PC1 in $U$ is highly correlated with POLLA, XANST and ECHCG; therefore, the subjects 'A', with a very low score in PC1, is expected to have a low ground covering for the aforementioned weed species. The above correlations are known as *loadings*.
+
+If we look at the rotation matrix $V$, we note that trait-scores are proportional to the correlations between subject scores and the original variables (see below).
+
+```{r}
+cors <- cor(X, U)
+print( cors/V, digits = 3)
+```
+
+Therefore, the rotation matrix V can help us understand the meaning of subject-scores in relation to the traits under study. We'll get back to this in a few minutes.
+
+In summary, we can say that **trait-scores relate to the correlations between subject-scores and the original variables in X**
+
+## Inner products of subject-scores and trait-scores
+
+We have seen that:
+
+$$U = Z \, V$$
+
+where $U$ is the matrix of subject-scores. Thus:
+
+$$Z = U V^T$$
+
+Indeed, we have decomposed our original matrix $Z$ into the product of two matrices: $U$ and $V$. This multiplication can be seen as the 'inner-products' of row-vectors in $U$ (subject-scores) by the row-vectors in $V$ (trait-scores), which return the original values in $X$. For example, the PC scores for the herbicide 'A' are:
+
+```{r}
+U[1,]
+```
+
+The scores for POLLA (see first row of V) are:
+
+```{r}
+V[1,]
+```
+
+The inner product for these two vectors is:
+
+```{r}
+-3.14916165 * 0.4600611 + 
+-0.69341377 * 0.2211836 +
+-1.23990604 * -0.2498484 +
+0.04915220 * 0.1657640 +
+0.03599628 * 0.6410762 +
+-0.08713997 * -0.4884065
+```
+
+which corresponds, exactly, to the standardised weed covering for POLLA treated with the herbicide 'A', i.e. the value in the first row and first column in the original standardised matrix $Z$.
+
+In general: **The inner products of subject-score row-vectors and trait-score row-vectors return the observed values in the standardised matrix $Z$.**
+
+# A brief recap
+
+At the moment, we have three main 'ingredients':
+
+1. Our starting matrix ($Z$), containing information about herbicidess and weed coverings
+2. A subject-score matrix ($U$), containing some information about the herbicides (e.g. their distances)
+3. A rotation matrix ($V$), which contains some information about the original variables (e.g how they correlate with principal components)
+4. The inner products of row-vectors in $U$ and row-vectors in $V$ return the original standardised observations $Z$.
+
+It is clear that $U$ and $V$, if taken together, contain all information available in $Z$.
+
+# What's the matter then?
+
+You might say that we have not made much gain, so far! Well, this is not true, indeed. The Eckart-Young theorem says that we do not need to take all columns in $U$ and all columns in $V$, as a reduced number of them will give us the best possible representation in reduced space. In other words, if we take, e.g., three columns of $U$ and three columns of $V$, we will get the best possible representation of $Z$ in a space of dimension equal to three. Likewise, if we take, two columns of $U$ and two columns of $V$, we will get the best possible representation of $Z$ in a space of dimension equal to two.
+
+The question is: how many columns should we take? The six original variables had a total variance of 6. Six PC in $U$ have a total variance of 6, so the quality of representation is 100%. Five PCs in $U$ have a total variance of 5.97, so the quality of representation is 99.4%. In general we have a quality of:
+
+```{r}
+cumsum(d)/6 * 100
+```
+
+We see that two components give a quality of representation of almost 80%, which is very good. Furthermore, according to the Kaiser criterion, we can remove all components with a variance lower than 1, i.e. those components with a lower variance than the original standardised variables. This criterion confirms that two components are more then enough to represent our original dataset. Of course, the representation is not perfect: we see that the following product:
+
+
+```{r}
+print( U[,1:2] %*% t(V[,1:2]), digits=3)
+```
+
+does not return exactly our original matrix $Z$, but it gives the best possible approximation in reduced rank space.
+
+# Principal components as an ordination method
+
+So far, we have seen that we can use two principal components in place of the six original variables, losing only a minor part of information. We have, therefore, solved the problem of rank reduction: the two principal components can be used in further analyses, such as cluster analysis or regression analysis, wherever using a low number of meaningful variables may be convenient. In this sense, principal component analysis may be prodromic to the adoption of other statistical methods.
+
+However, in many instances, PCA is used as a method of ordination, in order to understand how similar are the subjects and which variables contribute to the observed differences among subjects. We have already mentioned that we can look at $U$ and $V$ to understand what was the presence of weeds with the different herbicides. Another example: the herbicide 'H' has a high positive score on PC1 and low negative score on PC2; therefore, it is characterised by a high ground covering (above average) for weeds with positive scores on PC1 (POLLA, ECHCG, XANST, POLAV) and negative scores on PC2 (CHEPO, ECHCG, XANST, POLAV). 
+
+Instead of simply looking at the matrices $U$ and $V$, we can draw a typical kind of plot, which shows both subject-scores and trait-scores and, for this reason, it is known as 'biplot'.
+
+# The 'biplot'
+
+As I said, a 'biplot' shows two components (usually the first two) of both the subject-scores and the trait-scores. I'll show the biplot for the 'WeedPop' dataset. Please note that the two matrices are not on comparable scales and the scores on $U$ are higher than those on $V$. Therefore, the biplot uses a double reference system.
+
+
+```{r figR_biplot1, width="90%"}
+biplot(U[,1:2], V[,1:2], xlab="PC1 (64%)", 
+       ylab="PC2 (16%)")
+```
+
+
+Subjects scores are usually represented as symbols, while trait-scores are represented as 'vectors'. The biplot shows a huge amount of information, such as:
+
+1. similarity of subjects (distances)
+2. the original values in the standardised matrix $Z$
+
+Due to the characteristics of $U$ (see above), the distances of subjects on the biplot approximate their Euclidean distances on the original matrix $Z$. It means that distant subjects are characterised by different weed infestation levels, while close subjects are similar. What is interesting is that such a similarity/dissimilarity considers all the observed variables altogether.
+
+We can see that the herbicides 'C', 'E', 'F' and 'I' form a relatively homogeneous group, with a close-to-zero score on PC1 and different scores on PC2. A second group contains the herbicides 'A' and 'B', with negative values on PC1 and different scores on PC2. A third group contains the herbicides 'G' and 'H', with positive scores on PC1 and negative scores on PC2. The herbicide 'D' seems to be rather peculiar, with positive scores on both PCs.
+
+Apart from discovering groups, we need to be able to explain the rationale behind groupings. We have seen that the inner products between subject-scores and trait-scores give us the key to approximate the original matrix $Z$. How can we visualize the inner products in the biplot?
+
+Let's take a subject-score vector $u$ and a trait-score vector $v$: their inner product is the sum of products of their coordinates, which approximates the observed standardised value of that subject for that variable:
+
+$$z_{ij} \simeq u \cdot v = u_1 v_1 + u_2 v_2 + ... + u_n v_n$$
+
+We know that the cosine of the angle $\alpha$ between two vectors is equal to:
+
+$$cos \, \phi = \frac{u \cdot v}{\left|u\right| \cdot \left|v\right|}$$
+
+where $\left|u\right|$ and $ \cdot \left|v\right|$ are the 'lengths' of the two vectors. Therefore:
+
+$$cos \, \phi \cdot \left|u\right| \cdot \left|v\right| = u \cdot v = z_{ij}$$
+
+Let's look at this on a graph, relating to the herbicide 'A' and CHEPO. Let's draw a line along the direction of the vector $v$: we can identify a positive direction and a negative direction. We can also see that the projection of $u$ into the direction spanned by the trait-vector $v$ creates the segment $OA'$, which has length equal to $cos \, \phi \cdot \left|u\right|$ (this is one of the trigonometric ratios in right triangles). Let's call $l$ this length; now we have: $z_{ij} = l \times \left| v \right|$. We see that the standardised ground covering of one weed is high where the respective trait vector is long and the projection of the subject vector is long in the positive direction. In this case, the projection is long on the positive side, which means that the herbicide 'A' was characterised by high ground covering on CHEPO.
+
+
+```{r echo=FALSE, fig.height=6, fig.width=6}
+#Look at the biplot
+biplot(U[,1:2], V[,1:2], xlab="PC1 (64%)", 
+       ylab="PC2 (16%)")
+
+#Draw a part of it
+plot(0, type="n", xlim = c(-3.2, 2.2), ylim = c(-3.2, 2.2),
+  xlab = "PC1", ylab = "PC2")
+text(U[1,1], U[1,2], label = "A")
+text(0.1, 0.1, label = "O")
+arrows(0,0, 3*V[2,1], 3*V[2,2], col = "red")
+text(3.5*V[2,1], 3.5*V[2,2], label ="CHEPO")
+
+#Add a subject-vector
+arrows(0,0, U[1,1], U[1,2], lty=2, col = "red")
+
+#Add vector names
+text(-1.75, -0.25, label ="u", cex=1.4)
+text(-0.3, -0.8, label ="v", cex=1.4)
+
+#Add the angle
+diagram::curvedarrow(c(0.2*U[1,1], 0.2*U[1,2]), c(1.2*V[2,1], 1.2*V[2,2]), lwd = 1, lty = 1, lcol = "blue", arr.pos = 2, curve = 0.4)
+text(-0.8, -0.6, label = expression(phi), cex=1.4)
+
+
+#Prolonge the direction
+curve(V[2,2]/V[2,1] * x, add=T, lty=2, col="red")
+
+#Project a on the direction spanned by v
+curve(-V[2,1]/V[2,2] * x + U[1,2] + V[2,1]/V[2,2]*U[1,1], add=T, lty=2, col="red")
+text(-1.1, -2.2, label = "A'")
+```
+
+Let's draw all projections:
+
+```{r echo=FALSE, fig.height=6, fig.width=6}
+plot(0, type="n", xlim = c(-3.2, 2.3), ylim = c(-3.2, 2.2),
+  xlab = "PC1", ylab = "PC2")
+text(U[,1], U[,2], label = LETTERS[1:9], col=c(1:6,8:10))
+
+arrows(0,0, 3*V[2,1], 3*V[2,2], col = "red")
+text(3.5*V[2,1], 3.5*V[2,2], label ="CHEPO")
+
+#Prolonge the direction
+curve(V[2,2]/V[2,1] * x, add=T, lty=2, col="red")
+
+#Project a on the direction spanned by 
+curve(-V[2,1]/V[2,2] * x + U[1,2] + V[2,1]/V[2,2]*U[1,1], add=T, lty=2, col=1)
+curve(-V[2,1]/V[2,2] * x + U[2,2] + V[2,1]/V[2,2]*U[2,1], add=T, lty=2, col=2)
+curve(-V[2,1]/V[2,2] * x + U[3,2] + V[2,1]/V[2,2]*U[3,1], add=T, lty=2, col=3)
+curve(-V[2,1]/V[2,2] * x + U[4,2] + V[2,1]/V[2,2]*U[4,1], add=T, lty=2, col=4)
+curve(-V[2,1]/V[2,2] * x + U[5,2] + V[2,1]/V[2,2]*U[5,1], add=T, lty=2, col=5)
+curve(-V[2,1]/V[2,2] * x + U[6,2] + V[2,1]/V[2,2]*U[6,1], add=T, lty=2, col=6)
+curve(-V[2,1]/V[2,2] * x + U[7,2] + V[2,1]/V[2,2]*U[7,1], add=T, lty=2, col=8)
+curve(-V[2,1]/V[2,2] * x + U[8,2] + V[2,1]/V[2,2]*U[8,1], add=T, lty=2, col=9)
+curve(-V[2,1]/V[2,2] * x + U[9,2] + V[2,1]/V[2,2]*U[9,1], add=T, lty=2, col=10)
+```
+
+
+We clearly see that the herbicide 'A' showed the highest infestation with CHEPO, while the herbicide 'D' showest the lowest. 'F' and 'H' were slightly below average, while the others were slightly above average.
+
+The reader can pick up examples for other herbicides/weeds: just look at the projections of subject-vectors on trait-vectors!
+
+Let's conclude this section with two important highlights:
+
+1. distances and inner products on biplots are only approximations to the real distances of subjects and observed values for subjects on variables. We need to make sure that the approximation is good!
+2. The two axes need to have the samwe scaling, otherwise the geometrical propoerties are not respected. Please, do not pull and push a biplot, to fit the available size on a manuscript!
+
+
+# What if we start from centered (not standardised) data?
+
+You might wander what happens if we start from centered data (but not standardised). Centered data are as follows:
+
+```{r}
+C <- scale(X, scale = F)
+print(C, digits = 2)
+```
+
+This matrix reportes the data as differences with respect to the means and the variances of the different variables are not the same and equal to 1.
+
+Working with centered data involves the eigenvalue decomposition of the variance covariance matrix (Do you remember? I mentioned this a few sections above...), while the $U$ matrix is obtained as above, by using the eigenvectors from spectral decomposition:
+
+```{r}
+pca <- eigen( cov(X) )
+d <- pca$values
+V <- pca$vectors
+row.names(V) <- colnames(WeedPop[,2:7])
+colnames(V) <- paste("PC", 1:6, sep="")
+U <- C %*% V
+print(U, digits = 3)
+print(V, digits = 3)
+print(d, digits = 3)
+```
+
+One important difference is that the variance of components in the subject-score matrix has a sum equal to the sum of variances on the original matrix X:
+
+```{r}
+sum( apply(X, 2, var) )
+```
+
+Another important difference is that the inner products return the values in the centered matrix, i.e. the weed coverings of the different species as differences with respect to column-means. The goodness of representation and biplot are very similar to the previous ones. However, we may note that the weeds with higher variances (CHEPO and ECHCG) tend to have higher weight on the ordination, as shown by longer vectors. 
+
+```{r}
+cumsum(d)/sum(d) * 100
+apply(X, 2, var)
+```
+
+
+
+```{r}
+biplot(U[,1:2], V[,1:2], xlab="PC1 (65%)", 
+       ylab="PC2 (15%)")
+
+```
+
+
+# PCA with R
+
+PCA can be easily performed with R, altough there are several functions, among which it is often difficult to make a selection. We will now briefly introduce only `prcomp()` and `princomp()`, both in the 'stats' package.
+
+These two functions are different in relation to the algorithm that is used for calculation (spectral decomposition and singular value decomposition). In `princomp()`, we need to use the argument 'scale' to select between a PCA on centered data ('scale = F') and a PCA on standardised data ('scale = T'). In `prcomp()`, we can make the same selection by using the argument 'cor'. Other differences relate to the fact that `prcomp()` shows the standard deviations of subject-scores, instead of their variances. 
+
+Please, note that the output of `princomp()` is slightly different, as this function operates on standardised data by using population-based standard deviations and not sample-based standard deviations. This might be preferable, as PCA is, fundamentally, a descriptive method.
+
+
+```{r results='hide'}
+#prcomp()
+pcaAnalysis<-prcomp(X, scale=T)
+summary(pcaAnalysis)
+print( pcaAnalysis$x, digits=3) #Subject-scores
+print(pcaAnalysis$rotation, digits=3) #Trait-scores
+
+#princomp()
+pcaAnalysis2 <- princomp(X, cor=T)
+print(pcaAnalysis2, digits=3)
+print(pcaAnalysis2$scores, digits=3)
+print(pcaAnalysis2$loadings, digits=3)
+```
+
+Thanks for reading!
+
+Prof. Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences    
+University of Perugia (Italy)    
+Send comments to: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)
+
+<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow @onofriandreapg</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
