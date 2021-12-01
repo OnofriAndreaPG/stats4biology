@@ -1,7 +1,7 @@
 ---
 title: "Experimental methods in agriculture"
 author: "Andrea Onofri and Dario Sacco"
-date: "Update: v. 0.9 (2021-10-06), compil. 2021-11-23"
+date: "Update: v. 0.9 (2021-10-06), compil. 2021-12-01"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -586,9 +586,9 @@ In some cases, the experimental units can be grouped according to two innate pro
 <p class="caption">(\#fig:figName35)Example of a latin square design with four treatments (A, B, C and D) and four replicates. The different colours help identify the four treatments and their allocation to the plots.</p>
 </div>
 
-Latin square designs are not only useful for field experiments. For example, if we want to test the effect of four different working protocols in the time required to accomplish a certain task, we can use a number of workers as the experimental units. In order to have four replicates, we need 16 workers, to which we allocate the different protocols, according to a CRD or CRBD. We can reduce the number of workers by allowing each worker to use all four protocols, in four subsequent turns. For example, the first worker can use the protocols A, B, C and D, one after the other in a randomised order. By doing so, we only need four workers and the experiment is designed as CRBD, where the worker acts as a blocking factor. The advantage is that possible worker-to-worker differences in proficiency are not confounded with differences between protocols, as all workers use all protocols.
+Latin square designs are not only useful for field experiments. For example, if we want to test the effect of four different working protocols in the time required to accomplish a certain task, we can use a number of workers as the experimental units. In order to have four replicates, we need 16 workers, to which we allocate the different protocols, according to a CRD or CRBD. We can reduce the number of workers by allowing each worker to use all four protocols, in four subsequent shifts. For example, the first worker can use the protocols A, B, C and D, one after the other in a randomised order. By doing so, we only need four workers and the experiment is designed as CRBD, where the worker acts as a blocking factor. The advantage is that possible worker-to-worker differences in proficiency are not confounded with differences between protocols, as all workers use all protocols.
 
-However, we should also consider that workers tend to get tired over time and loose proficiency and, therefore, the protocols used at the beginning of the sequence are favoured with respect to the protocols used later on. We can account for this effect by allocating the protocols in a way that each one is used in all turns; as the consequence, the turn acts as the second blocking factor, as shown in Figure \@ref(fig:figName36). This is, indeed, a latin square design.
+However, we should also consider that workers tend to get tired over time and loose proficiency and, therefore, the protocols used at the beginning of the sequence are favoured with respect to the protocols used later on. We can account for this effect by allocating the protocols in a way that each one is used in all shifts; as the consequence, the shift acts as the second blocking factor, as shown in Figure \@ref(fig:figName36). This is, indeed, a latin square design.
 
 <div class="figure" style="text-align: center">
 <img src="_images/TurniOperatori.png" alt="Example of a latin square design for the comparison of four working protocols, by using four workers and four turns." width="90%" />
@@ -3548,10 +3548,7 @@ multcomp::cld(treat.means, adjust="none", Letters=LETTERS)
 ##  Unweeded         26.77 1.96 12    22.50     31.0    C  
 ## 
 ## Confidence level used: 0.95 
-## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays are a misleading way to display comparisons
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## significance level used: alpha = 0.05
 ```
 
 The letter display is handy, but it can only answer questions about the significance of differences, while it gives no hints about the direction and size of differences. For this reason, using the letter display is often regarded as a poor practice in the presentation of experimental results. 
@@ -3796,34 +3793,1583 @@ Pairwise contrasts and MCPs have been often abused in previous years and, still 
 
 # Multi-way ANOVA models 
 
-To be done ...
+
+In Chapter 7 we showed how we can fit linear models with one categorical predictor and one response variable (one-way ANOVA models). With those models, apart from differences due to the experimental treatments, all units must be completely independent and there should not be any other systematic sources of variability. On the contrary, with the most common experiments laid down as Randomised Complete Blocks (RCBDs) or, less commonly, as Latin Square (LSD), apart from the treatment factor, we also have, respectively, one and two blocking factors, which represent additional sources of systematic variability. Indeed, the block effect produces a more or less relevant increase/decrease in the observed response, with respect to the overall mean; for example, in a field experiment with two blocks, the most fertile one might might produce a yield increase of 1 t/ha, while the other one will produce a corresponding yield decrease of the same amount. Such yield variations will be systematically shared by all plots located in the same block. 
+
+In principle, we should not fit one-way ANOVA models to the data obtained from RCBDs or LSDs; if we do so, the residuals will also contain the block effect ($\pm$ 1 t/ha, in the previous example) and, therefore, those obtained in the same block will be more alike than the residuals obtained in different blocks. Consequently, the basic assumption of independence will no longer be valid; in order to avoid this, we need a new type of models that can account for treatment effects and block effects at the same time.
+
+## Motivating example: a genotype experiment in blocks
+
+Let's consider a field experiment to compare eight winter wheat genotypes, laid down in complete blocks, with three replicates. Each block consists of eight plots, to which genotypes were randomly allocated, one replicate per block; the blocks are laid out one beside the other, following the direction of the fertility gradient, so that plots within each block were as homogeneous as possible. The response variable is the yield, in tons per hectare.
+
+The dataset is available as the 'csv' file 'WinterWheat2002.csv', which can be loaded from an external repository, as shown in the box below.
+
+\vspace{12pt}
+
+```r
+repo <- "https://www.casaonofri.it/_datasets/"
+file <- "WinterWheat2002.csv"
+pathData <- paste(repo, file, sep = "")
+
+dataset <- read.csv(pathData, header = T)
+head(dataset)
+##   Plot Block Genotype Yield
+## 1   57     A COLOSSEO  4.31
+## 2   61     B COLOSSEO  4.73
+## 3   11     C COLOSSEO  5.64
+## 4   60     A    CRESO  3.99
+## 5   10     B    CRESO  4.82
+## 6   42     C    CRESO  4.17
+```
+
+The description of the dataset for each genotype (mean and standard deviation) is left to the reader, as an exercise.
+
+
+## Model definition
+
+Considering the experimental design, the yield of each plot depends on:
+
+1. the genotype;
+2. the block;
+3. other random and unknown effects.
+
+
+Consequently, a linear model can be specified as:
+
+$$ Y_{ij} = \mu + \gamma_i + \alpha_j + \varepsilon_{ij}$$
+
+where $Y_{ij}$ is the yield for the plot in the $i$^th^ block and with the $j$^th^ genotype, $\mu$ is the intercept, $\gamma_i$ is the effect of the $i$^th^ block, $\alpha_j$ is the effect of the $j$^th^ genotype and $\varepsilon$ is the residual plot error, which is assumed as gaussian, with mean equal to 0 and standard deviation equal to $\sigma$. With respect to the one-way ANOVA model, we have the additional block effect, which accounts for the grouping of observations, so that the residuals only 'contain' random and independent effects.
+
+As we did for the one-way ANOVA model, we need to put constraints on $\alpha$ and $\gamma$ values, so that model parameters are estimable. Regardless of the constraint, we have 7 genotype parameters and 2 block parameters to estimate, apart from $\sigma$.
+
+## Model fitting by hand
+
+Normally, the estimation process is done with R, by using the least squares method. For the sake of exercise, we do the calculations by hand, using the method of moments, which is correct whenever the experiment is balanced (same number of replicates for all genotypes). Hand-calculations are similar to those proposed in Chapter 7 and, if you had enough with them, you can safely skip this section and jump to the next one.
+
+For hand-calculations, we prefer to use the sum-to-zero contraint; therefore, $\mu$ is the overall mean, $\alpha_1$ to $\alpha_8$ are the effects of the genotypes, as differences with respect to the overall mean, $\gamma_1$ to $\gamma_3$ are the effects of blocks. Owing to the sum-to-zero constraint, $\alpha_8$ and $\gamma_3$ must obey the following restrictions: $\alpha_8 = -\sum_{i=1}^{7} \alpha_i$ and $\gamma_3 = -\sum_{i=1}^{2} \gamma_i$. 
+
+The initial step is to calculate the overall mean and the means for genotypes and blocks. As usual, we use the `tapply()` function to accomplish this task.
+
+\vspace{12pt}
+
+```r
+allMean <- mean(dataset$Yield)
+gMeans <- tapply(dataset$Yield, dataset$Genotype, mean)
+bMeans <- tapply(dataset$Yield, dataset$Block, mean)
+allMean
+## [1] 4.424583
+gMeans
+## COLOSSEO    CRESO   DUILIO   GRAZIA    IRIDE SANCARLO 
+## 4.893333 4.326667 4.240000 4.340000 4.963333 4.503333 
+##   SIMETO    SOLEX 
+## 3.340000 4.790000
+bMeans
+##       A       B       C 
+## 4.20625 4.41500 4.65250
+```
+
+Now we can calculate yield differences between the genotype means and the overall mean, so that we obtain the genotype effects $\alpha_i$. We do the same to obtain the block effects, as shown in the box below.
+
+\vspace{12pt}
+
+```r
+alpha <- gMeans - allMean
+alpha
+##    COLOSSEO       CRESO      DUILIO      GRAZIA       IRIDE 
+##  0.46875000 -0.09791667 -0.18458333 -0.08458333  0.53875000 
+##    SANCARLO      SIMETO       SOLEX 
+##  0.07875000 -1.08458333  0.36541667
+gamma <- bMeans - allMean
+gamma
+##            A            B            C 
+## -0.218333333 -0.009583333  0.227916667
+```
+
+It is useful to sort the dataset by genotypes and blocks and visualise all model parameters in a table; to do so, we need to repeat each genotype effects three times (the number of blocks) and the whole vector of block effects for eight times (the number of genotypes). Lately, we add to the table the expected values ($Y_{E(ij)} = \mu + \gamma_i + \alpha_j$) and the residuals ($\varepsilon_ij = Y_{ij} - Y_{E(ij)}$). The resulting data frame is shown in the box below. 
+
+
+
+
+\vspace{12pt}
+\small
+
+```r
+alpha <- rep(alpha, each = 3)
+gamma <- rep(gamma, 8)
+mu <- allMean
+YE <- mu + gamma + alpha
+epsilon <- dataset$Yield - YE
+lmod <- data.frame(dataset, mu, gamma, alpha, 
+                   YE, epsilon)
+print(lmod, digits = 4)
+##    Plot Block Genotype Yield    mu     gamma    alpha    YE
+## 1    57     A COLOSSEO  4.31 4.425 -0.218333  0.46875 4.675
+## 2    61     B COLOSSEO  4.73 4.425 -0.009583  0.46875 4.884
+## 3    11     C COLOSSEO  5.64 4.425  0.227917  0.46875 5.121
+## 4    60     A    CRESO  3.99 4.425 -0.218333 -0.09792 4.108
+## 5    10     B    CRESO  4.82 4.425 -0.009583 -0.09792 4.317
+## 6    42     C    CRESO  4.17 4.425  0.227917 -0.09792 4.555
+## 7    29     A   DUILIO  4.24 4.425 -0.218333 -0.18458 4.022
+## 8    48     B   DUILIO  4.10 4.425 -0.009583 -0.18458 4.230
+## 9    81     C   DUILIO  4.38 4.425  0.227917 -0.18458 4.468
+## 10   32     A   GRAZIA  4.07 4.425 -0.218333 -0.08458 4.122
+## 11   65     B   GRAZIA  4.18 4.425 -0.009583 -0.08458 4.330
+## 12   28     C   GRAZIA  4.77 4.425  0.227917 -0.08458 4.568
+## 13   19     A    IRIDE  5.18 4.425 -0.218333  0.53875 4.745
+## 14   79     B    IRIDE  4.88 4.425 -0.009583  0.53875 4.954
+## 15   55     C    IRIDE  4.83 4.425  0.227917  0.53875 5.191
+## 16    5     A SANCARLO  4.34 4.425 -0.218333  0.07875 4.285
+## 17   37     B SANCARLO  4.41 4.425 -0.009583  0.07875 4.494
+## 18   70     C SANCARLO  4.76 4.425  0.227917  0.07875 4.731
+## 19    2     A   SIMETO  3.03 4.425 -0.218333 -1.08458 3.122
+## 20   34     B   SIMETO  3.21 4.425 -0.009583 -1.08458 3.330
+## 21   67     C   SIMETO  3.78 4.425  0.227917 -1.08458 3.568
+## 22   74     A    SOLEX  4.49 4.425 -0.218333  0.36542 4.572
+## 23    9     B    SOLEX  4.99 4.425 -0.009583  0.36542 4.780
+## 24   56     C    SOLEX  4.89 4.425  0.227917  0.36542 5.018
+##     epsilon
+## 1  -0.36500
+## 2  -0.15375
+## 3   0.51875
+## 4  -0.11833
+## 5   0.50292
+## 6  -0.38458
+## 7   0.21833
+## 8  -0.13042
+## 9  -0.08792
+## 10 -0.05167
+## 11 -0.15042
+## 12  0.20208
+## 13  0.43500
+## 14 -0.07375
+## 15 -0.36125
+## 16  0.05500
+## 17 -0.08375
+## 18  0.02875
+## 19 -0.09167
+## 20 -0.12042
+## 21  0.21208
+## 22 -0.08167
+## 23  0.20958
+## 24 -0.12792
+```
+\normalsize
+
+From the above data frame, we can calculate all sum of squares; in detail, the residual sum of squares is obtained by squaring and summing up the residuals:
+
+\vspace{12pt}
+
+```r
+RSS <- sum( epsilon^2 )
+RSS
+## [1] 1.450208
+```
+
+Likewise, the sum of squares for blocks and genotypes is obtained by squaring and summing up the $\gamma$ and $\alpha$ effects.
+
+\vspace{12pt}
+
+```r
+TSS <- sum(alpha ^ 2)
+BSS <- sum(gamma ^ 2)
+TSS; BSS
+## [1] 5.630529
+## [1] 0.7976583
+```
+
+If we calculate the total deviance for all observations, we can confirm that this was partitioned in three parts: the first one is due to the block effects, the second one is due to the genotype effects and the third one is due to all other unknown sources of variability.
+
+\vspace{12pt}
+
+```r
+SS <- sum((dataset$Yield - mu)^2)
+SS
+## [1] 7.878396
+BSS + TSS + RSS
+## [1] 7.878396
+```
+
+The above hand-calculations should suffice for those who would like to see what happens 'under the hood'. Now, we can go back to model fitting with R.
+
+## Model fitting with R
+
+As shown in Chapter 7, ANOVA models with more than one predictor can be fit by using the `lm()` function and adding the block term along with the treatment term. It is fundamental that the block variable is transformed into a factor variable, otherwise R would consider it as numeric and would fit a regression model, instead of an ANOVA model (see later in this book). This error is very common in the most frequent case where a numeric variable is used to represent the blocks and it is easily spotted by checking the number of degrees of freedom in the final ANOVA table; indeed, if this number does not appear to correspond to our expectations (that is the number of blocks minus one; see below), it may mean that our model definition was wrong. 
+
+In the box below, we also transform the genotype variable into a factor, although this is optional, as the genotypes are represented by a character vector and not by a numeric vector.
+
+\vspace{12pt}
+
+```r
+dataset$Block <- factor(dataset$Block)
+dataset$Genotype <- factor(dataset$Genotype)
+
+mod <- lm(Yield ~ Block + Genotype, data = dataset)
+```
+
+We do not inspect model coefficients, as they are not particularly useful in this instance. However, should you like to do so, you can use the `summary()` method; please, remember that the treatment constraint is used by default in R.
+
+### Model checking
+
+As we have discussed in Chapter 8, once we have got the residuals we should inspect them, searching for possible deviations from basic assumptions. Therefore, we produce a plot of residuals against expected values and a QQ-plot, by using the code below. The output is shown in Figure \@ref(fig:figName121).
+
+\vspace{12pt}
+```
+par(mfrow=c(1,2))
+plot(mod, which = 1)
+plot(mod, which = 2)
+```
+
+\vspace{12pt}
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName121-1.png" alt="Graphical analyses of residuals for the genotype experiment" width="90%" />
+<p class="caption">(\#fig:figName121)Graphical analyses of residuals for the genotype experiment</p>
+</div>
+
+From that Figure, we observe that there are some slight signs of heteroscedasticity (see plot on the left side), although the Levene's test is not significant (but it is on the borderline of significance; see the box below). We decide not to address this problem, for the sake of simplicity and based on the unsignificant Levene's test.
+
+\vspace{12pt}
+
+```r
+epsilon <- residuals(mod)
+anova(lm(abs(epsilon) ~ factor(Genotype), data = dataset))
+## Analysis of Variance Table
+## 
+## Response: abs(epsilon)
+##                  Df  Sum Sq  Mean Sq F value  Pr(>F)  
+## factor(Genotype)  7 0.24819 0.035455  2.2162 0.08887 .
+## Residuals        16 0.25597 0.015998                  
+## ---
+## Signif. codes:  
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+
+### Variance partitioning
+
+Variance partitioning with R is performed by applying the  `anova()` method to the 'lm' object.
+
+\vspace{12pt}
+
+```r
+anova(mod)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##           Df Sum Sq Mean Sq F value    Pr(>F)    
+## Block      2 0.7977 0.39883  3.8502 0.0465178 *  
+## Genotype   7 5.6305 0.80436  7.7651 0.0006252 ***
+## Residuals 14 1.4502 0.10359                      
+## ---
+## Signif. codes:  
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+The sum of squares are the same as those obtained by hand-calculations and they measure the amount of data variability that can be attributed to the different effects. Sum of squares cannot be directly compared, because they are based on different degrees of freedom and, therefore, we calculate the corresponding variances.
+
+The number of Degrees of Freedom (DF) for the block effect is equal to the number of blocks $b$ minus one ($DF_b = b - 1 = 2$), while the number of DF for the genotype effect is equal to the number of genotypes $g$ minus one ($DF_g = g - 1 = 7$). The number of DF for the residual sum of squares is $g \times (b - 1)$ as in Chapter 7 (the number of blocks is equal to the number of replicates is the number of replicates), but we have to subtract $DF_b$, so that we have $DF_r = g \times (b - 1) - (b - 1) = (g - 1) \times (b - 1) = 14$.
+
+The residual mean square is $1.450208/14 = 0.10359$ and, from there, we can get an estimate of $\sigma = \sqrt{0.10359} = 0.3218483$. More easily, we can get $\sigma$ by using the `summary()` method and the '$sigma' extractor.
+
+\vspace{12pt}
+
+```r
+summary(mod)$sigma
+## [1] 0.3218483
+```
+
+Subsequently, we start our inference process by using $\sigma$ to estimate the standard error for a mean (SEM) and the standard error for a difference (SED), which are, respectively, equal to $0.3218483/\sqrt{3} = 0.186$ and $\sqrt{2} \times 0.3218483/\sqrt{3} = 0.263$.
+
+Next, we set our null hypotheses as:
+
+$$H_0: \gamma_1 = \gamma_2 = \gamma_3 = \gamma$$
+
+and:
+
+$$H_0: \alpha_1 = \alpha_2 = ... = \alpha_8 = 0$$
+
+Indeed, for a RCBD, we have two F ratios, with the same denominator (residual mean square) and, respectively, the mean square for blocks and the mean square for genotypes as numerators. Based on those F-ratios, we see that both the nulls can be rejected, as the corresponding P-values are below the 0.05 yardstick. In particular, we are interested about the genotype effect, as we introduced the blocks only to be able to account for possible plot-to-plot fertility differences. Consequently, we only proceed to pairwise comparisons between the genotypes.
+
+Please, note that we have 8 genotypes, implying that we need to test $8 \time 7 / 2 = 27$ pairwise differences, which is enough to justify the adoption of a multiplicity correction.  For the sake of clarity, we report the means and adopt a letter display, where we order the means in decreasing yield order (the best is the one with highest yield), by using the argument 'reverse = T'.
+
+\scriptsize
+
+
+```r
+library(emmeans)
+medie <- emmeans(mod, ~factor(Genotype))
+multcomp::cld(medie, Letters = LETTERS, reverse = T)
+##  Genotype emmean    SE df lower.CL upper.CL .group
+##  IRIDE      4.96 0.186 14     4.56     5.36  A    
+##  COLOSSEO   4.89 0.186 14     4.49     5.29  A    
+##  SOLEX      4.79 0.186 14     4.39     5.19  A    
+##  SANCARLO   4.50 0.186 14     4.10     4.90  A    
+##  GRAZIA     4.34 0.186 14     3.94     4.74  A    
+##  CRESO      4.33 0.186 14     3.93     4.73  A    
+##  DUILIO     4.24 0.186 14     3.84     4.64  AB   
+##  SIMETO     3.34 0.186 14     2.94     3.74   B   
+## 
+## Results are averaged over the levels of: Block 
+## Confidence level used: 0.95 
+## P value adjustment: tukey method for comparing a family of 8 estimates 
+## significance level used: alpha = 0.05
+```
+\normalsize
+
+The comment of results is left as an exercise.
+
+## Another example: comparing working protocols
+
+In Chapter 2, we introduced an example relating to the evaluation of the time required to accomplish a certain task, by using four different protocols. Four technicians were involved and each one worked with the four methods in different randomised shifts. The protocols were allocated to the different shifts and technicians so that we could have one replicate for each technician and shift. In the end, the dataset consists of one experimental factor (the protocol, with four levels) and two blocking factors (the technician and the shift for each technician). The results are available in the usual online repository.
+
+
+```r
+filePath <- "https://www.casaonofri.it/_datasets/"
+fileName <- "Technicians.csv"
+file <- paste(filePath, fileName, sep = "")
+dataset <- read.csv(file, header=T)
+head(dataset)
+##   Shift Technician Method Time
+## 1     I     Andrew      C   90
+## 2    II     Andrew      B   90
+## 3   III     Andrew      A   89
+## 4    IV     Andrew      D  104
+## 5     I       Anna      D   96
+## 6    II       Anna      C   91
+```
+
+The time required for the task can be described as follows:
+
+$$Y_{ijk} = \mu + \gamma_k + \beta_j + \alpha_i + \varepsilon_{ijk}$$
+
+where $\mu$ is the intercept, $\gamma$ is the effect of the $k$^th^ shift, $\beta$ is the effect of the $j$^th^ technician and $\alpha$ is the effect of the $i$^th^ protocol. The elements $\varepsilon_{ijk}$ represent the individual random sources of experimental error; they are assumed as gaussian, with mean equal to 0 and standard deviation equal to $\sigma$.
+
+For this example, model fitting is performed only with R, by including all blocking effects in the model.
+
+
+
+```r
+mod <- lm(Time ~ Method + Technician + Shift, data = dataset)
+```
+
+
+From the model fit object we extract the residuals and check for the basic assumptions for linear models, by using the usual `plot()` function. The resulting plots are shown in Figure \@ref(fig:figName122).
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName122-1.png" alt="Graphical analyses of residuals for a latin square experiment" width="90%" />
+<p class="caption">(\#fig:figName122)Graphical analyses of residuals for a latin square experiment</p>
+</div>
+
+We do not see problems of any kind and, therefore, we proceed to variance partitioning, to test the significance of all experimental factors.
+
+
+```r
+anova(mod)
+## Analysis of Variance Table
+## 
+## Response: Time
+##            Df Sum Sq Mean Sq F value    Pr(>F)    
+## Method      3 145.69  48.563 12.7377 0.0051808 ** 
+## Technician  3  17.19   5.729  1.5027 0.3065491    
+## Shift       3 467.19 155.729 40.8470 0.0002185 ***
+## Residuals   6  22.87   3.812                      
+## ---
+## Signif. codes:  
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+The difference between protocols is significant, as well as the difference between shifts, while the technicians did not differ significantly. We might be interested in selecting the best working protocols, which can be done by using pairwise comparisons. I will leave this part to you, as an exercise.
 
 <!--chapter:end:10-Eng_MultiWayANOVAModels.Rmd-->
 
 # Multi-way ANOVA models with interactions
 
 
-To be done ...
+In the previous Chapter we have seen models with more than one explanatory factor, that are used to describe data from Randomised Complete Block Designs and Latin Square designs, where we have one treatment factor and, respectively, one or two blocking factors. Most often, with these designs we have only one value for each combination between the experimental factor and the blocking factor; e.g., there is usually only one observation per treatment in each block in a Randomised Complete Block Design.
+
+In this Chapter, we would like to introduce a new situation, where we have more than one experimental factor and more than one observation for each combination of factor levels. In Chapter 2, we have already seen an example where we compared three tillage levels and two weed control methods in a crossed factorial design and we had four replicates for each combination of tillage and weed control method. In such condition, we can obtain an estimate of the so-called **interaction** between experimental factors, which is a very relevant information. 
+
+## The 'interaction' concept
+
+Let's look at the Figure \@ref(fig:figName131) where we displayed three possible situations, relating to the combinations between the factor A, with two levels (A1 and A2) and the factor B with two levels (B1 and B2). Each symbol represents a combination; e.g., in the left panel we see that the A1B1 combination showed a response equal to 10, while the A2B1 combination showed a response equal to 14. Therefore, passing from A1 to A2 gave an effect of +4 units. Likewise, we see that the yield of A1B2 was 15 and, thus, passing from B1 to B2 gave an effect of +5 units. Accordingly, we can predict the yield of A2B2 by summing up the yield of A1B1, the effact of passing from A1 to A2 and the effect of passing from B1 to B2, i.e. $10 + 4 + 5 = 19$. In this case A and B do not interact to each other and their effects are simply additive.
+
+Now, let's look at the central panel. Passing from A1B1 to A2B1 and passing from A1B1 to A1B2 produced the same effects as in the previous case (respectively +4 and +5 units), but we can no longer predict the response of A2B2, as we see that, while the expected value is 19, the observed value is 16. There must be some effect that hinders the response of this specific combination A2B2 and such an effect is known as the **interaction between the factors A and B** (or 'A $\times$ B' interaction). We can quantify such an interaction effect as $16 - 19 = -3$ units; this is an example of negative interaction, as the observed response is lower than the expected response. Furthermore, this is an example of **simple interaction**, where the expected response is lower, but the ranking of treatments is not affected; indeed, A2 is always higher than A1, regardless of B and B1 is always lower than B2, regardless of A.
+
+If we look at the left panel, we see that the interaction effect is even more dramatic: for A2B2 we observe 9 instead of 19, which means that the interaction is -10 units and it causes the change of ranking: A2 is higher than A1 when B is equal to B1, while the ranking is reversed when B is equal to B2. Whenever the interaction effect modifies the ranking of treatments, we talk about **cross-over interaction**.
+
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName131-1.png" alt="Possible relationships between experimental factors" width="90%" />
+<p class="caption">(\#fig:figName131)Possible relationships between experimental factors</p>
+</div>
+
+Why are we so concerned by the interaction? Let's take a further look at the third situation, as seen in the left panel of Figure \@ref(fig:figName131). Table \@ref(tab:tabName131) shows the means for the four combinations (A1B1, A1B2, A2B1, A2B2) that are usually named **cell means**, together with the means for main factor levels (A1, A2, B1 and B2), usually named **marginal means**, and the overall mean.
+
+
+Table: (\#tab:tabName131)Cross-over interaction between experimental factors
+
+|        |   B1|   B2| Average|
+|:-------|----:|----:|-------:|
+|A1      | 10.0| 14.0|    12.0|
+|A2      | 15.0|  9.0|    12.0|
+|Average | 12.5| 11.5|    12.0|
+
+If we look at the marginal means, we would have the wrong impression that factor A is totally ineffective and factor B only gives a minor effect. Indeed, both factors have very wide effects, although they are masked by the presence of a cross-over interaction.
+
+That is why we are so much concerned about possible interactions between the experimental factors: these effects can be highly misleading when we look at the marginal effects of A and B. And this is also why we organise a factorial experiment, instead of making two separate experiments for A and for B.
+
+## Genotype by N interactions
+
+We will use an example relating to a genotype experiment, where 5 winter wheat genotypes were compared at two different nitrogen fertilisation levels, according to a RCBD, with 3 replicates. The aim of such an experiment was to assess whether the ranking of genotypes, and thus genotype recommendation, is affected by N availability. The dataset was generated by Monte Carlo methods, starting from the results reported in Stagnari et al. (2013) and it was cut to five genotypes instead of the original 15 to make the hand-calculations easier.
+
+
+
+Yield results are reported in the file 'NGenotype.csv', that is available in the usual online repository. After loading the file we transform the numeric explanatory variables into factors.
+
+\vspace{12pt}
+
+```r
+filePath <- "https://www.casaonofri.it/_datasets/"
+fileName <- "NGenotype.csv"
+file <- paste(filePath, fileName, sep = "")
+dataset <- read.csv(file, header=T)
+dataset$Block <- factor(dataset$Block)
+dataset$N <- factor(dataset$N)
+head(dataset, 10)
+##    Block Genotype N Yield
+## 1      1        A 1 2.146
+## 2      2        A 1 2.433
+## 3      3        A 1 2.579
+## 4      1        A 2 2.362
+## 5      2        A 2 2.919
+## 6      3        A 2 2.912
+## 7      1        B 1 2.935
+## 8      2        B 1 2.919
+## 9      3        B 1 2.892
+## 10     1        B 2 3.241
+```
+
+
+### Model definition
+
+Yield results are determined by four effects:
+
+1. blocks
+2. genotypes
+3. N levels
+4. 'genotype $\times$ N' interaction
+
+Accordingly, a linear model can be written as:
+
+
+$$Y_{ijk} = \mu + \gamma_k + \alpha_i + \beta_j + \alpha\beta_{ij} + \varepsilon_{ijk}$$
+
+
+where $\mu$ is the intercept, $\gamma_k$ is the effect of the $k$^th^ block, $\alpha_i$ is the effect of the $i$^th^ genotype, $\beta_j$ is the effect of the $j$^th^ N level and $\alpha\beta_{ij}$ is the interaction effect of the combination between the $i$^th^ genotype and $j$^th^ nitrogen level. The unknown random effects are represented by the residuals $\varepsilon_{ijk}$, which we assume as gaussian distributed and homoscedastic, with mean equal to 0 and standard deviation equal to $\sigma$.
+
+### Model fitting by hand
+
+As in previous chapters, we will show how we can fit an ANOVA model by hand, as this is the best way to understand this technique; you can safely skip this part. if you are only interested in learning how to fit models with a computer.
+
+Model fitting by hand is most easily perfomed by using the sum-to-zero constraint and the method of moments, although I have to remind that this latter method is only valid with balanced data.
+
+First of all, we calculate all means: for blocks, genotypes, N levels and for the combinations between genotypes and nitrogen levels. We use the `tapply()` function, which, for the case of the 'genotype by nitrogen' combinations, returns a matrix.
+
+\vspace{12pt}
+
+```r
+mu <- mean(dataset$Yield)
+bMean <- tapply(dataset$Yield, dataset$Block, mean)
+gMean <- tapply(dataset$Yield, dataset$Genotype, mean)
+nMean <- tapply(dataset$Yield, dataset$N, mean)
+gnMean <- tapply(dataset$Yield, list(dataset$Genotype,dataset$N), mean)
+mu
+## [1] 2.901967
+bMean
+##      1      2      3 
+## 2.7997 2.9586 2.9476
+gMean
+##        A        B        C        D        E 
+## 2.558500 3.077333 2.362167 3.151000 3.360833
+gnMean
+##          1        2
+## A 2.386000 2.731000
+## B 2.915333 3.239333
+## C 2.533333 2.191000
+## D 2.956000 3.346000
+## E 3.256000 3.465667
+```
+
+
+With the sum-to-zero constraint, the effects are differences of group means with respect to the overall mean. Therefore, we can calculate $\gamma$, $\alpha$ and $\beta$, as follows:
+
+\vspace{12pt}
+
+```r
+gamma <- bMean - mu
+alpha <- gMean - mu
+beta <- nMean - mu
+gamma
+##           1           2           3 
+## -0.10226667  0.05663333  0.04563333
+alpha
+##          A          B          C          D          E 
+## -0.3434667  0.1753667 -0.5398000  0.2490333  0.4588667
+beta
+##           1           2 
+## -0.09263333  0.09263333
+```
+
+
+Now, as the average block effect is constrained to be zero (sum-to-zero contraint), the mean for a 'genotype by nitrogen' combination is equal to:
+
+$$\bar{Y}_{ij.} = \mu + \alpha_i + \beta_j + \alpha\beta_{ij}$$
+
+From there, we obtain the interaction effect as:
+
+$$\alpha\beta_{ij} = \bar{Y}_{ij.} - \mu - \alpha_i - \beta_j$$
+
+that is:
+
+\vspace{12pt}
+
+```r
+alphaBeta <- gnMean - mu - matrix(rep(alpha, 2), 5, 2) - 
+  matrix(rep(beta, 5), 5, 2, byrow = T)
+alphaBeta
+##             1           2
+## A -0.07986667  0.07986667
+## B -0.06936667  0.06936667
+## C  0.26380000 -0.26380000
+## D -0.10236667  0.10236667
+## E -0.01220000  0.01220000
+```
+
+
+For example, the interaction effects for the first combination (genotype A and first nitrogen rate) is $-0.07986667$, while for the second combination (genotype B and first nitrogen rate) the interaction effect is $-0.06936667$. Indeed, both combinations produce less than expected under addivity.
+
+\vspace{12pt}
+
+```r
+gnMean - mu - matrix(rep(alpha, 2), 5, 2) - 
+  matrix(rep(beta, 5), 5, 2, byrow = T)
+##             1           2
+## A -0.07986667  0.07986667
+## B -0.06936667  0.06936667
+## C  0.26380000 -0.26380000
+## D -0.10236667  0.10236667
+## E -0.01220000  0.01220000
+```
+
+
+With little patience, we can easily complete the calculations by hand and organise them in a summary data frame, together with the expected values (i.e. the sums $\hat{Y}_{ijk} = \mu + \gamma_k + \alpha_i + \beta_j + \alpha\beta_{ij}$) and the residuals (i.e. the differences between the observed and the expected values). You can use the prospect below to check your calculations.
+
+\vspace{12pt}
+\scriptsize
+
+
+\vspace{12pt}
+
+```r
+print(tab, digits = 3)
+##    Block Genotype N Yield  mu   gamma  alpha    beta
+## 1      1        A 1  2.15 2.9 -0.1023 -0.343 -0.0926
+## 2      2        A 1  2.43 2.9  0.0566 -0.343 -0.0926
+## 3      3        A 1  2.58 2.9  0.0456 -0.343 -0.0926
+## 4      1        A 2  2.36 2.9 -0.1023 -0.343  0.0926
+## 5      2        A 2  2.92 2.9  0.0566 -0.343  0.0926
+## 6      3        A 2  2.91 2.9  0.0456 -0.343  0.0926
+## 7      1        B 1  2.94 2.9 -0.1023  0.175 -0.0926
+## 8      2        B 1  2.92 2.9  0.0566  0.175 -0.0926
+## 9      3        B 1  2.89 2.9  0.0456  0.175 -0.0926
+## 10     1        B 2  3.24 2.9 -0.1023  0.175  0.0926
+## 11     2        B 2  3.30 2.9  0.0566  0.175  0.0926
+## 12     3        B 2  3.17 2.9  0.0456  0.175  0.0926
+## 13     1        C 1  2.38 2.9 -0.1023 -0.540 -0.0926
+## 14     2        C 1  2.53 2.9  0.0566 -0.540 -0.0926
+## 15     3        C 1  2.69 2.9  0.0456 -0.540 -0.0926
+## 16     1        C 2  2.30 2.9 -0.1023 -0.540  0.0926
+## 17     2        C 2  2.19 2.9  0.0566 -0.540  0.0926
+## 18     3        C 2  2.08 2.9  0.0456 -0.540  0.0926
+## 19     1        D 1  2.69 2.9 -0.1023  0.249 -0.0926
+## 20     2        D 1  3.34 2.9  0.0566  0.249 -0.0926
+## 21     3        D 1  2.84 2.9  0.0456  0.249 -0.0926
+## 22     1        D 2  3.30 2.9 -0.1023  0.249  0.0926
+## 23     2        D 2  3.29 2.9  0.0566  0.249  0.0926
+## 24     3        D 2  3.45 2.9  0.0456  0.249  0.0926
+## 25     1        E 1  3.24 2.9 -0.1023  0.459 -0.0926
+## 26     2        E 1  3.06 2.9  0.0566  0.459 -0.0926
+## 27     3        E 1  3.46 2.9  0.0456  0.459 -0.0926
+## 28     1        E 2  3.41 2.9 -0.1023  0.459  0.0926
+## 29     2        E 2  3.60 2.9  0.0566  0.459  0.0926
+## 30     3        E 2  3.38 2.9  0.0456  0.459  0.0926
+##    alphaBeta residuals
+## 1    -0.0799  -0.13773
+## 2    -0.0799  -0.00963
+## 3    -0.0799   0.14737
+## 4     0.0799  -0.26673
+## 5     0.0799   0.13137
+## 6     0.0799   0.13537
+## 7    -0.0694   0.12193
+## 8    -0.0694  -0.05297
+## 9    -0.0694  -0.06897
+## 10    0.0694   0.10393
+## 11    0.0694   0.00803
+## 12    0.0694  -0.11197
+## 13    0.2638  -0.05407
+## 14    0.2638  -0.06097
+## 15    0.2638   0.11503
+## 16   -0.2638   0.20827
+## 17   -0.2638  -0.05663
+## 18   -0.2638  -0.15163
+## 19   -0.1024  -0.16873
+## 20   -0.1024   0.32837
+## 21   -0.1024  -0.15963
+## 22    0.1024   0.05527
+## 23    0.1024  -0.11563
+## 24    0.1024   0.06037
+## 25   -0.0122   0.08927
+## 26   -0.0122  -0.24963
+## 27   -0.0122   0.16037
+## 28    0.0122   0.04860
+## 29    0.0122   0.07770
+## 30    0.0122  -0.12630
+```
+
+\normalsize
+
+
+
+The table above shows all effects and permits the calculation of sum of squares, as the sums of the squared elements in each column. The residual sum of squares is:
+
+\vspace{12pt}
+
+```r
+RSS <- sum(tab$residuals ^ 2)
+RSS
+## [1] 0.5849906
+```
+
+while the sum of squares for blocks, genotype, nitrogen and interaction effects are calculated as:
+
+\vspace{12pt}
+
+```r
+BSS <- sum(tab$gamma ^ 2)
+BSS
+## [1] 0.1574821
+GSS <- sum(tab$alpha ^ 2)
+GSS
+## [1] 4.276098
+NSS <- sum(tab$beta ^ 2)
+NSS
+## [1] 0.257428
+GNSS <- sum(tab$alphaBeta ^ 2)
+GNSS
+## [1] 0.5484518
+```
+
+Also in this case, we can see that the sum of all the above mentioned sum of squares is equal to the total deviance of all the observations.
+
+\vspace{12pt}
+
+```r
+sum((dataset$Yield - mu)^2)
+## [1] 5.824451
+RSS + GSS + NSS + GNSS
+## [1] 5.666969
+```
+
+We clearly see that the whole variability of yield has been partitioned in four parts, one is due to the effect of blocks, another one is due to the effect of genotypes, another one is due to the effect of N fertilisation and, finally, the last one is due to all other unknown effects of random nature.
+
+It is no worth to keep on with manual calculations from now on, thus let's switch the computer on.
+
+### Model fitting with R
+
+Model fitting with R is exactly the same as shown in previous chapters: we need to include all effect, as well as the interaction, which is represented by using the colon indicator ':'. Therefore, model syntax is:
+
+\vspace{12pt}
+```
+Yield ~ Block + Genotype + N + Genotype:N
+```
+
+which can be abbreviated as:
+
+\vspace{12pt}
+```
+Yield ~ Block + Genotype * N
+```
+
+The full coding is:
+
+\vspace{12pt}
+
+```r
+mod <- lm(Yield ~ Block + Genotype * N, data=dataset)
+```
+
+Before, proceeding, we need to perform the usual graphical check of model residuals, that is reported in Figure \@ref(fig:figName133).
+
+\vspace{12pt}
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName133-1.png" alt="Graphical analyses of residuals for a two-way ANOVA model with replicates" width="90%" />
+<p class="caption">(\#fig:figName133)Graphical analyses of residuals for a two-way ANOVA model with replicates</p>
+</div>
+
+From the graph, we see no evident deviations from the basic assumptions for linear models: variances do not seem to be dependent on the expected values and the QQ-plot does not show any relevant deviation from the diagonal. Therefore, we proceed to data analyses with no further checks.
+
+With ANOVA models we are not very much interested in parameter estimates and, therefore, we proceed to variance partitioning, by using the `anova()` method.
+
+\vspace{12pt}
+\footnotesize
+
+```r
+anova(mod)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##            Df Sum Sq Mean Sq F value   Pr(>F)    
+## Block       2 0.1575 0.07874  2.4228  0.11701    
+## Genotype    4 4.2761 1.06902 32.8936 4.72e-08 ***
+## N           1 0.2574 0.25743  7.9210  0.01148 *  
+## Genotype:N  4 0.5485 0.13711  4.2189  0.01392 *  
+## Residuals  18 0.5850 0.03250                     
+## ---
+## Signif. codes:  
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+\normalsize
+
+We see that the sum of squares are the same as those obtained by hand-calculations, while the degrees of freedom are easily obtained as the number of blocks/genotypes/N levels minus one. As for the interaction, the number of degrees of freedom is given by the product of the number of genotypes minus one and the number of nitrogen levels minus 1 ($4 \times 1 = 4$). The number of degrees of freedom for the residuals is obtained by subtraction, considering that the total number of degrees of freedom for 30 yield data is 29. Therefore, the residual sum of squares has $29 - 2 - 4 - 1 - 4 = 18$ degrees of freedom.
+
+The variances are obtained by dividing the mean squares for the respective number of degrees of freedom; These variances can be compared with the residual variance by three F ratios, which are, 2.42, 32.9, 7.9 and 4.2, respectively for the blocks, genotypes, N levels and 'genotype by nitrogen' interaction. 
+
+Apart from the block effects, which are uninteresting from a biological point of view, it is relevant to ask whether the other effects are significant. We know that the sampling distribution for the F ratio under the null hypothesis is Fisher-Snedecor, with the appropriate number of degrees of freedom. For example, for the genotype effect, the sampling distribution is Fisher-Snedecor with 4 degrees of freedom at the numerator and 18 degrees of freedom at the denominator. The probability of observing a value of 32.9 or higher under the null hypothesis is:
+
+\vspace{12pt}
+
+```r
+pf(32.8936, 4, 18, lower.tail = F)
+## [1] 4.720112e-08
+```
+
+This is exactly the result reported in the ANOVA table above, together with the P-levels for all other effects.
+
+Reading the P-levels for a two-way ANOVA requires some care and **it is fundamental to proceed from bottom to top**. Indeed, a significant interaction makes the P-level for main effects irrelevant, as their significance may be hidden by the presence of cross-over interaction. We have seen an example of such a situation at the beginning of this Chapter.
+
+### Inferences and standard errors
+
+Standard errors for means and differences are calculated by the usual rule, starting from the residual standard deviation, that is the square root of the residual variance. In R we can use the 'sigma' slot in the 'summary(mod)' object:
+
+\vspace{12pt}
+
+```r
+sigma <- summary(mod)$sigma
+sigma
+## [1] 0.1802761
+```
+
+We know that we have to divide the above amount for the square root of the number of replicates, but we have to carefully consider this latter information. Indeed, the combinations of factor levels have three replicates ($r = 3$), but, for each genotype, there is a higher number of replicates, given by the product of $r$ by the number of N levels ($3 \times 2 = 6$). On the other hand, for each N level, we have $r \times 5 = 15$ replicates, where 5 is the number of genotypes (take a look at the dataset to confirm this). Therefore, the SEMs, respectively for genotype means, N level means and the combinations, are:
+
+$$SEM_g = \frac{0.1802761}{\sqrt{3 \cdot 2}} = 0.0736$$
+
+
+$$SEM_n = \frac{0.1802761}{\sqrt{3 \cdot 5}} = 0.0465$$
+
+
+$$SEM_{gn} = \frac{1.87}{\sqrt{3}} = 0.104$$
+
+We may note that the means for main effects are estimated with higher precision, owing to the higher number of replicates.
+
+Standard errors for the differences between means can be easily derived by multiplying the SEMs for $\sqrt{2}$ as we have shown in previous Chapters.
+
+### Expected marginal means
+
+In general, with nominal explanatory variables we are interested in presenting and commenting the means. In this case, apart from the blocks, we have three types of means to consider:
+
+1. the marginal means for genotypes
+2. the marginal means for N fertilisation levels
+3. the cell means for the combinations of genotype and N fertilisation levels
+
+We have already calculated the arithmetic means, although expected marginal means are generally preferable, as they are equal to the arithmetic means when the data is balanced, but they are more reliable than arithmetic means when the data is unbalanced. Expected marginal means can be obtained with the `emmeans()` function in the 'emmeans' package, although we need to be careful in selecting which means to present
+
+As a general rule, for the reasons given above, we recommend that the means for the combinations are always reported in presence of a significant interaction, while the means for main effects can be reported and commented when the interaction is not significant. In the code below we added a letter display, following pairwise comparisons with multiplicity adjustment.
+
+\vspace{12pt}
+
+```r
+library(emmeans)
+GNmeans <- emmeans(mod, ~Genotype:N)
+multcomp::cld(GNmeans, Letters=LETTERS)
+##  Genotype N emmean    SE df lower.CL upper.CL .group 
+##  C        2   2.19 0.104 18     1.97     2.41  A     
+##  A        1   2.39 0.104 18     2.17     2.60  AB    
+##  C        1   2.53 0.104 18     2.31     2.75  ABC   
+##  A        2   2.73 0.104 18     2.51     2.95   BCD  
+##  B        1   2.92 0.104 18     2.70     3.13    CDE 
+##  D        1   2.96 0.104 18     2.74     3.17    CDEF
+##  B        2   3.24 0.104 18     3.02     3.46     DEF
+##  E        1   3.26 0.104 18     3.04     3.47     DEF
+##  D        2   3.35 0.104 18     3.13     3.56      EF
+##  E        2   3.47 0.104 18     3.25     3.68       F
+## 
+## Results are averaged over the levels of: Block 
+## Confidence level used: 0.95 
+## P value adjustment: tukey method for comparing a family of 10 estimates 
+## significance level used: alpha = 0.05
+```
+
+In the above output, multiplicity correction has been made for $10 \time 9 / 2 = 45$ comparisons. If we were only interested in comparing, e.g., the genotypes within each N level, we would have a lower number of comparisons ($5 \times 4/2 \times 2 = 20$) and, consequently, we would need a lower degree of multiplicity correction. We can specify such an analysis by using the following code (please note the use of the nesting operator '|').
+
+\vspace{12pt}
+
+```r
+GNmeans2 <- emmeans(mod, ~Genotype|N)
+multcomp::cld(GNmeans2, Letters=LETTERS)
+## N = 1:
+##  Genotype emmean    SE df lower.CL upper.CL .group
+##  A          2.39 0.104 18     2.17     2.60  A    
+##  C          2.53 0.104 18     2.31     2.75  AB   
+##  B          2.92 0.104 18     2.70     3.13   BC  
+##  D          2.96 0.104 18     2.74     3.17   BC  
+##  E          3.26 0.104 18     3.04     3.47    C  
+## 
+## N = 2:
+##  Genotype emmean    SE df lower.CL upper.CL .group
+##  C          2.19 0.104 18     1.97     2.41  A    
+##  A          2.73 0.104 18     2.51     2.95   B   
+##  B          3.24 0.104 18     3.02     3.46    C  
+##  D          3.35 0.104 18     3.13     3.56    C  
+##  E          3.47 0.104 18     3.25     3.68    C  
+## 
+## Results are averaged over the levels of: Block 
+## Confidence level used: 0.95 
+## P value adjustment: tukey method for comparing a family of 5 estimates 
+## significance level used: alpha = 0.05
+```
+
+From the table above, we note that the ranking of genotypes is strongly dependent on N fertilisation (C is better than A with N = 2, while it is not significantly different with A = 1), which is explained by the presence of cross-over interaction.
+
+
+## Nested effects: maize crosses
+
+In the previous example the factorial design was fully crossed, as the genotypes were the same for both N fertilisation levels. In plant breeding, it is fairly common to find nested designs, where the levels of one factor change depending on the levels of the other factor. For example, we could take three maize pollinating inbreds (A1, A2 and A3) and cross them with three female inbred lines (B1, B2 and B3 crossed with A1, B4, B5 and B6 crossed with A2 and B7, B8 and B9 crossed with A3). In the end, we harvest the yield of nine hybrids in three groups, depending on the pollinating line.
+
+The dataset 'crosses.csv' reports the results of a similar experiments, designed as complete blocks with 4 replicates (36 values, in total) and online available, in the usual web repository.
+
+
+
+\vspace{12pt}
+
+```r
+dataset <- read.csv("https://www.casaonofri.it/_datasets/crosses.csv", header=T)
+head(dataset, 15)
+##    Male Female Block     Yield
+## 1    A1     B1     1  9.984718
+## 2    A1     B1     2 13.932663
+## 3    A1     B1     3 12.201312
+## 4    A1     B1     4  1.916661
+## 5    A1     B2     1  8.928465
+## 6    A1     B2     2 10.513908
+## 7    A1     B2     3 10.035964
+## 8    A1     B2     4  2.375822
+## 9    A1     B3     1 21.511028
+## 10   A1     B3     2 21.859852
+## 11   A1     B3     3 17.626284
+## 12   A1     B3     4 13.966646
+## 13   A2     B4     1 17.483089
+## 14   A2     B4     2 19.480893
+## 15   A2     B4     3 12.838792
+```
+
+
+### Model definition
+
+In this experiment, the yield variation can be described as a function of the blocks ($\gamma$) and 'father' effect ($\alpha$), while 'mother' effect ($\delta$) can only be determined within each male line, as the female lines are different for each male line. In other words, the 'mother' effect is nested within the 'father' effect, as shown in Figure  \@ref(fig:figNameA3113). The linear model is as follows:
+
+$$Y_{ijk} = \mu + \gamma_k + \alpha_i + \delta_{ij} + \varepsilon_{ijk}$$
+
+where $\gamma_k$ is the block effect ($k$ goes from 1 to 4), $\alpha_i$ is the 'father' effect ($i$ goes from 1 to 3) and $\delta_{ij}$ is the 'mother' effect ($j$ goes from 1 to 9) within each male line $i$. The random component $\varepsilon$ is assumed as gaussian and homoscedastic, with mean equal to 0 and standard deviation equal to $\sigma$.
+
+Hopefully, the difference from the above model and a model for a two-way factorial design is clear: while this latter model contains the two main effects A and B and their interaction A:B, a model for a nested design contains only the main effect for A and the effect of B within A (A/B), while the main effect B is missing, as it does not exist, in practice.
+
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figNameA3113-1.png" alt="Structure for a nested design" width="70%" />
+<p class="caption">(\#fig:figNameA3113)Structure for a nested design</p>
+</div>
+
+
+### Parameter estimation
+
+In this case, we use R for the estimation of model parameters; as shown below, the model formula does not contain the main female effect.
+
+\vspace{12pt}
+\scriptsize
+
+```r
+mod <- lm(Yield ~ factor(Block) + Male + Male/Female, data = dataset)
+```
+\normalsize
+
+As usual, before proceedin,g we inspect the residuals, by using the `plot()` method. The Figure \@ref(fig:figName137) shows no visible problems with basic assumptions and, therefore, we proceed to variance partitioning.
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName137-1.png" alt="Graphical analyses of residuals for a two-way nested ANOVA model with replicates" width="90%" />
+<p class="caption">(\#fig:figName137)Graphical analyses of residuals for a two-way nested ANOVA model with replicates</p>
+</div>
+
+\vspace{12pt}
+
+```r
+anova(mod)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##               Df Sum Sq Mean Sq F value    Pr(>F)    
+## factor(Block)  3 383.75 127.917  44.355 6.051e-10 ***
+## Male           2 134.76  67.378  23.363 2.331e-06 ***
+## Male:Female    6 575.16  95.860  33.239 1.742e-10 ***
+## Residuals     24  69.21   2.884                      
+## ---
+## Signif. codes:  
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+From the ANOVA table we see that all effects are significant; as before, we should read the ANOVA table from bottom up and we should consider that the main affect of 'father' is relatively unimportant, as the three lines are mated to different female lines.
+
+We can use the function 'emmeans()' to calculate the expected marginal means and compare them.
+
+\vspace{12pt}
+
+```r
+library(emmeans)
+mfMeans <- emmeans(mod, ~Female|Male)
+multcomp::cld(mfMeans, Letters = LETTERS)
+## Male = A1:
+##  Female emmean    SE df lower.CL upper.CL .group
+##  B2       7.96 0.849 24     6.21     9.72  A    
+##  B1       9.51 0.849 24     7.76    11.26  A    
+##  B3      18.74 0.849 24    16.99    20.49   B   
+## 
+## Male = A2:
+##  Female emmean    SE df lower.CL upper.CL .group
+##  B6       8.72 0.849 24     6.97    10.47  A    
+##  B5      11.23 0.849 24     9.48    12.98  AB   
+##  B4      15.18 0.849 24    13.43    16.93   B   
+## 
+## Male = A3:
+##  Female emmean    SE df lower.CL upper.CL .group
+##  B9      10.11 0.849 24     8.35    11.86  A    
+##  B8      17.73 0.849 24    15.97    19.48   B   
+##  B7      20.12 0.849 24    18.36    21.87   B   
+## 
+## Results are averaged over the levels of: Block 
+## Confidence level used: 0.95 
+## Results are averaged over some or all of the levels of: Block 
+## P value adjustment: tukey method for comparing a family of 9 estimates 
+## significance level used: alpha = 0.05
+```
+
+In conclusion, we see that the analyses of nested factorial experiments is almost the same as for fully crossed factorial experiments, with the only exception that the main effect for the 'within' factor is not included in the model.
+
+Before concluding, we need to point out that, for a plant breeder, most often the interest is not to assess the significance of effects in ANOVA, but to evaluate the effects of male and female lines on yield variability and determine the so-called **variance components**, that are necessary to assess the heritability of the traits under investigation. We will not address this aspect here and refer the reader to the available literature.
+
+---
+
+## Further readings
+
+1. Stagnari, F., Onofri, A., Codianni, P., Pisante, M., 2013. Durum wheat varieties in N-deficient environments and organic farming: a comparison of yield, quality and stability performances. Plant Breeding 132, 266–275.
+
+
 
 <!--chapter:end:11-Eng_AnovaDueLivelli.Rmd-->
 
 # Plots of different sizes
 
-To be done ...
+Factorial experiments are not only laid down with completely randomised designs or in complete blocks. In chapter 2, we have already introduced split-plot or strip-plot designs, where treatment levels are allocated to the experimental units in groups. We have seen that this is advantageous in some circumstances, e.g., when one of the factors is better allocated to bigger plots, compared to the other factors. When factor levels are allocated to groups of individuals, the independency of residuals is broken, as the individuals within the group are more alike than the individuals in different groups. For example, let's consider a field experiment: if one group of plots is, e.g., more fertile than the other groups, all plots within that group will share such a positive effect and, therefore, their yields will be correlated. In this case, we talk about **intra-class correlation**, that is a similar concept to the Pearson correlation, which we have encountered in Chapter 3.
+
+In order to respect the basic assumption of independent residuals, data from  split-plot and strip-plot experiments cannot be analysed by using the methods proposed in Chapter 11 (multi-way ANOVA models), but they require a different approach.
+
+
+## Example 1: a split-plot experiment
+
+In chapter 2, we presented an experiment to compare three types of tillage (minimum tillage = MIN; shallow ploughing = SP; deep ploughing = DP) and two types of chemical weed control methods (broadcast = TOT; in-furrow = PART). This experiment was designed in four complete blocks with three main-plots per block, split into two sub-plots per main-plot; the three types of tillage were randomly allocated to the main-plots, while the two weed control treatments were randomly allocated to sub-plots (see Figure \@ref(fig:figName38)).
+
+The results of this experiment are reported in the 'beet.csv' file, that is available in the online repository. In the following box we load the file and transform the explanatory variables into factors.
+
+
+```r
+dataset <- read.csv("https://www.casaonofri.it/_datasets/beet.csv", header=T)
+dataset$Tillage <- factor(dataset$Tillage)
+dataset$WeedControl <- factor(dataset$WeedControl)
+dataset$Block <- factor(dataset$Block)
+head(dataset)
+##   Tillage WeedControl Block  Yield
+## 1     MIN         TOT     1 11.614
+## 2     MIN         TOT     2  9.283
+## 3     MIN         TOT     3  7.019
+## 4     MIN         TOT     4  8.015
+## 5     MIN        PART     1  5.117
+## 6     MIN        PART     2  4.306
+```
+
+
+By looking at the map in Figure \@ref(fig:figName38), it is easy to see that there are two types of constraints to randomisation:
+
+1. each replicate of the six combinations was allocated to each block
+2. the two weed control methods were allocated to each main plot
+
+As the consequence, apart from treatment factors, we have two blocking factors, i.e. the blocks and the main-plots within each block; Both this blocking factors should be included in the model, in order to ensure the independence of residuals.
+
+### Model definition
+
+Considering the above comments, a linear model for a two-way split-plot experiment is:
+
+$$Y_{ijk} = \mu + \gamma_k + \alpha_i + \theta_{ik} + \beta_j + \alpha\beta_{ij} + \varepsilon_{ijk}$$
+
+where $\gamma$ is the effect of the $k$^th^ block, $\alpha$ is the effect of the $i$^th^ tillage, $\beta$ is the effect of $j$^th^ weed control method, $\alpha\beta$ is the interaction between the $i$^th^ tillage method and $j$^th^  weed control method. Apart from these effects, which are totally the same as those used in Chapter 11, we also include the main-plot effect $\theta$, where we use the $i$ and $k$ subscripts, as each main-plot is uniquely identified by the block to which it belongs and by the tillage method with which it was treated (see Figure \@ref(fig:figName38)). Obviously, the main plots can be labelled in any other way, as long as each one is uniquely identified.
+
+Now, let's concentrate on the main-plots and forget the sub-plots for awhile; we see that the split-plot design in Figure \@ref(fig:figName38), without considering the sub-plots, is totally similar to a Randomised Complete Block Design. Consequently, the differences between main-plots treated alike (same tillage method), once the block effect has been removed, are only due to random factors, as there is no other known systematic source of variability. Furthermore, the levels of the tillage factor were independently allocated to main-plots, which, therefore, represent true-replicates for this factor. For these reasons, we say that the **main-plot effect is random**.
+
+Apart from the main-plot effect, the differences between sub-plots treated alike (same 'tillage by weed control method' combination) are only due to random effects (unknown sources of variability); therefore, **the sub-plot effect is also random**.
+
+In the end, in split-plot designs we have two random effects: $\theta$ (main-plot effect) and $\varepsilon$ (sub-plot effect), which are assumed as gaussian, with means equal to 0 and standard deviations equal to, respectively, $\sigma_{\theta}$ and $\sigma$. Models with more than one random effect are named **mixed models** and, consequently, data from split-plot designs need to be modelled by using a mixed model.
+
+The platform of mixed models is very important and, for a number of reasons, it is conceptually very different from the usual platform of fixed effects models. We do not intend to introduce mixed models in this book, but we thought that it might be appropriate to show how to fit split-plot (and strip-plot) models and how to interpret the resulting R output. Indeed, split-plot (and strip-plot) experiments are rather common in agriculture and plant breeding.
+
+
+### Model fitting with R
+
+First of all, we need to build a new variable to uniquely identify the main plots. We can do this by using numeric coding, or, more easily, by creating a new factor that combines the levels of block and tillage; we have already anticipated that each main plot is uniquely identified by the block and the tillage method.
+
+
+```r
+dataset$mainPlot <- with(dataset, factor(Block:Tillage))
+```
+
+Due to the presence of two random effects, we cannot use the `lm()` function for model fitting, which is only able to accomodate one residual random term. In R, there are several mixed model fitting function; in this book, we propose the use of the `lmer()` function, which requires two additional packages, i.e. 'lme4' and 'lmerTest', which we need to install,  unless we have already done so. These two packages need to be loaded in the environment before model fitting.
+
+The syntax of the `lmer()` function is rather similar to that of the `lm()` function, although the random main-plot effect is entered by using the '1|' operator and it is put in brackets, in order to better mark the difference with fixed effects. See the box below for the exact coding.
+
+
+```r
+# install.packages("lme4")  #only at first time
+# install.packages("lmerTest")  #only at first time
+library(lme4)
+library(lmerTest)
+mod.split <- lmer(Yield ~ Block + Tillage * WeedControl +
+                  (1|mainPlot), data=dataset)
+```
+
+
+As usual, the second step is based on the inspection of model residuals. The `plot()` method applied to the 'lmer' object only returns the graph of residuals against fitted values (Figure \@ref(fig:figName141b)), while there is no quick way to obtain a QQ-plot. Therefore, we use the Shapiro-Wilks test for normality, as shown in Chapter 8.
+
+
+```r
+shapiro.test(residuals(mod.split))
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  residuals(mod.split)
+## W = 0.93838, p-value = 0.1501
+```
+
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName141b-1.png" alt="Graphical analyses of residuals for a split-plot ANOVA model" width="90%" />
+<p class="caption">(\#fig:figName141b)Graphical analyses of residuals for a split-plot ANOVA model</p>
+</div>
+
+After having made sure that the basic assumptions for linear models hold, we can proceed to variance partitioning. In this case, we use the `anova()` method for a mixed model object, which gives a slightly different output than the `anova()` method for a linear model object. As the second argument, it is necessary to indicate the method we want to use to estimate the degrees of freedom, which, in mixed models, are not as easy to calculate as in linear models.
+
+
+```r
+anova(mod.split, ddf="Kenward-Roger")
+## Type III Analysis of Variance Table with Kenward-Roger's method
+##                      Sum Sq Mean Sq NumDF DenDF F value
+## Block                3.6596  1.2199     3     6  0.6521
+## Tillage             23.6565 11.8282     2     6  6.3228
+## WeedControl          3.3205  3.3205     1     9  1.7750
+## Tillage:WeedControl 19.4641  9.7321     2     9  5.2023
+##                      Pr(>F)  
+## Block               0.61016  
+## Tillage             0.03332 *
+## WeedControl         0.21552  
+## Tillage:WeedControl 0.03152 *
+## ---
+## Signif. codes:  
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+
+From the above table we see that the 'tillage by weed control method' interaction is significant and, therefore, we show the means for the corresponding combinations of experimental factors. As in previous chapters, we use the `emmeans()` function.
+
+
+
+```r
+library(emmeans)
+meansAB <- emmeans(mod.split, ~Tillage:WeedControl)
+multcomp::cld(meansAB, Letters = LETTERS)
+##  Tillage WeedControl emmean    SE   df lower.CL upper.CL
+##  MIN     PART          6.00 0.684 14.4     4.53     7.46
+##  SP      PART          8.48 0.684 14.4     7.01     9.94
+##  MIN     TOT           8.98 0.684 14.4     7.52    10.45
+##  SP      TOT           9.14 0.684 14.4     7.68    10.60
+##  DP      TOT           9.21 0.684 14.4     7.74    10.67
+##  DP      PART         10.63 0.684 14.4     9.17    12.09
+##  .group
+##   A    
+##   AB   
+##   AB   
+##   AB   
+##    B   
+##    B   
+## 
+## Results are averaged over the levels of: Block 
+## Degrees-of-freedom method: kenward-roger 
+## Confidence level used: 0.95 
+## P value adjustment: tukey method for comparing a family of 6 estimates 
+## significance level used: alpha = 0.05
+```
+
+We see that we should avoid controlling the weeds only along the crop rows, if we have not plowed the soil, at least to a shallow depth.
+
+
+## Example 2: a strip-plot design
+
+In Chapter 2 we have also seen another possible arrangement of plots, relating to an experiment where three crops (sugarbeet, rape and soybean) were sown 40 days after an herbicide treatment. The aim was to assess possible phytotoxicity effects relating to an excessive persistence of herbicide residues in soil and the untreated control was added for the sake of comparison. 
+
+Figure \@ref(fig:figName39) shows that each block was organised with three rows and two columns: the three crops were sown along the rows and the two herbicide treatments (rimsulfuron and the untreated control) were allocated along the columns. In this design, the observations are clustered in three groups:
+
+1. the blocks
+2. the rows within each block (three rows per block)
+3. the columns within each block (two columns per block)
+
+Analogously to the split-plot design, the rows represent the main plots for the crop factor, while the columns represent the main-plots for the herbicide factor. Both these grouping factors must be referenced as random effects in the model. The combinations between crops and herbicide treatments are allocated to the sub-plots, resulting from crossing the rows with the columns.
+
+The dataset for this experiment, with four replicates, is available in the 'recropS.csv' file, that can be loaded from the usual repository. After loading, we transform all explanatory variables into factors. Furthermore, we create the definition of rows and columns, by considering that each row is uniquely defined by a specific block and crop and each column is uniquely defined by a specific herbicide and block.
+
+
+```r
+rm(list=ls())
+dataset <- read.csv("https://www.casaonofri.it/_datasets/recropS.csv")
+head(dataset)
+##     Herbicide     Crop Block CropBiomass
+## 1       Check soyabean     1    199.0831
+## 2       Check soyabean     2    257.3081
+## 3       Check soyabean     3    345.5538
+## 4       Check soyabean     4    210.8574
+## 5 rimsulfuron soyabean     1    225.5651
+## 6 rimsulfuron soyabean     2    195.3952
+dataset$Herbicide <- factor(dataset$Herbicide)
+dataset$Crop <- factor(dataset$Crop)
+dataset$Block <- factor(dataset$Block)
+dataset$Rows <- factor(dataset$Crop:dataset$Block)
+dataset$Columns <- factor(dataset$Herbicide:dataset$Block)
+```
+
+
+### Model definition
+
+A good candidate model is:
+
+$$Y_{ijk} = \mu + \gamma_k + \alpha_i + \theta_{ik} + \beta_j + \zeta_{jk} + \alpha\beta_{ij} + \varepsilon_{ijk}$$
+
+where $\mu$ is the intercept, $\gamma_k$ are the block effects, $\alpha_i$ are the crop effects $\theta_ik$ are the random row effects, $\beta_j$ are the herbicide effects, $\zeta_{jk}$ are the random column effects, $\alpha\beta_{ij}$ are the 'crop by herbicide' interaction effects and $\varepsilon_ijk$ is the residual random error term. The three random effects are assumed as gaussian, with mean equal to zero and variances respectively equal to $\sigma_{\theta}$, $\sigma_{\zeta}$ and $\sigma$.
+
+
+### Model fitting with R
+
+At this stage, the code for model fitting should be straightforward, as well as that for variance partitioning
+
+
+```r
+model.strip <- lmer(CropBiomass ~ Block + Herbicide*Crop + 
+    (1|Rows) + (1|Columns), data = dataset)
+anova(model.strip, ddf = "Kenward-Roger")
+## Type III Analysis of Variance Table with Kenward-Roger's method
+##                Sum Sq Mean Sq NumDF  DenDF F value  Pr(>F)
+## Block           21451  7150.3     3 4.1367  2.5076 0.19387
+## Herbicide         148   147.9     1 3.0000  0.0519 0.83450
+## Crop            43874 21936.9     2 6.0000  7.6932 0.02208
+## Herbicide:Crop  12549  6274.4     2 6.0000  2.2004 0.19198
+##                 
+## Block           
+## Herbicide       
+## Crop           *
+## Herbicide:Crop  
+## ---
+## Signif. codes:  
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+
+
+We see that only the crop effect is significant and, thus, we can be reasonably sure that the herbicide did not provoke unwanted carry-over effects to the crops sown in treated soil 40 days after the treatment.
+
+---
+
+## Further readings
+
+1. Bates, D., Mächler, M., Bolker, B., Walker, S., 2015. Fitting Linear Mixed-Effects Models Using lme4. Journal of Statistical Software 67. https://doi.org/10.18637/jss.v067.i01
+2. Gałecki, A., Burzykowski, T., 2013. Linear mixed-effects models using R: a step-by-step approach. Springer, Berlin.
+3. Kuznetsova, A., Brockhoff, P.B., Christensen, H.B., 2017. lmerTest Package: Tests in Linear Mixed Effects Models. Journal of Statistical Software 82, 1--26.
+
+
+
+
+
+
 
 <!--chapter:end:12-Eng_SplitStrip.Rmd-->
 
 # Simple linear regression
 
-To be done ...
+In the previous chapters we have presented several ANOVA models to describe the results of experiments characterised by one or more explanatory factors, in the form of nominal variables. We gave ample space to these models because they are widely used in agriculture research and plant breeding, where the aim is, most often, to compare genotypes. However, experiments are often planned to study the effect of quantitative variables, such as a sequence of doses, time elapsed from an event, the density of seeds and so on. In these cases, factor levels represent quantities and the interest is to describe the whole range of responses, beyond the levels that were actually included in the experimental design.
 
-<!--chapter:end:14-Eng_LinearRegression.Rmd-->
+In those conditions, ANOVA models do not fully respect the dataset characteristics, as they concentrate exclusively on the responses to the selected levels for the factors under investigation. Therefore, we need another class of models, usually known as **regression models**, which we will introduce in these two final chapters.
+
+
+## Case-study: N fertilisation in wheat
+
+It may be important to state that this is not a real dataset, but it was generated by using Monte Carlo simulation, at the end of Chapter 4. It refers to an experiment aimed at assessing the effect of nitrogen fertilisation on wheat yield and designed with four N doses and four replicates, according to a completely randomised lay-out. The results are reported in Table \@ref(tab:tabName141) and they can be loaded into R from the usual repository, as shown in the box below.
+
+
+
+```r
+filePath <- "https://www.casaonofri.it/_datasets/"
+fileName <- "NWheat.csv"
+file <- paste(filePath, fileName, sep = "")
+dataset <- read.csv(file, header=T)
+```
+
+
+```
+## 
+## Attaching package: 'reshape'
+## The following object is masked from 'package:Matrix':
+## 
+##     expand
+## The following object is masked from 'package:dplyr':
+## 
+##     rename
+```
+
+
+
+Table: (\#tab:tabName141)Dataset relativo ad una prova di concimazione azotata su frumento
+
+| Dose|     1|     2|     3|     4|
+|----:|-----:|-----:|-----:|-----:|
+|    0| 21.98| 25.69| 27.71| 19.14|
+|   60| 35.07| 35.27| 32.56| 32.63|
+|  120| 41.59| 40.77| 41.81| 40.50|
+|  180| 50.06| 52.16| 54.40| 51.72|
+
+## Preliminary analysis
+
+Looking at this dataset, we note that it has a similar structure as the dataset proposed in Chapter 7, relating to the one-way ANOVA model. The only difference is that, in this example, the explanatory variable is quantitative, instead of nominal. However, as the first step, it may be useful to forget this characteristic and regard the doses as if they were nominal classes. Therefore, we start by fitting an ANOVA model to this dataset.
+
+
+
+```r
+modelAov <- lm(Yield ~ factor(Dose), data = dataset)
+```
+
+As usual, we inspect the residuals for the basic assumptions for linear models; the graphs at Figure \@ref(fig:figName141) do not show any relevant deviation and, therefore, we proceed to variance partitioning.
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName141-1.png" alt="Graphical analyses of residuals for a N-fertilisation experiment" width="90%" />
+<p class="caption">(\#fig:figName141)Graphical analyses of residuals for a N-fertilisation experiment</p>
+</div>
+
+
+
+```r
+anova(modelAov)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##              Df  Sum Sq Mean Sq F value    Pr(>F)    
+## factor(Dose)  3 1725.96  575.32  112.77 4.668e-09 ***
+## Residuals    12   61.22    5.10                      
+## ---
+## Signif. codes:  
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+
+We see that the treatment effect is significant and the residual standard deviation $\sigma$ is equal to $\sqrt{5.10} = 2.258$. This is a good estimate of the so-called **pure error**, measuring the variability between the replicates for each treatment.
+
+In contrast to what we have done in previous chapters, we do not proceed to contrasts and multiple comparison procedures. It would make no sense to compare, e.g., the yield response at 60 kg N ha^-1^ with that at 120 kg N ha ^-1^; indeed, we are not specifically interested in those two doses, but we are interested in the whole range of responses, from 0 to 180 kg N ha^-1^. We just selected four rates to cover that interval, but we could have as well selected four different doses, e.g. 0, 55, 125 and 180 kg N ha^-1^. As we are interested in the whole range of responses, our best option is to fit a regression model, where the dose is regarded as a numeric variabile, which can take all values from 0 to 180 kg N ha^-1^.
+
+## Definition of a linear model
+
+In this case, we have generated the response by using Monte Carlo simulation and we know that this is linear, within the range from 0 to 180 kg N ha^-1^. In practice, the regression function is selected according to biological realism and simplicity, keeping into account the shape of the observed response. A linear regression model is:
+
+$$Y_i = b_0 + b_1 X_i + \varepsilon_i$$
+
+where $Y_i$ is the yield in the $i$^t^h plot, treated with a N rate of $X_i$, $b_0$ is the intercept (yield level at N = 0) and $b_1$ is the slope, i.e. the yield increase for 1-unit increase in N dose. The stochastic component $\varepsilon$ is assumed as homoscedastic and gaussian, with mean equal to 0 and standard deviation equal to $\sigma$.
+
+
+## Parameter estimation
+
+In general, we know that parameter estimates for linear models are obtained by using the method of least squares, i.e., by selecting the values that result in the smallest sum of squared residuals. However, for our hand-calculations with ANOVA models, we could use the method of moments, which is very simple and based on means and differences among means. Unfortunately, such a simple method cannot be used for regression models and we have to resort to the general least squares method.
+
+Intuitively, applying this method is rather easy: we need to select the straight line that is the closest to the observed responses. In order to find a algebraic solution, we write the least squares function LS and make some slight mathematical manipulation:
+
+
+$$\begin{array}{l}
+LS = \sum\limits_{i = }^N {\left( {{Y_i} - \hat Y_i} \right)^2 = \sum\limits_{i = }^N {{{\left( {{Y_i} - {b_0} - {b_1}{X_i}} \right)}^2}}  = } \\
+ = \sum\limits_{i = }^N {\left( {Y_i^2 + b_0^2 + b_1^2X_i^2 - 2{Y_i}{b_0} - 2{Y_i}{b_1}{X_i} + 2{b_0}{b_1}{X_i}} \right)}  = \\
+ = \sum\limits_{i = }^N {Y_i^2 + Nb_0^2 + b_1^2\sum\limits_{i = }^N {X_i^2 - 2{b_0}\sum\limits_{i = }^N {Y_i^2 - 2{b_1}\sum\limits_{i = }^N {{X_i}{Y_i} + } } } } 2{b_0}{b_1}\sum\limits_{i = }^N {{X_i}} 
+\end{array} $$
+
+where $\hat{Y_i}$ is the expected value (i.e. $\hat{Y_i} = b_0 + b_1 X$). Now, we have to find the values of $b_0$ and $b_1$ that result in the minimum value of LS. You may remember from high school that a minimisation problem can be solved by setting the first derivative to zero. In this case, we have two unknown quantities $b_0$ and $b_1$, thus we have two partial derivatives, which we can set to zero. By doing so, we get to the following estimating functions:
+
+
+$${b_1} = \frac{{\sum\limits_{i = 1}^N {\left[ {\left( {{X_i} - {\mu _X}} \right)\left( {{Y_i} - {\mu _Y}} \right)} \right]} }}{{\sum\limits_{i = 1}^N {{{\left( {{X_i} - {\mu _X}} \right)}^2}} }}$$
+
+and:
+
+$${b_0} = {\mu _Y} - {b_1}{\mu _X}$$
+
+The hand-calculations, with R, lead to:
+
+
+```r
+X <- dataset$Dose
+Y <- dataset$Yield
+muX <- mean(X)
+muY <- mean(Y)
+b1 <- sum((X - muX)*(Y - muY))/sum((X - muX)^2)
+b0 <- muY - b1*muX
+b0; b1
+## [1] 23.79375
+## [1] 0.1544167
+```
+
+Hand-calculations look rather outdated, today: we would better fit the model by using the usual `lm()` function and the `summary()` method. Please, note that we use the 'Dose' vector as such, without transforming it into a factor:
+
+
+
+```r
+modelReg <- lm(Yield ~ Dose, data = dataset)
+summary(modelReg)
+## 
+## Call:
+## lm(formula = Yield ~ Dose, data = dataset)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4.6537 -1.5350 -0.4637  1.9250  3.9163 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) 23.793750   0.937906   25.37 4.19e-13 ***
+## Dose         0.154417   0.008356   18.48 3.13e-11 ***
+## ---
+## Signif. codes:  
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 2.242 on 14 degrees of freedom
+## Multiple R-squared:  0.9606,	Adjusted R-squared:  0.9578 
+## F-statistic: 341.5 on 1 and 14 DF,  p-value: 3.129e-11
+```
+
+Now, we know that, on average, we can expect that the relationship between wheat yield and N fertilisation dose can be described by using the following model:
+
+$$\hat{Y_i} = 23.794 + 0.154 \times X_i$$
+
+However, we also know that the observed response will not follow the above function, because of the stochastic element $\varepsilon_i$, which is regarded as gaussian and homoscedastic, with mean equal 0 and standard deviation equal to 2.242 (see the residual standard error in the output above).
+
+Are we sure that the above model provides a good description of our dataset? Let's investigate this issue.
+
+
+## Goodness of fit
+
+Regression models need to be inspected with some further attention with respect to ANOVA models. Indeed, we do not only need to verify that the residuals are gaussian and homoscedastic, we also need to carefully verify that model predictions closely follow the observed data (**goodness of fit**).
+
+The inspection of residuals can be done using the same graphical techniques, as shown for ANOVA models (plot of residuals against expected values and QQ-plot of standardised residuals). In this case, we have already made such inspections with the corresponding ANOVA model and we do not need to do them again with this regression model. However, we need to prove that the linear model provides a good fit to the observed data, which we can accomplish by using several methods.
+
+### Graphical evaluation
+
+The first and easiest method to check the goodness of fit is to plot the data along with model predictions, as shown in Figure \@ref(fig:figName142). Do we see any deviations from linearity? Clearly, the fitted model provides a good description of the observed data.
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName142-1.png" alt="Response of wheat yield to N fertilisation: the symbols show the observed data, the dashed line shows the fitted model" width="90%" />
+<p class="caption">(\#fig:figName142)Response of wheat yield to N fertilisation: the symbols show the observed data, the dashed line shows the fitted model</p>
+</div>
+
+
+### Standard errors for parameter estimates
+
+In some cases, looking at the standard error for the estimated parameters may help evaluate whether the fitted model is reasonable. For example, in this case, we might ask ourselves whether the regression line is horizontal, which would mean that wheat yield is not related to N fertilisation. A horizontal line has slope equal to 0, while $b_1$ was 0.154; however, we also know that $b_1$ is our best guess for the population slope $\beta_1$ (do not forget that we have observed a sample, but we are interested in the population). Is it possible that the population slope $\beta_1$ is, indeed, zero?
+
+If we remember the content of Chapter 5, we can build confidence intervals around an estimate by taking (approximately) twice the standard error. Consequently, the approximate confidence interval for the slope is 0.137705 - 0.171129 and we see that such an interval does not contain 0, which is, therefore, a very unlikely value. This supports the idea that the observed response is, indeed, a linear function of the predictor and that there is no relevant lack of fit.
+
+More formally, we can test the hypothesis $H_0: \beta_1 = 0$ based on the usual T ratio between an estimate and its standard error:
+
+$$T = \frac{b_1}{SE(b_1)} = \frac{0.154417}{0.008356} = 18.48$$
+
+If the null is true, the sampling distribution for T is a Student's t, with 14 degrees of freedom. Thus we see that we have obtained a very unlikely T value and the P-value is:
+
+
+```r
+2 * pt(0.154417/0.008356, 14, lower.tail = F)
+## [1] 3.131456e-11
+```
+
+Therefore, we can reject the null and conclude that $\beta_1 \ne 0$. The t-test for model parameters is reported in the output of the `summary()` method (see above).
+
+### F test for lack of fit
+
+Another formal test is based on comparing the fit of the ANOVA model above (where the dose was regarded as a nominal factor) and the regression model. The residual sum of squares for the ANOVA model is 61.22, while that for the regression model is 70.37 (see the box below).
+
+
+```r
+anova(modelReg)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##           Df  Sum Sq Mean Sq F value    Pr(>F)    
+## Dose       1 1716.80 1716.80  341.54 3.129e-11 ***
+## Residuals 14   70.37    5.03                      
+## ---
+## Signif. codes:  
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+Indeed, the ANOVA model appears to provide a better description of the experimental data, which is expected, as the residuals contain only the so-called pure error, i.e. the variability of each value around the group mean. On the other hand, the residuals from the regression model contain an additional component, represented by the distances from group means to the regression line. Such a component is the so-called **lack of fit** (LF) and it may be estimated as the following difference:
+
+$$\textrm{LF} = 70.37 - 61.22 = 9.15$$
+
+It is perfectly logic to ask ourselves whether the lack of fit component is bigger than the pure error component. We know that we can compare variances based on an F ratio; in this case the number of  degrees of freedom for the residuals is 14 for the regression model (16 values minus 2 estimated parameters) and 12 for the ANOVA model (3 $\times$ 4). Consequently, the lack of fit component has 2 degrees of freedom (14 - 12 = 2). The F ratio for lack of fit is:
+
+$$F_{LF} = \frac{ \frac{RSS_r - RSS_a}{DF_r - DF_a} } {\frac{RSS_a}{DF_a}} = \frac{9.15 / 2}{61.22/12} = 0.896$$
+
+where RSS~r~ is the residual sum of squares for regression, with DF~r~ degrees of freedom and RSS~a~ is the residual sum of squares for ANOVA, with DF~a~ degrees of freedom. More quickly, with R we can use the `anova()` method, passing both models as arguments:
+
+
+```r
+anova(modelReg, modelAov)
+## Analysis of Variance Table
+## 
+## Model 1: Yield ~ Dose
+## Model 2: Yield ~ factor(Dose)
+##   Res.Df    RSS Df Sum of Sq      F Pr(>F)
+## 1     14 70.373                           
+## 2     12 61.219  2    9.1542 0.8972 0.4334
+```
+
+This test is not significant (P > 0.05) and, therefore, we should not reject the null hypothesis of no significant lack of fit effect. Thus, we conclude that the regression model provides a good description of the dataset and it fits as well as an ANOVA model, but it is more parsimonious (in other words, it has a lower number of estimated parameters).
+
+### F test for goodness of fit and coefficient of determination
+
+As every other linear models, regression models can be reduced to the model of the mean (**null model**:  $Y_i = \mu + \varepsilon_i$) by removing parameters. For example, if we remove $b_1$, the simple linear regression model reduces to the model of the mean. If you remember from Chapter 4, the model of the mean has no predictors and, therefore, it must be the worst fitting model, as it assumes that we have no explanation for the data.
+
+Hence, we can compare the regression model with the null model and test whether the former is significantly better than the latter. The residual sum of squares for the null model is given in the following box, while we have seen that the residual sum of squares for the regression model is 70.37.
+
+
+```r
+modNull <- lm(Yield ~ 1, data = dataset)
+deviance(modNull)
+## [1] 1787.178
+```
+
+The difference between the null model and the regression model represents the so-called **goodness of fit** (GF) and it is:
+
+$$GF = 1787.18 - 70.37 = 1716.81$$ 
+
+The GF value is a measure of how much the fit improves when we add the predictor to the model; we can compare GF with the residual sum of squares from regression, by using another F ratio. The degrees of freedom are, respectively, 1 and 14 for the two sum of squares and, consequently, the F ratio is:
+
+$$ F_{GF} = \frac{\frac{RSS_t - RSS_r}{DF_t - DF_r} } {\frac{RSS_r}{DF_r}} = \frac{1716.81/1}{70.37/14}$$
+
+where RSS~t~ is the residual sum of squares for the null model, with DF~t~ degrees of freedom. In R, we can use the `anova()` method and we do not even need to include the null model as the argument, as this is included by default:
+
+
+```r
+anova(modelReg)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##           Df  Sum Sq Mean Sq F value    Pr(>F)    
+## Dose       1 1716.80 1716.80  341.54 3.129e-11 ***
+## Residuals 14   70.37    5.03                      
+## ---
+## Signif. codes:  
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+The null hypothesis (the goodness of fit is not significant) is rejected and we confirm that the regression model is a good model.
+
+In order to express the goodness of fit, a frequently used statistic is the **determination coefficient** or **R^2^**, i.e. the ratio of the residual sum of squares from regression to the residual sum of squares from the null model:
+
+
+$$R^2 = \frac{SS_{reg}}{SS_{tot}} = \frac{1716.81}{1787.18} = 0.961$$
+
+This ratio goes from 0 to 1: the highest the value the highest the proportion of the total deviance that can be explained by the regression model (please, remember that the residual sum of squares from the model of the mean corresponds to the total deviance). The determination coefficient is included in the output of the `summary()` method applied to the 'modelReg' object.
+
+## Making predictions
+
+Once we are sure that the model provides a good description of the dataset, we can use it to make predictions for whatever N dose we have in mind, as long as it is included within the minimum and maximum N dose in the experimental design (extrapolations are not allowed). For predictions, we can use the `predict()` method; it needs two arguments: the model object and the X values to use for the prediction, as a dataframe. In the box below we predict the yield for 30 and 80 kg N ha^-1^:
+
+
+```r
+pred <- predict(modelReg, newdata=data.frame(Dose=c(30, 80)), se=T)
+pred
+## $fit
+##        1        2 
+## 28.42625 36.14708 
+## 
+## $se.fit
+##         1         2 
+## 0.7519981 0.5666999 
+## 
+## $df
+## [1] 14
+## 
+## $residual.scale
+## [1] 2.242025
+```
+
+It is also useful to make inverse prediction, i.e. to calculate the dose giving a certain response level. For example, we may wonder what N dose we need to obtain a yield of 4.5 q ha^-1^. To determine this, we need to solve the model for the dose and make the necessary calculations:
+
+$$X = \frac{Y - b_0}{b_1} = \frac{45 - 23.79}{0.154} = 137.33$$
+
+In R, we can use the `deltaMethod()` function in the `car` package, that also provides standard errors based on the law of propagation of errors (we spoke about this in a previous chapter):
+
+
+```r
+car::deltaMethod(modelReg, "(45 - b0)/b1", 
+                 parameterNames=c("b0", "b1"))
+##              Estimate       SE    2.5 % 97.5 %
+## (45 - b0)/b1 137.3314   4.4424 128.6244 146.04
+```
+
+The above inverse predictions are often used in chemical laboratories for the process of calibration.
+
+
+
+
+---
+
+## Further readings
+
+1. Draper, N.R., Smith, H., 1981. Applied Regression Analysis, in: Applied Regression. John Wiley & Sons, Inc., IDA, pp. 224–241.
+2. Faraway, J.J., 2002. Practical regression and Anova using R. http://cran.r-project.org/doc/contrib/Faraway-PRA.pdf, R.
+
+
+
+<!--chapter:end:13-Eng_LinearRegression.Rmd-->
 
 # Nonlinear regression
 
 To be done ...
 
-<!--chapter:end:15-Eng_NonLineare.Rmd-->
+
+
+<!--chapter:end:14-Eng_NonLineare.Rmd-->
 
 # Exercises
 
@@ -4546,7 +6092,7 @@ $$Y = c + \frac{d - c}{1 + exp \left\{ - b \left[ log (X) - log (e) \right] \rig
 Parameterise the model and evaluate the goodnes of fit.
 
 
-<!--chapter:end:16-Eng_Exercises.Rmd-->
+<!--chapter:end:15-Eng_Exercises.Rmd-->
 
 # APPENDIX: A very gentle introduction to R
 
@@ -4868,7 +6414,7 @@ plot(y ~ x)
 curve(7.77 * exp(0.189 * x), add = T, col = "red")
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-140-1.png" width="90%" />
+<img src="_main_files/figure-html/unnamed-chunk-201-1.png" width="90%" />
 
 ---
 
@@ -4878,5 +6424,5 @@ curve(7.77 * exp(0.189 * x), add = T, col = "red")
 1. Maindonald J. Using R for Data Analysis and Graphics - Introduction, Examples and Commentary. (PDF, data sets and scripts are available at [JM's homepage](https://cran.r-project.org/doc/contrib/usingR.pdff).
 2. Oscar Torres Reina, 2013. Introductio to RStudio (v. 1.3). [This homepage](https://dss.princeton.edu/training/RStudio101.pdf)
 
-<!--chapter:end:17-Eng_IntroduzioneR.Rmd-->
+<!--chapter:end:16-Eng_IntroduzioneR.Rmd-->
 
