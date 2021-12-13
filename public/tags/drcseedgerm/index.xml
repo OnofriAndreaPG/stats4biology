@@ -5,10 +5,391 @@
     <description>Recent content in drcSeedGerm on The broken bridge between biologists and statisticians</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2018, @AndreaOnofri</copyright>
-    <lastBuildDate>Sat, 09 Oct 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 06 Dec 2021 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://www.statforbiology.com/tags/drcseedgerm/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Analysing seed germination and emergence data with R: a tutorial. Part 4</title>
+      <link>https://www.statforbiology.com/2021/stat_drcte_4-time-to-eventcurves/</link>
+      <pubDate>Mon, 06 Dec 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.statforbiology.com/2021/stat_drcte_4-time-to-eventcurves/</guid>
+      <description>
+&lt;script src=&#34;https://www.statforbiology.com/rmarkdown-libs/header-attrs/header-attrs.js&#34;&gt;&lt;/script&gt;
+
+
+&lt;p&gt;This is a follow-up post. If you are interested in other posts of this series, please go to: &lt;a href=&#34;https://www.statforbiology.com/tags/drcte/&#34;&gt;https://www.statforbiology.com/tags/drcte/&lt;/a&gt;&lt;/p&gt;
+&lt;div id=&#34;time-to-event-models-for-seed-germinationemergence&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Time-to-event models for seed germination/emergence&lt;/h1&gt;
+&lt;p&gt;The individual seeds within a population do not germinate/emerge altogether at the same moment; this is an undisputed fact, resulting from seed-to-seed variability in germination/emergence time. Accordingly, the primary reason why we organise germination assays is to describe the progress to germination for the whole population, by using some appropriate time-to-event model.&lt;/p&gt;
+&lt;p&gt;What is a time-to-event model? It is a model that describes the probability that the event (germination/emergence, in our case) occurs at any time &lt;span class=&#34;math inline&#34;&gt;\(t\)&lt;/span&gt; or before that time:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ P(t) = \Phi(T \le t)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;In practice, it may be easier to think that &lt;span class=&#34;math inline&#34;&gt;\(P(t)\)&lt;/span&gt; is the proportion of germinated/emerged seeds at time &lt;span class=&#34;math inline&#34;&gt;\(t\)&lt;/span&gt;. In statistical terms, &lt;span class=&#34;math inline&#34;&gt;\(\Phi\)&lt;/span&gt; is a Cumulative Distribution Function (CDF), with the following characteristics:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;the time &lt;span class=&#34;math inline&#34;&gt;\(t\)&lt;/span&gt; is constrained from 0 to +&lt;span class=&#34;math inline&#34;&gt;\(\infty\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;the response &lt;span class=&#34;math inline&#34;&gt;\(P(t)\)&lt;/span&gt; is constrained from 0 to 1&lt;/li&gt;
+&lt;li&gt;the response &lt;span class=&#34;math inline&#34;&gt;\(P(t)\)&lt;/span&gt; is monotonically increasing&lt;/li&gt;
+&lt;li&gt;due to the possible presence of a final fraction of individuals without the event (e.g., ungerminated seeds), &lt;span class=&#34;math inline&#34;&gt;\(P(t)\)&lt;/span&gt; may not necessarily reach 1.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The first task to fit a time-to-event model is to select a form for &lt;span class=&#34;math inline&#34;&gt;\(\Phi\)&lt;/span&gt;. In general, we have three possibilities:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;a parametric maximum likelihood model (ML)&lt;/li&gt;
+&lt;li&gt;a non-parametric maximum likelihood model (NPMLE)&lt;/li&gt;
+&lt;li&gt;a kernel density estimator (KDE)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Let’s have a closer look at those three options.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;parametric-time-to-event-models&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Parametric time-to-event models&lt;/h1&gt;
+&lt;p&gt;The CDF for parametric time-to-event models is characterised by a pre-defined, usually sigmoidal, shape. Right-skewed CDFs have proven useful, such as the log-normal, log-logistic or Weibull, which are only defined for &lt;span class=&#34;math inline&#34;&gt;\(t &amp;gt; 0\)&lt;/span&gt; (see #1 above). These CDFs contain a location (&lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt;) and a scale (&lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt;) parameter: the former is a measure of central tendency (e.g., the median for the log-logistic and log-normal CDFs) while the latter is a measure of how fast the curve grows during time. For seed germination/emergence, most often, a third parameter is necessary, to describe the fraction of dormant or nonviable seeds (&lt;span class=&#34;math inline&#34;&gt;\(0 &amp;lt; d \leq 1\)&lt;/span&gt;). As an example, we show a log-logistic CDF, that is also used in ecotoxicology, for dose-response studies:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[P(t) = \frac{d}{1 + exp\left\{ b \right[ \log(t) - log(e)\left] \right\}}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Fitting the above parametric model implies that, based on the observed data, we need to assign a specific value to the parameters &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt;, so that an appropriate likelihood function is maximised (Maximum Likelihood estimation). Relating to the estimation process, we should necessarily take into account that germination/emergence data are censored data; neglecting this fact has some important consequences, as I have described &lt;a href=&#34;https://www.statforbiology.com/2021/stat_drcte_2-methods/&#34;&gt;in this post&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;In practice, parametric time-to-event models can be fitted by the &lt;code&gt;drmte()&lt;/code&gt; function in the ‘drcte’ package. As an example, let’s consider a factitious dataset relating to an assay where the germinations of 30 seeds were counted daily for 15 days. A log-logistic time-to-event model can be easily fit as follows:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dataset &amp;lt;- read.csv(&amp;quot;https://www.casaonofri.it/_datasets/oneFlush.csv&amp;quot;)
+head(dataset)
+##   timeBef timeAf counts
+## 1       0      1      3
+## 2       1      2      2
+## 3       2      3      3
+## 4       3      4      4
+## 5       4      5      3
+## 6       5      6      2
+library(drcte)
+te.mod &amp;lt;- drmte(counts ~ timeBef + timeAf, fct = LL.3(),
+                data = dataset)
+# Alternative
+# te.mod &amp;lt;- drm(counts ~ timeBef + timeAf, fct = LL.3(),
+#                 data = dataset, type = &amp;quot;event&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We can see that we have directly considered the observed counts as the response variable, with no preliminary transformation. Furthermore, we have two predictors that represent the extremes of each time interval (‘timeBef’ and ‘timeAf’), by which we associate each count to the whole uncertainty interval during which germinations took place and not to a precise time instant. In other words, we fully respect our censored data.&lt;/p&gt;
+&lt;p&gt;The very same model can be fitted by using the &lt;code&gt;drm()&lt;/code&gt; function in the ‘drc’ package, although we should add the argument &lt;code&gt;type = &#34;event&#34;&lt;/code&gt;, as this latter package is not specific to time-to-event methods.&lt;/p&gt;
+&lt;p&gt;The usual &lt;code&gt;coef()&lt;/code&gt;, &lt;code&gt;summary()&lt;/code&gt;, &lt;code&gt;print()&lt;/code&gt; and &lt;code&gt;plot()&lt;/code&gt; methods can be used for ‘drcte’ objects as for any other model object in R.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(te.mod)
+## 
+## Model fitted: Log-logistic (ED50 as parameter) with lower limit at 0
+## 
+## Robust estimation: no 
+## 
+## Parameter estimates:
+## 
+##               Estimate Std. Error t-value   p-value    
+## b:(Intercept) -1.52553    0.44166 -3.4541 0.0005521 ***
+## d:(Intercept)  0.97842    0.16027  6.1048  1.03e-09 ***
+## e:(Intercept)  4.91400    1.68058  2.9240 0.0034558 ** 
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+plot(te.mod, ylim = c(0, 1), xlim = c(0, 15),
+     xlab = &amp;quot;Time&amp;quot;, ylab = &amp;quot;Cumulative proportion of germinated seeds&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_drcte_4-Time-to-EventCurves_files/figure-html/unnamed-chunk-2-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;div id=&#34;nonparametric-time-to-event-models&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Nonparametric time-to-event models&lt;/h2&gt;
+&lt;p&gt;In some cases we are not willing to assume that the germination curve has a certain predefined shape, but we need an extra degree of flexibility. For example, emergences may proceed in successive flushes that are not easily described by using a sigmoidal curve. In these cases, we can fit a non-parametric model, whose shape is not pre-defined, but it is built by closely following the observed data. In survival analyses, time-to-event curves for interval censored data are estimated by using Nonparametric Maximum Likelihood Estimators (NPMLE), that are potentially interesting also for plant science.&lt;/p&gt;
+&lt;p&gt;For example, we can consider another factitious dataset, where the germination took place in two distinct flushes; a non-parametric maximum likelihood model can be fit by using the &lt;code&gt;NPMLE()&lt;/code&gt; function, as shown in the box below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dataset &amp;lt;- read.csv(&amp;quot;https://www.casaonofri.it/_datasets/twoFlushes.csv&amp;quot;)
+head(dataset)
+##   timeBef timeAf nEmerg
+## 1       0      2      0
+## 2       2      4      1
+## 3       4      6     10
+## 4       6      8      9
+## 5       8     10      4
+## 6      10     12      0
+te.npmle &amp;lt;- drmte(nEmerg ~ timeBef + timeAf, fct = NPMLE(),
+                data = dataset)
+summary(te.npmle)
+## 
+## Model fitted: NPML estimator for time-to-event data
+## 
+## Robust estimation: no 
+## 
+## Turnbull&amp;#39;s intervals and masses:
+## 
+##            count   pdf   cdf Naive.SE
+## 1.(2,4]     1.00  0.02  0.02   0.0198
+## 1.(4,6]    10.00  0.20  0.22   0.0586
+## 1.(6,8]     9.00  0.18  0.40   0.0693
+## 1.(8,10]    4.00  0.08  0.48   0.0707
+## 1.(14,16]   1.00  0.02  0.50   0.0707
+## 1.(18,20]   1.00  0.02  0.52   0.0707
+## 1.(20,22]   1.00  0.02  0.54   0.0705
+## 1.(22,24]   4.00  0.08  0.62   0.0686
+## 1.(24,26]   7.00  0.14  0.76   0.0604
+## 1.(26,28]   6.00  0.12  0.88   0.0460
+## 1.(28,30]   3.00  0.06  0.94   0.0336
+## 1.(32,Inf)  3.00  0.06  1.00   0.0000
+par(mfrow = c(1,2))
+
+plot(te.npmle, ylim = c(0, 1),
+     xlab = &amp;quot;Time&amp;quot;, ylab = &amp;quot;Cumulative proportion of germinated seeds&amp;quot;,
+     main = &amp;quot;Interpolation method&amp;quot;, npmle.points = T)
+plot(te.npmle, ylim = c(0, 1),
+     xlab = &amp;quot;Time&amp;quot;, ylab = &amp;quot;Cumulative proportion of germinated seeds&amp;quot;,
+     npmle.type = &amp;quot;midpoint&amp;quot;, shading = F,
+     main = &amp;quot;Midpoint imputation&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_drcte_4-Time-to-EventCurves_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;With NPMLE, the time-to-event curve is only defined at the end of each time interval, while it is undefined elsewhere and it is (optionally) represented by a shaded area (Figure above, left). This shaded area reflects the uncertainty due to censoring.&lt;/p&gt;
+&lt;p&gt;Although we cannot know at what moment the nonparametric curve went up within the grey interval, we can make some reasonable assumptions. For example, we could assume that events are evenly spread within the interval, which is the approach taken in the ‘interval’ package (Figure above, left panel). In the ‘survival’ package and, most commonly, in survival analysis, it is assumed that the curve goes up in the middle of the interval (midpoint imputation; Figure above, right panel).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;kernel-density-estimators&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Kernel density estimators&lt;/h2&gt;
+&lt;p&gt;NPMLEs are very flexible and they can be used to describe the progress to germination/emergence with, virtually, every type of datasets, also when the events took place in distinct flushes. However, we may be reluctant to accept a time-to-event curve with a stairstep shape, especially for prediction purposes. A further possibility to describe the time to event curve with a smooth and flexible model is to use a so-called Kernel Density Estimator (KDE). A KDE is built by considering the observed data, a Kernel function (usually gaussian) and a bandwith value, that controls the degree of smoothing; a nice post to see how Kernel density estimation works in practice can be found &lt;a href=&#34;https://mathisonian.github.io/kde/&#34;&gt;at this link here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;In the box below we show that a KDE can be fitted to the observed data (same example as above) by using the &lt;code&gt;drmte()&lt;/code&gt; function and setting the ‘fct’ argument to &lt;code&gt;KDE()&lt;/code&gt;. Please, note that this type of KDE is specifically modified to comply with censoring.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;te.kde &amp;lt;- drmte(nEmerg ~ timeBef + timeAf, fct = KDE(),
+                data = dataset)
+summary(te.kde)
+## 
+## Model fitted: Kernel estimator for the distribution function
+## 
+## Robust estimation: no 
+## 
+## Bandwidth estimates:
+## 
+##               Estimate
+## h:(bandwidth)   1.7871
+plot(te.kde, ylim = c(0, 1),
+     xlab = &amp;quot;Time&amp;quot;, ylab = &amp;quot;Cumulative proportion of germinated seeds&amp;quot;)
+paf &amp;lt;- KDE.fun(seq(1,35, 1), dataset$timeBef, dataset$timeAf, dataset$nEmerg, 
+               h = 0.5)
+lines(paf ~ seq(1,35, 1), col = &amp;quot;red&amp;quot;)
+paf &amp;lt;- KDE.fun(seq(1,35, 1), dataset$timeBef, dataset$timeAf, dataset$nEmerg, 
+               h = 3.0)
+lines(paf ~ seq(1,35, 1), col = &amp;quot;blue&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_drcte_4-Time-to-EventCurves_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;We have augmented the above graph with three estimators: the blue one has a bandwidth &lt;span class=&#34;math inline&#34;&gt;\(h = 3\)&lt;/span&gt;, the red one has &lt;span class=&#34;math inline&#34;&gt;\(b = 0.5\)&lt;/span&gt; and the black one has &lt;span class=&#34;math inline&#34;&gt;\(b = 1.7871\)&lt;/span&gt;. Our aim was to show the effect of bandwidth selection on the resulting time-to-event curve, although it is usually necessary to apply an appropriate algorithm for the selection. The function &lt;code&gt;drmte()&lt;/code&gt;, by default, uses the AMISE method and, unless you know what you are doing, we recommend that you stick to such an algorithm.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;ml-npmle-or-kde&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;ML, NPMLE or KDE?&lt;/h1&gt;
+&lt;p&gt;There is no rule to select the type of time-to-event model for seed germination/emergence and you will have to make your own choice and defend it at the publication stage. As a swift suggestion, I would say that a parametric model is to be preferred, unless it shows some visible signs of lack of fit.&lt;/p&gt;
+&lt;p&gt;Whatever model you select, fitting a time-to-event model may be the most unambiguous way to describe the progress to germination/emergence. In a future post, we will see that we can also compare time-to-event models for different experimental treatments and or environmental conditions, which is, most often, the central step in our process of data analyses, for seed germination/emergence assays.&lt;/p&gt;
+&lt;p&gt;Thanks for reading!&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Barreiro-Ures D, Francisco-Fernández M, Cao R, Fraguela BB, Doallo R, González-Andújar JL, Reyes M (2019) Analysis of interval-grouped data in weed science: The binnednp Rcpp package. Ecol Evol 9:10903–10915&lt;/li&gt;
+&lt;li&gt;Fay MP, Shaw PA (2010) Exact and Asymptotic Weighted Logrank Tests for Interval Censored Data: The interval R Package. J Stat Softw 36:1–34&lt;/li&gt;
+&lt;li&gt;Ritz C, Jensen SM, Gerhard D, Streibig JC (2019) Dose-response analysis using RCRC Press. USA&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Analysing seed germination and emergence data with R: a tutorial. Part 3</title>
+      <link>https://www.statforbiology.com/2021/stat_drcte_3-reshapingdata/</link>
+      <pubDate>Tue, 19 Oct 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.statforbiology.com/2021/stat_drcte_3-reshapingdata/</guid>
+      <description>
+&lt;script src=&#34;https://www.statforbiology.com/rmarkdown-libs/header-attrs/header-attrs.js&#34;&gt;&lt;/script&gt;
+
+
+&lt;p&gt;This is a follow-up post. If you are interested in other posts of this series, please go to: &lt;a href=&#34;https://www.statforbiology.com/tags/drcte/&#34;&gt;https://www.statforbiology.com/tags/drcte/&lt;/a&gt;&lt;/p&gt;
+&lt;div id=&#34;reshaping-time-to-event-data&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Reshaping time-to-event data&lt;/h1&gt;
+&lt;p&gt;The first thing we should consider before working through this tutorial is the structure of germination/emergence data. To our experience, seed scientists are used to storing their datasets in several formats, that may not be immediately usable with the ‘drcte’ and ‘drc’ packages, which this tutorial is built upon. The figure below shows some of the possible formats that I have often encountered in my consulting work.&lt;/p&gt;
+&lt;p style=&#34;text-align:center&#34;&gt;
+&lt;img src=&#34;https://www.statforbiology.com/_Figures/Stat_drcte_3-method-data.png&#34; title=&#34;fig:&#34; style=&#34;width:90.0%&#34; alt=&#34;Possible data structures for seed germination/emergence data&#34; /&gt;
+&lt;/p&gt;
+&lt;p&gt;Both the ‘drcte’ and ‘drc’ packages require that the data is stored in LONG GROUPED format, as shown in the figure above (panel A, top left). Each row represents a time interval, the columns ‘timeBef’ and ‘timeAf’ represent the beginning and ending of the interval, while the column ‘count’ represents the seeds that germinated/emerged during that interval of time. Other columns may be needed, to represent, e.g., the randomisation unit (e.g., Petri dish) within which the count was made and the experimental treatment level that was allocated to that unit.&lt;/p&gt;
+&lt;p&gt;Apart from the LONG GROUPED format, other time-to-event packages, such as ‘survival’ (Therneau, 2021) or ‘interval’ (Fay and Shaw, 2010) require a different data format, which could be named as LONG UNGROUPED (Figure above, panel B, top right). In this format, each row represents a seed, while the columns ‘timeBef’ and ‘timeAf’ represent the beginning and ending of the interval during which that seed germinated/emerged. The column ‘count’ is not necessary, while other columns may be necessary, as for the LONG GROUPED format. Apart from the above mentioned ‘survival’ and ‘interval’ packages, this format is also compatible with the ‘drcte’ package.&lt;/p&gt;
+&lt;p&gt;Both the GROUPED and UNGROUPED formats have two basic advantages: (i) they can be used with all types of time-to-event data and (ii) they obey to the principles of tidy data (Wickham, 2016). However, to my experience, seed scientists often use other formats, such as the WIDE format (Figure above, panel C, bottom left) or the NONLINEAR REGRESSION format (Figure above, panel D, bottom right), which need to be preliminary transformed into one of the LONG GROUPED or LONG UNGROUPED formats.&lt;/p&gt;
+&lt;p&gt;In order to ease the transition from traditional methods of data analysis to time-to-event methods, we decided to develop a couple of service functions that can be used to reshape the data to a format that is more suitable for time-to-event analyses. Let’s see how to do this by using a ‘real-life’ example.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;motivating-example&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Motivating example&lt;/h1&gt;
+&lt;p&gt;Seeds of &lt;em&gt;L. ornithopodioides&lt;/em&gt; were collected from natural populations, at three different maturation stages, i.e. at 27 Days After Anthesis (DAA), when seeds were still green (Stage A), at 35 DAA, when seeds were brown and soft (Stage B) and at 41 DAA, when seeds were brown and moderately hard (Stage C). Germination assays were performed by placing four replicates of 25 seeds on filter paper (Whatman no. 3) in 9-cm diameter Petri dishes, in the dark and at a constant temperature of 20°C. The filter paper was initially moistened with 5 mL of distilled water and replenished as needed during the assay. Germinated seeds were counted daily over 15 days and removed from the Petri dishes. This dataset is a subset of a bigger dataset, aimed at assessing the time when the hard coat imposes dormancy in seeds of different legume species (Gresta et al., 2011).&lt;/p&gt;
+&lt;p&gt;The authors of the above study sent me the above dataset in WIDE format, where the rows represented each Petri dish and the columns represented all information about each dish, including the counts of germinated seeds, which were listed in different columns. The dataset is shown in the table below and it is available as the ‘lotusOr’ dataframe in the ‘drcte’ package.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;##  Stage Dish 1  2 3 4 5 6 7 8 9 10 11 12 13 14 15
+##      A    1 0  0 0 0 0 1 2 1 1  1  3  1  1  4  2
+##      A    2 0  0 0 0 0 1 1 1 1  2  1  2  3  1  1
+##      A    3 0  0 0 0 0 3 4 4 3  1  2  1  1  0  1
+##      A    4 0  0 0 0 0 1 3 1 2  1  2  1  3  1  1
+##      B    5 0  0 0 4 1 2 1 1 0  1  2  2  3  2  1
+##      B    6 0  0 0 4 2 2 1 0 1  1  3  4  3  4  0
+##      B    7 0  0 0 4 0 4 1 2 1  1  3  3  2  2  0
+##      B    8 0  0 0 4 3 2 2 3 1  1  1  1  1  0  0
+##      C    9 1 10 1 2 1 2 3 2 0  0  0  0  1  0  0
+##      C   10 1 10 4 1 4 0 1 1 0  0  0  0  1  0  1
+##      C   11 1 11 5 1 2 2 1 0 1  0  0  1  0  0  0
+##      C   12 0 16 1 2 2 1 1 0 0  1  0  0  0  1  0&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The WIDE format is handy for swift calculations with a spreadsheet, but, in general, it is not ok, as: (1) it does not obey to the principle of tidy data (Wickham, 2016); (2) it is not generally efficient and it cannot be used with a set of germination assays with different monitoring schedules. Therefore, facing a dataset in the WIDE format, we need to reshape it into a LONG format.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;transforming-from-wide-to-long-grouped&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Transforming from WIDE to LONG GROUPED&lt;/h1&gt;
+&lt;p&gt;For such a reshaping, we could use one of the available R functions, such us &lt;code&gt;pivot_longer()&lt;/code&gt; in the ‘tidyverse’ or &lt;code&gt;melt()&lt;/code&gt; in the ‘reshape’ package. However, when reshaping the data, it is also useful to make e few transformations, such as producing cumulative counts and proportions, that might be useful to plot graphs, or for other purposes. Therefore, we developed the &lt;code&gt;melt_te()&lt;/code&gt; function; let’s look at its usage, in the box below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;datasetG &amp;lt;- melt_te(lotusOr, count_cols = 3:17, treat = Stage, 
+                   monitimes = 1:15, subjects = rep(25,12))
+head(datasetG, 16)
+##    Stage Units timeBef timeAf count nCum propCum
+## 1      A     1       0      1     0    0    0.00
+## 2      A     1       1      2     0    0    0.00
+## 3      A     1       2      3     0    0    0.00
+## 4      A     1       3      4     0    0    0.00
+## 5      A     1       4      5     0    0    0.00
+## 6      A     1       5      6     1    1    0.04
+## 7      A     1       6      7     2    3    0.12
+## 8      A     1       7      8     1    4    0.16
+## 9      A     1       8      9     1    5    0.20
+## 10     A     1       9     10     1    6    0.24
+## 11     A     1      10     11     3    9    0.36
+## 12     A     1      11     12     1   10    0.40
+## 13     A     1      12     13     1   11    0.44
+## 14     A     1      13     14     4   15    0.60
+## 15     A     1      14     15     2   17    0.68
+## 16     A     1      15    Inf     8   NA      NA&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The &lt;code&gt;melt_te()&lt;/code&gt; function requires the following arguments:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;data: the original dataframe&lt;/li&gt;
+&lt;li&gt;count_cols: the positions of the columns in ‘data’, listing, for each dish, the counts of germinated seeds at each assessment time (columns)&lt;/li&gt;
+&lt;li&gt;treat: the columns in ‘data’, listing, for each dish, the levels of each experimental treatment&lt;/li&gt;
+&lt;li&gt;monitimes: a vector of monitoring times that needs to be of the same length as the argument ‘count_cols’&lt;/li&gt;
+&lt;li&gt;subjects: a vector with the number of viable seeds per dish, at the beginning of the assay. If this argument is omitted, the function assumes that such a number is equal to the total count of germinated seeds in each dish&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The functions outputs a dataframe in LONG format, where the initial columns code for the experimental treatments, the column ‘Units’ represents the original rows (Petri dishes), ‘timeAf’ represents the time at which the observation was made, ‘timeBef’ represents the time at which the previous observation was made, ‘count’ represents the number of seeds that germinated between ‘timeBef’ and ‘timeAf’, ‘nCum’ is the cumulative count and ‘propCum’ is the cumulative proportion of germinated seeds. An extra row is added for the ungerminated seeds at the end of the assay, with ‘timeBef’ equal to the final assessment time and ‘timeAf’ equal to &lt;span class=&#34;math inline&#34;&gt;\(\infty\)&lt;/span&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;transforming-from-wide-to-long-ungrouped&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Transforming from WIDE to LONG UNGROUPED&lt;/h1&gt;
+&lt;p&gt;The LONG GROUPED format is good for the packages ‘drc’ and ‘drcte’. However, we might be interested in performing data analyses within the framework of survival analysis, e.g. with the ‘survival’ or ‘interval’ packages, that require the LONG UNGROUPED format. In order to reshape the original dataset into the LONG UNGROUPED format, we can use the same &lt;code&gt;melt_te()&lt;/code&gt; function, by setting the argument &lt;code&gt;grouped = FALSE&lt;/code&gt;. An example is given in the box below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;datasetU &amp;lt;- melt_te(lotusOr, count_cols = 3:17, treat = 1, 
+                   monitimes = 1:15, subjects = rep(25,12), grouped = F)
+head(datasetU, 16)
+##    Stage Units timeBef timeAf
+## 1      A     1       5      6
+## 2      A     1       6      7
+## 3      A     1       6      7
+## 4      A     1       7      8
+## 5      A     1       8      9
+## 6      A     1       9     10
+## 7      A     1      10     11
+## 8      A     1      10     11
+## 9      A     1      10     11
+## 10     A     1      11     12
+## 11     A     1      12     13
+## 12     A     1      13     14
+## 13     A     1      13     14
+## 14     A     1      13     14
+## 15     A     1      13     14
+## 16     A     1      14     15&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;from-long-grouped-to-long-ungrouped-and-vice-versa&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;From LONG GROUPED to LONG UNGROUPED (and vice-versa)&lt;/h1&gt;
+&lt;p&gt;If necessary, we can easily reshape back and forth from the GROUPED and UNGROUPED formats, by using the funtions &lt;code&gt;ungroup_te&lt;/code&gt; and &lt;code&gt;group_te()&lt;/code&gt;. See the sample code below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# From LONG GROUPED to LONG UNGROUPED
+datasetU2 &amp;lt;- ungroup_te(datasetG, count)[,-c(5, 6)]
+head(datasetU2, 16)
+##    Stage Units timeBef timeAf
+## 1      A     1       5      6
+## 2      A     1       6      7
+## 3      A     1       6      7
+## 4      A     1       7      8
+## 5      A     1       8      9
+## 6      A     1       9     10
+## 7      A     1      10     11
+## 8      A     1      10     11
+## 9      A     1      10     11
+## 10     A     1      11     12
+## 11     A     1      12     13
+## 12     A     1      13     14
+## 13     A     1      13     14
+## 14     A     1      13     14
+## 15     A     1      13     14
+## 16     A     1      14     15&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# From LONG UNGROUPED to LONG GROUPED
+datasetG2 &amp;lt;- group_te(datasetU)
+head(datasetG2, 16)
+##    Stage Units timeBef timeAf count
+## 1      A     1       5      6     1
+## 2      A     1       6      7     2
+## 3      A     1       7      8     1
+## 4      A     1       8      9     1
+## 5      A     1       9     10     1
+## 6      A     1      10     11     3
+## 7      A     1      11     12     1
+## 8      A     1      12     13     1
+## 9      A     1      13     14     4
+## 10     A     1      14     15     2
+## 11     A     1      15    Inf     8
+## 12     A     2       5      6     1
+## 13     A     2       6      7     1
+## 14     A     2       7      8     1
+## 15     A     2       8      9     1
+## 16     A     2       9     10     2&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;from-nonlinear-regression-to-long-grouped&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;From NONLINEAR REGRESSION to LONG GROUPED&lt;/h1&gt;
+&lt;p&gt;In other instances, it may happen that the dataset was prepared as required by nonlinear regression analysis, i.e. listing the cumulative number of germinated seeds at each inspection time. The following Table shows an example for the first Petri dish, as available in the ‘lotusCum’ dataframe in the ‘drcte’ package.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;##  Stage Dish Time nCum
+##      A    1    1    0
+##      A    1    2    0
+##      A    1    3    0
+##      A    1    4    0
+##      A    1    5    0
+##      A    1    6    1
+##      A    1    7    3
+##      A    1    8    4
+##      A    1    9    5
+##      A    1   10    6
+##      A    1   11    9
+##      A    1   12   10
+##      A    1   13   11
+##      A    1   14   15
+##      A    1   15   17&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In this situation, we need to ‘decumulate’ the counts and add the beginning of each inspection interval (e.g., ‘timeBef’). We can easily do this by using the &lt;code&gt;decumulate_te()&lt;/code&gt; function in ‘drcte’. An example is given in the box below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dataset_sd &amp;lt;- decumulate_te(lotusCum,
+                            resp = nCum, 
+                            treat = Stage,
+                            monitimes = Time,
+                            units = Dish, 
+                            subjects = rep(25, 12),
+                            type = &amp;quot;count&amp;quot;)
+dataset_sd &amp;lt;- decumulate_te(lotusCum,
+                            resp = Prop, 
+                            treat = Stage,
+                            monitimes = Time,
+                            units = Dish, 
+                            subjects = rep(25, 12),
+                            type = &amp;quot;proportion&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The &lt;code&gt;decumulate_te()&lt;/code&gt; function requires the following arguments:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;resp: the column containing the counts/proportions of germinated seeds&lt;/li&gt;
+&lt;li&gt;treat: the columns listing, for each row of data, the corresponding level of experimental factors (one factor per column)&lt;/li&gt;
+&lt;li&gt;monitimes: the column listing monitoring times&lt;/li&gt;
+&lt;li&gt;units: the column listing the randomisation units&lt;/li&gt;
+&lt;li&gt;subjects: a vector listing the number of viable seeds, at the beginning of the assay, for each randomisation unit.&lt;/li&gt;
+&lt;li&gt;type: a value specifying if ‘resp’ contains ‘counts’ or ‘proportions’&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;We do hope that, with these functions, we can menage to ease your transition from traditional methods of data analysis to time-to-event methods, for seed germination/emergence assays.&lt;/p&gt;
+&lt;p&gt;Thanks for reading!&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Michael P. Fay, Pamela A. Shaw (2010). Exact and Asymptotic Weighted Logrank Tests for Interval Censored Data: The interval R Package. Journal of Statistical Software, 36(2), 1-34. URL &lt;a href=&#34;https://www.jstatsoft.org/v36/i02/&#34; class=&#34;uri&#34;&gt;https://www.jstatsoft.org/v36/i02/&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Gresta, F, G Avola, A Onofri, U Anastasi, A Cristaudo (2011) When Does Hard Coat Impose Dormancy in Legume Seeds? Lotus and Scorpiurus Case Study. Crop Science 51:1739–1747&lt;/li&gt;
+&lt;li&gt;Ritz, C., Baty, F., Streibig, J. C., Gerhard, D. (2015) Dose-Response Analysis Using R. PLOS ONE, 10(12), e0146021&lt;/li&gt;
+&lt;li&gt;Therneau T (2021). &lt;em&gt;A Package for Survival Analysis in R&lt;/em&gt;. R package version 3.2-11, &amp;lt;URL: &lt;a href=&#34;https://CRAN.R-project.org/package=survival&#34; class=&#34;uri&#34;&gt;https://CRAN.R-project.org/package=survival&lt;/a&gt;&amp;gt;.&lt;/li&gt;
+&lt;li&gt;Wickham, H, G Grolemund (2016) R for data science: import, tidy, transform, visualize, and model data. First edition. Sebastopol, CA: O’Reilly. 492 p&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Analysing seed germination and emergence data with R (a tutorial). Part 2</title>
