@@ -56,7 +56,6 @@ The authors of the above study sent me the above dataset in WIDE format, where t
 library(drcte)
 data(lotusOr)
 print(lotusOr, row.names = F)
-#kable(dataset, align = rep("c", 17), caption = "Table 1. Example of a common field-book for germination assays: the data is organised with one Petri dish per row and the number of germinated seeds at each inspection time along the columns.")
 ```
 
 The WIDE format is handy for swift calculations with a spreadsheet, but, in general, it is not ok, as: (1) it does not obey to the principle of tidy data (Wickham, 2016); (2) it is not generally efficient and it cannot be used with a set of germination assays with different monitoring schedules. Therefore, facing a dataset in the WIDE format, we need to reshape it into a LONG format.
@@ -66,8 +65,8 @@ The WIDE format is handy for swift calculations with a spreadsheet, but, in gene
 For such a reshaping, we could use one of the available R functions, such us `pivot_longer()` in the 'tidyverse' or `melt()` in the 'reshape' package. However, when reshaping the data, it is also useful to make e few transformations, such as producing cumulative counts and proportions, that might be useful to plot graphs, or for other purposes. Therefore, we developed the `melt_te()` function; let's look at its usage, in the box below.
 
 ```{r}
-datasetG <- melt_te(lotusOr, count_cols = 3:17, treat = Stage, 
-                   monitimes = 1:15, subjects = rep(25,12))
+datasetG <- melt_te(lotusOr, count_cols = 3:17, treat_cols = Stage, 
+                   monitimes = 1:15, n.subjects = rep(25,12))
 head(datasetG, 16)
 ```
 
@@ -86,8 +85,8 @@ The functions outputs a dataframe in LONG format, where the initial columns code
 The LONG GROUPED format is good for the packages 'drc' and 'drcte'. However, we might be interested in performing data analyses within the framework of survival analysis, e.g. with the 'survival' or 'interval' packages, that require the LONG UNGROUPED format. In order to reshape the original dataset into the LONG UNGROUPED format, we can use the same `melt_te()` function, by setting the argument `grouped = FALSE`. An example is given in the box below.
 
 ```{r}
-datasetU <- melt_te(lotusOr, count_cols = 3:17, treat = 1, 
-                   monitimes = 1:15, subjects = rep(25,12), grouped = F)
+datasetU <- melt_te(lotusOr, count_cols = 3:17, treat_cols = 1, 
+                   monitimes = 1:15, n.subjects = rep(25,12), grouped = F)
 head(datasetU, 16)
 ```
 
@@ -119,19 +118,20 @@ print(lotusCum[1:15,c(1:3,5)], row.names = F)
 In this situation, we need to 'decumulate' the counts and add the beginning of each inspection interval (e.g., 'timeBef'). We can easily do this by using the `decumulate_te()` function in 'drcte'. An example is given in the box below.
 
 ```{r}
+head(lotusCum)
 dataset_sd <- decumulate_te(lotusCum,
                             resp = nCum, 
-                            treat = Stage,
+                            treat_cols = Stage,
                             monitimes = Time,
                             units = Dish, 
-                            subjects = rep(25, 12),
+                            n.subjects = rep(25, 12),
                             type = "count")
 dataset_sd <- decumulate_te(lotusCum,
                             resp = Prop, 
-                            treat = Stage,
+                            treat_cols = "Stage",
                             monitimes = Time,
                             units = Dish, 
-                            subjects = rep(25, 12),
+                            n.subjects = rep(25, 12),
                             type = "proportion")
 ```
 

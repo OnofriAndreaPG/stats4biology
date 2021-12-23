@@ -227,8 +227,8 @@ Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.o
 &lt;div id=&#34;transforming-from-wide-to-long-grouped&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Transforming from WIDE to LONG GROUPED&lt;/h1&gt;
 &lt;p&gt;For such a reshaping, we could use one of the available R functions, such us &lt;code&gt;pivot_longer()&lt;/code&gt; in the ‘tidyverse’ or &lt;code&gt;melt()&lt;/code&gt; in the ‘reshape’ package. However, when reshaping the data, it is also useful to make e few transformations, such as producing cumulative counts and proportions, that might be useful to plot graphs, or for other purposes. Therefore, we developed the &lt;code&gt;melt_te()&lt;/code&gt; function; let’s look at its usage, in the box below.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;datasetG &amp;lt;- melt_te(lotusOr, count_cols = 3:17, treat = Stage, 
-                   monitimes = 1:15, subjects = rep(25,12))
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;datasetG &amp;lt;- melt_te(lotusOr, count_cols = 3:17, treat_cols = Stage, 
+                   monitimes = 1:15, n.subjects = rep(25,12))
 head(datasetG, 16)
 ##    Stage Units timeBef timeAf count nCum propCum
 ## 1      A     1       0      1     0    0    0.00
@@ -260,8 +260,8 @@ head(datasetG, 16)
 &lt;div id=&#34;transforming-from-wide-to-long-ungrouped&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Transforming from WIDE to LONG UNGROUPED&lt;/h1&gt;
 &lt;p&gt;The LONG GROUPED format is good for the packages ‘drc’ and ‘drcte’. However, we might be interested in performing data analyses within the framework of survival analysis, e.g. with the ‘survival’ or ‘interval’ packages, that require the LONG UNGROUPED format. In order to reshape the original dataset into the LONG UNGROUPED format, we can use the same &lt;code&gt;melt_te()&lt;/code&gt; function, by setting the argument &lt;code&gt;grouped = FALSE&lt;/code&gt;. An example is given in the box below.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;datasetU &amp;lt;- melt_te(lotusOr, count_cols = 3:17, treat = 1, 
-                   monitimes = 1:15, subjects = rep(25,12), grouped = F)
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;datasetU &amp;lt;- melt_te(lotusOr, count_cols = 3:17, treat_cols = 1, 
+                   monitimes = 1:15, n.subjects = rep(25,12), grouped = F)
 head(datasetU, 16)
 ##    Stage Units timeBef timeAf
 ## 1      A     1       5      6
@@ -345,19 +345,27 @@ head(datasetG2, 16)
 ##      A    1   14   15
 ##      A    1   15   17&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;In this situation, we need to ‘decumulate’ the counts and add the beginning of each inspection interval (e.g., ‘timeBef’). We can easily do this by using the &lt;code&gt;decumulate_te()&lt;/code&gt; function in ‘drcte’. An example is given in the box below.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dataset_sd &amp;lt;- decumulate_te(lotusCum,
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;head(lotusCum)
+##   Stage Dish Time nSeeds nCum Prop
+## 1     A    1    1      0    0 0.00
+## 2     A    1    2      0    0 0.00
+## 3     A    1    3      0    0 0.00
+## 4     A    1    4      0    0 0.00
+## 5     A    1    5      0    0 0.00
+## 6     A    1    6      1    1 0.04
+dataset_sd &amp;lt;- decumulate_te(lotusCum,
                             resp = nCum, 
-                            treat = Stage,
+                            treat_cols = Stage,
                             monitimes = Time,
                             units = Dish, 
-                            subjects = rep(25, 12),
+                            n.subjects = rep(25, 12),
                             type = &amp;quot;count&amp;quot;)
 dataset_sd &amp;lt;- decumulate_te(lotusCum,
                             resp = Prop, 
-                            treat = Stage,
+                            treat_cols = &amp;quot;Stage&amp;quot;,
                             monitimes = Time,
                             units = Dish, 
-                            subjects = rep(25, 12),
+                            n.subjects = rep(25, 12),
                             type = &amp;quot;proportion&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The &lt;code&gt;decumulate_te()&lt;/code&gt; function requires the following arguments:&lt;/p&gt;
 &lt;ol style=&#34;list-style-type: decimal&#34;&gt;
@@ -1049,6 +1057,638 @@ Achim Zeileis, Torsten Hothorn (2002). Diagnostic Checking in Regression Relatio
 &lt;h2&gt;&lt;code&gt;HTW2()&lt;/code&gt;&lt;/h2&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ G(t, \Psi) = 1 - exp \left\{ - \exp \left[ \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b50} + \delta)  }{\sigma}\right] \right\}\]&lt;/span&gt;&lt;/p&gt;
 &lt;/div&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Analysing seed germination and emergence data with R: a tutorial. Part 5</title>
+      <link>https://www.statforbiology.com/2019/stat_drcte_5-comparinglots/</link>
+      <pubDate>Sat, 20 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.statforbiology.com/2019/stat_drcte_5-comparinglots/</guid>
+      <description>
+&lt;script src=&#34;https://www.statforbiology.com/rmarkdown-libs/header-attrs/header-attrs.js&#34;&gt;&lt;/script&gt;
+
+
+&lt;p&gt;This is a follow-up post. If you are interested in other posts of this series, please go to: &lt;a href=&#34;https://www.statforbiology.com/tags/drcte/&#34;&gt;https://www.statforbiology.com/tags/drcte/&lt;/a&gt;&lt;/p&gt;
+&lt;div id=&#34;comparing-germinationemergence-for-several-seed-lots&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Comparing germination/emergence for several seed lots&lt;/h1&gt;
+&lt;p&gt;Very often, seed scientists need to compare the germination behavior of different seed populations, e.g., different plant species, or one single plant species submitted to different temperatures, light conditions, priming treatments and so on. How should such a comparison be performed? For example, if we have submitted several seed samples to different environmental conditions, how do we decide whether the germinative response is affected by those environmental conditions?&lt;/p&gt;
+&lt;p&gt;If the case that we have replicates for all experimental treatments, e.g. several Petri dishes, one possible line of attack is to take a summary measure for each dish and use that for further analyses, in a two-steps fashion. For example, we could take the total number of germinated seeds (Pmax) in each dish and use the resulting values to parameterise some sort of ANOVA-like model and test the significance of all effects.&lt;/p&gt;
+&lt;p&gt;This method of data analysis is known as ‘response feature analysis’ and it may be regarded as ‘very traditional’, in the sense that it is often found in literature; although it is not wrong, it is, undoubtedly, sub-optimal. Indeed, two seed lots submitted to different treatments may show the same total number of germinated seeds, but a different velocity or uniformity of germination. In other words, if we only consider, e.g., the Pmax, we can answer the question: “do the seed lots differ for their germination capability?”, but not the more general question: “are the seed lots different?”.&lt;/p&gt;
+&lt;p&gt;In order to answer this latter question, we should consider the entire time-course of germination and not only one single summary statistic. &lt;strong&gt;In other words, we need a method to fit and compare several time-to-event curves.&lt;/strong&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;a-motivating-example&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;A motivating example&lt;/h1&gt;
+&lt;p&gt;Let’s take a practical approach and start from an example: a few years ago, some colleagues of mine studied the germination behavior of a plant species (&lt;em&gt;Verbascum arcturus&lt;/em&gt;), in different conditions. In detail, they considered the factorial combination of two storage periods (LONG and SHORT storage) and two temperature regimes (FIX: constant daily temperature of 20°C; ALT: alternating daily temperature regime, with 25°C during daytime and 15°C during night time, with a 12:12h photoperiod). If you are a seed scientist and are interested in this experiment, you’ll find detail in Catara &lt;em&gt;et al.&lt;/em&gt; (2016).&lt;/p&gt;
+&lt;p&gt;If you are not a seed scientist, you may wonder why my colleagues made such an assay; well, there is evidence that, for some plant species, the germination ability improves over time, after seed maturation. Therefore, if we take seeds and store them for different periods of time, there might be an effect on their germination traits. Likewise, there is also evidence that germinations may be hindered if seed is not submitted to daily temperature fluctuations. For seed scientists, all these mechanisms are very important, as they permit to trigger the germinations when the environmental conditions are favorable for seedling survival.&lt;/p&gt;
+&lt;p&gt;Let’s go back to our assay: the experimental design consisted of four experimental ‘combinations’ (LONG-FIX, LONG-ALT, SHORT-FIX and SHORT-ALT) and four replicates for each combination. One replicate consisted of a Petri dish, that is a small plastic box containing humid blotting paper, with 25 seeds of &lt;em&gt;V. arcturus&lt;/em&gt;. In all, there were 16 Petri dishes, which were put in climatic chambers with the appropriate conditions. During the assay, my colleagues made daily inspections: germinated seeds were counted and removed from the dishes. Inspections were made for 15 days, until no more germinations could be observed.&lt;/p&gt;
+&lt;p&gt;The original dataset is available from a gitHub repository: let’s load and have a look at it.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;datasetOr &amp;lt;- read.csv(&amp;quot;https://raw.githubusercontent.com/OnofriAndreaPG/agroBioData/master/TempStorage.csv&amp;quot;, header = T, check.names = F)
+head(datasetOr)
+##   Dish Storage Temp 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+## 1    1     Low  Fix 0 0 0 0 0 0 0 0 3  4  6  0  1  0  3
+## 2    2     Low  Fix 0 0 0 0 1 0 0 0 2  7  2  3  0  5  1
+## 3    3     Low  Fix 0 0 0 0 1 0 0 1 3  5  2  4  0  1  3
+## 4    4     Low  Fix 0 0 0 0 1 0 3 0 0  3  1  1  0  4  4
+## 5    5    High  Fix 0 0 0 0 0 0 0 0 1  2  5  4  2  3  0
+## 6    6    High  Fix 0 0 0 0 0 0 0 0 2  2  7  8  1  2  1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We have one row per Petri dish; the first three columns show, respectively, the dish number, storage and temperature conditions. The next 15 columns represent the inspection times (from 1 to 15) and contain the counts of germinated seeds. The research question is:&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Is germination behavior affected by storage and temperature conditions?&lt;/em&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;fitting-several-time-to-event-curves&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Fitting several time-to-event curves&lt;/h1&gt;
+&lt;p&gt;The original dataset for our example is in a WIDE format and, as we have shown in a previous post (&lt;a href=&#34;https://www.statforbiology.com/2021/stat_drcte_3-reshapingdata/&#34;&gt;go to this link&lt;/a&gt;), it is necessary to reshape it in LONG GROUPED format, by using the &lt;code&gt;melt_te()&lt;/code&gt; function in the ‘drcte’ package. As I said in my previous posts, this package can be installed from gitHub (see the code at: &lt;a href=&#34;https://www.statforbiology.com/2021/stat_drcte_1-intro/&#34;&gt;this link&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;melt_te()&lt;/code&gt; function needs to receive the columns storing the counts (‘count_cols = 4:18’), the columns storing the factor variables (‘treat_cols = c(“Dish”, “Storage”, “Temp”)’), a vector of monitoring times (‘monitimes = 1:15’) and a vector with the total number of seeds in each Petri dish (‘n.subjects = rep(25,16)’).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(drcte)
+dataset &amp;lt;- melt_te(datasetOr, count_cols = 4:18, 
+                   treat_cols = c(&amp;quot;Dish&amp;quot;, &amp;quot;Storage&amp;quot;, &amp;quot;Temp&amp;quot;), 
+                   monitimes = 1:15, n.subjects = rep(25, 16))
+head(dataset, 16)
+##      Dish Storage Temp Units timeBef timeAf count nCum propCum
+## 1       1     Low  Fix     1       0      1     0    0    0.00
+## 1.1     1     Low  Fix     1       1      2     0    0    0.00
+## 1.2     1     Low  Fix     1       2      3     0    0    0.00
+## 1.3     1     Low  Fix     1       3      4     0    0    0.00
+## 1.4     1     Low  Fix     1       4      5     0    0    0.00
+## 1.5     1     Low  Fix     1       5      6     0    0    0.00
+## 1.6     1     Low  Fix     1       6      7     0    0    0.00
+## 1.7     1     Low  Fix     1       7      8     0    0    0.00
+## 1.8     1     Low  Fix     1       8      9     3    3    0.12
+## 1.9     1     Low  Fix     1       9     10     4    7    0.28
+## 1.10    1     Low  Fix     1      10     11     6   13    0.52
+## 1.11    1     Low  Fix     1      11     12     0   13    0.52
+## 1.12    1     Low  Fix     1      12     13     1   14    0.56
+## 1.13    1     Low  Fix     1      13     14     0   14    0.56
+## 1.14    1     Low  Fix     1      14     15     3   17    0.68
+## 1.15    1     Low  Fix     1      15    Inf     8   NA      NA&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In the resulting data frame, the column ‘timeAf’ contains the time when the inspection was made and the column ‘count’ contains the number of germinated seeds (e.g. 9 seeds were counted at day 9). These seeds did not germinate exactly at day 9; they germinated within the interval between two inspections, that is between day 8 and day 9. The beginning of the interval is given as the variable ‘timeBef’. Apart from these three columns, we have the columns for the blocking factor (‘Dish’ and ‘Units’; this latter column is added by the R function, but it is not useful in this case) and for the treatment factors (‘Storage’ and ‘Temp’) plus two other additional columns (‘nCum’ and ‘propCum’), which we are not going to use for our analyses.&lt;/p&gt;
+&lt;p&gt;In this case, we have reasons to believe that the germination time-course can be described by using a parametric log-logistic time-to-event model, which can be estimated by using either the &lt;code&gt;drm()&lt;/code&gt; function in the ‘drc’ package (Ritz et al., 2019) or the &lt;code&gt;drmte()&lt;/code&gt; function in the ‘drcte’ package (Onofri et al., submitted). In both cases, we have to include the experimental factor (‘curveid’ argument), to specify that we want to fit a different curve for each combination of storage and temperature.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(tidyverse)
+## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
+## ✓ ggplot2 3.3.5     ✓ dplyr   1.0.7
+## ✓ tibble  3.1.6     ✓ stringr 1.4.0
+## ✓ readr   2.0.2     ✓ forcats 0.5.1
+## ✓ purrr   0.3.4
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## x dplyr::arrange()   masks plyr::arrange()
+## x purrr::compact()   masks plyr::compact()
+## x dplyr::count()     masks plyr::count()
+## x dplyr::failwith()  masks plyr::failwith()
+## x dplyr::filter()    masks stats::filter()
+## x dplyr::id()        masks plyr::id()
+## x dplyr::lag()       masks stats::lag()
+## x dplyr::mutate()    masks plyr::mutate()
+## x dplyr::rename()    masks plyr::rename()
+## x dplyr::select()    masks MASS::select()
+## x dplyr::summarise() masks plyr::summarise()
+## x dplyr::summarize() masks plyr::summarize()
+dataset &amp;lt;- dataset %&amp;gt;% 
+  mutate(across(1:3, .fns = factor))
+mod1 &amp;lt;- drmte(count ~ timeBef + timeAf, fct = loglogistic(),
+            data = dataset, 
+            curveid = Temp:Storage)
+summary(mod1)
+## 
+## Model fitted: Log-logistic distribution of event times
+## 
+## Robust estimation: no 
+## 
+## Parameter estimates:
+## 
+##             Estimate Std. Error t-value   p-value    
+## b:Fix:Low   4.974317   0.819632  6.0690 1.287e-09 ***
+## b:Fix:High 11.476618   1.254439  9.1488 &amp;lt; 2.2e-16 ***
+## b:Alt:Low   7.854558   5.239825  1.4990    0.1339    
+## b:Alt:High 10.600439   1.014061 10.4534 &amp;lt; 2.2e-16 ***
+## d:Fix:Low   0.998474   0.150189  6.6481 2.968e-11 ***
+## d:Fix:High  0.861711   0.038987 22.1027 &amp;lt; 2.2e-16 ***
+## d:Alt:Low   1.405930   5.607576  0.2507    0.8020    
+## d:Alt:High  0.948113   0.024298 39.0208 &amp;lt; 2.2e-16 ***
+## e:Fix:Low  12.009974   0.987039 12.1677 &amp;lt; 2.2e-16 ***
+## e:Fix:High 10.906963   0.190532 57.2447 &amp;lt; 2.2e-16 ***
+## e:Alt:Low  17.014976  13.214513  1.2876    0.1979    
+## e:Alt:High  9.585255   0.166937 57.4183 &amp;lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In a previous post I have described a log-logistic time-to-event model (&lt;a href=&#34;https://www.statforbiology.com/2021/stat_drcte_4-time-to-eventcurves/&#34;&gt;see here&lt;/a&gt;), which has a sygmoidal shape, with the three parameters &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt;. These parameters represent, respectively, the slope at inflection point, the higher asymptote (i.e. the maximum proportion of germinated seeds) and the median germination time. As we have four curves, we have a number of 12 estimated parameters.&lt;/p&gt;
+&lt;p&gt;We see that the optimization routines returns an unreasonable value for the higher asymptote for one of the curves (&lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; = 1.40 with Alt:Low); it is unreasonable because the maximum proportion of germinated seeds may not exceed 1. Therefore, we should refit the model by adding a constraint (&lt;span class=&#34;math inline&#34;&gt;\(d \le 1\)&lt;/span&gt;) for all the four curves. We can do so by setting the ‘upperl’ argument to 1 for the 5&lt;sup&gt;th&lt;/sup&gt; through 8&lt;sup&gt;th&lt;/sup&gt; estimands.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod1 &amp;lt;- drmte(count ~ timeBef + timeAf, fct = loglogistic(),
+            data = dataset, 
+            curveid = Temp:Storage,
+            upperl = c(NA, NA, NA, NA, 1, 1, 1, 1, NA, NA, NA, NA))
+summary(mod1)
+## 
+## Model fitted: Log-logistic distribution of event times
+## 
+## Robust estimation: no 
+## 
+## Parameter estimates:
+## 
+##             Estimate Std. Error t-value   p-value    
+## b:Fix:Low   4.979665   0.818414  6.0845 1.168e-09 ***
+## b:Fix:High 11.471625   1.254025  9.1478 &amp;lt; 2.2e-16 ***
+## b:Alt:Low   8.408186   2.232712  3.7659 0.0001659 ***
+## b:Alt:High 10.605807   1.014523 10.4540 &amp;lt; 2.2e-16 ***
+## d:Fix:Low   0.997284   0.149235  6.6826 2.347e-11 ***
+## d:Fix:High  0.861709   0.038999 22.0955 &amp;lt; 2.2e-16 ***
+## d:Alt:Low   1.000000   0.881644  1.1342 0.2566920    
+## d:Alt:High  0.948132   0.024282 39.0468 &amp;lt; 2.2e-16 ***
+## e:Fix:Low  12.004534   0.981279 12.2336 &amp;lt; 2.2e-16 ***
+## e:Fix:High 10.907108   0.190613 57.2213 &amp;lt; 2.2e-16 ***
+## e:Alt:Low  15.903079   2.872327  5.5367 3.083e-08 ***
+## e:Alt:High  9.585297   0.166873 57.4406 &amp;lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+plot(mod1, log = &amp;quot;&amp;quot;, legendPos = c(6, 1))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_drcte_5-ComparingLots_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;From the graph we see that there are visible differences between the fitted curves (the legend considers the curves in alphabetical order, i.e. 1: Fix-Low, 2: Fix-High, 3: Alt-Low and 4: Alt-High). Now, the question is: could we say that those differences are only due to chance (null hypothesis)?&lt;/p&gt;
+&lt;p&gt;In order to make such a test, we could compare the logarithm of the likelihood for the fitted model with the logarithm of the likelihood for a ‘reduced’ model, where all curves have been pooled into one common curve for all treatment levels. The higher the log-likelihood difference, the lowest the probability that the null is true (Likelihood Ratio Test; LRT).&lt;/p&gt;
+&lt;p&gt;A LRT for parametric models can be done with the &lt;code&gt;compCDF()&lt;/code&gt; function in the ‘drcte’ package, as shown in the box below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;compCDF(mod1)
+## 
+## 
+## Likelihood ratio test
+## NULL: time-to-event curves are equal
+## 
+## Observed LR value:  202.8052
+## Degrees of freedom:  9
+## P-value:  8.551556e-39&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We see that the LR value, that relates to the difference between the two log-likelihoods, is rather high and equal to 202; when the null is true, this LR value has an approximate Chi-square distribution; accordingly, we see that the P-level is very low and, thus, the null should be rejected.&lt;/p&gt;
+&lt;p&gt;It general, the results of LRTs should be taken with care, particularly when the observed data are not independent from one another. Unfortunately, the lack of independence is an intrinsic characteristic of germination/emergence assays, where seeds are, most often, clustered within Petri dishes or other types of containers.&lt;/p&gt;
+&lt;p&gt;In this example, we got a very low p-level, which leaves us rather confident that the difference between time-to-event curves is significant. More generally, instead of relying on a chi-square approximation, we should better use a grouped-permutation approach. This technique is based on the idea that, when the difference between curves is not significant, we should be able to freely permute the labels (treatment level) among Petri dishes (clustering units) and, consequently, build an empirical distribution for the LR statistic under the null (permutation distribution). The p-level is related to the proportion of LR values in the permutation distribution that are higher than the observed value (i.e.: 202.8)&lt;/p&gt;
+&lt;p&gt;In the code below, we show how we can do this. The code is rather slow and, therefore, we should not use a very high number of permutation; the default is 199, that gives us a minimum p-value of 0.005. We see that we can confirm that the difference between curves is highly significant.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;compCDF(mod1, type = &amp;quot;permutation&amp;quot;, units = dataset$Dishes)
+## 
+ Permutation: 1
+ Permutation: 2
+ Permutation: 3
+ Permutation: 4
+ Permutation: 5
+ Permutation: 6
+ Permutation: 7
+ Permutation: 8
+ Permutation: 9
+ Permutation: 10
+ Permutation: 11
+ Permutation: 12
+ Permutation: 13
+ Permutation: 14
+ Permutation: 15
+ Permutation: 16
+ Permutation: 17
+ Permutation: 18
+ Permutation: 19
+ Permutation: 20
+ Permutation: 21
+ Permutation: 22
+ Permutation: 23
+ Permutation: 24
+ Permutation: 25
+ Permutation: 26
+ Permutation: 27
+ Permutation: 28
+ Permutation: 29
+ Permutation: 30
+ Permutation: 31
+ Permutation: 32
+ Permutation: 33
+ Permutation: 34
+ Permutation: 35
+ Permutation: 36
+ Permutation: 37
+ Permutation: 38
+ Permutation: 39
+ Permutation: 40
+ Permutation: 41
+ Permutation: 42
+ Permutation: 43
+ Permutation: 44
+ Permutation: 45
+ Permutation: 46
+ Permutation: 47
+ Permutation: 48
+ Permutation: 49
+ Permutation: 50
+ Permutation: 51
+ Permutation: 52
+ Permutation: 53
+ Permutation: 54
+ Permutation: 55
+ Permutation: 56
+ Permutation: 57
+ Permutation: 58
+ Permutation: 59
+ Permutation: 60
+ Permutation: 61
+ Permutation: 62
+ Permutation: 63
+ Permutation: 64
+ Permutation: 65
+ Permutation: 66
+ Permutation: 67
+ Permutation: 68
+ Permutation: 69
+ Permutation: 70
+ Permutation: 71
+ Permutation: 72
+ Permutation: 73
+ Permutation: 74
+ Permutation: 75
+ Permutation: 76
+ Permutation: 77
+ Permutation: 78
+ Permutation: 79
+ Permutation: 80
+ Permutation: 81
+ Permutation: 82
+ Permutation: 83
+ Permutation: 84
+ Permutation: 85
+ Permutation: 86
+ Permutation: 87
+ Permutation: 88
+ Permutation: 89
+ Permutation: 90
+ Permutation: 91
+ Permutation: 92
+ Permutation: 93
+ Permutation: 94
+ Permutation: 95
+ Permutation: 96
+ Permutation: 97
+ Permutation: 98
+ Permutation: 99
+ Permutation: 100
+ Permutation: 101
+ Permutation: 102
+ Permutation: 103
+ Permutation: 104
+ Permutation: 105
+ Permutation: 106
+ Permutation: 107
+ Permutation: 108
+ Permutation: 109
+ Permutation: 110
+ Permutation: 111
+ Permutation: 112
+ Permutation: 113
+ Permutation: 114
+ Permutation: 115
+ Permutation: 116
+ Permutation: 117
+ Permutation: 118
+ Permutation: 119
+ Permutation: 120
+ Permutation: 121
+ Permutation: 122
+ Permutation: 123
+ Permutation: 124
+ Permutation: 125
+ Permutation: 126
+ Permutation: 127
+ Permutation: 128
+ Permutation: 129
+ Permutation: 130
+ Permutation: 131
+ Permutation: 132
+ Permutation: 133
+ Permutation: 134
+ Permutation: 135
+ Permutation: 136
+ Permutation: 137
+ Permutation: 138
+ Permutation: 139
+ Permutation: 140
+ Permutation: 141
+ Permutation: 142
+ Permutation: 143
+ Permutation: 144
+ Permutation: 145
+ Permutation: 146
+ Permutation: 147
+ Permutation: 148
+ Permutation: 149
+ Permutation: 150
+ Permutation: 151
+ Permutation: 152
+ Permutation: 153
+ Permutation: 154
+ Permutation: 155
+ Permutation: 156
+ Permutation: 157
+ Permutation: 158
+ Permutation: 159
+ Permutation: 160
+ Permutation: 161
+ Permutation: 162
+ Permutation: 163
+ Permutation: 164
+ Permutation: 165
+ Permutation: 166
+ Permutation: 167
+ Permutation: 168
+ Permutation: 169
+ Permutation: 170
+ Permutation: 171
+ Permutation: 172
+ Permutation: 173
+ Permutation: 174
+ Permutation: 175
+ Permutation: 176
+ Permutation: 177
+ Permutation: 178
+ Permutation: 179
+ Permutation: 180
+ Permutation: 181
+ Permutation: 182
+ Permutation: 183
+ Permutation: 184
+ Permutation: 185
+ Permutation: 186
+ Permutation: 187
+ Permutation: 188
+ Permutation: 189
+ Permutation: 190
+ Permutation: 191
+ Permutation: 192
+ Permutation: 193
+ Permutation: 194
+ Permutation: 195
+ Permutation: 196
+ Permutation: 197
+ Permutation: 198
+ Permutation: 199
+## 
+## Likelihood ratio test (permutation based)
+## NULL: time-to-event curves are equal
+## 
+## Observed LR value:  202.8052
+## Degrees of freedom:  9
+## Naive P-value:  8.551556e-39
+## Permutation P-value (B = 199): 0.005&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;comparing-non-parametric-curves&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Comparing non-parametric curves&lt;/h1&gt;
+&lt;p&gt;In the above example, we have decided to fit a parametric time-to-event model. However, in other situations, we might be interested in fitting a non-parametric time-to-event model (NPMLE; &lt;a href=&#34;https://www.statforbiology.com/2021/stat_drcte_4-time-to-eventcurves/&#34;&gt;see here&lt;/a&gt;) and compare the curves for different treatment levels. In practice, nothing changes with respect to the approach I have shown above: first of all, we fit the NPMLEs with the following code:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;modNP &amp;lt;- drmte(count ~ timeBef + timeAf, fct = NPMLE(),
+            data = dataset, 
+            curveid = Temp:Storage)
+plot(modNP, log = &amp;quot;&amp;quot;, legendPos = c(6, 1))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_drcte_5-ComparingLots_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Next, we compare the non-parametric curves, in the very same fashion as above:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;compCDF(modNP, units = dataset$Units)
+## Exact Wilcoxon test (permutation form)
+## NULL: time-to-event curves are equal
+## 
+##      level   n   Scores
+## 1  Fix:Low 100   2.5350
+## 2 Fix:High 100   6.4600
+## 3  Alt:Low 100 -51.2275
+## 4 Alt:High 100  42.2325
+## 
+## Observed T value:  44.56
+## Permutation P-value (B = 199): 0.005&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Obviously, with NPMLEs, a different test statistic is used in the background; the default one is the Wilcoxon rank sum score, although two types of log-rank scores are also implemented (Sun’s scores and Finkelstein’s scores; see Fay and Shaw 2010). Permutation based P-values are calculated and reported.&lt;/p&gt;
+&lt;p&gt;The approach is exactly the same with Kernel Density Estimators (KDE; &lt;a href=&#34;https://www.statforbiology.com/2021/stat_drcte_4-time-to-eventcurves/&#34;&gt;see here&lt;/a&gt;). First we fit the four curves curves, by including the experimental factor as the ‘curveid’ argument:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;modKD &amp;lt;- drmte(count ~ timeBef + timeAf, fct = KDE(),
+            data = dataset, 
+            curveid = Temp:Storage)
+plot(modKD, log = &amp;quot;&amp;quot;, legendPos = c(6, 1))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_drcte_5-ComparingLots_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Second, we compare those curves, by using the &lt;code&gt;compCDF()&lt;/code&gt; function:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;compCDF(modKD, units = dataset$Units)
+## 
+ Group permutation:  1
+ Group permutation:  2
+ Group permutation:  3
+ Group permutation:  4
+ Group permutation:  5
+ Group permutation:  6
+ Group permutation:  7
+ Group permutation:  8
+ Group permutation:  9
+ Group permutation:  10
+ Group permutation:  11
+ Group permutation:  12
+ Group permutation:  13
+ Group permutation:  14
+ Group permutation:  15
+ Group permutation:  16
+ Group permutation:  17
+ Group permutation:  18
+ Group permutation:  19
+ Group permutation:  20
+ Group permutation:  21
+ Group permutation:  22
+ Group permutation:  23
+ Group permutation:  24
+ Group permutation:  25
+ Group permutation:  26
+ Group permutation:  27
+ Group permutation:  28
+ Group permutation:  29
+ Group permutation:  30
+ Group permutation:  31
+ Group permutation:  32
+ Group permutation:  33
+ Group permutation:  34
+ Group permutation:  35
+ Group permutation:  36
+ Group permutation:  37
+ Group permutation:  38
+ Group permutation:  39
+ Group permutation:  40
+ Group permutation:  41
+ Group permutation:  42
+ Group permutation:  43
+ Group permutation:  44
+ Group permutation:  45
+ Group permutation:  46
+ Group permutation:  47
+ Group permutation:  48
+ Group permutation:  49
+ Group permutation:  50
+ Group permutation:  51
+ Group permutation:  52
+ Group permutation:  53
+ Group permutation:  54
+ Group permutation:  55
+ Group permutation:  56
+ Group permutation:  57
+ Group permutation:  58
+ Group permutation:  59
+ Group permutation:  60
+ Group permutation:  61
+ Group permutation:  62
+ Group permutation:  63
+ Group permutation:  64
+ Group permutation:  65
+ Group permutation:  66
+ Group permutation:  67
+ Group permutation:  68
+ Group permutation:  69
+ Group permutation:  70
+ Group permutation:  71
+ Group permutation:  72
+ Group permutation:  73
+ Group permutation:  74
+ Group permutation:  75
+ Group permutation:  76
+ Group permutation:  77
+ Group permutation:  78
+ Group permutation:  79
+ Group permutation:  80
+ Group permutation:  81
+ Group permutation:  82
+ Group permutation:  83
+ Group permutation:  84
+ Group permutation:  85
+ Group permutation:  86
+ Group permutation:  87
+ Group permutation:  88
+ Group permutation:  89
+ Group permutation:  90
+ Group permutation:  91
+ Group permutation:  92
+ Group permutation:  93
+ Group permutation:  94
+ Group permutation:  95
+ Group permutation:  96
+ Group permutation:  97
+ Group permutation:  98
+ Group permutation:  99
+ Group permutation:  100
+ Group permutation:  101
+ Group permutation:  102
+ Group permutation:  103
+ Group permutation:  104
+ Group permutation:  105
+ Group permutation:  106
+ Group permutation:  107
+ Group permutation:  108
+ Group permutation:  109
+ Group permutation:  110
+ Group permutation:  111
+ Group permutation:  112
+ Group permutation:  113
+ Group permutation:  114
+ Group permutation:  115
+ Group permutation:  116
+ Group permutation:  117
+ Group permutation:  118
+ Group permutation:  119
+ Group permutation:  120
+ Group permutation:  121
+ Group permutation:  122
+ Group permutation:  123
+ Group permutation:  124
+ Group permutation:  125
+ Group permutation:  126
+ Group permutation:  127
+ Group permutation:  128
+ Group permutation:  129
+ Group permutation:  130
+ Group permutation:  131
+ Group permutation:  132
+ Group permutation:  133
+ Group permutation:  134
+ Group permutation:  135
+ Group permutation:  136
+ Group permutation:  137
+ Group permutation:  138
+ Group permutation:  139
+ Group permutation:  140
+ Group permutation:  141
+ Group permutation:  142
+ Group permutation:  143
+ Group permutation:  144
+ Group permutation:  145
+ Group permutation:  146
+ Group permutation:  147
+ Group permutation:  148
+ Group permutation:  149
+ Group permutation:  150
+ Group permutation:  151
+ Group permutation:  152
+ Group permutation:  153
+ Group permutation:  154
+ Group permutation:  155
+ Group permutation:  156
+ Group permutation:  157
+ Group permutation:  158
+ Group permutation:  159
+ Group permutation:  160
+ Group permutation:  161
+ Group permutation:  162
+ Group permutation:  163
+ Group permutation:  164
+ Group permutation:  165
+ Group permutation:  166
+ Group permutation:  167
+ Group permutation:  168
+ Group permutation:  169
+ Group permutation:  170
+ Group permutation:  171
+ Group permutation:  172
+ Group permutation:  173
+ Group permutation:  174
+ Group permutation:  175
+ Group permutation:  176
+ Group permutation:  177
+ Group permutation:  178
+ Group permutation:  179
+ Group permutation:  180
+ Group permutation:  181
+ Group permutation:  182
+ Group permutation:  183
+ Group permutation:  184
+ Group permutation:  185
+ Group permutation:  186
+ Group permutation:  187
+ Group permutation:  188
+ Group permutation:  189
+ Group permutation:  190
+ Group permutation:  191
+ Group permutation:  192
+ Group permutation:  193
+ Group permutation:  194
+ Group permutation:  195
+ Group permutation:  196
+ Group permutation:  197
+ Group permutation:  198
+ Group permutation:  199
+## Permutation test based on a Cramér-von-Mises type distance (Barreiro-Ures et al., 2019)
+## NULL HYPOTHESIS: time-to-event curves are equal
+## 
+##      level   n         D
+## 1  Fix:Low 100 0.0579661
+## 2 Fix:High 100 0.1347005
+## 3  Alt:Low 100 4.1378209
+## 4 Alt:High 100 3.8581487
+## 
+## Observed D value =  2.0472
+## P value =  0.005&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In this case, a Cramér‐von Mises type distance among curves is used (Barreiro-Ures et al., 2019), which, roughly speaking, is based on the integrated distance between the KDEs for the different groups and the pooled KDE for all groups. Permutation based P-values are also calculated and reported.&lt;/p&gt;
+&lt;p&gt;We do hope that this post helps you test your hypotheses about seed germination/emergence in a reliable way.&lt;/p&gt;
+&lt;p&gt;Thanks for reading!&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Barreiro‐Ures, D, M Francisco‐Fernández, R Cao, BB Fraguela, R Doallo, JL González‐Andújar, M Reyes (2019) Analysis of interval‐grouped data in weed science: The binnednp Rcpp package. Ecol Evol 9:10903–10915&lt;/li&gt;
+&lt;li&gt;Catara, S., Cristaudo, A., Gualtieri, A., Galesi, R., Impelluso, C., Onofri, A., 2016. Threshold temperatures for seed germination in nine species of Verbascum (Scrophulariaceae). Seed Science Research 26, 30–46.&lt;/li&gt;
+&lt;li&gt;Fay, MP, PA Shaw (2010) Exact and Asymptotic Weighted Logrank Tests for Interval Censored Data: The interval R Package. Journal of Statistical Software 36:1–34&lt;/li&gt;
+&lt;li&gt;Ritz, C., Jensen, S. M., Gerhard, D., Streibig, J. C. (2019) Dose-Response Analysis Using R CRC Press&lt;/li&gt;
+&lt;/ol&gt;
 &lt;/div&gt;
 </description>
     </item>

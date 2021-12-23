@@ -1,7 +1,7 @@
 ---
 title: "Experimental methods in agriculture"
 author: "Andrea Onofri and Dario Sacco"
-date: "Update: v. 0.99 (2021-12-01), compil. 2021-12-01"
+date: "Update: v. 0.99 (2021-12-01), compil. 2021-12-22"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -23,13 +23,13 @@ url: 'http\://www.casaonofri.it/images'
 
 <img src= "_images/cover.jpeg" width="350" align="right" alt="" class="cover" />
 
-This is the website for the book "Experimental methods in agriculture" and deals with the organisation of experiments and data analyses in agriculture and, more generally, in biology. Experiments are the key element to scientific progress and they need to be designed in a way that reliable data is produced. Once this fundamental requirement has been fullfilled, statistics can be used to summarise and explore the results, separating ‘signal’ from ‘noise’ and reaching appropriate conclusions.
+This is the website for the book "Experimental methods in agriculture", where we deal with the organisation of experiments and data analyses in agriculture and, more generally, in biology. Experiments are the key element to scientific progress and they need to be designed in a way that reliable data is produced. Once this fundamental requirement has been fulfilled, statistics can be used to summarise and explore the results, making a clear distinction between ‘signal’ and ‘noise’ and, hence, reaching appropriate conclusions.
 
-In this book, we will try to give some essential information to support the adoption of good research practices, with particular reference to field experiments, which are used to compare, e.g., innovative genotypes, agronomic practices, herbicides and other weed control methods. We firmly believe that the advancement of cropping techniques should always be based on the evidence produced by scientifically sound experiments.
+In this book, we will try to give some essential information to support the adoption of good research practices, with particular reference to field experiments, which are used to compare, e.g., innovative genotypes, agronomic practices, herbicides and other weed control methods. We firmly believe that the advancement of cropping techniques should always be based on the evidence provided by scientifically sound experiments.
 
-We will follow a 'learn-by-doing' approach, making use of several examples and case studies, while keeping theory and maths at a minimum level; indeed, we are talking to agronomists and biologists and not to statisticians!
+We will follow a 'learn-by-doing' approach, making use of several examples and case studies, while keeping theory and maths at a minimum level; indeed, we are talking to agronomists and biologists and not to statisticians! However, we will not totally remove theory: we think that being able to do some simple hand-calculations is the best way to master the process of data-analysis.
 
-This website is (and will always be) free to use, and is licensed under the Creative Commons Attribution-NonCommercial-NoDerivs 3.0 License. It is written in RMarkdown with bookdown and it is rebuilt every now and then to incorporate corrections and updates. This is necessary, as R is a rapidly evolving language.
+This website is (and will always be) free to use, and is licensed under the Creative Commons Attribution-NonCommercial-NoDerivs 3.0 License. It is written in RMarkdown with the 'bookdown' package and it is rebuilt every now and then, to incorporate corrections and updates. This is necessary, as R is a rapidly evolving language.
 
 
 ## Aims {-}
@@ -38,24 +38,22 @@ This book is not written aiming at completeness, but it is finely tuned for a 6 
 
 ## How this book is organised  {-}
 
-The first two Chapters deal with the experimental design and explain how to distinguish good from bad experiments. One key aspect is that we can never be sure that data are totally reliable and, thus, we assume that they are reliable whenever we can be reasonably sure that they were obtained by using reliable methods.
+In the first two Chapters we will deal with the experimental design: we need to be able to distinguish good from bad experiments. One key aspect is that our experimental results are only a sample from a universe of possible results and we can never be totally sure that such a sample fully reflects the characteristics of the whole universe. Hence, uncertainty is an unavoidable component of science, which we need to tackle by ensuring that the experimental methods are as reliable as possible.
 
-In Chapter 3 we learn how to describe the results, based on some simple stats, such as the mean, median, chi square value and Pearson correlation coefficient. In this chapter, we stick to the observed data, as if we were not interested in anything else. In chapter 4 we learn to see those observed data as the result of deterministic and stochastic processes, which we can describe by using statistical models.
+In Chapter 3 we will show how we can describe the experimental results, based on some simple stats, such as the mean, median, chi square value and Pearson correlation coefficient. In chapter 4 we will introduce some simple models, which we can use to describe the results of our experiments. Of course, the observed data come as the result of deterministic and stochastic processes and, therefore, we will also describe some stochastic models, with particular reference to the Gaussian Density function.
 
-In Chapters 5 and 6 we start recognising that the observed data is only one random sample from a wider universe of data and that we are mainly interested on that universe, as we want to use our experiment to draw general conclusions. Going from a sample to a population introduces a certain amount of uncertainty which we have to incorporate into our conclusions.
+In Chapters 5 and 6 we will talk about statistical inference and Formal Hypothesis Testing. We will describe the basic concepts of confidence intervals, P-levels and error types and we will introduce t-tests and chi-square tests.
 
-From Chapter 7 to Chapter 12 we deal with ANOVA, that is one of the most widely used techniques of data analysis, while the last two chapters deal with regression models.
-
-Within each chapter, we usually start with some motivating examples so that you can see the bigger picture, and then dive into the details. In the final chapter, we provide exercises for each book section, which should help you you practice what you’ve learned.
+From Chapter 7 to Chapter 12 we will talk about the ANOVA, that is one of the most widely used techniques of data analysis. We will show one-way and two-ways ANOVA models and we will also introduce more complex designs, such as the split-plot and strip-plot. Chapter 13 and 14 will be devoted to describe, respectively, linear and nonlinear regression models. In the Chapters from 7 to 14, we will always start from a motivating example, so that the readers can have an idea of the experimental situation, before diving into the details. In the final chapter 15, we will provide exercises for all book chapters, which should help the readers to practice with what they have learned, while reading the book.
 
 
 ## Statistical software {-}
 
-In this book, we will work through the examples using the R statistical software, together with the RStudio environment. We selected for a number of reasons: first of all we like it very much and we think that it is a pleasure to use it, once the initial difficulties have been overcame! Second, it is freeware, which is fundamental for the students. Third, in recent years the software skills of students in master programmes have notably increased and writing small chunks of code is no longer a problem for most of them. Last, but not least, we have seen that some experience with R is a very often required skill when applying for a job. Perhaps, we should say that we are very much indebted for the availability of those two wonderful pieces of free software. 
+In this book, we will work through all the examples by using the R statistical software, together with the RStudio environment. We selected such software for a number of reasons: first of all we like it very much and we think that it is a pleasure to use it, once the initial difficulties have been overcame! Second, it is freeware, which is fundamental for the students. Third, in recent years the software skills of students in master degree or PhD programmes have notably increased and writing small chunks of code is no longer a problem for most of them. Last, but not least, we have seen that some experience with R is a very often required skill when applying for a job. We should acknowledge that R and RStudio are two wonderful pieces of software and we are very much indebted to the whole community who is working to ensure their wide availability and freeware nature.
 
-R is characterised by a modular structure and its basic functionalities can be widely extended by a set of add-in packages. As this is mainly an introductory course, we decided, as long as possible, to stick to the main packages, which come with the basic R installation. However, we could not avoid the use of a few very important packages, which we will indicate later on. We should also mention that this book was built by using the ‘bookdown’ package and it is hosted on the website blog ‘www.statforbiology.com’, which is built by using the ‘blogdown’ package. We will not use these two packages during the course but we should mention that they were really useful.
+R is characterised by a modular structure and its basic functionalities can be widely extended by a set of add-in packages. As this is mainly an introductory course, we decided to stick to the main packages, which come with the basic R installation. However, we could not avoid the use of a few very important packages, which we will indicate later on. Of course, it is necessary to state that many of the tasks we perform in this book could be as well (or even better) performed by using additional packages, such as those included in the relatively new 'tidyverse' package. We should also mention that this book was built by using the ‘bookdown’ package and it is hosted on the blog ‘www.statforbiology.com’, which is built by using the ‘blogdown’ package. We will not use these two packages during the course, but we should mention that they are really useful.
 
-We recognise that R has a steep learning curve and we will start from the very beginning, without assuming that the students have any preliminary knowledge, either about statistics, or about R.  
+We will not assume any prior knowledge, and we will start from the very beginning. In order to help the readers, we also provide a very gentle introduction to R as an appendix.  
 
 
 ## The authors {-}
@@ -5062,6 +5060,19 @@ dataset <- read.csv(file, header=T)
 ```
 
 
+```
+## 
+## Attaching package: 'reshape'
+## The following object is masked from 'package:Matrix':
+## 
+##     expand
+## The following object is masked from 'package:dplyr':
+## 
+##     rename
+```
+
+
+
 Table: (\#tab:tabName141)Dataset relativo ad una prova di concimazione azotata su frumento
 
 | Dose|     1|     2|     3|     4|
@@ -5565,6 +5576,46 @@ Instead of coding the mean model from the scratch, we can use one of the availab
 # library(devtools)
 # install_github("onofriandreapg/aomisc")
 library(aomisc)
+## Loading required package: drc
+## Loading required package: MASS
+## 
+## Attaching package: 'MASS'
+## The following object is masked from 'package:dplyr':
+## 
+##     select
+## Loading required package: drcData
+## 
+## 'drc' has been loaded.
+## Please cite R and 'drc' if used for a publication,
+## for references type 'citation()' and 'citation('drc')'.
+## 
+## Attaching package: 'drc'
+## The following objects are masked from 'package:stats':
+## 
+##     gaussian, getInitial
+## Loading required package: plyr
+## ----------------------------------------------------------
+## You have loaded plyr after dplyr - this is likely to cause problems.
+## If you need functions from both plyr and dplyr, please load plyr first, then dplyr:
+## library(plyr); library(dplyr)
+## ----------------------------------------------------------
+## 
+## Attaching package: 'plyr'
+## The following objects are masked from 'package:reshape':
+## 
+##     rename, round_any
+## The following objects are masked from 'package:dplyr':
+## 
+##     arrange, count, desc, failwith, id, mutate,
+##     rename, summarise, summarize
+## Loading required package: car
+## Loading required package: carData
+## 
+## Attaching package: 'car'
+## The following object is masked from 'package:dplyr':
+## 
+##     recode
+## Loading required package: multcompView
 modNlin2 <- nls(Conc ~ NLS.expoDecay(Time, a, k),
                data = dataset)
 ```
@@ -5808,7 +5859,7 @@ A chemical analysis was performed in triplicate, with the following results: 125
 
 ### Exercise 2
 
-Download the Excel file 'rimsulfuron.csv' from [https://www.casaonofri.it/_datasets/rimsulfuron.csv](https://www.casaonofri.it/_datasets/rimsulfuron.csv). This is a dataset relating to a field experiment to compare 15 herbicides with 4 replicates. The response variables are maize yield and height. Describe the dataset and show the results on a barplot, including some measure of variability. Check whether yield correlates to height and comment on the results.
+Download the Excel file 'rimsulfuron.csv' from [https://www.casaonofri.it/_datasets/rimsulfuron.csv](https://www.casaonofri.it/_datasets/rimsulfuron.csv). This is a dataset relating to a field experiment to compare 14 herbicides and two untreated checks, with 4 replicates per treatment. The response variables are maize yield and weed coverage. Describe the dataset and show the results on a barplot, including some measure of variability. Check whether yield correlates to weed coverage and comment on the results.
 
 ### Exercise 3
 
