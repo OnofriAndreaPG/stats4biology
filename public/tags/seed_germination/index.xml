@@ -5,10 +5,448 @@
     <description>Recent content in Seed_germination on The broken bridge between biologists and statisticians</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2018, @AndreaOnofri</copyright>
-    <lastBuildDate>Mon, 06 Dec 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 18 Jan 2022 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://www.statforbiology.com/tags/seed_germination/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Analysing seed germination and emergence data with R (a tutorial). Part 6</title>
+      <link>https://www.statforbiology.com/2022/stat_drcte_6-ht1step/</link>
+      <pubDate>Tue, 18 Jan 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.statforbiology.com/2022/stat_drcte_6-ht1step/</guid>
+      <description>
+&lt;script src=&#34;https://www.statforbiology.com/rmarkdown-libs/header-attrs/header-attrs.js&#34;&gt;&lt;/script&gt;
+
+
+&lt;p&gt;This is a follow-up post. If you are interested in other posts of this series, please go to: &lt;a href=&#34;https://www.statforbiology.com/tags/drcte/&#34;&gt;https://www.statforbiology.com/tags/drcte/&lt;/a&gt;&lt;/p&gt;
+&lt;div id=&#34;fitting-time-to-event-models-with-environmental-covariates&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Fitting time-to-event models with environmental covariates&lt;/h1&gt;
+&lt;p&gt;In the previous post we have shown that time-to-event curves (e.g., germination or emergence curves) can be used to describe the time course of germinations/emergences for a seed lot (&lt;a href=&#34;https://www.statforbiology.com/2021/stat_drcte_4-time-to-eventcurves/&#34;&gt;this post&lt;/a&gt;). We have also seen that the effects of experimental factors on seed germination can be accounted for by coding a different time-to-event curve for each factor level (&lt;a href=&#34;https://www.statforbiology.com/2021/stat_drcte_5-comparinglots/&#34;&gt;this post&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;In this post, we would like to consider the environmental variables, that are, perhaps, the most important factors to trigger germination/emergence. For example, let’s consider either humidity content in the substrate, or temperature, or oxygen availability; it is clear that these variables play a fundamental role in determining germination extent and velocity and, therefore, they are very much studied by seed scientists. In principle, germination assays with environmental variables are straightforward to set up: several Petri dishes are submitted to different environmental conditions and germinations are inspected over time. What is the best method to analyse the resulting data and retrieve some important parameters, such as threshold temperatures (base, optimal or ceiling temperature) or base water potential?&lt;/p&gt;
+&lt;p&gt;It is important to anticipate that most environmental variables can be expressed on a quantitative scale; obviously when we make an experiment we are forced into selecting a subset of all possible, e.g., temperatures, such as 15, 20, 30°C, but that does not mean that we are not interested to what happens at, e.g., 18 or 22°C. From this point of view, quantitative variables are very different from qualitative variables, such as the different plant species that we have compared in &lt;a href=&#34;https://www.statforbiology.com/2021/stat_drcte_5-comparinglots/&#34;&gt;our previous post&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;In this post we will see an example of how we can account for the effects of water content in the substrate and include it in our time-to-event models. Of course, the same approach can be followed also with other types of environmental variables and, more generally, quantitative variables.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;fitting-hydro-time-to-event-models&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Fitting hydro-time-to-event models&lt;/h1&gt;
+&lt;p&gt;Let’s consider the following example: the germination of rapeseed (&lt;em&gt;Brassica napus&lt;/em&gt; L. var. &lt;em&gt;oleifera&lt;/em&gt;, cv. Excalibur) was tested at fourteen different water potential levels (0, -0.03, -0.15, -0.3, -0.4, -0.5, -0.6, -0.7, -0.8, -0.9, -1, -1.1, -1.2, -1.5 MPa), which were created by using a polyethylene glycol solution (PEG 6000). For each water potential level, three replicated Petri dishes with 50 seeds each were incubated at 20°C. Germinated seeds were counted every 2-3 days for 14 days and they were removed from the dishes after germination.&lt;/p&gt;
+&lt;p&gt;The dataset was published by Pace et al. (2012) and it is available as &lt;code&gt;rape&lt;/code&gt; in the &lt;code&gt;drcSeedGerm&lt;/code&gt; package, which needs to be installed from github (see below). Furthermore, the package &lt;code&gt;drcte&lt;/code&gt; is necessary to fit time-to-event models and it should also be installed from gitHub. The following code loads the necessary packages, loads the dataset &lt;code&gt;rape&lt;/code&gt; and shows the first six lines.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# library(devtools)
+# install_github(&amp;quot;OnofriAndreaPG/drcSeedGerm&amp;quot;)
+# install_github(&amp;quot;OnofriAndreaPG/drcte&amp;quot;)
+library(drcSeedGerm)
+library(drcte)
+library(ggplot2)
+data(rape)
+head(rape)
+##   Psi Dish timeBef timeAf nSeeds nCum propCum
+## 1   0    1       0      3     49   49    0.98
+## 2   0    1       3      4      0   49    0.98
+## 3   0    1       4      5      0   49    0.98
+## 4   0    1       5      7      0   49    0.98
+## 5   0    1       7     10      0   49    0.98
+## 6   0    1      10     14      0   49    0.98&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In the above data.frame, ‘timeAf’ represents the moment when germinated seeds were counted, while ’timeBef’ represents the previous inspection time (or the beginning of the assay). The column ’nSeeds’ is the number of seeds that germinated during the time interval between ‘timeBef’ and ‘timeAf. The ’propCum’ column contains the cumulative proportions of germinated seeds and it is not necessary for time-to-event model fitting, although we can use it for plotting purposes.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot(rape, aes(timeAf, propCum)) +
+  geom_point() +
+  facet_wrap(~Psi) +
+  scale_x_continuous(name = &amp;quot;Time (d)&amp;quot;) +
+  scale_y_continuous(name = &amp;quot;Cumulative proportion of germinated seeds&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_drcte_6-HT1step_files/figure-html/unnamed-chunk-2-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;The germination time-course is strongly affected by the water potential in the substrate, as this determines the ability of seeds to absorb water and, consequently, trigger the germination and emergence processes. Therefore, our obvious interest is to understand how the environmental factor affects the time-course of germination.&lt;/p&gt;
+&lt;p&gt;We have shown that a parametric time-to-event curve is defined as a cumulative probability function (&lt;span class=&#34;math inline&#34;&gt;\(\Phi\)&lt;/span&gt;), with three parameters:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[P(t) = \Phi \left( b, d, e \right)\]&lt;/span&gt;
+Considering &lt;a href=&#34;https://www.statforbiology.com/2021/stat_drcte_5-comparinglots/&#34;&gt;our previous post&lt;/a&gt;, the most obvious extension of the above model is to allow for different &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt; value for each water potential level:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[P(t, \Psi_i) = \Phi \left( b_i, d_i, e_i \right)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;The first problem is that, for some water potential levels, germination did not occur and, for other levels, it occurred very quickly, so that no time-course of events could be observed (e.g., see the graph at 0 or -0.03 MPa). We say that we have ‘degenerated’ time-to-event curves.&lt;/p&gt;
+&lt;p&gt;If we fit those curves by using the ‘curveid’ argument, we are forced into fitting the same time-to-event model to all water potential levels (as shown in our previous post), and, therefore, the presence of degenerated curves provokes an error.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Not run
+# mod0 &amp;lt;- drmte(nSeeds ~ timeBef + timeAf, data = rape,
+#              curveid = Psi, fct = loglogistic())&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This problem can be circumvented by using the &lt;code&gt;separate = TRUE&lt;/code&gt; argument; in this case, the different curves are fitted independent of one another and we are not tied to fitting the same model for all water potential levels. Errors are raised when trying to fit parametric time-to-event models, but they do not stop the execution in R.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod1 &amp;lt;- drmte(nSeeds ~ timeBef + timeAf, data = rape,
+             curveid = Psi, fct = loglogistic(),
+             separate = TRUE)
+## Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+##   non-finite finite-difference value [3]
+## Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+##   non-finite value supplied by optim
+## Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+##   non-finite value supplied by optim
+## Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
+##   non-finite value supplied by optim
+coef(mod1)
+##      d:-1.5      d:-1.2      d:-1.1        b:-1        d:-1        e:-1 
+##  0.00000000  0.00000000  0.00000000 64.39202307  0.04666194  8.36474946 
+##      b:-0.9      d:-0.9      e:-0.9      b:-0.8      d:-0.8      e:-0.8 
+##  5.83290900  0.55010281  5.87022056  3.73294999  0.87889318  4.47105672 
+##      b:-0.7      d:-0.7      e:-0.7      b:-0.6      d:-0.6      e:-0.6 
+##  3.59940891  0.93592886  2.73025095  1.46594380  1.00000000  0.73867461 
+##      b:-0.5      d:-0.5      e:-0.5      d:-0.4      d:-0.3     b:-0.15 
+##  1.09308015  0.96293123  0.20862176  0.98444444  0.94333333  0.82546511 
+##     d:-0.15     e:-0.15     d:-0.03         d:0 
+##  0.96143597  0.04345269  0.88666667  0.97333333&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In particular, for the cases where a time-course of events cannot be estimated, the &lt;code&gt;drmte()&lt;/code&gt; function resorts to fitting a simpler model, where only the &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; parameter is estimated (that is the maximum fraction of germinated seeds). In the box above, we can see the estimated parameters but no standard errors, which can be obtained by using the &lt;code&gt;summary()&lt;/code&gt; method, although there are some statistical issues that we will consider in a following post.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;a-better-modelling-approach&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;A better modelling approach&lt;/h1&gt;
+&lt;p&gt;The previous approach is clearly sub-optimal. First of all, the different water potential levels are assumed as independent, with no ordering and distances. In other words, we have a time-to-event curve for, e.g. -0.9 MPa and -0.8 MPa, but we have no information about the time-to-event curve for any water potential levels in between. Furthermore, we have no estimates of some relevant hydro-time parameters, such as the &lt;em&gt;base water potential&lt;/em&gt;, that is fundamental to predict the germination/emergence in field conditions.&lt;/p&gt;
+&lt;p&gt;In order to account for the very nature of the water potential variable, we could code a time-to-event model where the three parameters are continuous functions of &lt;span class=&#34;math inline&#34;&gt;\(\Psi\)&lt;/span&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[P(t, \Psi) = \Phi \left( b(\Psi), d(\Psi), e(\Psi) \right)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;We followed such an approach in a relatively recent publication (Onofri et al., 2018) and we also spoke about this in a &lt;a href=&#34;https://www.statforbiology.com/2020/stat_seedgermination_ht1step/&#34;&gt;recent post&lt;/a&gt;. In detail, we considered a log-logistic cumulative distribution function:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[P(t) = \frac{ d }{1 + \exp \left\{ b \left[ \log(t) - \log( e ) \right] \right\} }\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt; is the median germination time, &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; is the slope at the inflection point and &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; is the maximum germinated proportion. Considering that the germination rate is the inverse of germination time, we replaced &lt;span class=&#34;math inline&#34;&gt;\(e = 1/GR_{50}\)&lt;/span&gt; and wrote the three parameters as functions of &lt;span class=&#34;math inline&#34;&gt;\(\Psi\)&lt;/span&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[P(t, \Psi) = \frac{ d(\Psi) }{1 + \exp \left\{ b(\Psi) \left[ \log(t) - \log(1 / \left[ GR_{50}(\Psi) \right] ) \right] \right\} }\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[{\begin{array}{l}
+GR_{50}(\Psi) = \textrm{max} \left( \frac{\Psi - \Psi_{b}}{\theta_H}; 0 \right)\\
+d(\Psi ) = \textrm{max} \left\{ G \, \left[ 1 - \exp \left( \frac{ \Psi - \Psi_b }{\sigma_{\Psi_b}} \right) \right]; 0 \right\}\\
+b(\Psi) = b
+\end{array}}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;The parameters are:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(\Psi_{b}\)&lt;/span&gt;, that is the median base water potential in the seed lot (in &lt;em&gt;MPa&lt;/em&gt;),&lt;/li&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(\theta_H\)&lt;/span&gt;, that is the hydro-time constant (in &lt;em&gt;MPa day&lt;/em&gt; or &lt;em&gt;MPa hour&lt;/em&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(\sigma_{\Psi_b}\)&lt;/span&gt;, that represents the variability of &lt;span class=&#34;math inline&#34;&gt;\(\Psi_b\)&lt;/span&gt; within the population,&lt;/li&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(G\)&lt;/span&gt;, that is the germinable fraction, accounting for the fact that &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; may not reach 1, regardless of time and water potential.&lt;/li&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; (slope parameter) that is assumed to be constant and independent on &lt;span class=&#34;math inline&#34;&gt;\(\Psi\)&lt;/span&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;In the end, our hydro-time model is composed by four sub-models:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;a cumulative probability function (log-logistic, in our example), based on the three parameters &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(e = 1/GR50\)&lt;/span&gt;;&lt;/li&gt;
+&lt;li&gt;a sub-model expressing &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; as a function of &lt;span class=&#34;math inline&#34;&gt;\(\Psi\)&lt;/span&gt;;&lt;/li&gt;
+&lt;li&gt;a sub-model expressing &lt;span class=&#34;math inline&#34;&gt;\(GR50\)&lt;/span&gt; as a function of &lt;span class=&#34;math inline&#34;&gt;\(\Psi\)&lt;/span&gt;;&lt;/li&gt;
+&lt;li&gt;a sub-model expressing &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; as a function of &lt;span class=&#34;math inline&#34;&gt;\(\Psi\)&lt;/span&gt;, although, this was indeed a simple identity model &lt;span class=&#34;math inline&#34;&gt;\(b(\Psi) = b\)&lt;/span&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This hydro-time-to-event model was implemented in R as the &lt;code&gt;HTE1()&lt;/code&gt; function, and it is available within the &lt;code&gt;drcSeedGerm&lt;/code&gt; package, together with the appropriate self-starting routine. It can be fitted by using the &lt;code&gt;drmte()&lt;/code&gt; function in the &lt;code&gt;drcte&lt;/code&gt; package and the &lt;code&gt;coef()&lt;/code&gt; function can be used to retrieve the parameter estimates.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;modHTE &amp;lt;- drmte(nSeeds ~ timeBef + timeAf + Psi, 
+                data = rape, fct = HTE1())
+coef(modHTE)
+##         G:(Intercept)      Psib:(Intercept) sigmaPsib:(Intercept) 
+##             0.9577918            -1.0397239             0.1108891 
+##    thetaH:(Intercept)         b:(Intercept) 
+##             0.9061385             4.0273963&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;As we said before, we are also interested in standard errors for model parameters; we will address this issue in another post. It is important to note that this model gives us the ability of predicting germination at any water potential levels and it is not restrained to the values that we included in the experimental design. Furthermore, we have reliable estimates of &lt;span class=&#34;math inline&#34;&gt;\(\Psi_{b}\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(\theta_H\)&lt;/span&gt;, which we can use for prediction purposes in field conditions.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;another-modelling-approach&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Another modelling approach&lt;/h1&gt;
+&lt;p&gt;Another type of hydro-time model was proposed by Bradford (2002) and later extended by Mesgaran et al., (2013). These authors, instead of modifying a traditional log-logistic distribution to include the environmental covariate, wrote a totally new cumulative distribution function, based on theoretical underpinnings relating to the distribution of base water potential within a seed population. Their model is:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ P(t, \Psi) = \Phi \left\{ \frac{\Psi - (\theta_H / t) -\Psi_b }{\sigma_{\Psi_b}} \right\}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(\Phi\)&lt;/span&gt; is a gaussian cumulative distribution function for base water potential. More information on how this model can be obtained from the original papers; it is, however, important to highlight that it is assumed that base water potential changes from seed to seeds within the population, according to a gaussian distribution function. The cumulative distribution function of event times is indirectly modelled, but it is not, in itself, gaussian (you see that &lt;span class=&#34;math inline&#34;&gt;\(t\)&lt;/span&gt; is at the denominator).&lt;/p&gt;
+&lt;p&gt;Mesgaran et al (2013) suggested that &lt;span class=&#34;math inline&#34;&gt;\(\Phi\)&lt;/span&gt; may not be gaussian and proposed several alternatives, so that, in all, we have six possible hydro-time-to-event models, which we have implemented within the &lt;code&gt;drcSeedGerm&lt;/code&gt; package:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;gaussian (function &lt;code&gt;HTnorm()&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;logistic (function &lt;code&gt;HTL()&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;Gumbel (function &lt;code&gt;HTG()&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;log-logistic (function &lt;code&gt;HTLL()&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;Weibull (Type I) (function &lt;code&gt;HTW1()&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;Weibull (Type II) (function &lt;code&gt;HTW2()&lt;/code&gt;)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;These equations are given at the end of this post. The code to fit those models is given below:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod1 &amp;lt;- drmte(nSeeds ~ timeBef + timeAf + Psi, 
+              data = rape, fct = HTnorm())
+mod2 &amp;lt;- drmte(nSeeds ~ timeBef + timeAf + Psi,
+              data = rape, fct = HTL())
+mod3 &amp;lt;- drmte(nSeeds ~ timeBef + timeAf + Psi,
+              data = rape, fct = HTG())
+mod4 &amp;lt;- drmte(nSeeds ~ timeBef + timeAf + Psi,
+            data = rape, fct = HTLL())
+mod5 &amp;lt;- drmte(nSeeds ~ timeBef + timeAf + Psi,
+            data = rape, fct = HTW1())
+mod6 &amp;lt;- drmte(nSeeds ~ timeBef + timeAf + Psi,
+            data = rape, fct = HTW2())&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;What is the best model for this dataset? Let’s use the Akaike’s Information Criterion (AIC: the lowest, the best) to decide; we see that &lt;code&gt;modHTE&lt;/code&gt; was the best fitting one, followed by &lt;code&gt;mod4&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;AIC(mod1, mod2, mod3, mod4, mod5, mod6, modHTE)
+##         df      AIC
+## mod1   291 3516.914
+## mod2   291 3300.824
+## mod3   291 3097.775
+## mod4   290 2886.608
+## mod5   290 2889.306
+## mod6   290 3009.023
+## modHTE 289 2832.481&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It is important not to neglect a graphical inspection of model fit. The &lt;code&gt;plot()&lt;/code&gt; method does not work with time-to-event curves with additional covariates (apart from time). However, we can retrieve the fitted data by using the &lt;code&gt;plotData()&lt;/code&gt; function and use those predictions within the &lt;code&gt;ggplot()&lt;/code&gt; function. The box below shows the appropriate coding.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(ggplot2)
+tab &amp;lt;- plotData(modHTE)
+
+ggplot() +
+  geom_point(data = rape, mapping = aes(x = timeAf, y = propCum),
+            col = &amp;quot;red&amp;quot;) +
+  geom_line(data = tab$plotFits, mapping = aes(x = timeAf, y = CDF)) +
+  facet_wrap(~ Psi) +
+  scale_x_continuous(name = &amp;quot;Time (d)&amp;quot;) +
+  scale_y_continuous(name = &amp;quot;Cumulative proportion of germinated seeds&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_drcte_6-HT1step_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Thank you for reading!&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Bradford, K.J., 2002. Applications of hydrothermal time to quantifying and modeling seed germination and dormancy. Weed Science 50, 248–260.&lt;/li&gt;
+&lt;li&gt;Mesgaran, M.B., Mashhadi, H.R., Alizadeh, H., Hunt, J., Young, K.R., Cousens, R.D., 2013. Importance of distribution function selection for hydrothermal time models of seed germination. Weed Research 53, 89–101. &lt;a href=&#34;https://doi.org/10.1111/wre.12008&#34; class=&#34;uri&#34;&gt;https://doi.org/10.1111/wre.12008&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Onofri, A., Benincasa, P., Mesgaran, M.B., Ritz, C., 2018. Hydrothermal-time-to-event models for seed germination. European Journal of Agronomy 101, 129–139.&lt;/li&gt;
+&lt;li&gt;Onofri, A., Mesgaran, M.B., Neve, P., Cousens, R.D., 2014. Experimental design and parameter estimation for threshold models in seed germination. Weed Research 54, 425–435. &lt;a href=&#34;https://doi.org/10.1111/wre.12095&#34; class=&#34;uri&#34;&gt;https://doi.org/10.1111/wre.12095&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Pace, R., Benincasa, P., Ghanem, M.E., Quinet, M., Lutts, S., 2012. Germination of untreated and primed seeds in rapeseed (brassica napus var oleifera del.) under salinity and low matric potential. Experimental Agriculture 48, 238–251.&lt;/li&gt;
+&lt;li&gt;Ritz, C., Jensen, S. M., Gerhard, D., Streibig, J. C. (2019) Dose-Response Analysis Using R CRC Press.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;further-detail&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Further detail&lt;/h1&gt;
+&lt;p&gt;Let us conclude this page by giving some detail on all other models in Mesgaran et al (2913; slightly reparameterised). In same cases &lt;span class=&#34;math inline&#34;&gt;\(\Psi_b\)&lt;/span&gt; has been replaced by &lt;span class=&#34;math inline&#34;&gt;\(\mu\)&lt;/span&gt;, that is the location parameter of the cumulative distribution function of base water potential, but it is not the median value. On the other hand, &lt;span class=&#34;math inline&#34;&gt;\(\delta\)&lt;/span&gt; is the shifting parameter for all logarithm based distributions; indeed, logarithm based distribution are only defined for strictly positive variables, while we know that water potential usually assumes negative values. The shifting parameters is used to shift the cumulative distribution function to the right, so that negative values are allowed.&lt;/p&gt;
+&lt;div id=&#34;htl&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;code&gt;HTL()&lt;/code&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ G(t, \Psi) = \frac{1}{1 + exp \left[ - \frac{  \Psi  - \left( \theta _H/t \right) - \Psi_{b} } {\sigma}  \right] }\]&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;htg&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;code&gt;HTG()&lt;/code&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ G(t, \Psi) = \exp \left\{ { - \exp \left[ { - \left( {\frac{{\Psi - (\theta _H / t ) - \mu }}{\sigma }} \right)} \right]} \right\} \]&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;htll&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;code&gt;HTLL()&lt;/code&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ G(t, \Psi) = \frac{1}{1 + \exp \left\{ \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b} + \delta)  }{\sigma}\right\} }\]&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;htw1&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;code&gt;HTW1()&lt;/code&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ G(t, \Psi) = exp \left\{ - \exp \left[ - \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b} + \delta)  }{\sigma}\right] \right\}\]&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;htw2&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;code&gt;HTW2()&lt;/code&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ G(t, \Psi) = 1 - exp \left\{ - \exp \left[ \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b} + \delta)  }{\sigma}\right] \right\}\]&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Analysing seed germination and emergence data with R: a tutorial. Part 5</title>
+      <link>https://www.statforbiology.com/2021/stat_drcte_5-comparinglots/</link>
+      <pubDate>Thu, 23 Dec 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.statforbiology.com/2021/stat_drcte_5-comparinglots/</guid>
+      <description>
+&lt;script src=&#34;https://www.statforbiology.com/rmarkdown-libs/header-attrs/header-attrs.js&#34;&gt;&lt;/script&gt;
+
+
+&lt;p&gt;This is a follow-up post. If you are interested in other posts of this series, please go to: &lt;a href=&#34;https://www.statforbiology.com/tags/drcte/&#34;&gt;https://www.statforbiology.com/tags/drcte/&lt;/a&gt;&lt;/p&gt;
+&lt;div id=&#34;comparing-germinationemergence-for-several-seed-lots&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Comparing germination/emergence for several seed lots&lt;/h1&gt;
+&lt;p&gt;Very often, seed scientists need to compare the germination behavior of different seed populations, e.g., different plant species, or one single plant species submitted to different temperatures, light conditions, priming treatments and so on. How should such a comparison be performed? For example, if we have submitted several seed samples to different environmental conditions, how do we decide whether the germinative response is affected by those environmental conditions?&lt;/p&gt;
+&lt;p&gt;If the case that we have replicates for all experimental treatments, e.g. several Petri dishes, one possible line of attack is to take a summary measure for each dish and use that for further analyses, in a two-steps fashion. For example, we could take the total number of germinated seeds (Pmax) in each dish and use the resulting values to parameterise some sort of ANOVA-like model and test the significance of all effects.&lt;/p&gt;
+&lt;p&gt;This method of data analysis is known as ‘response feature analysis’ and it may be regarded as ‘very traditional’, in the sense that it is often found in literature; although it is not wrong, it is, undoubtedly, sub-optimal. Indeed, two seed lots submitted to different treatments may show the same total number of germinated seeds, but a different velocity or uniformity of germination. In other words, if we only consider, e.g., the Pmax, we can answer the question: “do the seed lots differ for their germination capability?”, but not the more general question: “are the seed lots different?”.&lt;/p&gt;
+&lt;p&gt;In order to answer this latter question, we should consider the entire time-course of germination and not only one single summary statistic. &lt;strong&gt;In other words, we need a method to fit and compare several time-to-event curves.&lt;/strong&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;a-motivating-example&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;A motivating example&lt;/h1&gt;
+&lt;p&gt;Let’s take a practical approach and start from an example: a few years ago, some colleagues of mine studied the germination behavior of a plant species (&lt;em&gt;Verbascum arcturus&lt;/em&gt;), in different conditions. In detail, they considered the factorial combination of two storage periods (LONG and SHORT storage) and two temperature regimes (FIX: constant daily temperature of 20°C; ALT: alternating daily temperature regime, with 25°C during daytime and 15°C during night time, with a 12:12h photoperiod). If you are a seed scientist and are interested in this experiment, you’ll find detail in Catara &lt;em&gt;et al.&lt;/em&gt; (2016).&lt;/p&gt;
+&lt;p&gt;If you are not a seed scientist, you may wonder why my colleagues made such an assay; well, there is evidence that, for some plant species, the germination ability improves over time, after seed maturation. Therefore, if we take seeds and store them for different periods of time, there might be an effect on their germination traits. Likewise, there is also evidence that germinations may be hindered if seed is not submitted to daily temperature fluctuations. For seed scientists, all these mechanisms are very important, as they permit to trigger the germinations when the environmental conditions are favorable for seedling survival.&lt;/p&gt;
+&lt;p&gt;Let’s go back to our assay: the experimental design consisted of four experimental ‘combinations’ (LONG-FIX, LONG-ALT, SHORT-FIX and SHORT-ALT) and four replicates for each combination. One replicate consisted of a Petri dish, that is a small plastic box containing humid blotting paper, with 25 seeds of &lt;em&gt;V. arcturus&lt;/em&gt;. In all, there were 16 Petri dishes, which were put in climatic chambers with the appropriate conditions. During the assay, my colleagues made daily inspections: germinated seeds were counted and removed from the dishes. Inspections were made for 15 days, until no more germinations could be observed.&lt;/p&gt;
+&lt;p&gt;The original dataset is available on a web repository: let’s load and have a look at it.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;datasetOr &amp;lt;- read.csv(&amp;quot;https://www.casaonofri.it/_datasets/TempStorage.csv&amp;quot;,
+                      header = T, check.names = F)
+head(datasetOr)
+##   Dish Storage Temp 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+## 1    1     Low  Fix 0 0 0 0 0 0 0 0 3  4  6  0  1  0  3
+## 2    2     Low  Fix 0 0 0 0 1 0 0 0 2  7  2  3  0  5  1
+## 3    3     Low  Fix 0 0 0 0 1 0 0 1 3  5  2  4  0  1  3
+## 4    4     Low  Fix 0 0 0 0 1 0 3 0 0  3  1  1  0  4  4
+## 5    5    High  Fix 0 0 0 0 0 0 0 0 1  2  5  4  2  3  0
+## 6    6    High  Fix 0 0 0 0 0 0 0 0 2  2  7  8  1  2  1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We have one row per Petri dish; the first three columns show, respectively, the dish number, storage and temperature conditions. The next 15 columns represent the inspection times (from 1 to 15) and contain the counts of germinated seeds. The research question is:&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Is germination behavior affected by storage and temperature conditions?&lt;/em&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;reshaping-the-data&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Reshaping the data&lt;/h1&gt;
+&lt;p&gt;The original dataset for our example is in a WIDE format and, as we have shown in a previous post (&lt;a href=&#34;https://www.statforbiology.com/2021/stat_drcte_3-reshapingdata/&#34;&gt;go to this link&lt;/a&gt;), it is necessary to reshape it in LONG GROUPED format, by using the &lt;code&gt;melt_te()&lt;/code&gt; function in the ‘drcte’ package. As I said in my previous posts, this package can be installed from gitHub (see the code at: &lt;a href=&#34;https://www.statforbiology.com/2021/stat_drcte_1-intro/&#34;&gt;this link&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;melt_te()&lt;/code&gt; function needs to receive the columns storing the counts (‘count_cols = 4:18’), the columns storing the factor variables (‘treat_cols = c(“Dish”, “Storage”, “Temp”)’), a vector of monitoring times (‘monitimes = 1:15’) and a vector with the total number of seeds in each Petri dish (‘n.subjects = rep(25,16)’).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(drcte)
+dataset &amp;lt;- melt_te(datasetOr, count_cols = 4:18, 
+                   treat_cols = c(&amp;quot;Dish&amp;quot;, &amp;quot;Storage&amp;quot;, &amp;quot;Temp&amp;quot;), 
+                   monitimes = 1:15, n.subjects = rep(25, 16))
+head(dataset, 16)
+##      Dish Storage Temp Units timeBef timeAf count nCum propCum
+## 1       1     Low  Fix     1       0      1     0    0    0.00
+## 1.1     1     Low  Fix     1       1      2     0    0    0.00
+## 1.2     1     Low  Fix     1       2      3     0    0    0.00
+## 1.3     1     Low  Fix     1       3      4     0    0    0.00
+## 1.4     1     Low  Fix     1       4      5     0    0    0.00
+## 1.5     1     Low  Fix     1       5      6     0    0    0.00
+## 1.6     1     Low  Fix     1       6      7     0    0    0.00
+## 1.7     1     Low  Fix     1       7      8     0    0    0.00
+## 1.8     1     Low  Fix     1       8      9     3    3    0.12
+## 1.9     1     Low  Fix     1       9     10     4    7    0.28
+## 1.10    1     Low  Fix     1      10     11     6   13    0.52
+## 1.11    1     Low  Fix     1      11     12     0   13    0.52
+## 1.12    1     Low  Fix     1      12     13     1   14    0.56
+## 1.13    1     Low  Fix     1      13     14     0   14    0.56
+## 1.14    1     Low  Fix     1      14     15     3   17    0.68
+## 1.15    1     Low  Fix     1      15    Inf     8   NA      NA&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In the resulting data frame, the column ‘timeAf’ contains the time when the inspection was made and the column ‘count’ contains the number of germinated seeds (e.g. 9 seeds were counted at day 9). These seeds did not germinate exactly at day 9; they germinated within the interval between two inspections, that is between day 8 and day 9. The beginning of the interval is given as the variable ‘timeBef’. Apart from these three columns, we have the columns for the blocking factor (‘Dish’ and ‘Units’; this latter column is added by the R function, but it is not useful in this case) and for the treatment factors (‘Storage’ and ‘Temp’) plus two other additional columns (‘nCum’ and ‘propCum’), which we are not going to use for our analyses.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;fitting-several-time-to-event-curves&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Fitting several time-to-event curves&lt;/h1&gt;
+&lt;p&gt;In this case, we have reasons to believe that the germination time-course can be described by using a parametric log-logistic time-to-event model, which can be estimated by using either the &lt;code&gt;drm()&lt;/code&gt; function in the ‘drc’ package (Ritz et al., 2019) or the &lt;code&gt;drmte()&lt;/code&gt; function in the ‘drcte’ package (Onofri et al., submitted). In both cases, we have to include the experimental factor (‘curveid’ argument), to specify that we want to fit a different curve for each combination of storage and temperature.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(tidyverse)
+dataset &amp;lt;- dataset %&amp;gt;% 
+  mutate(across(1:3, .fns = factor))
+mod1 &amp;lt;- drmte(count ~ timeBef + timeAf, fct = loglogistic(),
+            data = dataset, 
+            curveid = Temp:Storage)
+summary(mod1)
+## 
+## Model fitted: Log-logistic distribution of event times
+## 
+## Robust estimation: no 
+## 
+## Parameter estimates:
+## 
+##             Estimate Std. Error t-value   p-value    
+## b:Fix:Low   4.974317   0.819632  6.0690 1.287e-09 ***
+## b:Fix:High 11.476618   1.254439  9.1488 &amp;lt; 2.2e-16 ***
+## b:Alt:Low   7.854558   5.239825  1.4990    0.1339    
+## b:Alt:High 10.600439   1.014061 10.4534 &amp;lt; 2.2e-16 ***
+## d:Fix:Low   0.998474   0.150189  6.6481 2.968e-11 ***
+## d:Fix:High  0.861711   0.038987 22.1027 &amp;lt; 2.2e-16 ***
+## d:Alt:Low   1.405930   5.607576  0.2507    0.8020    
+## d:Alt:High  0.948113   0.024298 39.0208 &amp;lt; 2.2e-16 ***
+## e:Fix:Low  12.009974   0.987039 12.1677 &amp;lt; 2.2e-16 ***
+## e:Fix:High 10.906963   0.190532 57.2447 &amp;lt; 2.2e-16 ***
+## e:Alt:Low  17.014976  13.214513  1.2876    0.1979    
+## e:Alt:High  9.585255   0.166937 57.4183 &amp;lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In a previous post I have described a log-logistic time-to-event model (&lt;a href=&#34;https://www.statforbiology.com/2021/stat_drcte_4-time-to-eventcurves/&#34;&gt;see here&lt;/a&gt;), which has a sygmoidal shape, with the three parameters &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt;. These parameters represent, respectively, the slope at inflection point, the higher asymptote (i.e. the maximum proportion of germinated seeds) and the median germination time. As we have four curves, we have a number of 12 estimated parameters.&lt;/p&gt;
+&lt;p&gt;We see that the optimization routines returns an unreasonable value for the higher asymptote for one of the curves (&lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; = 1.40 with Alt:Low); it is unreasonable because the maximum proportion of germinated seeds may not exceed 1. Therefore, we should refit the model by adding a constraint (&lt;span class=&#34;math inline&#34;&gt;\(d \le 1\)&lt;/span&gt;) for all the four curves. We can do so by setting the ‘upperl’ argument to 1 for the 5&lt;sup&gt;th&lt;/sup&gt; through 8&lt;sup&gt;th&lt;/sup&gt; estimands.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod1 &amp;lt;- drmte(count ~ timeBef + timeAf, fct = loglogistic(),
+            data = dataset, 
+            curveid = Temp:Storage,
+            upperl = c(NA, NA, NA, NA, 1, 1, 1, 1, NA, NA, NA, NA))
+summary(mod1)
+## 
+## Model fitted: Log-logistic distribution of event times
+## 
+## Robust estimation: no 
+## 
+## Parameter estimates:
+## 
+##             Estimate Std. Error t-value   p-value    
+## b:Fix:Low   4.979665   0.818414  6.0845 1.168e-09 ***
+## b:Fix:High 11.471625   1.254025  9.1478 &amp;lt; 2.2e-16 ***
+## b:Alt:Low   8.408186   2.232712  3.7659 0.0001659 ***
+## b:Alt:High 10.605807   1.014523 10.4540 &amp;lt; 2.2e-16 ***
+## d:Fix:Low   0.997284   0.149235  6.6826 2.347e-11 ***
+## d:Fix:High  0.861709   0.038999 22.0955 &amp;lt; 2.2e-16 ***
+## d:Alt:Low   1.000000   0.881644  1.1342 0.2566920    
+## d:Alt:High  0.948132   0.024282 39.0468 &amp;lt; 2.2e-16 ***
+## e:Fix:Low  12.004534   0.981279 12.2336 &amp;lt; 2.2e-16 ***
+## e:Fix:High 10.907108   0.190613 57.2213 &amp;lt; 2.2e-16 ***
+## e:Alt:Low  15.903079   2.872327  5.5367 3.083e-08 ***
+## e:Alt:High  9.585297   0.166873 57.4406 &amp;lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+plot(mod1, log = &amp;quot;&amp;quot;, legendPos = c(6, 1), xlab = &amp;quot;Time&amp;quot;,
+     ylab = &amp;quot;Cumulative probability of germination&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_drcte_5-ComparingLots_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;From the graph we see that there are visible differences between the fitted curves (the legend considers the curves in alphabetical order, i.e. 1: Fix-Low, 2: Fix-High, 3: Alt-Low and 4: Alt-High). Now, the question is: could we say that those differences are only due to chance (null hypothesis)?&lt;/p&gt;
+&lt;p&gt;In order to make such a test, we could compare the logarithm of the likelihood for the fitted model with the logarithm of the likelihood for a ‘reduced’ model, where all curves have been pooled into one common curve for all treatment levels. The higher the log-likelihood difference, the lowest the probability that the null is true (Likelihood Ratio Test; LRT).&lt;/p&gt;
+&lt;p&gt;A LRT for parametric models can be done with the &lt;code&gt;compCDF()&lt;/code&gt; function in the ‘drcte’ package, as shown in the box below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;compCDF(mod1)
+## 
+## 
+## Likelihood ratio test
+## NULL: time-to-event curves are equal
+## 
+## Observed LR value:  202.8052
+## Degrees of freedom:  9
+## P-value:  8.551556e-39&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We see that the LR value, that relates to the difference between the two log-likelihoods, is rather high and equal to 202; when the null is true, this LR value has an approximate Chi-square distribution; accordingly, we see that the P-level is very low and, thus, the null should be rejected.&lt;/p&gt;
+&lt;p&gt;It general, the results of LRTs should be taken with care, particularly when the observed data are not independent from one another. Unfortunately, the lack of independence is an intrinsic characteristic of germination/emergence assays, where seeds are, most often, clustered within Petri dishes or other types of containers.&lt;/p&gt;
+&lt;p&gt;In this example, we got a very low p-level, which leaves us rather confident that the difference between time-to-event curves is significant. More generally, instead of relying on a chi-square approximation, we should better use a grouped-permutation approach. This technique is based on the idea that, when the difference between curves is not significant, we should be able to freely permute the labels (treatment level) among Petri dishes (clustering units) and, consequently, build an empirical distribution for the LR statistic under the null (permutation distribution). The p-level is related to the proportion of LR values in the permutation distribution that are higher than the observed value (i.e.: 202.8)&lt;/p&gt;
+&lt;p&gt;In the code below, we show how we can do this. The code is rather slow and, therefore, we should not use a very high number of permutation; the default is 199, that gives us a minimum p-value of 0.005. We see that we can confirm that the difference between curves is highly significant.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;compCDF(mod1, type = &amp;quot;permutation&amp;quot;, units = dataset$Dishes)
+## 
+## 
+## Likelihood ratio test (permutation based)
+## NULL: time-to-event curves are equal
+## 
+## Observed LR value:  202.8052
+## Degrees of freedom:  9
+## Naive P-value:  8.551556e-39
+## Permutation P-value (B = 199): 0.005&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;comparing-non-parametric-curves&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Comparing non-parametric curves&lt;/h1&gt;
+&lt;p&gt;In the above example, we have decided to fit a parametric time-to-event model. However, in other situations, we might be interested in fitting a non-parametric time-to-event model (NPMLE; &lt;a href=&#34;https://www.statforbiology.com/2021/stat_drcte_4-time-to-eventcurves/&#34;&gt;see here&lt;/a&gt;) and compare the curves for different treatment levels. In practice, nothing changes with respect to the approach I have shown above: first of all, we fit the NPMLEs with the following code:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;modNP &amp;lt;- drmte(count ~ timeBef + timeAf, fct = NPMLE(),
+            data = dataset, 
+            curveid = Temp:Storage)
+plot(modNP, log = &amp;quot;&amp;quot;, legendPos = c(6, 1))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_drcte_5-ComparingLots_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Next, we compare the non-parametric curves, in the very same fashion as above:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;compCDF(modNP, units = dataset$Units)
+## Exact Wilcoxon test (permutation form)
+## NULL: time-to-event curves are equal
+## 
+##      level   n   Scores
+## 1  Fix:Low 100   2.5350
+## 2 Fix:High 100   6.4600
+## 3  Alt:Low 100 -51.2275
+## 4 Alt:High 100  42.2325
+## 
+## Observed T value:  44.56
+## Permutation P-value (B = 199): 0.005&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Obviously, with NPMLEs, a different test statistic is used in the background; the default one is the Wilcoxon rank sum score, although two types of log-rank scores are also implemented (Sun’s scores and Finkelstein’s scores; see Fay and Shaw 2010). Permutation based P-values are calculated and reported.&lt;/p&gt;
+&lt;p&gt;The approach is exactly the same with Kernel Density Estimators (KDE; &lt;a href=&#34;https://www.statforbiology.com/2021/stat_drcte_4-time-to-eventcurves/&#34;&gt;see here&lt;/a&gt;). First we fit the four curves curves, by including the experimental factor as the ‘curveid’ argument:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;modKD &amp;lt;- drmte(count ~ timeBef + timeAf, fct = KDE(),
+            data = dataset, 
+            curveid = Temp:Storage)
+plot(modKD, log = &amp;quot;&amp;quot;, legendPos = c(6, 1))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_drcte_5-ComparingLots_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Second, we compare those curves, by using the &lt;code&gt;compCDF()&lt;/code&gt; function:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;compCDF(modKD, units = dataset$Units)
+## 
+## Permutation test based on a Cramér-von-Mises type distance (Barreiro-Ures et al., 2019)
+## NULL HYPOTHESIS: time-to-event curves are equal
+## 
+##      level   n         D
+## 1  Fix:Low 100 0.0579661
+## 2 Fix:High 100 0.1347005
+## 3  Alt:Low 100 4.1378209
+## 4 Alt:High 100 3.8581487
+## 
+## Observed D value =  2.0472
+## P value =  0.005&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In this case, a Cramér‐von Mises type distance among curves is used (Barreiro-Ures et al., 2019), which, roughly speaking, is based on the integrated distance between the KDEs for the different groups and the pooled KDE for all groups. Permutation based P-values are also calculated and reported.&lt;/p&gt;
+&lt;p&gt;We do hope that this post helps you test your hypotheses about seed germination/emergence in a reliable way.&lt;/p&gt;
+&lt;p&gt;Thanks for reading and, please, accept my best:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.casaonofri.it/_Figures/greetings.png&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Barreiro‐Ures, D, M Francisco‐Fernández, R Cao, BB Fraguela, R Doallo, JL González‐Andújar, M Reyes (2019) Analysis of interval‐grouped data in weed science: The binnednp Rcpp package. Ecol Evol 9:10903–10915&lt;/li&gt;
+&lt;li&gt;Catara, S., Cristaudo, A., Gualtieri, A., Galesi, R., Impelluso, C., Onofri, A., 2016. Threshold temperatures for seed germination in nine species of Verbascum (Scrophulariaceae). Seed Science Research 26, 30–46.&lt;/li&gt;
+&lt;li&gt;Fay, MP, PA Shaw (2010) Exact and Asymptotic Weighted Logrank Tests for Interval Censored Data: The interval R Package. Journal of Statistical Software 36:1–34&lt;/li&gt;
+&lt;li&gt;Ritz, C., Jensen, S. M., Gerhard, D., Streibig, J. C. (2019) Dose-Response Analysis Using R CRC Press&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Analysing seed germination and emergence data with R: a tutorial. Part 4</title>
@@ -770,11 +1208,12 @@ Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.o
 &lt;/div&gt;
 &lt;div id=&#34;the-r-package&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;The R package&lt;/h1&gt;
-&lt;p&gt;The analyses we propose for seed germination/emergence assays can be performed by using our new R package, namely &lt;code&gt;drcte&lt;/code&gt;. This package is heavily based on the ‘drc’ package (Ritz et al., 2015), that is a very flexible software for general model fitting purposes. Although &lt;code&gt;drc&lt;/code&gt; contains, already, several basic functions for time-to-event analyses, we felt that, in order to meet the specific needs of germination and emergence assays, it would be useful to make some further customisation and develop some additional functions.&lt;/p&gt;
-&lt;p&gt;The &lt;code&gt;drcte&lt;/code&gt; package can be downloaded and installed from gitHub, by using the code proposed in the box below. It requires the ‘devtools’ package, that needs to be as well installed, if it is not already included in the system.&lt;/p&gt;
+&lt;p&gt;The analyses we propose for seed germination/emergence assays can be performed by using our new R package, namely &lt;code&gt;drcte&lt;/code&gt;. This package is heavily based on the ‘drc’ package (Ritz et al., 2015), that is a very flexible software for general model fitting purposes. Although &lt;code&gt;drc&lt;/code&gt; contains, already, several basic functions for time-to-event analyses, we felt that, in order to meet the specific needs of agricultural research, it would be useful to make some further customisation and develop some additional functions, which we implemented in the ‘drcte’ package. Furthermore, we also created the &lt;code&gt;drcSeedGerm&lt;/code&gt; package, that contains specific functions for seed germination/emergence assays.&lt;/p&gt;
+&lt;p&gt;Both the &lt;code&gt;drcte&lt;/code&gt; and &lt;code&gt;drcSeedGerm&lt;/code&gt; packages can be downloaded and installed from gitHub, by using the code proposed in the box below. It requires the ‘devtools’ package, that needs to be as well installed, if it is not already included in the system.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;install.packages(&amp;quot;devtools&amp;quot;)
 library(devtools)
-install_github(&amp;quot;OnofriAndreaPG/drcte&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+install_github(&amp;quot;OnofriAndreaPG/drcte&amp;quot;)
+install_github(&amp;quot;OnofriAndreaPG/drcSeedGerm&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;We do hope you may find the package and tutorial useful to your purposes.&lt;/p&gt;
 &lt;p&gt;Please, stay tuned for further posts.&lt;/p&gt;
 &lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
@@ -1049,27 +1488,29 @@ University of Perugia (Italy)&lt;br /&gt;
       
       <guid>https://www.statforbiology.com/2020/stat_seedgermination_ht1step/</guid>
       <description>
+&lt;script src=&#34;https://www.statforbiology.com/rmarkdown-libs/header-attrs/header-attrs.js&#34;&gt;&lt;/script&gt;
 
 
+&lt;p&gt;&lt;strong&gt;THE CODE IN THIS POST WAS UPDATED ON JANUARY 2022&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;I am locked at home, due to the COVID-19 emergency in Italy. Luckily I am healthy, but there is not much to do, inside. I thought it might be nice to spend some time to talk about seed germination models and the connections with survival analysis.&lt;/p&gt;
 &lt;p&gt;We all know that seeds need water to germinate. Indeed, the absorption of water activates the hydrolytic enzymes, which break down food resources stored in seeds and provide energy for germination. As the consequence, there is a very close relationship between water content in the substrate and germination velocity: the higher the water content the quickest the germination, as long as the availability of oxygen does not become a problem (well, water and oxygen in soil may compete for space and a high water content may result in oxygen shortage).&lt;/p&gt;
 &lt;p&gt;Indeed, it is relevant to build germination models, linking the proportion of germinated seeds to water availability in the substrate; these models are usually known as hydro-time (HT) models. The starting point is the famous equation of Bradford (1992), where the germination rate (GR) for the &lt;span class=&#34;math inline&#34;&gt;\(i-th\)&lt;/span&gt; seed in the lot is expressed as a linear function of water potential in the substrate (&lt;span class=&#34;math inline&#34;&gt;\(\Psi\)&lt;/span&gt;):&lt;/p&gt;
-&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ GR_i = \textrm{min} \left( \frac{\Psi - \Psi_{b(i)}}{\theta_H}; 0 \right) \quad \quad \quad \quad (1)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ GR_i = \textrm{max} \left( \frac{\Psi - \Psi_{b(i)}}{\theta_H}; 0 \right) \quad \quad \quad \quad (1)\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;In that equation, &lt;span class=&#34;math inline&#34;&gt;\(\Psi_{b(i)}\)&lt;/span&gt; is the base water potential for the &lt;span class=&#34;math inline&#34;&gt;\(i-th\)&lt;/span&gt; seed and &lt;span class=&#34;math inline&#34;&gt;\(\theta_H\)&lt;/span&gt; is the hydro-time constant, expressed as &lt;em&gt;MPa day&lt;/em&gt; or &lt;em&gt;MPa hour&lt;/em&gt;. The concept is relatively simple: we just need to remember that the water can only move from a position with a higher water potential to a position with a lower water potential. Therefore, a seed cannot germinate when its base water potential is higher than the water potential in the substrate.&lt;/p&gt;
 &lt;p&gt;When &lt;span class=&#34;math inline&#34;&gt;\(\Psi &amp;gt; \Psi_b(i)\)&lt;/span&gt;, the germination rate of the &lt;span class=&#34;math inline&#34;&gt;\(i-th\)&lt;/span&gt; seed is linearly related to &lt;span class=&#34;math inline&#34;&gt;\(\Psi\)&lt;/span&gt;: the higher this latter value, the higher the germination rate. Now we should consider that the germination rate is the inverse of the germination time (&lt;span class=&#34;math inline&#34;&gt;\(GR = 1/t\)&lt;/span&gt;); thus, the higher the GR, the shortest the germination time. Germination is achieved at the time &lt;span class=&#34;math inline&#34;&gt;\(t\)&lt;/span&gt; when:&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ t \, \left( \Psi - \Psi_{b(i)} \right) = \theta_H \quad \quad \quad (2)\]&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;Elsewhere in this website, I show that Equation 1 can be fitted to germination data in a two-steps fashion. In this page we will see how we can embed Equation 1 into a germination model, to predict the proportion of germinated seeds, depending on time and water content in the substrate. As usual, let’s start from a practical example.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.statforbiology.com/2021/stat_seedgermination_htt2step/&#34;&gt;Elsewhere in this website&lt;/a&gt;, I show that Equation 1 can be fitted to germination data in a two-steps fashion. In this page we will see how we can embed Equation 1 into a time-to-event model, to predict the proportion of germinated seeds, depending on time and water content in the substrate. As usual, let’s start from a practical example.&lt;/p&gt;
 &lt;hr /&gt;
 &lt;div id=&#34;the-dataset&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;The dataset&lt;/h1&gt;
-&lt;p&gt;The germination of rapeseed (&lt;em&gt;Brassica napus&lt;/em&gt; L. var. &lt;em&gt;oleifera&lt;/em&gt;, cv. Excalibur) was tested at thirteen different water potentials (-0.03, -0.15, -0.3, -0.4, -0.5, -0.6, -0.7, -0.8, -0.9, -1, -1.1, -1.2, -1.5 MPa), which were created by using a polyethylene glycol solution (PEG 6000). For each water potential level, three replicated Petri dishes with 50 seeds were incubated at 20°C. Germinated seeds were counted and removed every 2-3 days for 14 days.&lt;/p&gt;
-&lt;p&gt;The dataset was published by Pace et al. (2012). It is available as &lt;code&gt;rape&lt;/code&gt; in the &lt;code&gt;drcSeedGerm&lt;/code&gt; package, which needs to be installed from github (see below). The following code loads the necessary packages, loads the dataset &lt;code&gt;rape&lt;/code&gt; and shows the first six lines.&lt;/p&gt;
+&lt;p&gt;The germination of rapeseed (&lt;em&gt;Brassica napus&lt;/em&gt; L. var. &lt;em&gt;oleifera&lt;/em&gt;, cv. Excalibur) was tested at fourteen different water potentials (0, -0.03, -0.15, -0.3, -0.4, -0.5, -0.6, -0.7, -0.8, -0.9, -1, -1.1, -1.2, -1.5 MPa), which were created by using a polyethylene glycol solution (PEG 6000). For each water potential level, three replicated Petri dishes with 50 seeds were incubated at 20°C. Germinated seeds were counted and removed every 2-3 days for 14 days.&lt;/p&gt;
+&lt;p&gt;The dataset was published by Pace et al. (2012) and it is available as &lt;code&gt;rape&lt;/code&gt; in the &lt;code&gt;drcSeedGerm&lt;/code&gt; package, which needs to be installed from github (see below). Furthermore, the package &lt;code&gt;drcte&lt;/code&gt; is necessary to fit time-to-event models and it should also be installed from gitHub. Please, make sure you have the most updated version for both packages.&lt;/p&gt;
+&lt;p&gt;The following code loads the necessary packages, loads the dataset &lt;code&gt;rape&lt;/code&gt; and shows the first six lines.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# library(devtools)
 # install_github(&amp;quot;OnofriAndreaPG/drcSeedGerm&amp;quot;)
-library(drc)
+# install_github(&amp;quot;OnofriAndreaPG/drcte&amp;quot;)
 library(drcSeedGerm)
-library(lmtest)
-library(sandwich)
+library(drcte)
 data(rape)
 head(rape)
 ##   Psi Dish timeBef timeAf nSeeds nCum propCum
@@ -1079,69 +1520,71 @@ head(rape)
 ## 4   0    1       5      7      0   49    0.98
 ## 5   0    1       7     10      0   49    0.98
 ## 6   0    1      10     14      0   49    0.98&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;We can see that the data are grouped by assessment interval: ‘timeAf’ represents the moment when germinated seeds were counted, while ’timeBef’ represents the previous inspection time (or the beginning of the assay). The column ’nSeeds’ is the number of seeds that germinated during the time interval between ‘timeBef’ and ‘timeAf. The ’propCum’ column contains the cumulative proportions of germinated seeds and it is not necessary for time-to-event models. The ‘drcSeedGerm’ package contains some service functions which might help prepare the dataset in this form (see the documentation for the functions ‘makeDrm()’ and ‘makeDrm2()’).&lt;/p&gt;
+&lt;p&gt;We can see that the data are grouped by assessment interval: ‘timeAf’ represents the moment when germinated seeds were counted, while ’timeBef’ represents the previous inspection time (or the beginning of the assay). The column ’nSeeds’ is the number of seeds that germinated during the time interval between ‘timeBef’ and ‘timeAf. The ’propCum’ column contains the cumulative proportions of germinated seeds and it is not necessary for time-to-event models.&lt;/p&gt;
 &lt;hr /&gt;
 &lt;/div&gt;
 &lt;div id=&#34;building-hydro-time-models&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Building hydro-time models&lt;/h1&gt;
 &lt;div id=&#34;models-based-on-the-distribution-of-germination-time&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Models based on the distribution of germination time&lt;/h2&gt;
-&lt;p&gt;How can we rework Equation 1 to predict the proportion of germinated seeds, as a function of time and water potential? One line of attack follows the proposal we made in a relatively recent paper (Onofri at al., 2018). We started from the idea that the time course of the proportion of germinated seeds (&lt;span class=&#34;math inline&#34;&gt;\(P\)&lt;/span&gt;) is expected to increase over time, according to a S-shaped curve, such as the usual log-logistic cumulative probability function (other cumulative distribution functions can be used; see our original paper):&lt;/p&gt;
-&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[P(t) = \frac{ P_{MAX} }{1 + \exp \left\{ b \left[ \log(t) - \log(t_{50} ) \right] \right\} } \quad \quad \quad (3)\]&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(t_{50}\)&lt;/span&gt; is the median germination time, &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; is the slope at the inflection point and &lt;span class=&#34;math inline&#34;&gt;\(P_{MAX}\)&lt;/span&gt; is the maximum germinated proportion. Considering that the germination rate is the inverse of germination time, we can write:&lt;/p&gt;
-&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[P(t) = \frac{ P_{MAX} }{1 + \exp \left\{ b \left[ \log(t) - \log(1 / GR_{50} ) \right] \right\} } \quad \quad \quad (4)\]&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(GR_{50}\)&lt;/span&gt; is the median germination rate in the population.&lt;/p&gt;
-&lt;p&gt;We can now express &lt;span class=&#34;math inline&#34;&gt;\(GR_{50}\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(P_{MAX}\)&lt;/span&gt; as linear/nonlinear functions of &lt;span class=&#34;math inline&#34;&gt;\(\Psi\)&lt;/span&gt; (temperature and other environmental variables can be included as well. See our original paper). In our paper, for &lt;span class=&#34;math inline&#34;&gt;\(GR_{50}\)&lt;/span&gt;, we used the Equation 1 above. For &lt;span class=&#34;math inline&#34;&gt;\(P_{MAX}\)&lt;/span&gt;, we used a shifted exponential distribution, which implies that germination capability is fully determined by the distribution of base water potential within the population and no germinations occur at &lt;span class=&#34;math inline&#34;&gt;\(\Psi \leq \Psi_b\)&lt;/span&gt;:&lt;/p&gt;
-&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[P_{MAX} = h_1(\Psi ) = \textrm{min} \left\{ G \, \left[ 1 - \exp \left( \frac{ \Psi - \Psi_b }{\sigma_{\Psi_b}} \right) \right]; 0 \right\} \quad \quad \quad (5)\]&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;In the above equation, &lt;span class=&#34;math inline&#34;&gt;\(\sigma_{\Psi_b}\)&lt;/span&gt; represents the variability of &lt;span class=&#34;math inline&#34;&gt;\(\Psi_b\)&lt;/span&gt; within the population, which determines the steepness of the increase in &lt;span class=&#34;math inline&#34;&gt;\(P_{MAX}\)&lt;/span&gt; as &lt;span class=&#34;math inline&#34;&gt;\(\Psi\)&lt;/span&gt; increases. &lt;span class=&#34;math inline&#34;&gt;\(G\)&lt;/span&gt; is the germinable fraction, accounting for the fact that &lt;span class=&#34;math inline&#34;&gt;\(P_{MAX}\)&lt;/span&gt; may not reach 1, regardless of time and water potential.&lt;/p&gt;
+&lt;p&gt;How can we rework Equation 1 to predict the proportion of germinated seeds, as a function of time and water potential? One line of attack follows the proposal we made in a relatively recent paper (Onofri at al., 2018). We start from the idea that the time course of the proportion of germinated seeds (&lt;span class=&#34;math inline&#34;&gt;\(P\)&lt;/span&gt;) is expected to increase over time, according to a S-shaped curve, such as the usual log-logistic cumulative probability function (other cumulative distribution functions can be used; see our original paper):&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[P(t) = \frac{ d }{1 + \exp \left\{ b \left[ \log(t) - \log( e ) \right] \right\} } \quad \quad \quad (3)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt; is the median germination time, &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; is the slope at the inflection point and &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; is the maximum germinated proportion. Considering that the germination rate is the inverse of germination time, we can write:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[P(t) = \frac{ d }{1 + \exp \left\{ b \left[ \log(t) - \log(1 / GR_{50} ) \right] \right\} } \quad \quad \quad (4)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(GR_{50}\)&lt;/span&gt; is the median germination rate in the population. We can now express &lt;span class=&#34;math inline&#34;&gt;\(GR_{50}\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; as linear/nonlinear functions of &lt;span class=&#34;math inline&#34;&gt;\(\Psi\)&lt;/span&gt; (temperature and other environmental variables can be included as well. See our original paper):&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[P(t, \Psi) = \frac{ h_1(\Psi) }{1 + \exp \left\{ b \left[ \log(t) - \log(1 / \left[ GR_{50}(\Psi) \right] ) \right] \right\} } \quad \quad \quad (5)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;In our paper, for &lt;span class=&#34;math inline&#34;&gt;\(GR_{50}\)&lt;/span&gt;, we slightly reparameterised Equation 1 above:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ GR_{50}(\Psi) = \textrm{max} \left( \frac{\Psi - \Psi_{b(50)}}{\theta_H}; 0 \right) \quad \quad \quad \quad (6)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(\Psi_{b(50)}\)&lt;/span&gt; is the median base water potential in the population.&lt;/p&gt;
+&lt;p&gt;For &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt;, we used a shifted exponential distribution, which implies that germination capability is fully determined by the distribution of base water potential within the population and no germination occurs at &lt;span class=&#34;math inline&#34;&gt;\(\Psi \leq \Psi_b\)&lt;/span&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[d = h_1(\Psi ) = \textrm{max} \left\{ G \, \left[ 1 - \exp \left( \frac{ \Psi - \Psi_{b(50)} }{\sigma_{\Psi_b}} \right) \right]; 0 \right\} \quad \quad \quad (7)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;In the above equation, &lt;span class=&#34;math inline&#34;&gt;\(\sigma_{\Psi_b}\)&lt;/span&gt; represents the variability of &lt;span class=&#34;math inline&#34;&gt;\(\Psi_b\)&lt;/span&gt; within the population, which determines the steepness of the increase in &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; as &lt;span class=&#34;math inline&#34;&gt;\(\Psi\)&lt;/span&gt; increases. &lt;span class=&#34;math inline&#34;&gt;\(G\)&lt;/span&gt; is the germinable fraction, accounting for the fact that &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; may not reach 1, regardless of time and water potential.&lt;/p&gt;
 &lt;p&gt;The parameter &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; was assumed to be constant and independent on &lt;span class=&#34;math inline&#34;&gt;\(\Psi\)&lt;/span&gt;. In the end, our hydro-time model is composed by four sub-models:&lt;/p&gt;
 &lt;ol style=&#34;list-style-type: decimal&#34;&gt;
-&lt;li&gt;a cumulative probability function (log-logistic, in our example), based on the three parameters &lt;span class=&#34;math inline&#34;&gt;\(P_{MAX}\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(GR50\)&lt;/span&gt;;&lt;/li&gt;
-&lt;li&gt;a sub-model expressing &lt;span class=&#34;math inline&#34;&gt;\(P_{MAX}\)&lt;/span&gt; as a function of &lt;span class=&#34;math inline&#34;&gt;\(\Psi\)&lt;/span&gt;;&lt;/li&gt;
-&lt;li&gt;a sub-model expressing &lt;span class=&#34;math inline&#34;&gt;\(GR50\)&lt;/span&gt; as a function of &lt;span class=&#34;math inline&#34;&gt;\(\Psi\)&lt;/span&gt;;&lt;/li&gt;
+&lt;li&gt;a cumulative probability function (log-logistic, in our example), based on the three parameters &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(e = 1/GR_{50}\)&lt;/span&gt;;&lt;/li&gt;
+&lt;li&gt;a sub-model expressing &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; as a function of &lt;span class=&#34;math inline&#34;&gt;\(\Psi\)&lt;/span&gt;;&lt;/li&gt;
+&lt;li&gt;a sub-model expressing &lt;span class=&#34;math inline&#34;&gt;\(GR_{50}\)&lt;/span&gt; as a function of &lt;span class=&#34;math inline&#34;&gt;\(\Psi\)&lt;/span&gt;;&lt;/li&gt;
 &lt;li&gt;a sub-model expressing &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; as a function of &lt;span class=&#34;math inline&#34;&gt;\(\Psi\)&lt;/span&gt;, although, this was indeed a simple identity model &lt;span class=&#34;math inline&#34;&gt;\(b(\Psi) = b\)&lt;/span&gt;.&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;The equation is:&lt;/p&gt;
-&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[P(t) = \frac{ h_1(\Psi) }{1 + \exp \left\{ b \left[ \log(t) - \log(1 / \left[ GR_{50}(\Psi) \right] ) \right] \right\} } \quad \quad \quad (6)\]&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;This hydro-time model was implemented in R as the &lt;code&gt;HTE1()&lt;/code&gt; function, and it is available within the &lt;code&gt;drcSeedGerm&lt;/code&gt; package, together with the appropriate self-starting routine. It can be fitting by using the &lt;code&gt;drm()&lt;/code&gt; function in the &lt;code&gt;drc&lt;/code&gt; package. Please, note that the argument &lt;code&gt;type&lt;/code&gt; has to be set to “event”.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;modHTE &amp;lt;- drm(nSeeds ~ timeBef + timeAf + Psi, 
-                data = rape, fct = HTE1(), type = &amp;quot;event&amp;quot;)
+&lt;p&gt;This hydro-time model was implemented in R as the &lt;code&gt;HTE1()&lt;/code&gt; function, and it is available within the &lt;code&gt;drcSeedGerm&lt;/code&gt; package, together with the appropriate self-starting routine. It can be fitting by using the &lt;code&gt;drmte()&lt;/code&gt; function in the &lt;code&gt;drcte&lt;/code&gt; package.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;modHTE &amp;lt;- drmte(nSeeds ~ timeBef + timeAf + Psi, 
+                data = rape, fct = HTE1())
 summary(modHTE)
 ## 
 ## Model fitted: Hydro-time model with shifted exponential for Pmax and linear model for GR50
 ## 
+## Robust estimation: no 
+## 
 ## Parameter estimates:
 ## 
 ##                         Estimate Std. Error  t-value   p-value    
-## G:(Intercept)          0.9577943  0.0063663  150.448 &amp;lt; 2.2e-16 ***
-## Psib:(Intercept)      -1.0397178  0.0047014 -221.152 &amp;lt; 2.2e-16 ***
-## sigmaPsib:(Intercept)  0.1108836  0.0087593   12.659 &amp;lt; 2.2e-16 ***
-## thetaH:(Intercept)     0.9060853  0.0301585   30.044 &amp;lt; 2.2e-16 ***
-## b:(Intercept)          4.0272972  0.1960877   20.538 &amp;lt; 2.2e-16 ***
+## G:(Intercept)          0.9577918  0.0063667  150.438 &amp;lt; 2.2e-16 ***
+## Psib:(Intercept)      -1.0397239  0.0047017 -221.138 &amp;lt; 2.2e-16 ***
+## sigmaPsib:(Intercept)  0.1108891  0.0087598   12.659 &amp;lt; 2.2e-16 ***
+## thetaH:(Intercept)     0.9061385  0.0301594   30.045 &amp;lt; 2.2e-16 ***
+## b:(Intercept)          4.0273963  0.1960845   20.539 &amp;lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;As seeds are clustered in Petri dishes, in order not to violate the independence assumption, it is preferable to get cluster robust standard errors. One possibility is to use the grouped version of the sandwich estimator, as available in the &lt;code&gt;sandwich package&lt;/code&gt; (Berger, 2017). The function &lt;code&gt;coeftest&lt;/code&gt; is available in the &lt;code&gt;lmtest&lt;/code&gt; package (Zeileis, 2002):&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;coeftest(modHTE, vcov = vcovCL, cluster = rape$Dish)
+&lt;p&gt;As seeds are clustered in Petri dishes, in order not to violate the independence assumption, it is preferable to get cluster robust standard errors. One possibility is to use the grouped version of the sandwich estimator, as available in the ‘sandwich’ package (Berger, 2017). The function &lt;code&gt;coeftest()&lt;/code&gt; is available in the ‘lmtest’ package (Zeileis, 2002) and its usage is shown in the box below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;lmtest::coeftest(modHTE, vcov = vcovCL, cluster = rape$Dish)
 ## 
 ## t test of coefficients:
 ## 
 ##                         Estimate Std. Error   t value  Pr(&amp;gt;|t|)    
-## G:(Intercept)          0.9577943  0.0080918  118.3661 &amp;lt; 2.2e-16 ***
-## Psib:(Intercept)      -1.0397178  0.0047067 -220.9003 &amp;lt; 2.2e-16 ***
-## sigmaPsib:(Intercept)  0.1108836  0.0121872    9.0983 &amp;lt; 2.2e-16 ***
-## thetaH:(Intercept)     0.9060853  0.0410450   22.0754 &amp;lt; 2.2e-16 ***
-## b:(Intercept)          4.0272972  0.1934579   20.8174 &amp;lt; 2.2e-16 ***
+## G:(Intercept)          0.9577918  0.0080923  118.3591 &amp;lt; 2.2e-16 ***
+## Psib:(Intercept)      -1.0397239  0.0047063 -220.9206 &amp;lt; 2.2e-16 ***
+## sigmaPsib:(Intercept)  0.1108891  0.0121879    9.0983 &amp;lt; 2.2e-16 ***
+## thetaH:(Intercept)     0.9061385  0.0410425   22.0781 &amp;lt; 2.2e-16 ***
+## b:(Intercept)          4.0273963  0.1934513   20.8187 &amp;lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;An alternative way to obtain cluster robust standard errors is to use the delete-a-group jackknife technique, which I described in one of my previous papers (Onofri et al., 2014). This is available in the &lt;code&gt;jackGroupSE()&lt;/code&gt; function in the &lt;code&gt;drcSeedGerm&lt;/code&gt; package. It takes quite a bit of computing time, so you may need to be patient, especially if you have a lot of Petri dishes.&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;jack &amp;lt;- jackGroupSE(modHTE, data = rape, cluster = rape$Dish)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Once the model is fitted, we may be interested in using the fitted to curve to retrieve some biologically relevant information. For example, it may be interesting to retrieve the germination rates for some selected percentiles (e.g., the 30th, 20th and 10th percentiles). This is possible using the &lt;code&gt;GRate()&lt;/code&gt; function, that is a wrapper for the original &lt;code&gt;ED()&lt;/code&gt; function in the package &lt;code&gt;drc&lt;/code&gt;. It reverses the behavior of the &lt;code&gt;ED()&lt;/code&gt; function, in the sense that it considers, by default, the percentiles for the whole population, including the ungerminated fraction, which is, in our opinion, the most widespread interpretation of germination rates in seed science. The &lt;code&gt;GRate()&lt;/code&gt; function works very much like the &lt;code&gt;ED()&lt;/code&gt; function, although additional variables, such as the selected &lt;span class=&#34;math inline&#34;&gt;\(\Psi\)&lt;/span&gt; level can be specified by using the argument &lt;code&gt;x2&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Once the model is fitted, we may be interested in using the resulting curve to retrieve some biologically relevant information. For example, it may be interesting to retrieve the germination rates for some selected percentiles (e.g., the 30th, 20th and 10th percentiles). This is possible using the &lt;code&gt;GRate()&lt;/code&gt; function, that is a wrapper for the original &lt;code&gt;ED()&lt;/code&gt; function in the package &lt;code&gt;drc&lt;/code&gt;. It reverses the behavior of the &lt;code&gt;ED()&lt;/code&gt; function, in the sense that it considers, by default, the percentiles for the whole population, including the ungerminated fraction, which is, in our opinion, the most widespread interpretation of germination rates in seed science. The &lt;code&gt;GRate()&lt;/code&gt; function works very much like the &lt;code&gt;ED()&lt;/code&gt; function, although additional variables, such as the selected &lt;span class=&#34;math inline&#34;&gt;\(\Psi\)&lt;/span&gt; level can be specified by using the argument &lt;code&gt;x2&lt;/code&gt;.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#Naive standard errors
 GRate(modHTE, x2 = -1, respLev = c(30, 20, 10))
-##           Estimate         SE
-## GR:1:30 0.00000000 0.00000000
-## GR:1:20 0.03578644 0.01515519
-## GR:1:10 0.05129734 0.01546193&lt;/code&gt;&lt;/pre&gt;
+##           Estimate          SE
+## GR:1:30 0.00000000 0.000000000
+## GR:1:20 0.03579236 0.005808732
+## GR:1:10 0.05130356 0.006221881&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;In this example, we see that the &lt;span class=&#34;math inline&#34;&gt;\(GR_{30}\)&lt;/span&gt; cannot be calculated, as the germination capacity did not reach 30% at the selected water potential level (&lt;span class=&#34;math inline&#34;&gt;\(-1 \,\, MPa\)&lt;/span&gt;).&lt;/p&gt;
 &lt;p&gt;As we said, cluster robust standard errors are recommended. The &lt;code&gt;GRate()&lt;/code&gt; function allows entering a user-defined variance-covariance matrix, that is obtained by using the &lt;code&gt;vcovCL()&lt;/code&gt; function in the &lt;code&gt;sandwich&lt;/code&gt; package. If necessary, germination times can be obtained in a similar way, by using the &lt;code&gt;GTime()&lt;/code&gt; function.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#Cluster robust standard errors
@@ -1149,14 +1592,14 @@ sc &amp;lt;- vcovCL(modHTE, cluster = rape$Dish)
 GRate(modHTE, x2 = -1, respLev = c(30, 20, 10), vcov.=sc)
 ##           Estimate          SE
 ## GR:1:30 0.00000000 0.000000000
-## GR:1:20 0.03578644 0.005452517
-## GR:1:10 0.05129734 0.005870701
+## GR:1:20 0.03579236 0.005450975
+## GR:1:10 0.05130356 0.005869140
 #Germination times
 GTime(modHTE, x2 = -1, respLev = c(30, 20, 10), vcov.=sc)
-##        Estimate       SE
-## T:1:30      Inf       NA
-## T:1:20 27.94355 4.257553
-## T:1:10 19.49419 2.231004&lt;/code&gt;&lt;/pre&gt;
+##        Estimate      SE
+## T:1:30      Inf      NA
+## T:1:20 27.93892 4.25494
+## T:1:10 19.49183 2.22987&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Last, but not least, we can predict the proportion of germinated seeds at given time and water potential level.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;predictSG(modHTE, se.fit=T, vcov. = vcovCL,
         newdata = data.frame(Time=c(10, 10, 10), 
@@ -1164,24 +1607,24 @@ GTime(modHTE, x2 = -1, respLev = c(30, 20, 10), vcov.=sc)
         )
 ##      Prediction         SE
 ## [1,]  0.0000000 0.00000000
-## [2,]  0.8794104 0.03907374
-## [3,]  0.9576615 0.01493018&lt;/code&gt;&lt;/pre&gt;
+## [2,]  0.8794025 0.03907487
+## [3,]  0.9576590 0.01493134&lt;/code&gt;&lt;/pre&gt;
 &lt;hr /&gt;
 &lt;/div&gt;
 &lt;div id=&#34;models-based-on-the-distribution-of-psi_b&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Models based on the distribution of &lt;span class=&#34;math inline&#34;&gt;\(\Psi_b\)&lt;/span&gt;&lt;/h2&gt;
 &lt;p&gt;Another type of hydro-time model was proposed by Bradford (2002) and later extended by Mesgaran et al (2013). This approach starts always from Equation 1; from that equation, considering that the germination time is the inverse of the GR, we can easily get to the following equation:&lt;/p&gt;
-&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\Psi_b = \Psi - \frac{\theta_H}{t} \quad \quad \quad (7)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\Psi_b = \Psi - \frac{\theta_H}{t} \quad \quad \quad (8)\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(t\)&lt;/span&gt; is the germination time. What does this equation tell us? Let’s assume that the hydro-time to germination is 10 &lt;span class=&#34;math inline&#34;&gt;\(MPa \, d\)&lt;/span&gt; and the environmental water potential is -1 &lt;span class=&#34;math inline&#34;&gt;\(MPa\)&lt;/span&gt;. A single seed germinates in exactly one day, if its base water potential is &lt;span class=&#34;math inline&#34;&gt;\(-1 - 10/1 = -11\)&lt;/span&gt;. If the base water potential is higher, germination will take more than one day; if it is lower, germination will take less than one day. But now, the following questions come: how many seeds in a population will be able to germinate in one day? And in two days? And in &lt;span class=&#34;math inline&#34;&gt;\(t\)&lt;/span&gt; days?&lt;/p&gt;
 &lt;p&gt;We know that the seeds within a population do not germinate altogether in the same moment, as they have different individual values of base water potential. If the population is big enough, we can describe the variation of &lt;span class=&#34;math inline&#34;&gt;\(\Psi_b\)&lt;/span&gt; within the population by using some density function, possibly parameterised by way of a location (&lt;span class=&#34;math inline&#34;&gt;\(\mu\)&lt;/span&gt;) and a scale (&lt;span class=&#34;math inline&#34;&gt;\(\sigma\)&lt;/span&gt;) parameter:&lt;/p&gt;
-&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ \Psi_b \sim \phi \left( \frac{\Psi_b - \mu}{\sigma} \right) \quad \quad \quad (8)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ \Psi_b \sim \phi \left( \frac{\Psi_b - \mu}{\sigma} \right) \quad \quad \quad (9)\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;This is easier to understand if we make a specific example. Let’s assume that the distribution of &lt;span class=&#34;math inline&#34;&gt;\(\Psi_b\)&lt;/span&gt; values within the population is gaussian, with mean &lt;span class=&#34;math inline&#34;&gt;\(\mu = -9\)&lt;/span&gt; and standard deviation &lt;span class=&#34;math inline&#34;&gt;\(\sigma = 1\)&lt;/span&gt;. Let’s also assume that the hydro-time parameter (&lt;span class=&#34;math inline&#34;&gt;\(\theta_H\)&lt;/span&gt;) is constant within the population. We have the situation depicted in the figure below.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_Survival_HT1step_files/figure-html/distribPsi-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_SeedGermination_HT1step_files/figure-html/distribPsi-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;The red left tail represents the proportion of seeds that germinate during the first day, as they have base water potentials equal to or lower than -11. By using the gaussian cumulative distribution function we can easily see that that proportion is 0.228:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;pnorm(-1 - 10/1, mean = -9, sd = 1)
 ## [1] 0.02275013&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;More generally, we can write:&lt;/p&gt;
-&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ G(t, \Psi) = \Phi \left\{ \frac{\Psi - (\theta_H / t) -\mu }{\sigma} \right\} \quad \quad \quad (9)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ P(t, \Psi) = \Phi \left\{ \frac{\Psi - (\theta_H / t) -\mu }{\sigma} \right\} \quad \quad \quad (10)\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(\Phi\)&lt;/span&gt; is the selected cumulative distribution function. The above model returns the proportion of germinated seeds (G), as a function of time and water potential in the substrate. According to Bradford (2002), &lt;span class=&#34;math inline&#34;&gt;\(\Phi\)&lt;/span&gt; is cumulative gaussian.&lt;/p&gt;
 &lt;p&gt;Let’s think more deeply about Equation 9 (Bradford, 2002). This function was built to represent the cumulative distribution function of base water potential within the population. However, &lt;strong&gt;it can be as well taken to represent the cumulative distribution function of germination time within the population&lt;/strong&gt;. Obviously, while the first distribution is gaussian, the second one is not: indeed, the germination time appears at the denominator of the expression &lt;span class=&#34;math inline&#34;&gt;\(\theta_H / t\)&lt;/span&gt;. It doesn’t matter: every cumulative distribution function for germination time can be fit by using time-to-event methods!&lt;/p&gt;
 &lt;p&gt;We implemented this model in R as the function &lt;code&gt;HTnorm()&lt;/code&gt; that is available within the &lt;code&gt;drcSeedGerm&lt;/code&gt; package and it is meant to be used with the &lt;code&gt;drm()&lt;/code&gt; function, in the &lt;code&gt;drc&lt;/code&gt; package.&lt;/p&gt;
@@ -1197,67 +1640,63 @@ GTime(modHTE, x2 = -1, respLev = c(30, 20, 10), vcov.=sc)
 &lt;p&gt;The equations are given at the end of this page; for gaussian, logistic and log-logistic distributions, &lt;span class=&#34;math inline&#34;&gt;\(\Psi_{b(50)}\)&lt;/span&gt; is the median base water potential within the population. For the gaussian distribution, &lt;span class=&#34;math inline&#34;&gt;\(\sigma_{\Psi b}\)&lt;/span&gt; corresponds to the standard deviation of &lt;span class=&#34;math inline&#34;&gt;\(\Psi_b\)&lt;/span&gt; within the population.&lt;/p&gt;
 &lt;p&gt;Distributions based on logarithms (the log-logistic and all other distributions thereafter) are only defined for positive amounts. On the contrary, we know that base water potential is mostly negative. Therefore, shifted distributions need to be used, by introducing a shifting parameter &lt;span class=&#34;math inline&#34;&gt;\(\delta\)&lt;/span&gt; which ‘moves’ the distribution to the left, along the x-axis, so that negative values are possible (see Mesgaran et al., 2013).&lt;/p&gt;
 &lt;p&gt;Let’s fit the above functions to the ‘rape’ dataset. But, before, let me highlight that providing starting values is not necessary, as self-starting routines are already implemented for all models.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(drc)
-mod1 &amp;lt;- drm(nSeeds ~ timeBef + timeAf + Psi, data = rape, 
-            fct = HTnorm(), type = &amp;quot;event&amp;quot;)
-mod2 &amp;lt;- drm(nSeeds ~ timeBef + timeAf + Psi, data = rape,
-            fct = HTL(), type = &amp;quot;event&amp;quot;)
-mod3 &amp;lt;- drm(nSeeds ~ timeBef + timeAf + Psi, data = rape,
-            fct = HTG(), type = &amp;quot;event&amp;quot;)
-mod4 &amp;lt;- drm(nSeeds ~ timeBef + timeAf + Psi,
-            data = rape, fct = HTLL(), type = &amp;quot;event&amp;quot;)
-mod5 &amp;lt;- drm(nSeeds ~ timeBef + timeAf + Psi,
-            data = rape, fct = HTW1(), type = &amp;quot;event&amp;quot;)
-mod6 &amp;lt;- drm(nSeeds ~ timeBef + timeAf + Psi,
-            data = rape, fct = HTW2(), type = &amp;quot;event&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod1 &amp;lt;- drmte(nSeeds ~ timeBef + timeAf + Psi, 
+              data = rape, fct = HTnorm())
+mod2 &amp;lt;- drmte(nSeeds ~ timeBef + timeAf + Psi,
+              data = rape, fct = HTL())
+mod3 &amp;lt;- drmte(nSeeds ~ timeBef + timeAf + Psi,
+              data = rape, fct = HTG())
+mod4 &amp;lt;- drmte(nSeeds ~ timeBef + timeAf + Psi,
+            data = rape, fct = HTLL())
+mod5 &amp;lt;- drmte(nSeeds ~ timeBef + timeAf + Psi,
+            data = rape, fct = HTW1())
+mod6 &amp;lt;- drmte(nSeeds ~ timeBef + timeAf + Psi,
+            data = rape, fct = HTW2())&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;What is the best model for this dataset? Let’s use the Akaike’s Information Criterion (AIC) to decide:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;AIC(mod1, mod2, mod3, mod4, mod5, mod6, modHTE)
 ##         df      AIC
 ## mod1   291 3516.914
 ## mod2   291 3300.824
 ## mod3   291 3097.775
-## mod4   290 2886.609
-## mod5   290 2889.307
-## mod6   290 2998.915
+## mod4   290 2886.608
+## mod5   290 2889.306
+## mod6   290 3009.023
 ## modHTE 289 2832.481&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The first model &lt;code&gt;modHTE&lt;/code&gt; considers explicitly the distribution of germination times and it is the best fitting of all. The other models consider explicitly the distribution of base water potential, while the distribution of germination times is indirectly included. Among these models, the gaussian is the worse fitting, while the log-logistic is the best one (&lt;code&gt;mod4&lt;/code&gt;).&lt;/p&gt;
-&lt;p&gt;For this latter model, we take a look at the value of estimated parameters. Cluster robust standard errors can be obtained as before, by way of the sandwich estimator or a fully iterated delete-a-group jackknife estimator.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sand &amp;lt;- coeftest(mod4, vcov = vcovCL, cluster = rape$Dish)
-# jack &amp;lt;- jackGroupSE(mod4, data = rape, cluster = rape$Dish)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sand
+&lt;p&gt;For this latter model, we take a look at the value of estimated parameters, with cluster robust standard errors.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;lmtest::coeftest(mod4, vcov = vcovCL, cluster = rape$Dish)
 ## 
 ## t test of coefficients:
 ## 
 ##                     Estimate Std. Error  t value Pr(&amp;gt;|t|)    
-## thetaH:(Intercept)  0.677472   0.072902   9.2930  &amp;lt; 2e-16 ***
-## delta:(Intercept)   1.136963   0.102440  11.0988  &amp;lt; 2e-16 ***
-## Psib50:(Intercept) -0.948101   0.020341 -46.6097  &amp;lt; 2e-16 ***
-## sigma:(Intercept)   0.372172   0.173360   2.1468  0.03264 *  
+## thetaH:(Intercept)  0.676804   0.074160   9.1263   &amp;lt;2e-16 ***
+## delta:(Intercept)   1.136671   0.101804  11.1652   &amp;lt;2e-16 ***
+## Psib50:(Intercept) -0.947798   0.020575 -46.0647   &amp;lt;2e-16 ***
+## sigma:(Intercept)   0.371971   0.172825   2.1523   0.0322 *  
 ## ---
-## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
-# jack&lt;/code&gt;&lt;/pre&gt;
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Germination rates and times for a certain percentile (e.g. GR50, GR30), can be obtained by using the &lt;code&gt;GRate()&lt;/code&gt; and &lt;code&gt;GTime()&lt;/code&gt; function in &lt;code&gt;drcSeedGerm&lt;/code&gt;. Again, the use of cluster-robust standard errors is highly recommended.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;GRate(mod4, respLev=c(30, 50, 70), x2 = 0, vcov. = vcovCL)
-##         Estimate        SE
-## GR:1:30 1.474866 0.1796681
-## GR:1:50 1.399469 0.1648390
-## GR:1:70 1.296120 0.1561949
+##          Estimate         SE
+## GR:1:30 0.6775790 0.08365887
+## GR:1:50 0.7140812 0.08509008
+## GR:1:70 0.7710049 0.09376307
 GTime(mod4, respLev=c(30, 50, 70), x2 = 0, vcov. = vcovCL)
-##         Estimate         SE
-## T:1:30 0.6780277 0.08259731
-## T:1:50 0.7145569 0.08416538
-## T:1:70 0.7715337 0.09297725&lt;/code&gt;&lt;/pre&gt;
+##        Estimate        SE
+## T:1:30 1.475843 0.1822184
+## T:1:50 1.400401 0.1668721
+## T:1:70 1.297009 0.1577312&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;We can also make predictions about the germinated proportion for a certain time and water potential level. The code below returns the maximum germinated proportions at -1.5, -0.75, and 0 MPa.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;predictSG(mod4, se.fit=T, vcov. = vcovCL,
         newdata = data.frame(Time=c(10, 10, 10), 
                              Psi=c(-1.5, -0.75, 0))
         )
 ##        Prediction           SE
-## [1,] 6.658526e-15 1.124604e-13
-## [2,] 8.038034e-01 5.594629e-02
-## [3,] 9.906059e-01 9.465305e-03&lt;/code&gt;&lt;/pre&gt;
+## [1,] 6.541125e-15 1.102220e-13
+## [2,] 8.035981e-01 5.617769e-02
+## [3,] 9.906224e-01 9.435188e-03&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Let’s use the &lt;code&gt;predictSG()&lt;/code&gt; function to plot the ‘modHTE’ and ‘mod4’ objects together in the same graph.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_Survival_HT1step_files/figure-html/unnamed-chunk-14-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_SeedGermination_HT1step_files/figure-html/unnamed-chunk-13-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Thanks for reading!&lt;/p&gt;
 &lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
 Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
@@ -1287,656 +1726,24 @@ Achim Zeileis, Torsten Hothorn (2002). Diagnostic Checking in Regression Relatio
 &lt;p&gt;The equation for the model &lt;code&gt;HTnorm()&lt;/code&gt;. Here, we show all other equations, as implemented in our package.&lt;/p&gt;
 &lt;div id=&#34;htl&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;&lt;code&gt;HTL()&lt;/code&gt;&lt;/h2&gt;
-&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ G(t, \Psi) = \frac{1}{1 + exp \left[ - \frac{  \Psi  - \left( \theta _H/t \right) - \Psi_{b(50)} } {\sigma}  \right] }\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ P(t, \Psi) = \frac{1}{1 + exp \left[ - \frac{  \Psi  - \left( \theta _H/t \right) - \Psi_{b(50)} } {\sigma}  \right] }\]&lt;/span&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;htg&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;&lt;code&gt;HTG()&lt;/code&gt;&lt;/h2&gt;
-&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ G(t, \Psi) = \exp \left\{ { - \exp \left[ { - \left( {\frac{{\Psi - (\theta _H / t ) - \mu }}{\sigma }} \right)} \right]} \right\} \]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ P(t, \Psi) = \exp \left\{ { - \exp \left[ { - \left( {\frac{{\Psi - (\theta _H / t ) - \mu }}{\sigma }} \right)} \right]} \right\} \]&lt;/span&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;htll&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;&lt;code&gt;HTLL()&lt;/code&gt;&lt;/h2&gt;
-&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ G(t, \Psi) = \frac{1}{1 + \exp \left\{ \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b50} + \delta)  }{\sigma}\right\} }\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ P(t, \Psi) = \frac{1}{1 + \exp \left\{ \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b50} + \delta)  }{\sigma}\right\} }\]&lt;/span&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;htw1&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;&lt;code&gt;HTW1()&lt;/code&gt;&lt;/h2&gt;
-&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ G(t, \Psi) = exp \left\{ - \exp \left[ - \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b50} + \delta)  }{\sigma}\right] \right\}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ P(t, \Psi) = exp \left\{ - \exp \left[ - \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b50} + \delta)  }{\sigma}\right] \right\}\]&lt;/span&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;htw2&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;&lt;code&gt;HTW2()&lt;/code&gt;&lt;/h2&gt;
-&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ G(t, \Psi) = 1 - exp \left\{ - \exp \left[ \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b50} + \delta)  }{\sigma}\right] \right\}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ P(t, \Psi) = 1 - exp \left\{ - \exp \left[ \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b50} + \delta)  }{\sigma}\right] \right\}\]&lt;/span&gt;&lt;/p&gt;
 &lt;/div&gt;
-&lt;/div&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Analysing seed germination and emergence data with R: a tutorial. Part 5</title>
-      <link>https://www.statforbiology.com/2019/stat_drcte_5-comparinglots/</link>
-      <pubDate>Sat, 20 Jul 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.statforbiology.com/2019/stat_drcte_5-comparinglots/</guid>
-      <description>
-&lt;script src=&#34;https://www.statforbiology.com/rmarkdown-libs/header-attrs/header-attrs.js&#34;&gt;&lt;/script&gt;
-
-
-&lt;p&gt;This is a follow-up post. If you are interested in other posts of this series, please go to: &lt;a href=&#34;https://www.statforbiology.com/tags/drcte/&#34;&gt;https://www.statforbiology.com/tags/drcte/&lt;/a&gt;&lt;/p&gt;
-&lt;div id=&#34;comparing-germinationemergence-for-several-seed-lots&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;Comparing germination/emergence for several seed lots&lt;/h1&gt;
-&lt;p&gt;Very often, seed scientists need to compare the germination behavior of different seed populations, e.g., different plant species, or one single plant species submitted to different temperatures, light conditions, priming treatments and so on. How should such a comparison be performed? For example, if we have submitted several seed samples to different environmental conditions, how do we decide whether the germinative response is affected by those environmental conditions?&lt;/p&gt;
-&lt;p&gt;If the case that we have replicates for all experimental treatments, e.g. several Petri dishes, one possible line of attack is to take a summary measure for each dish and use that for further analyses, in a two-steps fashion. For example, we could take the total number of germinated seeds (Pmax) in each dish and use the resulting values to parameterise some sort of ANOVA-like model and test the significance of all effects.&lt;/p&gt;
-&lt;p&gt;This method of data analysis is known as ‘response feature analysis’ and it may be regarded as ‘very traditional’, in the sense that it is often found in literature; although it is not wrong, it is, undoubtedly, sub-optimal. Indeed, two seed lots submitted to different treatments may show the same total number of germinated seeds, but a different velocity or uniformity of germination. In other words, if we only consider, e.g., the Pmax, we can answer the question: “do the seed lots differ for their germination capability?”, but not the more general question: “are the seed lots different?”.&lt;/p&gt;
-&lt;p&gt;In order to answer this latter question, we should consider the entire time-course of germination and not only one single summary statistic. &lt;strong&gt;In other words, we need a method to fit and compare several time-to-event curves.&lt;/strong&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div id=&#34;a-motivating-example&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;A motivating example&lt;/h1&gt;
-&lt;p&gt;Let’s take a practical approach and start from an example: a few years ago, some colleagues of mine studied the germination behavior of a plant species (&lt;em&gt;Verbascum arcturus&lt;/em&gt;), in different conditions. In detail, they considered the factorial combination of two storage periods (LONG and SHORT storage) and two temperature regimes (FIX: constant daily temperature of 20°C; ALT: alternating daily temperature regime, with 25°C during daytime and 15°C during night time, with a 12:12h photoperiod). If you are a seed scientist and are interested in this experiment, you’ll find detail in Catara &lt;em&gt;et al.&lt;/em&gt; (2016).&lt;/p&gt;
-&lt;p&gt;If you are not a seed scientist, you may wonder why my colleagues made such an assay; well, there is evidence that, for some plant species, the germination ability improves over time, after seed maturation. Therefore, if we take seeds and store them for different periods of time, there might be an effect on their germination traits. Likewise, there is also evidence that germinations may be hindered if seed is not submitted to daily temperature fluctuations. For seed scientists, all these mechanisms are very important, as they permit to trigger the germinations when the environmental conditions are favorable for seedling survival.&lt;/p&gt;
-&lt;p&gt;Let’s go back to our assay: the experimental design consisted of four experimental ‘combinations’ (LONG-FIX, LONG-ALT, SHORT-FIX and SHORT-ALT) and four replicates for each combination. One replicate consisted of a Petri dish, that is a small plastic box containing humid blotting paper, with 25 seeds of &lt;em&gt;V. arcturus&lt;/em&gt;. In all, there were 16 Petri dishes, which were put in climatic chambers with the appropriate conditions. During the assay, my colleagues made daily inspections: germinated seeds were counted and removed from the dishes. Inspections were made for 15 days, until no more germinations could be observed.&lt;/p&gt;
-&lt;p&gt;The original dataset is available from a gitHub repository: let’s load and have a look at it.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;datasetOr &amp;lt;- read.csv(&amp;quot;https://raw.githubusercontent.com/OnofriAndreaPG/agroBioData/master/TempStorage.csv&amp;quot;, header = T, check.names = F)
-head(datasetOr)
-##   Dish Storage Temp 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
-## 1    1     Low  Fix 0 0 0 0 0 0 0 0 3  4  6  0  1  0  3
-## 2    2     Low  Fix 0 0 0 0 1 0 0 0 2  7  2  3  0  5  1
-## 3    3     Low  Fix 0 0 0 0 1 0 0 1 3  5  2  4  0  1  3
-## 4    4     Low  Fix 0 0 0 0 1 0 3 0 0  3  1  1  0  4  4
-## 5    5    High  Fix 0 0 0 0 0 0 0 0 1  2  5  4  2  3  0
-## 6    6    High  Fix 0 0 0 0 0 0 0 0 2  2  7  8  1  2  1&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;We have one row per Petri dish; the first three columns show, respectively, the dish number, storage and temperature conditions. The next 15 columns represent the inspection times (from 1 to 15) and contain the counts of germinated seeds. The research question is:&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;Is germination behavior affected by storage and temperature conditions?&lt;/em&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div id=&#34;fitting-several-time-to-event-curves&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;Fitting several time-to-event curves&lt;/h1&gt;
-&lt;p&gt;The original dataset for our example is in a WIDE format and, as we have shown in a previous post (&lt;a href=&#34;https://www.statforbiology.com/2021/stat_drcte_3-reshapingdata/&#34;&gt;go to this link&lt;/a&gt;), it is necessary to reshape it in LONG GROUPED format, by using the &lt;code&gt;melt_te()&lt;/code&gt; function in the ‘drcte’ package. As I said in my previous posts, this package can be installed from gitHub (see the code at: &lt;a href=&#34;https://www.statforbiology.com/2021/stat_drcte_1-intro/&#34;&gt;this link&lt;/a&gt;).&lt;/p&gt;
-&lt;p&gt;The &lt;code&gt;melt_te()&lt;/code&gt; function needs to receive the columns storing the counts (‘count_cols = 4:18’), the columns storing the factor variables (‘treat_cols = c(“Dish”, “Storage”, “Temp”)’), a vector of monitoring times (‘monitimes = 1:15’) and a vector with the total number of seeds in each Petri dish (‘n.subjects = rep(25,16)’).&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(drcte)
-dataset &amp;lt;- melt_te(datasetOr, count_cols = 4:18, 
-                   treat_cols = c(&amp;quot;Dish&amp;quot;, &amp;quot;Storage&amp;quot;, &amp;quot;Temp&amp;quot;), 
-                   monitimes = 1:15, n.subjects = rep(25, 16))
-head(dataset, 16)
-##      Dish Storage Temp Units timeBef timeAf count nCum propCum
-## 1       1     Low  Fix     1       0      1     0    0    0.00
-## 1.1     1     Low  Fix     1       1      2     0    0    0.00
-## 1.2     1     Low  Fix     1       2      3     0    0    0.00
-## 1.3     1     Low  Fix     1       3      4     0    0    0.00
-## 1.4     1     Low  Fix     1       4      5     0    0    0.00
-## 1.5     1     Low  Fix     1       5      6     0    0    0.00
-## 1.6     1     Low  Fix     1       6      7     0    0    0.00
-## 1.7     1     Low  Fix     1       7      8     0    0    0.00
-## 1.8     1     Low  Fix     1       8      9     3    3    0.12
-## 1.9     1     Low  Fix     1       9     10     4    7    0.28
-## 1.10    1     Low  Fix     1      10     11     6   13    0.52
-## 1.11    1     Low  Fix     1      11     12     0   13    0.52
-## 1.12    1     Low  Fix     1      12     13     1   14    0.56
-## 1.13    1     Low  Fix     1      13     14     0   14    0.56
-## 1.14    1     Low  Fix     1      14     15     3   17    0.68
-## 1.15    1     Low  Fix     1      15    Inf     8   NA      NA&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;In the resulting data frame, the column ‘timeAf’ contains the time when the inspection was made and the column ‘count’ contains the number of germinated seeds (e.g. 9 seeds were counted at day 9). These seeds did not germinate exactly at day 9; they germinated within the interval between two inspections, that is between day 8 and day 9. The beginning of the interval is given as the variable ‘timeBef’. Apart from these three columns, we have the columns for the blocking factor (‘Dish’ and ‘Units’; this latter column is added by the R function, but it is not useful in this case) and for the treatment factors (‘Storage’ and ‘Temp’) plus two other additional columns (‘nCum’ and ‘propCum’), which we are not going to use for our analyses.&lt;/p&gt;
-&lt;p&gt;In this case, we have reasons to believe that the germination time-course can be described by using a parametric log-logistic time-to-event model, which can be estimated by using either the &lt;code&gt;drm()&lt;/code&gt; function in the ‘drc’ package (Ritz et al., 2019) or the &lt;code&gt;drmte()&lt;/code&gt; function in the ‘drcte’ package (Onofri et al., submitted). In both cases, we have to include the experimental factor (‘curveid’ argument), to specify that we want to fit a different curve for each combination of storage and temperature.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(tidyverse)
-## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
-## ✓ ggplot2 3.3.5     ✓ dplyr   1.0.7
-## ✓ tibble  3.1.6     ✓ stringr 1.4.0
-## ✓ readr   2.0.2     ✓ forcats 0.5.1
-## ✓ purrr   0.3.4
-## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-## x dplyr::arrange()   masks plyr::arrange()
-## x purrr::compact()   masks plyr::compact()
-## x dplyr::count()     masks plyr::count()
-## x dplyr::failwith()  masks plyr::failwith()
-## x dplyr::filter()    masks stats::filter()
-## x dplyr::id()        masks plyr::id()
-## x dplyr::lag()       masks stats::lag()
-## x dplyr::mutate()    masks plyr::mutate()
-## x dplyr::rename()    masks plyr::rename()
-## x dplyr::select()    masks MASS::select()
-## x dplyr::summarise() masks plyr::summarise()
-## x dplyr::summarize() masks plyr::summarize()
-dataset &amp;lt;- dataset %&amp;gt;% 
-  mutate(across(1:3, .fns = factor))
-mod1 &amp;lt;- drmte(count ~ timeBef + timeAf, fct = loglogistic(),
-            data = dataset, 
-            curveid = Temp:Storage)
-summary(mod1)
-## 
-## Model fitted: Log-logistic distribution of event times
-## 
-## Robust estimation: no 
-## 
-## Parameter estimates:
-## 
-##             Estimate Std. Error t-value   p-value    
-## b:Fix:Low   4.974317   0.819632  6.0690 1.287e-09 ***
-## b:Fix:High 11.476618   1.254439  9.1488 &amp;lt; 2.2e-16 ***
-## b:Alt:Low   7.854558   5.239825  1.4990    0.1339    
-## b:Alt:High 10.600439   1.014061 10.4534 &amp;lt; 2.2e-16 ***
-## d:Fix:Low   0.998474   0.150189  6.6481 2.968e-11 ***
-## d:Fix:High  0.861711   0.038987 22.1027 &amp;lt; 2.2e-16 ***
-## d:Alt:Low   1.405930   5.607576  0.2507    0.8020    
-## d:Alt:High  0.948113   0.024298 39.0208 &amp;lt; 2.2e-16 ***
-## e:Fix:Low  12.009974   0.987039 12.1677 &amp;lt; 2.2e-16 ***
-## e:Fix:High 10.906963   0.190532 57.2447 &amp;lt; 2.2e-16 ***
-## e:Alt:Low  17.014976  13.214513  1.2876    0.1979    
-## e:Alt:High  9.585255   0.166937 57.4183 &amp;lt; 2.2e-16 ***
-## ---
-## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;In a previous post I have described a log-logistic time-to-event model (&lt;a href=&#34;https://www.statforbiology.com/2021/stat_drcte_4-time-to-eventcurves/&#34;&gt;see here&lt;/a&gt;), which has a sygmoidal shape, with the three parameters &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt;. These parameters represent, respectively, the slope at inflection point, the higher asymptote (i.e. the maximum proportion of germinated seeds) and the median germination time. As we have four curves, we have a number of 12 estimated parameters.&lt;/p&gt;
-&lt;p&gt;We see that the optimization routines returns an unreasonable value for the higher asymptote for one of the curves (&lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; = 1.40 with Alt:Low); it is unreasonable because the maximum proportion of germinated seeds may not exceed 1. Therefore, we should refit the model by adding a constraint (&lt;span class=&#34;math inline&#34;&gt;\(d \le 1\)&lt;/span&gt;) for all the four curves. We can do so by setting the ‘upperl’ argument to 1 for the 5&lt;sup&gt;th&lt;/sup&gt; through 8&lt;sup&gt;th&lt;/sup&gt; estimands.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod1 &amp;lt;- drmte(count ~ timeBef + timeAf, fct = loglogistic(),
-            data = dataset, 
-            curveid = Temp:Storage,
-            upperl = c(NA, NA, NA, NA, 1, 1, 1, 1, NA, NA, NA, NA))
-summary(mod1)
-## 
-## Model fitted: Log-logistic distribution of event times
-## 
-## Robust estimation: no 
-## 
-## Parameter estimates:
-## 
-##             Estimate Std. Error t-value   p-value    
-## b:Fix:Low   4.979665   0.818414  6.0845 1.168e-09 ***
-## b:Fix:High 11.471625   1.254025  9.1478 &amp;lt; 2.2e-16 ***
-## b:Alt:Low   8.408186   2.232712  3.7659 0.0001659 ***
-## b:Alt:High 10.605807   1.014523 10.4540 &amp;lt; 2.2e-16 ***
-## d:Fix:Low   0.997284   0.149235  6.6826 2.347e-11 ***
-## d:Fix:High  0.861709   0.038999 22.0955 &amp;lt; 2.2e-16 ***
-## d:Alt:Low   1.000000   0.881644  1.1342 0.2566920    
-## d:Alt:High  0.948132   0.024282 39.0468 &amp;lt; 2.2e-16 ***
-## e:Fix:Low  12.004534   0.981279 12.2336 &amp;lt; 2.2e-16 ***
-## e:Fix:High 10.907108   0.190613 57.2213 &amp;lt; 2.2e-16 ***
-## e:Alt:Low  15.903079   2.872327  5.5367 3.083e-08 ***
-## e:Alt:High  9.585297   0.166873 57.4406 &amp;lt; 2.2e-16 ***
-## ---
-## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
-plot(mod1, log = &amp;quot;&amp;quot;, legendPos = c(6, 1))&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_drcte_5-ComparingLots_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;From the graph we see that there are visible differences between the fitted curves (the legend considers the curves in alphabetical order, i.e. 1: Fix-Low, 2: Fix-High, 3: Alt-Low and 4: Alt-High). Now, the question is: could we say that those differences are only due to chance (null hypothesis)?&lt;/p&gt;
-&lt;p&gt;In order to make such a test, we could compare the logarithm of the likelihood for the fitted model with the logarithm of the likelihood for a ‘reduced’ model, where all curves have been pooled into one common curve for all treatment levels. The higher the log-likelihood difference, the lowest the probability that the null is true (Likelihood Ratio Test; LRT).&lt;/p&gt;
-&lt;p&gt;A LRT for parametric models can be done with the &lt;code&gt;compCDF()&lt;/code&gt; function in the ‘drcte’ package, as shown in the box below.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;compCDF(mod1)
-## 
-## 
-## Likelihood ratio test
-## NULL: time-to-event curves are equal
-## 
-## Observed LR value:  202.8052
-## Degrees of freedom:  9
-## P-value:  8.551556e-39&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;We see that the LR value, that relates to the difference between the two log-likelihoods, is rather high and equal to 202; when the null is true, this LR value has an approximate Chi-square distribution; accordingly, we see that the P-level is very low and, thus, the null should be rejected.&lt;/p&gt;
-&lt;p&gt;It general, the results of LRTs should be taken with care, particularly when the observed data are not independent from one another. Unfortunately, the lack of independence is an intrinsic characteristic of germination/emergence assays, where seeds are, most often, clustered within Petri dishes or other types of containers.&lt;/p&gt;
-&lt;p&gt;In this example, we got a very low p-level, which leaves us rather confident that the difference between time-to-event curves is significant. More generally, instead of relying on a chi-square approximation, we should better use a grouped-permutation approach. This technique is based on the idea that, when the difference between curves is not significant, we should be able to freely permute the labels (treatment level) among Petri dishes (clustering units) and, consequently, build an empirical distribution for the LR statistic under the null (permutation distribution). The p-level is related to the proportion of LR values in the permutation distribution that are higher than the observed value (i.e.: 202.8)&lt;/p&gt;
-&lt;p&gt;In the code below, we show how we can do this. The code is rather slow and, therefore, we should not use a very high number of permutation; the default is 199, that gives us a minimum p-value of 0.005. We see that we can confirm that the difference between curves is highly significant.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;compCDF(mod1, type = &amp;quot;permutation&amp;quot;, units = dataset$Dishes)
-## 
- Permutation: 1
- Permutation: 2
- Permutation: 3
- Permutation: 4
- Permutation: 5
- Permutation: 6
- Permutation: 7
- Permutation: 8
- Permutation: 9
- Permutation: 10
- Permutation: 11
- Permutation: 12
- Permutation: 13
- Permutation: 14
- Permutation: 15
- Permutation: 16
- Permutation: 17
- Permutation: 18
- Permutation: 19
- Permutation: 20
- Permutation: 21
- Permutation: 22
- Permutation: 23
- Permutation: 24
- Permutation: 25
- Permutation: 26
- Permutation: 27
- Permutation: 28
- Permutation: 29
- Permutation: 30
- Permutation: 31
- Permutation: 32
- Permutation: 33
- Permutation: 34
- Permutation: 35
- Permutation: 36
- Permutation: 37
- Permutation: 38
- Permutation: 39
- Permutation: 40
- Permutation: 41
- Permutation: 42
- Permutation: 43
- Permutation: 44
- Permutation: 45
- Permutation: 46
- Permutation: 47
- Permutation: 48
- Permutation: 49
- Permutation: 50
- Permutation: 51
- Permutation: 52
- Permutation: 53
- Permutation: 54
- Permutation: 55
- Permutation: 56
- Permutation: 57
- Permutation: 58
- Permutation: 59
- Permutation: 60
- Permutation: 61
- Permutation: 62
- Permutation: 63
- Permutation: 64
- Permutation: 65
- Permutation: 66
- Permutation: 67
- Permutation: 68
- Permutation: 69
- Permutation: 70
- Permutation: 71
- Permutation: 72
- Permutation: 73
- Permutation: 74
- Permutation: 75
- Permutation: 76
- Permutation: 77
- Permutation: 78
- Permutation: 79
- Permutation: 80
- Permutation: 81
- Permutation: 82
- Permutation: 83
- Permutation: 84
- Permutation: 85
- Permutation: 86
- Permutation: 87
- Permutation: 88
- Permutation: 89
- Permutation: 90
- Permutation: 91
- Permutation: 92
- Permutation: 93
- Permutation: 94
- Permutation: 95
- Permutation: 96
- Permutation: 97
- Permutation: 98
- Permutation: 99
- Permutation: 100
- Permutation: 101
- Permutation: 102
- Permutation: 103
- Permutation: 104
- Permutation: 105
- Permutation: 106
- Permutation: 107
- Permutation: 108
- Permutation: 109
- Permutation: 110
- Permutation: 111
- Permutation: 112
- Permutation: 113
- Permutation: 114
- Permutation: 115
- Permutation: 116
- Permutation: 117
- Permutation: 118
- Permutation: 119
- Permutation: 120
- Permutation: 121
- Permutation: 122
- Permutation: 123
- Permutation: 124
- Permutation: 125
- Permutation: 126
- Permutation: 127
- Permutation: 128
- Permutation: 129
- Permutation: 130
- Permutation: 131
- Permutation: 132
- Permutation: 133
- Permutation: 134
- Permutation: 135
- Permutation: 136
- Permutation: 137
- Permutation: 138
- Permutation: 139
- Permutation: 140
- Permutation: 141
- Permutation: 142
- Permutation: 143
- Permutation: 144
- Permutation: 145
- Permutation: 146
- Permutation: 147
- Permutation: 148
- Permutation: 149
- Permutation: 150
- Permutation: 151
- Permutation: 152
- Permutation: 153
- Permutation: 154
- Permutation: 155
- Permutation: 156
- Permutation: 157
- Permutation: 158
- Permutation: 159
- Permutation: 160
- Permutation: 161
- Permutation: 162
- Permutation: 163
- Permutation: 164
- Permutation: 165
- Permutation: 166
- Permutation: 167
- Permutation: 168
- Permutation: 169
- Permutation: 170
- Permutation: 171
- Permutation: 172
- Permutation: 173
- Permutation: 174
- Permutation: 175
- Permutation: 176
- Permutation: 177
- Permutation: 178
- Permutation: 179
- Permutation: 180
- Permutation: 181
- Permutation: 182
- Permutation: 183
- Permutation: 184
- Permutation: 185
- Permutation: 186
- Permutation: 187
- Permutation: 188
- Permutation: 189
- Permutation: 190
- Permutation: 191
- Permutation: 192
- Permutation: 193
- Permutation: 194
- Permutation: 195
- Permutation: 196
- Permutation: 197
- Permutation: 198
- Permutation: 199
-## 
-## Likelihood ratio test (permutation based)
-## NULL: time-to-event curves are equal
-## 
-## Observed LR value:  202.8052
-## Degrees of freedom:  9
-## Naive P-value:  8.551556e-39
-## Permutation P-value (B = 199): 0.005&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;div id=&#34;comparing-non-parametric-curves&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;Comparing non-parametric curves&lt;/h1&gt;
-&lt;p&gt;In the above example, we have decided to fit a parametric time-to-event model. However, in other situations, we might be interested in fitting a non-parametric time-to-event model (NPMLE; &lt;a href=&#34;https://www.statforbiology.com/2021/stat_drcte_4-time-to-eventcurves/&#34;&gt;see here&lt;/a&gt;) and compare the curves for different treatment levels. In practice, nothing changes with respect to the approach I have shown above: first of all, we fit the NPMLEs with the following code:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;modNP &amp;lt;- drmte(count ~ timeBef + timeAf, fct = NPMLE(),
-            data = dataset, 
-            curveid = Temp:Storage)
-plot(modNP, log = &amp;quot;&amp;quot;, legendPos = c(6, 1))&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_drcte_5-ComparingLots_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;Next, we compare the non-parametric curves, in the very same fashion as above:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;compCDF(modNP, units = dataset$Units)
-## Exact Wilcoxon test (permutation form)
-## NULL: time-to-event curves are equal
-## 
-##      level   n   Scores
-## 1  Fix:Low 100   2.5350
-## 2 Fix:High 100   6.4600
-## 3  Alt:Low 100 -51.2275
-## 4 Alt:High 100  42.2325
-## 
-## Observed T value:  44.56
-## Permutation P-value (B = 199): 0.005&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Obviously, with NPMLEs, a different test statistic is used in the background; the default one is the Wilcoxon rank sum score, although two types of log-rank scores are also implemented (Sun’s scores and Finkelstein’s scores; see Fay and Shaw 2010). Permutation based P-values are calculated and reported.&lt;/p&gt;
-&lt;p&gt;The approach is exactly the same with Kernel Density Estimators (KDE; &lt;a href=&#34;https://www.statforbiology.com/2021/stat_drcte_4-time-to-eventcurves/&#34;&gt;see here&lt;/a&gt;). First we fit the four curves curves, by including the experimental factor as the ‘curveid’ argument:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;modKD &amp;lt;- drmte(count ~ timeBef + timeAf, fct = KDE(),
-            data = dataset, 
-            curveid = Temp:Storage)
-plot(modKD, log = &amp;quot;&amp;quot;, legendPos = c(6, 1))&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_drcte_5-ComparingLots_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;Second, we compare those curves, by using the &lt;code&gt;compCDF()&lt;/code&gt; function:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;compCDF(modKD, units = dataset$Units)
-## 
- Group permutation:  1
- Group permutation:  2
- Group permutation:  3
- Group permutation:  4
- Group permutation:  5
- Group permutation:  6
- Group permutation:  7
- Group permutation:  8
- Group permutation:  9
- Group permutation:  10
- Group permutation:  11
- Group permutation:  12
- Group permutation:  13
- Group permutation:  14
- Group permutation:  15
- Group permutation:  16
- Group permutation:  17
- Group permutation:  18
- Group permutation:  19
- Group permutation:  20
- Group permutation:  21
- Group permutation:  22
- Group permutation:  23
- Group permutation:  24
- Group permutation:  25
- Group permutation:  26
- Group permutation:  27
- Group permutation:  28
- Group permutation:  29
- Group permutation:  30
- Group permutation:  31
- Group permutation:  32
- Group permutation:  33
- Group permutation:  34
- Group permutation:  35
- Group permutation:  36
- Group permutation:  37
- Group permutation:  38
- Group permutation:  39
- Group permutation:  40
- Group permutation:  41
- Group permutation:  42
- Group permutation:  43
- Group permutation:  44
- Group permutation:  45
- Group permutation:  46
- Group permutation:  47
- Group permutation:  48
- Group permutation:  49
- Group permutation:  50
- Group permutation:  51
- Group permutation:  52
- Group permutation:  53
- Group permutation:  54
- Group permutation:  55
- Group permutation:  56
- Group permutation:  57
- Group permutation:  58
- Group permutation:  59
- Group permutation:  60
- Group permutation:  61
- Group permutation:  62
- Group permutation:  63
- Group permutation:  64
- Group permutation:  65
- Group permutation:  66
- Group permutation:  67
- Group permutation:  68
- Group permutation:  69
- Group permutation:  70
- Group permutation:  71
- Group permutation:  72
- Group permutation:  73
- Group permutation:  74
- Group permutation:  75
- Group permutation:  76
- Group permutation:  77
- Group permutation:  78
- Group permutation:  79
- Group permutation:  80
- Group permutation:  81
- Group permutation:  82
- Group permutation:  83
- Group permutation:  84
- Group permutation:  85
- Group permutation:  86
- Group permutation:  87
- Group permutation:  88
- Group permutation:  89
- Group permutation:  90
- Group permutation:  91
- Group permutation:  92
- Group permutation:  93
- Group permutation:  94
- Group permutation:  95
- Group permutation:  96
- Group permutation:  97
- Group permutation:  98
- Group permutation:  99
- Group permutation:  100
- Group permutation:  101
- Group permutation:  102
- Group permutation:  103
- Group permutation:  104
- Group permutation:  105
- Group permutation:  106
- Group permutation:  107
- Group permutation:  108
- Group permutation:  109
- Group permutation:  110
- Group permutation:  111
- Group permutation:  112
- Group permutation:  113
- Group permutation:  114
- Group permutation:  115
- Group permutation:  116
- Group permutation:  117
- Group permutation:  118
- Group permutation:  119
- Group permutation:  120
- Group permutation:  121
- Group permutation:  122
- Group permutation:  123
- Group permutation:  124
- Group permutation:  125
- Group permutation:  126
- Group permutation:  127
- Group permutation:  128
- Group permutation:  129
- Group permutation:  130
- Group permutation:  131
- Group permutation:  132
- Group permutation:  133
- Group permutation:  134
- Group permutation:  135
- Group permutation:  136
- Group permutation:  137
- Group permutation:  138
- Group permutation:  139
- Group permutation:  140
- Group permutation:  141
- Group permutation:  142
- Group permutation:  143
- Group permutation:  144
- Group permutation:  145
- Group permutation:  146
- Group permutation:  147
- Group permutation:  148
- Group permutation:  149
- Group permutation:  150
- Group permutation:  151
- Group permutation:  152
- Group permutation:  153
- Group permutation:  154
- Group permutation:  155
- Group permutation:  156
- Group permutation:  157
- Group permutation:  158
- Group permutation:  159
- Group permutation:  160
- Group permutation:  161
- Group permutation:  162
- Group permutation:  163
- Group permutation:  164
- Group permutation:  165
- Group permutation:  166
- Group permutation:  167
- Group permutation:  168
- Group permutation:  169
- Group permutation:  170
- Group permutation:  171
- Group permutation:  172
- Group permutation:  173
- Group permutation:  174
- Group permutation:  175
- Group permutation:  176
- Group permutation:  177
- Group permutation:  178
- Group permutation:  179
- Group permutation:  180
- Group permutation:  181
- Group permutation:  182
- Group permutation:  183
- Group permutation:  184
- Group permutation:  185
- Group permutation:  186
- Group permutation:  187
- Group permutation:  188
- Group permutation:  189
- Group permutation:  190
- Group permutation:  191
- Group permutation:  192
- Group permutation:  193
- Group permutation:  194
- Group permutation:  195
- Group permutation:  196
- Group permutation:  197
- Group permutation:  198
- Group permutation:  199
-## Permutation test based on a Cramér-von-Mises type distance (Barreiro-Ures et al., 2019)
-## NULL HYPOTHESIS: time-to-event curves are equal
-## 
-##      level   n         D
-## 1  Fix:Low 100 0.0579661
-## 2 Fix:High 100 0.1347005
-## 3  Alt:Low 100 4.1378209
-## 4 Alt:High 100 3.8581487
-## 
-## Observed D value =  2.0472
-## P value =  0.005&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;In this case, a Cramér‐von Mises type distance among curves is used (Barreiro-Ures et al., 2019), which, roughly speaking, is based on the integrated distance between the KDEs for the different groups and the pooled KDE for all groups. Permutation based P-values are also calculated and reported.&lt;/p&gt;
-&lt;p&gt;We do hope that this post helps you test your hypotheses about seed germination/emergence in a reliable way.&lt;/p&gt;
-&lt;p&gt;Thanks for reading!&lt;/p&gt;
-&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
-Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
-University of Perugia (Italy)&lt;br /&gt;
-Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
-&lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
-&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
-&lt;hr /&gt;
-&lt;/div&gt;
-&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;References&lt;/h1&gt;
-&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
-&lt;li&gt;Barreiro‐Ures, D, M Francisco‐Fernández, R Cao, BB Fraguela, R Doallo, JL González‐Andújar, M Reyes (2019) Analysis of interval‐grouped data in weed science: The binnednp Rcpp package. Ecol Evol 9:10903–10915&lt;/li&gt;
-&lt;li&gt;Catara, S., Cristaudo, A., Gualtieri, A., Galesi, R., Impelluso, C., Onofri, A., 2016. Threshold temperatures for seed germination in nine species of Verbascum (Scrophulariaceae). Seed Science Research 26, 30–46.&lt;/li&gt;
-&lt;li&gt;Fay, MP, PA Shaw (2010) Exact and Asymptotic Weighted Logrank Tests for Interval Censored Data: The interval R Package. Journal of Statistical Software 36:1–34&lt;/li&gt;
-&lt;li&gt;Ritz, C., Jensen, S. M., Gerhard, D., Streibig, J. C. (2019) Dose-Response Analysis Using R CRC Press&lt;/li&gt;
-&lt;/ol&gt;
 &lt;/div&gt;
 </description>
     </item>
