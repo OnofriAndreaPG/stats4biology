@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.0 (15/03/2021), compil. 2021-05-03"
+date: "Update: v. 1.0 (15/03/2021), compil. 2022-02-02"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -941,7 +941,7 @@ boxplot(values ~ series)
 
 ### Distribuzioni di frequenze e classamento
 
-Utilizziamo il dataset 'mtcars' disponibile nell'installazione di base di R, che possiamo caricare utilizzando la funzione `data()`.
+Utilizziamo il dataset 'mtcars' disponibile nell'installazione di gbase di R, che possiamo caricare utilizzando la funzione `data()`.
 
 
 ```r
@@ -3134,9 +3134,9 @@ library(emmeans)
 medie <- emmeans(mod, ~Insecticide)
 medie
 ##  Insecticide emmean    SE df lower.CL upper.CL
-##  A             6.34 0.178 12     5.96     6.73
-##  B             5.81 0.178 12     5.43     6.20
-##  C             3.95 0.178 12     3.56     4.34
+##  T1            6.34 0.178 12     5.96     6.73
+##  T2            5.81 0.178 12     5.43     6.20
+##  T3            3.95 0.178 12     3.56     4.34
 ## 
 ## Results are given on the log (not the response) scale. 
 ## Confidence level used: 0.95
@@ -3152,7 +3152,7 @@ In questo modo la nostra unità di misura ridiventa quella originale, anche se i
 
 ```r
 mean(dataset[dataset$Insecticide == "A","Count"])
-## [1] 589.8
+## [1] NaN
 ```
 
 e risulta più alta della media retro-trasformata. In realtà, se è vero che i logaritmi sono normalmente distribuiti, la media dei logaritmi (6.34) dovrebbe essere uguale alla mediana (ricordiamo che in una distribuzione normale media e mediana coincidono). La mediana è il valore centrale; dato che la retro-trasformazione è monotona, il valore centrale resta centrale, anche se io retro-trasformo. Quindi la media retro-trasformata è uno stimatore della mediana della popolazione originale, non della sua media. Questo non è uno svantaggio: infatti il QQ-plot suggerisce un'asimmetria positiva (confronta la Figura \@ref(fig:figName111) con la Figura \@ref(fig:figName106) ) cosa che è confermata dal fatto che la mediana è minore della media. Se la distribuzione dei dati è asimmetrica, la mediana è un indicatore di tendenza centrale migliore della media, perché meno sensibile ai valori estremi, che sono più frequenti in caso di asimmetria.
@@ -3164,9 +3164,9 @@ Il problema è che, se vogliamo utilizzare la media retro-trasformata, dobbiamo 
 retroMedie <- emmeans(mod, ~Insecticide, transform = "response")
 retroMedie
 ##  Insecticide response     SE df lower.CL upper.CL
-##  A              568.6 101.01 12    348.5      789
-##  B              335.1  59.54 12    205.4      465
-##  C               51.9   9.22 12     31.8       72
+##  T1             568.6 101.01 12    348.5      789
+##  T2             335.1  59.54 12    205.4      465
+##  T3              51.9   9.22 12     31.8       72
 ## 
 ## Confidence level used: 0.95
 ```
@@ -3327,10 +3327,10 @@ Una volta definiti i coefficienti, possiamo utilizzare il package  ‘emmeans’
 K <- list(k1 = k1, K2 = k2, k3 = k3, k4 = k4)
 contrast(medie, method = K, adjust="none")
 ##  contrast estimate   SE df t.ratio p.value
-##  k1         -16.39 2.26 12 -7.244  <.0001 
-##  K2           7.89 2.40 12  3.289  0.0065 
-##  k3          11.73 2.77 12  4.235  0.0012 
-##  k4           4.05 2.77 12  1.461  0.1697
+##  k1         -16.39 2.26 12  -7.244  <.0001
+##  K2           7.89 2.40 12   3.289  0.0065
+##  k3          11.73 2.77 12   4.235  0.0012
+##  k4           4.05 2.77 12   1.461  0.1697
 ```
 
 \normalsize
@@ -3351,12 +3351,12 @@ Nel quadro sottostante mostriamo un confronto tipo Tukey (tutti contro tutti), e
 #Confronti multipli a coppie
 contrast(medie, adjust="none", method="pairwise")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461  0.1697 
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774  0.0168 
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352  <.0001 
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235  0.0012 
-##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813  <.0001 
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578  0.0038
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  0.1697
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.0168
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  <.0001
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0012
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0038
 ```
 \normalsize
 
@@ -3368,9 +3368,9 @@ Per i confronti del tipo 'tutti verso uno' è possibile utilizzare la stessa fun
 ```r
 contrast(medie, adjust="none", method="dunnett")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Mixture_378 - Metribuzin__348       -4.05 2.77 12 -1.461  0.1697 
-##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12  2.774  0.0168 
-##  Unweeded - Metribuzin__348          17.60 2.77 12  6.352  <.0001
+##  Mixture_378 - Metribuzin__348       -4.05 2.77 12  -1.461  0.1697
+##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12   2.774  0.0168
+##  Unweeded - Metribuzin__348          17.60 2.77 12   6.352  <.0001
 ```
 \normalsize
 
@@ -3382,9 +3382,9 @@ Così facendo vediamo che R confronta tutte le tesi con metribuzin, che è il pr
 ```r
 contrast(medie, adjust="none", method="dunnett", ref = 2)
 ##  contrast                      estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378     4.05 2.77 12 1.461   0.1697 
-##  Rimsulfuron_30 - Mixture_378     11.73 2.77 12 4.235   0.0012 
-##  Unweeded - Mixture_378           21.64 2.77 12 7.813   <.0001
+##  Metribuzin__348 - Mixture_378     4.05 2.77 12   1.461  0.1697
+##  Rimsulfuron_30 - Mixture_378     11.73 2.77 12   4.235  0.0012
+##  Unweeded - Mixture_378           21.64 2.77 12   7.813  <.0001
 ```
 
 \normalsize
@@ -3433,7 +3433,10 @@ multcomp::cld(medie, adjust="none", Letters=LETTERS)
 ##  Unweeded         26.77 1.96 12    22.50     31.0    C  
 ## 
 ## Confidence level used: 0.95 
-## significance level used: alpha = 0.05
+## significance level used: alpha = 0.05 
+## NOTE: Compact letter displays can be misleading
+##       because they show NON-findings rather than findings.
+##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 ```
 
 
@@ -3477,12 +3480,12 @@ Più facilmente, possiamo arrivare allo stesso risultato con il package 'emmeans
 ```r
 contrast(medie, method = "pairwise", adjust = "sidak", ref = 2)
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461  0.6723 
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774  0.0968 
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352  0.0002 
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235  0.0069 
-##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813  <.0001 
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578  0.0226 
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  0.6723
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.0968
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  0.0002
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0069
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0226
 ## 
 ## P value adjustment: sidak method for 6 tests
 ```
@@ -3511,12 +3514,12 @@ Oppure possiamo utilizzare la funzione `contrast()`:
 ```r
 contrast(medie, method = "pairwise", adjust = "bonferroni")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461  1.0000 
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774  0.1010 
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352  0.0002 
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235  0.0069 
-##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813  <.0001 
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578  0.0228 
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  1.0000
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.1010
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  0.0002
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0069
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0228
 ## 
 ## P value adjustment: bonferroni method for 6 tests
 ```
@@ -3533,12 +3536,12 @@ Oltre che aggiustare il P-level, possiamo anche utilizzare altre procedure di ag
 #Confronti multipli a coppie, basati sul t multivariato
 contrast(medie, method="pairwise")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461  0.4885 
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774  0.0698 
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352  0.0002 
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235  0.0055 
-##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813  <.0001 
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578  0.0173 
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  0.4885
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.0698
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  0.0002
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0055
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0173
 ## 
 ## P value adjustment: tukey method for comparing a family of 4 estimates
 ```
@@ -3554,9 +3557,9 @@ Ovviamente la correzione per la molteplicità ed il conseguente innalzamento del
 #Confronti multipli a coppie, basati sul t multivariato
 contrast(medie, method="dunnett")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Mixture_378 - Metribuzin__348       -4.05 2.77 12 -1.461  0.3711 
-##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12  2.774  0.0442 
-##  Unweeded - Metribuzin__348          17.60 2.77 12  6.352  0.0001 
+##  Mixture_378 - Metribuzin__348       -4.05 2.77 12  -1.461  0.3711
+##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12   2.774  0.0442
+##  Unweeded - Metribuzin__348          17.60 2.77 12   6.352  0.0001
 ## 
 ## P value adjustment: dunnettx method for 3 tests
 ```
@@ -3878,7 +3881,10 @@ multcomp::cld(medie, Letters = LETTERS, reverse = T)
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 16 estimates 
-## significance level used: alpha = 0.05
+## significance level used: alpha = 0.05 
+## NOTE: Compact letter displays can be misleading
+##       because they show NON-findings rather than findings.
+##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 ```
 
 \normalsize
@@ -4564,7 +4570,10 @@ multcomp::cld(medie, Letters = LETTERS)
 ## 
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
-## significance level used: alpha = 0.05
+## significance level used: alpha = 0.05 
+## NOTE: Compact letter displays can be misleading
+##       because they show NON-findings rather than findings.
+##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 ```
 
 Se volessimo confrontare le lavorazioni a parità di diserbo o tutte le combinazioni dovremmo utilizzare una sintassi leggermente diversa:
@@ -4588,7 +4597,10 @@ multcomp::cld(medie, Letters=LETTERS)
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 3 estimates 
-## significance level used: alpha = 0.05
+## significance level used: alpha = 0.05 
+## NOTE: Compact letter displays can be misleading
+##       because they show NON-findings rather than findings.
+##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 medie <- emmeans(mod, ~Tillage:WeedControl)
 multcomp::cld(medie, Letters=LETTERS)
 ##  Tillage WeedControl emmean    SE df lower.CL upper.CL .group
@@ -4602,7 +4614,10 @@ multcomp::cld(medie, Letters=LETTERS)
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 6 estimates 
-## significance level used: alpha = 0.05
+## significance level used: alpha = 0.05 
+## NOTE: Compact letter displays can be misleading
+##       because they show NON-findings rather than findings.
+##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 ```
 
 Le tre analisi (contronti tra lavorazioni a parità di diserbo, tra diserbi a parità di lavorazione e tutti verso tutti) portano a risultati leggermente diversi per il diverso numero di confronti effettuati: tre nel primo caso, sei nel secondo e 15 nel terzo, che richiedono una diversa correzione per la molteplicità.
@@ -4748,7 +4763,7 @@ multcomp::cld(mfMeans, Letters = LETTERS)
 ## Male = A2:
 ##  Female emmean    SE df lower.CL upper.CL .group
 ##  B6       8.72 0.849 24     6.97    10.47  A    
-##  B5      11.23 0.849 24     9.48    12.98  A    
+##  B5      11.23 0.849 24     9.48    12.98  AB   
 ##  B4      15.18 0.849 24    13.43    16.93   B   
 ## 
 ## Male = A3:
@@ -4760,21 +4775,183 @@ multcomp::cld(mfMeans, Letters = LETTERS)
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
 ## Results are averaged over some or all of the levels of: Block 
-## P value adjustment: tukey method for comparing a family of 4.772 estimates 
-## significance level used: alpha = 0.05
+## P value adjustment: tukey method for comparing a family of 9 estimates 
+## significance level used: alpha = 0.05 
+## NOTE: Compact letter displays can be misleading
+##       because they show NON-findings rather than findings.
+##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 ```
 
 In conclusione, vediamo che l'analisi dei disegni con due fattori innestati è piuttosto simile a quella per due fattori incrociati, con l'unica eccezione che l'effetto principale per il fattore innestato non è incluso nel modello.
 
 <!--chapter:end:12-AnovaDueLivelli.Rmd-->
 
-# Split-plots, split-blocks e altri disegni sperimenatli in campo
-
-[Da aggiungere]
+# Breve introduzione ai modelli misti
 
 
+In questo libro abbiamo affrontato le questioni più rilevanti in relazione all'attività di ricerca e sperimentazione, almeno quelle che dovrebbero far parte del bagaglio culturale di ogni laureato in agraria o altre discipline biologiche. La trattazione non è affatto esaustiva e quindi, se si avesse l'intenzioni intraprendere una carriera professionale nel mondo dell'analisi dei dati, non si potrebbe prescindere dalla lettura di altri testi di approfondimento, che sono stati via via segnalati. Ci sembra comunque opportuno, in questo capitolo e quello successivo, dare almeno alcune informazioni di base su altri modelli un po' più complessi, il cui impiego è abbastanza comune nella sperimentazione di pieno campo.
 
-<!--chapter:end:13-SplitNested.Rmd-->
+
+## Raggruppamenti tra parcelle
+
+Nel capitolo 2 abbiamo parlato dei disegni a split-plot o a strip-plot, caratterizzati da trattamenti che non sono allocati a caso, ma a gruppi di parcelle contigue.
+
+Ad esempio, nella Figura 2.9 abbiamo mostrato come, in un esperimento a split-plot, i livello del fattore principale vengano allocati alle *main-plots*, ognuna delle quali è poi suddivisa in tante *sub-plots*, alle quali vengono allocati i livelli del trattamento secondario.  Analogamente, in uno schema a strip-plot, il blocco viene diviso in righe e colonne, alle quali vengono rispettivamente allocati i livelli dei due fattori sperimentali.
+
+Questi gruppi di parcelle trattate in modo non indipendente costituiscono dei veri e propri *blocking factors*, che si aggiungono agli altri fattori sperimentali di cui abbiamo parlato finora. Trascurare questi elementi di raggruppamento nel corso dell'analisi dei dati è sbagliato, in quanto si viene a rompere l'indipendenza dei residui. Ad esempio, in un disegno a split-plot, se una *main-plot* è più fertile di un'altra, tutte le misurazioni effettuate su di essa condivideranno lo stesso effetto positivo e saranno quindi più simili tra di loro che le misurazioni effettuate su *main-plots* diverse. Insomma, con uno schema a split-plot, i dati ottenuti sulla stessa *main-plot* non sono indipendenti, ma sono in qualche modo 'apparentati'; più propriamente, si parla di **correlazione intra-classe**, un concetto simile, ma non totalmente coincidente con quello di correlazione di Pearson. Se l'effetto prodotto dalle *main-plots* o dagli altri *blocking factor* non viene incluso nel modello statistico descrittivo, esso rimane tra gli effetti non spiegati e, di conseguenza, viene incluso nei residui, che, pertanto, saranno correlati e quindi non indipendenti tra di loro.
+
+In generale, dobbiamo tener presente che, ogni volta in cui l'allocazione dei trattamenti comporta una qualche forma di raggruppamento tra parcelle, l'elemento di raggruppamento, o meglio, l'effetto da esso provocato, deve essere introdotto nel modello, in modo che nei residui rimangano solo effetti puramente stocastici ed ignoti.
+
+## Esperimenti a split-plot
+
+Consideriamo nuovamente l'esempio presentato nel capitolo 12, nel quale avevamo due fattori sperimentali a confronto: il diserbo, con due livelli (totale o localizzato sulla fila) e la lavorazione, con tre livelli (aratura profonda, aratura superficiale e *minimum tillage*). In precedenza abbiamo analizzato i dati come se l'esperimento fosse stato disegnato a blocchi randomizzati, secondo la mappa di campo riportata nel Capitolo 2, in Figura 2.8. In realtà, questo esperimento era stato disegnato seguendo uno schema a split-plot, come indicato in Figura 2.9; vediamo quindi come procedere all'analisi dei dati in modo corretto. 
+
+
+### Definizione del modello lineare
+
+Il modello ANOVA per un disegno a split-plot è simile a quello dell'ANOVA fattoriale, fatta salva la presenza di un effetto aggiuntivo, cioè quello delle parcelle principali, che costituiscono un elemento di raggruppamento delle osservazioni:
+
+$$Y_{ijk} = \mu + \gamma_k + \alpha_i + \theta_{ik} + \beta_j + \alpha\beta_{ij} + \varepsilon_{ijk}$$
+
+
+dove $\gamma$ è l’effetto del blocco $k$, $\alpha$ è l’effetto della lavorazione $i$, $\beta$ è l’effetto del diserbo $j$, $\alpha\beta$ è l'effetto dell'interazione per la specifica combinazione della lavorazione $i$ e del diserbo $j$. Abbiamo incluso anche $\theta$ che è l'effetto della main-plot; dato che ogni parcella principale è identificata univocamente dal blocco $k$ a cui appartiene e dalla lavorazione $i$ in essa eseguita, abbiamo utilizzato i pedici corrispondenti.
+
+Concentriamoci per un attimo sulle *main-plots*: esiste una differenza sostanziale tra questo effetto e gli altri effetti in gioco. In particolare, mentre i livelli delle lavorazioni e del diserbo li abbiamo attentamente prescelti, perché eravamo specificatamente interessati ad essi, nel caso delle *main-plots* non abbiamo nessun interesse specifico, abbiamo operato una selezione casuale da un universo più grosso, quello di tutte le *main-plots* possibili nel nostro appezzamento. In altre parole, possiamo dire che le *main-plots* potrebbero essere cambiate a piacimento senza snaturare le finalità del nostro esperimento, cosa che non possiamo altrettanto dire dei livelli delle lavorazioni e del diserbo. In termini statistici diciamo che lavorazioni e diserbo sono **effetti fissi** mentre le *main-plots* sono un **effetto random**, che si aggiunge ad $\varepsilon$.
+
+Abbiamo quindi definito un modello che, a differenza di tutti quelli che abbiamo considerato finora, ha due effetti random, entrambi assunti come gaussiani, con media zero e deviazioni standard rispettivamente pari a $\sigma_{\theta}$ e $\sigma$. I modelli che hanno più di un effetto random si chiamano **modelli misti** e, di conseguenza, i dati provenienti da esperimenti a split-plot e, vedremo tra poco, a *strip-plot* debbono essere analizzati utilizzando un modello misto.
+
+La piattaforma dei modelli misti presenta molte differenze concettuali rispetto alla piattaforma dei modelli lineari, che abbiamo utilizzato finora. Data la complessità, l'argomento richiede un corso di livello più avanzato e non può essere introdotto qui, anche se ci sembra opportuno mostrare almeno come trattare i dati provenienti da questi esperimenti così comuni in ambito agrario.
+
+
+### Model fitting con R
+
+Come abbiamo visto, i risultati di questo esperimento sono disponibili nel file 'beet.csv', che può essere aperto direttamente dalla solita repository online, utilizzando il codice sottostante. Subito dopo aver caricato il file, trasformiamo le variabili indipendenti in 'factors', come al solito.
+
+
+```r
+fileName <- "https://www.casaonofri.it/_datasets/beet.csv"
+dataset <- read.csv(fileName, header=T)
+dataset$Tillage <- as.factor(dataset$Tillage)
+dataset$WeedControl <- as.factor(dataset$WeedControl)
+dataset$Block <- as.factor(dataset$Block)
+head(dataset)
+##   Tillage WeedControl Block  Yield
+## 1     MIN         TOT     1 11.614
+## 2     MIN         TOT     2  9.283
+## 3     MIN         TOT     3  7.019
+## 4     MIN         TOT     4  8.015
+## 5     MIN        PART     1  5.117
+## 6     MIN        PART     2  4.306
+```
+
+
+Prima di tutto, dobbiamo creare una variabile che identifichi in modo univoco le *main-plots*. Per questo potremmo utilizzare una codifica numerica, oppure, più semplicemente, costruire un nuovo fattore combinando i livelli del blocco e della lavorazione, dato che ogni *main-plot* è identificata univocamente dal blocco di cui fa parte e dalla lavorazione che ha subito.
+
+
+
+```r
+dataset$mainPlot <- with(dataset, factor(Block:Tillage))
+```
+
+In secondo luogo, il model fitting non può essere effettuato con la funzione `lm()`, che ci permette di definire un solo effetto random. Dobbiamo invece utilizzare una delle funzioni di R per i modelli misti, tra le quali proponiamo `lmer()`, che richiede due packages aggiuntivi: 'lme4' e 'lmerTest', che dobbiamo installare, se non lo abbiamo già fatto, e caricare in memoria.
+
+```
+install.packages("lme4") #only at first time
+install.packages("lmerTest") #only at first time
+```
+La sintassi di `lmer()` è simile a quella di `lm()` e gli effetti random possono essere inseriti tra parentesi, utilizzando l'operatore '1|', come mostrato nel box sottostante.
+
+
+```r
+library(lme4)
+library(lmerTest)
+mod.split <- lmer(Yield ~ Block + Tillage * WeedControl +
+                  (1|mainPlot), data=dataset)
+```
+
+Per quanto riguarda le assunzioni di base, i modelli misti sono sempre e comunque modelli linear e quindi fanno le stesse assunzioni di moscedasticità e normalità dei residui. L'ispezione grafica di questi utlimi può essere condotta nel modo usuale, se non che la funzione `plot()` restituisce solo il grafico dei residui verso i valori attesi (quello corrispondente all'argomento 'which = 1' in `lm()`). D'altro canto, non c'è un modo veloce per ottenere un QQ-plot e, pertanto, per la valutazione della normalità dei residui, possiamo utilizzare il test di Shapiro-Wilks, già indicato nel capitolo 8.
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName141b-1.png" alt="Analisi grafica dei residui per un modello misto" width="90%" />
+<p class="caption">(\#fig:figName141b)Analisi grafica dei residui per un modello misto</p>
+</div>
+
+
+
+```r
+shapiro.test(residuals(mod.split))
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  residuals(mod.split)
+## W = 0.93838, p-value = 0.1501
+```
+
+Dopo esserci accertati della validità delle assunzioni di base, possiamo procedere con la scomposizione della varianza, utilizzando l'usuale funzione `anova()`, che fornisce però un output leggermente diverso dal solito. Come secondo argomento è necessario indicare il metodo prescelto per la stima dei gradi di libertà, che non è così semplice come nel caso dei modelli lineari generali. Consigliamo il metodo 'Kenward-Roger' che, pur fornendo comunque un'approssimazione, ha dimostrato ottima affidabilità.
+
+
+```r
+anova(mod.split, ddf="Kenward-Roger")
+## Type III Analysis of Variance Table with Kenward-Roger's method
+##                      Sum Sq Mean Sq NumDF DenDF F value  Pr(>F)  
+## Block                3.6596  1.2199     3     6  0.6521 0.61016  
+## Tillage             23.6565 11.8282     2     6  6.3228 0.03332 *
+## WeedControl          3.3205  3.3205     1     9  1.7750 0.21552  
+## Tillage:WeedControl 19.4641  9.7321     2     9  5.2023 0.03152 *
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+Da qui in avanti l'analisi procede con il metodo usuale, già spiegato nel capitolo 12, utilizzando la funzione `emmeans()` per il calcolo delle medie marginali e per i confronti multipli. Questa parte di lavoro viene lasciata per esercizio.
+
+
+## Esperimenti a strip-plot
+
+In alcune circostanze, soprattutto nelle prove di diserbo chimico, potrebbe trovare applicazione un altro tipo di schema sperimentale, nel quale ogni blocco viene diviso in tante righe quanti sono i livelli di un fattore sperimentale e tante colonne quanti sono i livelli dell'altro. In questo modo, il primo trattamento sperimentale viene applicato a tutte le parcelle di una riga e l'altro trattamento a tutte le parcelle di una colonna. Ovviamente, l'allocazione alle righe e alle colonne è casuale e cambia in ogni blocco.
+
+Questo disegno è detto **strip-plot** ed è molto comodo perché consente di lavorare velocemente. Nel capitolo 2 abbiamo già presentato un esempio di come l'esperimento di cui stiamo parlando (interazione tra lavorazioni e diserbo chimico) avrebbe potuto essere pianificato, con uno schema a strip-plot (Figura 2.10).
+
+### Definizione del modello lineare
+
+Dalla mappa si può osservare che, entro ogni blocco, le osservazioni sono raggruppate per riga e per colonna. Di conseguenza, anche le righe e le colonne debbono essere incluse nel modello lineare, per ripristinare l'indipendenza dei residui. Il modello è quindi:
+
+
+$$Y_{ijk} = \mu + \gamma_k + \alpha_i + \theta_{ik} + \beta_j + \zeta_{jk} + \alpha\beta_{ij} + \varepsilon_{ijk}$$
+
+Analogamente a quanto abbiamo visto per lo split-plot, le 12 righe sono univocamente definite da un livello di lavorazione e un blocco e, per questo, l'effetto $\theta$ porta i pedici $i$ e $k$. D'altra parte, le 8 colonne sono definite da un livello di diserbo e un blocco, per cui l'effetto $\zeta$ porta i pedici $j$ e $k$. Entrambi gli effetti sono da considerare random, per cui anche questo è un modello 'misto', con tre effetti random.
+
+### Model fitting con R
+
+Il codice da utilizzare è analogo a quello precedentemente esposto per il disegno a split-plot e prevede l'introduzione degli effetti random 'riga' e 'colonna', che vengono inseriti tra parentesi e con l'operatore '1|', come indicato nel box sottostante.
+
+
+```r
+dataset$column <- with(dataset, factor(Block:Tillage))
+dataset$row <- with(dataset, factor(Block:WeedControl))
+mod.strip <- lmer(Yield ~ Block + Tillage * WeedControl +
+                  (1|column) + (1|row), data=dataset)
+anova(mod.strip, ddf = "Kenward-Roger")
+## Type III Analysis of Variance Table with Kenward-Roger's method
+##                      Sum Sq Mean Sq NumDF  DenDF F value  Pr(>F)  
+## Block                1.6323  0.5441     3 2.5022  0.3631 0.78795  
+## Tillage             23.6565 11.8282     2 6.0000  7.8934 0.02089 *
+## WeedControl          1.4810  1.4810     1 3.0000  0.9883 0.39343  
+## Tillage:WeedControl 19.4641  9.7321     2 6.0000  6.4946 0.03155 *
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+Anche in questo caso, il calcolo delle medie e i confronti multipli vengono effettuati con la tecnica usuale, indicata nei capitoli precedenti.
+
+
+## Altre letture
+
+1. Bates, D., Mächler, M., Bolker, B., Walker, S., 2015. Fitting Linear Mixed-Effects Models Using lme4. Journal of Statistical Software 67. https://doi.org/10.18637/jss.v067.i01
+2. Gałecki, A., Burzykowski, T., 2013. Linear mixed-effects models using R: a step-by-step approach. Springer, Berlin.
+3. Kuznetsova, A., Brockhoff, P.B., Christensen, H.B., 2017. lmerTest Package: Tests in Linear Mixed Effects Models. Journal of Statistical Software 82, 1--26.
+
+
+<!--chapter:end:13-SplitStrip.Rmd-->
 
 # La regressione non-lineare
 
@@ -4785,12 +4962,12 @@ Da un punto di vista pratico, è quindi fondamentale saper adattare ai dati funz
 
 ## Caso studio: degradazione di un erbicida nel terreno
 
-Un suolo è stato trattato con metamitron (un erbicida) alla concentrazione di 100 ng g^1^. Dopo essere stato opportunamente mescolato, è stato distribuito in 24 contenitori di alluminio e posto in cella climatica alla temperatura di 20 °C. In 8 tempi diversi dopo l'inizio del saggio, sono stati prelevati 3 contenitori e sottoposti ad analisi chimica per la determinazione della concentrazione residua dell'erbicida. I dati osservati sono disponibili nel package 'aomisc', che deve quindi essere installato e caricato in memoria, secondo le istruzioni fornite nell'introduzione.
+Un suolo è stato trattato con metamitron (un erbicida) alla concentrazione di 100 ng g^1^. Dopo essere stato opportunamente mescolato, è stato distribuito in 24 contenitori di alluminio e posto in cella climatica alla temperatura di 20 °C. In 8 tempi diversi dopo l'inizio del saggio, sono stati prelevati 3 contenitori e sottoposti ad analisi chimica per la determinazione della concentrazione residua dell'erbicida. I risultati sono disponibili nel file 'degradation.csv', nella solita repository online.
 
 
 ```r
-library(aomisc)
-data(degradation)
+fileName <- "https://www.casaonofri.it/_datasets/degradation.csv"
+degradation <- read.csv(fileName)
 head(degradation, 10)
 ##    Time   Conc
 ## 1     0  96.40
@@ -4805,7 +4982,7 @@ head(degradation, 10)
 ## 10   10  49.20
 ```
 
-Per prima cosa, plottiamo i dati osservati (Figura \@ref(fig:figName151)); vediamo che l'andamento della concentrazione nel tempo è chiaramente curvilineo e, di conseguenza, non possiamo utilizzare la regressione lineare semplice, esposta nel capitolo precedente. 
+Per prima cosa, plottiamo i dati osservati (Figura \@ref(fig:figName151)). Vediamo che l'andamento della concentrazione nel tempo è chiaramente curvilineo e, di conseguenza, non possiamo utilizzare la regressione lineare semplice, esposta nel capitolo precedente. 
 
 <div class="figure" style="text-align: center">
 <img src="_main_files/figure-html/figName151-1.png" alt="Degradazione di metamitron nel terreno" width="90%" />
@@ -4835,7 +5012,7 @@ Noi ci poniamo nella situazione più comune, quella in cui la scelta del modello
 
 $$Y_i = A e^{-k \,X_i} + \varepsilon_i$$ 
 
-dove A è la concentrazione iniziale e $k$ e il tasso di degradazione (costante nel tempo). Come anticipato, la componente stocastica $\varepsilon$ si assume normalmente distribuita e omoscedastica.
+dove $A$ è la concentrazione iniziale e $k$ e il tasso di degradazione (costante nel tempo). Come anticipato, la componente stocastica $\varepsilon$ si assume normalmente distribuita e omoscedastica.
 
 ## Stima dei parametri
 
@@ -4877,7 +5054,7 @@ summary(mod)
 ## F-statistic: 136.6 on 1 and 22 DF,  p-value: 6.564e-11
 ```
 
-Le funzioni non-lineari che possono essere trasformate in lineari sono dette *linearizzabili* e hanno il vantaggio di semplificare molto i calcoli richiesti per la stima dei parametri. Un grave svantaggio è dato dal fatto che, trasformando la Y, si trasforma anche la distribuzione degli errori e quindi bisogna verificare che le assunzioni di base dei modelli lineari (omogeneità delle varianze e normalità dei residui) siano valide nella scala trasformata.
+Le funzioni non-lineari che possono essere trasformate in lineari sono dette *linearizzabili* e hanno il vantaggio di semplificare molto i calcoli richiesti per la stima dei parametri. Un grave svantaggio è dato dal fatto che, trasformando la risposta, si trasforma anche la distribuzione degli errori e quindi bisogna verificare che le assunzioni di base dei modelli lineari (omogeneità delle varianze e normalità dei residui) siano valide nella scala trasformata.
 
 
 
@@ -4930,7 +5107,7 @@ La terza strada, quella più percorsa, è utilizzare metodiche di regressione no
 
 ## La regressione non-lineare con R
 
-La funzione più comune in R per la parametrizzazione di funzioni non-lineari è 'nls()'. Nella chiamata alla funzione dobbiamo anche fornire stime iniziali per i valori dei parametri. Ottenere queste stime è facile pensando al loro significato biologico: $A$ è la concentrazione iniziale e quindi una stima ragionevole è data dal valor medio osservato al tempo 0 (100). Il parametro $k$ è invece il tasso di degradazione relativo; possiamo notare che nei primi 10 giorni la concentrazione si riduce della metà circa, cioè si abbassa mediamente un po' più del 5% al giorno. Possiamo quindi assegnare a $k$ un valore iniziale pari a 0.05.
+La funzione più comune in R per la parametrizzazione di funzioni non-lineari è `nls()`. Nella chiamata alla funzione dobbiamo anche fornire stime iniziali per i valori dei parametri. Ottenere queste stime è facile pensando al loro significato biologico: $A$ è la concentrazione iniziale e quindi una stima ragionevole è data dal valor medio osservato al tempo 0 (100). Il parametro $k$ è invece il tasso di degradazione relativo; possiamo notare che nei primi 10 giorni la concentrazione si riduce della metà circa, cioè si abbassa mediamente un po' più del 5% al giorno. Possiamo quindi assegnare a $k$ un valore iniziale pari a 0.05.
 
 
 
@@ -4962,18 +5139,26 @@ Le assunzioni parametriche di base relative ai modelli non-lineari sono le stess
 
 ### Analisi grafica dei residui
 
-L'analisi grafica dei residui viene eseguita in modo del tutto analogo a quanto visto per la regressione lineare. In primo luogo, verifichiamo le assunzioni di base di normalità e omoscedasticità, mediante il metodo 'plot()' per l'oggetto 'nls', che è disponibile nel package 'aomisc', già caricato in precedenza.
+L'analisi grafica dei residui viene eseguita in modo del tutto analogo a quanto visto per la regressione lineare. In primo luogo, verifichiamo le assunzioni di base di normalità e omoscedasticità, mediante il metodo `plot()` per l'oggetto 'nls', che è disponibile nel package 'aomisc', già caricato in precedenza.
 
 
 ```r
 par(mfrow=c(1,2))
 plot(modNlin, which = 1)
-plot(modNlin, which = 2)
 ```
 
 <div class="figure" style="text-align: center">
 <img src="_main_files/figure-html/figName154-1.png" alt="Analisi grafica dei residui per la regressione non-lineare, relativa alla degradazione di metamitron nel suolo" width="90%" />
-<p class="caption">(\#fig:figName154)Analisi grafica dei residui per la regressione non-lineare, relativa alla degradazione di metamitron nel suolo</p>
+<p class="caption">(\#fig:figName154-1)Analisi grafica dei residui per la regressione non-lineare, relativa alla degradazione di metamitron nel suolo</p>
+</div>
+
+```r
+plot(modNlin, which = 2)
+```
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName154-2.png" alt="Analisi grafica dei residui per la regressione non-lineare, relativa alla degradazione di metamitron nel suolo" width="90%" />
+<p class="caption">(\#fig:figName154-2)Analisi grafica dei residui per la regressione non-lineare, relativa alla degradazione di metamitron nel suolo</p>
 </div>
 
 La Figura \@ref(fig:figName154) non mostra deviazioni rispetto agli assunti di base. Pertanto, proseguiamo l'analisi grafica della bontà di adattamento, verificando il plot dei valori attesi e di quelli osservati (Figure \@ref(fig:figName155)). Questo grafico, per gli oggetti 'nls' può essere ottenuto velocemente utilizzando la funzione 'plotnls()', nel package 'aomisc'.
@@ -5101,6 +5286,7 @@ I due coefficienti di determinazione (tradizionale e corretto) possono essere ot
 
 
 ```r
+library(aomisc)
 R2nls(modNlin)
 ## $PseudoR2
 ## [1] 0.9939126
@@ -5217,11 +5403,6 @@ Con un oggetto 'nls', possiamo utilizzare la funzione 'boxcox' nel package 'aomi
 class(modNlin)
 ## [1] "nls"
 modNlin2 <- boxcox(modNlin)
-```
-
-![](_main_files/figure-html/unnamed-chunk-166-1.png)<!-- -->
-
-```r
 modNlin2
 ## Nonlinear regression model
 ##   model: bcFct1(Conc) ~ bcFct2(A * exp(-k * Time))
@@ -5255,11 +5436,6 @@ Invece che far scegliere alla funzione 'boxcox' il valore di $\lambda$ ottimale,
 
 ```r
 modNlin3 <- boxcox(modNlin, lambda = 0.5)
-```
-
-![](_main_files/figure-html/unnamed-chunk-167-1.png)<!-- -->
-
-```r
 summary(modNlin3)
 ## 
 ## Formula: bcFct1(Conc) ~ bcFct2(A * exp(-k * Time))
@@ -5472,11 +5648,12 @@ dove Y è la concentrazione al tempo t. Dopo aver spruzzato questo erbicida, che
 
 ### Esercizio 4
 
-Un erbicida si degrada nel terreno seguendo una cinetica del primo ordine:
+Una sostanza xenobiotica si degrada nell'acqua a 20°C seguendo una cinetica del primo ordine:
 
-$$Y = 100 \, e^{-0.07 \, t}$$
+$$Y = C_0 \, e^{-0.06 \, t}$$
 
-dove Y è la concentrazione al tempo t. Dopo aver spruzzato questo erbicida, che probabilità abbiamo che dopo 50 giorni la concentrazione si sia abbassata al disotto della soglia di tossicità per i mammiferi (2 ng/g)? Tenere conto che lo strumento di misura produce un coefficiente di variabilità del 20%
+dove Y è la concentrazione al tempo t. Simulare i risultati di un esperimento in cui, dopo la somministrazione di questa sostanza alla dose $C_0 = 63$ ng/mL, facciamo dodici prelievi settimanali e misuriamo la concentrazione del residuo. Considerare che (1) l'errore sperimentale è gaussiano e omoscedastico sul logaritmo della concentrazione, con media 0 e deviazione standard pari a 0.25; (2) l'esperimento è a randomizzazione completa con tre repliche.
+
 
 
 
