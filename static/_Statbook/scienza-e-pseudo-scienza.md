@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.0 (26/02/2021), compil. 2021-02-26"
+date: "Update: v. 1.0 (15/03/2021), compil. 2022-03-03"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -34,7 +34,7 @@ Per quanto affascinante possa sembrare l'idea del ricercatore che con un'improvv
 
 Che cosa è che permette ad una prova scientifica di uscire dall'ambito delle opinioni legate a divergenze di cultura, percezione e/o credenze individuali, per divenire, al contrario, oggettiva e universalmente valida? Che cosa è che distingue la verità scientifica da altre verità di natura metafisica, religiosa o pseudoscientifica?
 
-A questo proposito, si riportano alcuni aforismi significativi:
+A questo proposito, è utile leggere questi aforismi interessanti e significativi:
 
 1.  Analogy cannot serve as proof (Pasteur)
 2.  The interest I have in believing a thing is not a proof of the existence of that thing (Voltaire)
@@ -42,7 +42,7 @@ A questo proposito, si riportano alcuni aforismi significativi:
 
 ## Scienza = dati
 
-La base di tutta la scienza risiede nel cosiddetto 'metodo scientifico', che si fa comunemente risalire a Galileo Galilei (1564-1642) e che è riassunto nella figura seguente.
+La base di tutta la scienza risiede nel cosiddetto 'metodo scientifico', che si fa comunemente risalire a Galileo Galilei (1564-1642) e che è riassunto nella Figura \@ref(fig:figName11).
 
 <div class="figure" style="text-align: center">
 <img src="_images/MSAMap.jpg" alt="Il metodo scientifico Galileiano" width="75%" />
@@ -87,11 +87,11 @@ Con il termine **precisione** intendiamo due cose: la prima è relativa al numer
 
 Il termine accuratezza ha invece un significato completamente diverso, riconducibile alla differenza tra la misura effettuata e il valore vero della caratteristica da misurare. Può sembrare una banalità, ma proviamo a pensare ad uno strumento non tarato, come, ad esempio, un gascromatografo, che restituisce sempre una concentrazione maggiorata del 20%. Se noi ripetessimo le analisi 100 volte, in assenza di altri errori, otterremmo sempre lo stesso risultato, molto preciso, ma totalmente inaffidabile, nel senso che non riflette la concentrazione reale della soluzione in studio. L'errore sistematico, oltre a produrre un calo di precisione, produce anche inaccuratezza.
 
-Comprendiamo bene che l'accuratezza è più importante della precisione: infatti una misura accurata, ma imprecisa, riflette bene la realtà, anche se in modo vago. Al contrario, una misura precisa, ma inaccurata, ci porta completamente fuori strada, perché non riflette la realtà. Con linguaggio tecnico, un dato non accurato si dice 'distorto' (*biased*) e, siccome l'a distosione dipende'inaccuratezza dipende dagli errori sistematici, questi utlimi vanno assolutamente evitati, ad esempio con la perfetta taratura degli strumenti e l'adozione di metodi di misura rigidamente standardizzati e accettati dalla comunità scientifica mondiale.
+Comprendiamo bene che l'accuratezza è più importante della precisione: infatti una misura accurata, ma imprecisa, riflette bene la realtà, anche se in modo vago. Al contrario, una misura precisa, ma inaccurata, ci porta completamente fuori strada, perché non riflette la realtà. Con linguaggio tecnico, un dato non accurato si dice 'distorto' (*biased*) e, siccome la distosione dipende dagli errori sistematici, questi ultimi vanno assolutamente evitati, ad esempio con la perfetta taratura degli strumenti e l'adozione di metodi di misura rigidamente standardizzati e accettati dalla comunità scientifica mondiale.
 
-L'inaccuratezza preoccupa molto i laboratori di analisi, che spesso utilizzanostandard di confronto, la cui misura è perfettamente nota e viene periodicamente confrontata con quella rilevabile dallo strumento stesso, per verificarne la taratura. Altro metodo utilizzato nelle procedure di accreditamento dei laboratori è il *ring test*, dove campioni reali della matrice da misurare sono inviati a più laboratori a livello nazionale, in modo da poter confrontare le misure ottenute e valutarne la variabilità. Con un *ring test*, un laboratorio può valutare la sua stessa affidabilità in confronto con laboratori simili, basandosi sull'eventuale differenza tra il risultato ottenuto e quelli ottenuti in tutti gli altri laboratori valutati.
+L'inaccuratezza preoccupa molto i laboratori di analisi, che spesso utilizzano standard di confronto, la cui misura è perfettamente nota e viene periodicamente confrontata con quella rilevabile dallo strumento stesso, per verificarne la taratura. Altro metodo utilizzato nelle procedure di accreditamento dei laboratori è il *ring test*, dove campioni reali della matrice da misurare sono inviati a più laboratori a livello nazionale, in modo da poter confrontare le misure ottenute e valutarne la variabilità. Con un *ring test*, un laboratorio può valutare la sua stessa affidabilità in confronto con laboratori simili, basandosi sull'eventuale differenza tra il risultato ottenuto e quelli ottenuti in tutti gli altri laboratori valutati.
 
-Sfortunatamente la possibilità di raccogliere dati inaccurati è tutt'altro che remota. Gli scienziati americani Pons e Fleischmann, il 23 Marzo del 1989, diffusero pubblicamente la notizia di essere riusciti a riprodurre la fusione nucleare fredda, causando elevatissimo interesse nella comunità scientifica. Purtroppo le loro misure erano viziate da una serie di problemi e il loro risultato fu clamorosamente smentito da esperimenti successivi.
+Sfortunatamente la possibilità di raccogliere dati inaccurati è tutt'altro che remota. Gli scienziati americani Pons e Fleischmann, il 23 Marzo del 1989, diffusero pubblicamente la notizia di essere riusciti a riprodurre la fusione nucleare fredda, causando elevatissimo interesse nella comunità scientifica (Fig. \@ref(fig:figName2)). Purtroppo le loro misure erano viziate da una serie di problemi e il loro risultato fu smentito da esperimenti successivi.
 
 <div class="figure" style="text-align: center">
 <img src="_images/FalseResults.jpg" alt="Conseguenze di un esperimento sbagliato" width="50%" />
@@ -113,7 +113,7 @@ Il principio di falsificazione è piuttosto importante nel mondo scientifico ed 
 3.  Eliminato l'errore sistematico, l'evantuale errore casuale residuo deve essere sempre quantificato e visualizzato insieme ai risultati.
 4.  In considerazione dell'errore residuo, dobbiamo decidere se i dati raccolti consentono di rigettare la nostra ipotesi di partenza. Altrimenti, l'esperimento è inconclusivo e, pur non avendone la certezza, terremo per vera la nostra ipotesi di partenza fino a che non sarà smentita da future osservazioni.
 
-Oltre al principio di falsificazione, la scienza fa largo uso del principio del 'rasoio di Occam'. Guglielmo di Occam (XIV secolo) era un frate francescano che, in un periodo in cui le dimostrazioni scientifiche iniziavano a divenire troppo complesse, voleva ribadire l'importanza della semplicità. Il suo principio è solitamente formulato come '*Entia non sunt multiplicanda praeter necessitatem*' ed è noto come il 'rasoio' in quanto porta a respingere con nettezza (tagliare con il rasoio) le spiegazioni troppo complesse. Nela comunità scientifica, applichiamo questo principio preferendo sempre, tra due ipotesi alternative ugualmente buone, quella più semplice.
+Oltre al principio di falsificazione, la scienza fa largo uso del principio del 'rasoio di Occam'. Guglielmo di Occam (XIV secolo) era un frate francescano che, in un periodo in cui le dimostrazioni scientifiche iniziavano a divenire troppo complesse, voleva ribadire l'importanza della semplicità. Il suo principio è solitamente formulato come '*Entia non sunt multiplicanda praeter necessitatem*' ed è noto come il 'rasoio' in quanto porta a respingere con nettezza (tagliare con il rasoio) le spiegazioni troppo complesse. Nella comunità scientifica, applichiamo questo principio preferendo sempre, tra due ipotesi alternative ugualmente buone, quella più semplice.
 
 ## Falsificare un risultato
 
@@ -182,7 +182,7 @@ L'assegnazione casuale del trattamento, o la selezione casuale dei soggetti trat
 
 ### Esperimenti invalidi
 
-A questo punto dovrebbe essere chiaro che un esperimento valido deve essere controllato, replicato e randomizzato: la mancanza anche di uno solo di questi elementi pone dubbi ragionevoli sull'affidabilità dei risultati. In particolare, gli esperimenti 'invalidi' sono caratterizzati da:
+A questo punto, dovrebbe essere chiaro che un esperimento valido deve essere controllato, replicato e randomizzato: la mancanza anche di uno solo di questi elementi pone dubbi ragionevoli sull'affidabilità dei risultati. In particolare, gli esperimenti 'invalidi' sono caratterizzati da:
 
 1.  Cattivo controllo degli errori
 2.  Fondati sospetti di confounding
@@ -203,7 +203,7 @@ Diversa è la situazione in cui un cattivo controllo degli errori, ad esempio l'
 
 Abbiamo appena menzionato il problema fondamentale della ricerca, cioè il **confounding**, vale a dire la confusione tra l'effetto del trattamento e un qualche altro effetto casuale, legato alle caratteristiche innate del soggetto o a qualche intrusione più o meno 'demoniaca'. Abbiamo detto che non possiamo mai avere la certezza dell'assenza di confounding, ma abbiamo anche detto che l'adozione di una pratica sperimentale corretta ne minimizza la probabilità.
 
-Chiaramente, rimangono dei rischi che sono tipici di situazioni nelle quali il controllo adottato non è perfetto, come capita, ad esempio, negli esperimenti osservazionali. In questo ambito è piuttosto temuta la cosiddetta 'correlazione spuria', una forma di confounding casuale per cui due variabili variano congiuntamente (sono direttamente o inversamente proporzionali), ma in modo del tutto casuale. Esistono, ad esempio, dati che mostrano una chiara correlazione tra le vendite di panna acida e le morti per incidenti in motocicletta. Chiaramente, non esistono spiegazioni scientifiche per questo effetto, che è, ovviamente, del tutto casuale. Il problema è che questa correlazione spuria non è sempre così semplice da rintracciare.
+Chiaramente, rimangono dei rischi che sono tipici di situazioni nelle quali il controllo adottato non è perfetto, come capita, ad esempio, negli esperimenti osservazionali. In questo ambito è piuttosto temuta la cosiddetta 'correlazione spuria', una forma di confounding casuale per cui due variabili variano congiuntamente (sono direttamente o inversamente proporzionali), ma in modo del tutto casuale. Esistono, ad esempio, dati che mostrano una chiara correlazione tra le vendite di panna acida e le morti per incidenti in motocicletta (Fig. \@ref(fig:figName22)). Chiaramente, non esistono spiegazioni scientifiche per questo effetto, che è, ovviamente, del tutto casuale. Il problema è che questa correlazione spuria non è sempre così semplice da rintracciare.
 
 <div class="figure" style="text-align: center">
 <img src="_images/PannaAcida.png" alt="Esempio di correlazione spuria" width="90%" />
@@ -216,7 +216,7 @@ Il confounding non casuale è spesso difficile da evidenziare, soprattutto se le
 
 #### Pseudo-repliche e randomizzazione poco attenta
 
-Per evidenziare questi problemi e comprendere meglio la differenza tra un esperimento corretto e uno non corretto, è utilissima la classificazione fatta da Hurlbert (1984), che riportiamo di seguito.
+Per evidenziare questi problemi e comprendere meglio la differenza tra un esperimento corretto e uno non corretto, è utilissima la classificazione fatta da Hurlbert (1984), che riportiamo in Figura \@ref(fig:figName23).
 
 <div class="figure" style="text-align: center">
 <img src="_images/Randomisation.jpg" alt="Indicazioni per una corretta randomizzazione (Hurlbert, 1984)" width="90%" />
@@ -278,7 +278,7 @@ In conclusione, possiamo ripartire dalla domanda iniziale: "Che cosa è la scien
 
 Qual è il *take-home message* di questo capitolo? Fidatevi solo delle riviste scientifiche attendibili, cioè quelle che adottano un serio processo di *peer review* prima della pubblicazione.
 
-------------------------------------------------------------------------
+---
 
 ## Altre letture
 
@@ -286,7 +286,7 @@ Qual è il *take-home message* di questo capitolo? Fidatevi solo delle riviste s
 2.  Hurlbert, S., 1984. Pseudoreplication and the design of ecological experiments. Ecological Monographs, 54, 187-211
 3.  Kuehl, R. O., 2000. Design of experiments: statistical principles of research design and analysis. Duxbury Press (CHAPTER 1)
 
-<!--chapter:end:01-introBiometry.Rmd-->
+<!--chapter:end:01-introBiometria.Rmd-->
 
 
 # Progettare un esperimento
@@ -294,19 +294,13 @@ Qual è il *take-home message* di questo capitolo? Fidatevi solo delle riviste s
 Placeholder
 
 
+## Gli elementi della ricerca
 ## Ipotesi scientifica $\rightarrow$ obiettivo dell'esperimento
 ## Identificazione dei fattori sperimentali
-### Esperimenti (multi)fattoriali
-### L'importanza del controllo
-### Fattori sperimentali di trattamento e di blocco
-## Identificazione delle unità sperimentali
-### Cornice di campionamento
-### Scelta delle unità sperimentali
-### Unità sperimentali in campo: le parcelle
-## Allocazione dei trattamenti e disegno sperimentale
-### Disegni completamente randomizzati
-### Disegni a blocchi randomizzati
-### Disegni a quadrato latino
+### Esperimenti (multi-)fattoriali
+### Controllo o testimone
+## Le unità sperimentali
+## Allocazione dei trattamenti
 ## Le variabili sperimentali
 ### Variabili nominali (categoriche)
 ### Variabili ordinali
@@ -314,11 +308,20 @@ Placeholder
 ### Variabili quantitative continue
 ### Rilievi visivi e sensoriali
 ### Variabili di confondimento
-## Impianto delle prove
-## Scrivere un progetto/report di ricerca: semplici indicazioni
-## Per approfondire un po'...
+## Esperimenti di campo
+### Scegliere il campo
+### Le unità sperimentali in campo
+### Numero di repliche
+### La mappa di campo
+### Lay-out sperimentale
+#### Disegni completamente randomizzati
+#### Disegni a blocchi randomizzati
+#### Disegni a quadrato latino
+#### Disegni a split-plot
+#### Disegni a strip-plot
+## Altre letture
 
-<!--chapter:end:02-ResProject.Rmd-->
+<!--chapter:end:02-ProgettoRicerca.Rmd-->
 
 
 # Richiami di statistica descrittiva
@@ -326,21 +329,21 @@ Placeholder
 Placeholder
 
 
-## Dati quantitativi: analisi chimiche e altre misurazioni fondamentali
+## Dati quantitativi
 ### Indicatori di tendenza centrale
 ### Indicatori di dispersione
-### Arrotondamenti
-### Descrizione dei sottogruppi
+### Incertezza delle misure derivate
 ### Relazioni tra variabili quantitative: correlazione
-## Dati qualitativi: conteggi e frequenze
+## Dati qualitativi
 ### Distribuzioni di frequenze e classamento
 ### Statistiche descrittive per le distribuzioni di frequenze 
 ### Distribuzioni di frequenza bivariate: le tabelle di contingenze
 ### Connessione
-## Esercizi
-### Esercizio 1
-### Esercizio 2 
-## Per approfondire un po'...
+## Statistiche descrittive con R
+### Descrizione dei sottogruppi
+### Distribuzioni di frequenze e classamento
+### Connessione
+## Altre letture
 
 <!--chapter:end:03-StatisticaDescrittiva.Rmd-->
 
@@ -351,23 +354,17 @@ Placeholder
 
 
 ## Verità 'vera' e modelli deterministici
-### Qualche esempio di modello deterministico
 ## Genesi deterministica delle osservazioni sperimentali
 ## Errore sperimentale e modelli stocastici
 ### Funzioni di probabilità
 ### Funzioni di densità
-## La distribuzione normale (curva di Gauss)
+### La distribuzione normale (curva di Gauss)
 ## Modelli 'a due facce'
 ## E allora?
 ## Le simulazioni Monte Carlo
 ## Analisi dei dati e 'model fitting'
-## Per approfondire un po'...
-### Generazione dei dati sperimentali: un esempio più realistico
-### Modelli stocastici non-normali
-#### t di Student
-#### F di Fisher
-#### La distribuzione binomiale
-### Altre letture
+## Modelli stocastici non-normali
+## Altre letture
 
 <!--chapter:end:04-ModelliSperimentazione.Rmd-->
 
@@ -377,13 +374,11 @@ Placeholder
 Placeholder
 
 
-## L'analisi dei dati: gli 'ingredienti' fondamentali
 ## Esempio: una soluzione erbicida
-### Il modello dei dati
 ### Analisi dei dati: stima dei parametri
 ### La 'sampling distribution'
 ### L'errore standard
-## Riepilogo 1: Caratterizzare l'incertezza di un esperimento
+## Stima per intervallo
 ## L'intervallo di confidenza
 ## Qual è il senso dell'intervallo di confidenza?
 ## Come presentare i risultati degli esperimenti
@@ -392,33 +387,31 @@ Placeholder
 ### Popolazioni gaussiane e non 
 ## Analisi statistica dei dati: riassunto del percorso logico
 ## Da ricordare
-## Esercizi
 ## Per approfondire un po'...
 ## *Coverage* degli intervalli di confidenza
 ### Intervalli di confidenza per fenomeni non-normali
-### Altre letture
+## Altre letture
 
 <!--chapter:end:05-InferenzaStatistica.Rmd-->
 
 
-# Decisioni e incertezza
+# Decisioni ed incertezza
 
 Placeholder
 
 
-## Confronto tra una media osservata e una media teorica
+## Confronto tra due medie: il test t di Student
+### L'ipotesi nulla e alternativa
+### La statistica T
 ### Simulazione Monte Carlo
 ### Soluzione formale
 ### Interpretazione del P-level
-## Confronto tra due medie: il test t di Student
-## Confronto tra due proporzioni: il test $\chi^2$
-## Conclusioni
-## Riepilogo
-## Esercizi
-## Per approfondire un po'...
 ### Tipologie alternative di test t di Student
-### Simulazione del P-value nel test d'ipotesi
-### Altre letture
+## Confronto tra due proporzioni: il test $\chi^2$
+### Simulazione Monte Carlo
+### Soluzione formale
+## Conclusioni e riepilogo
+## Altre letture
 
 <!--chapter:end:06-TestIpotesi.Rmd-->
 
@@ -431,6 +424,7 @@ Placeholder
 ## Caso-studio: confronto tra erbicidi in vaso
 ## Descrizione del dataset
 ## Definizione di un modello lineare
+## Parametrizzazione del modello
 ## Assunzioni di base
 ## Fitting del modello: metodo manuale
 ### Stima dei parametri
@@ -438,15 +432,13 @@ Placeholder
 ### Stima di $\sigma$
 ## Scomposizione della varianza
 ## Test d'ipotesi
-### Inferenza statistica
+## Inferenza statistica
 ## Fitting del modello con R
 ## Medie marginali attese
 ## Per concludere ...
-## Per approfondire un po'...
-### Simulazione della *sampling distribution* per F
-### Altre letture
+## Altre letture
 
-<!--chapter:end:09-oneWayANOVA.Rmd-->
+<!--chapter:end:07-ANOVAunaVia.Rmd-->
 
 
 # La verifica delle assunzioni di base
@@ -454,11 +446,12 @@ Placeholder
 Placeholder
 
 
+## Violazioni delle assunzioni di base
 ## Procedure diagnostiche
 ## Analisi grafica dei residui
 ### Grafico dei residui contro i valori attesi
 ### QQ-plot
-## Strumenti diagnostici formali
+## Test d'ipotesi
 ## Risultati contraddittori
 ## 'Terapia'
 ### Correzione/Rimozione degli outliers
@@ -466,10 +459,11 @@ Placeholder
 ### Trasformazione della variabile indipendente
 ### Impiego di metodiche statistiche avanzate
 ### Trasformazioni stabilizzanti
-## Esempio
-## Per approfondire un po' ...
+## Esempio 1
+## Esempio 2
+## Altre letture
 
-<!--chapter:end:10-AssunzioniBase.Rmd-->
+<!--chapter:end:08-AssunzioniBase.Rmd-->
 
 
 # Contrasti e confronti multipli
@@ -479,20 +473,16 @@ Placeholder
 
 ## Esempio
 ## I contrasti
-### Varianza del contrasto e test d'ipotesi
-### I contrasti con R
+## I contrasti con R
 ## I confronti multipli a coppie (pairwise comparisons)
 ## Display a lettere
-## Problemi di molteplicità: tassi di errore per confronto e per esperimento
-### Correzione per la molteplicità
+## Tassi di errore per confronto e per esperimento
+## Aggiustamento per la molteplicità
 ## E le classiche procedure di confronto multiplo?
 ## Consigli pratici
-## Per approfondire un po'...
-### Intervallo di confidenza di un contrasto
-### Correzione per la molteplicità: qualche dettaglio ulteriore
-### Altre letture
+## Altre letture
 
-<!--chapter:end:11-ConfrontoMultiplo.Rmd-->
+<!--chapter:end:09-ConfrontoMultiplo.Rmd-->
 
 
 # Modelli ANOVA con fattori di blocco
@@ -504,34 +494,14 @@ Placeholder
 ## Definizione di un modello lineare
 ## Stima dei parametri
 ### Coefficienti del modello
-### Residui e devianze
+### Stima di $\sigma$
 ## Scomposizione della varianza
+## Adattamento del modello con R
 ## Disegni a quadrato latino
 ## Caso studio: confronto tra metodi costruttivi
 ## Definizione di un modello lineare
 
-<!--chapter:end:12-MultiWayANOVAModels.Rmd-->
-
-
-# Modelli ANOVA a due vie
-
-Placeholder
-
-
-## Il concetto di ’interazione’
-## Tipi di interazione
-## Caso-studio: interazione tra lavorazioni e diserbo chimico
-## Definizione del modello lineare
-## Stima dei parametri
-## Verifica delle assunzioni di base
-## Scomposizione delle varianze
-## Medie marginali attese
-## Calcolo degli errori standard (SEM e SED)
-## Medie marginali attese e confronti multipli con R
-## Per approfondire un po'....
-### Anova a due vie: scomposizione 'manuale' della varianza
-
-<!--chapter:end:13-AnovaDueLivelli.Rmd-->
+<!--chapter:end:10-MultiWayANOVAModels.Rmd-->
 
 
 # La regressione lineare semplice
@@ -549,9 +519,48 @@ Placeholder
 ### Test F per la mancanza d'adattamento
 ### Test F per la bontà di adattamento e coefficiente di determinazione
 ## Previsioni
-## Per approfondire un po'...
+## Altre letture
 
-<!--chapter:end:14-LinearRegression.Rmd-->
+<!--chapter:end:11-LinearRegression.Rmd-->
+
+
+# Modelli ANOVA a due vie con interazione
+
+Placeholder
+
+
+## Il concetto di ’interazione’
+## Effetti incrociati: interazione tra lavorazioni e diserbo chimico
+## Definizione del modello lineare
+## Calcoli manuali
+### Scomposizione della varianza
+## Calcoli con R
+### Model fitting
+### Verifica delle assunzioni di base
+### Scomposizione della varianza
+### Medie marginali attese e confronti multipli con R
+## Effetti innestati: valutazione di ibridi di mais
+## Definizione del modello lineare
+## Fitting del modello con R
+
+<!--chapter:end:12-AnovaDueLivelli.Rmd-->
+
+
+# Breve introduzione ai modelli misti
+
+Placeholder
+
+
+## Raggruppamenti tra parcelle
+## Esperimenti a split-plot
+### Definizione del modello lineare
+### Model fitting con R
+## Esperimenti a strip-plot
+### Definizione del modello lineare
+### Model fitting con R
+## Altre letture
+
+<!--chapter:end:13-SplitStrip.Rmd-->
 
 
 # La regressione non-lineare
@@ -580,7 +589,76 @@ Placeholder
 ### Riparametrizzazione delle funzioni non-lineari
 ### Altre letture
 
-<!--chapter:end:15-NonLineare.Rmd-->
+<!--chapter:end:14-NonLineare.Rmd-->
+
+
+# Esercizi
+
+Placeholder
+
+
+## Capitoli 1 e 2
+### Esercizio 1
+### Esercizio 2
+## Capitolo 3
+### Esercizio 1
+### Esercizio 2
+### Esercizio 3
+## Capitolo 4
+### Esercizio 1
+### Esercizio 2
+### Esercizio 3
+### Esercizio 4
+### Esercizio 5
+### Esercizio 6
+### Esercizio 7
+### Esercizio 8
+## Capitolo 5
+### Esercizio 1
+### Esercizio 2
+### Esercizio 3
+### Esercizio 4
+### Esercizio 5
+## Capitolo 6
+### Esercizio 1
+### Esercizio 2
+### Esercizio 3
+### Esercizio 4
+### Esercizio 5
+### Esercizio 6
+### Esercizio 7
+### Esercizio 8
+### Esercizio 9
+### Esercizio 10
+## Capitoli da 7 a 9
+### Esercizio 1
+### Esercizio 2
+### Esercizio 3
+### Esercizio 4
+## Capitolo 10
+### Esercizio 1
+### Esercizio 2
+### Esercizio 3
+## Capitolo 11
+### Esercizio 1
+### Esercizio 2
+## Capitoli 12 e 13
+### Esercizio 1
+### Esercizio 2
+### Esercizio 3
+### Esercizio 4
+### Esercizio 5
+### Esercizio 6
+## Capitolo 14
+### Esercizio 1
+### Esercizio 2
+### Esercizio 3
+### Esercizio 4
+### Esercizio 5
+### Esercizio 6
+### Esercizio 7
+
+<!--chapter:end:15-Esercizi.Rmd-->
 
 
 # Appendice 1: breve introduzione ad R
@@ -597,9 +675,9 @@ Placeholder
 ## Operazioni ed operatori {-}
 ## Funzioni ed argomenti {-}
 ## Consigli per l'immissione di dati sperimentali {-}
-### Immissione manuale di dati {-}
 ### Immissione di numeri progressivi {-}
 ### Immissione dei codici delle tesi e dei blocchi {-}
+### Immissione dei valori e creazione del datframe {-}
 ### Leggere e salvare dati esterni {-}
 ## Alcune operazioni comuni sul dataset {-}
 ### Selezionare un subset di dati {-}
@@ -609,7 +687,7 @@ Placeholder
 ## Interrogazione di oggetti {-}
 ## Altre funzioni matriciali {-}
 ## Cenni sulle funzionalità grafiche in R {-}
-## Per approfondire un po'... {-}
+## Altre letture {-}
 
-<!--chapter:end:23-IntroduzioneR.Rmd-->
+<!--chapter:end:17-IntroduzioneR.Rmd-->
 

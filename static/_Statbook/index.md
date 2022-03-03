@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.0 (15/03/2021), compil. 2022-02-02"
+date: "Update: v. 1.0 (15/03/2021), compil. 2022-03-03"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -76,7 +76,7 @@ Per quanto affascinante possa sembrare l'idea del ricercatore che con un'improvv
 
 Che cosa è che permette ad una prova scientifica di uscire dall'ambito delle opinioni legate a divergenze di cultura, percezione e/o credenze individuali, per divenire, al contrario, oggettiva e universalmente valida? Che cosa è che distingue la verità scientifica da altre verità di natura metafisica, religiosa o pseudoscientifica?
 
-A questo proposito, si riportano alcuni aforismi significativi:
+A questo proposito, è utile leggere questi aforismi interessanti e significativi:
 
 1.  Analogy cannot serve as proof (Pasteur)
 2.  The interest I have in believing a thing is not a proof of the existence of that thing (Voltaire)
@@ -84,7 +84,7 @@ A questo proposito, si riportano alcuni aforismi significativi:
 
 ## Scienza = dati
 
-La base di tutta la scienza risiede nel cosiddetto 'metodo scientifico', che si fa comunemente risalire a Galileo Galilei (1564-1642) e che è riassunto nella figura seguente.
+La base di tutta la scienza risiede nel cosiddetto 'metodo scientifico', che si fa comunemente risalire a Galileo Galilei (1564-1642) e che è riassunto nella Figura \@ref(fig:figName11).
 
 <div class="figure" style="text-align: center">
 <img src="_images/MSAMap.jpg" alt="Il metodo scientifico Galileiano" width="75%" />
@@ -129,11 +129,11 @@ Con il termine **precisione** intendiamo due cose: la prima è relativa al numer
 
 Il termine accuratezza ha invece un significato completamente diverso, riconducibile alla differenza tra la misura effettuata e il valore vero della caratteristica da misurare. Può sembrare una banalità, ma proviamo a pensare ad uno strumento non tarato, come, ad esempio, un gascromatografo, che restituisce sempre una concentrazione maggiorata del 20%. Se noi ripetessimo le analisi 100 volte, in assenza di altri errori, otterremmo sempre lo stesso risultato, molto preciso, ma totalmente inaffidabile, nel senso che non riflette la concentrazione reale della soluzione in studio. L'errore sistematico, oltre a produrre un calo di precisione, produce anche inaccuratezza.
 
-Comprendiamo bene che l'accuratezza è più importante della precisione: infatti una misura accurata, ma imprecisa, riflette bene la realtà, anche se in modo vago. Al contrario, una misura precisa, ma inaccurata, ci porta completamente fuori strada, perché non riflette la realtà. Con linguaggio tecnico, un dato non accurato si dice 'distorto' (*biased*) e, siccome l'a distosione dipende'inaccuratezza dipende dagli errori sistematici, questi utlimi vanno assolutamente evitati, ad esempio con la perfetta taratura degli strumenti e l'adozione di metodi di misura rigidamente standardizzati e accettati dalla comunità scientifica mondiale.
+Comprendiamo bene che l'accuratezza è più importante della precisione: infatti una misura accurata, ma imprecisa, riflette bene la realtà, anche se in modo vago. Al contrario, una misura precisa, ma inaccurata, ci porta completamente fuori strada, perché non riflette la realtà. Con linguaggio tecnico, un dato non accurato si dice 'distorto' (*biased*) e, siccome la distosione dipende dagli errori sistematici, questi ultimi vanno assolutamente evitati, ad esempio con la perfetta taratura degli strumenti e l'adozione di metodi di misura rigidamente standardizzati e accettati dalla comunità scientifica mondiale.
 
-L'inaccuratezza preoccupa molto i laboratori di analisi, che spesso utilizzanostandard di confronto, la cui misura è perfettamente nota e viene periodicamente confrontata con quella rilevabile dallo strumento stesso, per verificarne la taratura. Altro metodo utilizzato nelle procedure di accreditamento dei laboratori è il *ring test*, dove campioni reali della matrice da misurare sono inviati a più laboratori a livello nazionale, in modo da poter confrontare le misure ottenute e valutarne la variabilità. Con un *ring test*, un laboratorio può valutare la sua stessa affidabilità in confronto con laboratori simili, basandosi sull'eventuale differenza tra il risultato ottenuto e quelli ottenuti in tutti gli altri laboratori valutati.
+L'inaccuratezza preoccupa molto i laboratori di analisi, che spesso utilizzano standard di confronto, la cui misura è perfettamente nota e viene periodicamente confrontata con quella rilevabile dallo strumento stesso, per verificarne la taratura. Altro metodo utilizzato nelle procedure di accreditamento dei laboratori è il *ring test*, dove campioni reali della matrice da misurare sono inviati a più laboratori a livello nazionale, in modo da poter confrontare le misure ottenute e valutarne la variabilità. Con un *ring test*, un laboratorio può valutare la sua stessa affidabilità in confronto con laboratori simili, basandosi sull'eventuale differenza tra il risultato ottenuto e quelli ottenuti in tutti gli altri laboratori valutati.
 
-Sfortunatamente la possibilità di raccogliere dati inaccurati è tutt'altro che remota. Gli scienziati americani Pons e Fleischmann, il 23 Marzo del 1989, diffusero pubblicamente la notizia di essere riusciti a riprodurre la fusione nucleare fredda, causando elevatissimo interesse nella comunità scientifica. Purtroppo le loro misure erano viziate da una serie di problemi e il loro risultato fu clamorosamente smentito da esperimenti successivi.
+Sfortunatamente la possibilità di raccogliere dati inaccurati è tutt'altro che remota. Gli scienziati americani Pons e Fleischmann, il 23 Marzo del 1989, diffusero pubblicamente la notizia di essere riusciti a riprodurre la fusione nucleare fredda, causando elevatissimo interesse nella comunità scientifica (Fig. \@ref(fig:figName2)). Purtroppo le loro misure erano viziate da una serie di problemi e il loro risultato fu smentito da esperimenti successivi.
 
 <div class="figure" style="text-align: center">
 <img src="_images/FalseResults.jpg" alt="Conseguenze di un esperimento sbagliato" width="50%" />
@@ -155,7 +155,7 @@ Il principio di falsificazione è piuttosto importante nel mondo scientifico ed 
 3.  Eliminato l'errore sistematico, l'evantuale errore casuale residuo deve essere sempre quantificato e visualizzato insieme ai risultati.
 4.  In considerazione dell'errore residuo, dobbiamo decidere se i dati raccolti consentono di rigettare la nostra ipotesi di partenza. Altrimenti, l'esperimento è inconclusivo e, pur non avendone la certezza, terremo per vera la nostra ipotesi di partenza fino a che non sarà smentita da future osservazioni.
 
-Oltre al principio di falsificazione, la scienza fa largo uso del principio del 'rasoio di Occam'. Guglielmo di Occam (XIV secolo) era un frate francescano che, in un periodo in cui le dimostrazioni scientifiche iniziavano a divenire troppo complesse, voleva ribadire l'importanza della semplicità. Il suo principio è solitamente formulato come '*Entia non sunt multiplicanda praeter necessitatem*' ed è noto come il 'rasoio' in quanto porta a respingere con nettezza (tagliare con il rasoio) le spiegazioni troppo complesse. Nela comunità scientifica, applichiamo questo principio preferendo sempre, tra due ipotesi alternative ugualmente buone, quella più semplice.
+Oltre al principio di falsificazione, la scienza fa largo uso del principio del 'rasoio di Occam'. Guglielmo di Occam (XIV secolo) era un frate francescano che, in un periodo in cui le dimostrazioni scientifiche iniziavano a divenire troppo complesse, voleva ribadire l'importanza della semplicità. Il suo principio è solitamente formulato come '*Entia non sunt multiplicanda praeter necessitatem*' ed è noto come il 'rasoio' in quanto porta a respingere con nettezza (tagliare con il rasoio) le spiegazioni troppo complesse. Nella comunità scientifica, applichiamo questo principio preferendo sempre, tra due ipotesi alternative ugualmente buone, quella più semplice.
 
 ## Falsificare un risultato
 
@@ -224,7 +224,7 @@ L'assegnazione casuale del trattamento, o la selezione casuale dei soggetti trat
 
 ### Esperimenti invalidi
 
-A questo punto dovrebbe essere chiaro che un esperimento valido deve essere controllato, replicato e randomizzato: la mancanza anche di uno solo di questi elementi pone dubbi ragionevoli sull'affidabilità dei risultati. In particolare, gli esperimenti 'invalidi' sono caratterizzati da:
+A questo punto, dovrebbe essere chiaro che un esperimento valido deve essere controllato, replicato e randomizzato: la mancanza anche di uno solo di questi elementi pone dubbi ragionevoli sull'affidabilità dei risultati. In particolare, gli esperimenti 'invalidi' sono caratterizzati da:
 
 1.  Cattivo controllo degli errori
 2.  Fondati sospetti di confounding
@@ -245,7 +245,7 @@ Diversa è la situazione in cui un cattivo controllo degli errori, ad esempio l'
 
 Abbiamo appena menzionato il problema fondamentale della ricerca, cioè il **confounding**, vale a dire la confusione tra l'effetto del trattamento e un qualche altro effetto casuale, legato alle caratteristiche innate del soggetto o a qualche intrusione più o meno 'demoniaca'. Abbiamo detto che non possiamo mai avere la certezza dell'assenza di confounding, ma abbiamo anche detto che l'adozione di una pratica sperimentale corretta ne minimizza la probabilità.
 
-Chiaramente, rimangono dei rischi che sono tipici di situazioni nelle quali il controllo adottato non è perfetto, come capita, ad esempio, negli esperimenti osservazionali. In questo ambito è piuttosto temuta la cosiddetta 'correlazione spuria', una forma di confounding casuale per cui due variabili variano congiuntamente (sono direttamente o inversamente proporzionali), ma in modo del tutto casuale. Esistono, ad esempio, dati che mostrano una chiara correlazione tra le vendite di panna acida e le morti per incidenti in motocicletta. Chiaramente, non esistono spiegazioni scientifiche per questo effetto, che è, ovviamente, del tutto casuale. Il problema è che questa correlazione spuria non è sempre così semplice da rintracciare.
+Chiaramente, rimangono dei rischi che sono tipici di situazioni nelle quali il controllo adottato non è perfetto, come capita, ad esempio, negli esperimenti osservazionali. In questo ambito è piuttosto temuta la cosiddetta 'correlazione spuria', una forma di confounding casuale per cui due variabili variano congiuntamente (sono direttamente o inversamente proporzionali), ma in modo del tutto casuale. Esistono, ad esempio, dati che mostrano una chiara correlazione tra le vendite di panna acida e le morti per incidenti in motocicletta (Fig. \@ref(fig:figName22)). Chiaramente, non esistono spiegazioni scientifiche per questo effetto, che è, ovviamente, del tutto casuale. Il problema è che questa correlazione spuria non è sempre così semplice da rintracciare.
 
 <div class="figure" style="text-align: center">
 <img src="_images/PannaAcida.png" alt="Esempio di correlazione spuria" width="90%" />
@@ -258,7 +258,7 @@ Il confounding non casuale è spesso difficile da evidenziare, soprattutto se le
 
 #### Pseudo-repliche e randomizzazione poco attenta
 
-Per evidenziare questi problemi e comprendere meglio la differenza tra un esperimento corretto e uno non corretto, è utilissima la classificazione fatta da Hurlbert (1984), che riportiamo di seguito.
+Per evidenziare questi problemi e comprendere meglio la differenza tra un esperimento corretto e uno non corretto, è utilissima la classificazione fatta da Hurlbert (1984), che riportiamo in Figura \@ref(fig:figName23).
 
 <div class="figure" style="text-align: center">
 <img src="_images/Randomisation.jpg" alt="Indicazioni per una corretta randomizzazione (Hurlbert, 1984)" width="90%" />
@@ -320,7 +320,7 @@ In conclusione, possiamo ripartire dalla domanda iniziale: "Che cosa è la scien
 
 Qual è il *take-home message* di questo capitolo? Fidatevi solo delle riviste scientifiche attendibili, cioè quelle che adottano un serio processo di *peer review* prima della pubblicazione.
 
-------------------------------------------------------------------------
+---
 
 ## Altre letture
 
@@ -1200,12 +1200,12 @@ e la varianza è pari a:
 
 
 ```r
-(0 - mu)^2 * 0.2 + (1 - mu)^2 * 0.3 + (2 - mu)^2 * 0.3 +
-  (3 - mu)^2 * 0.2
-## [1] 1.06
+(0 - mu)^2 * 0.2 + (1 - mu)^2 * 0.3 + (2 - mu)^2 * 0.4 +
+  (3 - mu)^2 * 0.1
+## [1] 0.84
 ```
 
-Mediamente, le nostre piante hanno 1.4 germogli con una varianza pari a 1.06.
+Mediamente, le nostre piante hanno 1.4 germogli con una varianza pari a 0.84.
 
 
 ### Funzioni di densità
@@ -3327,10 +3327,10 @@ Una volta definiti i coefficienti, possiamo utilizzare il package  ‘emmeans’
 K <- list(k1 = k1, K2 = k2, k3 = k3, k4 = k4)
 contrast(medie, method = K, adjust="none")
 ##  contrast estimate   SE df t.ratio p.value
-##  k1         -16.39 2.26 12  -7.244  <.0001
-##  K2           7.89 2.40 12   3.289  0.0065
-##  k3          11.73 2.77 12   4.235  0.0012
-##  k4           4.05 2.77 12   1.461  0.1697
+##  k1         -16.39 2.26 12 -7.244  <.0001 
+##  K2           7.89 2.40 12  3.289  0.0065 
+##  k3          11.73 2.77 12  4.235  0.0012 
+##  k4           4.05 2.77 12  1.461  0.1697
 ```
 
 \normalsize
@@ -3351,12 +3351,12 @@ Nel quadro sottostante mostriamo un confronto tipo Tukey (tutti contro tutti), e
 #Confronti multipli a coppie
 contrast(medie, adjust="none", method="pairwise")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  0.1697
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.0168
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  <.0001
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0012
-##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0038
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461  0.1697 
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774  0.0168 
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352  <.0001 
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235  0.0012 
+##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813  <.0001 
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578  0.0038
 ```
 \normalsize
 
@@ -3368,9 +3368,9 @@ Per i confronti del tipo 'tutti verso uno' è possibile utilizzare la stessa fun
 ```r
 contrast(medie, adjust="none", method="dunnett")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Mixture_378 - Metribuzin__348       -4.05 2.77 12  -1.461  0.1697
-##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12   2.774  0.0168
-##  Unweeded - Metribuzin__348          17.60 2.77 12   6.352  <.0001
+##  Mixture_378 - Metribuzin__348       -4.05 2.77 12 -1.461  0.1697 
+##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12  2.774  0.0168 
+##  Unweeded - Metribuzin__348          17.60 2.77 12  6.352  <.0001
 ```
 \normalsize
 
@@ -3382,9 +3382,9 @@ Così facendo vediamo che R confronta tutte le tesi con metribuzin, che è il pr
 ```r
 contrast(medie, adjust="none", method="dunnett", ref = 2)
 ##  contrast                      estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378     4.05 2.77 12   1.461  0.1697
-##  Rimsulfuron_30 - Mixture_378     11.73 2.77 12   4.235  0.0012
-##  Unweeded - Mixture_378           21.64 2.77 12   7.813  <.0001
+##  Metribuzin__348 - Mixture_378     4.05 2.77 12 1.461   0.1697 
+##  Rimsulfuron_30 - Mixture_378     11.73 2.77 12 4.235   0.0012 
+##  Unweeded - Mixture_378           21.64 2.77 12 7.813   <.0001
 ```
 
 \normalsize
@@ -3433,10 +3433,7 @@ multcomp::cld(medie, adjust="none", Letters=LETTERS)
 ##  Unweeded         26.77 1.96 12    22.50     31.0    C  
 ## 
 ## Confidence level used: 0.95 
-## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## significance level used: alpha = 0.05
 ```
 
 
@@ -3478,14 +3475,14 @@ Più facilmente, possiamo arrivare allo stesso risultato con il package 'emmeans
 
 
 ```r
-contrast(medie, method = "pairwise", adjust = "sidak", ref = 2)
+contrast(medie, method = "pairwise", adjust = "sidak")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  0.6723
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.0968
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  0.0002
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0069
-##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0226
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461  0.6723 
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774  0.0968 
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352  0.0002 
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235  0.0069 
+##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813  <.0001 
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578  0.0226 
 ## 
 ## P value adjustment: sidak method for 6 tests
 ```
@@ -3514,12 +3511,12 @@ Oppure possiamo utilizzare la funzione `contrast()`:
 ```r
 contrast(medie, method = "pairwise", adjust = "bonferroni")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  1.0000
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.1010
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  0.0002
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0069
-##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0228
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461  1.0000 
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774  0.1010 
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352  0.0002 
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235  0.0069 
+##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813  <.0001 
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578  0.0228 
 ## 
 ## P value adjustment: bonferroni method for 6 tests
 ```
@@ -3536,12 +3533,12 @@ Oltre che aggiustare il P-level, possiamo anche utilizzare altre procedure di ag
 #Confronti multipli a coppie, basati sul t multivariato
 contrast(medie, method="pairwise")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  0.4885
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.0698
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  0.0002
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0055
-##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0173
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461  0.4885 
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774  0.0698 
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352  0.0002 
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235  0.0055 
+##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813  <.0001 
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578  0.0173 
 ## 
 ## P value adjustment: tukey method for comparing a family of 4 estimates
 ```
@@ -3557,9 +3554,9 @@ Ovviamente la correzione per la molteplicità ed il conseguente innalzamento del
 #Confronti multipli a coppie, basati sul t multivariato
 contrast(medie, method="dunnett")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Mixture_378 - Metribuzin__348       -4.05 2.77 12  -1.461  0.3711
-##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12   2.774  0.0442
-##  Unweeded - Metribuzin__348          17.60 2.77 12   6.352  0.0001
+##  Mixture_378 - Metribuzin__348       -4.05 2.77 12 -1.461  0.3711 
+##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12  2.774  0.0442 
+##  Unweeded - Metribuzin__348          17.60 2.77 12  6.352  0.0001 
 ## 
 ## P value adjustment: dunnettx method for 3 tests
 ```
@@ -3881,10 +3878,7 @@ multcomp::cld(medie, Letters = LETTERS, reverse = T)
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 16 estimates 
-## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## significance level used: alpha = 0.05
 ```
 
 \normalsize
@@ -4570,10 +4564,7 @@ multcomp::cld(medie, Letters = LETTERS)
 ## 
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
-## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## significance level used: alpha = 0.05
 ```
 
 Se volessimo confrontare le lavorazioni a parità di diserbo o tutte le combinazioni dovremmo utilizzare una sintassi leggermente diversa:
@@ -4597,10 +4588,7 @@ multcomp::cld(medie, Letters=LETTERS)
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 3 estimates 
-## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## significance level used: alpha = 0.05
 medie <- emmeans(mod, ~Tillage:WeedControl)
 multcomp::cld(medie, Letters=LETTERS)
 ##  Tillage WeedControl emmean    SE df lower.CL upper.CL .group
@@ -4614,10 +4602,7 @@ multcomp::cld(medie, Letters=LETTERS)
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 6 estimates 
-## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## significance level used: alpha = 0.05
 ```
 
 Le tre analisi (contronti tra lavorazioni a parità di diserbo, tra diserbi a parità di lavorazione e tutti verso tutti) portano a risultati leggermente diversi per il diverso numero di confronti effettuati: tre nel primo caso, sei nel secondo e 15 nel terzo, che richiedono una diversa correzione per la molteplicità.
@@ -4776,10 +4761,7 @@ multcomp::cld(mfMeans, Letters = LETTERS)
 ## Confidence level used: 0.95 
 ## Results are averaged over some or all of the levels of: Block 
 ## P value adjustment: tukey method for comparing a family of 9 estimates 
-## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## significance level used: alpha = 0.05
 ```
 
 In conclusione, vediamo che l'analisi dei disegni con due fattori innestati è piuttosto simile a quella per due fattori incrociati, con l'unica eccezione che l'effetto principale per il fattore innestato non è incluso nel modello.
@@ -5598,7 +5580,11 @@ Vi è stata affidata una prova sperimentale per la taratura agronomica di un nuo
 3.  Valutare se è opportuno splittare la dose di 20 g/ha in due distribuzioni
 4.  Valutare l'efficacia del nuovo diserbante con gli opportuni controlli (testimoni)
 
-Coerentemente con questi obiettivi, scrivere un protocollo sperimentale sufficientemente dettagliato (una pagina) ed aggiungere lo schema della prova
+Coerentemente con questi obiettivi, scrivere un protocollo sperimentale sufficientemente dettagliato (una pagina) ed aggiungere la mappa di campo della prova
+
+### Esercizio 2
+
+Dovete progettare una prova sperimentale per valutare i possibili effetti dell'epoca di semina (autunnale oppure primaverile) su sette varietà di favino (che etichetteremo con le lettere da A a G). Progettare un esperimento di pieno campo, decidendo il numero di repliche ed il lay-out sperimentale. Redigere la mappa di campo ed allocare i trattamenti, in base al lay-out prescelto. Aggiungere alla mappa di campo tutti i dettagli necessari (dimensioni delle parcelle, localizzazione ed orientamento dell'esperimento).
 
 ---
 
