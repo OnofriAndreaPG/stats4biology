@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.0 (15/03/2021), compil. 2022-03-03"
+date: "Update: v. 1.1 (Anno Accademico 2022), compil. 2022-03-08"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -19,7 +19,6 @@ delete_merged_file: true
 # Premessa {-}
 
 <img src= "_images/cover.jpeg" width="350" align="right" alt="" class="cover" />
-
 
 
 In questo sito troverete il libro "Metodologia sperimentale per le scienze agrarie", con il quale ci siamo posti il compito di fornirvi informazioni su come sia possibile ottenere informazioni scientificamente attendibili, partendo da un esperimento opportunamente pianificato ed organizzato. Siamo convinti che già sappiate come gli esperimenti siano l'elemento chiave del progresso scientifico; forse però non siete coscienti del fatto che non tutti gli esperimenti sono ugualmente buoni e producono dati ugualmente validi. In questo libro, cercheremo di mostrarvi come si riconosce un buon esperimento da un cattivo esperimento e, di conseguenza, come si riconosce la scienza dalla pseudoscienza.
@@ -45,7 +44,7 @@ Nei capitoli cinque e sei vedremo come il dataset che abbiamo raccolto, proprio 
 
 Nei capitoli da sette a dodici ci occuperemo dell'ANOVA, una delle tecniche più importanti per l'analisi dei dati. Gli ultimi due capitoli si occuperanno invece dei modelli di regressione.
 
-In ogni capitolo, patrtiremo da un esempio pratico, in modo che possiate cogliere la finalità del lavoro prima di passare ad un'analisi più dettagliata. Nell'ultimo capitolo forniremo una serie di esercizi, con i quali potrete acquisire un po' di pratica.
+In ogni capitolo, partiremo da un esempio pratico, in modo che possiate cogliere la finalità del lavoro prima di passare ad un'analisi più dettagliata. Nell'ultimo capitolo forniremo una serie di esercizi, con i quali potrete acquisire un po' più di familiarità con gli argomenti trattati.
 
 
 ## Software statistico {-}
@@ -56,15 +55,19 @@ In secondo luogo, R è gratuito (freeware), cosa che è fondamentale per uno stu
 
 R ha una struttura modulare e le sue potenzialità possono essere notevolmente estese installando librerie aggiuntive. Per semplicità, in questo libro abbiamo deciso di utilizzare l'installazione di base, evitando il più possibile l'installazione di altre librerie aggiuntive. In alcuni casi ciò non è stato possibile e quindi sarà necessario installare i componenti che vi indicheremo di volta in volta.
 
-Riconosciamo che la curva di apprendimento con R è un po' ripida, all'inizio. Non preoccupatevi, non daremo nulla per scontato e partiremo dall'inizio, procedendo lentamente, passo dopo passo. Concludiamo questa introduzione ringraziando gli autori di R e di RStudio: senza di essi questo libro non avrebbe certamente visto la luce. Se trovate degli errori perdonateci e, se potete, segnalateceli... vi saremo molto grati.
+Riconosciamo che la curva di apprendimento con R è un po' ripida, all'inizio. Non preoccupatevi, non daremo nulla per scontato e partiremo dall'inizio, procedendo lentamente, passo dopo passo.
 
 
-## The authors {-}
+## Gli autori {-}
 
 Andrea è Professore Associato al Dipartimento di Scienze Agrarie, Alimentari e Ambientali dell'Università degli Studi di Perugia ed insegna Metodologia Sperimentale in Agricoltura dal 2000. Dario era Professore Associato al Dipartimento di Scienze Agrarie, Forestali e Alimentari dell'Università degli Studi di Torino e ha insegnato Metodologia Sperimentale fino al 2020, quando è venuto improvvisamente a mancare prematuramente nel 2020. Purtroppo non ha mai visto questo libro completo... Ciao Dario!
 
-## Ringraziamenti {-}
 
+## Ringraziamenti e scuse {-}
+
+Iniziamo con le scuse. C'è una cosa che, probabilmente non piacerà a qualcuno: in questo testo abbiamo utilizzato il punto come separatore decimale. Sappiamo che questo non è del tutto corretto nella tradizione italiano, ma ci siamo resi conto che se avessimo utilizzato la virgola nel testo avremmo generato una gran confusione, in quanto non saremmo comunque riusciti ad evitare l'uso del punto decimale nel codice R e nei suoi risultati.
+
+Per quanto riguarda i ringraziamenti, siamo profondamente grati a tutto il Core Team di R per aver creato e per mantenere questo ambiente di programmazione estremamente potente e gratuito. Siamo inoltre grati a Yihui Xie e ai suoi collaboratori per la disponibilità di Rmarkdown e Bookdown, due pacchetti fondamentali per la redazione di questo testo, nelle due versioni online e a stampa.
 
 <!--chapter:end:index.Rmd-->
 
@@ -635,17 +638,38 @@ Questo disegno è detto **strip-plot** ed è molto comodo perché consente di la
 
 # Richiami di statistica descrittiva
 
+Qualunque esperimento include un processo di raccolta dati, tramite osservazioni e/o misurazioni, al termine del quale abbiamo a disposizione un collettivo di valori, di solito organizzati sotto forma di tabella ('dataset'), dove ogni riga corrisponde ad un'unità sperimentale (soggetto) con tutti i suoi attributi, mentre ogni colonna (detta anche variabile) corrisponde ad un attributo e contiene i valori rilevati per tutte le unità sperimentali. Un esempio di dataset è riportato nella Tabella \@ref(tab:tabName1).
 
-Qualunque esperimento include una serie di rilievi, al termine dei quali ci troviamo con una o più variabili, che costituiscono un 'dataset'. Il nostro primo compito è quello di comprendere e descrivere le caratteristiche fondamentali di ogni variabile, utilizzando opportune statistiche descrittive, che cambiano al cambiare del tipo di variabile.
 
-## Dati quantitativi
+Table: (\#tab:tabName1)Numero totale (in migliaia) di passeggeri nei voli internazionali dal 1949 al 1960 (Box & Jenkins airline data).
 
-Se i dati sono stati ottenuti con un processo di misurazione e rappresentano una quantità, come, ad esempio, il peso, l'altezza, la concentrazione e così via, abbiamo una variabile quantitativa, le cui caratteristiche fondamentali sono almeno due:
+|     | Gen| Feb| Mar| Apr| Mag| Giu| Lug| Ago| Set| Ott| Nov| Dic|
+|:----|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+|1949 | 112| 115| 145| 171| 196| 204| 242| 284| 315| 340| 360| 417|
+|1950 | 118| 126| 150| 180| 196| 188| 233| 277| 301| 318| 342| 391|
+|1951 | 132| 141| 178| 193| 236| 235| 267| 317| 356| 362| 406| 419|
+|1952 | 129| 135| 163| 181| 235| 227| 269| 313| 348| 348| 396| 461|
+|1953 | 121| 125| 172| 183| 229| 234| 270| 318| 355| 363| 420| 472|
+|1954 | 135| 149| 178| 218| 243| 264| 315| 374| 422| 435| 472| 535|
+|1955 | 148| 170| 199| 230| 264| 302| 364| 413| 465| 491| 548| 622|
+|1956 | 148| 170| 199| 242| 272| 293| 347| 405| 467| 505| 559| 606|
+|1957 | 136| 158| 184| 209| 237| 259| 312| 355| 404| 404| 463| 508|
+|1958 | 119| 133| 162| 191| 211| 229| 274| 306| 347| 359| 407| 461|
+|1959 | 104| 114| 146| 172| 180| 203| 237| 271| 305| 310| 362| 390|
+|1960 | 118| 140| 166| 194| 201| 229| 278| 306| 336| 337| 405| 432|
+
+
+Il nostro primo compito è quello di comprendere e descrivere le caratteristiche fondamentali di ogni variabile, utilizzando statistiche descrittive opportunamente scelte, in base al tipo di dato e alle caratteristiche che si vogliono descrivere.
+
+
+## Descrizione di dati quantitativi
+
+Se i dati sono stati ottenuti con un processo di misurazione e rappresentano una quantità, come, ad esempio, il peso, l'altezza, la concentrazione e così via, abbiamo una variabile quantitativa, della quale dobbiamo descrivere almeno due caratteristiche fondamentali:
 
 1. tendenza centrale
 2. dispersione
 
-La tendenza centrale di una variabile quantitativa è un valore, intorno al quale si collocano tutte le osservazioni, mentre la dispersione misura, in qualche modo, la distanza delle osservazioni tra di loro. Esistono diverse statistiche di tendenza centrale e dispersione; di seguito, descriveremo le più importanti. 
+La tendenza centrale è un valore che rappresenta il 'centro', attorno al quale si collocano tutte le osservazioni; al contrario, la dispersione misura la distanza delle osservazioni tra di loro, cioè, in altre parole, la loro variabilità. Ovviamente, esistono anche altre importanti proprietà di una variabile quantitativa, come la simmetria e la curtosi, anche se in questo capitolo ci accontenteremo di esaminare le più diffuse statistiche descrittive di tendenza centrale e dispersione. 
 
 ### Indicatori di tendenza centrale
 
@@ -659,64 +683,70 @@ Il calcolo della media è banale:
 
 $$\mu = \frac{178 + 175 + 158 + 153}{4} = 166$$
 
-Un altro indicatore di tendenza centrale è la *mediana*, cioè il valore che bipartisce i dati in modo da lasciarne metà a sinistra e metà a destra, così da risultare superiore a quello del 50% degli individui. Per calcolare la mediana, basta ordinare i soggetti in ordine crescente: se il numero di individui è dispari, la mediana è data dal valore dall’individuo che occupa il posto centrale o, se gli individui sono in numero pari, dalla media delle due osservazioni centrali. Nel nostro dataset relativo alle altezze, i dati sono in numero pari, quindi dopo averli ordinati, prendiamo il secondo e il terzo valore e calcoliamo la loro media, pari a $(158 + 175)/2 = 166.5$.
+La media è 'centrale' nel senso che la somma delle sue distanze da ogni altra osservazione è nulla. Di conseguenza, è molto sensibile ai valori estremi; se, ad esempio, supponiamo di avere i cinque valori: 1, 4, 7, 9 e 10 con media pari a 6,2 e supponiamo di sostituire il valore più alto con 100, la media aumenta di conseguenza, diventando pari a 24,2. Per questa sua sensibilità ai valori estremi, si dice che la media non è un indicatore di tendenza centrale 'robusto' nei confronti degli *outliers*, cioè delle osservazioni in qualche modo 'aberranti'. In presenza di queste osservazioni, che potrebbero essere frutto di un errore sperimentale rilevante, la media tende a non rappresentare più la tendenza centrale del collettivo in modo affidabile.
 
-La mediana è un indicatore più robusto della media: infatti, supponiamo di avere i cinque valori: 1 - 4 - 7 - 9 - 10. La media è pari a 6.2, mentre la mediana è pari a 7 (valore centrale). Se cambiano il numero più alto in questo modo, sostituendolo con 100, la media diventa 24.2, mentre la mediana rimane pari a 7, mostrando come essa non sia per nulla influenzata dai valori estremi (*outliers*).
+Un altro indicatore di tendenza centrale è la *mediana*, cioè il valore che bipartisce i dati in modo che la metà di essi siano più alti e la metà più bassi. Per calcolare la mediana, basta ordinare i soggetti in ordine crescente: se il numero di individui è dispari, la mediana è data dal valore dall’individuo che occupa il posto centrale o, se gli individui sono in numero pari, dalla media delle due osservazioni centrali. Nell'esempio precedente, i dati sono in numero pari, quindi la mediana è: $(158 + 175)/2 = 166.5$.
+
+La mediana è un indicatore più robusto della media: infatti, se consideriamo gli stessi cinque valori elencati in precedenza (1, 4, 7, 9 e 10), la mediana è pari a 7 e non cambia quando sostituiamo il valore più alto con 100.
 
 
 ### Indicatori di dispersione
 
-Gli indicatori di tendenza centrale, da soli, non ci informano su come le unità sperimentali tendono a differire l’una dall’altra: ad esempio una media pari a 100 può essere ottenuta con tre individui che misurano 99, 100 e 101 rispettivamente o con tre individui che misurano 1, 100 e 199. E’ evidente che in questo secondo gruppo gli individui sono molto più differenti tra loro (dispersi) che nel primo gruppo.
+Conoscere la tendenza centrale di un collettivo è importante, ma non è sufficiente. Infatti, una media pari a 100 può essere ottenuta con tre individui che misurano 99, 100 e 101, rispettivamente, o con tre individui che misurano 1, 100 e 199. E’ evidente che i due gruppi hanno la stessa tendenza centrale, ma sono molto diversi in termini di dispersione (o variabilità) rispetto alla media. Per descrivere la dispersione dei dati possiamo utilizzare il *campo di variazione*, che è la differenza tra la misura più bassa e la misura più alta. In realtà, questo indicatore è poco diffuso, perché considera solo i valori estremi del collettivo e non necessariamente cresce al crescere della variabilità. Altri indicatori sono più diffusi ed affidabili, come la devianza, la varianza, la deviazione standard ed il coefficiente di variabilità, tutti legati da relazioni algebriche ben definite.
 
-Pertanto, i risultati di un processo di misurazione non possono essere descritti solo con la media, ma è necessario anche calcolare un indice di variabilità. Tra essi, il più semplice è il *campo di variazione*, che è la differenza tra la misura più bassa e la misura più alta. In realtà, non si tratta di un vero e proprio indice di variabilità, in quanto dipende solo dai termini estremi della distribuzione e non necessariamente cresce al crescere della variabilità degli individui. Per questo motivo, si preferisce utilizzare indicatori più affidabili, come la devianza, la varianza, la deviazione standard ed il coefficiente di variabilità, tutti collegati da relazioni algebriche ben definite.
+La *devianza*, generalmente nota come somma dei quadrati (abbreviata SS, da *sum of squares*) è data da:
 
-La *devianza* (generalmente nota come SS, cioè somma dei quadrati, *sum of squares*) è data da:
+$$SS = \sum\limits_{i = 1}^n {(x_i  - \mu)^2 }$$
 
-$$SS = \sum\limits_{i = 1}^n {(x_i  - \bar x)^2 }$$
+Ad esempio, per le quattro altezze menzionate in precedenza, la devianza è pari a:
 
-Si tratta di un indicatore caratterizzato da un significato geometrico molto preciso, collegabile alla somma dei quadrati delle distanze euclidee di ogni osservazione rispetto alla media. Per le altezze che abbiamo utilizzato in precedenza, la devianza si calcola:
+$$SS = \left(178 - 166 \right)^2 + \left(175 - 166 \right)^2 + \left(158 - 166 \right)^2  + \left(153 - 166 \right)^2 = 458$$
 
-$$SS = \left(178 - 166 \right)^2 + \left(175 - 166 \right)^2 + \left(158 - 166 \right)^2  + \left(153 - 166 \right)^2= 458$$
+La devianza è un indicatore di dispersione molto utilizzato, soprattutto perché ha un suo preciso significato geometrico, in quanto somma delle distanze euclidee al quadrato, rispetto alla media. Tuttavia, ha due aspetti che vanno tenuti in considerazione: in primo luogo, proprio perché è una somma, il valore finale dipende dal numero di addendi e quindi non la si può utilizzare per confrontare la variabilità di collettivi con diversa numerosità. Inoltre, l'unità di misura della devianza è pari al quadrato dell'unità di misura originale dei dati; ad esempio se le osservazioni sono espresse in centimetri (come nel nostro esempio), la devianza è espressa in centimetri quadrati, il che rende più difficoltosa l'interpretazione dei risultati.
 
-La devianza è molto utile in alcuni contesti che vedremo, ma per la semplice descrizione della variabilità dei dati ha due problemi: in primo luogo, proprio perché è una somma, il valore finale dipende dal numero di addendi e quindi non lo si può utilizzare per confrontare la variabilità di collettivi diversamente numerosi. Inoltre, l'unità di misura della devianza è al quadrato rispetto all'unità di misura originale dei dati; ad esempio se le osservazioni sono espresse in centimetri (come in questo caso), la devianza è espressa in centimetri quadrati, il che rende più difficoltosa l'interpretazione di questa statistica.
-
-Oltre dalla devianza, si può calcolare la *varianza* (o meglio, varianza campionaria), definita come segue:
+Oltre dalla devianza, un indicatore molto utilizzato è la *varianza campionaria* (o semplicemente *varianza*), che è data dalla devianza divisa per il numero di dati meno uno:
 
 $$\sigma^2  = \frac{SS}{n - 1}$$
 
-Nel nostro caso:
+Nel caso delle nostre altezze:
 
 $$\sigma^2  = \frac{458}{3} = 152.67$$
 
-La varianza permette di confrontare la variabilità di collettivi diversamente numerosi, anche se permane il problema che questo indicatore è espresso in un’unità di misura al quadrato, rispetto a quella delle osservazioni originali. Per eliminare questo problema si ricorre alla radice quadrata della varianza, cioè la *deviazione standard*, che si indica con $\sigma$. La deviazione standard è espressa nella stessa unità di misura dei dati originari ed è quindi molto informativa sulla banda di oscillazione dei dati rispetto alla media. Viene frequentemente utilizzata per descrivere l'*incertezza assoluta* di una misura ripetuta più volte. Nel nostro caso, risulta che:
+La varianza è anche detta scarto quadratico medio è permette di confrontare la variabilità di collettivi diversamente numerosi, anche se permane il problema dell'unità di misura, che è sempre il quadrato di quella delle singole osservazioni. Per eliminare questo problema si ricorre alla radice quadrata della varianza, cioè la *deviazione standard*, che si indica con $\sigma$. La deviazione standard è espressa nella stessa unità di misura dei dati originali ed è quindi molto utilizzata per descrivere l'*incertezza assoluta* di misure ripetute più volte. Nel nostro caso, risulta che:
 
 $$\sigma  = \sqrt{152.67} = 12.36$$
 
-e questo valore ci fa capire che, 'mediamente', la distanza euclidea tra le osservazioni e la media è 12.36 centimetri. Media e deviazione standard sono spesso riportate contemporaneamente, utilizzando un intervallo $l$ definito come:
+e questo valore ci fa capire che, 'mediamente', la distanza euclidea tra ogni valore e $\mu$ è pari $12.36$ centimetri. Media e deviazione standard sono spesso riportate contemporaneamente, utilizzando un intervallo $l$ definito come:
 
 $$l = \mu \pm \sigma$$
 
-In assenza della media, $\sigma$ non riesce a dare informazioni facilmente comprensibili: se in un collettivo la deviazione standard è 12.36 come è questo collettivo? Molto o poco variabile? Non possiamo dirlo: potrebbe essere molto disperso se la media fosse bassa (ad esempio 16), oppure poco disperso, se la media fosse alta (esempio 1600). Per questo, se dobbiamo descrivere la variabilità dei dati indipendentemente dalla media, utilizziamo il *coefficiente di variabilità* (CV):
+Un problema della deviazione standard è che essa, in assenza della media, non riesce a dare informazioni facilmente comprensibili; infatti, se dicessimo semplicemente che un gruppo di individui ha una deviazione standard pari a $12.36$, cosa potremmo concludere in relazione alla variabilità di questo collettivo? È alta o bassa? È evidente che, senza sapere la media, non riusciamo a rispondere a questa domanda: la variabilità potrebbe essere considerata molto alta se la media fosse bassa (ad esempio 16), oppure molto bassa, se la media fosse alta (esempio 1600). Per questo, se dovessimo descrivere la variabilità dei dati indipendentemente dalla media, dovremmo  utilizzare il *coefficiente di variabilità* (CV):
 
 $$CV = \frac{\sigma }{\mu } \times 100$$
 
-che è un numero puro e non dipende dall’unità di misura e dall’ampiezza del collettivo, sicché è molto adatto ad esprimere, ad esempio, l’errore degli strumenti di misura e delle apparecchiature di analisi (**incertezza relativa**). Nel nostro caso, abbiamo:
+Il CV è un numero puro e non dipende dall’unità di misura e dall’ampiezza del collettivo, sicché è molto adatto ad esprimere, ad esempio, l’errore degli strumenti di misura e delle apparecchiature di analisi (**incertezza relativa**). Nel nostro caso, abbiamo:
 
 $$CV = \frac{12.36}{166} \times 100 = 7.45 \%$$
 
-Come la media, anche la devianza, varianza e deviazione standard sono sensibili agli outliers. Pertanto, in presenza di queste osservazioni aberranti, possiamo estendere il concetto di mediana, calcolando i cosiddetti *percentili*, che bipartiscono la popolazione di partenza in modo da lasciare una certa quantità di termini alla sua sinistra e la restante quantità alla sua destra. Ad esempio, il primo percentile bipartisce la popolazione in modo da lasciare a sinistra l’ 1% dei valori e alla destra il restante 99%. Allo stesso modo l’ottantesimo percentile bipartisce la popolazione in modo da lasciare a sinistra l’80% dei termini e alla destra il restante 20%, mentre la mediana rappresenta il 50-esimo percentile.
+Come la media, anche la devianza, la varianza e la deviazione standard sono sensibili agli *outliers*. Pertanto, in presenza di osservazioni aberranti, preferiamo descrivere la variabilità del collettivo utilizzando i cosiddetti *percentili*, che, estendendo il concetto di mediana, bipartiscono il collettivo in modo da lasciare una certa percentuale di individui alla loro sinistra. Ad esempio, il primo percentile bipartisce il collettivo in modo che l’1% dei soggetti sono più bassi e il 99% sono più alti. Allo stesso modo, l’ottantesimo percentile bipartisce il collettivo in modo che l’80% dei soggetti sono più bassi e il 20% sono più alti. Ovviamente, la mediana rappresenta il 50-esimo percentile.
 
-I percentili più utilizzati per descrivere la dispersione di un collettivo sono il 25-esimo e il 75-esimo: se questi sono molto vicini, significa che il 50% dei soggetti è compreso in un intervallo piccolo e quindi la variabilità della popolazione è bassa. Calcolare i percentili a mano non è banale e, di conseguenza, lo faremo nei paragrafi successivi utilizzando R. 
+I percentili più utilizzati per descrivere la dispersione di un collettivo sono il 25-esimo e il 75-esimo, che individuano un intervallo all'interno del quale è compreso il 50% dei soggetti: se questo intervallo è piccolo, significa che la variabilità è bassa. Calcolare i percentili a mano non è banale e, di conseguenza, lo faremo nei paragrafi successivi, utilizzando R. 
 
 ### Incertezza delle misure derivate
 
-A volte noi misuriamo due quantità e poi le combiniamo, per ottenere una misura derivata. La combinazione più semplice è la somma, ad esempio quando determiniamo separatamente il peso di due specie infestanti in un vaso e poi sommiamo questi due valori per ottenere il peso totale della biomassa infestante. In questo caso, **l'incertezza assoluta di una somma o di una differenza è sempre uguale alla radice quadrata della somma dei quadrati delle incertezze assolute degli addendi**. Ad esempio, se abbiamo le due quantità $22 \pm 2$ e $14 \pm 3$, la somma sarà $36 \pm \sqrt{4 + 9}$ e la differenza sarà $8 \pm 3.6$.
+A volte noi misuriamo due quantità e poi le combiniamo, per ottenere una misura derivata, ad esempio la somma o la differenza. Se le due misure hanno un certo grado di incertezza, quantificabile, ad esempio, con la deviazione standard, qual è l'incertezza della loro somma o della loro differenza? La legge di propagazione degli errori dice che, in caso di misure indipendenti, **la deviazione standard di una somma o di una differenza è uguale alla radice quadrata della somma dei quadrati delle deviazioni standard degli addendi**. Ad esempio, se abbiamo fatto due misure indipendenti in triplicato, ottenendo le due medie $22$ e $14$, con deviazioni standard rispettivamente pari a $2$ e $3$, la somma sarà pari a $36$, con deviazione standard pari $\sqrt{2^2 + 3^2} = 3.6$, mentre la differenza sarà pari ad $8$ con deviazione standard comunque pari a $3.6$. Ovviamente è anche possibile calcolare la deviazione standard di misure derivate con funzioni diverse dalla somma o dalla differenza, ma si tratta di una situazione meno comune, che non tratteremo in questo libro.
 
 ### Relazioni tra variabili quantitative: correlazione
 
-Se su ogni soggetto abbiamo rilevato due caratteri quantitativi (ad esempio il peso e l'altezza, oppure la produzione e il contenuto di proteina della granella), è possibile verificare se esiste una relazione tra la coppia di variabili ottenuta, cioè se al variare di una cambia anche il valore dell’altra, in modo congiunto.
+Se su ogni soggetto abbiamo rilevato due caratteri quantitativi (ad esempio il peso e l'altezza, oppure la produzione e il contenuto di proteina della granella), è possibile verificare se esista una relazione tra la coppia di variabili ottenute, cioè se al variare di una cambi anche il valore dell’altra, in modo congiunto (variazione congiunta).
 
-Per questo fine, si utilizza il *coefficiente di correlazione di Péearson* costituito dal rapporto tra la codevianza (o somma dei prodotti) delle due variabili e la radice quadrata del prodotto delle loro devianze. Il coefficiente di correlazione varia tra $-1$ e $+1$: un valore pari a $+1$ indica concordanza perfetta (quando aumenta una variabile, aumenta anche l’altra in modo proporzionale), mentre un valore pari a $-1$ indica discordanza perfetta (quando aumenta una variabile, diminuisce l’altra in modo inversamente proporzionale). Un valore pari a $0$ indica assenza di qualunque grado di variazione congiunta tra le due variabili (assenza di correlazione). Valori intermedi tra quelli anzidetti indicano correlazione positiva (se positivi) e negativa (se negativi).
+Per questo fine, si utilizza il *coefficiente di correlazione di Pearson* costituito dal rapporto tra la codevianza (o somma dei prodotti) delle due variabili e la radice quadrata del prodotto delle loro devianze. Vedremo tra poco il metodo di calcolo, ma vogliamo anticipare che il coefficiente di correlazione varia tra $-1$ e $+1$; se è pari ad 1, abbiamo una situazione ideale di concordanza perfetta (quando aumenta una variabile, aumenta anche l’altra in modo esattamente proporzionale), mentre quando è pari a $-1$, abbiamo una situazione ideale di discordanza perfetta (quando aumenta una variabile, diminuisce l’altra in modo inversamente proporzionale). Un valore pari a $0$ è altrettanto ideal ed indica assenza di qualunque grado di variazione congiunta (assenza di correlazione). Nell'intervallo tra $-1$ ed $1$, il coefficiente indica una correlazione imperfetta, ma tanto migliore quanto più ci allontaniamo dallo zero e ci avviciniamo a $-1$ o $1$. Due esempi di ottima correlazione sono mostrati in Figura \@ref(fig:figName311); si evidenzia un elevato grado di correlazione, che, tuttavia, non è perfetta, in quanto i punti non sono esattamente allineati. 
+
+<div class="figure" style="text-align: center">
+<img src="_images/CorrelationExample.png" alt="Esempio di correlazione positiva (destra) e negativa (sinistra)" width="75%" />
+<p class="caption">(\#fig:figName311)Esempio di correlazione positiva (destra) e negativa (sinistra)</p>
+</div>
+
 
 Proviamo a considerare questo esempio: il contenuto di olio di 9 lotti di acheni di girasole è stato misurato con due metodi diversi ed è riportato più sotto.
 
@@ -726,17 +756,31 @@ A <- c(45, 47, 49, 51, 44, 37, 48, 44, 53)
 B <- c(44, 44, 49, 53, 48, 34, 47, 46, 51)
 ```
 
-Valutare la correlazione tra i risultati dei due metodi di analisi. Manualmente dobbiamo eseguire alcune operazioni:
+Per valutare la entità della correlazione tra i risultati dei due metodi di analisi, dobbiamo eseguire alcune operazioni preliminari, cioè:
 
-1. calcolare la devianza di A
-2. calcolare la devianza di B
-3. calcolare la loro codevianza
+1. calcolare i residui per A ($z_A$)
+2. calcolare i residui per B ($z_B$)
+3. calcolare devianze e codevianze
 
-In primo luogo, vediamo che le due medie sono, rispettivamente 46.44 e 46.22. A questo punto possiamo calcolare gli scarti, come differenze tra ogni dato e la sua media e calcolare i loro quadrati, nonché i loro prodotti, riportando il tutto in una tabella, come indicato qui di seguito.
+In primo luogo, calcoliamo le due medie, che sono, rispettivamente, 46.44 e 46.22. Successivamente, possiamo calcolare i residui, come differenze tra ogni dato e la sua media, i loro quadrati ed i loro prodotti, come indicato in Tabella \@ref(tab:tabName3).
 
 
 
-A questo punto possiamo calcolare la somma dei quadrati degli scarti, ottenendo le devianze di $A$ e $B$ (rispettivamente 176.22 e 239.56) nonché le somme dei prodotti degli scarti, ottenendo la codevianza (pari a 184.11).
+Table: (\#tab:tabName3)Calcolo manuale del coefficiente di correlazione
+
+|  A|  B|  $z_A$|   $z_B$| $z_A^2$| $z_B^2$| $z_A \times z_B$|
+|--:|--:|------:|-------:|-------:|-------:|----------------:|
+| 45| 44| -1.444|  -2.222|   3.210|   2.086|            4.938|
+| 47| 44|  0.556|  -2.222|  -1.235|   0.309|            4.938|
+| 49| 49|  2.556|   2.778|   7.099|   6.531|            7.716|
+| 51| 53|  4.556|   6.778|  30.877|  20.753|           45.938|
+| 44| 48| -2.444|   1.778|  -4.346|   5.975|            3.160|
+| 37| 34| -9.444| -12.222| 115.432|  89.198|          149.383|
+| 48| 47|  1.556|   0.778|   1.210|   2.420|            0.605|
+| 44| 46| -2.444|  -0.222|   0.543|   5.975|            0.049|
+| 53| 51|  6.556|   4.778|  31.321|  42.975|           22.827|
+
+La somma dei quadrati dei residui ci permette di calcolare le devianze di $A$ e $B$ (rispettivamente 176.22 e 239.56), mentre la somme dei prodotti degli residui ci permette di calcolare la codevianza (pari a 184.11).
 
 Il coefficiente di correlazione è quindi:
 
@@ -745,11 +789,11 @@ $$r = \frac{184.11}{\sqrt{176.22 \times 239.56}} = 0.896$$
 
 Vediamo che il coefficiente di correlazione è abbastanza vicino ad 1 e quindi possiamo concludere che i due metodi di analisi danno risultati ben concordanti.
 
-## Dati qualitativi
+## Descrizione di dati qualitativi
 
-Nel capitolo 2 abbiamo visto che le variabili qualitative sono ottenute assegnando un soggetta ad una classe scelta tra due o più possibili opzioni. La descrizione di queste variabili di solito è effettuata calcolando le *frequenza assolute*, cioè il numero di individui assegnato ad ogni classe. Ad esempio, se abbiamo esaminato 500 insetti rilevando l'ordine a cui appartengono, le frequenze assolute potrebbero essere: 100 ditteri, 200  imenotteri e 150 ortotteri.
+Nel capitolo 2 abbiamo visto che le variabili qualitative sono ottenute assegnando ogni soggetto di un collettivo ad una classe scelta tra due o più possibili opzioni. Al termine di questo processo di classificazione, di solito calcoliamo le *frequenza assolute*, cioè il numero di individui assegnato ad ogni classe. Ad esempio, se abbiamo esaminato 500 insetti rilevando l'ordine a cui appartengono, le frequenze assolute potrebbero essere: 100 ditteri, 200  imenotteri e 150 ortotteri.
 
-Oltre alle frequenze assolute, possiamo calcolare anche le *frequenze relative*, dividendo le frequenze assolute per il numero totale degli individui del collettivo. Nel caso prima accennato, la frequenza relativa dei ditteri è pari a $100/500 = 0.2$.
+Oltre alle frequenze assolute, possiamo calcolare anche le *frequenze relative*, dividendo le frequenze assolute per il numero totale degli individui del collettivo. Nel caso precedentemente menzionato, la frequenza relativa dei ditteri è pari a $100/500 = 0.2$.
 
 Se le classi possono essere logicamente ordinate, oltre alle frequenze assolute e relative, possiamo calcolare anche le cosiddette *frequenze cumulate*, che si ottengono cumulando le frequenze relative di una classe con quelle di tutte le classi precedenti.
 
@@ -767,7 +811,7 @@ Ad esempio, se consideriamo il famoso database 'mtcars', relativo alle 32 auto s
 |     5|        5|     0.16|     1.00|
 
 
-Una distribuzione di frequenze può essere rappresentata con un grafico a torte, come vedremo tra poco. Inoltre, precisiamo anche che le distribuzioni di frequenze possono essere costruite anche per le variabili quantitative, tramite un’operazione di *classamento*, che consiste nel creare classi con intervalli opportuni e contare i soggetti in ogni classe. In questo modo, se le osservazioni sono molto numerose, la lettura delle informazioni risulta più semplice e più completa che non elencando tutti i valori o, d'altra parte, riportando solo la media e la deviazione standard. Daremo un esempio di questa tecnica in un paragrafo successivo.
+Le distribuzioni di frequenze possono essere costruite anche per le variabili quantitative, tramite un’operazione di *classamento*, che consiste nel suddividere il campo di variazione dei dati in una serie di intervalli (esempio, da 10 a 20, da 20 a 40 e così via) e contare i soggetti in ogni classe. In questo modo, se le osservazioni sono molto numerose, la lettura delle informazioni risulta più semplice e più completa che non elencando tutti i valori o, d'altra parte, riportando solo la loro media e la loro deviazione standard. Daremo un esempio di questa tecnica in un paragrafo successivo.
 
 
 ### Statistiche descrittive per le distribuzioni di frequenze 
@@ -778,45 +822,60 @@ In alcune condizioni (distribuzioni di frequenze per caratteri qualitativi ordin
 
 ### Distribuzioni di frequenza bivariate: le tabelle di contingenze
 
-In alcuni casi, in ciascuna unità sperimentale del collettivo vengono studiati due (o più) caratteri qualitativi e, di conseguenza, si ha a che fare con distribuzioni di frequenze bivariate (o multivariate), rappresentabili con *tabelle di contingenze*. Si tratta di tabelle a due entrate, nelle quali ogni numero rappresenta la frequenza assoluta per una particolare combinazione delle due variabili.
+In alcuni casi, in ciascuna unità sperimentale del collettivo vengono studiati due (o più) caratteri qualitativi, che possiamo rappresentare in una *tabella di contingenze*. Si tratta di tabelle a due (o più) entrate, nelle quali ogni valore rappresenta la frequenza assoluta per una particolare combinazione dei caratteri rilevati.
 
-Ad esempio, se per un gruppo di bacche di pomodoro abbiamo rilevato, bacca per bacca, la varietà (nelle due classi SANREMO e FANO) e la forma (nelle tre classi LUNGO, TONDO ed OVALE) potremo definire la tabella di contingenze sotto riportata.
+Ad esempio, potremmo aver valutato la germinabilità di cariossidi di frumento sottoposte a due tipi di illuminazione, rossa o blu. Per ogni cariosside abbiamo quindi due informazioni, il trattamento a cui è stata sottoposta (luce rossa o blu) e se è germinata oppure no, per un totale di quattro possibili combinazioni (Rosso-si, Rosso-no, Blu-si, Blu-no). Supponendo di aver osservato 95 cariossidi germinate su 110 testate con luce rossa e 67 germinate su 120 testate con luce blu, possiamo definire la tabella di contingenze riportata di seguito.
 
 
 
-|        | LUNGO| TONDO| OVALE|
-|:-------|-----:|-----:|-----:|
-|SANREMO |    37|    32|    61|
-|FANO    |    45|    74|    59|
+|      | SI| NO|
+|:-----|--:|--:|
+|ROSSO | 95| 15|
+|BLU   | 67| 53|
 
-Ogni riga della tabella sovrastante costituisce una distribuzione di frequenze per la forma del frutto, data una certa classe di varietà (distribuzione di frequenze condizionate). Allo stesso modo si può dire che ogni colonna rapresenta una distribuzione di frequenze condizionate per una certa classe di forma.
+Ogni riga della tabella sovrastante costituisce una distribuzione di frequenze per la germinabilità, data una certa tipologia di luce (distribuzione di frequenze condizionate).
 
 
 ### Connessione
 
-Se guardiamo le due distribuzioni condizionate per SANREMO e FANO possiamo notare che esiste una certa differenza. Potremmo chiederci quindi se il presentarsi di una data modalità del carattere varietà (SANREMO o FANO) influenza il presentarsi di una particolare modalità del carattere forma del frutto. In altre parole, potremmo chiederci se le baccke della varietà SANREMO sono più frequentemente ovali, mentre quelle della varietà FANO sono più frequentemente tonde. Se fosse così, si potrebbe parlare di dipendenza o connessione, mentre, nel caso contrario, si dovrebbe parlare di indipendenza dei caratteri.
+Se guardiamo le due distribuzioni condizionate per la luce rossa e blu, possiamo notare che esiste una certa differenza e che la germinabilità pare maggiore con luce rossa. Potremmo chiederci quindi se una certa modalità del carattere luce (rossa o blue) influenzi il presentarsi di una particolare modalità del carattere germinabilità (si o no). Se così fosse, potremmo parlare di dipendenza o connessione, mentre, nel caso contrario, si dovrebbe parlare di indipendenza dei caratteri.
 
-Come si fa a stabilire se i caratteri sono indipendenti o connessi? Bisogna pensare che, in caso di indipendenza, le distribuzioni condizionate di una variabile, ad esempio la forma, dovrebbero essere uguali per entrambe le varietà. Se consideriamo la classe LUNGO, la frequenza relativa marginale è pari ad $82/308 = 0.266$ (82 è il numero totale di pomodori di forma allungata, mentre 308 è il numero totale dei pomodori); in caso di indipendenza, questa frequenza dovrebbe essere la stessa, sia per SANREMO che per FANO. In cifre, la frequenza assoluta per la combinazione LUNGO|SANREMO dovrebbe essere pari a $130 \times 0.266 =34.6$. mentre per la combinazione LUNGO|FANO dovrebbe essere pari a $178 \times 0.266=47.4$. Procedendo allo stesso modo, possiamo costruire la tabella delle frequenze assolute attese, nell'ipotesi di indipendenza completa tra i due caratteri.
+Come si fa a stabilire se i caratteri sono indipendenti o connessi? Il punto di partenza è pensare che, se i caratteri fossero indipendenti, la germinabilità dovrebbe essere la stessa con entrambi i trattamenti; in totale, abbiamo osservato 230 semi, di cui 162 sono germinati e 68 non lo sono e, di conseguenza, la  proporzione di semi germinati è stata pari a 162/230 = 0.704. Ebbene, questa proporzione la si dovrebbe riscontrare con entrambi i trattamenti. In cifre, il numero di semi germinati con luce rossa dovrebbe essere pari a $110 \times 0.704 = 77.44$, mentre il numero di semi germinati con luce blu dovrebbe essere pari a $120 \times 0.704 = 84.48$. Rispettando i totali marginali (cioè il numero totale di semi saggiati con luce rossa e blu dovrebbe essere pari, rispettivamente a 110 e 120), possiamo costruire la tabella delle frequenze assolute attese, nell'ipotesi di indipendenza completa tra i due caratteri.
 
 
-|        | LUNGO| TONDO| OVALE|
-|:-------|-----:|-----:|-----:|
-|SANREMO |  34.6|  44.7|  50.6|
-|FANO    |  47.4|  61.3|  69.4|
+|      |    SI|    NO|
+|:-----|-----:|-----:|
+|ROSSO | 77.44| 32.56|
+|BLU   | 84.48| 35.52|
 
-A questo punto è logico costruire un indice statistico di connessione, detto $\chi^2$, che misuri lo scostamento tra le frequenze osservate e quelle attese nell’ipotesi di indipendenza perfetta:
+A questo punto possiamo costruire un indice statistico di connessione, detto $\chi^2$, che misuri la discrepanzatra le due tabelle, quella delle frequenze osservate e quella delle frequenze teoriche che si sarebbero dovute osservare nell’ipotesi di indipendenza perfetta:
 
 $$\chi ^2  = \sum \left[ \frac{\left( {f_o  - f_a } \right)^2 }{f_a } \right]$$
 
-dove $f_o$ sta per frequenza osservata ed $f_a$ sta per frequenza attesa nel caso indipendenza. Questo indice assume valore pari a zero nel caso di indipendenza completa (le frequenze osservate sono uguali a quelle attese) ed assume un valore positivo tanto più alto quanto maggiore è la connessione tra i due caratteri, fino ad un valore massimo dato dal prodotto del numero degli individui per il valore minimo tra il numero di righe meno una e il numero di colonne meno una:
+dove $f_o$ sta per frequenza osservata ed $f_a$ sta per frequenza attesa nel caso indipendenza. Questo indice assume valore pari a zero nel caso di indipendenza completa (le frequenze osservate sono uguali a quelle attese) ed assume un valore positivo tanto più alto quanto maggiore è la connessione tra i due caratteri.
+
+Nel nostro esempio:
+
+$$\chi^2  = \frac{\left( {95  - 77.44 } \right)^2 }{77.44 } + \frac{\left( {15  - 32.56 } \right)^2 }{32.56 } + \frac{\left( {67  - 84.48 } \right)^2 }{84.48 } + \frac{\left( {53  - 35.52 } \right)^2 }{35.52 } = 25.67$$
+
+
+Se i caratteri fossero veramente indipendenti, la tabella delle frequenze osservate dovrebbe essere uguale a quella delle frequenze atteso, il che implicherebbe $\chi^2 = 0$. Il valore da noi osservato è maggiore di 0 e quindi possiamo dire che esiste un certo grado di connessione, ma non sappiamo dire quanto questa sia elevata. Qual è il $\chi^2$ massimo possibile?
+
+Intuitivamente, possiamo immaginare che la connessione potrebbe essere la più elevata possibile quando con uno dei due trattamenti i semi sono tutti germinati, mentre con l'altro non ne è germinato nessuno, come indicato nella tabella seguente:
+
+
+|      |  SI|  NO|
+|:-----|---:|---:|
+|ROSSO | 110|   0|
+|BLU   |   0| 120|
+
+
+
+Se calcoliamo il valore di $\chi^2$ per la tabella sovrastante otteniamo 230, che è appunto il massimo valore possibile nella nostra condizione. Più in generale, il $\chi^2$ massimo è dato dal prodotto del numero degli individui per il valore minimo tra il numero di righe meno una e il numero di colonne meno una:
 
 $$\max \chi ^2  = n \cdot \min (r - 1,\,c - 1)$$
 
-Nel nostro caso, il chi quadro è:
-
-$$\chi ^2  = \frac{\left( {37  - 34.6 } \right)^2 }{34.6 } + \frac{\left( {32  - 44.7 } \right)^2 }{44.7 } + ... + \frac{\left( {59  - 69.4 } \right)^2 }{69.4 } = 10.22$$
-
-Il valore massimo ammissibile sarebbe pari a 308, cioè il numero totale di bacche moltiplicato per uno, che è il valore minimo tra 2 (numero di colonne menu una) e 1 (numero di righe meno una). Il valore osservato è quindi il 3% circa di quello massimo possibile ($10.22/308=0.033$) e si può concludere che la connessione tra i due caratteri esiste, ma non è molto forte.
+Possiamo concludere che la connessione tra i due caratteri è pari all'11% circa di quello massima ($25.67/230 = 0.112$).
 
 
 ## Statistiche descrittive con R
@@ -843,7 +902,7 @@ median(dataset$height)
 ## [1] 162.5
 ```
 
-Per la devianza, non esiste una funzione dedicata e, di conseguenza, si deve utilizzare l'equazione fornita più sopra:
+Per la devianza, non esiste una funzione dedicata e dobbiamo utilizzare l'equazione fornita in precedenza:
 
 
 ```r
@@ -851,7 +910,7 @@ sum( (dataset$height - mean(dataset$height))^2 )
 ## [1] 4050
 ```
 
-Varianza e deviazione standard sono molto facili da calcolare, grazie alle funzioni apposite, mentre il coefficiente di variabilità si può calcolare con la formula data più sopra:
+Varianza e deviazione standard sono molto facili da calcolare, grazie alle funzioni apposite, mentre il coefficiente di variabilità si può calcolare con la formula fornita in precedenza:
 
 
 ```r
@@ -898,11 +957,11 @@ descript
 ## V 165.25 19.51709
 ```
 
-Nel codice sovrastante, `height` è la variabile che contiene i valori da mediare, `var` è la variabile che contiene la codifica di gruppo, `mean` è la funzione che dobbiamo calcolare. Ovviamente `mean` può essere sostituito da qualunque altra funzione ammissibile in R, come ad esempio la deviazione standard; successivamente, nel codice sovrastante abbiamo utilizzato la funzione `data.frame()` per creare un nuovo dataset con le medie e le deviazioni standard.
+Nel codice immediatamente precedente, `height` è la variabile che contiene i valori da mediare, `var` è la variabile che contiene la codifica di gruppo, `mean` è la funzione che dobbiamo calcolare. Ovviamente `mean` può essere sostituito da qualunque altra funzione ammissibile in R, come ad esempio la deviazione standard. Nel codice precedente abbiamo utilizzato la funzione `data.frame()` per creare una tabella riassuntiva con le medie e le deviazioni standard dei quattro gruppi.
 
 Oltre che in una tabella, i risultati possono anche essere riportati in un grafico a barre, con l'indicazione della variabilità dei dati. Possiamo utilizzare la funzione `barplot()` alla quale passeremo come argomenti l'altezza delle barre, data dalle medie dei diversi gruppi, i nomi dei gruppi medesimi e, opzionalmente, la scala dell'asse delle ordinate. La funzione `barplot()`, oltre che creare il grafico, restituisce le ascisse del centro di ogni barra, che possiamo utilizzare per creare dei segmenti verticali corrispondenti alle deviazioni standard di ogni gruppo, attraverso la funzione `arrows()`.
 
-Se, per ogni gruppo, le ascisse sono nel vettore 'coord', i segmenti di variabilità avranno un punto di partenza con  ascissa 'coord' e ordinata uguale al valore medio dell'altezza meno la deviazione standard e un punto di arrivo con ascissa sempre uguale a 'coord' e ordinata uguale all'altezza media più la deviazione standard. Gli altri argomenti della funzione `arrows()` servono per specificare il tipo di segmento che vogliamo tracciare; il codice sottostante produce l'output mostrato in Figura \@ref(fig:figName242).
+L'uso di quest'ultima funzione non è immediato; poniamo che le ascisse del centro di ogni barra siano contenute nel vettore 'coord'; allora i segmenti di variabilità dovranno avere punti di partenza con ascisse contenute in 'coord' ed ordinate uguali all'altezza di ogni barra meno la deviazione standard. I punti di arrivo, invece, dovranno avere le stesse ascisse dei punti di partenza ed ordinate uguali all'altezza di ogni barra più la deviazione standard. Gli altri argomenti della funzione `arrows()` servono per meglio specificare l'aspetto dei segmenti di variabilità; ad esempio, il codice sottostante produce il risultato mostrato in Figura \@ref(fig:figName242); il grafico non è bellissimo, ma, con un po' di esercizio, è possibile ottenere grafici altamente professionali.
 
 
 ```r
@@ -918,9 +977,7 @@ arrows(coord, descript$Media - descript$SD,
 <p class="caption">(\#fig:figName242)Esempio di boxplot in R</p>
 </div>
 
-Il grafico non è bellissimo; per ora ci accontenteremo, ma, con un po' di esercizio, è possibile ottenere grafici di alto livello.
-
-Quando abbiamo a che fare con gruppi molto numerosi, con un certo numero di outliers, è bene sostituire la mediana alla media, in associazione con il 25-esimo e 75-esimo percentile, come indicazioni di variabilità. Da un punto di vista grafico, possiamo utilizzare un *boxplot* (grafico Box-Whisker). Si tratta di una scatola (box) che ha per estremi il 25-esimo e il 75-esimo percentile ed è tagliata da una linea centrale in corrispondenza della mediana. Dalla scatola partono due linee verticali (baffi = whiskers) che identificano il valore massimo e il minimo. Se il massimo (o il minimo) distano dalla mediana più di 1.5 volte la differenza tra la mediana stessa e il 75-esimo (o 25-esimo) percentile, allora le linee verticali si fermano ad un valore pari ad 1.5 volte il 75-esimo (o il 25-esimo) percentile ed i dati più estremi vengono raffigurati come outliers. In basso abbiamo create tre gruppi con una funzione di estrazione di numeri casuali e li abbiamo rappresentati nel boxplot mostrato in Figura \@ref(fig:figName241).
+Quando abbiamo a che fare con gruppi molto numerosi, con un certo numero di outliers, è bene sostituire la mediana alla media, in associazione con il 25-esimo e 75-esimo percentile, come indicazioni di variabilità. Da un punto di vista grafico, possiamo utilizzare un *boxplot* (grafico Box-Whisker). Si tratta di una scatola (box) che ha per estremi il 25-esimo e il 75-esimo percentile ed è tagliata da una linea centrale in corrispondenza della mediana. Dalla scatola partono due linee verticali (baffi = whiskers) che identificano il valore massimo e il minimo. Se il massimo (o il minimo) distano dalla mediana più di 1.5 volte la differenza tra la mediana stessa e il 75-esimo (o 25-esimo) percentile, allora le linee verticali si fermano ad un valore pari ad 1.5 volte il 75-esimo (o il 25-esimo) percentile ed i dati più estremi vengono considerati outliers e rappresentati con un piccolo cerchio. In Figura \@ref(fig:figName241) abbiamo raprresentato tre gruppi di valori estratti casualmente nell'intervallo da 0 ad 1.
 
 
 ```r
@@ -3327,10 +3384,10 @@ Una volta definiti i coefficienti, possiamo utilizzare il package  ‘emmeans’
 K <- list(k1 = k1, K2 = k2, k3 = k3, k4 = k4)
 contrast(medie, method = K, adjust="none")
 ##  contrast estimate   SE df t.ratio p.value
-##  k1         -16.39 2.26 12 -7.244  <.0001 
-##  K2           7.89 2.40 12  3.289  0.0065 
-##  k3          11.73 2.77 12  4.235  0.0012 
-##  k4           4.05 2.77 12  1.461  0.1697
+##  k1         -16.39 2.26 12  -7.244  <.0001
+##  K2           7.89 2.40 12   3.289  0.0065
+##  k3          11.73 2.77 12   4.235  0.0012
+##  k4           4.05 2.77 12   1.461  0.1697
 ```
 
 \normalsize
@@ -3351,12 +3408,12 @@ Nel quadro sottostante mostriamo un confronto tipo Tukey (tutti contro tutti), e
 #Confronti multipli a coppie
 contrast(medie, adjust="none", method="pairwise")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461  0.1697 
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774  0.0168 
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352  <.0001 
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235  0.0012 
-##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813  <.0001 
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578  0.0038
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  0.1697
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.0168
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  <.0001
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0012
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0038
 ```
 \normalsize
 
@@ -3368,9 +3425,9 @@ Per i confronti del tipo 'tutti verso uno' è possibile utilizzare la stessa fun
 ```r
 contrast(medie, adjust="none", method="dunnett")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Mixture_378 - Metribuzin__348       -4.05 2.77 12 -1.461  0.1697 
-##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12  2.774  0.0168 
-##  Unweeded - Metribuzin__348          17.60 2.77 12  6.352  <.0001
+##  Mixture_378 - Metribuzin__348       -4.05 2.77 12  -1.461  0.1697
+##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12   2.774  0.0168
+##  Unweeded - Metribuzin__348          17.60 2.77 12   6.352  <.0001
 ```
 \normalsize
 
@@ -3382,9 +3439,9 @@ Così facendo vediamo che R confronta tutte le tesi con metribuzin, che è il pr
 ```r
 contrast(medie, adjust="none", method="dunnett", ref = 2)
 ##  contrast                      estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378     4.05 2.77 12 1.461   0.1697 
-##  Rimsulfuron_30 - Mixture_378     11.73 2.77 12 4.235   0.0012 
-##  Unweeded - Mixture_378           21.64 2.77 12 7.813   <.0001
+##  Metribuzin__348 - Mixture_378     4.05 2.77 12   1.461  0.1697
+##  Rimsulfuron_30 - Mixture_378     11.73 2.77 12   4.235  0.0012
+##  Unweeded - Mixture_378           21.64 2.77 12   7.813  <.0001
 ```
 
 \normalsize
@@ -3433,7 +3490,10 @@ multcomp::cld(medie, adjust="none", Letters=LETTERS)
 ##  Unweeded         26.77 1.96 12    22.50     31.0    C  
 ## 
 ## Confidence level used: 0.95 
-## significance level used: alpha = 0.05
+## significance level used: alpha = 0.05 
+## NOTE: Compact letter displays can be misleading
+##       because they show NON-findings rather than findings.
+##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 ```
 
 
@@ -3477,12 +3537,12 @@ Più facilmente, possiamo arrivare allo stesso risultato con il package 'emmeans
 ```r
 contrast(medie, method = "pairwise", adjust = "sidak")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461  0.6723 
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774  0.0968 
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352  0.0002 
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235  0.0069 
-##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813  <.0001 
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578  0.0226 
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  0.6723
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.0968
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  0.0002
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0069
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0226
 ## 
 ## P value adjustment: sidak method for 6 tests
 ```
@@ -3511,12 +3571,12 @@ Oppure possiamo utilizzare la funzione `contrast()`:
 ```r
 contrast(medie, method = "pairwise", adjust = "bonferroni")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461  1.0000 
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774  0.1010 
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352  0.0002 
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235  0.0069 
-##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813  <.0001 
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578  0.0228 
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  1.0000
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.1010
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  0.0002
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0069
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0228
 ## 
 ## P value adjustment: bonferroni method for 6 tests
 ```
@@ -3533,12 +3593,12 @@ Oltre che aggiustare il P-level, possiamo anche utilizzare altre procedure di ag
 #Confronti multipli a coppie, basati sul t multivariato
 contrast(medie, method="pairwise")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461  0.4885 
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774  0.0698 
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352  0.0002 
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235  0.0055 
-##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813  <.0001 
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578  0.0173 
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  0.4885
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.0698
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  0.0002
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0055
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0173
 ## 
 ## P value adjustment: tukey method for comparing a family of 4 estimates
 ```
@@ -3554,9 +3614,9 @@ Ovviamente la correzione per la molteplicità ed il conseguente innalzamento del
 #Confronti multipli a coppie, basati sul t multivariato
 contrast(medie, method="dunnett")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Mixture_378 - Metribuzin__348       -4.05 2.77 12 -1.461  0.3711 
-##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12  2.774  0.0442 
-##  Unweeded - Metribuzin__348          17.60 2.77 12  6.352  0.0001 
+##  Mixture_378 - Metribuzin__348       -4.05 2.77 12  -1.461  0.3711
+##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12   2.774  0.0442
+##  Unweeded - Metribuzin__348          17.60 2.77 12   6.352  0.0001
 ## 
 ## P value adjustment: dunnettx method for 3 tests
 ```
@@ -3878,7 +3938,10 @@ multcomp::cld(medie, Letters = LETTERS, reverse = T)
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 16 estimates 
-## significance level used: alpha = 0.05
+## significance level used: alpha = 0.05 
+## NOTE: Compact letter displays can be misleading
+##       because they show NON-findings rather than findings.
+##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 ```
 
 \normalsize
@@ -4564,7 +4627,10 @@ multcomp::cld(medie, Letters = LETTERS)
 ## 
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
-## significance level used: alpha = 0.05
+## significance level used: alpha = 0.05 
+## NOTE: Compact letter displays can be misleading
+##       because they show NON-findings rather than findings.
+##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 ```
 
 Se volessimo confrontare le lavorazioni a parità di diserbo o tutte le combinazioni dovremmo utilizzare una sintassi leggermente diversa:
@@ -4588,7 +4654,10 @@ multcomp::cld(medie, Letters=LETTERS)
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 3 estimates 
-## significance level used: alpha = 0.05
+## significance level used: alpha = 0.05 
+## NOTE: Compact letter displays can be misleading
+##       because they show NON-findings rather than findings.
+##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 medie <- emmeans(mod, ~Tillage:WeedControl)
 multcomp::cld(medie, Letters=LETTERS)
 ##  Tillage WeedControl emmean    SE df lower.CL upper.CL .group
@@ -4602,7 +4671,10 @@ multcomp::cld(medie, Letters=LETTERS)
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 6 estimates 
-## significance level used: alpha = 0.05
+## significance level used: alpha = 0.05 
+## NOTE: Compact letter displays can be misleading
+##       because they show NON-findings rather than findings.
+##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 ```
 
 Le tre analisi (contronti tra lavorazioni a parità di diserbo, tra diserbi a parità di lavorazione e tutti verso tutti) portano a risultati leggermente diversi per il diverso numero di confronti effettuati: tre nel primo caso, sei nel secondo e 15 nel terzo, che richiedono una diversa correzione per la molteplicità.
@@ -4761,7 +4833,10 @@ multcomp::cld(mfMeans, Letters = LETTERS)
 ## Confidence level used: 0.95 
 ## Results are averaged over some or all of the levels of: Block 
 ## P value adjustment: tukey method for comparing a family of 9 estimates 
-## significance level used: alpha = 0.05
+## significance level used: alpha = 0.05 
+## NOTE: Compact letter displays can be misleading
+##       because they show NON-findings rather than findings.
+##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 ```
 
 In conclusione, vediamo che l'analisi dei disegni con due fattori innestati è piuttosto simile a quella per due fattori incrociati, con l'unica eccezione che l'effetto principale per il fattore innestato non è incluso nel modello.
@@ -4940,7 +5015,16 @@ Anche in questo caso, il calcolo delle medie e i confronti multipli vengono effe
 
 I fenomeni biologici, come ad esempio la crescita di una coltura, la cinetica degradativa degli erbicidi nel terreno, la risposta produttiva delle colture a densità crescenti di malerbe o a dosi crescenti di concime, la risposta fitotossica di una specie infestante alla dose di un erbicida, hanno in genere andamenti curvilinei, posseggono punti di massimo o minimo, flessi e, soprattutto, hanno frequentemente asintoti. Pertanto, difficilmente possono essere descritti con funzioni lineari, a meno che non ci accontentiamo di approssimare localmente l'andamento dei dati, in un intervallo ristretto della variabile indipendente.
 
-Da un punto di vista pratico, è quindi fondamentale saper adattare ai dati funzioni curvilinee di ogni tipo. Introduciamo il problema con un esempio.
+Da un punto di vista pratico, è quindi fondamentale saper adattare ai dati funzioni curvilinee di ogni tipo. Introduciamo il problema con un esempio, per il quale avremo bisogno di un package aggiuntivo che potremo installare (la prima volta) e caricare con il codice riportato più sotto.
+
+
+```r
+# Solo la prima volta
+# install.packages("devtools")
+# devtools::install_github("onofriandreapg/nlstools2")
+library(nlstools2)
+```
+
 
 ## Caso studio: degradazione di un erbicida nel terreno
 
@@ -5127,20 +5211,12 @@ L'analisi grafica dei residui viene eseguita in modo del tutto analogo a quanto 
 ```r
 par(mfrow=c(1,2))
 plot(modNlin, which = 1)
-```
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName154-1.png" alt="Analisi grafica dei residui per la regressione non-lineare, relativa alla degradazione di metamitron nel suolo" width="90%" />
-<p class="caption">(\#fig:figName154-1)Analisi grafica dei residui per la regressione non-lineare, relativa alla degradazione di metamitron nel suolo</p>
-</div>
-
-```r
 plot(modNlin, which = 2)
 ```
 
 <div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName154-2.png" alt="Analisi grafica dei residui per la regressione non-lineare, relativa alla degradazione di metamitron nel suolo" width="90%" />
-<p class="caption">(\#fig:figName154-2)Analisi grafica dei residui per la regressione non-lineare, relativa alla degradazione di metamitron nel suolo</p>
+<img src="_main_files/figure-html/figName154-1.png" alt="Analisi grafica dei residui per la regressione non-lineare, relativa alla degradazione di metamitron nel suolo" width="90%" />
+<p class="caption">(\#fig:figName154)Analisi grafica dei residui per la regressione non-lineare, relativa alla degradazione di metamitron nel suolo</p>
 </div>
 
 La Figura \@ref(fig:figName154) non mostra deviazioni rispetto agli assunti di base. Pertanto, proseguiamo l'analisi grafica della bontà di adattamento, verificando il plot dei valori attesi e di quelli osservati (Figure \@ref(fig:figName155)). Questo grafico, per gli oggetti 'nls' può essere ottenuto velocemente utilizzando la funzione 'plotnls()', nel package 'aomisc'.
@@ -5149,7 +5225,7 @@ La Figura \@ref(fig:figName154) non mostra deviazioni rispetto agli assunti di b
 
 ```r
 library(lattice)
-nlstools::plotfit(modNlin, smooth = T)
+plotfit(modNlin, smooth = T)
 ```
 
 <div class="figure" style="text-align: center">
