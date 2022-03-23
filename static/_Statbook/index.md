@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.1 (Anno Accademico 2022), compil. 2022-03-10"
+date: "Update: v. 1.11 (Anno Accademico 2021-2022), compil. 2022-03-23"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -3384,10 +3384,10 @@ Una volta definiti i coefficienti, possiamo utilizzare il package  ‘emmeans’
 K <- list(k1 = k1, K2 = k2, k3 = k3, k4 = k4)
 contrast(medie, method = K, adjust="none")
 ##  contrast estimate   SE df t.ratio p.value
-##  k1         -16.39 2.26 12 -7.244  <.0001 
-##  K2           7.89 2.40 12  3.289  0.0065 
-##  k3          11.73 2.77 12  4.235  0.0012 
-##  k4           4.05 2.77 12  1.461  0.1697
+##  k1         -16.39 2.26 12  -7.244  <.0001
+##  K2           7.89 2.40 12   3.289  0.0065
+##  k3          11.73 2.77 12   4.235  0.0012
+##  k4           4.05 2.77 12   1.461  0.1697
 ```
 
 \normalsize
@@ -3408,12 +3408,12 @@ Nel quadro sottostante mostriamo un confronto tipo Tukey (tutti contro tutti), e
 #Confronti multipli a coppie
 contrast(medie, adjust="none", method="pairwise")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461  0.1697 
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774  0.0168 
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352  <.0001 
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235  0.0012 
-##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813  <.0001 
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578  0.0038
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  0.1697
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.0168
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  <.0001
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0012
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0038
 ```
 \normalsize
 
@@ -3425,9 +3425,9 @@ Per i confronti del tipo 'tutti verso uno' è possibile utilizzare la stessa fun
 ```r
 contrast(medie, adjust="none", method="dunnett")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Mixture_378 - Metribuzin__348       -4.05 2.77 12 -1.461  0.1697 
-##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12  2.774  0.0168 
-##  Unweeded - Metribuzin__348          17.60 2.77 12  6.352  <.0001
+##  Mixture_378 - Metribuzin__348       -4.05 2.77 12  -1.461  0.1697
+##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12   2.774  0.0168
+##  Unweeded - Metribuzin__348          17.60 2.77 12   6.352  <.0001
 ```
 \normalsize
 
@@ -3439,9 +3439,9 @@ Così facendo vediamo che R confronta tutte le tesi con metribuzin, che è il pr
 ```r
 contrast(medie, adjust="none", method="dunnett", ref = 2)
 ##  contrast                      estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378     4.05 2.77 12 1.461   0.1697 
-##  Rimsulfuron_30 - Mixture_378     11.73 2.77 12 4.235   0.0012 
-##  Unweeded - Mixture_378           21.64 2.77 12 7.813   <.0001
+##  Metribuzin__348 - Mixture_378     4.05 2.77 12   1.461  0.1697
+##  Rimsulfuron_30 - Mixture_378     11.73 2.77 12   4.235  0.0012
+##  Unweeded - Mixture_378           21.64 2.77 12   7.813  <.0001
 ```
 
 \normalsize
@@ -3490,7 +3490,10 @@ multcomp::cld(medie, adjust="none", Letters=LETTERS)
 ##  Unweeded         26.77 1.96 12    22.50     31.0    C  
 ## 
 ## Confidence level used: 0.95 
-## significance level used: alpha = 0.05
+## significance level used: alpha = 0.05 
+## NOTE: Compact letter displays can be misleading
+##       because they show NON-findings rather than findings.
+##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 ```
 
 
@@ -3534,12 +3537,12 @@ Più facilmente, possiamo arrivare allo stesso risultato con il package 'emmeans
 ```r
 contrast(medie, method = "pairwise", adjust = "sidak")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461  0.6723 
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774  0.0968 
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352  0.0002 
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235  0.0069 
-##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813  <.0001 
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578  0.0226 
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  0.6723
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.0968
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  0.0002
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0069
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0226
 ## 
 ## P value adjustment: sidak method for 6 tests
 ```
@@ -3568,12 +3571,12 @@ Oppure possiamo utilizzare la funzione `contrast()`:
 ```r
 contrast(medie, method = "pairwise", adjust = "bonferroni")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461  1.0000 
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774  0.1010 
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352  0.0002 
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235  0.0069 
-##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813  <.0001 
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578  0.0228 
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  1.0000
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.1010
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  0.0002
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0069
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0228
 ## 
 ## P value adjustment: bonferroni method for 6 tests
 ```
@@ -3590,12 +3593,12 @@ Oltre che aggiustare il P-level, possiamo anche utilizzare altre procedure di ag
 #Confronti multipli a coppie, basati sul t multivariato
 contrast(medie, method="pairwise")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461  0.4885 
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774  0.0698 
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352  0.0002 
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235  0.0055 
-##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813  <.0001 
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578  0.0173 
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  0.4885
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.0698
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  0.0002
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0055
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0173
 ## 
 ## P value adjustment: tukey method for comparing a family of 4 estimates
 ```
@@ -3611,9 +3614,9 @@ Ovviamente la correzione per la molteplicità ed il conseguente innalzamento del
 #Confronti multipli a coppie, basati sul t multivariato
 contrast(medie, method="dunnett")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Mixture_378 - Metribuzin__348       -4.05 2.77 12 -1.461  0.3711 
-##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12  2.774  0.0442 
-##  Unweeded - Metribuzin__348          17.60 2.77 12  6.352  0.0001 
+##  Mixture_378 - Metribuzin__348       -4.05 2.77 12  -1.461  0.3711
+##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12   2.774  0.0442
+##  Unweeded - Metribuzin__348          17.60 2.77 12   6.352  0.0001
 ## 
 ## P value adjustment: dunnettx method for 3 tests
 ```
@@ -3935,7 +3938,10 @@ multcomp::cld(medie, Letters = LETTERS, reverse = T)
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 16 estimates 
-## significance level used: alpha = 0.05
+## significance level used: alpha = 0.05 
+## NOTE: Compact letter displays can be misleading
+##       because they show NON-findings rather than findings.
+##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 ```
 
 \normalsize
@@ -4621,7 +4627,10 @@ multcomp::cld(medie, Letters = LETTERS)
 ## 
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
-## significance level used: alpha = 0.05
+## significance level used: alpha = 0.05 
+## NOTE: Compact letter displays can be misleading
+##       because they show NON-findings rather than findings.
+##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 ```
 
 Se volessimo confrontare le lavorazioni a parità di diserbo o tutte le combinazioni dovremmo utilizzare una sintassi leggermente diversa:
@@ -4645,7 +4654,10 @@ multcomp::cld(medie, Letters=LETTERS)
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 3 estimates 
-## significance level used: alpha = 0.05
+## significance level used: alpha = 0.05 
+## NOTE: Compact letter displays can be misleading
+##       because they show NON-findings rather than findings.
+##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 medie <- emmeans(mod, ~Tillage:WeedControl)
 multcomp::cld(medie, Letters=LETTERS)
 ##  Tillage WeedControl emmean    SE df lower.CL upper.CL .group
@@ -4659,7 +4671,10 @@ multcomp::cld(medie, Letters=LETTERS)
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 6 estimates 
-## significance level used: alpha = 0.05
+## significance level used: alpha = 0.05 
+## NOTE: Compact letter displays can be misleading
+##       because they show NON-findings rather than findings.
+##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 ```
 
 Le tre analisi (contronti tra lavorazioni a parità di diserbo, tra diserbi a parità di lavorazione e tutti verso tutti) portano a risultati leggermente diversi per il diverso numero di confronti effettuati: tre nel primo caso, sei nel secondo e 15 nel terzo, che richiedono una diversa correzione per la molteplicità.
@@ -4818,7 +4833,10 @@ multcomp::cld(mfMeans, Letters = LETTERS)
 ## Confidence level used: 0.95 
 ## Results are averaged over some or all of the levels of: Block 
 ## P value adjustment: tukey method for comparing a family of 9 estimates 
-## significance level used: alpha = 0.05
+## significance level used: alpha = 0.05 
+## NOTE: Compact letter displays can be misleading
+##       because they show NON-findings rather than findings.
+##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 ```
 
 In conclusione, vediamo che l'analisi dei disegni con due fattori innestati è piuttosto simile a quella per due fattori incrociati, con l'unica eccezione che l'effetto principale per il fattore innestato non è incluso nel modello.
@@ -5688,11 +5706,11 @@ Calcolare (a mano) il coefficiente di correlazione di Pearson e valutare la ampi
 
 ### Esercizio 4
 
-Considerate il file EXCEL 'rimsulfuron.xlsx', che può essere scaricato [da questo link](https://www.casaonofri.it/_datasets/rimsulfuron.xlsx). In questo file sono riportati i risultati di un esperimento con 15 trattamenti e 4 repliche, nel quale sono stati posti a confronti diversi erbicidi e/o dosi per il diserbo nel mais. Calcolare le medie produttive ottenute con le diverse tesi sperimentali e riportarle su un grafico, includendo anche un'indicazione di variabilità. Verificare se la produzione è correlata con l'altezza delle piante e commentare i risultati ottenuti. Il file può essere scaricato
+Considerate il file EXCEL 'rimsulfuron.csv', che potete trovare in questo percorso: 'https://www.casaonofri.it/_datasets/students.csv'. In questo file sono riportati i risultati di un esperimento con 16 trattamenti e 4 repliche, nel quale sono stati posti a confronti diversi erbicidi e/o dosi per il diserbo nel mais. Calcolare le medie produttive ottenute con le diverse tesi sperimentali e riportarle su un grafico, includendo anche un'indicazione di variabilità. Verificare se la produzione è correlata con il ricoprimento (WeedCover) delle piante infestanti.
 
 ### Esercizio 5
 
-Caricare il datasets 'students' disponibile al link: '<https://www.casaonofri.it/_datasets/students.csv>'. In questo file potete trovare una database relativo alla valutazione degli studenti in alcune materie del primo anno di Agraria. Ogni record rappresenta un esame, con il relativo voto, la materia e la scuola di provenienza dello studente. Con un uso appropriato delle tabelle di contingenza e del chi quadro, valutare se il voto dipende dalla materia e dalla scuola di provenienza dello studente.
+Caricare il datasets 'students' disponibile al link: 'https://www.casaonofri.it/_datasets/students.csv'. In questo file potete trovare una database relativo alla valutazione degli studenti in alcune materie del primo anno di Agraria. Ogni record rappresenta un esame, con il relativo voto, la materia e la scuola di provenienza dello studente. Con un uso appropriato delle tabelle di contingenza e del chi quadro, valutare se il voto dipende dalla materia e dalla scuola di provenienza dello studente.
 
 ---
 
@@ -5720,7 +5738,7 @@ Un erbicida si degrada nel terreno seguendo una cinetica del primo ordine:
 
 $$Y = 100 \, e^{-0.07 \, t}$$
 
-dove Y è la concentrazione al tempo t. Dopo aver spruzzato questo erbicida, che probabilità abbiamo di osservare, dopo 50 giorni, una concentrazione sotto la soglia di tossicità per i mammiferi (2 ng/g)? Tenere conto che lo strumento di misura produce un coefficiente di variabilità del 20%
+dove Y è la concentrazione al tempo t. Dopo aver spruzzato questo erbicida, che probabilità abbiamo di osservare, dopo 50 giorni, una concentrazione che risulti erroneamente al disotto della soglia di tossicità per i mammiferi (2 ng/g)? Tenere conto che lo strumento di misura produce un coefficiente di variabilità del 20%
 
 
 
@@ -5739,11 +5757,11 @@ dove Y è la concentrazione al tempo t. Simulare i risultati di un esperimento i
 
 Una coltura produce in funzione della sua fittezza, secondo la seguente relazione:
 
-$$ Y = 8 + 8 \, X - 0.07 \, X^2$$
+$$ Y = 0.8 + 0.8 \, X - 0.07 \, X^2$$
 
 
 
-Stabilire la fittezza necessaria per ottenere il massimo produttivo (graficamente o analiticamente). Valutare la probabilità di ottenere una produzione compresa tra 180 e 200 q/ha, seminando alla fittezza ottimale. Considerare che la variabilità stocastica è del 12%.
+Stabilire la fittezza necessaria per ottenere il massimo produttivo (graficamente o analiticamente). Valutare la probabilità di ottenere una produzione compresa tra 2.5 e 3 t/ha, seminando alla fittezza ottimale. Considerare che la variabilità stocastica è del 12%.
 
 
 
@@ -5751,7 +5769,9 @@ Stabilire la fittezza necessaria per ottenere il massimo produttivo (graficament
 
 La tossicità di un insetticida varia con la dose, secondo la legge log-logistica:
 
-$$ Y = \frac{1}{1 + exp\left\{ -2 \, \left[log(X) - log(15)\right] \right\}}$$ Dove Y è la proporzione di animali morti e X è la dose. Se trattiamo 150 insetti con una dose pari a 35 g, qual è la probabilità di trovare più di 120 morti? Considerare che la risposta è variabile da individuo ad individuo nella popolazione e questa variabilità può essere approssimata utilizzando una distribuzione gaussiana con un errore standard pari a 10.
+$$ Y = \frac{1}{1 + exp\left\{ -2 \, \left[log(X) - log(15)\right] \right\}}$$
+
+dove Y è la proporzione di animali morti e X è la dose. Se trattiamo 150 insetti con una dose pari a 35 g, qual è la probabilità di trovare più di 120 morti? Considerare che la risposta è variabile da individuo ad individuo nella popolazione e questa variabilità può essere approssimata utilizzando una distribuzione gaussiana con un errore standard pari a 10.
 
 
 
@@ -5761,7 +5781,12 @@ Simulare i risultati di un esperimento varietale, con sette varietà di frumento
 
 ### Esercizio 8
 
-Considerando il testo dell'esercizio 5, simulare un esperimento in cui l'insetticida viene utilizzato a cinque dosi crescenti, con quattro repliche.
+Considerando il testo dell'esercizio 5, simulare un esperimento in cui la coltura viene seminata a fittezze di 2, 4, 6, 8 piante per metro quadrato, con quattro repliche.
+
+
+### Esercizio 9
+
+Considerando il testo dell'esercizio 6, simulare un esperimento in cui l'insetticida viene utilizzato a cinque dosi crescenti (a vostra scelta), con quattro repliche.
 
 ---
 
