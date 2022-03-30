@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.11 (Anno Accademico 2021-2022), compil. 2022-03-24"
+date: "Update: v. 1.11 (Anno Accademico 2021-2022), compil. 2022-03-30"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -1476,7 +1476,7 @@ Nel capitolo precedente abbiamo visto che:
 
 1.  I fenomeni biologici seguono una legge di natura (verità 'vera'), che ne costituisce il meccanismo deterministico fondamentale. Questa legge di natura produce un risultato atteso $Y_E$.
 2.  Quando si organizza un esperimento, i soggetti sperimentali obbediscono a questo meccanismo di fondo, al quale tuttavia si sovrappongono molto altri elementi di 'confusione', altamente incontrollabili, che vanno sotto il nome di errore sperimentale.
-3.  L'osservazione sperimentale è quindi un'immagine confusa della verità vera ($Y_O \neq Y_E$) e, soprattutto, essa tende ad essere diversa per ogni sforzo di campionamento.
+3.  L'osservazione sperimentale è quindi un'immagine confusa della verità vera ($Y_O \neq Y_E$) e, soprattutto, essa tende ad essere sempre diversa, anche quando ripetiamo lo stesso esperimento nelle stesse condizioni.
 4.  Compito del ricercatore è comprendere come sia la verità 'vera', separata dal 'rumore di fondo' generato dall'errore sperimentale.
 
 
@@ -1524,7 +1524,7 @@ m; s
 ## [1] 13.9479
 ```
 
-Questo processo con il quale assegniamo alla popolazione le caratteristiche del campione prende il nome di **stima puntuale** dei parametri. Vediamo ancora una volta che l'osservazione sperimentale non coincide con la verità 'vera' ($m \neq \mu$ e $s \neq \sigma)$, ma non siamo molto distanti, considerando il 10% di variabilità dello strumento di analisi. Tuttavia, visto che dobbiamo trarre conclusioni che riguardano la popolazione e non il campione, è giustificato da parte nostra un atteggiamento prudenziale: prima di dire che la concentrazione erbicida nella soluzione è pari 120.6192187, dobbiamo chiederci: che cosa succederebbe se ripetessimo l'esperimento molte altre volte?
+Questo processo con il quale assegniamo alla popolazione le caratteristiche del campione prende il nome di **stima puntuale** dei parametri. Vediamo ancora una volta che l'osservazione sperimentale non coincide con la verità 'vera' ($m \neq \mu$ e $s \neq \sigma)$, ma non siamo molto distanti, considerando il 10% di variabilità dello strumento di analisi. Tuttavia, visto che dobbiamo trarre conclusioni che riguardano l'intero meccanismo causa-effetto e non il campione, è giustificato da parte nostra un atteggiamento prudenziale: prima di dire che la concentrazione erbicida nella soluzione è pari 120.6192187, dobbiamo chiederci: che cosa succederebbe se ripetessimo l'esperimento molte altre volte?
 
 
 ### La 'sampling distribution'
@@ -1554,8 +1554,8 @@ In sostanza, la simulazione Monte Carlo ci consente di fare quello che dovremmo 
 
 Notiamo che:
 
-1.  La media delle medie è praticamente coincidente con $\mu$, la verità 'vera'. Ciò conferma che l'unico modo di ottenere risultati totalmente precisi è ripetere infinite volte l'esperimento;
-2.  La deviazione standard delle medie è pari a 6.939063. Questo valore prende il nome di **errore standard** della media (SEM).
+1.  La media delle medie è praticamente coincidente con $\mu$, la verità 'vera'. Ciò conferma che $m$ è uno stimatore non distorto di $\mu$, perché tende a convergere su $\mu$ quando il numero di repliche tende a diventare molto elevato;
+2.  La deviazione standard delle medie è pari a 6.939063. Questo valore prende il nome di **errore standard** della media (SEM) e, in qualche modo, caratterizza la replicabilità di un esperimento, ovvero la sua precisione.
 
 Esploriamo meglio la *sampling distribution*. Con R possiamo provare a discretizzarla e a riportarla su di un grafico a barre (figura \@ref(fig:figName62) ).
 
@@ -1567,11 +1567,11 @@ Esploriamo meglio la *sampling distribution*. Con R possiamo provare a discretiz
 
 ### L'errore standard
 
-La *sampling distribution* che abbiamo ottenuto con la simulazione Monte Carlo è puramente empirica. Sarebbe interessante capire con più esattezza se esista una funzione di densità che permetta di descriverla con esattezza. In effetti, il grafico precedente mostra che la *sampling distribution* assomiglia molto ad una distribuzione normale, con media pari a 120 e deviazione standard pari all'errore standard.
+La *sampling distribution* che abbiamo ottenuto con la simulazione Monte Carlo è puramente empirica. Sarebbe interessante capire con più esattezza se esista una funzione di densità che permetta di ottenere una sampling distribution, senza ricorrere ad una simulazione Monte Carlo. In effetti, il grafico precedente mostra che la *sampling distribution* assomiglia molto ad una distribuzione normale, con media pari a 120 e deviazione standard pari all'errore standard.
 
-Formalmente, il problema si può risolvere grazie alla legge di propagazione degli errori, che stabilisce tre importanti elementi:
+Questa osservazione empirica sulla 'normalità' della sampling distribution è dimostrabile attraverso la legge di propagazione degli errori, che permette tre importanti conclusioni:
 
-1. Se ho due variabili normalmente distribuite e le sommo tra di loro, la variabile risultante è ancora normale. Se ho una variabile normalmente distribuita e la moltiplico per una costante, la variabile risultante è ancora normale.
+1. se ho due variabili normalmente distribuite e le sommo tra di loro, la variabile risultante è ancora normale. Se ho una variabile normalmente distribuita e la moltiplico per una costante, la variabile risultante è ancora normale.
 2. Per variabili indipendenti, la varianza della somma è uguale alla somma delle varianze.
 3. La varianza del prodotto di una variabile per una costante $k$ è pari alla varianza della variabile originale moltiplicata per $k^2$. 
 
@@ -1827,9 +1827,9 @@ Neyman scoprì che la sampling distribution di T poteva essere perfettamente des
 
 Quindi, quando i campioni sono piccoli, il modo giusto di calcolare l'intervallo di confidenza è quello di utilizzare l'espressione seguente:
 
-$$P \left( m - \textrm{qt}(0.975,n - 1) \cdot s_m \le \mu  \le m + \textrm{qt}(0.975,n - 1) \cdot s_m \right) = 0.95$$
+$$P \left[ m - \textrm{qt}(0.975,n - 1) \cdot s_m \le \mu  \le m + \textrm{qt}(0.975,n - 1) \cdot s_m \right] = 0.95$$
 
-dove $\textrm{qt}(0.025,n - 1)$ e $\textrm{qt}(0.975,n - 1)$ sono rispettivamente il 2.5-esimo e il 97.5-esimo percentile della distribuzione t di Student, con n-1 gradi di libertà.
+dove $\textrm{qt}(0.975,n - 1)$ è il 97.5-esimo percentile della distribuzione t di Student, con n-1 gradi di libertà.
 
 E' facile osservare che, se l'intervallo di confidenza è calcolato in questo modo, il suo *coverage* effettivo e pari al 95%. 
 
@@ -1839,7 +1839,7 @@ result <- rep(0, 100000)
 set.seed(1234)
 for (i in 1:100000){
   sample <- rnorm(3, 120, 12)
-  limInf<- mean(sample) + sd(sample)/sqrt(3) * qt(0.025, 2) 
+  limInf<- mean(sample) - sd(sample)/sqrt(3) * qt(0.975, 2) 
   limSup<- mean(sample) + sd(sample)/sqrt(3) * qt(0.975, 2) 
   if (limInf<= 120 & limSup>= 120) result[i] = 1
 }
@@ -1983,7 +1983,7 @@ Nel capitolo precedente abbiamo visto come è possibile esprimere l'incertezza c
 
 ## Confronto tra due medie: il test t di Student
 
-Un ricercatore ha scelto casualmente dieci piante da una popolazione; ne ha trattate cinque con l'erbicida A e cinque con il placebo P. Alla fine dell'esperimento ha determinato il peso di ognuna delle dieci piante. E' evidente che le piante in prova sono solo un campione di quelle possibili, così come è evidente che il peso, come ogni altra variabile biologica, è soggetto ad una certa variabilità naturale, legata sia a questioni genotipiche che fenotipiche, oltre che ad eventuali errori casuali di misura.
+Un ricercatore ha testato due genotipi (A e P) in un disegno sperimentale a randomizzazione completa, con cinque repliche (dieci parcelle in totale). Alla fine dell'esperimento ha determinato la produzione parcellare, ottenendo quindi dieci valori, che debbono essere considerati come un campione di tutti quelli possibili; per ogni genotipo, i valori sono diversi, a seguito degli effetti stocastici di varia natura, agronomica ed ambientale, che costituiscono il meccanismo perturbativo di fondo.
 
 I risultati sono i seguenti:
 
@@ -1996,9 +1996,9 @@ P <- c(80, 81, 84, 88, 94)
 
 Nel campione A la media è pari a 70.2, mentre la deviazione standard è pari a 4.87. L'errore standard è pari a 2.18 e quindi l'intervallo di confidenza della media è 70.2 $\pm$ 6.04. Invece, nel campione P, la media è 85.4, mentre la deviazione standard è pari a 5.72. L'errore standard è pari a 2.56, mentre l'intervallo di confidenza per la media è 85.4 $\pm$ 7.11.
 
-Dopo aver completato questo esperimento, ci chiediamo se sia possibile concludere che l'erbicida A riduca il peso delle piante trattate, coerentemente con le aspettative riguardo ad una molecola di questo tipo. Nel rispondere a questa domanda bisogna tener presente che i campioni sono totalmente irrilevanti, dato che il nostro interesse è rivolto alle popolazioni che hanno generato i campioni; vogliamo infatti che le nostre conclusioni abbiano carattere di universalità e non siano specifiche per il nostro esperimento. Dobbiamo quindi **trovare un metodo per decidere se la popolazione delle piante trattate con A ha una media diversa dalla popolazione delle piante trattate con P**, pur in presenza dell'incertezza legata all'errore sperimentale.
+Dopo aver completato questo esperimento, ci chiediamo se sia possibile concludere che il genotipo P è più produttivo del genotipo A, coerentemente con i risultati osservati. Nel rispondere a questa domanda bisogna tener presente che i due campioni ottenuti sono totalmente irrilevanti, dato che il nostro interesse è rivolto alle popolazioni che hanno generato i campioni; vogliamo infatti che le nostre conclusioni abbiano carattere di universalità e non siano specifiche per il nostro esperimento. Dobbiamo quindi **trovare un metodo per decidere se il genotipo P, in generale, è più produttivo del genotipo A**, pur in presenza dell'incertezza legata all'errore sperimentale.
 
-Un primo approccio intuitivo potrebbe essere basato sugli intervalli di confidenza delle due medie. Possiamo notare che il limite di confidenza superiore per A (70.2 + 6.04 = 76.24) è inferiore al limite di confidenza inferiore per P (85.4 - 7.11 = 78.29), in modo che gli intervalli di confidenza non si sovrappongono (Figura \@ref(fig:figName70)). In base a questo criterio, quindi, potremmo concludere che le popolazioni da cui provengono i due campioni sono diverse e, di conseguenza, A è un erbicida efficace.
+Un primo approccio intuitivo potrebbe essere basato sugli intervalli di confidenza delle due medie. Possiamo notare che il limite di confidenza superiore per A (70.2 + 6.04 = 76.24) è inferiore al limite di confidenza inferiore per P (85.4 - 7.11 = 78.29), in modo che gli intervalli di confidenza non si sovrappongono (Figura \@ref(fig:figName70)). In base a questo criterio, quindi, potremmo concludere che le popolazioni da cui provengono i due campioni sono diverse e, di conseguenza, P è un genotipo più produttivo.
 
 <div class="figure" style="text-align: center">
 <img src="_main_files/figure-html/figName70-1.png" alt="Medie ed intervalli di confidenza calcolati sue due campioni. Si può notare che gli intervalli di confidenza non si sovrappongono." width="50%" />
@@ -2006,15 +2006,15 @@ Un primo approccio intuitivo potrebbe essere basato sugli intervalli di confiden
 </div>
 
 
-Anche se questo criterio è accettabile, in pratica si preferisce utilizzare un altro criterio più rigoroso, che illustreremo di seguito.
+Anche se questo criterio è, in qualche modo, accettabile, in pratica si preferisce utilizzare un altro criterio più rigoroso, che illustreremo di seguito.
 
 ### L'ipotesi nulla e alternativa
 
-Innanzitutto, ricordiamo la logica Popperiana illustrata nel primo capitolo, secondo la quale nessun esperimento può dimostrare che un'ipotesi scientifica è vera, mentre è possibile dimostrare che essa è falsa. E'quindi conveniente porre la nostra ipotesi scientifica in modo che essa possa essere falsificata; dovendo dimostrare che l'effetto di A è diverso da quello di P, possiamo formulare l'ipotesi scientifica ($H_0$) in questo modo:
+Innanzitutto, ricordiamo la logica Popperiana illustrata nel primo capitolo, secondo la quale nessun esperimento può dimostrare che un'ipotesi scientifica è vera, mentre è possibile dimostrare che essa è falsa. E'quindi conveniente porre la nostra ipotesi scientifica in modo che essa possa essere falsificata; dovendo dimostrare che la produzione di A è diversa da quella di P, possiamo formulare l'ipotesi scientifica ($H_0$) in questo modo:
 
 $$H_0: \mu_A = \mu_P = \mu$$
 
-In altre parole, la nostra ipotesi di lavoro è che i due campioni siano in realtà estratti da due distribuzioni normali con la stessa media e la stessa deviazione standard, il che equivale a dire che essi provengono da un'unica distribuzione normale con media $\mu$ e deviazione standard $\sigma$. Questa ipotesi si chiama **ipotesi nulla** e, se riuscissimo a falsificarla, avremmo conseguito il nostro obiettivo in totale coerenza con la logica Popperiana. Vi chiediamo di fare nuovamente attenzione al fatto che l'ipotesi nulla riguarda le popolazioni che hanno generato i campioni, non i campioni stessi, per i quali già sappiamo che le medie osservate sono diverse.
+In altre parole, la nostra ipotesi di lavoro è che i due campioni siano in realtà estratti da due distribuzioni normali con la stessa media e la stessa deviazione standard, il che equivale a dire che essi provengono da un'unica distribuzione normale con media $\mu$ e deviazione standard $\sigma$. Questa ipotesi si chiama **ipotesi nulla** e, se riuscissimo a falsificarla, avremmo conseguito il nostro obiettivo, in totale coerenza con la logica Popperiana. Vi chiediamo di fare nuovamente attenzione al fatto che l'ipotesi nulla riguarda le medie delle popolazioni che hanno generato i campioni, non i campioni stessi, per i quali già sappiamo che le medie sono diverse.
 
 Oltre all'ipotesi nulla possiamo anche definire l'ipotesi alternativa, che abbracceremmo se dovessimo riuscire a falsificare quella nulla. L'ipotesi alternativa semplice è:
 
@@ -2028,11 +2028,11 @@ oppure:
 
 $$H_1 :\mu_A  < \mu_P$$
 
-Abbiamo già anticipato che le ipotesi (nulla ed alternativa) debbono essere stabilite prima di effettuare l'esperimento. Che cosa è possibile attendersi prima di un esperimento, in relazione all'effetto di una molecola erbicida? Ci si potrebbe aspettare che $\mu_A  < \mu_P$, anche se questo non sarebbe del tutto vero, dato che molti erbicidi, soprattutto se utilizzati a certe dosi, possono indurre una stimolazione della crescita, con un fenomeno detto 'ormesi'. Quindi non è possibile escludere 'a priori' la possibilità che $\mu_A  > \mu_P$, il che ci induce a considerare l'ipotesi alternativa semplice $\mu_A  \neq \mu_P$. Più in generale, è possibile adottare una delle due ipotesi alternative complesse solo quando l'altra può essere esclusa 'a priori', già prima di aver visto i risultati dell'esperimento.
+Abbiamo già anticipato che le ipotesi (nulla ed alternativa) debbono essere stabilite prima di effettuare l'esperimento. Che cosa è possibile attendersi prima di un esperimento, in relazione alla produttività di due genotipi? In mancanza di informazioni preliminari attendibili, dovremmo essere indotti ad abbracciare l'ipotesi alternativa semplice $\mu_A  \neq \mu_P$, mentre una delle due ipotesi alternative complesse può essere adottata soli in quei casi in cui l'altra può essere esclusa 'a priori', già prima di aver visto i risultati dell'esperimento.
 
 ### La statistica T
 
-Ma torniamo a lavorare sull'ipotesi nulla. Possiamo intuire che l'idea che $\mu_A = \mu_P$ non è impossibile; infatti, se avessimo una sola popolazione gaussiana con media $\mu$, potremmo comunque campionare cinque soggetti sulla coda sinistra (e quindi con basso peso) e cinque soggetti sulla coda destra (con elevato peso), in modo che $m_A \neq m_P$. Il problema è capire quanto questo sia probabile.
+Ma torniamo a lavorare sull'ipotesi nulla. Possiamo intuire che l'idea che $\mu_A = \mu_P$ non è impossibile; infatti, se avessimo una sola popolazione gaussiana con media $\mu$, potremmo comunque campionare cinque parcelle sulla coda sinistra (e quindi con bassa produzione) e cinque parcelle sulla coda destra (con elevata produzione), in modo che $m_A \neq m_P$. Il problema è capire quanto questo sia probabile.
 
 Cerchiamo di definire una statistica che, posto $\mu_A = \mu_P$, ci permetta di capire che possibilità ho di trovare $m_A \neq m_P$. Due sono i valori di cui tenere conto:
 
@@ -2081,7 +2081,7 @@ Ipotizzando che l'ipotesi nulla sia vera ($\mu_A = \mu_P$), che valori può assu
 
 Nel nostro esperimento, il valore di T che abbiamo ottenuto è abbastanza diverso da zero, il che indica un certo grado di discrepanza tra l'osservazione è l'ipotesi nulla. **Possiamo affermare che ciò sia imputabile solo alla variabilità di campionamento e che quindi il nostro esperimento confermi l’ipotesi nulla**?
 
-Per rispondere a questa domanda, supponiamo che l'ipotesi nulla sia vera. In questo caso, immaginiamo che le nostre dieci piante siano tutte estratte da una sola popolazione con media e deviazione standard stimate (stima puntuale) come segue:
+Per rispondere a questa domanda, supponiamo che l'ipotesi nulla sia vera. In questo caso, immaginiamo che le nostre dieci parcelle siano tutte estratte da una sola popolazione di parcelle con media e deviazione standard stimate (stima puntuale) come segue:
 
 
 ```r
@@ -3384,10 +3384,10 @@ Una volta definiti i coefficienti, possiamo utilizzare il package  ‘emmeans’
 K <- list(k1 = k1, K2 = k2, k3 = k3, k4 = k4)
 contrast(medie, method = K, adjust="none")
 ##  contrast estimate   SE df t.ratio p.value
-##  k1         -16.39 2.26 12  -7.244  <.0001
-##  K2           7.89 2.40 12   3.289  0.0065
-##  k3          11.73 2.77 12   4.235  0.0012
-##  k4           4.05 2.77 12   1.461  0.1697
+##  k1         -16.39 2.26 12 -7.244  <.0001 
+##  K2           7.89 2.40 12  3.289  0.0065 
+##  k3          11.73 2.77 12  4.235  0.0012 
+##  k4           4.05 2.77 12  1.461  0.1697
 ```
 
 \normalsize
@@ -3408,12 +3408,12 @@ Nel quadro sottostante mostriamo un confronto tipo Tukey (tutti contro tutti), e
 #Confronti multipli a coppie
 contrast(medie, adjust="none", method="pairwise")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  0.1697
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.0168
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  <.0001
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0012
-##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0038
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461  0.1697 
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774  0.0168 
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352  <.0001 
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235  0.0012 
+##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813  <.0001 
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578  0.0038
 ```
 \normalsize
 
@@ -3425,9 +3425,9 @@ Per i confronti del tipo 'tutti verso uno' è possibile utilizzare la stessa fun
 ```r
 contrast(medie, adjust="none", method="dunnett")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Mixture_378 - Metribuzin__348       -4.05 2.77 12  -1.461  0.1697
-##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12   2.774  0.0168
-##  Unweeded - Metribuzin__348          17.60 2.77 12   6.352  <.0001
+##  Mixture_378 - Metribuzin__348       -4.05 2.77 12 -1.461  0.1697 
+##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12  2.774  0.0168 
+##  Unweeded - Metribuzin__348          17.60 2.77 12  6.352  <.0001
 ```
 \normalsize
 
@@ -3439,9 +3439,9 @@ Così facendo vediamo che R confronta tutte le tesi con metribuzin, che è il pr
 ```r
 contrast(medie, adjust="none", method="dunnett", ref = 2)
 ##  contrast                      estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378     4.05 2.77 12   1.461  0.1697
-##  Rimsulfuron_30 - Mixture_378     11.73 2.77 12   4.235  0.0012
-##  Unweeded - Mixture_378           21.64 2.77 12   7.813  <.0001
+##  Metribuzin__348 - Mixture_378     4.05 2.77 12 1.461   0.1697 
+##  Rimsulfuron_30 - Mixture_378     11.73 2.77 12 4.235   0.0012 
+##  Unweeded - Mixture_378           21.64 2.77 12 7.813   <.0001
 ```
 
 \normalsize
@@ -3490,10 +3490,7 @@ multcomp::cld(medie, adjust="none", Letters=LETTERS)
 ##  Unweeded         26.77 1.96 12    22.50     31.0    C  
 ## 
 ## Confidence level used: 0.95 
-## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## significance level used: alpha = 0.05
 ```
 
 
@@ -3537,12 +3534,12 @@ Più facilmente, possiamo arrivare allo stesso risultato con il package 'emmeans
 ```r
 contrast(medie, method = "pairwise", adjust = "sidak")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  0.6723
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.0968
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  0.0002
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0069
-##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0226
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461  0.6723 
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774  0.0968 
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352  0.0002 
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235  0.0069 
+##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813  <.0001 
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578  0.0226 
 ## 
 ## P value adjustment: sidak method for 6 tests
 ```
@@ -3571,12 +3568,12 @@ Oppure possiamo utilizzare la funzione `contrast()`:
 ```r
 contrast(medie, method = "pairwise", adjust = "bonferroni")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  1.0000
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.1010
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  0.0002
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0069
-##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0228
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461  1.0000 
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774  0.1010 
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352  0.0002 
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235  0.0069 
+##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813  <.0001 
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578  0.0228 
 ## 
 ## P value adjustment: bonferroni method for 6 tests
 ```
@@ -3593,12 +3590,12 @@ Oltre che aggiustare il P-level, possiamo anche utilizzare altre procedure di ag
 #Confronti multipli a coppie, basati sul t multivariato
 contrast(medie, method="pairwise")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  0.4885
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.0698
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  0.0002
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0055
-##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0173
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461  0.4885 
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774  0.0698 
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352  0.0002 
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235  0.0055 
+##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813  <.0001 
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578  0.0173 
 ## 
 ## P value adjustment: tukey method for comparing a family of 4 estimates
 ```
@@ -3614,9 +3611,9 @@ Ovviamente la correzione per la molteplicità ed il conseguente innalzamento del
 #Confronti multipli a coppie, basati sul t multivariato
 contrast(medie, method="dunnett")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Mixture_378 - Metribuzin__348       -4.05 2.77 12  -1.461  0.3711
-##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12   2.774  0.0442
-##  Unweeded - Metribuzin__348          17.60 2.77 12   6.352  0.0001
+##  Mixture_378 - Metribuzin__348       -4.05 2.77 12 -1.461  0.3711 
+##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12  2.774  0.0442 
+##  Unweeded - Metribuzin__348          17.60 2.77 12  6.352  0.0001 
 ## 
 ## P value adjustment: dunnettx method for 3 tests
 ```
@@ -3938,10 +3935,7 @@ multcomp::cld(medie, Letters = LETTERS, reverse = T)
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 16 estimates 
-## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## significance level used: alpha = 0.05
 ```
 
 \normalsize
@@ -4627,10 +4621,7 @@ multcomp::cld(medie, Letters = LETTERS)
 ## 
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
-## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## significance level used: alpha = 0.05
 ```
 
 Se volessimo confrontare le lavorazioni a parità di diserbo o tutte le combinazioni dovremmo utilizzare una sintassi leggermente diversa:
@@ -4654,10 +4645,7 @@ multcomp::cld(medie, Letters=LETTERS)
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 3 estimates 
-## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## significance level used: alpha = 0.05
 medie <- emmeans(mod, ~Tillage:WeedControl)
 multcomp::cld(medie, Letters=LETTERS)
 ##  Tillage WeedControl emmean    SE df lower.CL upper.CL .group
@@ -4671,10 +4659,7 @@ multcomp::cld(medie, Letters=LETTERS)
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 6 estimates 
-## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## significance level used: alpha = 0.05
 ```
 
 Le tre analisi (contronti tra lavorazioni a parità di diserbo, tra diserbi a parità di lavorazione e tutti verso tutti) portano a risultati leggermente diversi per il diverso numero di confronti effettuati: tre nel primo caso, sei nel secondo e 15 nel terzo, che richiedono una diversa correzione per la molteplicità.
@@ -4833,10 +4818,7 @@ multcomp::cld(mfMeans, Letters = LETTERS)
 ## Confidence level used: 0.95 
 ## Results are averaged over some or all of the levels of: Block 
 ## P value adjustment: tukey method for comparing a family of 9 estimates 
-## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## significance level used: alpha = 0.05
 ```
 
 In conclusione, vediamo che l'analisi dei disegni con due fattori innestati è piuttosto simile a quella per due fattori incrociati, con l'unica eccezione che l'effetto principale per il fattore innestato non è incluso nel modello.
@@ -5644,8 +5626,30 @@ Pur essendo entrambi gli approcci corretti, il secondo è certamente più elegan
 
 # Esercizi
 
+## Capitolo 1
 
-## Capitoli 1 e 2
+### Domanda 1
+
+Quali sono le caratteristiche fondamentali di un esperimento scientifico, perché possa essere ritenuto valido?
+
+### Domanda 2
+
+Illustrare brevemente il motodo scientifico 'galileiano'.
+
+### Domanda 3
+
+Illustrare brevemente la differenza tra errori casuali e sistematici. In presenza di quale dei due è possibile ottenere risultati scientifici validi?
+
+### Domanda 4
+
+Qual è la differenza tra repliche vere e pseudo-repliche?
+
+### Domanda 5
+
+Cosa è il confounding e come può rendere distorti i risultati di un esperimento scientifico?
+
+
+## Capitolo 2
 
 ### Esercizio 1
 
@@ -5805,7 +5809,6 @@ Siamo interessati a conoscere il contenuto medio di nitrati dei pozzi della medi
 35.0 38.1 37.4 38.3 34.8 40.4 39.3 37.0 38.7    
 38.2 38.4    
 ```
-
 
 Stimare la concentrazione media per l'intera valle del Tevere
 
