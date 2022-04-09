@@ -19,7 +19,7 @@ archives:
 <script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
-<p>This is a follow-up post. If you are interested in other posts of this series, please go to: <a href="https://www.statforbiology.com/tags/drcte/">https://www.statforbiology.com/tags/drcte/</a>. All these posts exapand on a paper that we have recently published in the Journal ‘Weed Science’; please follow <a href="https://doi.org/10.1017/wsc.2022.8">this link</a> to the paper.</p>
+<p>This is a follow-up post. If you are interested in other posts of this series, please go to: <a href="https://www.statforbiology.com/tags/drcte/">https://www.statforbiology.com/tags/drcte/</a>. All these posts expand on a paper that we have recently published in the Journal ‘Weed Science’; please follow <a href="https://doi.org/10.1017/wsc.2022.8">this link</a> to the paper.</p>
 <div id="exploring-the-results-of-a-time-to-event-fit-model-parameters" class="section level1">
 <h1>Exploring the results of a time-to-event fit: model parameters</h1>
 <p>In the previous post we have shown that time-to-event curves (e.g., germination or emergence curves) can be used to describe the time course of germinations/emergences for a seed lot (<a href="https://www.statforbiology.com/2021/stat_drcte_4-time-to-eventcurves/">this post</a>). We have also seen that the effects of experimental factors on seed germination can be accounted for by coding a different time-to-event curve for each factor level (<a href="https://www.statforbiology.com/2021/stat_drcte_5-comparinglots/">this post</a>).</p>
@@ -31,45 +31,39 @@ archives:
 library(drcte)
 data(rape)
 modHTE &lt;- drmte(nSeeds ~ timeBef + timeAf + Psi, 
-                data = rape, fct = HTE1())
+                data = rape, fct = HTnorm())
 coef(modHTE)
-##         G:(Intercept)      Psib:(Intercept) sigmaPsib:(Intercept) 
-##             0.9577918            -1.0397239             0.1108891 
-##    thetaH:(Intercept)         b:(Intercept) 
-##             0.9061385             4.0273963</code></pre>
+##    ThetaH:(Intercept)    Psib50:(Intercept) sigmaPsib:(Intercept) 
+##             0.7510691            -0.9069810             0.2369954</code></pre>
 <p>Indeed, we got parameter estimates, but we are not happy with this. We also need standard errors, to present along with estimates in our papers. The easiest way to obtain parameters and their standard errors altogether is to use the <code>summary()</code> method for ‘drcte’ objects:</p>
 <pre class="r"><code>summary(modHTE)
 ## 
-## Model fitted: Hydro-time model with shifted exponential for Pmax and linear model for GR50
+## Model fitted: Hydrotime model with normal distribution of Psib (Bradford et al., 2002)
 ## 
 ## Robust estimation: no 
 ## 
 ## Parameter estimates:
 ## 
-##                         Estimate Std. Error  t-value   p-value    
-## G:(Intercept)          0.9577918  0.0063667  150.438 &lt; 2.2e-16 ***
-## Psib:(Intercept)      -1.0397239  0.0047017 -221.138 &lt; 2.2e-16 ***
-## sigmaPsib:(Intercept)  0.1108891  0.0087598   12.659 &lt; 2.2e-16 ***
-## thetaH:(Intercept)     0.9061385  0.0301594   30.045 &lt; 2.2e-16 ***
-## b:(Intercept)          4.0273963  0.1960845   20.539 &lt; 2.2e-16 ***
+##                         Estimate Std. Error t-value   p-value    
+## ThetaH:(Intercept)     0.7510691  0.0394604  19.034 &lt; 2.2e-16 ***
+## Psib50:(Intercept)    -0.9069810  0.0118081 -76.810 &lt; 2.2e-16 ***
+## sigmaPsib:(Intercept)  0.2369954  0.0071406  33.190 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>Unfortunately, the above standard errors are not correct: indeed, they are obtained assuming that the observational units (i.e., the seeds) are independent, while they are clustered within randomisation units (Petri dishes, in this case). Consequently, seeds in the same Petri dish are more similar than seeds in different Petri dishes (there is intra-class correlation, we say). How can we obtain standard errors that account for such lack of independence?</p>
 <p>If we look at the literature about survival analysis (that is where we borrowed our methods from), we can see that cluster robust sandwich estimators of standard errors have proven useful and reliable (Yu and Peng, 2008). Therefore, we have implemented them in ‘drcte’; the ‘units’ argument in the <code>summary()</code> method can be used to provide a variable for the Petri dishes and calculate cluster-robust SEs, by way of the facilities provided in the ‘sandwich’ package (Zeileis et al. 2020).</p>
 <pre class="r"><code>summary(modHTE, robust = T, units = Dish)
 ## 
-## Model fitted: Hydro-time model with shifted exponential for Pmax and linear model for GR50
+## Model fitted: Hydrotime model with normal distribution of Psib (Bradford et al., 2002)
 ## 
 ## Robust estimation: Cluster robust sandwich SEs 
 ## 
 ## Parameter estimates:
 ## 
-##                         Estimate Std. Error   t value  Pr(&gt;|t|)    
-## G:(Intercept)          0.9577918  0.0080923  118.3591 &lt; 2.2e-16 ***
-## Psib:(Intercept)      -1.0397239  0.0047063 -220.9206 &lt; 2.2e-16 ***
-## sigmaPsib:(Intercept)  0.1108891  0.0121879    9.0983 &lt; 2.2e-16 ***
-## thetaH:(Intercept)     0.9061385  0.0410425   22.0781 &lt; 2.2e-16 ***
-## b:(Intercept)          4.0273963  0.1934513   20.8187 &lt; 2.2e-16 ***
+##                        Estimate Std. Error  t value  Pr(&gt;|t|)    
+## ThetaH:(Intercept)     0.751069   0.131968   5.6913 3.075e-08 ***
+## Psib50:(Intercept)    -0.906981   0.039530 -22.9444 &lt; 2.2e-16 ***
+## sigmaPsib:(Intercept)  0.236995   0.031309   7.5696 4.974e-13 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>We see that the difference between ‘naive’ and cluster robust SEs is remarkable.</p>
@@ -87,6 +81,7 @@ Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it
 <h1>References</h1>
 <ol style="list-style-type: decimal">
 <li>Yu, B., Peng, Y., 2008. Mixture cure models for multivariate survival data. Computational Statistics and Data Analysis 52, 1524–1532.</li>
+<li>Onofri, A., Mesgaran, M., &amp; Ritz, C. (2022). A unified framework for the analysis of germination, emergence, and other time-to-event data in weed science. Weed Science, 1-13. <a href="doi:10.1017/wsc.2022.8" class="uri">doi:10.1017/wsc.2022.8</a></li>
 <li>Zeileis, A., Köll, S., Graham, N., 2020. Various Versatile Variances: An Object-Oriented Implementation of Clustered Covariances in R. J. Stat. Soft. 95. <a href="https://doi.org/10.18637/jss.v095.i01" class="uri">https://doi.org/10.18637/jss.v095.i01</a></li>
 </ol>
 </div>

@@ -1,0 +1,155 @@
+---
+title: 'Analysing seed germination and emergence data with R (a tutorial). Part 8'
+author: "Andrea Onofri"
+date: 2022-01-18
+slug: 'Time_to_event_models'
+categories:
+  - R
+  - 'Time_to_event_models'
+tags:
+  - R
+  - 'Time_to_event_models'
+  - 'Seed_germination'
+  - drcte
+  - drcSeedGerm
+archives:
+  - 2022
+---
+
+
+
+<p>This is a follow-up post. If you are interested in other posts of this series, please go to: <a href="https://www.statforbiology.com/tags/drcte/">https://www.statforbiology.com/tags/drcte/</a>. All these posts expand on a paper that we have recently published in the Journal ‘Weed Science’; please follow <a href="https://doi.org/10.1017/wsc.2022.8">this link</a> to the paper.</p>
+<div id="predictions-from-a-parametric-time-to-event-model" class="section level1">
+<h1>Predictions from a parametric time-to-event model</h1>
+<p>In previous posts we have shown that time-to-event models (e.g., germination or emergence models) can be used to describe the time course of germinations/emergences for a seed lot (<a href="https://www.statforbiology.com/2021/stat_drcte_4-time-to-eventcurves/">this post</a>) or for several seed lots, submitted to different experimental treatments (<a href="https://www.statforbiology.com/2021/stat_drcte_5-comparinglots/">this post</a>). We have seen that fitted models can be used to extract information of biological relevance (<a href="https://www.statforbiology.com/2022/stat_drcte_7-summary/">this post</a>).</p>
+<p>Another key aspect is to use a fitted model to make predictions: what fraction of germinated/emerged seeds will we find in, e.g., one/two weeks? And in one month? For example, let’s consider the hydro-time model we have fitted in some previous posts (the first one is <a href="https://www.statforbiology.com/2022/stat_drcte_6-ht1step/">at this link</a>):</p>
+<p><span class="math display">\[ P(t, \Psi) = \Phi \left\{ \frac{\Psi - (\theta_H / t) -\Psi_b }{\sigma_{\Psi_b}} \right\}\]</span></p>
+<p>In the above model, <span class="math inline">\(P\)</span> is the cumulative proportion of germinated seeds at time <span class="math inline">\(t\)</span> and water potential <span class="math inline">\(\Psi\)</span>, <span class="math inline">\(\Phi\)</span> is a gaussian cumulative distribution function for base water potential, <span class="math inline">\(\Psi_{b}\)</span> is the median base water potential in the seed lot (in MPa), <span class="math inline">\(\theta_H\)</span> is the hydro-time constant (in MPa day or MPa hour) and <span class="math inline">\(\sigma_{\Psi_b}\)</span> represents the variability of <span class="math inline">\(\Psi_b\)</span> within the population.</p>
+<p>The code below can be used to fit the above model to the ‘rape’ dataset in the ‘drcSeedGerm’ package and retreive the estimated parameters, with robust standard errors:</p>
+<pre class="r"><code>library(drcSeedGerm)
+library(drcte)
+data(rape)
+modHTE &lt;- drmte(nSeeds ~ timeBef + timeAf + Psi, 
+                data = rape, fct = HTnorm())
+summary(modHTE, units = Dish)
+## 
+## Model fitted: Hydrotime model with normal distribution of Psib (Bradford et al., 2002)
+## 
+## Robust estimation: Cluster robust sandwich SEs 
+## 
+## Parameter estimates:
+## 
+##                        Estimate Std. Error  t value  Pr(&gt;|t|)    
+## ThetaH:(Intercept)     0.751069   0.131968   5.6913 3.075e-08 ***
+## Psib50:(Intercept)    -0.906981   0.039530 -22.9444 &lt; 2.2e-16 ***
+## sigmaPsib:(Intercept)  0.236995   0.031309   7.5696 4.974e-13 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>Now, we may wonder: if we have a seed lot with the above characteristics (<span class="math inline">\(\theta = 0.751\)</span> MPa d, <span class="math inline">\(\Psi_{b_{50}} = -0.907\)</span> MPa and <span class="math inline">\(\sigma_{\Psi_b} = 0.237\)</span>), what will the proportion of germinated seeds be, e.g., at 1, 3, 5, 7 days after water imbibition, when the base water potential in the substrate is, e.g., 0, -0.25 and -0.5 MPa? To predict this from the model object we can build a data frame with the values of predictors (see below the use of the <code>expand.grid()</code> function) and use it as the ‘newdata’ argument to the <code>predict()</code> method.</p>
+<pre class="r"><code>newd &lt;- expand.grid(time = c(1, 3, 5, 7), 
+                    psi = c(0, -0.25, -0.5))
+predict(modHTE, newdata = newd)
+##    time   psi Prediction
+## 1     1  0.00 0.74468884
+## 2     3  0.00 0.99720253
+## 3     5  0.00 0.99929640
+## 4     7  0.00 0.99962993
+## 5     1 -0.25 0.34568239
+## 6     3 -0.25 0.95689600
+## 7     5 -0.25 0.98375378
+## 8     7 -0.25 0.98981312
+## 9     1 -0.50 0.07326801
+## 10    3 -0.50 0.74565419
+## 11    5 -0.50 0.86069050
+## 12    7 -0.50 0.89697826</code></pre>
+<p>With time-to-event models, the ‘newdata’ argument takes a data frame, where the first column is always time and the succeeding columns, wherever needed, represent the environmental covariates, in the same order as they appear in the model definition. If several models have been simultaneously fitted by using the ‘curveid’ argument (not in this case, though), predictions are made for all models, always using the same ‘newdata’.</p>
+<p>We can also obtain standard errors and confidence intervals for the predictions, by adding the <code>se.fit = TRUE</code> and <code>interval = TRUE</code> arguments. We also recommend to add the <code>robust = T</code> argument, so that we obtain robust standard errors, accounting for the clustering of seeds within Petri dishes (lack of independence). With parametric time-to-event models, robust standard errors are obtained by using a cluster-robust sandwich variance-covariance matrix (Zeileis et al. 2020); in this case, a clustering variable needs to be provided with the <code>units</code> argument.</p>
+<pre class="r"><code># Naive standard errors and confidence intervals
+predict(modHTE, newdata = newd, se.fit = T, interval = T)
+##    time   psi Prediction           SE      Lower     Upper
+## 1     1  0.00 0.74468884 0.0452433821 0.65601344 0.8333642
+## 2     3  0.00 0.99720253 0.0008053309 0.99562411 0.9987809
+## 3     5  0.00 0.99929640 0.0002384085 0.99882913 0.9997637
+## 4     7  0.00 0.99962993 0.0001358778 0.99936362 0.9998963
+## 5     1 -0.25 0.34568239 0.0488012921 0.25003362 0.4413312
+## 6     3 -0.25 0.95689600 0.0060636345 0.94501149 0.9687805
+## 7     5 -0.25 0.98375378 0.0027953655 0.97827496 0.9892326
+## 8     7 -0.25 0.98981312 0.0019555787 0.98598025 0.9936460
+## 9     1 -0.50 0.07326801 0.0182524957 0.03749378 0.1090422
+## 10    3 -0.50 0.74565419 0.0143630866 0.71750306 0.7738053
+## 11    5 -0.50 0.86069050 0.0098002073 0.84148245 0.8798986
+## 12    7 -0.50 0.89697826 0.0084761895 0.88036524 0.9135913</code></pre>
+<pre class="r"><code># Cluster robust standard errors and confidence intervals
+predict(modHTE, newdata = newd, se.fit = T, interval = T,
+        robust = T, units = Dish)
+##    time   psi Prediction           SE      Lower     Upper
+## 1     1  0.00 0.74468884 0.1450176755 0.46045941 1.0289183
+## 2     3  0.00 0.99720253 0.0035012373 0.99034023 1.0040648
+## 3     5  0.00 0.99929640 0.0011070141 0.99712670 1.0014661
+## 4     7  0.00 0.99962993 0.0006427237 0.99837022 1.0008897
+## 5     1 -0.25 0.34568239 0.1576339911 0.03672545 0.6546393
+## 6     3 -0.25 0.95689600 0.0251911861 0.90752218 1.0062698
+## 7     5 -0.25 0.98375378 0.0129567170 0.95835908 1.0091485
+## 8     7 -0.25 0.98981312 0.0093141326 0.97155775 1.0080685
+## 9     1 -0.50 0.07326801 0.0622953823 0.00000000 0.1953647
+## 10    3 -0.50 0.74565419 0.0498559815 0.64793826 0.8433701
+## 11    5 -0.50 0.86069050 0.0424570614 0.77747619 0.9439048
+## 12    7 -0.50 0.89697826 0.0388178876 0.82089660 0.9730599</code></pre>
+<p>We are currently studying a way to avoid that confidence intervals return unrealistic predictions (see above some values that are higher than 1). We may note that cluster robust standard errors are higher than naive standard errors: the seed in the same Petri dish are correlated and, thus, they do not contribute full information.</p>
+</div>
+<div id="predictions-from-non-parametric-time-to-event-models" class="section level1">
+<h1>Predictions from non-parametric time-to-event models</h1>
+<p>The very same method can be used to make predictions from NPMLE and KDE fits. In this case, no environmental covariates are admissible and, therefore, we can provide ‘newdata’ as a vector of times to make predictions. In the code below we fit the NPMLE of a time-to-event model to four species of the genus <em>Verbascum</em>, for which the data are available as the ‘verbascum’ data frame. We also make predictions relating to the proportion of germinated seeds at 1, 3, 5, and 7 days from water imbibition.</p>
+<pre class="r"><code>data(verbascum)
+mod &lt;- drmte(nSeeds ~ timeBef + timeAf, fct = NPMLE(),
+             curveid = Species, data = verbascum)
+
+# Define the values for predictions
+newd &lt;- c(1, 3, 5, 7)
+predict(mod, newdata = newd, se.fit = T, interval = T,
+        robust = T, units = Dish)
+##      Species newdata Prediction         SE Lower     Upper
+## 1   arcturus       1       0.00 0.00000000  0.00 0.0000000
+## 2   arcturus       3       0.00 0.00000000  0.00 0.0000000
+## 3   arcturus       5       0.00 0.00000000  0.00 0.0000000
+## 4   arcturus       7       0.00 0.00000000  0.00 0.0000000
+## 5  blattaria       1       0.00 0.00000000  0.00 0.0000000
+## 6  blattaria       3       0.09 0.05011522  0.02 0.1961875
+## 7  blattaria       5       0.73 0.06189176  0.61 0.8500000
+## 8  blattaria       7       0.80 0.05331406  0.70 0.9061875
+## 9   creticum       1       0.00 0.00000000  0.00 0.0000000
+## 10  creticum       3       0.33 0.08613411  0.18 0.5100000
+## 11  creticum       5       0.97 0.02361623  0.92 1.0000000
+## 12  creticum       7       0.97 0.02361623  0.92 1.0000000</code></pre>
+<p>Standard errors are estimated by using a resampling approach, that is performed at the group level, whenever a grouping variable is provided, by way of the ‘units’ argument (Davison and Hinkley, 1997).</p>
+<p>For KDE models, we can make predictions in the very same way, although we are still unsure about the most reliable way to obtain standard errors. For this reason, the use of the ‘predict’ method with this type of non-parametric models does not yet provide standard errors and confidence intervals.</p>
+</div>
+<div id="predictions-from-a-time-to-event-model-from-literature" class="section level1">
+<h1>Predictions from a time-to-event model from literature</h1>
+<p>In some cases, we do not have a fitted model, but we have some literature information. For example, we have seen a manuscript where the authors say that, for a certain species, emergences appeared to follow a log-logistic time-course with the following parameters: ‘b’ (the slope at inflection point) equal to -1, ‘d’ (maximum germinated proportion) equal to 0.83 and ‘e’ (median germination time for the germinated fraction) equal to 12.3. Considering that a log-logistic time-to-event model is represented as LL.3(), we can make predictions by using the following code:</p>
+<pre class="r"><code>predict(LL.3(), coefs = c(-1, 0.83, 12.3),
+        newdata = c(1, 3, 5, 7, 10))
+##   newdata prediction
+## 1       1 0.06240602
+## 2       3 0.16274510
+## 3       5 0.23988439
+## 4       7 0.30103627
+## 5      10 0.37219731</code></pre>
+<p>Please, stay tuned for other posts in this series.
+Thank you for reading!</p>
+<p>Prof. Andrea Onofri<br />
+Department of Agricultural, Food and Environmental Sciences<br />
+University of Perugia (Italy)<br />
+Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow <span class="citation">@onofriandreapg</span></a>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<hr />
+</div>
+<div id="references" class="section level1">
+<h1>References</h1>
+<ol style="list-style-type: decimal">
+<li>Davison, A.C., Hinkley, D.V., 1997. Bootstrap methods and their application. Cambridge University Press, UK.</li>
+<li>Onofri, A., Mesgaran, M., &amp; Ritz, C. (2022). A unified framework for the analysis of germination, emergence, and other time-to-event data in weed science. Weed Science, 1-13. <a href="doi:10.1017/wsc.2022.8" class="uri">doi:10.1017/wsc.2022.8</a></li>
+<li>Zeileis, A., Köll, S., Graham, N., 2020. Various Versatile Variances: An Object-Oriented Implementation of Clustered Covariances in R. J. Stat. Soft. 95. <a href="https://doi.org/10.18637/jss.v095.i01" class="uri">https://doi.org/10.18637/jss.v095.i01</a></li>
+</ol>
+</div>
