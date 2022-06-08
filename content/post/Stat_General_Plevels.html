@@ -1,0 +1,68 @@
+---
+title: Should I say ''there is no difference'' or ''the difference is not significant''?
+author: Andrea Onofri
+date: '2022-06-01'
+slug: should-i-say-there-is-no-difference-or-the-difference-is-not-significant
+categories:
+  - R
+tags:
+  - R
+  - Statistical_inference
+  - P-values
+archives:
+  - 2022
+---
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<p>In a recent manuscript we wrote a sentence similar to the following: “<em>On average, the genotype A gave a yield of 12.4 tons per hectare, while the genotype B gave 10.6 tons per hectare and such a difference was not significant (P = 0.20)</em>”. Perhaps I should point out that we were talking about maize yields… One of the reviewers complained that “<em>This is an example of expression having no place in a scientific paper</em>” and that we should write: “<em>… no difference in yield was found between A and B (P = 0.20)</em>”.</p>
+<p>This is one of the cases where I cannot agree with the reviewer… and here is why.</p>
+<p>I think that we should make a clear distinction between the experiment and the ‘whole picture’. If we stick to the experiment and look at the 8 plots we harvested (yes, we had four replicated plots per each genotype, in a completely randomised design), we should conclude that the average yield WAS different and such a difference WAS equal to 1.8 tons per hectare. Any doubt about this? Therefore, it would seem to be perfectly legitimate for us to say that there was a difference.</p>
+<p>However, nobody wants to reach conclusions that are only valid for eights plots; the reason why we make experiments is that we always want to reach general conclusions! Therefore, we have to look at the ‘whole picture’, i.e. the two populations of all possible plots we could have inspected for the two genotypes in the very same environmental conditions. Can we say that, in general, the two genotypes (the two populations of plots) are different?</p>
+<p>Obviously, if we do not have (or do not intend to use) any other preliminary information about the two genotypes (no prior knowledge), we have to reach general conclusions based solely on our eight plots. What can we reasonably say about the two genotypes, looking at the eight data?</p>
+<p>In a ‘Fisherian’ context (you may know that Fisher was a very renown scientist, to whom we owe a great part of our approaches to experimental methods), we start by making a ‘null’ hypothesis, i.e. that the two genotypes are, indeed, the same genotype (thus, they have the same average yield). We can all understand that, even if the ‘null’ were absolutely true, growing this unique genotype in two groups of four independent plots would never lead to exactly the same average yield, due to the usual plot-to-plot variability. For example, in the box below, I have drawn two samples of 4 yields from the same population and found a difference of about 1 ton. When I have taken a second pair of samples, the difference was 1.5 tons.</p>
+<pre class="r"><code>set.seed(1234)
+sample1 &lt;- rnorm(4, (12.4 + 10.6)/2, 2)
+sample2 &lt;- rnorm(4, (12.4 + 10.6)/2, 2)
+mean(sample1) - mean(sample2)
+## [1] -1.002351
+# Second sampling
+sample1 &lt;- rnorm(4, (12.4 + 10.6)/2, 2)
+sample2 &lt;- rnorm(4, (12.4 + 10.6)/2, 2)
+mean(sample1) - mean(sample2)
+## [1] -1.533741</code></pre>
+<p>Now we may wonder what happens if we take 100’000 pairs of samples? Let’s do a Monte Carlo simulation.</p>
+<pre class="r"><code>diff &lt;- c()
+for(i in 1:100000){
+  sample1 &lt;- rnorm(4, (12.4 + 10.6)/2, 2)
+  sample2 &lt;- rnorm(4, (12.4 + 10.6)/2, 2)
+  diff[i] &lt;- mean(sample1) - mean(sample2)
+}
+sum(diff &gt; 1.8) + sum(diff &lt; -1.8)
+## [1] 20069</code></pre>
+<p>In our experiment we observed a difference equal to 1.8 tons per hectare and Monte Carlo simulation shows that, taking two perfectly equal genotypes and making an experiment like ours, there is more than 20% probability (20,069 cases out of 100,000) that we observe a difference as high as 1.8 (in absolute value) or higher. We need to admit that such a probability is rather high; consequently, we need to conclude that our observation is compatible with the ‘null’ and there is no evidence to reject it. Therefore, we cannot conclude that the two genotypes are different. This is true for the eight plots, but it is not true in general; at least, such a conclusion is not supported by the data at hand (and we have to let the data speak!).</p>
+<p>But, can we say that there is no difference between between the two genotypes, as advocated by the reviewer? Let’s consider a possible alternative hypothesis, i.e. that the two genotypes are different and the difference is 1.8 tons. Monte Carlo simulation shows that there is a considerable amount of cases (49,146 out of 100,000) where a hypothetical experiment leads to differences that are equal to 1.8 or less, in absolute value.</p>
+<pre class="r"><code>diff &lt;- c()
+for(i in 1:100000){
+  sample1 &lt;- rnorm(4, 12.4, 2)
+  sample2 &lt;- rnorm(4, 10.6, 2)
+  diff[i] &lt;- mean(sample1) - mean(sample2)
+}
+sum(diff &lt; 1.8 &amp; diff &gt; -1.8)
+## [1] 49146</code></pre>
+<p>In other words, our experiment is not only compatible with the ‘null’, it is also compatible with the ‘alternative’ hypothesis, i.e. that the two genotypes are different.</p>
+<p>You may object that my reasoning is flawed; indeed, while there is only one possible ‘null’, there is an infinite amount of ‘alternatives’ to consider and we have no prior knowledge to favour one of those, as I did before. You are right and, in fact, we always work with the ‘null’ and test whether we can reject it; if we fail, we have to accept it. However, my point is that, even though we accept the null, we cannot say that this is true, because there is no way to be sure about this. Particularly when the sample size is small or the effect under study is highly variable.</p>
+<p>As the bottom line, I strongly encourage that a cautious language is used: the absence of evidence should never be taken as the evidence of absence (Altman and Bland, 1995)!</p>
+<p>Thanks for reading!</p>
+<p>Prof. Andrea Onofri<br />
+Department of Agricultural, Food and Environmental Sciences<br />
+University of Perugia (Italy)<br />
+Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow <span class="citation">@onofriandreapg</span></a>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<hr />
+<div id="reference" class="section level1">
+<h1>Reference</h1>
+<p>Altman, D.G., Bland, J.M., 1995. Statistics notes: Absence of evidence is not evidence of absence. BMJ 311, 485.</p>
+</div>
