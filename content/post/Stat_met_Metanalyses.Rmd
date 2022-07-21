@@ -1,0 +1,201 @@
+---
+title: 'Meta-analysis for a single study. Is it possible?'
+author: "Andrea Onofri"
+date: 2022-07-21
+slug: 'Multi_environment_studies'
+categories:
+  - R
+  - 'Multi_environment_studies'
+tags:
+  - R
+  - 'Meta_analysis'
+  - 'Multi_environment_studies'
+  - lme
+  - nlme
+  - metafor
+  - 'Mixed_models'
+archives:
+  - 2022
+---
+
+```{r setup, cache = F, echo = F}
+#Put at the beginning
+knitr::knit_hooks$set(document = function(x){ 
+  gsub("```\n*```r*\n*", "", x) 
+})
+```
+
+
+We all know that the word meta-analysis encompasses a body of statistical techniques to combine quantitative evidence from several independent studies. However, I have recently discovered that meta-analytic methods can also be used to analyse the results of a single research project. That happened a few months ago, when I was reading a paper from Damesa et al. (2017), where the authors describe some interesting methods of data analyses for multi-environment genotype experiments. These authors gave a few nice examples with related SAS code, that is rooted in mixed models. As an R enthusiast, I was willing to reproduce their analyses with R, but I could not succeed, until I realised that I could make use of the package 'metafor' and its bunch of meta-analityc methods.
+
+In this post, I will share my R coding, for those of you who are interested in meta-analytic methods and multi-environment experiments. Let's start by having a look at the example that motivated my interest (Example 1 in Damesa et al., 2017, p. 849).
+
+# Motivating example
+
+Twenty-two different genotypes of maize were compared in Ethiopia, in relation to their yield level, in four sites (Dhera, Melkassa, Mieso, and Ziway). At all sites, there were 11 incomplete blocks in each of three replicates. The data are available in Damesa et al. (2017) as supplemental material; I have put this data at your disposal in my web repository, to reproduce this example; let's load the data first.
+
+```{r message=FALSE, warning=FALSE}
+rm(list = ls())
+library(tidyverse)
+library(nlme)
+library(sommer)
+library(emmeans)
+fileName <- "https://www.casaonofri.it/_datasets/Damesa2017.csv"
+dataset <- read.csv(fileName)
+dataset <- dataset %>% 
+  mutate(across(1:5, .fns = factor))
+head(dataset)
+```
+
+This is a typical multi-environment experiment: we have three blocking factors ('site', 'rep' and 'block') and one treatment factor ('genotype'), as well as the 'yield' response variable.  Let's see how this dataset can be analysed.
+
+# The 'golden standard' analysis
+
+In most situations with multi-environment experiments, we are interested in broad space inference about genotypes, which means that we want to determine the best genotypes across the whole set of environments. Accordingly, the 'site' and 'site x genotype' effects must be regarded as random, while the 'genotype' effect is fixed. Furthermore, we need to consider the 'design' effects, that (in this specific case) are the 'reps within sites' and the 'blocks within reps within sites' random effects. Finally, we have the residual error term ('plots within blocks within reps within sites'), that is always included by default.
+
+So far, so good, but we have to go slightly more complex; for this type of studies, the variances for replicates, blocks, and residual error should be site specific, which is usually the most realistic assumption. In the end, we need to estimate:
+
+1. 22 genotype means with standard errors
+2. one variance component for the site effect
+3. one variance component for the 'genotype x site' interaction
+4. four variance components (one per site) for the 'rep' effect
+5. four variance components (one per site) for the 'block within rep' effect
+6. four variance components (one per site) for the residual error
+
+If we work with the `lme()` function in the `nlme` package, we have to create a couple of 'dummy' variables ('one' and 'GE'), in order to reference the crossed random effects (see Galecki and Burzykowski, 2013).
+
+```{r}
+# One stage analysis
+dataset$one <- 1L
+dataset$GE <- with(dataset, genotype:site)
+model.mix <- lme(yield ~ genotype - 1, 
+             random = list(one = pdIdent(~ site - 1),
+                           one = pdIdent(~ GE - 1),
+                           rep = pdDiag(~ site - 1),
+                           block = pdDiag(~ site - 1)),
+                              data = dataset,
+             weights = varIdent(form = ~1|site))
+```
+
+The means for genotypes are:
+
+```{r message=FALSE, warning=FALSE}
+mg <- emmeans(model.mix, ~ genotype)
+mg
+```
+
+while the variance components are:
+
+```{r}
+VarCorr(model.mix)
+```
+
+We can see that, apart from some differences relating to the optimisation method, the results are equal to those reported in Tables 1 and 2 of Damesa et al. (2017).
+
+# Two-stage analyses
+
+The above analysis is fully correct, but, in some circumstances may be unfeasible. In particular, we may have problems when:
+
+1. the number of sites is very high, and
+2. different experimental designs have been used in different sites.
+
+In these circumstances, it is advantageous to break the analysis in two stages, as follows:
+
+1. first stage: we separately analyse the different experiments and obtain the means for all genotypes in all sites;
+2. second stage: we jointly analyse the genotype means from all sites.
+
+This two-stage analysis is far simpler, because the data are only pooled at the second stage, where possible design constraints are no longer important (they are considered only at the first stage). However, this two-stage analysis does not necessarily lead to the same results as the one-stage analysis, unless the whole information obtained at the first stage is carried forward to the second one (fully efficient two-stage analysis).
+
+In more detail, genotypic variances and correlations, as observed in the first stage, should not be neglected in the second stage. Damesa et al. (2017) demonstrate that the best approach is to take the full variance-covariance matrix of genotypes at the first stage and bring it forward to the second stage. They give the coding with SAS, but, how do we do it, with R?
+
+First of all, we perform the first stage of analysis, using the `by()` function to analyse the data separately for each site. In each site, we fit a mixed model, where the genotype is fixed, while the replicates and the incomplete blocks within replicates are random effects. Of course, this coding works because the experimental design is the same at all sites, while it should be modified in other cases.
+
+```{r}
+# First stage
+model.1step <- by(dataset, dataset$site,
+                  function(df) lme(yield ~ genotype - 1, 
+             random = ~1|rep/block, 
+             data = df) )
+```
+
+From there, we use the function `lapply()` to get the variance components. The results are similar to those obtained in one-stage analysis (see also Damesa et al., 2017, Table 1) 
+
+```{r}
+# Get the variance components
+lapply(model.1step, VarCorr)
+```
+
+Now we can retrieve the genotypic means at all sites:
+
+```{r}
+# Get the means
+sitmeans <- lapply(model.1step, 
+                function(el) 
+                  data.frame(emmeans(el, ~genotype)))
+sitmeans <- do.call(rbind, sitmeans)
+sitmeans$site <- factor(rep(1:4, each = 22))
+head(sitmeans)
+```
+
+The variance-covariance matrix for genotype means is obtained, for each site, by using the `vcov()` function. Afterwords, we build a block diagonal matrix using the four variance-covariance matrices as the building blocks.
+
+```{r}
+# Get the vcov matrices
+Omega <- lapply(model.1step, vcov)
+Omega <- Matrix::bdiag(Omega)
+round(Omega[1:8, 1:8], 3)
+```
+
+Now we can proceed to the second stage, which can be performed by using the `rma.mv()` function in the `metafor` package, as shown in the box below. We see that we inject the variance-covariance matrix coming from the first stage into the second. That's why this is a meta-analytic technique: we are behaving as if we had obtained the data from the first stage from literature!
+
+```{r}
+# Second stage (fully efficient)
+mod.meta <- metafor::rma.mv(emmean, Omega, 
+                            mods = ~ genotype - 1,
+                            random = ~ 1|site/genotype,
+                    data = sitmeans, method="REML")
+```
+
+From this fit we get the remaining variance components (for the 'sites' and for the 'sites x genotypes' interaction) and the genotypic means, which correspond to those obtained from one-step analysis, apart from small differences relating to the optimisation method (see also Tables 1 and 2 in Damesa et al., 2017). That's why Damesa and co-authors talk about **fully efficient two-stage analysis**.
+
+```{r}
+# Variance components
+mod.meta$sigma2
+head(mod.meta$beta)
+```
+
+A possible approximation to this fully-efficient method is also shown in Damesa et al. (2017) and consists of approximating the variance-covariance matrix of genotypic means ('Omega') by using a vector of weights, which can be obtained by taking the diagonal elements of the inverse of the 'Omega' matrix. To achieve these, we can use the R coding in the box below.  
+
+```{r}
+siij <- diag(solve(Omega))
+mod.meta2 <- metafor::rma.mv(emmean, 1/siij,
+                            mods = ~ genotype - 1,
+                            random = ~ 1|site/genotype,
+                    data = sitmeans, method="REML") 
+mod.meta2$sigma2
+head(mod.meta2$beta)
+```
+
+With this, we have fully reproduced the results relating to the Example 1 in the paper we used as the reference for this post. Hope this was useful.
+
+Happy coding!
+
+
+---
+
+Prof. Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences    
+University of Perugia (Italy)    
+Send comments to: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)
+
+<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow @onofriandreapg</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+# References
+
+1. Damesa, T.M., Möhring, J., Worku, M., Piepho, H.-P., 2017. One Step at a Time: Stage-Wise Analysis of a Series of Experiments. Agronomy Journal 109, 845. https://doi.org/10.2134/agronj2016.07.0395
+2. Gałecki, A., Burzykowski, T., 2013. Linear mixed-effects models using R: a step-by-step approach. Springer, Berlin.
+3. Lenth R (2022). Emmeans: Estimated Marginal Means, aka Least-Squares Means. R package version 1.7.5-090001, https://github.com/rvlenth/emmeans.
+4. Pinheiro JC, Bates DM (2000). Mixed-Effects Models in S and S-PLUS.Springer, New York. doi:10.1007/b98882. https://doi.org/10.1007/b98882.
+5. Viechtbauer, W. (2010). Conducting meta-analyses in R with the metafor package. Journal of Statistical Software, 36(3), 1-48. https://doi.org/10.18637/jss.v036.i03
+  

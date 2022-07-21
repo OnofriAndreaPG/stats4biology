@@ -5,10 +5,346 @@
     <description>Recent content in Multi_environment_studies on The broken bridge between biologists and statisticians</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2018, @AndreaOnofri</copyright>
-    <lastBuildDate>Fri, 05 Mar 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 21 Jul 2022 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://www.statforbiology.com/tags/multi_environment_studies/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Meta-analysis for a single study. Is it possible?</title>
+      <link>https://www.statforbiology.com/2022/stat_met_metanalyses/</link>
+      <pubDate>Thu, 21 Jul 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.statforbiology.com/2022/stat_met_metanalyses/</guid>
+      <description>
+
+
+&lt;p&gt;We all know that the word meta-analysis encompasses a body of statistical techniques to combine quantitative evidence from several independent studies. However, I have recently discovered that meta-analytic methods can also be used to analyse the results of a single research project. That happened a few months ago, when I was reading a paper from Damesa et al. (2017), where the authors describe some interesting methods of data analyses for multi-environment genotype experiments. These authors gave a few nice examples with related SAS code, that is rooted in mixed models. As an R enthusiast, I was willing to reproduce their analyses with R, but I could not succeed, until I realised that I could make use of the package ‘metafor’ and its bunch of meta-analityc methods.&lt;/p&gt;
+&lt;p&gt;In this post, I will share my R coding, for those of you who are interested in meta-analytic methods and multi-environment experiments. Let’s start by having a look at the example that motivated my interest (Example 1 in Damesa et al., 2017, p. 849).&lt;/p&gt;
+&lt;div id=&#34;motivating-example&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Motivating example&lt;/h1&gt;
+&lt;p&gt;Twenty-two different genotypes of maize were compared in Ethiopia, in relation to their yield level, in four sites (Dhera, Melkassa, Mieso, and Ziway). At all sites, there were 11 incomplete blocks in each of three replicates. The data are available in Damesa et al. (2017) as supplemental material; I have put this data at your disposal in my web repository, to reproduce this example; let’s load the data first.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rm(list = ls())
+library(tidyverse)
+library(nlme)
+library(sommer)
+library(emmeans)
+fileName &amp;lt;- &amp;quot;https://www.casaonofri.it/_datasets/Damesa2017.csv&amp;quot;
+dataset &amp;lt;- read.csv(fileName)
+dataset &amp;lt;- dataset %&amp;gt;% 
+  mutate(across(1:5, .fns = factor))
+head(dataset)
+##   site rep block plot genotype row col yield
+## 1    1   1     1    1        6   1   1  9.93
+## 2    1   1     1    2       22   1   2  6.51
+## 3    1   1     2    3       17   1   3  7.92
+## 4    1   1     2    4       14   1   4  9.28
+## 5    1   1     3    5       12   1   5  7.56
+## 6    1   1     3    6       10   1   6  9.54&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This is a typical multi-environment experiment: we have three blocking factors (‘site’, ‘rep’ and ‘block’) and one treatment factor (‘genotype’), as well as the ‘yield’ response variable. Let’s see how this dataset can be analysed.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;the-golden-standard-analysis&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;The ‘golden standard’ analysis&lt;/h1&gt;
+&lt;p&gt;In most situations with multi-environment experiments, we are interested in broad space inference about genotypes, which means that we want to determine the best genotypes across the whole set of environments. Accordingly, the ‘site’ and ‘site x genotype’ effects must be regarded as random, while the ‘genotype’ effect is fixed. Furthermore, we need to consider the ‘design’ effects, that (in this specific case) are the ‘reps within sites’ and the ‘blocks within reps within sites’ random effects. Finally, we have the residual error term (‘plots within blocks within reps within sites’), that is always included by default.&lt;/p&gt;
+&lt;p&gt;So far, so good, but we have to go slightly more complex; for this type of studies, the variances for replicates, blocks, and residual error should be site specific, which is usually the most realistic assumption. In the end, we need to estimate:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;22 genotype means with standard errors&lt;/li&gt;
+&lt;li&gt;one variance component for the site effect&lt;/li&gt;
+&lt;li&gt;one variance component for the ‘genotype x site’ interaction&lt;/li&gt;
+&lt;li&gt;four variance components (one per site) for the ‘rep’ effect&lt;/li&gt;
+&lt;li&gt;four variance components (one per site) for the ‘block within rep’ effect&lt;/li&gt;
+&lt;li&gt;four variance components (one per site) for the residual error&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;If we work with the &lt;code&gt;lme()&lt;/code&gt; function in the &lt;code&gt;nlme&lt;/code&gt; package, we have to create a couple of ‘dummy’ variables (‘one’ and ‘GE’), in order to reference the crossed random effects (see Galecki and Burzykowski, 2013).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# One stage analysis
+dataset$one &amp;lt;- 1L
+dataset$GE &amp;lt;- with(dataset, genotype:site)
+model.mix &amp;lt;- lme(yield ~ genotype - 1, 
+             random = list(one = pdIdent(~ site - 1),
+                           one = pdIdent(~ GE - 1),
+                           rep = pdDiag(~ site - 1),
+                           block = pdDiag(~ site - 1)),
+                              data = dataset,
+             weights = varIdent(form = ~1|site))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The means for genotypes are:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mg &amp;lt;- emmeans(model.mix, ~ genotype)
+mg
+##  genotype emmean   SE  df lower.CL upper.CL
+##  1          5.15 1.65 210    1.900     8.40
+##  2          5.54 1.65 210    2.296     8.79
+##  3          5.19 1.65 210    1.939     8.44
+##  4          4.59 1.65 210    1.341     7.84
+##  5          4.82 1.65 210    1.568     8.07
+##  6          4.66 1.65 210    1.411     7.91
+##  7          4.64 1.65 210    1.388     7.88
+##  8          4.36 1.65 210    1.110     7.61
+##  9          5.03 1.65 210    1.785     8.28
+##  10         4.84 1.65 210    1.592     8.09
+##  11         4.54 1.65 210    1.290     7.79
+##  12         4.87 1.65 210    1.622     8.12
+##  13         4.84 1.65 210    1.593     8.09
+##  14         4.29 1.65 210    1.045     7.54
+##  15         4.47 1.65 210    1.224     7.72
+##  16         4.37 1.65 210    1.123     7.62
+##  17         4.07 1.65 210    0.819     7.32
+##  18         4.95 1.65 210    1.697     8.19
+##  19         4.71 1.65 210    1.466     7.96
+##  20         4.86 1.65 210    1.612     8.11
+##  21         4.13 1.65 210    0.885     7.38
+##  22         4.63 1.65 210    1.380     7.88
+## 
+## Degrees-of-freedom method: containment 
+## Confidence level used: 0.95&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;while the variance components are:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;VarCorr(model.mix)
+##          Variance          StdDev      
+## one =    pdIdent(site - 1)             
+## site1    1.045428e+01      3.233309e+00
+## site2    1.045428e+01      3.233309e+00
+## site3    1.045428e+01      3.233309e+00
+## site4    1.045428e+01      3.233309e+00
+## one =    pdIdent(GE - 1)               
+## GE1:1    1.052944e-01      3.244909e-01
+## GE1:2    1.052944e-01      3.244909e-01
+## GE1:3    1.052944e-01      3.244909e-01
+## GE1:4    1.052944e-01      3.244909e-01
+## GE2:1    1.052944e-01      3.244909e-01
+## GE2:2    1.052944e-01      3.244909e-01
+## GE2:3    1.052944e-01      3.244909e-01
+## GE2:4    1.052944e-01      3.244909e-01
+## GE3:1    1.052944e-01      3.244909e-01
+## GE3:2    1.052944e-01      3.244909e-01
+## GE3:3    1.052944e-01      3.244909e-01
+## GE3:4    1.052944e-01      3.244909e-01
+## GE4:1    1.052944e-01      3.244909e-01
+## GE4:2    1.052944e-01      3.244909e-01
+## GE4:3    1.052944e-01      3.244909e-01
+## GE4:4    1.052944e-01      3.244909e-01
+## GE5:1    1.052944e-01      3.244909e-01
+## GE5:2    1.052944e-01      3.244909e-01
+## GE5:3    1.052944e-01      3.244909e-01
+## GE5:4    1.052944e-01      3.244909e-01
+## GE6:1    1.052944e-01      3.244909e-01
+## GE6:2    1.052944e-01      3.244909e-01
+## GE6:3    1.052944e-01      3.244909e-01
+## GE6:4    1.052944e-01      3.244909e-01
+## GE7:1    1.052944e-01      3.244909e-01
+## GE7:2    1.052944e-01      3.244909e-01
+## GE7:3    1.052944e-01      3.244909e-01
+## GE7:4    1.052944e-01      3.244909e-01
+## GE8:1    1.052944e-01      3.244909e-01
+## GE8:2    1.052944e-01      3.244909e-01
+## GE8:3    1.052944e-01      3.244909e-01
+## GE8:4    1.052944e-01      3.244909e-01
+## GE9:1    1.052944e-01      3.244909e-01
+## GE9:2    1.052944e-01      3.244909e-01
+## GE9:3    1.052944e-01      3.244909e-01
+## GE9:4    1.052944e-01      3.244909e-01
+## GE10:1   1.052944e-01      3.244909e-01
+## GE10:2   1.052944e-01      3.244909e-01
+## GE10:3   1.052944e-01      3.244909e-01
+## GE10:4   1.052944e-01      3.244909e-01
+## GE11:1   1.052944e-01      3.244909e-01
+## GE11:2   1.052944e-01      3.244909e-01
+## GE11:3   1.052944e-01      3.244909e-01
+## GE11:4   1.052944e-01      3.244909e-01
+## GE12:1   1.052944e-01      3.244909e-01
+## GE12:2   1.052944e-01      3.244909e-01
+## GE12:3   1.052944e-01      3.244909e-01
+## GE12:4   1.052944e-01      3.244909e-01
+## GE13:1   1.052944e-01      3.244909e-01
+## GE13:2   1.052944e-01      3.244909e-01
+## GE13:3   1.052944e-01      3.244909e-01
+## GE13:4   1.052944e-01      3.244909e-01
+## GE14:1   1.052944e-01      3.244909e-01
+## GE14:2   1.052944e-01      3.244909e-01
+## GE14:3   1.052944e-01      3.244909e-01
+## GE14:4   1.052944e-01      3.244909e-01
+## GE15:1   1.052944e-01      3.244909e-01
+## GE15:2   1.052944e-01      3.244909e-01
+## GE15:3   1.052944e-01      3.244909e-01
+## GE15:4   1.052944e-01      3.244909e-01
+## GE16:1   1.052944e-01      3.244909e-01
+## GE16:2   1.052944e-01      3.244909e-01
+## GE16:3   1.052944e-01      3.244909e-01
+## GE16:4   1.052944e-01      3.244909e-01
+## GE17:1   1.052944e-01      3.244909e-01
+## GE17:2   1.052944e-01      3.244909e-01
+## GE17:3   1.052944e-01      3.244909e-01
+## GE17:4   1.052944e-01      3.244909e-01
+## GE18:1   1.052944e-01      3.244909e-01
+## GE18:2   1.052944e-01      3.244909e-01
+## GE18:3   1.052944e-01      3.244909e-01
+## GE18:4   1.052944e-01      3.244909e-01
+## GE19:1   1.052944e-01      3.244909e-01
+## GE19:2   1.052944e-01      3.244909e-01
+## GE19:3   1.052944e-01      3.244909e-01
+## GE19:4   1.052944e-01      3.244909e-01
+## GE20:1   1.052944e-01      3.244909e-01
+## GE20:2   1.052944e-01      3.244909e-01
+## GE20:3   1.052944e-01      3.244909e-01
+## GE20:4   1.052944e-01      3.244909e-01
+## GE21:1   1.052944e-01      3.244909e-01
+## GE21:2   1.052944e-01      3.244909e-01
+## GE21:3   1.052944e-01      3.244909e-01
+## GE21:4   1.052944e-01      3.244909e-01
+## GE22:1   1.052944e-01      3.244909e-01
+## GE22:2   1.052944e-01      3.244909e-01
+## GE22:3   1.052944e-01      3.244909e-01
+## GE22:4   1.052944e-01      3.244909e-01
+## rep =    pdDiag(site - 1)              
+## site1    8.817499e-02      2.969427e-01
+## site2    1.383338e+00      1.176154e+00
+## site3    4.245188e-09      6.515511e-05
+## site4    1.442336e-02      1.200973e-01
+## block =  pdDiag(site - 1)              
+## site1    3.312025e-01      5.755020e-01
+## site2    4.746751e-01      6.889667e-01
+## site3    5.498857e-09      7.415428e-05
+## site4    6.953371e-02      2.636925e-01
+## Residual 1.346652e+00      1.160454e+00&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We can see that, apart from some differences relating to the optimisation method, the results are equal to those reported in Tables 1 and 2 of Damesa et al. (2017).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;two-stage-analyses&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Two-stage analyses&lt;/h1&gt;
+&lt;p&gt;The above analysis is fully correct, but, in some circumstances may be unfeasible. In particular, we may have problems when:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;the number of sites is very high, and&lt;/li&gt;
+&lt;li&gt;different experimental designs have been used in different sites.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;In these circumstances, it is advantageous to break the analysis in two stages, as follows:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;first stage: we separately analyse the different experiments and obtain the means for all genotypes in all sites;&lt;/li&gt;
+&lt;li&gt;second stage: we jointly analyse the genotype means from all sites.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This two-stage analysis is far simpler, because the data are only pooled at the second stage, where possible design constraints are no longer important (they are considered only at the first stage). However, this two-stage analysis does not necessarily lead to the same results as the one-stage analysis, unless the whole information obtained at the first stage is carried forward to the second one (fully efficient two-stage analysis).&lt;/p&gt;
+&lt;p&gt;In more detail, genotypic variances and correlations, as observed in the first stage, should not be neglected in the second stage. Damesa et al. (2017) demonstrate that the best approach is to take the full variance-covariance matrix of genotypes at the first stage and bring it forward to the second stage. They give the coding with SAS, but, how do we do it, with R?&lt;/p&gt;
+&lt;p&gt;First of all, we perform the first stage of analysis, using the &lt;code&gt;by()&lt;/code&gt; function to analyse the data separately for each site. In each site, we fit a mixed model, where the genotype is fixed, while the replicates and the incomplete blocks within replicates are random effects. Of course, this coding works because the experimental design is the same at all sites, while it should be modified in other cases.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# First stage
+model.1step &amp;lt;- by(dataset, dataset$site,
+                  function(df) lme(yield ~ genotype - 1, 
+             random = ~1|rep/block, 
+             data = df) )&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;From there, we use the function &lt;code&gt;lapply()&lt;/code&gt; to get the variance components. The results are similar to those obtained in one-stage analysis (see also Damesa et al., 2017, Table 1)&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Get the variance components
+lapply(model.1step, VarCorr)
+## $`1`
+##             Variance     StdDev   
+## rep =       pdLogChol(1)          
+## (Intercept) 0.1003720    0.3168153
+## block =     pdLogChol(1)          
+## (Intercept) 0.2505444    0.5005441
+## Residual    1.2361933    1.1118423
+## 
+## $`2`
+##             Variance     StdDev   
+## rep =       pdLogChol(1)          
+## (Intercept) 1.4012207    1.1837317
+## block =     pdLogChol(1)          
+## (Intercept) 0.4645211    0.6815579
+## Residual    0.2020162    0.4494621
+## 
+## $`3`
+##             Variance     StdDev      
+## rep =       pdLogChol(1)             
+## (Intercept) 2.457639e-10 1.567686e-05
+## block =     pdLogChol(1)             
+## (Intercept) 1.824486e-09 4.271400e-05
+## Residual    1.054905e+00 1.027085e+00
+## 
+## $`4`
+##             Variance     StdDev   
+## rep =       pdLogChol(1)          
+## (Intercept) 0.01412879   0.1188646
+## block =     pdLogChol(1)          
+## (Intercept) 0.07196842   0.2682693
+## Residual    0.11262234   0.3355925&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now we can retrieve the genotypic means at all sites:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Get the means
+sitmeans &amp;lt;- lapply(model.1step, 
+                function(el) 
+                  data.frame(emmeans(el, ~genotype)))
+sitmeans &amp;lt;- do.call(rbind, sitmeans)
+sitmeans$site &amp;lt;- factor(rep(1:4, each = 22))
+head(sitmeans)
+##     genotype   emmean        SE df lower.CL  upper.CL site
+## 1.1        1 8.253672 0.7208426 12 6.683091  9.824253    1
+## 1.2        2 7.731118 0.7208426 12 6.160537  9.301699    1
+## 1.3        3 7.249198 0.7208426 12 5.678617  8.819779    1
+## 1.4        4 8.565262 0.7208426 12 6.994681 10.135843    1
+## 1.5        5 8.560002 0.7208426 12 6.989421 10.130583    1
+## 1.6        6 9.510255 0.7208426 12 7.939674 11.080836    1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The variance-covariance matrix for genotype means is obtained, for each site, by using the &lt;code&gt;vcov()&lt;/code&gt; function. Afterwords, we build a block diagonal matrix using the four variance-covariance matrices as the building blocks.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Get the vcov matrices
+Omega &amp;lt;- lapply(model.1step, vcov)
+Omega &amp;lt;- Matrix::bdiag(Omega)
+round(Omega[1:8, 1:8], 3)
+## 8 x 8 sparse Matrix of class &amp;quot;dgCMatrix&amp;quot;
+##                                                     
+## [1,] 0.520 0.061 0.037 0.034 0.033 0.035 0.034 0.033
+## [2,] 0.061 0.520 0.061 0.037 0.033 0.034 0.033 0.033
+## [3,] 0.037 0.061 0.520 0.061 0.033 0.033 0.034 0.033
+## [4,] 0.034 0.037 0.061 0.520 0.033 0.033 0.033 0.033
+## [5,] 0.033 0.033 0.033 0.033 0.520 0.035 0.034 0.061
+## [6,] 0.035 0.034 0.033 0.033 0.035 0.520 0.061 0.034
+## [7,] 0.034 0.033 0.034 0.033 0.034 0.061 0.520 0.033
+## [8,] 0.033 0.033 0.033 0.033 0.061 0.034 0.033 0.520&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now we can proceed to the second stage, which can be performed by using the &lt;code&gt;rma.mv()&lt;/code&gt; function in the &lt;code&gt;metafor&lt;/code&gt; package, as shown in the box below. We see that we inject the variance-covariance matrix coming from the first stage into the second. That’s why this is a meta-analytic technique: we are behaving as if we had obtained the data from the first stage from literature!&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Second stage (fully efficient)
+mod.meta &amp;lt;- metafor::rma.mv(emmean, Omega, 
+                            mods = ~ genotype - 1,
+                            random = ~ 1|site/genotype,
+                    data = sitmeans, method=&amp;quot;REML&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;From this fit we get the remaining variance components (for the ‘sites’ and for the ‘sites x genotypes’ interaction) and the genotypic means, which correspond to those obtained from one-step analysis, apart from small differences relating to the optimisation method (see also Tables 1 and 2 in Damesa et al., 2017). That’s why Damesa and co-authors talk about &lt;strong&gt;fully efficient two-stage analysis&lt;/strong&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Variance components
+mod.meta$sigma2
+## [1] 10.4538773  0.1271925
+head(mod.meta$beta)
+##               [,1]
+## genotype1 5.134780
+## genotype2 5.509773
+## genotype3 5.147052
+## genotype4 4.593256
+## genotype5 4.844761
+## genotype6 4.691955&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;A possible approximation to this fully-efficient method is also shown in Damesa et al. (2017) and consists of approximating the variance-covariance matrix of genotypic means (‘Omega’) by using a vector of weights, which can be obtained by taking the diagonal elements of the inverse of the ‘Omega’ matrix. To achieve these, we can use the R coding in the box below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;siij &amp;lt;- diag(solve(Omega))
+mod.meta2 &amp;lt;- metafor::rma.mv(emmean, 1/siij,
+                            mods = ~ genotype - 1,
+                            random = ~ 1|site/genotype,
+                    data = sitmeans, method=&amp;quot;REML&amp;quot;) 
+mod.meta2$sigma2
+## [1] 10.422928  0.127908
+head(mod.meta2$beta)
+##               [,1]
+## genotype1 5.112614
+## genotype2 5.431455
+## genotype3 5.151905
+## genotype4 4.583911
+## genotype5 4.811698
+## genotype6 4.704518&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;With this, we have fully reproduced the results relating to the Example 1 in the paper we used as the reference for this post. Hope this was useful.&lt;/p&gt;
+&lt;p&gt;Happy coding!&lt;/p&gt;
+&lt;hr /&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Damesa, T.M., Möhring, J., Worku, M., Piepho, H.-P., 2017. One Step at a Time: Stage-Wise Analysis of a Series of Experiments. Agronomy Journal 109, 845. &lt;a href=&#34;https://doi.org/10.2134/agronj2016.07.0395&#34; class=&#34;uri&#34;&gt;https://doi.org/10.2134/agronj2016.07.0395&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Gałecki, A., Burzykowski, T., 2013. Linear mixed-effects models using R: a step-by-step approach. Springer, Berlin.&lt;/li&gt;
+&lt;li&gt;Lenth R (2022). Emmeans: Estimated Marginal Means, aka Least-Squares Means. R package version 1.7.5-090001, &lt;a href=&#34;https://github.com/rvlenth/emmeans&#34; class=&#34;uri&#34;&gt;https://github.com/rvlenth/emmeans&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Pinheiro JC, Bates DM (2000). Mixed-Effects Models in S and S-PLUS.Springer, New York. &lt;a href=&#34;doi:10.1007/b98882&#34; class=&#34;uri&#34;&gt;doi:10.1007/b98882&lt;/a&gt;. &lt;a href=&#34;https://doi.org/10.1007/b98882&#34; class=&#34;uri&#34;&gt;https://doi.org/10.1007/b98882&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Viechtbauer, W. (2010). Conducting meta-analyses in R with the metafor package. Journal of Statistical Software, 36(3), 1-48. &lt;a href=&#34;https://doi.org/10.18637/jss.v036.i03&#34; class=&#34;uri&#34;&gt;https://doi.org/10.18637/jss.v036.i03&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>lmDiallel: a new R package to fit diallel models. Multienvironment diallel experiments</title>
