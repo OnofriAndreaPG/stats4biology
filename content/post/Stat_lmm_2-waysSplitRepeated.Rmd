@@ -1,7 +1,7 @@
 ---
-title: "Fitting 'complex' mixed models with 'nlme': Example #2"
+title: "Multi-environment split-plot experiments"
 author: "Andrea Onofri"
-date: 2019-09-13
+date: 2022-09-13
 slug: 'Mixed models'
 categories:
   - R
@@ -11,7 +11,7 @@ tags:
   - 'Mixed_models'
   - 'Split_plot'
 archives:
-  - 2019
+  - 2022
 ---
 
 ```{r setup, cache = F, echo = F}
@@ -21,278 +21,120 @@ knitr::knit_hooks$set(document = function(x){
 })
 ```
 
-# A repeated split-plot experiment with heteroscedastic errors
 
-Let's imagine a field experiment, where different genotypes of khorasan wheat are to be compared under different nitrogen (N) fertilisation systems. Genotypes require bigger plots, with respect to fertilisation treatments and, therefore, the most convenient choice would be to lay-out the experiment as a split-plot, in a randomised complete block design. Genotypes would be randomly allocated to main plots, while fertilisation systems would be randomly allocated to sub-plots.  As usual in agricultural research, the experiment should be repeated in different years, in order to explore the environmental variability of results.
+Have you made a split-plot field experiment? Have you repeated such an experiment in two (or more) years/locations? Have you run into troubles, because the reviewer told you that your ANOVA model was invalid? If so, please, stop for awhile and read: this post might help you understand what was wrong with your analyses.
 
-What could we expect from such an experiment?
+# Motivating example
 
+Let's think of a field experiment, where 6 genotypes of faba bean were compared under two different sowing times (autumn and spring). For the ease of organisation, such an experiment was laid down as a **split-plot**, in a randomised complete block design; sowing times were randomly allocated to main-plots, while genotypes were randomly allocated to sub-plots. Let's stop for a moment... does this sound strange to you? Do you need further information about split-plot designs? You can get some general information [at this link](https://www.statforbiology.com/_statbookeng/designing-experiments.html#setting-up-a-field-experiment) and hints on how to analyse the results at this [other link](https://www.statforbiology.com/_statbookeng/plots-of-different-sizes.html)
 
-```{r eval=FALSE, include=FALSE}
-#Dataset is simulated from Stagnari et al, durum wheat ####
-#Lately heteroscedastic errors are introduced
-dataset <- read.csv("kamutOr.csv", header=T)
-head(dataset)
-levels(dataset$Var) <- LETTERS[1:15]
-names(dataset)[2] <- "Genotype"
-dataset$Block <- factor(dataset$Block)
-dataset$Year <- factor(dataset$Year)
-dataset$N <- factor(dataset$N)
+The above experiment was repeated in three years and two locations (six environments in all), in order to explore the environmental variability of results (we will not make any distinction between years and locations, for the sake of this post). In the end, we recorded crop yield and produced a dataset with 288 record (6 environments by 2 sowing times by 6 genotypes by 4 blocks). If you are interested in more detail about this experiment, you can find them in Stagnari et al., (2007).
 
-#Mixed model
-library(lme4)
-model.mix <- lmer(Yield ~ Year*Genotype*N + (1|Year:Block) + (1|Year:Block:Genotype),
-                  data = dataset)
-anova(model.mix)
-YieldN <-  simulate(model.mix)
-dataset$Yield <- round(YieldN[,1],2)
-head(dataset)
+The resulting dataset ('fabaBeanSplitMet.csv') is available in a public online repository and contains six columns, the 'Location', the 'Year', the 'Sowing' time, the 'Genotype', the 'Block' and the response variable, i.e. the 'Yield'. After loading the dataset, we need to recode the independent variables into factors and create the new 'Environment' factor, as the combination of 'Year' and 'Location' levels. In the box below, we use the 'dplyr' package to accomplish this preliminary step (Wickham et al., 2022). 
 
-write.csv(dataset, file = "kamut.csv", row.names = F)
-```
-
-Please, look at the dataset 'kamut.csv', which is available on github. It provides the results for a split-plot experiment with 15 genotypes and 2 N fertilisation treatments, laid-out in three blocks and repeated in four years (360 observations, in all).
-
-The dataset has five columns, the 'Year', the 'Genotype', the fertilisation level ('N'), the 'Block' and the response variable, i.e. 'Yield'. The fifteen genotypes are coded by using the letters from A to O, while the levels of the other independent variables are coded by using numbers. The following snippets loads the file and recodes the numerical independent variables into factors.
-
-```{r}
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
 rm(list=ls())
-dataset <- read.csv("https://raw.githubusercontent.com/OnofriAndreaPG/agroBioData/master/kamut.csv", header = T)
-dataset$Block <- factor(dataset$Block)
-dataset$Year <- factor(dataset$Year)
-dataset$N <- factor(dataset$N)
+fileName <- "https://www.casaonofri.it/_datasets/fabaBeanSplitMet.csv"
+dataset <- read.csv(fileName)
+dataset <- dataset %>% 
+  mutate(across(c(Location, Year, Sowing, Genotype, Block),
+                .fns = factor),
+         Environment = factor(Location:Year))
 head(dataset)
 ```
 
-Additionally, it may be useful to code some 'helper' factors, to represent the blocks (within years) and the main-plots. The first factors ('YearBlock') has 12 levels (4 years and 3 blocks per year) and the second factor ('MainPlot') has 180 levels (4 years, 3 blocks per year and 15 genotypes per block).
+# Building a valid model
 
-```{r}
-dataset$YearBlock <- with(dataset, factor(Year:Block))
-dataset$MainPlot <- with(dataset, factor(Year:Block:Genotype))
-```
+A model is identified by listing all the effects which we need to explain the observed yield. In this case, considering the aims of our experiment, it is pretty easy to grasp the importance of the 'sowing date' effect, the 'genotype' effect and their interaction. These are the so-called treatment factors and we have no doubt that they should be included in our model. Furthermore, we should also be interested to know whether those treatment effects interact with the environment effect, so we should clearly add to the model the 'sowing time by environment', 'genotype by environment' and 'sowing time by genotype by environment' interactions.  
 
-For the analyses, we will make use of the 'plyr' (Wickham, 2011), 'car' (Fox and Weisberg, 2011) and 'nlme' (Pinheiro et al., 2018) packages, which we load now.
+At this step, it is possible that we have no specific interest in any other effects, apart from those we have just mentioned; however, if we stop now, our model is still incomplete and, therefore, invalid. Indeed, we should also think about possible grouping factors. You may wonder: what are the grouping factors? This aspect needs particular attention.
 
-```{r message=FALSE, warning=FALSE, paged.print=FALSE}
-library(plyr)
-library(car)
-library(nlme)
-```
+In split-plot and other very common types of designs, the experimental units are not completely randomised, but they are organised ('grouped', indeed) by way of some innate attribute, such as the environment or block or main-plot, which they belong to. These attributes are known as 'grouping factors (see Piepho et al., 2003) and they introduce a sort of 'parenthood', so that some observations are more alike than others, because they belong to the same 'group' (e.g., same block or same main-plot). If we neglect the effects of 'grouping factors', these 'parenthood' effects remain in the residuals, which will be correlated. The correlation of residuals represent an important violation of the basic assumptions for linear model fitting and, therefore, the model will be invalid and our paper will be rejected. One first conclusion: **please, do never forget the grouping factors, if you want your paper to be accepted!**.
 
-It is always useful to start by separately considering the results for each year. This gives us a feel for what happened in all experiments. What model do we have to fit to single-year split-plot data? In order to avoid mathematical notation, I will follow the notation proposed by Piepho (2003), by using the names of variables, as reported in the dataset. The treatment model for this split-plot design is:
+What are the grouping factors in this case? First of all we have the environments (six levels), then we have the blocks within each environment (24 levels in all) and, finally, we have the main-plots within each block and within each environment (48 levels, in all). In this latter respect, we can see that each main-plot can be uniquely identified by the combination of one environment, one block and one sowing time. Consequently, the final (valid) model is:
 
 ```
-Yield ~ Genotype * N
+Yield ~ Environment + Sowing + Environment:Sowing + Genotype + 
+        Environment:Genotype + Environment:Sowing:Genotype + 
+        Environment:Block + Environment:Block:Sowing
 ```
-
-All treatment effects are fixed. The block model, referencing all grouping structures, is:
-
-```
-Yield ~ Block + Block:MainPlot + Block:MainPlot:Subplot
-```
-
-The first element references the blocks, while the second element references the main-plots, to which the genotypes are randomly allocated (randomisation unit). The third element references the sub-plots, to which N treatments are randomly allocated (another randomisation unit); this latter element corresponds to the residual error and, therefore, it is fitted by default and needs not be explicitly included in the model. Main-plot and sub-plot effects need to be random, as they reference randomisation units (Piepho, 2003). The nature of the block effect is still under debate (Dixon, 2016), but I'll take it as random (do not worry: I will also show how we can take it as fixed).
-
-Coding a split-plot model in 'lme' is rather simple:
+In R, we can abbreviate as:
 
 ```
-lme(Yield ~ Genotype * N, random = ~1|Block/MainPlot
+Yield ~ Environment * Sowing * Genotype + 
+        Environment:Block + Environment:Block:Sowing
 ```
 
-where the notation 'Block/MainPlot' is totally equivalent to 'Block + Block:MainPlot'. Instead of manually fitting this model four times (one per year), we can ask R to do so by using the 'ddply()' function in the 'plyr' package. In the code below, I used this technique to retrieve the residual variance for each experiment.
 
-```{r}
-lmmFits <- ddply(dataset, c("Year"),
-      function(df) summary( lme(Yield ~ Genotype * N,
-                 random = ~1|Block/MainPlot,
-                 data = df))$sigma^2 )
-lmmFits
-```
+Sorry, I know I am running the risk of being regarded as a boring professor; but, please, remember: **failing to include any of the above mentioned effects in the model, unless they are clearly non-significant, leads to totally invalid results!** 
 
-We see great differences! The residual variance in 2005 is more that 500 times smaller than that observed in 2007. Clearly, if we pool the data and make an ANOVA, when we pool the data, we violate the homoscedasticity assumption. In general, this problem has an obvious solution: we can model the variance-covariance matrix of observations, allowing a different variance per year. In R, this is only possible by using the 'lme()' function (unless we want to use the 'asreml-R' package, which is not freeware, unfortunately). The question is: how do we code such a model?
+Now, we need to take a very important decision: which factors are fixed and which factors are random? The rule is that all factors that reference randomisation units (to which treatments are allocated) NEED TO BE RANDOM, while, for the other factors, we can make our own subjective choice. Here, the main-plot factor, to which we allocated the sowing dates, needs to be taken as random. For the other factors, we make the most traditional choice of taking them as fixed, although we need to consider that, in other instances, it might be appropriate to regard the 'environment' and 'block' effects as random (relating to block effects, you may read Dixon, 2016, for interesting information).
 
-First of all, let's derive a correct mixed model. The treatment model is:
-
-```
-Yield ~ Genotype * N
-```
-We have mentioned that the genotype and N effects are likely to be taken as fixed. The block model is:
-
-```
- ~ Year + Year/Block + Year:Block:MainPlot + Year:Block:MainPlot:Subplot
-```
-
-The second element in the block model references the blocks within years, the second element references the main-plots, while the third element references the sub-plots and, as before, it is not needed. The year effect is likely to interact with both the treatment effects, so we need to add the following effects:
-
-```
- ~ Year + Year:Genotype + Year:N + Year:Genotype:N
-```
-
-which is equivalent to writing:
-
-```
- ~ Year*Genotype*N
-```
-
-The year effect can be taken as either as random or as fixed. In this post, we will show both approaches
-
+If I were to suggest a simple package to fit the above model, I'd say that you should favour the `lmer()` function in the `lme4 ` package, where the random effects are coded by using the '(1|effect)' notation, as shown in the box below; before fitting, we load the 'lme4' package, together with the 'lmerTest' package, which gives us extra-flexibility to produce an ANOVA table:
 
 ```{r eval=FALSE, include=FALSE}
-#Reference analysis with asreml
-library(asreml)
-modRef <- asreml(Yield ~ Year * Genotype * N,
-                 random = ~YearBlock + MainPlot,
-                 residual = ~idh(Year):Genotype:N:Block,
-                 data = dataset)
-summary(modRef)$varcomp
-predict(modRef, classify = "Year:Genotype:N")
-wald(modRef, denDF = "default")
-wald(modRef)
-# Year                            1.440794e-01 0.1698371353 0.8483387     P 0.0
-# Year:N                          8.202839e-02 0.0843150862 0.9728791     P 0.2
-# YearBlock                       2.229394e-02 0.0142857084 1.5605761     P 0.0
-# Year:Genotype                   4.350839e-07           NA        NA     B 0.0
-# Year:Genotype:N                 9.900392e-02 0.0288300807 3.4340493     P 0.2
-# MainPlot                        1.024186e-02 0.0028331422 3.6150186     P 0.0
-# Year:Genotype:N:Block!R         1.000000e+00           NA        NA     F 0.0
-# Year:Genotype:N:Block!Year_2004 5.324574e-02 0.0114237669 4.6609614     P 0.0
-# Year:Genotype:N:Block!Year_2005 1.424008e-03 0.0003676572 3.8731938     P 0.0
-# Year:Genotype:N:Block!Year_2006 8.636912e-01 0.1513800576 5.7054487     P 0.1
-# Year:Genotype:N:Block!Year_2007 9.009957e-01 0.1560811579 5.7726106     P 0.1
+modAov <- aov(Yield ~ Environment * Sowing * Genotype +
+                Block:Environment +
+                Error(Environment:Block:Sowing),
+               data = dataset)
+summary(modAov)
+
+modAov <- aov(Yield ~ Environment * Genotype * Sowing
+               + allBlocks + Error(allMainPlots),
+               data = dataset)
+summary(modAov)
+
+# Error: Environment:Block:Sowing
+#                    Df Sum Sq Mean Sq F value   Pr(>F)    
+# Environment         5  316.6   63.31 453.052  < 2e-16 ***
+# Sowing              1   56.7   56.66 405.428 8.57e-14 ***
+# Environment:Sowing  5   13.6    2.72  19.452 1.09e-06 ***
+# Environment:Block  18    5.4    0.30   2.156   0.0561 .  
+# Residuals          18    2.5    0.14                     
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# Error: Within
+#                              Df Sum Sq Mean Sq F value   Pr(>F)    
+# Genotype                      5  8.030  1.6060  14.171 1.09e-11 ***
+# Environment:Genotype         25  9.468  0.3787   3.342 1.45e-06 ***
+# Genotype:Sowing               5  5.340  1.0679   9.423 5.39e-08 ***
+# Environment:Genotype:Sowing  25  7.912  0.3165   2.793 4.51e-05 ***
+# Residuals                   180 20.399  0.1133 
+
 ```
 
 
-# Year effect is fixed
 
-If we take the year effect as fixed and the block effect as random, we see that the random effects are nested (blocks within years and main-plots within blocks and within years). The function 'lme()' is specifically tailored to deal with nested random effects and, therefore, fitting the above model is rather easy. In the first snippet we fit a homoscedastic model:
-
-```{r}
-modMix1 <- lme(Yield ~ Year * Genotype * N,
-                 random = ~1|YearBlock/MainPlot,
-                 data = dataset)
-```
-
-We could also fit this model with the 'lme4' package and the 'lmer()'; however, we are not happy with this, because we have seen clear signs of heteroscedastic within-year errors. Thus, let's account for such an heteroscedasticity, by using the 'weights()' argument and the 'varIdent()' variance structure:
-
-```{r}
-modMix2 <- lme(Yield ~ Year * Genotype * N,
-                 random = ~1|YearBlock/MainPlot,
-                 data = dataset,
-               weights = varIdent(form = ~1|Year))
-AIC(modMix1, modMix2)
-```
-
-```{r eval=FALSE, include=FALSE}
-#Analysis is correct
-summary(modRef)$varcomp
-summary(modMix2)$sigma^2
-(coef(modMix2$modelStruct$varStruct, unconstrained = F)*summary(modMix2)$sigma)^2
+```{r message=FALSE, warning=FALSE}
+library(lme4)
+library(lmerTest)
+modMix <- lmer(Yield ~ Environment * Sowing * Genotype +
+               Environment:Block + (1|Environment:Block:Sowing),
+               data = dataset)
+anova(modMix)
 ```
 
 
-Based on the Akaike Information Criterion, we see that the second model is better than the first one, which supports the idea of heteroscedastic residuals. From this moment on, the analyses proceeds as usual, e.g. by testing for fixed effects and comparing means, as necessary. Just a few words about testing for fixed effects: Wald F tests can be obtained by using the 'anova()' function, although I usually avoid this with 'lme' objects, as there is no reliable approximation to degrees of freedom. With 'lme' objects, I suggest using the 'Anova()' function in the 'car' package, which shows the results of Wald chi square tests.  
+Obviously, multiple comparison testing can be done with the 'emmeans' package as we have shown elsewhere. Transforming the environment or block effects into random effects is pretty straightforward, by changing the R notation; please remember that, if you regard the environment as random, all its interactions should also be regarded most often regardes as well as random.
 
+Did I menage to make myself clear? If not, drop me a line to the address below. Happy coding!
 
-```{r}
-Anova(modMix2)
-```
-
-One further aspect: do you prefer fixed blocks? Then you can fit the following model.
-
-```{r}
-modMix4 <- lme(Yield ~ Year * Genotype * N + Year:Block,
-                 random = ~1|MainPlot,
-                 data = dataset,
-               weights = varIdent(form = ~1|Year))
-```
-
-
-# Year effect is random
-
-If we'd rather take the year effect as random, all the interactions therein are random as well (Year:Genotype, Year:N and Year:Genotype:N). Similarly, the block (within years) effect needs to be random. Therefore, we have several crossed random effects, which are not straightforward to code with 'lme()'. First, I will show the code, second, I will comment it. 
-
-```{r eval=FALSE, include=FALSE}
-#Reference analysis with asreml
-library(asreml)
-modRef2 <- asreml(Yield ~ Genotype * N,
-                 random = ~Year + Year:Genotype + Year:N +
-                   Year:Genotype:N + YearBlock + MainPlot,
-                 residual = ~idh(Year):Genotype:N:Block,
-                 data = dataset)
-summary(modRef2)$varcomp
-predict(modRef2, classify = "Year:Genotype:N")
-wald(modRef2, denDF = "default")
-wald(modRef2, ssType = "incremental")
-# Year                            1.440794e-01 0.1698371353 0.8483387     P 0.0
-# Year:N                          8.202839e-02 0.0843150862 0.9728791     P 0.2
-# YearBlock                       2.229394e-02 0.0142857084 1.5605761     P 0.0
-# Year:Genotype                   4.350839e-07           NA        NA     B 0.0
-# Year:Genotype:N                 9.900392e-02 0.0288300807 3.4340493     P 0.2
-# MainPlot                        1.024186e-02 0.0028331422 3.6150186     P 0.0
-# Year:Genotype:N:Block!R         1.000000e+00           NA        NA     F 0.0
-# Year:Genotype:N:Block!Year_2004 5.324574e-02 0.0114237669 4.6609614     P 0.0
-# Year:Genotype:N:Block!Year_2005 1.424008e-03 0.0003676572 3.8731938     P 0.0
-# Year:Genotype:N:Block!Year_2006 8.636912e-01 0.1513800576 5.7054487     P 0.1
-# Year:Genotype:N:Block!Year_2007 9.009957e-01 0.1560811579 5.7726106     P 0.1
-```
-
-
-```{r}
-modMix5 <- lme(Yield ~ Genotype * N,
-                  random = list(Year = pdIdent(~1),
-                                Year = pdIdent(~Block - 1),
-                                Year = pdIdent(~MainPlot - 1),
-                                Year = pdIdent(~Genotype - 1),
-                                Year = pdIdent(~N - 1),
-                                Genotype = pdIdent(~N - 1)),
-                  data=dataset,
-               weights = varIdent(form = ~1|Year))
-```
-
-We see that random effects are coded using a named list; each component of this list is a *pdMat* object with name equal to a grouping factor. For example, the component 'Year = pdIdent(~ 1)' represents a random year effect, while 'Year = pdIdent(~ Block - 1)' represents a random year effect for each level of Block, i.e. a random 'year x block' interaction. This latter variance component is the same for all blocks ('varIdent'), i.e. there is homoscedastic at this level.
-
-It is important to remember that the grouping factors in the list are treated as nested; however, the grouping factor is only one ('Year'), so that the nesting is irrelevant. The only exception is the genotype, which is regarded as nested within the year. As the consequence, the component 'Genotype = pdIdent(~N - 1)', specifies a random year:genotype effect for each level of N treatment, i.e. a random year:genotype:N interaction.
-
-I agree, this is not straightforward to understand! If necessary, take a look at the good book of Gałecki and Burzykowski (2013). When fitting the above model, be patient; convergence may take a few seconds. I'd only like to reinforce the idea that, in case you need to test for fixed effects, you should not rely on the 'anova()' function, but you should prefer Wald chi square tests in the 'Anova()' function in the 'car' package.
-
-```{r}
-Anova(modMix5, type = 2)
-```
-
-Another note: coding random effects as a named list is always possible. For example 'modMix2' can also be coded as:
-
-```{r}
-modMix2b <- lme(Yield ~ Year * Genotype * N,
-                 random = list(YearBlock = ~ 1, MainPlot = ~ 1),
-                 data = dataset,
-               weights = varIdent(form = ~1|Year))
-```
-
-
-Or, also as:
-
-```{r}
-modMix2c <- lme(Yield ~ Year * Genotype * N,
-                 random = list(YearBlock = pdIdent(~ 1), MainPlot = pdIdent(~ 1)),
-                 data = dataset,
-               weights = varIdent(form = ~1|Year))
-```
-
-Hope this is useful! Have fun with it.
 
 ---
 
-Andrea Onofri   
-Department of Agricultural, Food and Environmental Sciences   
-University of Perugia (Italy)   
-andrea.onofri@unipg.it   
+Prof. Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences    
+University of Perugia (Italy)    
+Send comments to: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)
+
+<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow @onofriandreapg</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 
 # References
 
 1. Dixon, P., 2016. Should blocks be fixed or random? Conference on Applied Statistics in Agriculture. https://doi.org/10.4148/2475-7772.1474
-2. Fox J. and Weisberg S. (2011). An {R} Companion to Applied Regression, Second Edition. Thousand Oaks CA: Sage. URL: http://socserv.socsci.mcmaster.ca/jfox/Books/Companion
-3. Gałecki, A., Burzykowski, T., 2013. Linear mixed-effects models using R: a step-by-step approach. Springer, Berlin.
-4. Piepho, H.-P., Büchse, A., Emrich, K., 2003. A Hitchhiker’s Guide to Mixed Models for Randomized Experiments. Journal of Agronomy and Crop Science 189, 310–322.
-5. Pinheiro J, Bates D, DebRoy S, Sarkar D, R Core Team (2018). nlme: Linear and Nonlinear Mixed Effects Models_. R package version 3.1-137, <URL: https://CRAN.R-project.org/package=nlme>.
-6. Hadley Wickham (2011). The Split-Apply-Combine Strategy for Data Analysis. Journal of Statistical Software, 40(1), 1-29. URL: http://www.jstatsoft.org/v40/i01/.
+2. Piepho, H.-P., Büchse, A., Emrich, K., 2003. A Hitchhiker’s Guide to Mixed Models for Randomized Experiments. Journal of Agronomy and Crop Science 189, 310–322.
+3. Stagnari, F., Onofri, A., Jemison, J.J., Monotti, M., 2007. Improved multivariate analyses to discriminate the behaviour of faba bean varieties. Agronomy For Sustainable Development 27, 387–397.
+4. Wickham H, François R, Henry L, Müller K (2022). Dplyr: A Grammar of Data Manipulation. R package version 1.0.9, <https://CRAN.R-project.org/package=dplyr>.

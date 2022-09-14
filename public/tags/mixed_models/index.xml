@@ -5,10 +5,97 @@
     <description>Recent content in mixed_models on The broken bridge between biologists and statisticians</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2018, @AndreaOnofri</copyright>
-    <lastBuildDate>Thu, 21 Jul 2022 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 13 Sep 2022 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://www.statforbiology.com/tags/mixed_models/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Multi-environment split-plot experiments</title>
+      <link>https://www.statforbiology.com/2022/stat_lmm_2-wayssplitrepeated/</link>
+      <pubDate>Tue, 13 Sep 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.statforbiology.com/2022/stat_lmm_2-wayssplitrepeated/</guid>
+      <description>
+
+
+&lt;p&gt;Have you made a split-plot field experiment? Have you repeated such an experiment in two (or more) years/locations? Have you run into troubles, because the reviewer told you that your ANOVA model was invalid? If so, please, stop for awhile and read: this post might help you understand what was wrong with your analyses.&lt;/p&gt;
+&lt;div id=&#34;motivating-example&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Motivating example&lt;/h1&gt;
+&lt;p&gt;Let’s think of a field experiment, where 6 genotypes of faba bean were compared under two different sowing times (autumn and spring). For the ease of organisation, such an experiment was laid down as a &lt;strong&gt;split-plot&lt;/strong&gt;, in a randomised complete block design; sowing times were randomly allocated to main-plots, while genotypes were randomly allocated to sub-plots. Let’s stop for a moment… does this sound strange to you? Do you need further information about split-plot designs? You can get some general information &lt;a href=&#34;https://www.statforbiology.com/_statbookeng/designing-experiments.html#setting-up-a-field-experiment&#34;&gt;at this link&lt;/a&gt; and hints on how to analyse the results at this &lt;a href=&#34;https://www.statforbiology.com/_statbookeng/plots-of-different-sizes.html&#34;&gt;other link&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The above experiment was repeated in three years and two locations (six environments in all), in order to explore the environmental variability of results (we will not make any distinction between years and locations, for the sake of this post). In the end, we recorded crop yield and produced a dataset with 288 record (6 environments by 2 sowing times by 6 genotypes by 4 blocks). If you are interested in more detail about this experiment, you can find them in Stagnari et al., (2007).&lt;/p&gt;
+&lt;p&gt;The resulting dataset (‘fabaBeanSplitMet.csv’) is available in a public online repository and contains six columns, the ‘Location’, the ‘Year’, the ‘Sowing’ time, the ‘Genotype’, the ‘Block’ and the response variable, i.e. the ‘Yield’. After loading the dataset, we need to recode the independent variables into factors and create the new ‘Environment’ factor, as the combination of ‘Year’ and ‘Location’ levels. In the box below, we use the ‘dplyr’ package to accomplish this preliminary step (Wickham et al., 2022).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(tidyverse)
+rm(list=ls())
+fileName &amp;lt;- &amp;quot;https://www.casaonofri.it/_datasets/fabaBeanSplitMet.csv&amp;quot;
+dataset &amp;lt;- read.csv(fileName)
+dataset &amp;lt;- dataset %&amp;gt;% 
+  mutate(across(c(Location, Year, Sowing, Genotype, Block),
+                .fns = factor),
+         Environment = factor(Location:Year))
+head(dataset)
+##   Location      Year Sowing  Genotype Block Yield       Environment
+## 1  papiano 2002-2003 autumn    Chiaro     1  2.05 papiano:2002-2003
+## 2  papiano 2002-2003 autumn    Chiaro     2  2.50 papiano:2002-2003
+## 3  papiano 2002-2003 autumn    Chiaro     3  2.64 papiano:2002-2003
+## 4  papiano 2002-2003 autumn    Chiaro     4  2.45 papiano:2002-2003
+## 5  papiano 2002-2003 autumn Collameno     1  2.01 papiano:2002-2003
+## 6  papiano 2002-2003 autumn Collameno     2  2.19 papiano:2002-2003&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;building-a-valid-model&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Building a valid model&lt;/h1&gt;
+&lt;p&gt;A model is identified by listing all the effects which we need to explain the observed yield. In this case, considering the aims of our experiment, it is pretty easy to grasp the importance of the ‘sowing date’ effect, the ‘genotype’ effect and their interaction. These are the so-called treatment factors and we have no doubt that they should be included in our model. Furthermore, we should also be interested to know whether those treatment effects interact with the environment effect, so we should clearly add to the model the ‘sowing time by environment’, ‘genotype by environment’ and ‘sowing time by genotype by environment’ interactions.&lt;/p&gt;
+&lt;p&gt;At this step, it is possible that we have no specific interest in any other effects, apart from those we have just mentioned; however, if we stop now, our model is still incomplete and, therefore, invalid. Indeed, we should also think about possible grouping factors. You may wonder: what are the grouping factors? This aspect needs particular attention.&lt;/p&gt;
+&lt;p&gt;In split-plot and other very common types of designs, the experimental units are not completely randomised, but they are organised (‘grouped’, indeed) by way of some innate attribute, such as the environment or block or main-plot, which they belong to. These attributes are known as ‘grouping factors (see Piepho et al., 2003) and they introduce a sort of ’parenthood’, so that some observations are more alike than others, because they belong to the same ‘group’ (e.g., same block or same main-plot). If we neglect the effects of ‘grouping factors’, these ‘parenthood’ effects remain in the residuals, which will be correlated. The correlation of residuals represent an important violation of the basic assumptions for linear model fitting and, therefore, the model will be invalid and our paper will be rejected. One first conclusion: &lt;strong&gt;please, do never forget the grouping factors, if you want your paper to be accepted!&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;What are the grouping factors in this case? First of all we have the environments (six levels), then we have the blocks within each environment (24 levels in all) and, finally, we have the main-plots within each block and within each environment (48 levels, in all). In this latter respect, we can see that each main-plot can be uniquely identified by the combination of one environment, one block and one sowing time. Consequently, the final (valid) model is:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Yield ~ Environment + Sowing + Environment:Sowing + Genotype + 
+        Environment:Genotype + Environment:Sowing:Genotype + 
+        Environment:Block + Environment:Block:Sowing&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In R, we can abbreviate as:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Yield ~ Environment * Sowing * Genotype + 
+        Environment:Block + Environment:Block:Sowing&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Sorry, I know I am running the risk of being regarded as a boring professor; but, please, remember: &lt;strong&gt;failing to include any of the above mentioned effects in the model, unless they are clearly non-significant, leads to totally invalid results!&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Now, we need to take a very important decision: which factors are fixed and which factors are random? The rule is that all factors that reference randomisation units (to which treatments are allocated) NEED TO BE RANDOM, while, for the other factors, we can make our own subjective choice. Here, the main-plot factor, to which we allocated the sowing dates, needs to be taken as random. For the other factors, we make the most traditional choice of taking them as fixed, although we need to consider that, in other instances, it might be appropriate to regard the ‘environment’ and ‘block’ effects as random (relating to block effects, you may read Dixon, 2016, for interesting information).&lt;/p&gt;
+&lt;p&gt;If I were to suggest a simple package to fit the above model, I’d say that you should favour the &lt;code&gt;lmer()&lt;/code&gt; function in the &lt;code&gt;lme4&lt;/code&gt; package, where the random effects are coded by using the ‘(1|effect)’ notation, as shown in the box below; before fitting, we load the ‘lme4’ package, together with the ‘lmerTest’ package, which gives us extra-flexibility to produce an ANOVA table:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(lme4)
+library(lmerTest)
+modMix &amp;lt;- lmer(Yield ~ Environment * Sowing * Genotype +
+               Environment:Block + (1|Environment:Block:Sowing),
+               data = dataset)
+anova(modMix)
+## Type III Analysis of Variance Table with Satterthwaite&amp;#39;s method
+##                             Sum Sq Mean Sq NumDF DenDF  F value    Pr(&amp;gt;F)    
+## Environment                 71.084  14.217     5    18 125.4463 2.430e-13 ***
+## Sowing                      45.947  45.947     1    18 405.4282 8.574e-14 ***
+## Genotype                     8.030   1.606     5   180  14.1707 1.091e-11 ***
+## Environment:Sowing          11.022   2.204     5    18  19.4520 1.086e-06 ***
+## Environment:Genotype         9.468   0.379    25   180   3.3418 1.454e-06 ***
+## Sowing:Genotype              5.340   1.068     5   180   9.4231 5.388e-08 ***
+## Environment:Block            4.398   0.244    18    18   2.1560    0.0561 .  
+## Environment:Sowing:Genotype  7.912   0.316    25   180   2.7925 4.513e-05 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Obviously, multiple comparison testing can be done with the ‘emmeans’ package as we have shown elsewhere. Transforming the environment or block effects into random effects is pretty straightforward, by changing the R notation; please remember that, if you regard the environment as random, all its interactions should also be regarded most often regardes as well as random.&lt;/p&gt;
+&lt;p&gt;Did I menage to make myself clear? If not, drop me a line to the address below. Happy coding!&lt;/p&gt;
+&lt;hr /&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Dixon, P., 2016. Should blocks be fixed or random? Conference on Applied Statistics in Agriculture. &lt;a href=&#34;https://doi.org/10.4148/2475-7772.1474&#34; class=&#34;uri&#34;&gt;https://doi.org/10.4148/2475-7772.1474&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Piepho, H.-P., Büchse, A., Emrich, K., 2003. A Hitchhiker’s Guide to Mixed Models for Randomized Experiments. Journal of Agronomy and Crop Science 189, 310–322.&lt;/li&gt;
+&lt;li&gt;Stagnari, F., Onofri, A., Jemison, J.J., Monotti, M., 2007. Improved multivariate analyses to discriminate the behaviour of faba bean varieties. Agronomy For Sustainable Development 27, 387–397.&lt;/li&gt;
+&lt;li&gt;Wickham H, François R, Henry L, Müller K (2022). Dplyr: A Grammar of Data Manipulation. R package version 1.0.9, &lt;a href=&#34;https://CRAN.R-project.org/package=dplyr&#34; class=&#34;uri&#34;&gt;https://CRAN.R-project.org/package=dplyr&lt;/a&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Meta-analysis for a single study. Is it possible?</title>
@@ -1549,10 +1636,10 @@ I-06121 - PERUGIA&lt;/p&gt;
     
     <item>
       <title>Fitting &#39;complex&#39; mixed models with &#39;nlme&#39;: Example #2</title>
-      <link>https://www.statforbiology.com/2019/stat_lmm_2-wayssplitrepeated/</link>
+      <link>https://www.statforbiology.com/2019/stat_lmm_2-wayssplitrepeatedhet/</link>
       <pubDate>Fri, 13 Sep 2019 00:00:00 +0000</pubDate>
       
-      <guid>https://www.statforbiology.com/2019/stat_lmm_2-wayssplitrepeated/</guid>
+      <guid>https://www.statforbiology.com/2019/stat_lmm_2-wayssplitrepeatedhet/</guid>
       <description>
 
 
@@ -1561,12 +1648,13 @@ I-06121 - PERUGIA&lt;/p&gt;
 &lt;p&gt;Let’s imagine a field experiment, where different genotypes of khorasan wheat are to be compared under different nitrogen (N) fertilisation systems. Genotypes require bigger plots, with respect to fertilisation treatments and, therefore, the most convenient choice would be to lay-out the experiment as a split-plot, in a randomised complete block design. Genotypes would be randomly allocated to main plots, while fertilisation systems would be randomly allocated to sub-plots. As usual in agricultural research, the experiment should be repeated in different years, in order to explore the environmental variability of results.&lt;/p&gt;
 &lt;p&gt;What could we expect from such an experiment?&lt;/p&gt;
 &lt;p&gt;Please, look at the dataset ‘kamut.csv’, which is available on github. It provides the results for a split-plot experiment with 15 genotypes and 2 N fertilisation treatments, laid-out in three blocks and repeated in four years (360 observations, in all).&lt;/p&gt;
-&lt;p&gt;The dataset has five columns, the ‘Year’, the ‘Genotype’, the fertilisation level (‘N’), the ‘Block’ and the response variable, i.e. ‘Yield’. The fifteen genotypes are coded by using the letters from A to O, while the levels of the other independent variables are coded by using numbers. The following snippets loads the file and recodes the numerical independent variables into factors.&lt;/p&gt;
+&lt;p&gt;The dataset has five columns, the ‘Year’, the ‘Genotype’, the fertilisation level (‘N’), the ‘Block’ and the response variable, i.e. ‘Yield’. The fifteen genotypes are coded by using the letters from A to O, while the levels of the other independent variables are coded by using numbers. The following snippets loads the file and recodes the numerical independent variables into factors.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rm(list=ls())
-dataset &amp;lt;- read.csv(&amp;quot;https://raw.githubusercontent.com/OnofriAndreaPG/agroBioData/master/kamut.csv&amp;quot;, header = T)
+dataset &amp;lt;- read.csv(&amp;quot;https://www.casaonofri.it/_datasets/kamutHet.csv&amp;quot;)
 dataset$Block &amp;lt;- factor(dataset$Block)
 dataset$Year &amp;lt;- factor(dataset$Year)
 dataset$N &amp;lt;- factor(dataset$N)
+dataset$Genotype &amp;lt;- factor(dataset$Genotype)
 head(dataset)
 ##   Year Genotype N Block Yield
 ## 1 2004        A 1     1 2.235
@@ -1604,7 +1692,7 @@ lmmFits
 &lt;p&gt;First of all, let’s derive a correct mixed model. The treatment model is:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;Yield ~ Genotype * N&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;We have mentioned that the genotype and N effects are likely to be taken as fixed. The block model is:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt; ~ Year + Year/Block + Year:Block:MainPlot + Year:Block:MainPlot:Subplot&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt; ~ Year + Year:Block + Year:Block:MainPlot + Year:Block:MainPlot:Subplot&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The second element in the block model references the blocks within years, the second element references the main-plots, while the third element references the sub-plots and, as before, it is not needed. The year effect is likely to interact with both the treatment effects, so we need to add the following effects:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt; ~ Year + Year:Genotype + Year:N + Year:Genotype:N&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;which is equivalent to writing:&lt;/p&gt;
@@ -1684,10 +1772,12 @@ AIC(modMix1, modMix2)
                weights = varIdent(form = ~1|Year))&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Hope this is useful! Have fun with it.&lt;/p&gt;
 &lt;hr /&gt;
-&lt;p&gt;Andrea Onofri&lt;br /&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
 Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
 University of Perugia (Italy)&lt;br /&gt;
-&lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34; class=&#34;email&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
 &lt;/div&gt;
 &lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;References&lt;/h1&gt;
