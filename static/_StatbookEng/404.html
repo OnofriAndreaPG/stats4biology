@@ -4,20 +4,20 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 6 Making Decisions under uncertainty | Experimental methods in agriculture</title>
-  <meta name="description" content="Chapter 6 Making Decisions under uncertainty | Experimental methods in agriculture: a tutorial book with R" />
+  <title>Page not found | Experimental methods in agriculture</title>
+  <meta name="description" content="Page not found | Experimental methods in agriculture: a tutorial book with R" />
   <meta name="generator" content="bookdown 0.27 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 6 Making Decisions under uncertainty | Experimental methods in agriculture" />
+  <meta property="og:title" content="Page not found | Experimental methods in agriculture" />
   <meta property="og:type" content="book" />
   <meta property="og:image" content="http://www.casaonofri.it/images/coversmall.png" />
-  <meta property="og:description" content="Chapter 6 Making Decisions under uncertainty | Experimental methods in agriculture: a tutorial book with R" />
+  <meta property="og:description" content="Page not found | Experimental methods in agriculture: a tutorial book with R" />
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 6 Making Decisions under uncertainty | Experimental methods in agriculture" />
+  <meta name="twitter:title" content="Page not found | Experimental methods in agriculture" />
   <meta name="twitter:site" content="@onofriandreapg" />
-  <meta name="twitter:description" content="Chapter 6 Making Decisions under uncertainty | Experimental methods in agriculture: a tutorial book with R" />
+  <meta name="twitter:description" content="Page not found | Experimental methods in agriculture: a tutorial book with R" />
   <meta name="twitter:image" content="http://www.casaonofri.it/images/coversmall.png" />
 
 <meta name="author" content="Andrea Onofri and Dario Sacco" />
@@ -29,8 +29,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="estimation-of-model-parameters.html"/>
-<link rel="next" href="one-way-anova-models.html"/>
+
+
 <script src="book_assets/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="book_assets/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -525,258 +525,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="making-decisions-under-uncertainty" class="section level1 hasAnchor" number="6">
-<h1><span class="header-section-number">Chapter 6</span> Making Decisions under uncertainty<a href="making-decisions-under-uncertainty.html#making-decisions-under-uncertainty" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>In Chapter 5 we have seen that experimental errors and, above all, sampling errors, produce uncertainty in the estimation process, which we have to account for by determining and displaying standard errors and confidence intervals. In the very same fashion, we need to be able to make decisions in presence of uncertainty; is the effect of a treatment statistically significant? Is the effect of a treatment higher/lower than the effect of another treatment?</p>
-<p>Making such decisions is called <strong>Formal Hypothesis Testing</strong> (FHT) and we will see that this is mainly based on the so-called <strong>P-value</strong>. As usual, I will introduce the problem by using an example.</p>
-<div id="comparing-sample-means-the-students-t-test" class="section level2 hasAnchor" number="6.1">
-<h2><span class="header-section-number">6.1</span> Comparing sample means: the Student’s t-test<a href="making-decisions-under-uncertainty.html#comparing-sample-means-the-students-t-test" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div id="the-dataset" class="section level3 hasAnchor" number="6.1.1">
-<h3><span class="header-section-number">6.1.1</span> The dataset<a href="making-decisions-under-uncertainty.html#the-dataset" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>We have planned an experiment where we have compared the yield of genotype A with the yield of the genotype P and the experiment is laid down according to a completely randomised design with five replicates. This is a small-plot experiment with 10 plots, which need to be regarded as sampled from a wider population of plots; as we mentioned in the previous chapter, our interest is not in the sample, but it is in the population of plots, which means that we are looking for conclusions of general validity.</p>
-<p>The results (in quintals per hectare) are the following:</p>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="making-decisions-under-uncertainty.html#cb42-1" aria-hidden="true" tabindex="-1"></a>A <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">65</span>, <span class="dv">68</span>, <span class="dv">69</span>, <span class="dv">71</span>, <span class="dv">78</span>)</span>
-<span id="cb42-2"><a href="making-decisions-under-uncertainty.html#cb42-2" aria-hidden="true" tabindex="-1"></a>P <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">80</span>, <span class="dv">81</span>, <span class="dv">84</span>, <span class="dv">88</span>, <span class="dv">94</span>)</span></code></pre></div>
-<p>As usual we calculate the descriptive statistics (mean and standard deviation) for each sample:</p>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="making-decisions-under-uncertainty.html#cb43-1" aria-hidden="true" tabindex="-1"></a>mA <span class="ot">&lt;-</span> <span class="fu">mean</span>(A)</span>
-<span id="cb43-2"><a href="making-decisions-under-uncertainty.html#cb43-2" aria-hidden="true" tabindex="-1"></a>mP <span class="ot">&lt;-</span> <span class="fu">mean</span>(P)</span>
-<span id="cb43-3"><a href="making-decisions-under-uncertainty.html#cb43-3" aria-hidden="true" tabindex="-1"></a>sA <span class="ot">&lt;-</span> <span class="fu">sd</span>(A)</span>
-<span id="cb43-4"><a href="making-decisions-under-uncertainty.html#cb43-4" aria-hidden="true" tabindex="-1"></a>sP <span class="ot">&lt;-</span> <span class="fu">sd</span>(P)</span>
-<span id="cb43-5"><a href="making-decisions-under-uncertainty.html#cb43-5" aria-hidden="true" tabindex="-1"></a>mA; sA</span>
-<span id="cb43-6"><a href="making-decisions-under-uncertainty.html#cb43-6" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 70.2</span></span>
-<span id="cb43-7"><a href="making-decisions-under-uncertainty.html#cb43-7" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 4.868265</span></span>
-<span id="cb43-8"><a href="making-decisions-under-uncertainty.html#cb43-8" aria-hidden="true" tabindex="-1"></a>mP; sP</span>
-<span id="cb43-9"><a href="making-decisions-under-uncertainty.html#cb43-9" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 85.4</span></span>
-<span id="cb43-10"><a href="making-decisions-under-uncertainty.html#cb43-10" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 5.727128</span></span></code></pre></div>
-<p>We see that the mean for the genotype P is higher than the mean for the genotype A, but such descriptive statistics are not sufficient to our aims. Therefore, we calculate standard errors, to express our uncertainty about the population means, as we have shown in the previous chapter.</p>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="making-decisions-under-uncertainty.html#cb44-1" aria-hidden="true" tabindex="-1"></a>seA <span class="ot">&lt;-</span> sA<span class="sc">/</span><span class="fu">sqrt</span>(<span class="dv">5</span>); seA</span>
-<span id="cb44-2"><a href="making-decisions-under-uncertainty.html#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 2.177154</span></span>
-<span id="cb44-3"><a href="making-decisions-under-uncertainty.html#cb44-3" aria-hidden="true" tabindex="-1"></a>seP <span class="ot">&lt;-</span> sP<span class="sc">/</span><span class="fu">sqrt</span>(<span class="dv">5</span>); seP</span>
-<span id="cb44-4"><a href="making-decisions-under-uncertainty.html#cb44-4" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 2.56125</span></span></code></pre></div>
-<p>Consequently, we can produce interval estimates for the population means, i.e., 85.4 <span class="math inline">\(\pm\)</span> 5.12 and 70.2 <span class="math inline">\(\pm\)</span> 4.35. We note that the confidence intervals do not overlap, which supports the idea that P is better than A, but we would like to reach a more formal decision.</p>
-<p>First of all, we can see that the observed difference between <span class="math inline">\(m_A\)</span> and <span class="math inline">\(m_P\)</span> is equal to:</p>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="making-decisions-under-uncertainty.html#cb45-1" aria-hidden="true" tabindex="-1"></a>mA <span class="sc">-</span> mP</span>
-<span id="cb45-2"><a href="making-decisions-under-uncertainty.html#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] -15.2</span></span></code></pre></div>
-<p>However, we are not interested in the above difference, but we are interested in the population difference, i.e. <span class="math inline">\(\mu_A - \mu_P\)</span>. We know that both the means have a certain degree of uncertainty, which propagates to the difference. In the previous chapter, we have seen that the variance of the sum/difference of independent samples is equal to the sum of variances; therefore, the standard error of the difference (SED) is equal to:</p>
-<p><span class="math display">\[SED = \sqrt{ SEM_1^2 + SEM_2^2 }\]</span></p>
-<p>In our example, the SED is:</p>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="making-decisions-under-uncertainty.html#cb46-1" aria-hidden="true" tabindex="-1"></a>SED <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(seA<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> seP<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb46-2"><a href="making-decisions-under-uncertainty.html#cb46-2" aria-hidden="true" tabindex="-1"></a>SED</span>
-<span id="cb46-3"><a href="making-decisions-under-uncertainty.html#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 3.361547</span></span></code></pre></div>
-<p>It is intuitively clear that the difference (in quintals per hectare) should be regarded as significant when it is much higher than its standard error; indeed, this would mean that the difference is stronger than the uncertainty with which we have estimated it. We can formalise such an intuition by defining the <span class="math inline">\(T\)</span> statistic for the sample difference:</p>
-<p><span class="math display">\[T = \frac{m_A - m_P}{SED}\]</span></p>
-<p>which is equal to:</p>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="making-decisions-under-uncertainty.html#cb47-1" aria-hidden="true" tabindex="-1"></a>Ti <span class="ot">&lt;-</span> (mA <span class="sc">-</span> mP)<span class="sc">/</span>SED</span>
-<span id="cb47-2"><a href="making-decisions-under-uncertainty.html#cb47-2" aria-hidden="true" tabindex="-1"></a>Ti</span>
-<span id="cb47-3"><a href="making-decisions-under-uncertainty.html#cb47-3" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] -4.521727</span></span></code></pre></div>
-<p>If T is big, the difference is likely to be significant (not due to random effects); however, <span class="math inline">\(T\)</span> is a sample statistic and it is expected to change whenever we repeat the experiment. How is the sampling distribution for <span class="math inline">\(T\)</span>? To answer this question, we should distinguish two possible hypotheses about the data:</p>
-<ul>
-<li>Hypothesis 1. There is no difference between the two genotypes (<strong>null hypothesis</strong>: <span class="math inline">\(H_0\)</span>) and, consequently, we have only one population and the two samples A and P are extracted from this population.</li>
-<li>Hypothesis 2. The two genotypes are different (<strong>alternative hypothesis</strong>: <span class="math inline">\(H_1\)</span>) and, consequently, the two samples are extracted from two different populations, one for the A genotype and the other one for the P genotype.</li>
-</ul>
-<p>In mathematical terms, the null hypothesis is:</p>
-<p><span class="math display">\[H_0: \mu_1 = \mu_2 = \mu\]</span></p>
-<p>The alternative hypothesis is:</p>
-<p><span class="math display">\[H_1 :\mu_1  \neq \mu_2\]</span></p>
-<p>More complex alternative hypotheses are also possible, such as <span class="math inline">\(H_1 :\mu _1 &gt; \mu _2\)</span>, or <span class="math inline">\(H_1 :\mu _1 &lt; \mu _2\)</span>. However, hypotheses should be set before looking at the data (according to the Galilean principle) and, in this case, we have no prior knowledge to justify the selection of one of such complex hypotheses. Therefore, we select the simple alternative hypothesis.</p>
-<p>Which of the two hypotheses is more reasonable, by considering the observed data? We have seen that, <strong>according to the Popperian falsification principle, experiments should be planned to falsify hypotheses. Therefore, we take the null hypothesis and see whether we can falsify it.</strong></p>
-<p>This is one hint: if the null hypothesis were true, we should observe <span class="math inline">\(T = 0\)</span>, while we have observed <span class="math inline">\(T = -4.521727\)</span>. Is this enough to reject the null? Not at all, obviously. Indeed, the sample means can change from one experiment to the other and it is possible to obtain <span class="math inline">\(T \neq 0\)</span> also when the experimental treatments are, indeed, the same treatment. Therefore, we need to ask ourselves: <strong>what is the sampling distribution for <span class="math inline">\(T\)</span> under the null hypothesis?</strong></p>
-</div>
-<div id="monte-carlo-simulation" class="section level3 hasAnchor" number="6.1.2">
-<h3><span class="header-section-number">6.1.2</span> Monte Carlo simulation<a href="making-decisions-under-uncertainty.html#monte-carlo-simulation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>We can easily build an empirical sampling distribution for <span class="math inline">\(T\)</span> by using Monte Carlo simulation. Look at the code in the box below: we use the <code>for()</code> statement to repeat the experiment 100,000 times. Each experiment consists of getting two samples of five individuals from the same population, with mean and standard deviation equal to the overall mean/standard deviation of the two original samples A and P. For each of the 100,000 couples of samples, we calculate T and store the result in the ‘result’ vector, which, in the end, represents the sampling distribution we were looking for.</p>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="making-decisions-under-uncertainty.html#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We assume a single population</span></span>
-<span id="cb48-2"><a href="making-decisions-under-uncertainty.html#cb48-2" aria-hidden="true" tabindex="-1"></a>mAP <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">c</span>(A, P))</span>
-<span id="cb48-3"><a href="making-decisions-under-uncertainty.html#cb48-3" aria-hidden="true" tabindex="-1"></a>devStAP <span class="ot">&lt;-</span> <span class="fu">sd</span>(<span class="fu">c</span>(A, P))</span>
-<span id="cb48-4"><a href="making-decisions-under-uncertainty.html#cb48-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-5"><a href="making-decisions-under-uncertainty.html#cb48-5" aria-hidden="true" tabindex="-1"></a><span class="co"># we repeatedly sample from this common population</span></span>
-<span id="cb48-6"><a href="making-decisions-under-uncertainty.html#cb48-6" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">34</span>)</span>
-<span id="cb48-7"><a href="making-decisions-under-uncertainty.html#cb48-7" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span>, <span class="dv">100000</span>)</span>
-<span id="cb48-8"><a href="making-decisions-under-uncertainty.html#cb48-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">100000</span>){</span>
-<span id="cb48-9"><a href="making-decisions-under-uncertainty.html#cb48-9" aria-hidden="true" tabindex="-1"></a>  sample1 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">5</span>, mAP, devStAP)</span>
-<span id="cb48-10"><a href="making-decisions-under-uncertainty.html#cb48-10" aria-hidden="true" tabindex="-1"></a>  sample2 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">5</span>, mAP, devStAP)</span>
-<span id="cb48-11"><a href="making-decisions-under-uncertainty.html#cb48-11" aria-hidden="true" tabindex="-1"></a>  SED <span class="ot">&lt;-</span> <span class="fu">sqrt</span>( (<span class="fu">sd</span>(sample1)<span class="sc">/</span><span class="fu">sqrt</span>(<span class="dv">5</span>))<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span></span>
-<span id="cb48-12"><a href="making-decisions-under-uncertainty.html#cb48-12" aria-hidden="true" tabindex="-1"></a>                 (<span class="fu">sd</span>(sample2)<span class="sc">/</span><span class="fu">sqrt</span>(<span class="dv">5</span>))<span class="sc">^</span><span class="dv">2</span> )</span>
-<span id="cb48-13"><a href="making-decisions-under-uncertainty.html#cb48-13" aria-hidden="true" tabindex="-1"></a>  result[i] <span class="ot">&lt;-</span> (<span class="fu">mean</span>(sample1) <span class="sc">-</span> <span class="fu">mean</span>(sample2)) <span class="sc">/</span> SED</span>
-<span id="cb48-14"><a href="making-decisions-under-uncertainty.html#cb48-14" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb48-15"><a href="making-decisions-under-uncertainty.html#cb48-15" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(result) </span>
-<span id="cb48-16"><a href="making-decisions-under-uncertainty.html#cb48-16" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] -0.001230418</span></span>
-<span id="cb48-17"><a href="making-decisions-under-uncertainty.html#cb48-17" aria-hidden="true" tabindex="-1"></a><span class="fu">min</span>(result)</span>
-<span id="cb48-18"><a href="making-decisions-under-uncertainty.html#cb48-18" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] -9.993187</span></span>
-<span id="cb48-19"><a href="making-decisions-under-uncertainty.html#cb48-19" aria-hidden="true" tabindex="-1"></a><span class="fu">max</span>(result)</span>
-<span id="cb48-20"><a href="making-decisions-under-uncertainty.html#cb48-20" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 9.988315</span></span></code></pre></div>
-<p>What values did we obtain for <span class="math inline">\(T\)</span>? On average, the values are close to 0, as we expected, considering that both samples were always obtained from the same population. However, we also note pretty high and low values (close to 10 and -10), which proves that random sampling fluctuations can also bring to very ‘odd’ results. For our real experiment we obtained <span class="math inline">\(T = -4.521727\)</span>, although the negative sign is just an artifact, relating to how we sorted the two means: we could have as well obtained <span class="math inline">\(T = 4.521727\)</span>.</p>
-<p><strong>Ronald Fisher proposed that we should reject the null, based on the probability of obtaining values as extreme or more extreme than those we observed, when the null is true</strong>. Looking at the vector ‘result’ we see that the proportion of values lower than -4.521727 and higher than 4.521727 is <span class="math inline">\(0.00095 + 0.00082 = 0.00177\)</span>. This is the so called <strong>P-value</strong> (see the code below).</p>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="making-decisions-under-uncertainty.html#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(result[result <span class="sc">&lt;</span> Ti]) <span class="sc">/</span> <span class="dv">100000</span></span>
-<span id="cb49-2"><a href="making-decisions-under-uncertainty.html#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 0.00095</span></span>
-<span id="cb49-3"><a href="making-decisions-under-uncertainty.html#cb49-3" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(result[result <span class="sc">&gt;</span> <span class="sc">-</span> Ti]) <span class="sc">/</span><span class="dv">100000</span></span>
-<span id="cb49-4"><a href="making-decisions-under-uncertainty.html#cb49-4" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 0.00082</span></span></code></pre></div>
-<p>Let’s summarise. We have seen that, when the null is true, the sampling distribution for <span class="math inline">\(T\)</span> contains a very low proportion of values outside the interval from -4.521727 to 4.521727. Therefore, our observation fell in a very unlikely range, corresponding to a probability of 0.00177 (P-value = 0.00177); the usual yardstick for decision is 0.05, thus we reject the null. We do so, because, if the null were true, we would have obtained a very unlikely result; in other words, our scientific evidence against the null is strong enough to reject it.</p>
-</div>
-<div id="a-formal-solution" class="section level3 hasAnchor" number="6.1.3">
-<h3><span class="header-section-number">6.1.3</span> A formal solution<a href="making-decisions-under-uncertainty.html#a-formal-solution" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>A new question: is there any formal PDF, which we can use in place of our empirical, Monte-Carlo based sampling distribution for T? Let’s give a closer look at the ‘result’ vector. In particular, we can bin this continuous variable and plot the empirical distribution of frequencies (see Figure <a href="making-decisions-under-uncertainty.html#fig:figName71">6.1</a>)</p>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="making-decisions-under-uncertainty.html#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Sampling distribution per T </span></span>
-<span id="cb50-2"><a href="making-decisions-under-uncertainty.html#cb50-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb50-3"><a href="making-decisions-under-uncertainty.html#cb50-3" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">10</span>, <span class="dv">10</span>, <span class="at">by=</span><span class="fl">0.25</span>)</span>
-<span id="cb50-4"><a href="making-decisions-under-uncertainty.html#cb50-4" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(result, <span class="at">breaks =</span> b, <span class="at">freq=</span>F, </span>
-<span id="cb50-5"><a href="making-decisions-under-uncertainty.html#cb50-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(m)), <span class="at">ylab=</span><span class="st">&quot;Density&quot;</span>, </span>
-<span id="cb50-6"><a href="making-decisions-under-uncertainty.html#cb50-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlim=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">10</span>,<span class="dv">10</span>), <span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="fl">0.45</span>), <span class="at">main=</span><span class="st">&quot;&quot;</span>)</span>
-<span id="cb50-7"><a href="making-decisions-under-uncertainty.html#cb50-7" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dnorm</span>(x), <span class="at">add=</span><span class="cn">TRUE</span>, <span class="at">col=</span><span class="st">&quot;blue&quot;</span>, <span class="at">n =</span> <span class="dv">10001</span>)</span>
-<span id="cb50-8"><a href="making-decisions-under-uncertainty.html#cb50-8" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dt</span>(x, <span class="dv">8</span>), <span class="at">add=</span><span class="cn">TRUE</span>, <span class="at">col=</span><span class="st">&quot;red&quot;</span>, <span class="at">n =</span> <span class="dv">10001</span>)</span></code></pre></div>
-<div class="figure" style="text-align: center"><span style="display:block;" id="fig:figName71"></span>
-<img src="_main_files/figure-html/figName71-1.png" alt="Empirical sampling distribution for the T statistic, compared to a standardised gaussian (blue line) and a Student's t distribution with 8 degree of freedom (red line)" width="85%" />
-<p class="caption">
-Figure 6.1: Empirical sampling distribution for the T statistic, compared to a standardised gaussian (blue line) and a Student’s t distribution with 8 degree of freedom (red line)
-</p>
-</div>
-<p>We see that the empirical distribution is not exactly standardised gaussian, but it can be described by using another type of distribution, that is the Student’s t distribution, with eight degrees of freedom (i.e. the sum of the degrees of freedom for the two samples). Now that we know this, instead of making a time consuming Monte Carlo simulation, we can use the Student’s t CDF to calculate the P-value, as shown in the box below.</p>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="making-decisions-under-uncertainty.html#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pt</span>(Ti, <span class="at">df=</span><span class="dv">8</span>) <span class="co"># probability that T &gt; 4.5217</span></span>
-<span id="cb51-2"><a href="making-decisions-under-uncertainty.html#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 0.0009727349</span></span>
-<span id="cb51-3"><a href="making-decisions-under-uncertainty.html#cb51-3" aria-hidden="true" tabindex="-1"></a><span class="fu">pt</span>(<span class="sc">-</span>Ti, <span class="at">df=</span><span class="dv">8</span>, <span class="at">lower.tail =</span> F) <span class="co"># probability that T &lt; -4.5217</span></span>
-<span id="cb51-4"><a href="making-decisions-under-uncertainty.html#cb51-4" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 0.0009727349</span></span>
-<span id="cb51-5"><a href="making-decisions-under-uncertainty.html#cb51-5" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span> <span class="sc">*</span> <span class="fu">pt</span>(Ti, <span class="at">df=</span><span class="dv">8</span>) <span class="co">#P-value</span></span>
-<span id="cb51-6"><a href="making-decisions-under-uncertainty.html#cb51-6" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 0.00194547</span></span></code></pre></div>
-<p>We see that the P-value is very close to that obtained by using simulation.</p>
-</div>
-<div id="the-t-test-with-r" class="section level3 hasAnchor" number="6.1.4">
-<h3><span class="header-section-number">6.1.4</span> The t test with R<a href="making-decisions-under-uncertainty.html#the-t-test-with-r" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>What we have just described is known as the Student’s t-test and it is often used to compare the means of two samples. The null hypothesis is that the two samples are drawn from the same populations and, therefore, their means are not significantly different. In practice, what we do is:</p>
-<ol style="list-style-type: decimal">
-<li>Calculate the means and standard errors for the two samples</li>
-<li>Calculate the difference between the means</li>
-<li>Calculate the SED</li>
-<li>Calculate the observed <span class="math inline">\(T\)</span> value</li>
-<li>Use the Student’s t CDF to retrieve the probabilities <span class="math inline">\(P(t &lt; -T)\)</span> and <span class="math inline">\(P(t &gt; T)\)</span></li>
-<li>Reject the null hypothesis if the sum of the above probabilities is lower than 0.05.</li>
-</ol>
-<p>More simply, we can reach the same solution by using the <code>t.test()</code> function in R, as shown in the box below.</p>
-<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="making-decisions-under-uncertainty.html#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(A, P, <span class="at">paired =</span> F, <span class="at">var.equal =</span> T)</span>
-<span id="cb52-2"><a href="making-decisions-under-uncertainty.html#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb52-3"><a href="making-decisions-under-uncertainty.html#cb52-3" aria-hidden="true" tabindex="-1"></a><span class="do">##  Two Sample t-test</span></span>
-<span id="cb52-4"><a href="making-decisions-under-uncertainty.html#cb52-4" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb52-5"><a href="making-decisions-under-uncertainty.html#cb52-5" aria-hidden="true" tabindex="-1"></a><span class="do">## data:  A and P</span></span>
-<span id="cb52-6"><a href="making-decisions-under-uncertainty.html#cb52-6" aria-hidden="true" tabindex="-1"></a><span class="do">## t = -4.5217, df = 8, p-value = 0.001945</span></span>
-<span id="cb52-7"><a href="making-decisions-under-uncertainty.html#cb52-7" aria-hidden="true" tabindex="-1"></a><span class="do">## alternative hypothesis: true difference in means is not equal to 0</span></span>
-<span id="cb52-8"><a href="making-decisions-under-uncertainty.html#cb52-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 95 percent confidence interval:</span></span>
-<span id="cb52-9"><a href="making-decisions-under-uncertainty.html#cb52-9" aria-hidden="true" tabindex="-1"></a><span class="do">##  -22.951742  -7.448258</span></span>
-<span id="cb52-10"><a href="making-decisions-under-uncertainty.html#cb52-10" aria-hidden="true" tabindex="-1"></a><span class="do">## sample estimates:</span></span>
-<span id="cb52-11"><a href="making-decisions-under-uncertainty.html#cb52-11" aria-hidden="true" tabindex="-1"></a><span class="do">## mean of x mean of y </span></span>
-<span id="cb52-12"><a href="making-decisions-under-uncertainty.html#cb52-12" aria-hidden="true" tabindex="-1"></a><span class="do">##      70.2      85.4</span></span></code></pre></div>
-<p>Perhaps, it is worth to discuss the meaning of the two arguments ‘paired’ and ‘var.equal’, which were set, respectively, to FALSE and TRUE. In some cases two measures are taken on the same subject and we are interested in knowing whether there is a significant difference between the first and the second measure. For example, let’s imagine that we have given a group of five cows a certain drug and we have measured some blood parameter before and after the treatment. We would have a dataset composed by ten values, but we would only have five subjects, which would make a big difference with respect to our previous example.</p>
-<p>In such a condition we talk about a paired t-test, which is performed by setting the argument ‘paired’ to TRUE, as shown in the box below.</p>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="making-decisions-under-uncertainty.html#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(A, P, <span class="at">paired =</span> T, <span class="at">var.equal =</span> T)</span>
-<span id="cb53-2"><a href="making-decisions-under-uncertainty.html#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb53-3"><a href="making-decisions-under-uncertainty.html#cb53-3" aria-hidden="true" tabindex="-1"></a><span class="do">##  Paired t-test</span></span>
-<span id="cb53-4"><a href="making-decisions-under-uncertainty.html#cb53-4" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb53-5"><a href="making-decisions-under-uncertainty.html#cb53-5" aria-hidden="true" tabindex="-1"></a><span class="do">## data:  A and P</span></span>
-<span id="cb53-6"><a href="making-decisions-under-uncertainty.html#cb53-6" aria-hidden="true" tabindex="-1"></a><span class="do">## t = -22.915, df = 4, p-value = 2.149e-05</span></span>
-<span id="cb53-7"><a href="making-decisions-under-uncertainty.html#cb53-7" aria-hidden="true" tabindex="-1"></a><span class="do">## alternative hypothesis: true mean difference is not equal to 0</span></span>
-<span id="cb53-8"><a href="making-decisions-under-uncertainty.html#cb53-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 95 percent confidence interval:</span></span>
-<span id="cb53-9"><a href="making-decisions-under-uncertainty.html#cb53-9" aria-hidden="true" tabindex="-1"></a><span class="do">##  -17.04169 -13.35831</span></span>
-<span id="cb53-10"><a href="making-decisions-under-uncertainty.html#cb53-10" aria-hidden="true" tabindex="-1"></a><span class="do">## sample estimates:</span></span>
-<span id="cb53-11"><a href="making-decisions-under-uncertainty.html#cb53-11" aria-hidden="true" tabindex="-1"></a><span class="do">## mean difference </span></span>
-<span id="cb53-12"><a href="making-decisions-under-uncertainty.html#cb53-12" aria-hidden="true" tabindex="-1"></a><span class="do">##           -15.2</span></span></code></pre></div>
-<p>The calculations are totally different and, therefore, the significance is, as well, different. In particular, we consider the five pairwise differences, their mean and their standard error, as shown below:</p>
-<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="making-decisions-under-uncertainty.html#cb54-1" aria-hidden="true" tabindex="-1"></a>diff <span class="ot">&lt;-</span> <span class="fu">mean</span>(A <span class="sc">-</span> P)</span>
-<span id="cb54-2"><a href="making-decisions-under-uncertainty.html#cb54-2" aria-hidden="true" tabindex="-1"></a>SED <span class="ot">&lt;-</span> <span class="fu">sd</span>(A <span class="sc">-</span> P)<span class="sc">/</span><span class="fu">sqrt</span>(<span class="dv">5</span>) </span>
-<span id="cb54-3"><a href="making-decisions-under-uncertainty.html#cb54-3" aria-hidden="true" tabindex="-1"></a>diff<span class="sc">/</span>SED</span>
-<span id="cb54-4"><a href="making-decisions-under-uncertainty.html#cb54-4" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] -22.91486</span></span></code></pre></div>
-<p>One further difference is that, as we have five subjects instead of ten, we only have four degrees of freedom.</p>
-<p>In relation to the argument ‘var.equal’, you have perhaps noted that we made our Monte Carlo simulation by drawing samples from one gaussian distribution. However, the two samples might come from two gaussian distributions with the same mean and different standard deviations, which would modify our sampling distribution for <span class="math inline">\(T\)</span>, so that our P-level would become invalid. We talk about <strong>heteroscedasticity</strong> when the populations, and therefore the two samples, have different standard deviations. Otherwise we talk about <strong>homoscedasticity</strong>.</p>
-<p>If we have reasons to suppose that the two samples come from populations with different standard deviations, we should use a heteroscedastic t-test (better known as Welch test). We can set the ‘var.equal’ argument to FALSE, as shown in the box below.</p>
-<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="making-decisions-under-uncertainty.html#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(A, P, <span class="at">paired =</span> F, <span class="at">var.equal =</span> F)</span>
-<span id="cb55-2"><a href="making-decisions-under-uncertainty.html#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb55-3"><a href="making-decisions-under-uncertainty.html#cb55-3" aria-hidden="true" tabindex="-1"></a><span class="do">##  Welch Two Sample t-test</span></span>
-<span id="cb55-4"><a href="making-decisions-under-uncertainty.html#cb55-4" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb55-5"><a href="making-decisions-under-uncertainty.html#cb55-5" aria-hidden="true" tabindex="-1"></a><span class="do">## data:  A and P</span></span>
-<span id="cb55-6"><a href="making-decisions-under-uncertainty.html#cb55-6" aria-hidden="true" tabindex="-1"></a><span class="do">## t = -4.5217, df = 7.7977, p-value = 0.002076</span></span>
-<span id="cb55-7"><a href="making-decisions-under-uncertainty.html#cb55-7" aria-hidden="true" tabindex="-1"></a><span class="do">## alternative hypothesis: true difference in means is not equal to 0</span></span>
-<span id="cb55-8"><a href="making-decisions-under-uncertainty.html#cb55-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 95 percent confidence interval:</span></span>
-<span id="cb55-9"><a href="making-decisions-under-uncertainty.html#cb55-9" aria-hidden="true" tabindex="-1"></a><span class="do">##  -22.986884  -7.413116</span></span>
-<span id="cb55-10"><a href="making-decisions-under-uncertainty.html#cb55-10" aria-hidden="true" tabindex="-1"></a><span class="do">## sample estimates:</span></span>
-<span id="cb55-11"><a href="making-decisions-under-uncertainty.html#cb55-11" aria-hidden="true" tabindex="-1"></a><span class="do">## mean of x mean of y </span></span>
-<span id="cb55-12"><a href="making-decisions-under-uncertainty.html#cb55-12" aria-hidden="true" tabindex="-1"></a><span class="do">##      70.2      85.4</span></span></code></pre></div>
-<p>We see that the test is slightly less powerful (lower P-value), due to a reduced number of degrees of freedom, that is approximated by using the Satterthwaite formula:</p>
-<p><span class="math display">\[DF_s \simeq \frac{ \left( s^2_1 + s^2_2 \right)^2 }{ \frac{(s^2_1)^2}{DF_1} + \frac{(s^2_2)^2}{DF_2} }\]</span></p>
-<p>which reduces to:</p>
-<p><span class="math display">\[DF_s = 2 \times DF\]</span></p>
-<p>when the two samples are homoscedastic (<span class="math inline">\(s_1 = s_2\)</span>).</p>
-<p>in our example:</p>
-<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="making-decisions-under-uncertainty.html#cb56-1" aria-hidden="true" tabindex="-1"></a>dfS <span class="ot">&lt;-</span> (<span class="fu">var</span>(A) <span class="sc">+</span> <span class="fu">var</span>(P))<span class="sc">^</span><span class="dv">2</span> <span class="sc">/</span> </span>
-<span id="cb56-2"><a href="making-decisions-under-uncertainty.html#cb56-2" aria-hidden="true" tabindex="-1"></a>  ((<span class="fu">var</span>(A)<span class="sc">^</span><span class="dv">2</span>)<span class="sc">/</span><span class="dv">4</span> <span class="sc">+</span> (<span class="fu">var</span>(P)<span class="sc">^</span><span class="dv">2</span>)<span class="sc">/</span><span class="dv">4</span>)</span>
-<span id="cb56-3"><a href="making-decisions-under-uncertainty.html#cb56-3" aria-hidden="true" tabindex="-1"></a>dfS</span>
-<span id="cb56-4"><a href="making-decisions-under-uncertainty.html#cb56-4" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 7.79772</span></span></code></pre></div>
-<p>How do we decide whether the two samples have the same standard deviation and thus we can use a homoscedastic t-test? In general, we use a heteroscedastic t-test whenever the standard deviation for one sample is twice or three times as much with respect to the other, although some statisticians suggest that we should better use a heteroscedastic t-test in all cases, in order to increase our protection level against wrong rejections.</p>
-</div>
-</div>
-<div id="comparing-proportions-the-chi2-test" class="section level2 hasAnchor" number="6.2">
-<h2><span class="header-section-number">6.2</span> Comparing proportions: the <span class="math inline">\(\chi^2\)</span> test<a href="making-decisions-under-uncertainty.html#comparing-proportions-the-chi2-test" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>The t-test is very useful, but we can only use it with quantitative variables. What if we have a nominal response, e.g. death/alive, germinated/ungerminated? Let’s imagine an experiment where we have sprayed two populations of insects with an insecticide, respectively with or without an adjuvant. From one population (with adjuvant), we get a random sample of 75 insects and record 56 deaths, while from the other population (without adjuvant) we get a random sample of 50 insects and record 48 deaths.</p>
-<p>In this case the sample efficacies are <span class="math inline">\(p_1 = 56/75 = 0.747\)</span> and <span class="math inline">\(p_2 = 0.96\)</span>, but we are not interested in the samples, but in the whole populations, from where we sampled our insects.</p>
-<p>If we remember Chapter 3, we may recall that the results of such an experiment reduce to a contingency table, as shown in the box below:</p>
-<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="making-decisions-under-uncertainty.html#cb57-1" aria-hidden="true" tabindex="-1"></a>counts <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">56</span>, <span class="dv">19</span>, <span class="dv">48</span>, <span class="dv">2</span>)</span>
-<span id="cb57-2"><a href="making-decisions-under-uncertainty.html#cb57-2" aria-hidden="true" tabindex="-1"></a>tab <span class="ot">&lt;-</span> <span class="fu">matrix</span>(counts, <span class="dv">2</span>, <span class="dv">2</span>, <span class="at">byrow =</span> T)</span>
-<span id="cb57-3"><a href="making-decisions-under-uncertainty.html#cb57-3" aria-hidden="true" tabindex="-1"></a><span class="fu">row.names</span>(tab) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;I&quot;</span>, <span class="st">&quot;IA&quot;</span>)</span>
-<span id="cb57-4"><a href="making-decisions-under-uncertainty.html#cb57-4" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(tab) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;D&quot;</span>, <span class="st">&quot;A&quot;</span>)</span>
-<span id="cb57-5"><a href="making-decisions-under-uncertainty.html#cb57-5" aria-hidden="true" tabindex="-1"></a>tab <span class="ot">&lt;-</span> <span class="fu">as.table</span>(tab)</span>
-<span id="cb57-6"><a href="making-decisions-under-uncertainty.html#cb57-6" aria-hidden="true" tabindex="-1"></a>tab</span>
-<span id="cb57-7"><a href="making-decisions-under-uncertainty.html#cb57-7" aria-hidden="true" tabindex="-1"></a><span class="do">##     D  A</span></span>
-<span id="cb57-8"><a href="making-decisions-under-uncertainty.html#cb57-8" aria-hidden="true" tabindex="-1"></a><span class="do">## I  56 19</span></span>
-<span id="cb57-9"><a href="making-decisions-under-uncertainty.html#cb57-9" aria-hidden="true" tabindex="-1"></a><span class="do">## IA 48  2</span></span></code></pre></div>
-<p>For such a table, we already know how to calculate a <span class="math inline">\(\chi^2\)</span>, which measures the dependency among the two traits (insecticide treatment and deaths); the observed value, for our sample, is 9.768 (see below).</p>
-<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="making-decisions-under-uncertainty.html#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(tab)</span>
-<span id="cb58-2"><a href="making-decisions-under-uncertainty.html#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Number of cases in table: 125 </span></span>
-<span id="cb58-3"><a href="making-decisions-under-uncertainty.html#cb58-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Number of factors: 2 </span></span>
-<span id="cb58-4"><a href="making-decisions-under-uncertainty.html#cb58-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Test for independence of all factors:</span></span>
-<span id="cb58-5"><a href="making-decisions-under-uncertainty.html#cb58-5" aria-hidden="true" tabindex="-1"></a><span class="do">##  Chisq = 9.768, df = 1, p-value = 0.001776</span></span></code></pre></div>
-<p>Clearly, like any other sample based statistic, the value of <span class="math inline">\(\chi^2\)</span> changes any time we repeat the sampling effort. Therefore, the null hypothesis is:</p>
-<p><span class="math display">\[H_o :\pi_1  = \pi_2  = \pi\]</span></p>
-<p>Please, note that we make a reference to the populations, not to the samples. If this is true, what is the sampling distribution for <span class="math inline">\(\chi^2\)</span>? And, what is the probability of obtaining a value of 9.768, or higher?</p>
-<p>Although it is possible to set up a Monte Carlo simulation to derive an empirical distribution, we will not do so, for the sake of brevity. We anticipate that the sampling distribution for <span class="math inline">\(\chi^2\)</span> can be described by using the <span class="math inline">\(\chi^2\)</span> density function, with the appropriate number of degrees of freedom (the minimum between the number of columns and the number of rows, minus 1). In our case, we have only one degree of freedom and we can use the cumulative <span class="math inline">\(\chi^2\)</span> distribution function to derive the probability of obtaining a value of 9.768, or higher:</p>
-<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="making-decisions-under-uncertainty.html#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pchisq</span>(<span class="fl">9.76801</span>, <span class="dv">1</span>, <span class="at">lower.tail=</span>F)</span>
-<span id="cb59-2"><a href="making-decisions-under-uncertainty.html#cb59-2" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 0.001775746</span></span></code></pre></div>
-<p>The P-value is much lower than 0.05 and thus we can reject the null. We can get to the same result by using the <code>chisq.test()</code> function:</p>
-<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="making-decisions-under-uncertainty.html#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">chisq.test</span>(tab, <span class="at">correct =</span> F)</span>
-<span id="cb60-2"><a href="making-decisions-under-uncertainty.html#cb60-2" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb60-3"><a href="making-decisions-under-uncertainty.html#cb60-3" aria-hidden="true" tabindex="-1"></a><span class="do">##  Pearson&#39;s Chi-squared test</span></span>
-<span id="cb60-4"><a href="making-decisions-under-uncertainty.html#cb60-4" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb60-5"><a href="making-decisions-under-uncertainty.html#cb60-5" aria-hidden="true" tabindex="-1"></a><span class="do">## data:  tab</span></span>
-<span id="cb60-6"><a href="making-decisions-under-uncertainty.html#cb60-6" aria-hidden="true" tabindex="-1"></a><span class="do">## X-squared = 9.768, df = 1, p-value = 0.001776</span></span></code></pre></div>
-<p>Please, note the argument ‘correct = F’. A chi-square test is appropriate only when the number of subjects is high enough, e.g. higher than 30 subjects, or so. If not, we should improve our result by applying the so-called continuity correction, by using the argument ‘correct = T’, that is the default option in R.</p>
-</div>
-<div id="correct-interpretation-of-the-p-value" class="section level2 hasAnchor" number="6.3">
-<h2><span class="header-section-number">6.3</span> Correct interpretation of the P-value<a href="making-decisions-under-uncertainty.html#correct-interpretation-of-the-p-value" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>We use the P-value as the tool to decide whether we should accept or reject the null, i.e. we use it as an heuristic tool, which was exactly Ronald Fisher’s original intention. Later work by Jarzy Neyman and Egon Pearson, around 1930, gave the P-value a slightly different meaning, i.e. the probability of wrongly rejecting the null (so-called type I error rate: false positive). However, we should interpret such a probability with reference to the sampling distribution, not with reference to a single experiment. It means that we can say that: <em>if the null is true and we repeat the experiment an infinite number of times, we have less than 5% probability of obtaining such a high T or <span class="math inline">\(\chi^2\)</span> value</em>. On the other hand, we cannot legitimately conclude our experiment by saying that: <em>there is less then 5% probability that we have reached wrong conclusions</em>. Indeed, we do not (and will never) know whether we have reached correct conclusions in our specific experiment, while our ‘false-positive’ probability is only valid on the long run.</p>
-</div>
-<div id="conclusions-3" class="section level2 hasAnchor" number="6.4">
-<h2><span class="header-section-number">6.4</span> Conclusions<a href="making-decisions-under-uncertainty.html#conclusions-3" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>The intrinsic uncertainty in all experimental data does not allow us to reach conclusions and make decisions with no risk of error. As our aim is to reject hypotheses, we protect ourself as much as possible against the possibility of wrong rejection. To this aim, we use the P-value for the null hypothesis: if this is lower than the predefined yardstick level (usually <span class="math inline">\(\alpha = 0.05\)</span>) we reject the null and we can be confident that such an heuristic, in the long run, will result in less than 5% of wrong rejections.</p>
-<p>Before concluding, we should point out that we do not only run the risk of committing a false-positive error (type I error), we also run the risk of committing a false negative error (type II error), whenever we fail to reject a false null hypothesis. These two type of errors are nicely put in Figure <a href="making-decisions-under-uncertainty.html#fig:figName72">6.2</a>, that is commonly available in the web.</p>
-<div class="figure" style="text-align: center"><span style="display:block;" id="fig:figName72"></span>
-<img src="_images/statisticalErrors.jpeg" alt="The two types of statistical errors" width="85%" />
-<p class="caption">
-Figure 6.2: The two types of statistical errors
-</p>
-</div>
-<p>Please, also note that the two error types are interrelated and the highest the protection against the false-positive error, the highest the risk of committing a false negative error. In general, we should be always careful to decide which of the two errors might be more dangerous for our specific aim.</p>
-<hr />
-</div>
-<div id="further-readings-4" class="section level2 hasAnchor" number="6.5">
-<h2><span class="header-section-number">6.5</span> Further readings<a href="making-decisions-under-uncertainty.html#further-readings-4" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<ol style="list-style-type: decimal">
-<li>Hastie, T., Tibshirani, R., Friedman, J., 2009. The elements of statistical learning, Springer Series in Statistics. Springer Science + Business Media, California, USA.</li>
-</ol>
-
-</div>
+<div id="page-not-found" class="section level1">
+<h1>Page not found</h1>
+<p>The page you requested cannot be found (perhaps it was moved or renamed).</p>
+<p>You may want to try searching to find the page's new location, or use
+the table of contents to find the page you are looking for.</p>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="estimation-of-model-parameters.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="one-way-anova-models.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+
+
     </div>
   </div>
 <script src="book_assets/gitbook-2.6.7/js/app.min.js"></script>

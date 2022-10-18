@@ -1,7 +1,7 @@
 ---
 title: "Experimental methods in agriculture"
 author: "Andrea Onofri and Dario Sacco"
-date: "Update: v. 0.99 (2021-12-01), compil. 2021-12-22"
+date: "Update: v. 0.99 (2021-12-01), compil. 2022-10-18"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -2167,12 +2167,12 @@ t.test(A, P, paired = T, var.equal = T)
 ## 
 ## data:  A and P
 ## t = -22.915, df = 4, p-value = 2.149e-05
-## alternative hypothesis: true difference in means is not equal to 0
+## alternative hypothesis: true mean difference is not equal to 0
 ## 95 percent confidence interval:
 ##  -17.04169 -13.35831
 ## sample estimates:
-## mean of the differences 
-##                   -15.2
+## mean difference 
+##           -15.2
 ```
 
 The calculations are totally different and, therefore, the significance is, as well, different. In particular, we consider the five pairwise differences, their mean and their standard error, as shown below:
@@ -3439,10 +3439,10 @@ contrast(treat.means, method = K, adjust="none")
 ##  c(0, -1, 1, 0)                                               
 ##  c(1, -1, 0, 0)                                               
 ##  estimate   SE df t.ratio p.value
-##    -16.39 2.26 12 -7.244  <.0001 
-##      7.89 2.40 12  3.289  0.0065 
-##     11.73 2.77 12  4.235  0.0012 
-##      4.05 2.77 12  1.461  0.1697
+##    -16.39 2.26 12  -7.244  <.0001
+##      7.89 2.40 12   3.289  0.0065
+##     11.73 2.77 12   4.235  0.0012
+##      4.05 2.77 12   1.461  0.1697
 ```
 
 \normalsize
@@ -3467,19 +3467,19 @@ The first situation implies a very high number of contrasts that is equal to $k 
 # Pairwise contrasts
 contrast(treat.means, adjust="none", method="pairwise")
 ##  contrast                         estimate   SE df t.ratio
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461 
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774 
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352 
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235 
-##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813 
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578 
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578
 ##  p.value
-##  0.1697 
-##  0.0168 
-##  <.0001 
-##  0.0012 
-##  <.0001 
-##  0.0038
+##   0.1697
+##   0.0168
+##   <.0001
+##   0.0012
+##   <.0001
+##   0.0038
 ```
 \normalsize
 
@@ -3492,13 +3492,13 @@ The second situation implies a lower number of contrasts and we can set the 'met
 # Dunnett contrasts
 contrast(treat.means, adjust="none", method="dunnett", ref = 2)
 ##  contrast                      estimate   SE df t.ratio
-##  Metribuzin__348 - Mixture_378     4.05 2.77 12 1.461  
-##  Rimsulfuron_30 - Mixture_378     11.73 2.77 12 4.235  
-##  Unweeded - Mixture_378           21.64 2.77 12 7.813  
+##  Metribuzin__348 - Mixture_378     4.05 2.77 12   1.461
+##  Rimsulfuron_30 - Mixture_378     11.73 2.77 12   4.235
+##  Unweeded - Mixture_378           21.64 2.77 12   7.813
 ##  p.value
-##  0.1697 
-##  0.0012 
-##  <.0001
+##   0.1697
+##   0.0012
+##   <.0001
 ```
 \normalsize
 
@@ -3547,7 +3547,7 @@ multcomp::cld(treat.means, adjust="none", Letters=LETTERS)
 ## 
 ## Confidence level used: 0.95 
 ## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays are a misleading way to display comparisons
+## NOTE: Compact letter displays can be misleading
 ##       because they show NON-findings rather than findings.
 ##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 ```
@@ -3594,19 +3594,19 @@ Pf
 # With R
 contrast(treat.means, method = "pairwise", adjust = "sidak")
 ##  contrast                         estimate   SE df t.ratio
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461 
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774 
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352 
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235 
-##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813 
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578 
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578
 ##  p.value
-##  0.6723 
-##  0.0968 
-##  0.0002 
-##  0.0069 
-##  <.0001 
-##  0.0226 
+##   0.6723
+##   0.0968
+##   0.0002
+##   0.0069
+##   <.0001
+##   0.0226
 ## 
 ## P value adjustment: sidak method for 6 tests
 ```
@@ -3625,19 +3625,19 @@ Pc * 6
 ## [5] 2.869792e-05 2.276671e-02
 contrast(treat.means, method = "pairwise", adjust = "bonferroni")
 ##  contrast                         estimate   SE df t.ratio
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461 
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774 
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352 
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235 
-##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813 
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578 
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578
 ##  p.value
-##  1.0000 
-##  0.1010 
-##  0.0002 
-##  0.0069 
-##  <.0001 
-##  0.0228 
+##   1.0000
+##   0.1010
+##   0.0002
+##   0.0069
+##   <.0001
+##   0.0228
 ## 
 ## P value adjustment: bonferroni method for 6 tests
 ```
@@ -3652,30 +3652,30 @@ In recent times, a group of American scientists has found the way of accounting 
 ```r
 contrast(treat.means, method="pairwise")
 ##  contrast                         estimate   SE df t.ratio
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461 
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774 
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352 
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235 
-##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813 
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578 
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578
 ##  p.value
-##  0.4885 
-##  0.0698 
-##  0.0002 
-##  0.0055 
-##  <.0001 
-##  0.0173 
+##   0.4885
+##   0.0698
+##   0.0002
+##   0.0055
+##   <.0001
+##   0.0173
 ## 
 ## P value adjustment: tukey method for comparing a family of 4 estimates
 contrast(treat.means, method="dunnett")
 ##  contrast                         estimate   SE df t.ratio
-##  Mixture_378 - Metribuzin__348       -4.05 2.77 12 -1.461 
-##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12  2.774 
-##  Unweeded - Metribuzin__348          17.60 2.77 12  6.352 
+##  Mixture_378 - Metribuzin__348       -4.05 2.77 12  -1.461
+##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12   2.774
+##  Unweeded - Metribuzin__348          17.60 2.77 12   6.352
 ##  p.value
-##  0.3711 
-##  0.0442 
-##  0.0001 
+##   0.3711
+##   0.0442
+##   0.0001
 ## 
 ## P value adjustment: dunnettx method for 3 tests
 ```
@@ -3724,7 +3724,7 @@ Getting the back-trasfomed means for all treatments is easy, by using the `emmea
 
 
 ```r
-retroMedie <- emmeans(modt, ~Insecticide, transform = "response")
+retroMedie <- emmeans(modt, ~Insecticide, regrid = "response")
 retroMedie
 ##  Insecticide response     SE df lower.CL upper.CL
 ##  T1             568.6 101.01 12    348.5      789
@@ -4113,7 +4113,7 @@ multcomp::cld(medie, Letters = LETTERS, reverse = T)
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 8 estimates 
 ## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays are a misleading way to display comparisons
+## NOTE: Compact letter displays can be misleading
 ##       because they show NON-findings rather than findings.
 ##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 ```
@@ -4620,7 +4620,7 @@ multcomp::cld(GNmeans, Letters=LETTERS)
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 10 estimates 
 ## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays are a misleading way to display comparisons
+## NOTE: Compact letter displays can be misleading
 ##       because they show NON-findings rather than findings.
 ##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 ```
@@ -4652,7 +4652,7 @@ multcomp::cld(GNmeans2, Letters=LETTERS)
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 5 estimates 
 ## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays are a misleading way to display comparisons
+## NOTE: Compact letter displays can be misleading
 ##       because they show NON-findings rather than findings.
 ##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 ```
@@ -4778,7 +4778,7 @@ multcomp::cld(mfMeans, Letters = LETTERS)
 ## Results are averaged over some or all of the levels of: Block 
 ## P value adjustment: tukey method for comparing a family of 9 estimates 
 ## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays are a misleading way to display comparisons
+## NOTE: Compact letter displays can be misleading
 ##       because they show NON-findings rather than findings.
 ##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 ```
@@ -4796,248 +4796,6 @@ Before concluding, we need to point out that, for a plant breeder, most often th
 
 
 <!--chapter:end:11-Eng_AnovaDueLivelli.Rmd-->
-
-# Plots of different sizes
-
-Factorial experiments are not only laid down with completely randomised designs or in complete blocks. In chapter 2, we have already introduced split-plot or strip-plot designs, where treatment levels are allocated to the experimental units in groups. We have seen that this is advantageous in some circumstances, e.g., when one of the factors is better allocated to bigger plots, compared to the other factors. When factor levels are allocated to groups of individuals, the independency of residuals is broken, as the individuals within the group are more alike than the individuals in different groups. For example, let's consider a field experiment: if one group of plots is, e.g., more fertile than the other groups, all plots within that group will share such a positive effect and, therefore, their yields will be correlated. In this case, we talk about **intra-class correlation**, that is a similar concept to the Pearson correlation, which we have encountered in Chapter 3.
-
-In order to respect the basic assumption of independent residuals, data from  split-plot and strip-plot experiments cannot be analysed by using the methods proposed in Chapter 11 (multi-way ANOVA models), but they require a different approach.
-
-
-## Example 1: a split-plot experiment
-
-In chapter 2, we presented an experiment to compare three types of tillage (minimum tillage = MIN; shallow ploughing = SP; deep ploughing = DP) and two types of chemical weed control methods (broadcast = TOT; in-furrow = PART). This experiment was designed in four complete blocks with three main-plots per block, split into two sub-plots per main-plot; the three types of tillage were randomly allocated to the main-plots, while the two weed control treatments were randomly allocated to sub-plots (see Figure \@ref(fig:figName38)).
-
-The results of this experiment are reported in the 'beet.csv' file, that is available in the online repository. In the following box we load the file and transform the explanatory variables into factors.
-
-
-```r
-dataset <- read.csv("https://www.casaonofri.it/_datasets/beet.csv", header=T)
-dataset$Tillage <- factor(dataset$Tillage)
-dataset$WeedControl <- factor(dataset$WeedControl)
-dataset$Block <- factor(dataset$Block)
-head(dataset)
-##   Tillage WeedControl Block  Yield
-## 1     MIN         TOT     1 11.614
-## 2     MIN         TOT     2  9.283
-## 3     MIN         TOT     3  7.019
-## 4     MIN         TOT     4  8.015
-## 5     MIN        PART     1  5.117
-## 6     MIN        PART     2  4.306
-```
-
-
-By looking at the map in Figure \@ref(fig:figName38), it is easy to see that there are two types of constraints to randomisation:
-
-1. each replicate of the six combinations was allocated to each block
-2. the two weed control methods were allocated to each main plot
-
-As the consequence, apart from treatment factors, we have two blocking factors, i.e. the blocks and the main-plots within each block; Both this blocking factors should be included in the model, in order to ensure the independence of residuals.
-
-### Model definition
-
-Considering the above comments, a linear model for a two-way split-plot experiment is:
-
-$$Y_{ijk} = \mu + \gamma_k + \alpha_i + \theta_{ik} + \beta_j + \alpha\beta_{ij} + \varepsilon_{ijk}$$
-
-where $\gamma$ is the effect of the $k$^th^ block, $\alpha$ is the effect of the $i$^th^ tillage, $\beta$ is the effect of $j$^th^ weed control method, $\alpha\beta$ is the interaction between the $i$^th^ tillage method and $j$^th^  weed control method. Apart from these effects, which are totally the same as those used in Chapter 11, we also include the main-plot effect $\theta$, where we use the $i$ and $k$ subscripts, as each main-plot is uniquely identified by the block to which it belongs and by the tillage method with which it was treated (see Figure \@ref(fig:figName38)). Obviously, the main plots can be labelled in any other way, as long as each one is uniquely identified.
-
-Now, let's concentrate on the main-plots and forget the sub-plots for awhile; we see that the split-plot design in Figure \@ref(fig:figName38), without considering the sub-plots, is totally similar to a Randomised Complete Block Design. Consequently, the differences between main-plots treated alike (same tillage method), once the block effect has been removed, are only due to random factors, as there is no other known systematic source of variability. Furthermore, the levels of the tillage factor were independently allocated to main-plots, which, therefore, represent true-replicates for this factor. For these reasons, we say that the **main-plot effect is random**.
-
-Apart from the main-plot effect, the differences between sub-plots treated alike (same 'tillage by weed control method' combination) are only due to random effects (unknown sources of variability); therefore, **the sub-plot effect is also random**.
-
-In the end, in split-plot designs we have two random effects: $\theta$ (main-plot effect) and $\varepsilon$ (sub-plot effect), which are assumed as gaussian, with means equal to 0 and standard deviations equal to, respectively, $\sigma_{\theta}$ and $\sigma$. Models with more than one random effect are named **mixed models** and, consequently, data from split-plot designs need to be modelled by using a mixed model.
-
-The platform of mixed models is very important and, for a number of reasons, it is conceptually very different from the usual platform of fixed effects models. We do not intend to introduce mixed models in this book, but we thought that it might be appropriate to show how to fit split-plot (and strip-plot) models and how to interpret the resulting R output. Indeed, split-plot (and strip-plot) experiments are rather common in agriculture and plant breeding.
-
-
-### Model fitting with R
-
-First of all, we need to build a new variable to uniquely identify the main plots. We can do this by using numeric coding, or, more easily, by creating a new factor that combines the levels of block and tillage; we have already anticipated that each main plot is uniquely identified by the block and the tillage method.
-
-
-```r
-dataset$mainPlot <- with(dataset, factor(Block:Tillage))
-```
-
-Due to the presence of two random effects, we cannot use the `lm()` function for model fitting, which is only able to accomodate one residual random term. In R, there are several mixed model fitting function; in this book, we propose the use of the `lmer()` function, which requires two additional packages, i.e. 'lme4' and 'lmerTest', which we need to install,  unless we have already done so. These two packages need to be loaded in the environment before model fitting.
-
-The syntax of the `lmer()` function is rather similar to that of the `lm()` function, although the random main-plot effect is entered by using the '1|' operator and it is put in brackets, in order to better mark the difference with fixed effects. See the box below for the exact coding.
-
-
-```r
-# install.packages("lme4")  #only at first time
-# install.packages("lmerTest")  #only at first time
-library(lme4)
-library(lmerTest)
-mod.split <- lmer(Yield ~ Block + Tillage * WeedControl +
-                  (1|mainPlot), data=dataset)
-```
-
-
-As usual, the second step is based on the inspection of model residuals. The `plot()` method applied to the 'lmer' object only returns the graph of residuals against fitted values (Figure \@ref(fig:figName141b)), while there is no quick way to obtain a QQ-plot. Therefore, we use the Shapiro-Wilks test for normality, as shown in Chapter 8.
-
-
-```r
-shapiro.test(residuals(mod.split))
-## 
-## 	Shapiro-Wilk normality test
-## 
-## data:  residuals(mod.split)
-## W = 0.93838, p-value = 0.1501
-```
-
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName141b-1.png" alt="Graphical analyses of residuals for a split-plot ANOVA model" width="90%" />
-<p class="caption">(\#fig:figName141b)Graphical analyses of residuals for a split-plot ANOVA model</p>
-</div>
-
-After having made sure that the basic assumptions for linear models hold, we can proceed to variance partitioning. In this case, we use the `anova()` method for a mixed model object, which gives a slightly different output than the `anova()` method for a linear model object. As the second argument, it is necessary to indicate the method we want to use to estimate the degrees of freedom, which, in mixed models, are not as easy to calculate as in linear models.
-
-
-```r
-anova(mod.split, ddf="Kenward-Roger")
-## Type III Analysis of Variance Table with Kenward-Roger's method
-##                      Sum Sq Mean Sq NumDF DenDF F value
-## Block                3.6596  1.2199     3     6  0.6521
-## Tillage             23.6565 11.8282     2     6  6.3228
-## WeedControl          3.3205  3.3205     1     9  1.7750
-## Tillage:WeedControl 19.4641  9.7321     2     9  5.2023
-##                      Pr(>F)  
-## Block               0.61016  
-## Tillage             0.03332 *
-## WeedControl         0.21552  
-## Tillage:WeedControl 0.03152 *
-## ---
-## Signif. codes:  
-## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-```
-
-
-From the above table we see that the 'tillage by weed control method' interaction is significant and, therefore, we show the means for the corresponding combinations of experimental factors. As in previous chapters, we use the `emmeans()` function.
-
-
-
-```r
-library(emmeans)
-meansAB <- emmeans(mod.split, ~Tillage:WeedControl)
-multcomp::cld(meansAB, Letters = LETTERS)
-##  Tillage WeedControl emmean    SE   df lower.CL upper.CL
-##  MIN     PART          6.00 0.684 14.4     4.53     7.46
-##  SP      PART          8.48 0.684 14.4     7.01     9.94
-##  MIN     TOT           8.98 0.684 14.4     7.52    10.45
-##  SP      TOT           9.14 0.684 14.4     7.68    10.60
-##  DP      TOT           9.21 0.684 14.4     7.74    10.67
-##  DP      PART         10.63 0.684 14.4     9.17    12.09
-##  .group
-##   A    
-##   AB   
-##   AB   
-##   AB   
-##    B   
-##    B   
-## 
-## Results are averaged over the levels of: Block 
-## Degrees-of-freedom method: kenward-roger 
-## Confidence level used: 0.95 
-## P value adjustment: tukey method for comparing a family of 6 estimates 
-## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays are a misleading way to display comparisons
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
-```
-
-We see that we should avoid controlling the weeds only along the crop rows, if we have not plowed the soil, at least to a shallow depth.
-
-
-## Example 2: a strip-plot design
-
-In Chapter 2 we have also seen another possible arrangement of plots, relating to an experiment where three crops (sugarbeet, rape and soybean) were sown 40 days after an herbicide treatment. The aim was to assess possible phytotoxicity effects relating to an excessive persistence of herbicide residues in soil and the untreated control was added for the sake of comparison. 
-
-Figure \@ref(fig:figName39) shows that each block was organised with three rows and two columns: the three crops were sown along the rows and the two herbicide treatments (rimsulfuron and the untreated control) were allocated along the columns. In this design, the observations are clustered in three groups:
-
-1. the blocks
-2. the rows within each block (three rows per block)
-3. the columns within each block (two columns per block)
-
-Analogously to the split-plot design, the rows represent the main plots for the crop factor, while the columns represent the main-plots for the herbicide factor. Both these grouping factors must be referenced as random effects in the model. The combinations between crops and herbicide treatments are allocated to the sub-plots, resulting from crossing the rows with the columns.
-
-The dataset for this experiment, with four replicates, is available in the 'recropS.csv' file, that can be loaded from the usual repository. After loading, we transform all explanatory variables into factors. Furthermore, we create the definition of rows and columns, by considering that each row is uniquely defined by a specific block and crop and each column is uniquely defined by a specific herbicide and block.
-
-
-```r
-rm(list=ls())
-dataset <- read.csv("https://www.casaonofri.it/_datasets/recropS.csv")
-head(dataset)
-##     Herbicide     Crop Block CropBiomass
-## 1       Check soyabean     1    199.0831
-## 2       Check soyabean     2    257.3081
-## 3       Check soyabean     3    345.5538
-## 4       Check soyabean     4    210.8574
-## 5 rimsulfuron soyabean     1    225.5651
-## 6 rimsulfuron soyabean     2    195.3952
-dataset$Herbicide <- factor(dataset$Herbicide)
-dataset$Crop <- factor(dataset$Crop)
-dataset$Block <- factor(dataset$Block)
-dataset$Rows <- factor(dataset$Crop:dataset$Block)
-dataset$Columns <- factor(dataset$Herbicide:dataset$Block)
-```
-
-
-### Model definition
-
-A good candidate model is:
-
-$$Y_{ijk} = \mu + \gamma_k + \alpha_i + \theta_{ik} + \beta_j + \zeta_{jk} + \alpha\beta_{ij} + \varepsilon_{ijk}$$
-
-where $\mu$ is the intercept, $\gamma_k$ are the block effects, $\alpha_i$ are the crop effects $\theta_ik$ are the random row effects, $\beta_j$ are the herbicide effects, $\zeta_{jk}$ are the random column effects, $\alpha\beta_{ij}$ are the 'crop by herbicide' interaction effects and $\varepsilon_ijk$ is the residual random error term. The three random effects are assumed as gaussian, with mean equal to zero and variances respectively equal to $\sigma_{\theta}$, $\sigma_{\zeta}$ and $\sigma$.
-
-
-### Model fitting with R
-
-At this stage, the code for model fitting should be straightforward, as well as that for variance partitioning
-
-
-```r
-model.strip <- lmer(CropBiomass ~ Block + Herbicide*Crop + 
-    (1|Rows) + (1|Columns), data = dataset)
-anova(model.strip, ddf = "Kenward-Roger")
-## Type III Analysis of Variance Table with Kenward-Roger's method
-##                Sum Sq Mean Sq NumDF  DenDF F value  Pr(>F)
-## Block           21451  7150.3     3 4.1367  2.5076 0.19387
-## Herbicide         148   147.9     1 3.0000  0.0519 0.83450
-## Crop            43874 21936.9     2 6.0000  7.6932 0.02208
-## Herbicide:Crop  12549  6274.4     2 6.0000  2.2004 0.19198
-##                 
-## Block           
-## Herbicide       
-## Crop           *
-## Herbicide:Crop  
-## ---
-## Signif. codes:  
-## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-```
-
-
-
-We see that only the crop effect is significant and, thus, we can be reasonably sure that the herbicide did not provoke unwanted carry-over effects to the crops sown in treated soil 40 days after the treatment.
-
----
-
-## Further readings
-
-1. Bates, D., Mächler, M., Bolker, B., Walker, S., 2015. Fitting Linear Mixed-Effects Models Using lme4. Journal of Statistical Software 67. https://doi.org/10.18637/jss.v067.i01
-2. Gałecki, A., Burzykowski, T., 2013. Linear mixed-effects models using R: a step-by-step approach. Springer, Berlin.
-3. Kuznetsova, A., Brockhoff, P.B., Christensen, H.B., 2017. lmerTest Package: Tests in Linear Mixed Effects Models. Journal of Statistical Software 82, 1--26.
-
-
-
-
-
-
-
-<!--chapter:end:12-Eng_SplitStrip.Rmd-->
 
 # Simple linear regression
 
@@ -5063,9 +4821,6 @@ dataset <- read.csv(file, header=T)
 ```
 ## 
 ## Attaching package: 'reshape'
-## The following object is masked from 'package:Matrix':
-## 
-##     expand
 ## The following object is masked from 'package:dplyr':
 ## 
 ##     rename
@@ -5377,7 +5132,267 @@ The above inverse predictions are often used in chemical laboratories for the pr
 
 
 
-<!--chapter:end:13-Eng_LinearRegression.Rmd-->
+<!--chapter:end:12-Eng_LinearRegression.Rmd-->
+
+# A brief intro to mixed models
+
+In this book we have, so far, encountered models with only one random effect, i.e. the residual error term. These models are named 'fixed effect models' and they represent the main topic of this book. However, we should not forget that several experiments in agriculture and biology may be affected by two or more sources of random variability and, therefore, we should also be able to fit models with more than one random term. These latter models are named 'mixed effect models' and, since the advent of personal computers in the 70s of the previous century, they are usually fitted by using more complex algorithms, with respect to the least square algorithm that we have, so far, used for 'fixed effect models'.
+
+In this chapter we will show how we can fit some simple mixed models to datasets resulting from several common types of field experiments. For the sake of brevity, we will not give any detail about the theory of mixed models; for those who are intersted in this subject, we recommend the wonderful book 'Linear mixed-effects models using R: a step-by-step approach' (Gałecki and Burzykowski, 2013).
+
+## Plots of different sizes
+
+Factorial experiments are not only laid down with completely randomised designs or in complete blocks. In chapter 2, we have already introduced split-plot or strip-plot designs, where treatment levels are allocated to the experimental units in groups. We have seen that this is advantageous in some circumstances, e.g., when one of the factors is better allocated to bigger plots, compared to the other factors. When factor levels are allocated to groups of individuals, the independency of residuals is broken, as the individuals within the group are more alike than the individuals in different groups. For example, let's consider a field experiment: if one group of plots is, e.g., more fertile than the other groups, all plots within that group will share such a positive effect and, therefore, their yields will be correlated. In this case, we talk about **intra-class correlation**, that is a similar concept to the Pearson correlation, which we have encountered in Chapter 3.
+
+In order to respect the basic assumption of independent residuals, data from  split-plot and strip-plot experiments cannot be analysed by using the methods proposed in Chapter 11 (multi-way ANOVA models), but they require a different approach.
+
+
+### Example 1: a split-plot experiment
+
+In chapter 2, we presented an experiment to compare three types of tillage (minimum tillage = MIN; shallow ploughing = SP; deep ploughing = DP) and two types of chemical weed control methods (broadcast = TOT; in-furrow = PART). This experiment was designed in four complete blocks with three main-plots per block, split into two sub-plots per main-plot; the three types of tillage were randomly allocated to the main-plots, while the two weed control treatments were randomly allocated to sub-plots (see Figure \@ref(fig:figName38)).
+
+The results of this experiment are reported in the 'beet.csv' file, that is available in the online repository. In the following box we load the file and transform the explanatory variables into factors.
+
+
+```r
+dataset <- read.csv("https://www.casaonofri.it/_datasets/beet.csv", header=T)
+dataset$Tillage <- factor(dataset$Tillage)
+dataset$WeedControl <- factor(dataset$WeedControl)
+dataset$Block <- factor(dataset$Block)
+head(dataset)
+##   Tillage WeedControl Block  Yield
+## 1     MIN         TOT     1 11.614
+## 2     MIN         TOT     2  9.283
+## 3     MIN         TOT     3  7.019
+## 4     MIN         TOT     4  8.015
+## 5     MIN        PART     1  5.117
+## 6     MIN        PART     2  4.306
+```
+
+
+By looking at the map in Figure \@ref(fig:figName38), it is easy to see that there are two types of constraints to randomisation:
+
+1. each replicate of the six combinations was allocated to each block
+2. the two weed control methods were allocated to each main plot
+
+As the consequence, apart from treatment factors, we have two blocking factors, i.e. the blocks and the main-plots within each block; Both this blocking factors should be included in the model, in order to ensure the independence of residuals.
+
+#### Model definition
+
+Considering the above comments, a linear model for a two-way split-plot experiment is:
+
+$$Y_{ijk} = \mu + \gamma_k + \alpha_i + \theta_{ik} + \beta_j + \alpha\beta_{ij} + \varepsilon_{ijk}$$
+
+where $\gamma$ is the effect of the $k$^th^ block, $\alpha$ is the effect of the $i$^th^ tillage, $\beta$ is the effect of $j$^th^ weed control method, $\alpha\beta$ is the interaction between the $i$^th^ tillage method and $j$^th^  weed control method. Apart from these effects, which are totally the same as those used in Chapter 11, we also include the main-plot effect $\theta$, where we use the $i$ and $k$ subscripts, as each main-plot is uniquely identified by the block to which it belongs and by the tillage method with which it was treated (see Figure \@ref(fig:figName38)). Obviously, the main plots can be labelled in any other way, as long as each one is uniquely identified.
+
+Now, let's concentrate on the main-plots and forget the sub-plots for awhile; we see that the split-plot design in Figure \@ref(fig:figName38), without considering the sub-plots, is totally similar to a Randomised Complete Block Design. Consequently, the differences between main-plots treated alike (same tillage method), once the block effect has been removed, are only due to random factors, as there is no other known systematic source of variability. Furthermore, the levels of the tillage factor were independently allocated to main-plots, which, therefore, represent true-replicates for this factor. For these reasons, we say that the **main-plot effect is random**.
+
+Apart from the main-plot effect, the differences between sub-plots treated alike (same 'tillage by weed control method' combination) are only due to random effects (unknown sources of variability); therefore, **the sub-plot effect is also random**.
+
+In the end, in split-plot designs we have two random effects: $\theta$ (main-plot effect) and $\varepsilon$ (sub-plot effect), which are assumed as gaussian, with means equal to 0 and standard deviations equal to, respectively, $\sigma_{\theta}$ and $\sigma$. Models with more than one random effect are named **mixed models** and, consequently, data from split-plot designs need to be modelled by using a mixed model.
+
+The platform of mixed models is very important and, for a number of reasons, it is conceptually very different from the usual platform of fixed effects models. We do not intend to introduce mixed models in this book, but we thought that it might be appropriate to show how to fit split-plot (and strip-plot) models and how to interpret the resulting R output. Indeed, split-plot (and strip-plot) experiments are rather common in agriculture and plant breeding.
+
+
+#### Model fitting with R
+
+First of all, we need to build a new variable to uniquely identify the main plots. We can do this by using numeric coding, or, more easily, by creating a new factor that combines the levels of block and tillage; we have already anticipated that each main plot is uniquely identified by the block and the tillage method.
+
+
+```r
+dataset$mainPlot <- with(dataset, factor(Block:Tillage))
+```
+
+Due to the presence of two random effects, we cannot use the `lm()` function for model fitting, which is only able to accomodate one residual random term. In R, there are several mixed model fitting function; in this book, we propose the use of the `lmer()` function, which requires two additional packages, i.e. 'lme4' and 'lmerTest', which we need to install,  unless we have already done so. These two packages need to be loaded in the environment before model fitting.
+
+The syntax of the `lmer()` function is rather similar to that of the `lm()` function, although the random main-plot effect is entered by using the '1|' operator and it is put in brackets, in order to better mark the difference with fixed effects. See the box below for the exact coding.
+
+
+```r
+# install.packages("lme4")  #only at first time
+# install.packages("lmerTest")  #only at first time
+library(lme4)
+library(lmerTest)
+mod.split <- lmer(Yield ~ Block + Tillage * WeedControl +
+                  (1|mainPlot), data=dataset)
+```
+
+
+As usual, the second step is based on the inspection of model residuals. The `plot()` method applied to the 'lmer' object only returns the graph of residuals against fitted values (Figure \@ref(fig:figName141b)), while there is no quick way to obtain a QQ-plot. Therefore, we use the Shapiro-Wilks test for normality, as shown in Chapter 8.
+
+
+```r
+shapiro.test(residuals(mod.split))
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  residuals(mod.split)
+## W = 0.93838, p-value = 0.1501
+```
+
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName141b-1.png" alt="Graphical analyses of residuals for a split-plot ANOVA model" width="90%" />
+<p class="caption">(\#fig:figName141b)Graphical analyses of residuals for a split-plot ANOVA model</p>
+</div>
+
+After having made sure that the basic assumptions for linear models hold, we can proceed to variance partitioning. In this case, we use the `anova()` method for a mixed model object, which gives a slightly different output than the `anova()` method for a linear model object. As the second argument, it is necessary to indicate the method we want to use to estimate the degrees of freedom, which, in mixed models, are not as easy to calculate as in linear models.
+
+
+```r
+anova(mod.split, ddf="Kenward-Roger")
+## Type III Analysis of Variance Table with Kenward-Roger's method
+##                      Sum Sq Mean Sq NumDF DenDF F value
+## Block                3.6596  1.2199     3     6  0.6521
+## Tillage             23.6565 11.8282     2     6  6.3228
+## WeedControl          3.3205  3.3205     1     9  1.7750
+## Tillage:WeedControl 19.4641  9.7321     2     9  5.2023
+##                      Pr(>F)  
+## Block               0.61016  
+## Tillage             0.03332 *
+## WeedControl         0.21552  
+## Tillage:WeedControl 0.03152 *
+## ---
+## Signif. codes:  
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+
+From the above table we see that the 'tillage by weed control method' interaction is significant and, therefore, we show the means for the corresponding combinations of experimental factors. As in previous chapters, we use the `emmeans()` function.
+
+
+
+```r
+library(emmeans)
+meansAB <- emmeans(mod.split, ~Tillage:WeedControl)
+multcomp::cld(meansAB, Letters = LETTERS)
+##  Tillage WeedControl emmean    SE   df lower.CL upper.CL
+##  MIN     PART          6.00 0.684 14.4     4.53     7.46
+##  SP      PART          8.48 0.684 14.4     7.01     9.94
+##  MIN     TOT           8.98 0.684 14.4     7.52    10.45
+##  SP      TOT           9.14 0.684 14.4     7.68    10.60
+##  DP      TOT           9.21 0.684 14.4     7.74    10.67
+##  DP      PART         10.63 0.684 14.4     9.17    12.09
+##  .group
+##   A    
+##   AB   
+##   AB   
+##   AB   
+##    B   
+##    B   
+## 
+## Results are averaged over the levels of: Block 
+## Degrees-of-freedom method: kenward-roger 
+## Confidence level used: 0.95 
+## P value adjustment: tukey method for comparing a family of 6 estimates 
+## significance level used: alpha = 0.05 
+## NOTE: Compact letter displays can be misleading
+##       because they show NON-findings rather than findings.
+##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+```
+
+We see that we should avoid controlling the weeds only along the crop rows, if we have not plowed the soil, at least to a shallow depth.
+
+
+### Example 2: a strip-plot design
+
+In Chapter 2 we have also seen another possible arrangement of plots, relating to an experiment where three crops (sugarbeet, rape and soybean) were sown 40 days after an herbicide treatment. The aim was to assess possible phytotoxicity effects relating to an excessive persistence of herbicide residues in soil and the untreated control was added for the sake of comparison. 
+
+Figure \@ref(fig:figName39) shows that each block was organised with three rows and two columns: the three crops were sown along the rows and the two herbicide treatments (rimsulfuron and the untreated control) were allocated along the columns. In this design, the observations are clustered in three groups:
+
+1. the blocks
+2. the rows within each block (three rows per block)
+3. the columns within each block (two columns per block)
+
+Analogously to the split-plot design, the rows represent the main plots for the crop factor, while the columns represent the main-plots for the herbicide factor. Both these grouping factors must be referenced as random effects in the model. The combinations between crops and herbicide treatments are allocated to the sub-plots, resulting from crossing the rows with the columns.
+
+The dataset for this experiment, with four replicates, is available in the 'recropS.csv' file, that can be loaded from the usual repository. After loading, we transform all explanatory variables into factors. Furthermore, we create the definition of rows and columns, by considering that each row is uniquely defined by a specific block and crop and each column is uniquely defined by a specific herbicide and block.
+
+
+```r
+rm(list=ls())
+dataset <- read.csv("https://www.casaonofri.it/_datasets/recropS.csv")
+head(dataset)
+##     Herbicide     Crop Block CropBiomass
+## 1       Check soyabean     1    199.0831
+## 2       Check soyabean     2    257.3081
+## 3       Check soyabean     3    345.5538
+## 4       Check soyabean     4    210.8574
+## 5 rimsulfuron soyabean     1    225.5651
+## 6 rimsulfuron soyabean     2    195.3952
+dataset$Herbicide <- factor(dataset$Herbicide)
+dataset$Crop <- factor(dataset$Crop)
+dataset$Block <- factor(dataset$Block)
+dataset$Rows <- factor(dataset$Crop:dataset$Block)
+dataset$Columns <- factor(dataset$Herbicide:dataset$Block)
+```
+
+
+#### Model definition
+
+A good candidate model is:
+
+$$Y_{ijk} = \mu + \gamma_k + \alpha_i + \theta_{ik} + \beta_j + \zeta_{jk} + \alpha\beta_{ij} + \varepsilon_{ijk}$$
+
+where $\mu$ is the intercept, $\gamma_k$ are the block effects, $\alpha_i$ are the crop effects $\theta_ik$ are the random row effects, $\beta_j$ are the herbicide effects, $\zeta_{jk}$ are the random column effects, $\alpha\beta_{ij}$ are the 'crop by herbicide' interaction effects and $\varepsilon_ijk$ is the residual random error term. The three random effects are assumed as gaussian, with mean equal to zero and variances respectively equal to $\sigma_{\theta}$, $\sigma_{\zeta}$ and $\sigma$.
+
+
+#### Model fitting with R
+
+At this stage, the code for model fitting should be straightforward, as well as that for variance partitioning
+
+
+```r
+model.strip <- lmer(CropBiomass ~ Block + Herbicide*Crop + 
+    (1|Rows) + (1|Columns), data = dataset)
+anova(model.strip, ddf = "Kenward-Roger")
+## Type III Analysis of Variance Table with Kenward-Roger's method
+##                Sum Sq Mean Sq NumDF  DenDF F value  Pr(>F)
+## Block           21451  7150.3     3 4.1367  2.5076 0.19387
+## Herbicide         148   147.9     1 3.0000  0.0519 0.83450
+## Crop            43874 21936.9     2 6.0000  7.6932 0.02208
+## Herbicide:Crop  12549  6274.4     2 6.0000  2.2004 0.19198
+##                 
+## Block           
+## Herbicide       
+## Crop           *
+## Herbicide:Crop  
+## ---
+## Signif. codes:  
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+
+
+We see that only the crop effect is significant and, thus, we can be reasonably sure that the herbicide did not provoke unwanted carry-over effects to the crops sown in treated soil 40 days after the treatment.
+
+## Subsampling designs
+
+To be added
+
+## Repeated measures in perennial crops
+
+To be added
+
+## Repeated experiments
+
+To be added
+
+---
+
+## Further readings
+
+1. Bates, D., Mächler, M., Bolker, B., Walker, S., 2015. Fitting Linear Mixed-Effects Models Using lme4. Journal of Statistical Software 67. https://doi.org/10.18637/jss.v067.i01
+2. Gałecki, A., Burzykowski, T., 2013. Linear mixed-effects models using R: a step-by-step approach. Springer, Berlin.
+3. Kuznetsova, A., Brockhoff, P.B., Christensen, H.B., 2017. lmerTest Package: Tests in Linear Mixed Effects Models. Journal of Statistical Software 82, 1--26.
+
+
+
+
+
+
+
+<!--chapter:end:13-Eng_SplitStrip.Rmd-->
 
 # Nonlinear regression
 
@@ -5616,6 +5631,9 @@ library(aomisc)
 ## 
 ##     recode
 ## Loading required package: multcompView
+## Registered S3 method overwritten by 'aomisc':
+##   method   from
+##   plot.nls nlme
 modNlin2 <- nls(Conc ~ NLS.expoDecay(Time, a, k),
                data = dataset)
 ```
@@ -5851,23 +5869,68 @@ The 'gnlht()' function provides standard errors based on the delta method, which
 
 # Exercises
 
-## Chapter 3
+The following excercises are organised by section, each one corresponding to a book chapter. Use the exercises to verify your learning process, after studying each chapter and before proceeding to the next one.
 
-### Exercise 1
+## Ch 1: Introduction to biometry
 
-A chemical analysis was performed in triplicate, with the following results: 125,  169 and 142 ng/g. Calculate mean, sum of squares, mean square, standard deviation and coefficient of variation.
+### Question 1
+
+What are the fundamental traits of a valid experiment?
+
+### Question 2
+
+What are the main steps of Galileo's scientific method?
+
+### Question 3
+
+What is the difference between systematic and random errors? Which of the two errors is most concerning?
+
+### Question 4
+
+What is the difference between true-replicates and pseudo-replicates?
+
+### Question 5
+
+What do we intend with the word 'confounding'? What is the role of 'confounding' in scientific experiments?
+
+
+## Ch. 2: Designing experiments
+
+### Excercise 1
+
+You have been requested to lay-out a breeding experiment, with 16 wheat genotypes, coded by using letters of the Roman alphabet. The aim is to determine which genotype behaves the best in a given environment.
+
+Write the experimental protocol, where you specify all the main elements of your project (subjects, variables, replicates, experimental design) and add the field map.
 
 ### Exercise 2
 
-Download the Excel file 'rimsulfuron.csv' from [https://www.casaonofri.it/_datasets/rimsulfuron.csv](https://www.casaonofri.it/_datasets/rimsulfuron.csv). This is a dataset relating to a field experiment to compare 14 herbicides and two untreated checks, with 4 replicates per treatment. The response variables are maize yield and weed coverage. Describe the dataset and show the results on a barplot, including some measure of variability. Check whether yield correlates to weed coverage and comment on the results.
+Describe the protocol of an experiment to determine the effect of sowing date (autumn and spring) on seven faba bean genotypes. Include all possible elements to assess whether the experiment is valid, describe the type of design and include the field map, showing all relevant information (including plot sizes and orientation in space). What type of check would you add (if any)? Motivate all your choices.
 
 ### Exercise 3
 
-Load the csv file 'students.csv' from [https://www.casaonofri.it/_datasets/students.csv](https://www.casaonofri.it/_datasets/students.csv). This dataset relates to a number of students, their votes in several undergraduate exams and information on high school. Determine whether (i) the average votes depend on the exam subject and (ii) the average votes depend on high school type.
+Describe the protocol of an experiment to determine the effect of nitrogen dose on several wheat genotypes. Include all possible elements to assess whether the experiment is valid, describe the type of design and include the field map, showing all relevant information (including plot sizes and orientation in space). Motivate all your choices.
+
+
 
 ---
 
-## Chapter 4
+## Ch. 3: describing the observations
+
+### Exercise 1
+
+A chemical analysis was performed in triplicate, with the following results: 125,  169 and 142 ng/g. Calculate mean, sum of squares, mean square, standard deviation and coefficient of variation. What is a correct way to display the result?
+
+### Exercise 2
+
+Consider the Excel file 'rimsulfuron.csv' from [https://www.casaonofri.it/_datasets/rimsulfuron.csv](https://www.casaonofri.it/_datasets/rimsulfuron.csv) (you can either download it, or read it directly from the internet repository). This is a dataset relating to a field experiment to compare 14 herbicides and two untreated checks, with 4 replicates per treatment. The response variables are maize yield and weed coverage. Describe the dataset and show the results on a barplot, including some measure of variability. Check whether yield correlates to weed coverage and comment on the results.
+
+### Exercise 3
+
+Load the csv file 'students.csv' from [https://www.casaonofri.it/_datasets/students.csv](https://www.casaonofri.it/_datasets/students.csv). This dataset relates to a number of students, their votes in several undergraduate exams and information on high school. Determine: (i) the absolute and relative frequencies for the different subjects; (ii) the frequency distribution of votes in three classes (bins): <24, 24-27, >27; (iii) whether the votes depend on the exam subject and (iv) whether the votes depend on the high school type.
+
+---
+
+## Ch. 4: modeling the experimental data 
 
 ### Exercise 1
 
@@ -5913,15 +5976,17 @@ Consider the sample C = [140 - 170 - 155], which was drawn by a gaussian distrib
 
 ### Exercise 5
 
-Consider a gaussian population with $\mu$ = 23 and $\sigma$ = 1. Calculate the probability of drawing three individuals with a mean
+Reproduce the possible results of a genotype experiment, with five maize genotypes (A, B, C, D and E) and expected values of, respectively, 12, 13, 12.5, 14 and 11 tons per hectare. Assume that the experimental (random) variability can be described by a gaussian distribution, with mean equal to 0 and standard deviation equal to 12.5 (common value for all genotypes). The experiment is designed as completely randomised, with four replicates.
 
-1. higher than 25
-2. lower than 21
-3. between 21 and 25
+### Exercise 6
+
+Consider the relationship between crop yield and density, as shown in Exercise 2 ($ Y = 8 + 8 \, X - 0.07 \, X^2$). Reproduce the results of a completely randomised (four replicates) sowing density experiment, with six densities (2, 4, 6, 8 and 10 plants per square meter), considering that the experimental (random) variability can be described by a gaussian distribution, with mean equal to 0 and standard deviation equal to 0.25 (common value for all densities).
+
+
 
 ---
 
-## Chapter 5
+## Ch. 5: Estimation of model parameters
 
 ### Exercise 1
 
@@ -5959,7 +6024,7 @@ A sample of 400 insects was sprayed with an insecticide and 136 individuals surv
 
 ---
 
-## Chapter 6
+## Ch. 6: making decisions under uncertainty
 
 ### Exercise 1
 
@@ -6042,7 +6107,7 @@ A botanist counted the number of germinated seeds for oilseed rape at two differ
 
 ---
 
-## Chapters 7 to 9
+## Ch. 7 to 9: one-way ANOVA models
 
 ### Exercise 1
 
@@ -6145,7 +6210,7 @@ Which is the most resistant genotype?
 
 ---
 
-## Chapter 10
+## Ch. 10: multy-way ANOVA models
 
 ### Exercise 1
 
@@ -6216,7 +6281,7 @@ A latin square experiment was planned to assess effect of four different fertili
 
 ---
 
-## Chapters 11 and 12
+## Ch. 11 and 12: multi-way ANOVA models with interactions
 
 ### Exercise 1
 
@@ -6368,7 +6433,7 @@ A chemical process requires one alcohol and one base. A study is organised to ev
 
 ---
 
-## Chapter 13
+## Ch. 13: simple linear regression
 
 ### Exercise 1
 
@@ -6425,7 +6490,7 @@ A study was conducted to evaluate the effect of increasing densities of a weed (
 
 ---
 
-## Chapter 14
+## Ch. 14: nonlinear regression
 
 ### Exercise 1
 
