@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Section 6 Fitting time-to-event models with environmental covariates | Analysing seed germination and emergence data with R: a tutorial</title>
+  <meta name="description" content="This document describes a new framework for the analyses of seed germination and emergence data and it is associated to the new R packages ‘drcte’ and ‘drcSeedGerm’" />
+  <meta name="generator" content="bookdown 0.27 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Section 6 Fitting time-to-event models with environmental covariates | Analysing seed germination and emergence data with R: a tutorial" />
+  <meta property="og:type" content="book" />
+  <meta property="og:image" content="/coversmall.png" />
+  <meta property="og:description" content="This document describes a new framework for the analyses of seed germination and emergence data and it is associated to the new R packages ‘drcte’ and ‘drcSeedGerm’" />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Section 6 Fitting time-to-event models with environmental covariates | Analysing seed germination and emergence data with R: a tutorial" />
+  <meta name="twitter:site" content="@onofriandreapg" />
+  <meta name="twitter:description" content="This document describes a new framework for the analyses of seed germination and emergence data and it is associated to the new R packages ‘drcte’ and ‘drcSeedGerm’" />
+  <meta name="twitter:image" content="/coversmall.png" />
+
+<meta name="author" content="Andrea Onofri" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="comparing-germinationemergence-for-several-seed-lots.html"/>
+<link rel="next" href="exploring-the-results-of-a-time-to-event-fit-model-parameters.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-131792052-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  
+    gtag('config', 'UA-131792052-1');
+  </script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Time-to-event analyses with R</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#the-r-package"><i class="fa fa-check"></i><b>1.1</b> The R package</a></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#our-purpose"><i class="fa fa-check"></i><b>1.2</b> Our purpose</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html"><i class="fa fa-check"></i><b>2</b> What is time-to-event data?</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#time-to-event-data-are-censored-data"><i class="fa fa-check"></i><b>2.1</b> Time-to-event data are censored data</a></li>
+<li class="chapter" data-level="2.2" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#motivating-example-a-simulated-dataset"><i class="fa fa-check"></i><b>2.2</b> Motivating example: a simulated dataset</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#step-1-the-ungerminated-fraction"><i class="fa fa-check"></i><b>2.2.1</b> Step 1: the ungerminated fraction</a></li>
+<li class="chapter" data-level="2.2.2" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#step-2-germination-times-for-the-germinated-fraction"><i class="fa fa-check"></i><b>2.2.2</b> Step 2: germination times for the germinated fraction</a></li>
+<li class="chapter" data-level="2.2.3" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#step-3-counts-of-germinated-seeds"><i class="fa fa-check"></i><b>2.2.3</b> Step 3: counts of germinated seeds</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#neglecting-censoring"><i class="fa fa-check"></i><b>2.3</b> Neglecting censoring</a></li>
+<li class="chapter" data-level="2.4" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#accounting-for-censoring"><i class="fa fa-check"></i><b>2.4</b> Accounting for censoring</a></li>
+<li class="chapter" data-level="2.5" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#neglecting-or-accounting-for-censoring"><i class="fa fa-check"></i><b>2.5</b> Neglecting or accounting for censoring?</a></li>
+<li class="chapter" data-level="2.6" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#take-home-message"><i class="fa fa-check"></i><b>2.6</b> Take-home message</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html"><i class="fa fa-check"></i><b>3</b> Reshaping time-to-event data</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html#motivating-example"><i class="fa fa-check"></i><b>3.1</b> Motivating example</a></li>
+<li class="chapter" data-level="3.2" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html#transforming-from-wide-to-long-grouped"><i class="fa fa-check"></i><b>3.2</b> Transforming from WIDE to LONG GROUPED</a></li>
+<li class="chapter" data-level="3.3" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html#transforming-from-wide-to-long-ungrouped"><i class="fa fa-check"></i><b>3.3</b> Transforming from WIDE to LONG UNGROUPED</a></li>
+<li class="chapter" data-level="3.4" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html#from-long-grouped-to-long-ungrouped-and-vice-versa"><i class="fa fa-check"></i><b>3.4</b> From LONG GROUPED to LONG UNGROUPED (and vice-versa)</a></li>
+<li class="chapter" data-level="3.5" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html#from-nonlinear-regression-to-long-grouped"><i class="fa fa-check"></i><b>3.5</b> From NONLINEAR REGRESSION to LONG GROUPED</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="time-to-event-models-for-seed-germinationemergence.html"><a href="time-to-event-models-for-seed-germinationemergence.html"><i class="fa fa-check"></i><b>4</b> Time-to-event models for seed germination/emergence</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="time-to-event-models-for-seed-germinationemergence.html"><a href="time-to-event-models-for-seed-germinationemergence.html#parametric-time-to-event-models"><i class="fa fa-check"></i><b>4.1</b> Parametric time-to-event models</a></li>
+<li class="chapter" data-level="4.2" data-path="time-to-event-models-for-seed-germinationemergence.html"><a href="time-to-event-models-for-seed-germinationemergence.html#nonparametric-time-to-event-models"><i class="fa fa-check"></i><b>4.2</b> Nonparametric time-to-event models</a></li>
+<li class="chapter" data-level="4.3" data-path="time-to-event-models-for-seed-germinationemergence.html"><a href="time-to-event-models-for-seed-germinationemergence.html#kernel-density-estimators"><i class="fa fa-check"></i><b>4.3</b> Kernel density estimators</a></li>
+<li class="chapter" data-level="4.4" data-path="time-to-event-models-for-seed-germinationemergence.html"><a href="time-to-event-models-for-seed-germinationemergence.html#ml-npmle-or-kde"><i class="fa fa-check"></i><b>4.4</b> ML, NPMLE or KDE?</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="comparing-germinationemergence-for-several-seed-lots.html"><a href="comparing-germinationemergence-for-several-seed-lots.html"><i class="fa fa-check"></i><b>5</b> Comparing germination/emergence for several seed lots</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="comparing-germinationemergence-for-several-seed-lots.html"><a href="comparing-germinationemergence-for-several-seed-lots.html#a-motivating-example"><i class="fa fa-check"></i><b>5.1</b> A motivating example</a></li>
+<li class="chapter" data-level="5.2" data-path="comparing-germinationemergence-for-several-seed-lots.html"><a href="comparing-germinationemergence-for-several-seed-lots.html#fitting-several-time-to-event-curves"><i class="fa fa-check"></i><b>5.2</b> Fitting several time-to-event curves</a></li>
+<li class="chapter" data-level="5.3" data-path="comparing-germinationemergence-for-several-seed-lots.html"><a href="comparing-germinationemergence-for-several-seed-lots.html#comparing-non-parametric-curves"><i class="fa fa-check"></i><b>5.3</b> Comparing non-parametric curves</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html"><i class="fa fa-check"></i><b>6</b> Fitting time-to-event models with environmental covariates</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#hydro-time-to-event-models"><i class="fa fa-check"></i><b>6.1</b> Hydro-time-to-event models</a></li>
+<li class="chapter" data-level="6.2" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#a-better-modelling-approach"><i class="fa fa-check"></i><b>6.2</b> A better modelling approach</a></li>
+<li class="chapter" data-level="6.3" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#another-modelling-approach"><i class="fa fa-check"></i><b>6.3</b> Another modelling approach</a></li>
+<li class="chapter" data-level="6.4" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#further-detail"><i class="fa fa-check"></i><b>6.4</b> Further detail</a>
+<ul>
+<li class="chapter" data-level="6.4.1" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#htl"><i class="fa fa-check"></i><b>6.4.1</b> <code>HTL()</code></a></li>
+<li class="chapter" data-level="6.4.2" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#htg"><i class="fa fa-check"></i><b>6.4.2</b> <code>HTG()</code></a></li>
+<li class="chapter" data-level="6.4.3" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#htll"><i class="fa fa-check"></i><b>6.4.3</b> <code>HTLL()</code></a></li>
+<li class="chapter" data-level="6.4.4" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#htw1"><i class="fa fa-check"></i><b>6.4.4</b> <code>HTW1()</code></a></li>
+<li class="chapter" data-level="6.4.5" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#htw2"><i class="fa fa-check"></i><b>6.4.5</b> <code>HTW2()</code></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="exploring-the-results-of-a-time-to-event-fit-model-parameters.html"><a href="exploring-the-results-of-a-time-to-event-fit-model-parameters.html"><i class="fa fa-check"></i><b>7</b> Exploring the results of a time-to-event fit: model parameters</a></li>
+<li class="chapter" data-level="8" data-path="predictions-from-time-to-event-models.html"><a href="predictions-from-time-to-event-models.html"><i class="fa fa-check"></i><b>8</b> Predictions from time-to-event models</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="predictions-from-time-to-event-models.html"><a href="predictions-from-time-to-event-models.html#parametric-time-to-event-model"><i class="fa fa-check"></i><b>8.1</b> Parametric time-to-event model</a></li>
+<li class="chapter" data-level="8.2" data-path="predictions-from-time-to-event-models.html"><a href="predictions-from-time-to-event-models.html#non-parametric-time-to-event-models"><i class="fa fa-check"></i><b>8.2</b> Non-parametric time-to-event models</a></li>
+<li class="chapter" data-level="8.3" data-path="predictions-from-time-to-event-models.html"><a href="predictions-from-time-to-event-models.html#predictions-from-a-time-to-event-model-from-literature"><i class="fa fa-check"></i><b>8.3</b> Predictions from a time-to-event model from literature</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html"><i class="fa fa-check"></i><b>9</b> Quantiles from time-to-event models</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#peculiarities-of-seed-science-data"><i class="fa fa-check"></i><b>9.1</b> Peculiarities of seed science data</a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#quantiles-and-restricted-quantiles"><i class="fa fa-check"></i><b>9.1.1</b> Quantiles and ‘restricted’ quantiles</a></li>
+<li class="chapter" data-level="9.1.2" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#germinationemergence-rates"><i class="fa fa-check"></i><b>9.1.2</b> Germination/emergence rates</a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#getting-the-quantiles-with-drcte"><i class="fa fa-check"></i><b>9.2</b> Getting the quantiles with ‘drcte’</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#parametric-models"><i class="fa fa-check"></i><b>9.2.1</b> Parametric models</a></li>
+<li class="chapter" data-level="9.2.2" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#parametric-models-with-environmental-covariates"><i class="fa fa-check"></i><b>9.2.2</b> Parametric models with environmental covariates</a></li>
+<li class="chapter" data-level="9.2.3" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#non-parametric-npmle-models"><i class="fa fa-check"></i><b>9.2.3</b> Non-parametric (NPMLE) models</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#quantiles-and-effective-doses-ed"><i class="fa fa-check"></i><b>9.3</b> Quantiles and Effective Doses (ED)</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>10</b> References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Analysing seed germination and emergence data with R: a tutorial</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="fitting-time-to-event-models-with-environmental-covariates" class="section level1 hasAnchor" number="6">
+<h1><span class="header-section-number">Section 6</span> Fitting time-to-event models with environmental covariates<a href="fitting-time-to-event-models-with-environmental-covariates.html#fitting-time-to-event-models-with-environmental-covariates" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>We have seen that time-to-event curves (e.g., germination or emergence curves) can be used to describe the time course of germinations/emergences for a seed lot and we have also seen that the effects of experimental factors on seed germination can be accounted for by coding a different time-to-event curve for each factor level.</p>
+<p>In some cases, we might be interested in considering environmental variables, that are, perhaps, the most important factors to trigger germination/emergence. For example, let’s consider either humidity content in the substrate, or temperature, or oxygen availability; it is clear that these variables play a fundamental role in determining germination extent and velocity and, therefore, they are very much studied by seed scientists. In principle, germination assays with environmental variables are straightforward to set up: several Petri dishes are submitted to different environmental conditions and germinations are inspected over time. What is the best method to analyse the resulting data and retrieve some important parameters, such as threshold temperatures (base, optimal or ceiling temperature) or base water potential?</p>
+<p>It is important to anticipate that most environmental variables can be expressed on a quantitative scale; obviously when we make an experiment we are forced into selecting a subset of all possible, e.g., temperatures, such as 15, 20, 30°C, but that does not mean that we are not interested to what happens at, e.g., 18 or 22°C. From this point of view, quantitative variables are very different from qualitative variables, such as the different plant species that we have compared in previous sections of this tutorial.</p>
+<p>In this post we will see an example of how we can account for the effects of water content in the substrate and include it in our time-to-event models. Of course, the same approach can be followed also with other types of environmental variables and, more generally, quantitative variables.</p>
+<div id="hydro-time-to-event-models" class="section level2 hasAnchor" number="6.1">
+<h2><span class="header-section-number">6.1</span> Hydro-time-to-event models<a href="fitting-time-to-event-models-with-environmental-covariates.html#hydro-time-to-event-models" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Let’s consider the following example: the germination of rapeseed (<em>Brassica napus</em> L. var. <em>oleifera</em>, cv. Excalibur) was tested at fourteen different water potential levels (0, -0.03, -0.15, -0.3, -0.4, -0.5, -0.6, -0.7, -0.8, -0.9, -1, -1.1, -1.2, -1.5 MPa), which were created by using a polyethylene glycol solution (PEG 6000). For each water potential level, three replicated Petri dishes with 50 seeds each were incubated at 20°C. Germinated seeds were counted every 2-3 days for 14 days and they were removed from the dishes after germination.</p>
+<p>The dataset was published by Pace et al. (2012) and it is available as <code>rape</code> in the <code>drcSeedGerm</code> package, which needs to be installed from github (see below). Furthermore, the package <code>drcte</code> is necessary to fit time-to-event models and it should also be installed from gitHub. The following code loads the necessary packages, loads the dataset <code>rape</code> and shows the first six lines.</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># library(devtools)</span></span>
+<span id="cb34-2"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install_github(&quot;OnofriAndreaPG/drcSeedGerm&quot;)</span></span>
+<span id="cb34-3"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="co"># install_github(&quot;OnofriAndreaPG/drcte&quot;)</span></span>
+<span id="cb34-4"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(drcSeedGerm)</span>
+<span id="cb34-5"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(drcte)</span>
+<span id="cb34-6"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb34-7"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(rape)</span>
+<span id="cb34-8"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(rape)</span>
+<span id="cb34-9"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="do">##   Psi Dish timeBef timeAf nSeeds nCum propCum</span></span>
+<span id="cb34-10"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb34-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 1   0    1       0      3     49   49    0.98</span></span>
+<span id="cb34-11"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb34-11" aria-hidden="true" tabindex="-1"></a><span class="do">## 2   0    1       3      4      0   49    0.98</span></span>
+<span id="cb34-12"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb34-12" aria-hidden="true" tabindex="-1"></a><span class="do">## 3   0    1       4      5      0   49    0.98</span></span>
+<span id="cb34-13"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb34-13" aria-hidden="true" tabindex="-1"></a><span class="do">## 4   0    1       5      7      0   49    0.98</span></span>
+<span id="cb34-14"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb34-14" aria-hidden="true" tabindex="-1"></a><span class="do">## 5   0    1       7     10      0   49    0.98</span></span>
+<span id="cb34-15"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb34-15" aria-hidden="true" tabindex="-1"></a><span class="do">## 6   0    1      10     14      0   49    0.98</span></span></code></pre></div>
+<p>In the above data.frame, ‘timeAf’ represents the moment when germinated seeds were counted, while ’timeBef’ represents the previous inspection time (or the beginning of the assay). The column ’nSeeds’ is the number of seeds that germinated during the time interval between ‘timeBef’ and ‘timeAf. The ’propCum’ column contains the cumulative proportions of germinated seeds and it is not necessary for time-to-event model fitting, although we can use it for plotting purposes.</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(rape, <span class="fu">aes</span>(timeAf, propCum)) <span class="sc">+</span></span>
+<span id="cb35-2"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb35-3"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Psi) <span class="sc">+</span></span>
+<span id="cb35-4"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">name =</span> <span class="st">&quot;Time (d)&quot;</span>) <span class="sc">+</span></span>
+<span id="cb35-5"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">name =</span> <span class="st">&quot;Cumulative proportion of germinated seeds&quot;</span>)</span></code></pre></div>
+<p><img src="_seedGerminationTutorial_files/figure-html/unnamed-chunk-33-1.png" width="672" /></p>
+<p>The germination time-course is strongly affected by the water potential in the substrate, as this determines the ability of seeds to absorb water and, consequently, trigger the germination and emergence processes. Therefore, our obvious interest is to understand how the environmental factor affects the time-course of germination.</p>
+<p>We have shown that a parametric time-to-event curve is defined as a cumulative probability function (<span class="math inline">\(\Phi\)</span>), with three parameters:</p>
+<p><span class="math display">\[P(t) = \Phi \left( b, d, e \right)\]</span>
+Considering <a href="https://www.statforbiology.com/2021/stat_drcte_5-comparinglots/">our previous post</a>, the most obvious extension of the above model is to allow for different <span class="math inline">\(b\)</span>, <span class="math inline">\(d\)</span> and <span class="math inline">\(e\)</span> value for each water potential level:</p>
+<p><span class="math display">\[P(t, \Psi_i) = \Phi \left( b_i, d_i, e_i \right)\]</span></p>
+<p>The first problem is that, for some water potential levels, germination did not occur and, for other levels, it occurred very quickly, so that no time-course of events could be observed (e.g., see the graph at 0 or -0.03 MPa). We say that we have ‘degenerated’ time-to-event curves.</p>
+<p>If we fit those curves by using the ‘curveid’ argument, we are forced into fitting the same time-to-event model to all water potential levels (as shown in our previous post), and, therefore, the presence of degenerated curves provokes an error.</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Not run</span></span>
+<span id="cb36-2"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="co"># mod0 &lt;- drmte(nSeeds ~ timeBef + timeAf, data = rape,</span></span>
+<span id="cb36-3"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="co">#              curveid = Psi, fct = loglogistic())</span></span></code></pre></div>
+<p>This problem can be circumvented by using the <code>separate = TRUE</code> argument; in this case, the different curves are fitted independent of one another and we are not tied to fitting the same model for all water potential levels. Errors are raised when trying to fit parametric time-to-event models, but they do not stop the execution in R.</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb37-1" aria-hidden="true" tabindex="-1"></a>mod1 <span class="ot">&lt;-</span> <span class="fu">drmte</span>(nSeeds <span class="sc">~</span> timeBef <span class="sc">+</span> timeAf, <span class="at">data =</span> rape,</span>
+<span id="cb37-2"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb37-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">curveid =</span> Psi, <span class="at">fct =</span> <span class="fu">loglogistic</span>(),</span>
+<span id="cb37-3"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb37-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">separate =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb37-4"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : </span></span>
+<span id="cb37-5"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="do">##   non-finite finite-difference value [3]</span></span>
+<span id="cb37-6"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb37-6" aria-hidden="true" tabindex="-1"></a><span class="do">## Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : </span></span>
+<span id="cb37-7"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="do">##   non-finite value supplied by optim</span></span>
+<span id="cb37-8"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb37-8" aria-hidden="true" tabindex="-1"></a><span class="do">## Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : </span></span>
+<span id="cb37-9"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb37-9" aria-hidden="true" tabindex="-1"></a><span class="do">##   non-finite value supplied by optim</span></span>
+<span id="cb37-10"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb37-10" aria-hidden="true" tabindex="-1"></a><span class="do">## Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : </span></span>
+<span id="cb37-11"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb37-11" aria-hidden="true" tabindex="-1"></a><span class="do">##   non-finite value supplied by optim</span></span>
+<span id="cb37-12"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb37-12" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(mod1)</span>
+<span id="cb37-13"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb37-13" aria-hidden="true" tabindex="-1"></a><span class="do">##          b:-1          d:-1          e:-1        b:-0.9        d:-0.9 </span></span>
+<span id="cb37-14"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb37-14" aria-hidden="true" tabindex="-1"></a><span class="do">##  6.439202e+01  4.666194e-02  8.364749e+00  5.832909e+00  5.501028e-01 </span></span>
+<span id="cb37-15"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb37-15" aria-hidden="true" tabindex="-1"></a><span class="do">##        e:-0.9        b:-0.8        d:-0.8        e:-0.8        b:-0.7 </span></span>
+<span id="cb37-16"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb37-16" aria-hidden="true" tabindex="-1"></a><span class="do">##  5.870221e+00  3.732950e+00  8.788932e-01  4.471057e+00  3.599409e+00 </span></span>
+<span id="cb37-17"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb37-17" aria-hidden="true" tabindex="-1"></a><span class="do">##        d:-0.7        e:-0.7        b:-0.6        d:-0.6        e:-0.6 </span></span>
+<span id="cb37-18"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb37-18" aria-hidden="true" tabindex="-1"></a><span class="do">##  9.359289e-01  2.730251e+00 -1.439224e+00 -2.343929e+03  7.160646e-01 </span></span>
+<span id="cb37-19"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb37-19" aria-hidden="true" tabindex="-1"></a><span class="do">##        b:-0.5        d:-0.5        e:-0.5       b:-0.15       d:-0.15 </span></span>
+<span id="cb37-20"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb37-20" aria-hidden="true" tabindex="-1"></a><span class="do">## -6.019417e-01 -1.486343e+03  6.107110e-02 -5.594961e-01 -2.775981e+03 </span></span>
+<span id="cb37-21"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb37-21" aria-hidden="true" tabindex="-1"></a><span class="do">##       e:-0.15 </span></span>
+<span id="cb37-22"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb37-22" aria-hidden="true" tabindex="-1"></a><span class="do">##  2.952136e-02</span></span></code></pre></div>
+<p>In particular, for the cases where a time-course of events cannot be estimated, the <code>drmte()</code> function resorts to fitting a simpler model, where only the <span class="math inline">\(d\)</span> parameter is estimated (that is the maximum fraction of germinated seeds). In the box above, we can see the estimated parameters but no standard errors, which can be obtained by using the <code>summary()</code> method, although there are some statistical issues that we will consider in a following post.</p>
+</div>
+<div id="a-better-modelling-approach" class="section level2 hasAnchor" number="6.2">
+<h2><span class="header-section-number">6.2</span> A better modelling approach<a href="fitting-time-to-event-models-with-environmental-covariates.html#a-better-modelling-approach" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The previous approach is clearly sub-optimal. First of all, the different water potential levels are assumed as independent, with no ordering and distances. In other words, we have a time-to-event curve for, e.g. -0.9 MPa and -0.8 MPa, but we have no information about the time-to-event curve for any water potential levels in between. Furthermore, we have no estimates of some relevant hydro-time parameters, such as the <em>base water potential</em>, that is fundamental to predict the germination/emergence in field conditions.</p>
+<p>In order to account for the very nature of the water potential variable, we could code a time-to-event model where the three parameters are continuous functions of <span class="math inline">\(\Psi\)</span>:</p>
+<p><span class="math display">\[P(t, \Psi) = \Phi \left( b(\Psi), d(\Psi), e(\Psi) \right)\]</span></p>
+<p>We followed such an approach in a relatively recent publication (Onofri et al., 2018) and we also spoke about this in a <a href="https://www.statforbiology.com/2020/stat_seedgermination_ht1step/">recent post</a>. In detail, we considered a log-logistic cumulative distribution function:</p>
+<p><span class="math display">\[P(t) = \frac{ d }{1 + \exp \left\{ b \left[ \log(t) - \log( e ) \right] \right\} }\]</span></p>
+<p>where <span class="math inline">\(e\)</span> is the median germination time, <span class="math inline">\(b\)</span> is the slope at the inflection point and <span class="math inline">\(d\)</span> is the maximum germinated proportion. Considering that the germination rate is the inverse of germination time, we replaced <span class="math inline">\(e = 1/GR_{50}\)</span> and wrote the three parameters as functions of <span class="math inline">\(\Psi\)</span>:</p>
+<p><span class="math display">\[P(t, \Psi) = \frac{ d(\Psi) }{1 + \exp \left\{ b(\Psi) \left[ \log(t) - \log(1 / \left[ GR_{50}(\Psi) \right] ) \right] \right\} }\]</span></p>
+<p>where:</p>
+<p><span class="math display">\[{\begin{array}{l}
+GR_{50}(\Psi) = \textrm{max} \left( \frac{\Psi - \Psi_{b}}{\theta_H}; 0 \right)\\
+d(\Psi ) = \textrm{max} \left\{ G \, \left[ 1 - \exp \left( \frac{ \Psi - \Psi_b }{\sigma_{\Psi_b}} \right) \right]; 0 \right\}\\
+b(\Psi) = b
+\end{array}}\]</span></p>
+<p>The parameters are:</p>
+<ol style="list-style-type: decimal">
+<li><span class="math inline">\(\Psi_{b}\)</span>, that is the median base water potential in the seed lot (in <em>MPa</em>),</li>
+<li><span class="math inline">\(\theta_H\)</span>, that is the hydro-time constant (in <em>MPa day</em> or <em>MPa hour</em>)</li>
+<li><span class="math inline">\(\sigma_{\Psi_b}\)</span>, that represents the variability of <span class="math inline">\(\Psi_b\)</span> within the population,</li>
+<li><span class="math inline">\(G\)</span>, that is the germinable fraction, accounting for the fact that <span class="math inline">\(d\)</span> may not reach 1, regardless of time and water potential.</li>
+<li><span class="math inline">\(b\)</span> (slope parameter) that is assumed to be constant and independent on <span class="math inline">\(\Psi\)</span>.</li>
+</ol>
+<p>In the end, our hydro-time model is composed by four sub-models:</p>
+<ol style="list-style-type: decimal">
+<li>a cumulative probability function (log-logistic, in our example), based on the three parameters <span class="math inline">\(d\)</span>, <span class="math inline">\(b\)</span> and <span class="math inline">\(e = 1/GR50\)</span>;</li>
+<li>a sub-model expressing <span class="math inline">\(d\)</span> as a function of <span class="math inline">\(\Psi\)</span>;</li>
+<li>a sub-model expressing <span class="math inline">\(GR50\)</span> as a function of <span class="math inline">\(\Psi\)</span>;</li>
+<li>a sub-model expressing <span class="math inline">\(b\)</span> as a function of <span class="math inline">\(\Psi\)</span>, although, this was indeed a simple identity model <span class="math inline">\(b(\Psi) = b\)</span>.</li>
+</ol>
+<p>This hydro-time-to-event model was implemented in R as the <code>HTE1()</code> function, and it is available within the <code>drcSeedGerm</code> package, together with the appropriate self-starting routine. It can be fitted by using the <code>drmte()</code> function in the <code>drcte</code> package and the <code>coef()</code> function can be used to retrieve the parameter estimates.</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb38-1" aria-hidden="true" tabindex="-1"></a>modHTE <span class="ot">&lt;-</span> <span class="fu">drmte</span>(nSeeds <span class="sc">~</span> timeBef <span class="sc">+</span> timeAf <span class="sc">+</span> Psi, </span>
+<span id="cb38-2"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb38-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> rape, <span class="at">fct =</span> <span class="fu">HTE1</span>())</span>
+<span id="cb38-3"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coef</span>(modHTE)</span>
+<span id="cb38-4"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="do">##         G:(Intercept)      Psib:(Intercept) sigmaPsib:(Intercept) </span></span>
+<span id="cb38-5"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="do">##             0.9577918            -1.0397239             0.1108891 </span></span>
+<span id="cb38-6"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="do">##    thetaH:(Intercept)         b:(Intercept) </span></span>
+<span id="cb38-7"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb38-7" aria-hidden="true" tabindex="-1"></a><span class="do">##             0.9061385             4.0273963</span></span></code></pre></div>
+<p>As we said before, we are also interested in standard errors for model parameters; we will address this issue in another post. It is important to note that this model gives us the ability of predicting germination at any water potential levels and it is not restrained to the values that we included in the experimental design. Furthermore, we have reliable estimates of <span class="math inline">\(\Psi_{b}\)</span> and <span class="math inline">\(\theta_H\)</span>, which we can use for prediction purposes in field conditions.</p>
+</div>
+<div id="another-modelling-approach" class="section level2 hasAnchor" number="6.3">
+<h2><span class="header-section-number">6.3</span> Another modelling approach<a href="fitting-time-to-event-models-with-environmental-covariates.html#another-modelling-approach" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Another type of hydro-time model was proposed by Bradford (2002) and later extended by Mesgaran et al., (2013). These authors, instead of modifying a traditional log-logistic distribution to include the environmental covariate, wrote a totally new cumulative distribution function, based on theoretical underpinnings relating to the distribution of base water potential within a seed population. Their model is:</p>
+<p><span class="math display">\[ P(t, \Psi) = \Phi \left\{ \frac{\Psi - (\theta_H / t) -\Psi_b }{\sigma_{\Psi_b}} \right\}\]</span></p>
+<p>where <span class="math inline">\(\Phi\)</span> is a gaussian cumulative distribution function for base water potential. More information on how this model can be obtained from the original papers; it is, however, important to highlight that it is assumed that base water potential changes from seed to seeds within the population, according to a gaussian distribution function. The cumulative distribution function of event times is indirectly modelled, but it is not, in itself, gaussian (you see that <span class="math inline">\(t\)</span> is at the denominator).</p>
+<p>Mesgaran et al (2013) suggested that <span class="math inline">\(\Phi\)</span> may not be gaussian and proposed several alternatives, so that, in all, we have six possible hydro-time-to-event models, which we have implemented within the <code>drcSeedGerm</code> package:</p>
+<ol style="list-style-type: decimal">
+<li>gaussian (function <code>HTnorm()</code>)</li>
+<li>logistic (function <code>HTL()</code>)</li>
+<li>Gumbel (function <code>HTG()</code>)</li>
+<li>log-logistic (function <code>HTLL()</code>)</li>
+<li>Weibull (Type I) (function <code>HTW1()</code>)</li>
+<li>Weibull (Type II) (function <code>HTW2()</code>)</li>
+</ol>
+<p>These equations are given at the end of this post. The code to fit those models is given below:</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb39-1" aria-hidden="true" tabindex="-1"></a>mod1 <span class="ot">&lt;-</span> <span class="fu">drmte</span>(nSeeds <span class="sc">~</span> timeBef <span class="sc">+</span> timeAf <span class="sc">+</span> Psi, </span>
+<span id="cb39-2"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb39-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">data =</span> rape, <span class="at">fct =</span> <span class="fu">HTnorm</span>())</span>
+<span id="cb39-3"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb39-3" aria-hidden="true" tabindex="-1"></a>mod2 <span class="ot">&lt;-</span> <span class="fu">drmte</span>(nSeeds <span class="sc">~</span> timeBef <span class="sc">+</span> timeAf <span class="sc">+</span> Psi,</span>
+<span id="cb39-4"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb39-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">data =</span> rape, <span class="at">fct =</span> <span class="fu">HTL</span>())</span>
+<span id="cb39-5"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb39-5" aria-hidden="true" tabindex="-1"></a>mod3 <span class="ot">&lt;-</span> <span class="fu">drmte</span>(nSeeds <span class="sc">~</span> timeBef <span class="sc">+</span> timeAf <span class="sc">+</span> Psi,</span>
+<span id="cb39-6"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb39-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">data =</span> rape, <span class="at">fct =</span> <span class="fu">HTG</span>())</span>
+<span id="cb39-7"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb39-7" aria-hidden="true" tabindex="-1"></a>mod4 <span class="ot">&lt;-</span> <span class="fu">drmte</span>(nSeeds <span class="sc">~</span> timeBef <span class="sc">+</span> timeAf <span class="sc">+</span> Psi,</span>
+<span id="cb39-8"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb39-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> rape, <span class="at">fct =</span> <span class="fu">HTLL</span>())</span>
+<span id="cb39-9"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb39-9" aria-hidden="true" tabindex="-1"></a>mod5 <span class="ot">&lt;-</span> <span class="fu">drmte</span>(nSeeds <span class="sc">~</span> timeBef <span class="sc">+</span> timeAf <span class="sc">+</span> Psi,</span>
+<span id="cb39-10"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb39-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> rape, <span class="at">fct =</span> <span class="fu">HTW1</span>())</span>
+<span id="cb39-11"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb39-11" aria-hidden="true" tabindex="-1"></a>mod6 <span class="ot">&lt;-</span> <span class="fu">drmte</span>(nSeeds <span class="sc">~</span> timeBef <span class="sc">+</span> timeAf <span class="sc">+</span> Psi,</span>
+<span id="cb39-12"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb39-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> rape, <span class="at">fct =</span> <span class="fu">HTW2</span>())</span></code></pre></div>
+<p>What is the best model for this dataset? Let’s use the Akaike’s Information Criterion (AIC: the lowest, the best) to decide; we see that <code>modHTE</code> was the best fitting one, followed by <code>mod4</code>.</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">AIC</span>(mod1, mod2, mod3, mod4, mod5, mod6, modHTE)</span>
+<span id="cb40-2"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="do">##         df      AIC</span></span>
+<span id="cb40-3"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="do">## mod1   291 3516.914</span></span>
+<span id="cb40-4"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="do">## mod2   291 3300.824</span></span>
+<span id="cb40-5"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="do">## mod3   291 3097.775</span></span>
+<span id="cb40-6"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb40-6" aria-hidden="true" tabindex="-1"></a><span class="do">## mod4   290 2886.608</span></span>
+<span id="cb40-7"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb40-7" aria-hidden="true" tabindex="-1"></a><span class="do">## mod5   290 2889.306</span></span>
+<span id="cb40-8"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb40-8" aria-hidden="true" tabindex="-1"></a><span class="do">## mod6   290 3009.023</span></span>
+<span id="cb40-9"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb40-9" aria-hidden="true" tabindex="-1"></a><span class="do">## modHTE 289 2832.481</span></span></code></pre></div>
+<p>It is important not to neglect a graphical inspection of model fit. The <code>plot()</code> method does not work with time-to-event curves with additional covariates (apart from time). However, we can retrieve the fitted data by using the <code>plotData()</code> function and use those predictions within the <code>ggplot()</code> function. The box below shows the appropriate coding.</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb41-2"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb41-2" aria-hidden="true" tabindex="-1"></a>tab <span class="ot">&lt;-</span> <span class="fu">plotData</span>(modHTE)</span>
+<span id="cb41-3"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb41-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-4"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb41-5"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb41-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> rape, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> timeAf, <span class="at">y =</span> propCum),</span>
+<span id="cb41-6"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb41-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">col =</span> <span class="st">&quot;red&quot;</span>) <span class="sc">+</span></span>
+<span id="cb41-7"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb41-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> tab<span class="sc">$</span>plotFits, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> timeAf, <span class="at">y =</span> CDF)) <span class="sc">+</span></span>
+<span id="cb41-8"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb41-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Psi) <span class="sc">+</span></span>
+<span id="cb41-9"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb41-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">name =</span> <span class="st">&quot;Time (d)&quot;</span>) <span class="sc">+</span></span>
+<span id="cb41-10"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb41-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">name =</span> <span class="st">&quot;Cumulative proportion of germinated seeds&quot;</span>)</span>
+<span id="cb41-11"><a href="fitting-time-to-event-models-with-environmental-covariates.html#cb41-11" aria-hidden="true" tabindex="-1"></a><span class="do">## Warning: Removed 42 rows containing missing values (geom_point).</span></span></code></pre></div>
+<p><img src="_seedGerminationTutorial_files/figure-html/unnamed-chunk-39-1.png" width="672" /></p>
+</div>
+<div id="further-detail" class="section level2 hasAnchor" number="6.4">
+<h2><span class="header-section-number">6.4</span> Further detail<a href="fitting-time-to-event-models-with-environmental-covariates.html#further-detail" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Let us conclude this section by giving some detail on all other models in Mesgaran et al (2913; slightly reparameterised). In same cases <span class="math inline">\(\Psi_b\)</span> has been replaced by <span class="math inline">\(\mu\)</span>, that is the location parameter of the cumulative distribution function of base water potential, but it is not the median value. On the other hand, <span class="math inline">\(\delta\)</span> is the shifting parameter for all logarithm based distributions; indeed, logarithm based distribution are only defined for strictly positive variables, while we know that water potential usually assumes negative values. The shifting parameters is used to shift the cumulative distribution function to the right, so that negative values are allowed.</p>
+<div id="htl" class="section level3 hasAnchor" number="6.4.1">
+<h3><span class="header-section-number">6.4.1</span> <code>HTL()</code><a href="fitting-time-to-event-models-with-environmental-covariates.html#htl" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><span class="math display">\[ G(t, \Psi) = \frac{1}{1 + exp \left[ - \frac{  \Psi  - \left( \theta _H/t \right) - \Psi_{b} } {\sigma}  \right] }\]</span></p>
+</div>
+<div id="htg" class="section level3 hasAnchor" number="6.4.2">
+<h3><span class="header-section-number">6.4.2</span> <code>HTG()</code><a href="fitting-time-to-event-models-with-environmental-covariates.html#htg" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><span class="math display">\[ G(t, \Psi) = \exp \left\{ { - \exp \left[ { - \left( {\frac{{\Psi - (\theta _H / t ) - \mu }}{\sigma }} \right)} \right]} \right\} \]</span></p>
+</div>
+<div id="htll" class="section level3 hasAnchor" number="6.4.3">
+<h3><span class="header-section-number">6.4.3</span> <code>HTLL()</code><a href="fitting-time-to-event-models-with-environmental-covariates.html#htll" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><span class="math display">\[ G(t, \Psi) = \frac{1}{1 + \exp \left\{ \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b} + \delta)  }{\sigma}\right\} }\]</span></p>
+</div>
+<div id="htw1" class="section level3 hasAnchor" number="6.4.4">
+<h3><span class="header-section-number">6.4.4</span> <code>HTW1()</code><a href="fitting-time-to-event-models-with-environmental-covariates.html#htw1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><span class="math display">\[ G(t, \Psi) = exp \left\{ - \exp \left[ - \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b} + \delta)  }{\sigma}\right] \right\}\]</span></p>
+</div>
+<div id="htw2" class="section level3 hasAnchor" number="6.4.5">
+<h3><span class="header-section-number">6.4.5</span> <code>HTW2()</code><a href="fitting-time-to-event-models-with-environmental-covariates.html#htw2" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><span class="math display">\[ G(t, \Psi) = 1 - exp \left\{ - \exp \left[ \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b} + \delta)  }{\sigma}\right] \right\}\]</span></p>
+
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="comparing-germinationemergence-for-several-seed-lots.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="exploring-the-results-of-a-time-to-event-fit-model-parameters.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["_seedGerminationTutorial.pdf", "_seedGerminationTutorial.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

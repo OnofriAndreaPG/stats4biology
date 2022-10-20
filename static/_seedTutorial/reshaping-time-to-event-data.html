@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Section 3 Reshaping time-to-event data | Analysing seed germination and emergence data with R: a tutorial</title>
+  <meta name="description" content="This document describes a new framework for the analyses of seed germination and emergence data and it is associated to the new R packages ‘drcte’ and ‘drcSeedGerm’" />
+  <meta name="generator" content="bookdown 0.27 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Section 3 Reshaping time-to-event data | Analysing seed germination and emergence data with R: a tutorial" />
+  <meta property="og:type" content="book" />
+  <meta property="og:image" content="/coversmall.png" />
+  <meta property="og:description" content="This document describes a new framework for the analyses of seed germination and emergence data and it is associated to the new R packages ‘drcte’ and ‘drcSeedGerm’" />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Section 3 Reshaping time-to-event data | Analysing seed germination and emergence data with R: a tutorial" />
+  <meta name="twitter:site" content="@onofriandreapg" />
+  <meta name="twitter:description" content="This document describes a new framework for the analyses of seed germination and emergence data and it is associated to the new R packages ‘drcte’ and ‘drcSeedGerm’" />
+  <meta name="twitter:image" content="/coversmall.png" />
+
+<meta name="author" content="Andrea Onofri" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="what-is-time-to-event-data.html"/>
+<link rel="next" href="time-to-event-models-for-seed-germinationemergence.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-131792052-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  
+    gtag('config', 'UA-131792052-1');
+  </script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Time-to-event analyses with R</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#the-r-package"><i class="fa fa-check"></i><b>1.1</b> The R package</a></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#our-purpose"><i class="fa fa-check"></i><b>1.2</b> Our purpose</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html"><i class="fa fa-check"></i><b>2</b> What is time-to-event data?</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#time-to-event-data-are-censored-data"><i class="fa fa-check"></i><b>2.1</b> Time-to-event data are censored data</a></li>
+<li class="chapter" data-level="2.2" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#motivating-example-a-simulated-dataset"><i class="fa fa-check"></i><b>2.2</b> Motivating example: a simulated dataset</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#step-1-the-ungerminated-fraction"><i class="fa fa-check"></i><b>2.2.1</b> Step 1: the ungerminated fraction</a></li>
+<li class="chapter" data-level="2.2.2" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#step-2-germination-times-for-the-germinated-fraction"><i class="fa fa-check"></i><b>2.2.2</b> Step 2: germination times for the germinated fraction</a></li>
+<li class="chapter" data-level="2.2.3" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#step-3-counts-of-germinated-seeds"><i class="fa fa-check"></i><b>2.2.3</b> Step 3: counts of germinated seeds</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#neglecting-censoring"><i class="fa fa-check"></i><b>2.3</b> Neglecting censoring</a></li>
+<li class="chapter" data-level="2.4" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#accounting-for-censoring"><i class="fa fa-check"></i><b>2.4</b> Accounting for censoring</a></li>
+<li class="chapter" data-level="2.5" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#neglecting-or-accounting-for-censoring"><i class="fa fa-check"></i><b>2.5</b> Neglecting or accounting for censoring?</a></li>
+<li class="chapter" data-level="2.6" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#take-home-message"><i class="fa fa-check"></i><b>2.6</b> Take-home message</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html"><i class="fa fa-check"></i><b>3</b> Reshaping time-to-event data</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html#motivating-example"><i class="fa fa-check"></i><b>3.1</b> Motivating example</a></li>
+<li class="chapter" data-level="3.2" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html#transforming-from-wide-to-long-grouped"><i class="fa fa-check"></i><b>3.2</b> Transforming from WIDE to LONG GROUPED</a></li>
+<li class="chapter" data-level="3.3" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html#transforming-from-wide-to-long-ungrouped"><i class="fa fa-check"></i><b>3.3</b> Transforming from WIDE to LONG UNGROUPED</a></li>
+<li class="chapter" data-level="3.4" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html#from-long-grouped-to-long-ungrouped-and-vice-versa"><i class="fa fa-check"></i><b>3.4</b> From LONG GROUPED to LONG UNGROUPED (and vice-versa)</a></li>
+<li class="chapter" data-level="3.5" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html#from-nonlinear-regression-to-long-grouped"><i class="fa fa-check"></i><b>3.5</b> From NONLINEAR REGRESSION to LONG GROUPED</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="time-to-event-models-for-seed-germinationemergence.html"><a href="time-to-event-models-for-seed-germinationemergence.html"><i class="fa fa-check"></i><b>4</b> Time-to-event models for seed germination/emergence</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="time-to-event-models-for-seed-germinationemergence.html"><a href="time-to-event-models-for-seed-germinationemergence.html#parametric-time-to-event-models"><i class="fa fa-check"></i><b>4.1</b> Parametric time-to-event models</a></li>
+<li class="chapter" data-level="4.2" data-path="time-to-event-models-for-seed-germinationemergence.html"><a href="time-to-event-models-for-seed-germinationemergence.html#nonparametric-time-to-event-models"><i class="fa fa-check"></i><b>4.2</b> Nonparametric time-to-event models</a></li>
+<li class="chapter" data-level="4.3" data-path="time-to-event-models-for-seed-germinationemergence.html"><a href="time-to-event-models-for-seed-germinationemergence.html#kernel-density-estimators"><i class="fa fa-check"></i><b>4.3</b> Kernel density estimators</a></li>
+<li class="chapter" data-level="4.4" data-path="time-to-event-models-for-seed-germinationemergence.html"><a href="time-to-event-models-for-seed-germinationemergence.html#ml-npmle-or-kde"><i class="fa fa-check"></i><b>4.4</b> ML, NPMLE or KDE?</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="comparing-germinationemergence-for-several-seed-lots.html"><a href="comparing-germinationemergence-for-several-seed-lots.html"><i class="fa fa-check"></i><b>5</b> Comparing germination/emergence for several seed lots</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="comparing-germinationemergence-for-several-seed-lots.html"><a href="comparing-germinationemergence-for-several-seed-lots.html#a-motivating-example"><i class="fa fa-check"></i><b>5.1</b> A motivating example</a></li>
+<li class="chapter" data-level="5.2" data-path="comparing-germinationemergence-for-several-seed-lots.html"><a href="comparing-germinationemergence-for-several-seed-lots.html#fitting-several-time-to-event-curves"><i class="fa fa-check"></i><b>5.2</b> Fitting several time-to-event curves</a></li>
+<li class="chapter" data-level="5.3" data-path="comparing-germinationemergence-for-several-seed-lots.html"><a href="comparing-germinationemergence-for-several-seed-lots.html#comparing-non-parametric-curves"><i class="fa fa-check"></i><b>5.3</b> Comparing non-parametric curves</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html"><i class="fa fa-check"></i><b>6</b> Fitting time-to-event models with environmental covariates</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#hydro-time-to-event-models"><i class="fa fa-check"></i><b>6.1</b> Hydro-time-to-event models</a></li>
+<li class="chapter" data-level="6.2" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#a-better-modelling-approach"><i class="fa fa-check"></i><b>6.2</b> A better modelling approach</a></li>
+<li class="chapter" data-level="6.3" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#another-modelling-approach"><i class="fa fa-check"></i><b>6.3</b> Another modelling approach</a></li>
+<li class="chapter" data-level="6.4" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#further-detail"><i class="fa fa-check"></i><b>6.4</b> Further detail</a>
+<ul>
+<li class="chapter" data-level="6.4.1" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#htl"><i class="fa fa-check"></i><b>6.4.1</b> <code>HTL()</code></a></li>
+<li class="chapter" data-level="6.4.2" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#htg"><i class="fa fa-check"></i><b>6.4.2</b> <code>HTG()</code></a></li>
+<li class="chapter" data-level="6.4.3" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#htll"><i class="fa fa-check"></i><b>6.4.3</b> <code>HTLL()</code></a></li>
+<li class="chapter" data-level="6.4.4" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#htw1"><i class="fa fa-check"></i><b>6.4.4</b> <code>HTW1()</code></a></li>
+<li class="chapter" data-level="6.4.5" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#htw2"><i class="fa fa-check"></i><b>6.4.5</b> <code>HTW2()</code></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="exploring-the-results-of-a-time-to-event-fit-model-parameters.html"><a href="exploring-the-results-of-a-time-to-event-fit-model-parameters.html"><i class="fa fa-check"></i><b>7</b> Exploring the results of a time-to-event fit: model parameters</a></li>
+<li class="chapter" data-level="8" data-path="predictions-from-time-to-event-models.html"><a href="predictions-from-time-to-event-models.html"><i class="fa fa-check"></i><b>8</b> Predictions from time-to-event models</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="predictions-from-time-to-event-models.html"><a href="predictions-from-time-to-event-models.html#parametric-time-to-event-model"><i class="fa fa-check"></i><b>8.1</b> Parametric time-to-event model</a></li>
+<li class="chapter" data-level="8.2" data-path="predictions-from-time-to-event-models.html"><a href="predictions-from-time-to-event-models.html#non-parametric-time-to-event-models"><i class="fa fa-check"></i><b>8.2</b> Non-parametric time-to-event models</a></li>
+<li class="chapter" data-level="8.3" data-path="predictions-from-time-to-event-models.html"><a href="predictions-from-time-to-event-models.html#predictions-from-a-time-to-event-model-from-literature"><i class="fa fa-check"></i><b>8.3</b> Predictions from a time-to-event model from literature</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html"><i class="fa fa-check"></i><b>9</b> Quantiles from time-to-event models</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#peculiarities-of-seed-science-data"><i class="fa fa-check"></i><b>9.1</b> Peculiarities of seed science data</a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#quantiles-and-restricted-quantiles"><i class="fa fa-check"></i><b>9.1.1</b> Quantiles and ‘restricted’ quantiles</a></li>
+<li class="chapter" data-level="9.1.2" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#germinationemergence-rates"><i class="fa fa-check"></i><b>9.1.2</b> Germination/emergence rates</a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#getting-the-quantiles-with-drcte"><i class="fa fa-check"></i><b>9.2</b> Getting the quantiles with ‘drcte’</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#parametric-models"><i class="fa fa-check"></i><b>9.2.1</b> Parametric models</a></li>
+<li class="chapter" data-level="9.2.2" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#parametric-models-with-environmental-covariates"><i class="fa fa-check"></i><b>9.2.2</b> Parametric models with environmental covariates</a></li>
+<li class="chapter" data-level="9.2.3" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#non-parametric-npmle-models"><i class="fa fa-check"></i><b>9.2.3</b> Non-parametric (NPMLE) models</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#quantiles-and-effective-doses-ed"><i class="fa fa-check"></i><b>9.3</b> Quantiles and Effective Doses (ED)</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>10</b> References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Analysing seed germination and emergence data with R: a tutorial</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="reshaping-time-to-event-data" class="section level1 hasAnchor" number="3">
+<h1><span class="header-section-number">Section 3</span> Reshaping time-to-event data<a href="reshaping-time-to-event-data.html#reshaping-time-to-event-data" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>Let’s now open a parenthesis about the structure of germination/emergence data. To our experience, seed scientists are used to storing their datasets in several formats, that may not be immediately usable with the ‘drcte’ and ‘drc’ packages, which this tutorial is built upon. The figure below shows some of the possible formats that I have often encountered in my consulting work.</p>
+<p style="text-align:center">
+<div class="figure">
+<img src="https://www.statforbiology.com/_Figures/Stat_drcte_3-method-data.png" style="width:90.0%" alt="" />
+<p class="caption">Possible data structures for seed germination/emergence data</p>
+</div>
+</p>
+<p>Both the ‘drcte’ and ‘drc’ packages require that the data is stored in LONG GROUPED format, as shown in the figure above (panel A, top left). We have already mentioned in the previous section that each row represents a time interval, the columns ‘timeBef’ and ‘timeAf’ represent the beginning and ending of the interval, while the column ‘count’ represents the seeds that germinated/emerged during that interval of time. Other columns may be needed, to represent, e.g., the randomisation unit (e.g., Petri dish) within which the count was made and the experimental treatment level that was allocated to that unit.</p>
+<p>Apart from the LONG GROUPED format, other time-to-event packages, such as ‘survival’ (Therneau, 2021) or ‘interval’ (Fay and Shaw, 2010) require a different data format, which could be named as LONG UNGROUPED (Figure above, panel B, top right). In this format, each row represents a seed, while the columns ‘timeBef’ and ‘timeAf’ represent the beginning and ending of the interval during which that seed germinated/emerged. The column ‘count’ is not necessary, while other columns may be necessary, as for the LONG GROUPED format. Apart from the above mentioned ‘survival’ and ‘interval’ packages, this format is also compatible with the ‘drcte’ package.</p>
+<p>Both the GROUPED and UNGROUPED formats have two basic advantages: (i) they can be used with all types of time-to-event data and (ii) they obey to the principles of tidy data (Wickham, 2016). However, to my experience, seed scientists often use other formats, such as the WIDE format (Figure above, panel C, bottom left) or the NONLINEAR REGRESSION format (Figure above, panel D, bottom right), which need to be preliminary transformed into one of the LONG GROUPED or LONG UNGROUPED formats.</p>
+<p>In order to ease the transition from traditional methods of data analysis to time-to-event methods, we decided to develop a couple of service functions that can be used to reshape the data to a format that is more suitable for time-to-event analyses. Let’s see how to do this by using a ‘real-life’ example.</p>
+<div id="motivating-example" class="section level2 hasAnchor" number="3.1">
+<h2><span class="header-section-number">3.1</span> Motivating example<a href="reshaping-time-to-event-data.html#motivating-example" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Seeds of <em>L. ornithopodioides</em> were collected from natural populations, at three different maturation stages, i.e. at 27 Days After Anthesis (DAA), when seeds were still green (Stage A), at 35 DAA, when seeds were brown and soft (Stage B) and at 41 DAA, when seeds were brown and moderately hard (Stage C). Germination assays were performed by placing four replicates of 25 seeds on filter paper (Whatman no. 3) in 9-cm diameter Petri dishes, in the dark and at a constant temperature of 20°C. The filter paper was initially moistened with 5 mL of distilled water and replenished as needed during the assay. Germinated seeds were counted daily over 15 days and removed from the Petri dishes. This dataset is a subset of a bigger dataset, aimed at assessing the time when the hard coat imposes dormancy in seeds of different legume species (Gresta et al., 2011).</p>
+<p>The authors of the above study sent me the above dataset in WIDE format, where the rows represented each Petri dish and the columns represented all information about each dish, including the counts of germinated seeds, which were listed in different columns. The dataset is shown in the table below and it is available as the ‘lotusOr’ dataframe in the ‘drcte’ package.</p>
+<pre><code>##  Stage Dish 1  2 3 4 5 6 7 8 9 10 11 12 13 14 15
+##      A    1 0  0 0 0 0 1 2 1 1  1  3  1  1  4  2
+##      A    2 0  0 0 0 0 1 1 1 1  2  1  2  3  1  1
+##      A    3 0  0 0 0 0 3 4 4 3  1  2  1  1  0  1
+##      A    4 0  0 0 0 0 1 3 1 2  1  2  1  3  1  1
+##      B    5 0  0 0 4 1 2 1 1 0  1  2  2  3  2  1
+##      B    6 0  0 0 4 2 2 1 0 1  1  3  4  3  4  0
+##      B    7 0  0 0 4 0 4 1 2 1  1  3  3  2  2  0
+##      B    8 0  0 0 4 3 2 2 3 1  1  1  1  1  0  0
+##      C    9 1 10 1 2 1 2 3 2 0  0  0  0  1  0  0
+##      C   10 1 10 4 1 4 0 1 1 0  0  0  0  1  0  1
+##      C   11 1 11 5 1 2 2 1 0 1  0  0  1  0  0  0
+##      C   12 0 16 1 2 2 1 1 0 0  1  0  0  0  1  0</code></pre>
+<p>The WIDE format is handy for swift calculations with a spreadsheet, but, in general, it is not ok, as: (1) it does not obey to the principle of tidy data (Wickham, 2016); (2) it is not generally efficient and it cannot be used with a set of germination assays with different monitoring schedules. Therefore, facing a dataset in the WIDE format, we need to reshape it into a LONG format.</p>
+</div>
+<div id="transforming-from-wide-to-long-grouped" class="section level2 hasAnchor" number="3.2">
+<h2><span class="header-section-number">3.2</span> Transforming from WIDE to LONG GROUPED<a href="reshaping-time-to-event-data.html#transforming-from-wide-to-long-grouped" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>For such a reshaping, we could use one of the available R functions, such us <code>pivot_longer()</code> in the ‘tidyverse’ or <code>melt()</code> in the ‘reshape’ package. However, when reshaping the data, it is also useful to make e few transformations, such as producing cumulative counts and proportions, that might be useful to plot graphs, or for other purposes. Therefore, we developed the <code>melt_te()</code> function; let’s look at its usage, in the box below.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="reshaping-time-to-event-data.html#cb14-1" aria-hidden="true" tabindex="-1"></a>datasetG <span class="ot">&lt;-</span> <span class="fu">melt_te</span>(lotusOr, <span class="at">count_cols =</span> <span class="dv">3</span><span class="sc">:</span><span class="dv">17</span>, <span class="at">treat =</span> Stage, </span>
+<span id="cb14-2"><a href="reshaping-time-to-event-data.html#cb14-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">monitimes =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">15</span>, <span class="at">n.subjects =</span> <span class="fu">rep</span>(<span class="dv">25</span>,<span class="dv">12</span>))</span>
+<span id="cb14-3"><a href="reshaping-time-to-event-data.html#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(datasetG, <span class="dv">16</span>)</span>
+<span id="cb14-4"><a href="reshaping-time-to-event-data.html#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="do">##    Stage Units timeBef timeAf count nCum propCum</span></span>
+<span id="cb14-5"><a href="reshaping-time-to-event-data.html#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="do">## 1      A     1       0      1     0    0    0.00</span></span>
+<span id="cb14-6"><a href="reshaping-time-to-event-data.html#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="do">## 2      A     1       1      2     0    0    0.00</span></span>
+<span id="cb14-7"><a href="reshaping-time-to-event-data.html#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 3      A     1       2      3     0    0    0.00</span></span>
+<span id="cb14-8"><a href="reshaping-time-to-event-data.html#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 4      A     1       3      4     0    0    0.00</span></span>
+<span id="cb14-9"><a href="reshaping-time-to-event-data.html#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 5      A     1       4      5     0    0    0.00</span></span>
+<span id="cb14-10"><a href="reshaping-time-to-event-data.html#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 6      A     1       5      6     1    1    0.04</span></span>
+<span id="cb14-11"><a href="reshaping-time-to-event-data.html#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="do">## 7      A     1       6      7     2    3    0.12</span></span>
+<span id="cb14-12"><a href="reshaping-time-to-event-data.html#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="do">## 8      A     1       7      8     1    4    0.16</span></span>
+<span id="cb14-13"><a href="reshaping-time-to-event-data.html#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="do">## 9      A     1       8      9     1    5    0.20</span></span>
+<span id="cb14-14"><a href="reshaping-time-to-event-data.html#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="do">## 10     A     1       9     10     1    6    0.24</span></span>
+<span id="cb14-15"><a href="reshaping-time-to-event-data.html#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="do">## 11     A     1      10     11     3    9    0.36</span></span>
+<span id="cb14-16"><a href="reshaping-time-to-event-data.html#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="do">## 12     A     1      11     12     1   10    0.40</span></span>
+<span id="cb14-17"><a href="reshaping-time-to-event-data.html#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="do">## 13     A     1      12     13     1   11    0.44</span></span>
+<span id="cb14-18"><a href="reshaping-time-to-event-data.html#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="do">## 14     A     1      13     14     4   15    0.60</span></span>
+<span id="cb14-19"><a href="reshaping-time-to-event-data.html#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="do">## 15     A     1      14     15     2   17    0.68</span></span>
+<span id="cb14-20"><a href="reshaping-time-to-event-data.html#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="do">## 16     A     1      15    Inf     8   NA      NA</span></span></code></pre></div>
+<p>The <code>melt_te()</code> function requires the following arguments:</p>
+<ol style="list-style-type: decimal">
+<li>data: the original dataframe</li>
+<li>count_cols: the positions of the columns in ‘data’, listing, for each dish, the counts of germinated seeds at each assessment time (columns)</li>
+<li>treat: the columns in ‘data’, listing, for each dish, the levels of each experimental treatment</li>
+<li>monitimes: a vector of monitoring times that needs to be of the same length as the argument ‘count_cols’</li>
+<li>subjects: a vector with the number of viable seeds per dish, at the beginning of the assay. If this argument is omitted, the function assumes that such a number is equal to the total count of germinated seeds in each dish</li>
+</ol>
+<p>The functions outputs a dataframe in LONG format, where the initial columns code for the experimental treatments, the column ‘Units’ represents the original rows (Petri dishes), ‘timeAf’ represents the time at which the observation was made, ‘timeBef’ represents the time at which the previous observation was made, ‘count’ represents the number of seeds that germinated between ‘timeBef’ and ‘timeAf’, ‘nCum’ is the cumulative count and ‘propCum’ is the cumulative proportion of germinated seeds. An extra row is added for the ungerminated seeds at the end of the assay, with ‘timeBef’ equal to the final assessment time and ‘timeAf’ equal to <span class="math inline">\(\infty\)</span>.</p>
+</div>
+<div id="transforming-from-wide-to-long-ungrouped" class="section level2 hasAnchor" number="3.3">
+<h2><span class="header-section-number">3.3</span> Transforming from WIDE to LONG UNGROUPED<a href="reshaping-time-to-event-data.html#transforming-from-wide-to-long-ungrouped" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The LONG GROUPED format is good for the packages ‘drc’ and ‘drcte’. However, we might be interested in performing data analyses within the framework of survival analysis, e.g. with the ‘survival’ or ‘interval’ packages, that require the LONG UNGROUPED format. In order to reshape the original dataset into the LONG UNGROUPED format, we can use the same <code>melt_te()</code> function, by setting the argument <code>grouped = FALSE</code>. An example is given in the box below.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="reshaping-time-to-event-data.html#cb15-1" aria-hidden="true" tabindex="-1"></a>datasetU <span class="ot">&lt;-</span> <span class="fu">melt_te</span>(lotusOr, <span class="at">count_cols =</span> <span class="dv">3</span><span class="sc">:</span><span class="dv">17</span>, <span class="at">treat =</span> <span class="dv">1</span>, </span>
+<span id="cb15-2"><a href="reshaping-time-to-event-data.html#cb15-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">monitimes =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">15</span>, <span class="at">n.subjects =</span> <span class="fu">rep</span>(<span class="dv">25</span>,<span class="dv">12</span>), <span class="at">grouped =</span> F)</span>
+<span id="cb15-3"><a href="reshaping-time-to-event-data.html#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(datasetU, <span class="dv">16</span>)</span>
+<span id="cb15-4"><a href="reshaping-time-to-event-data.html#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="do">##    Stage Units timeBef timeAf</span></span>
+<span id="cb15-5"><a href="reshaping-time-to-event-data.html#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="do">## 1      A     1       5      6</span></span>
+<span id="cb15-6"><a href="reshaping-time-to-event-data.html#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="do">## 2      A     1       6      7</span></span>
+<span id="cb15-7"><a href="reshaping-time-to-event-data.html#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 3      A     1       6      7</span></span>
+<span id="cb15-8"><a href="reshaping-time-to-event-data.html#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 4      A     1       7      8</span></span>
+<span id="cb15-9"><a href="reshaping-time-to-event-data.html#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 5      A     1       8      9</span></span>
+<span id="cb15-10"><a href="reshaping-time-to-event-data.html#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 6      A     1       9     10</span></span>
+<span id="cb15-11"><a href="reshaping-time-to-event-data.html#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="do">## 7      A     1      10     11</span></span>
+<span id="cb15-12"><a href="reshaping-time-to-event-data.html#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="do">## 8      A     1      10     11</span></span>
+<span id="cb15-13"><a href="reshaping-time-to-event-data.html#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="do">## 9      A     1      10     11</span></span>
+<span id="cb15-14"><a href="reshaping-time-to-event-data.html#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="do">## 10     A     1      11     12</span></span>
+<span id="cb15-15"><a href="reshaping-time-to-event-data.html#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="do">## 11     A     1      12     13</span></span>
+<span id="cb15-16"><a href="reshaping-time-to-event-data.html#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="do">## 12     A     1      13     14</span></span>
+<span id="cb15-17"><a href="reshaping-time-to-event-data.html#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="do">## 13     A     1      13     14</span></span>
+<span id="cb15-18"><a href="reshaping-time-to-event-data.html#cb15-18" aria-hidden="true" tabindex="-1"></a><span class="do">## 14     A     1      13     14</span></span>
+<span id="cb15-19"><a href="reshaping-time-to-event-data.html#cb15-19" aria-hidden="true" tabindex="-1"></a><span class="do">## 15     A     1      13     14</span></span>
+<span id="cb15-20"><a href="reshaping-time-to-event-data.html#cb15-20" aria-hidden="true" tabindex="-1"></a><span class="do">## 16     A     1      14     15</span></span></code></pre></div>
+</div>
+<div id="from-long-grouped-to-long-ungrouped-and-vice-versa" class="section level2 hasAnchor" number="3.4">
+<h2><span class="header-section-number">3.4</span> From LONG GROUPED to LONG UNGROUPED (and vice-versa)<a href="reshaping-time-to-event-data.html#from-long-grouped-to-long-ungrouped-and-vice-versa" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>If necessary, we can easily reshape back and forth from the GROUPED and UNGROUPED formats, by using the funtions <code>ungroup_te</code> and <code>group_te()</code>. See the sample code below.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="reshaping-time-to-event-data.html#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># From LONG GROUPED to LONG UNGROUPED</span></span>
+<span id="cb16-2"><a href="reshaping-time-to-event-data.html#cb16-2" aria-hidden="true" tabindex="-1"></a>datasetU2 <span class="ot">&lt;-</span> <span class="fu">ungroup_te</span>(datasetG, count)[,<span class="sc">-</span><span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">6</span>)]</span>
+<span id="cb16-3"><a href="reshaping-time-to-event-data.html#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(datasetU2, <span class="dv">16</span>)</span>
+<span id="cb16-4"><a href="reshaping-time-to-event-data.html#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="do">##    Stage Units timeBef timeAf</span></span>
+<span id="cb16-5"><a href="reshaping-time-to-event-data.html#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="do">## 1      A     1       5      6</span></span>
+<span id="cb16-6"><a href="reshaping-time-to-event-data.html#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="do">## 2      A     1       6      7</span></span>
+<span id="cb16-7"><a href="reshaping-time-to-event-data.html#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 3      A     1       6      7</span></span>
+<span id="cb16-8"><a href="reshaping-time-to-event-data.html#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 4      A     1       7      8</span></span>
+<span id="cb16-9"><a href="reshaping-time-to-event-data.html#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 5      A     1       8      9</span></span>
+<span id="cb16-10"><a href="reshaping-time-to-event-data.html#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 6      A     1       9     10</span></span>
+<span id="cb16-11"><a href="reshaping-time-to-event-data.html#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="do">## 7      A     1      10     11</span></span>
+<span id="cb16-12"><a href="reshaping-time-to-event-data.html#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="do">## 8      A     1      10     11</span></span>
+<span id="cb16-13"><a href="reshaping-time-to-event-data.html#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="do">## 9      A     1      10     11</span></span>
+<span id="cb16-14"><a href="reshaping-time-to-event-data.html#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="do">## 10     A     1      11     12</span></span>
+<span id="cb16-15"><a href="reshaping-time-to-event-data.html#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="do">## 11     A     1      12     13</span></span>
+<span id="cb16-16"><a href="reshaping-time-to-event-data.html#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="do">## 12     A     1      13     14</span></span>
+<span id="cb16-17"><a href="reshaping-time-to-event-data.html#cb16-17" aria-hidden="true" tabindex="-1"></a><span class="do">## 13     A     1      13     14</span></span>
+<span id="cb16-18"><a href="reshaping-time-to-event-data.html#cb16-18" aria-hidden="true" tabindex="-1"></a><span class="do">## 14     A     1      13     14</span></span>
+<span id="cb16-19"><a href="reshaping-time-to-event-data.html#cb16-19" aria-hidden="true" tabindex="-1"></a><span class="do">## 15     A     1      13     14</span></span>
+<span id="cb16-20"><a href="reshaping-time-to-event-data.html#cb16-20" aria-hidden="true" tabindex="-1"></a><span class="do">## 16     A     1      14     15</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="reshaping-time-to-event-data.html#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># From LONG UNGROUPED to LONG GROUPED</span></span>
+<span id="cb17-2"><a href="reshaping-time-to-event-data.html#cb17-2" aria-hidden="true" tabindex="-1"></a>datasetG2 <span class="ot">&lt;-</span> <span class="fu">group_te</span>(datasetU)</span>
+<span id="cb17-3"><a href="reshaping-time-to-event-data.html#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(datasetG2, <span class="dv">16</span>)</span>
+<span id="cb17-4"><a href="reshaping-time-to-event-data.html#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="do">##    Stage Units timeBef timeAf count</span></span>
+<span id="cb17-5"><a href="reshaping-time-to-event-data.html#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="do">## 1      A     1       5      6     1</span></span>
+<span id="cb17-6"><a href="reshaping-time-to-event-data.html#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="do">## 2      A     1       6      7     2</span></span>
+<span id="cb17-7"><a href="reshaping-time-to-event-data.html#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 3      A     1       7      8     1</span></span>
+<span id="cb17-8"><a href="reshaping-time-to-event-data.html#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 4      A     1       8      9     1</span></span>
+<span id="cb17-9"><a href="reshaping-time-to-event-data.html#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 5      A     1       9     10     1</span></span>
+<span id="cb17-10"><a href="reshaping-time-to-event-data.html#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 6      A     1      10     11     3</span></span>
+<span id="cb17-11"><a href="reshaping-time-to-event-data.html#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="do">## 7      A     1      11     12     1</span></span>
+<span id="cb17-12"><a href="reshaping-time-to-event-data.html#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="do">## 8      A     1      12     13     1</span></span>
+<span id="cb17-13"><a href="reshaping-time-to-event-data.html#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="do">## 9      A     1      13     14     4</span></span>
+<span id="cb17-14"><a href="reshaping-time-to-event-data.html#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="do">## 10     A     1      14     15     2</span></span>
+<span id="cb17-15"><a href="reshaping-time-to-event-data.html#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="do">## 11     A     1      15    Inf     8</span></span>
+<span id="cb17-16"><a href="reshaping-time-to-event-data.html#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="do">## 12     A     2       5      6     1</span></span>
+<span id="cb17-17"><a href="reshaping-time-to-event-data.html#cb17-17" aria-hidden="true" tabindex="-1"></a><span class="do">## 13     A     2       6      7     1</span></span>
+<span id="cb17-18"><a href="reshaping-time-to-event-data.html#cb17-18" aria-hidden="true" tabindex="-1"></a><span class="do">## 14     A     2       7      8     1</span></span>
+<span id="cb17-19"><a href="reshaping-time-to-event-data.html#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="do">## 15     A     2       8      9     1</span></span>
+<span id="cb17-20"><a href="reshaping-time-to-event-data.html#cb17-20" aria-hidden="true" tabindex="-1"></a><span class="do">## 16     A     2       9     10     2</span></span></code></pre></div>
+</div>
+<div id="from-nonlinear-regression-to-long-grouped" class="section level2 hasAnchor" number="3.5">
+<h2><span class="header-section-number">3.5</span> From NONLINEAR REGRESSION to LONG GROUPED<a href="reshaping-time-to-event-data.html#from-nonlinear-regression-to-long-grouped" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In other instances, it may happen that the dataset was prepared as required by nonlinear regression analysis, i.e. listing the cumulative number of germinated seeds at each inspection time. The following Table shows an example for the first Petri dish, as available in the ‘lotusCum’ dataframe in the ‘drcte’ package.</p>
+<pre><code>##  Stage Dish Time nCum
+##      A    1    1    0
+##      A    1    2    0
+##      A    1    3    0
+##      A    1    4    0
+##      A    1    5    0
+##      A    1    6    1
+##      A    1    7    3
+##      A    1    8    4
+##      A    1    9    5
+##      A    1   10    6
+##      A    1   11    9
+##      A    1   12   10
+##      A    1   13   11
+##      A    1   14   15
+##      A    1   15   17</code></pre>
+<p>In this situation, we need to ‘decumulate’ the counts and add the beginning of each inspection interval (e.g., ‘timeBef’). We can easily do this by using the <code>decumulate_te()</code> function in ‘drcte’. An example is given in the box below.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="reshaping-time-to-event-data.html#cb19-1" aria-hidden="true" tabindex="-1"></a>dataset_sd <span class="ot">&lt;-</span> <span class="fu">decumulate_te</span>(lotusCum,</span>
+<span id="cb19-2"><a href="reshaping-time-to-event-data.html#cb19-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">resp =</span> nCum, </span>
+<span id="cb19-3"><a href="reshaping-time-to-event-data.html#cb19-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">treat =</span> Stage,</span>
+<span id="cb19-4"><a href="reshaping-time-to-event-data.html#cb19-4" aria-hidden="true" tabindex="-1"></a>                            <span class="at">monitimes =</span> Time,</span>
+<span id="cb19-5"><a href="reshaping-time-to-event-data.html#cb19-5" aria-hidden="true" tabindex="-1"></a>                            <span class="at">units =</span> Dish, </span>
+<span id="cb19-6"><a href="reshaping-time-to-event-data.html#cb19-6" aria-hidden="true" tabindex="-1"></a>                            <span class="at">n.subjects =</span> <span class="fu">rep</span>(<span class="dv">25</span>, <span class="dv">12</span>),</span>
+<span id="cb19-7"><a href="reshaping-time-to-event-data.html#cb19-7" aria-hidden="true" tabindex="-1"></a>                            <span class="at">type =</span> <span class="st">&quot;count&quot;</span>)</span>
+<span id="cb19-8"><a href="reshaping-time-to-event-data.html#cb19-8" aria-hidden="true" tabindex="-1"></a>dataset_sd <span class="ot">&lt;-</span> <span class="fu">decumulate_te</span>(lotusCum,</span>
+<span id="cb19-9"><a href="reshaping-time-to-event-data.html#cb19-9" aria-hidden="true" tabindex="-1"></a>                            <span class="at">resp =</span> Prop, </span>
+<span id="cb19-10"><a href="reshaping-time-to-event-data.html#cb19-10" aria-hidden="true" tabindex="-1"></a>                            <span class="at">treat =</span> Stage,</span>
+<span id="cb19-11"><a href="reshaping-time-to-event-data.html#cb19-11" aria-hidden="true" tabindex="-1"></a>                            <span class="at">monitimes =</span> Time,</span>
+<span id="cb19-12"><a href="reshaping-time-to-event-data.html#cb19-12" aria-hidden="true" tabindex="-1"></a>                            <span class="at">units =</span> Dish, </span>
+<span id="cb19-13"><a href="reshaping-time-to-event-data.html#cb19-13" aria-hidden="true" tabindex="-1"></a>                            <span class="at">n.subjects =</span> <span class="fu">rep</span>(<span class="dv">25</span>, <span class="dv">12</span>),</span>
+<span id="cb19-14"><a href="reshaping-time-to-event-data.html#cb19-14" aria-hidden="true" tabindex="-1"></a>                            <span class="at">type =</span> <span class="st">&quot;proportion&quot;</span>)</span></code></pre></div>
+<p>The <code>decumulate_te()</code> function requires the following arguments:</p>
+<ol style="list-style-type: decimal">
+<li>resp: the column containing the counts/proportions of germinated seeds</li>
+<li>treat: the columns listing, for each row of data, the corresponding level of experimental factors (one factor per column)</li>
+<li>monitimes: the column listing monitoring times</li>
+<li>units: the column listing the randomisation units</li>
+<li>subjects: a vector listing the number of viable seeds, at the beginning of the assay, for each randomisation unit.</li>
+<li>type: a value specifying if ‘resp’ contains ‘counts’ or ‘proportions’</li>
+</ol>
+<p>We do hope that, with these functions, we can menage to ease your transition from traditional methods of data analysis to time-to-event methods, for seed germination/emergence assays.</p>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="what-is-time-to-event-data.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="time-to-event-models-for-seed-germinationemergence.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["_seedGerminationTutorial.pdf", "_seedGerminationTutorial.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

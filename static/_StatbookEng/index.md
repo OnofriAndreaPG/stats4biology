@@ -1,7 +1,7 @@
 ---
 title: "Experimental methods in agriculture"
 author: "Andrea Onofri and Dario Sacco"
-date: "Update: v. 0.99 (2021-12-01), compil. 2022-10-18"
+date: "Update: v. 1.001 (2022-10-08), compil. 2022-10-19"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -5893,6 +5893,7 @@ What is the difference between true-replicates and pseudo-replicates?
 
 What do we intend with the word 'confounding'? What is the role of 'confounding' in scientific experiments?
 
+---
 
 ## Ch. 2: Designing experiments
 
@@ -5946,7 +5947,7 @@ where Y is the concentration at time $t$. After spraying this substance in soil,
 
 Crop yield is a function of its density, according to the following function:
 
-$$ Y = 8 + 8 \, X - 0.07 \, X^2$$
+$$ Y = 0.8 + 0.8 \, X - 0.07 \, X^2$$
 
 
 
@@ -5976,11 +5977,11 @@ Consider the sample C = [140 - 170 - 155], which was drawn by a gaussian distrib
 
 ### Exercise 5
 
-Reproduce the possible results of a genotype experiment, with five maize genotypes (A, B, C, D and E) and expected values of, respectively, 12, 13, 12.5, 14 and 11 tons per hectare. Assume that the experimental (random) variability can be described by a gaussian distribution, with mean equal to 0 and standard deviation equal to 12.5 (common value for all genotypes). The experiment is designed as completely randomised, with four replicates.
+Reproduce the possible results of a genotype experiment, with five maize genotypes (A, B, C, D and E) and expected values of, respectively, 12, 13, 12.5, 14 and 11 tons per hectare. Assume that the experimental (random) variability can be described by a gaussian distribution, with mean equal to 0 and standard deviation equal to 1.25 (common value for all genotypes). The experiment is designed as completely randomised, with four replicates.
 
 ### Exercise 6
 
-Consider the relationship between crop yield and density, as shown in Exercise 2 ($ Y = 8 + 8 \, X - 0.07 \, X^2$). Reproduce the results of a completely randomised (four replicates) sowing density experiment, with six densities (2, 4, 6, 8 and 10 plants per square meter), considering that the experimental (random) variability can be described by a gaussian distribution, with mean equal to 0 and standard deviation equal to 0.25 (common value for all densities).
+Consider the relationship between crop yield and density, as shown in Exercise 2 ($Y = 0.8 + 0.8 \, X - 0.07 \, X^2$). Reproduce the results of a completely randomised (four replicates) sowing density experiment, with five densities (2, 4, 6, 8 and 10 plants per square meter), considering that the experimental (random) variability can be described by a gaussian distribution, with mean equal to 0 and standard deviation equal to 0.25 (common value for all densities).
 
 
 
@@ -6289,7 +6290,7 @@ A pot experiment was planned to evaluate the best timing for herbicide applicati
 
 
 | Sizes ↓ / Timing → | 2-3   | 4-5   | 6-7   | 8-9   | 3-4/8-9 | Untreated|
-|:----|:----:|:----:|:----:|:----:|:----:|:----:|
+|:--------------|:-----:|:-----:|:-----:|:-----:|:-------:|:----:|
 | 2-nodes       | 34.03 | 0.10  | 30.91 | 33.21 | 2.89    | 41.63|
 |               | 22.31 | 6.08  | 35.34 | 43.44 | 19.06   | 22.96|
 |               | 21.70 | 3.73  | 24.23 | 44.06 | 0.10    | 52.14|
