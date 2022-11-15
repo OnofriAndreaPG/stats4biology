@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.11 (Anno Accademico 2021-2022), compil. 2022-03-30"
+date: "Update: v. 1.12 (Anno Accademico 2021-2022), compil. 2022-11-15"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -42,9 +42,7 @@ Nel terzo capitolo vedremo come descrivere i risultati ottenuti, utilizzando sem
 
 Nei capitoli cinque e sei vedremo come il dataset che abbiamo raccolto, proprio perché prodotto in conseguenza di processi, almeno in parte, stocastici, debba essere considerato come un campione estratto da un universo di possibili risultati. Visto che vogliamo sempre ottenere informazioni generali, non saremo mai interessati solo ai risultati ottenuti, ma cercheremo di ottenere informazioni su tutto l'universo da cui i nostri data sono stati campionati. Generalizzare i risultati di un campione comporta sempre un certo grado di incertezza, che dovremo imparare ad esplicitare e presentare come una componente integrante del nostro report.
 
-Nei capitoli da sette a dodici ci occuperemo dell'ANOVA, una delle tecniche più importanti per l'analisi dei dati. Gli ultimi due capitoli si occuperanno invece dei modelli di regressione.
-
-In ogni capitolo, partiremo da un esempio pratico, in modo che possiate cogliere la finalità del lavoro prima di passare ad un'analisi più dettagliata. Nell'ultimo capitolo forniremo una serie di esercizi, con i quali potrete acquisire un po' più di familiarità con gli argomenti trattati.
+Nei capitoli da sette a dodici ci occuperemo dell'ANOVA, una delle tecniche più importanti per l'analisi dei dati. Gli ultimi due capitoli si occuperanno invece dei modelli di regressione. In questi capitoli (da 7 a 14) partiremo sempre da un esempio pratico, in modo che possiate cogliere la finalità del lavoro prima di passare ad un'analisi più dettagliata. Nell'ultimo capitolo forniremo una serie di esercizi, con i quali potrete acquisire un po' più di familiarità con gli argomenti trattati; gli esercizi sono organizzati in gruppi in modo che sappiate con esattezza a quale capitolo del libro ogni gruppo si riferisce.
 
 
 ## Software statistico {-}
@@ -55,12 +53,12 @@ In secondo luogo, R è gratuito (freeware), cosa che è fondamentale per uno stu
 
 R ha una struttura modulare e le sue potenzialità possono essere notevolmente estese installando librerie aggiuntive. Per semplicità, in questo libro abbiamo deciso di utilizzare l'installazione di base, evitando il più possibile l'installazione di altre librerie aggiuntive. In alcuni casi ciò non è stato possibile e quindi sarà necessario installare i componenti che vi indicheremo di volta in volta.
 
-Riconosciamo che la curva di apprendimento con R è un po' ripida, all'inizio. Non preoccupatevi, non daremo nulla per scontato e partiremo dall'inizio, procedendo lentamente, passo dopo passo.
+In questo libro daremo per scontata una conoscenza, seppur limitata, di R e dell'ambiente RStudio, anche se abbiamo aggiunto un'appendice, nella quale troverete tutte le indicazioni necessarie per i principianti. Quindi, Non preoccupatevi, non daremo nulla per scontato e partiremo dall'inizio, procedendo lentamente, passo dopo passo.
 
 
 ## Gli autori {-}
 
-Andrea è Professore Associato al Dipartimento di Scienze Agrarie, Alimentari e Ambientali dell'Università degli Studi di Perugia ed insegna Metodologia Sperimentale in Agricoltura dal 2000. Dario era Professore Associato al Dipartimento di Scienze Agrarie, Forestali e Alimentari dell'Università degli Studi di Torino e ha insegnato Metodologia Sperimentale fino al 2020, quando è venuto improvvisamente a mancare prematuramente nel 2020. Purtroppo non ha mai visto questo libro completo... Ciao Dario!
+Andrea è Professore Associato al Dipartimento di Scienze Agrarie, Alimentari e Ambientali dell'Università degli Studi di Perugia ed insegna Metodologia Sperimentale in Agricoltura dal 2000. Dario era Professore Associato al Dipartimento di Scienze Agrarie, Forestali e Alimentari dell'Università degli Studi di Torino e ha insegnato Metodologia Sperimentale fino al 2020, quando, troppo presto, è venuto improvvisamente a mancare. Purtroppo non ha mai visto questo libro completo... Ciao Dario!
 
 
 ## Ringraziamenti e scuse {-}
@@ -2272,12 +2270,12 @@ t.test(D1, D2, var.equal=F, paired=T)
 ## 
 ## data:  D1 and D2
 ## t = -38.002, df = 4, p-value = 2.864e-06
-## alternative hypothesis: true difference in means is not equal to 0
+## alternative hypothesis: true mean difference is not equal to 0
 ## 95 percent confidence interval:
 ##  -23.76497 -20.52885
 ## sample estimates:
-## mean of the differences 
-##               -22.14691
+## mean difference 
+##       -22.14691
 ```
 
 
@@ -3218,7 +3216,7 @@ Il problema è che, se vogliamo utilizzare la media retro-trasformata, dobbiamo 
 
 
 ```r
-retroMedie <- emmeans(mod, ~Insecticide, transform = "response")
+retroMedie <- emmeans(mod, ~Insecticide, regrid = "response")
 retroMedie
 ##  Insecticide response     SE df lower.CL upper.CL
 ##  T1             568.6 101.01 12    348.5      789
@@ -3384,10 +3382,10 @@ Una volta definiti i coefficienti, possiamo utilizzare il package  ‘emmeans’
 K <- list(k1 = k1, K2 = k2, k3 = k3, k4 = k4)
 contrast(medie, method = K, adjust="none")
 ##  contrast estimate   SE df t.ratio p.value
-##  k1         -16.39 2.26 12 -7.244  <.0001 
-##  K2           7.89 2.40 12  3.289  0.0065 
-##  k3          11.73 2.77 12  4.235  0.0012 
-##  k4           4.05 2.77 12  1.461  0.1697
+##  k1         -16.39 2.26 12  -7.244  <.0001
+##  K2           7.89 2.40 12   3.289  0.0065
+##  k3          11.73 2.77 12   4.235  0.0012
+##  k4           4.05 2.77 12   1.461  0.1697
 ```
 
 \normalsize
@@ -3408,12 +3406,12 @@ Nel quadro sottostante mostriamo un confronto tipo Tukey (tutti contro tutti), e
 #Confronti multipli a coppie
 contrast(medie, adjust="none", method="pairwise")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461  0.1697 
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774  0.0168 
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352  <.0001 
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235  0.0012 
-##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813  <.0001 
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578  0.0038
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  0.1697
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.0168
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  <.0001
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0012
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0038
 ```
 \normalsize
 
@@ -3425,9 +3423,9 @@ Per i confronti del tipo 'tutti verso uno' è possibile utilizzare la stessa fun
 ```r
 contrast(medie, adjust="none", method="dunnett")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Mixture_378 - Metribuzin__348       -4.05 2.77 12 -1.461  0.1697 
-##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12  2.774  0.0168 
-##  Unweeded - Metribuzin__348          17.60 2.77 12  6.352  <.0001
+##  Mixture_378 - Metribuzin__348       -4.05 2.77 12  -1.461  0.1697
+##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12   2.774  0.0168
+##  Unweeded - Metribuzin__348          17.60 2.77 12   6.352  <.0001
 ```
 \normalsize
 
@@ -3439,9 +3437,9 @@ Così facendo vediamo che R confronta tutte le tesi con metribuzin, che è il pr
 ```r
 contrast(medie, adjust="none", method="dunnett", ref = 2)
 ##  contrast                      estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378     4.05 2.77 12 1.461   0.1697 
-##  Rimsulfuron_30 - Mixture_378     11.73 2.77 12 4.235   0.0012 
-##  Unweeded - Mixture_378           21.64 2.77 12 7.813   <.0001
+##  Metribuzin__348 - Mixture_378     4.05 2.77 12   1.461  0.1697
+##  Rimsulfuron_30 - Mixture_378     11.73 2.77 12   4.235  0.0012
+##  Unweeded - Mixture_378           21.64 2.77 12   7.813  <.0001
 ```
 
 \normalsize
@@ -3490,7 +3488,10 @@ multcomp::cld(medie, adjust="none", Letters=LETTERS)
 ##  Unweeded         26.77 1.96 12    22.50     31.0    C  
 ## 
 ## Confidence level used: 0.95 
-## significance level used: alpha = 0.05
+## significance level used: alpha = 0.05 
+## NOTE: Compact letter displays can be misleading
+##       because they show NON-findings rather than findings.
+##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 ```
 
 
@@ -3534,12 +3535,12 @@ Più facilmente, possiamo arrivare allo stesso risultato con il package 'emmeans
 ```r
 contrast(medie, method = "pairwise", adjust = "sidak")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461  0.6723 
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774  0.0968 
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352  0.0002 
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235  0.0069 
-##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813  <.0001 
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578  0.0226 
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  0.6723
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.0968
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  0.0002
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0069
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0226
 ## 
 ## P value adjustment: sidak method for 6 tests
 ```
@@ -3568,12 +3569,12 @@ Oppure possiamo utilizzare la funzione `contrast()`:
 ```r
 contrast(medie, method = "pairwise", adjust = "bonferroni")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461  1.0000 
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774  0.1010 
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352  0.0002 
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235  0.0069 
-##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813  <.0001 
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578  0.0228 
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  1.0000
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.1010
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  0.0002
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0069
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0228
 ## 
 ## P value adjustment: bonferroni method for 6 tests
 ```
@@ -3590,12 +3591,12 @@ Oltre che aggiustare il P-level, possiamo anche utilizzare altre procedure di ag
 #Confronti multipli a coppie, basati sul t multivariato
 contrast(medie, method="pairwise")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12  1.461  0.4885 
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12 -2.774  0.0698 
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12 -6.352  0.0002 
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12 -4.235  0.0055 
-##  Mixture_378 - Unweeded             -21.64 2.77 12 -7.813  <.0001 
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12 -3.578  0.0173 
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  0.4885
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.0698
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  0.0002
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0055
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0173
 ## 
 ## P value adjustment: tukey method for comparing a family of 4 estimates
 ```
@@ -3611,9 +3612,9 @@ Ovviamente la correzione per la molteplicità ed il conseguente innalzamento del
 #Confronti multipli a coppie, basati sul t multivariato
 contrast(medie, method="dunnett")
 ##  contrast                         estimate   SE df t.ratio p.value
-##  Mixture_378 - Metribuzin__348       -4.05 2.77 12 -1.461  0.3711 
-##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12  2.774  0.0442 
-##  Unweeded - Metribuzin__348          17.60 2.77 12  6.352  0.0001 
+##  Mixture_378 - Metribuzin__348       -4.05 2.77 12  -1.461  0.3711
+##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12   2.774  0.0442
+##  Unweeded - Metribuzin__348          17.60 2.77 12   6.352  0.0001
 ## 
 ## P value adjustment: dunnettx method for 3 tests
 ```
@@ -3935,7 +3936,10 @@ multcomp::cld(medie, Letters = LETTERS, reverse = T)
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 16 estimates 
-## significance level used: alpha = 0.05
+## significance level used: alpha = 0.05 
+## NOTE: Compact letter displays can be misleading
+##       because they show NON-findings rather than findings.
+##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 ```
 
 \normalsize
@@ -4354,8 +4358,8 @@ Table: (\#tab:tabName131)Interazione cross-over tra fattori sperimentali
 
 |      |   B1|   B2| Media|
 |:-----|----:|----:|-----:|
-|A1    | 10.0| 14.0|  12.0|
-|A2    | 15.0|  9.0|  12.0|
+|A1    | 10.0| 15.0|  12.0|
+|A2    | 14.0|  9.0|  12.0|
 |Media | 12.5| 11.5|  12.0|
 
 Se guardassimo solo le medie marginali, avremmo l'impressione sbagliata che il fattore A, da solo, non ha alcun effetto (le medie A1 e A2 sono uguali) e che il fattore B ha solo un piccolissimo effetto. La realtà è invece che entrambi i fattori hanno un grande effetto, ma la presenza dell'interazione lo nasconde completamente, impedendoci di raggiungere conclusioni attendibili guardando ai due fattori, uno separatamente dall'altro. 
@@ -4621,7 +4625,10 @@ multcomp::cld(medie, Letters = LETTERS)
 ## 
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
-## significance level used: alpha = 0.05
+## significance level used: alpha = 0.05 
+## NOTE: Compact letter displays can be misleading
+##       because they show NON-findings rather than findings.
+##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 ```
 
 Se volessimo confrontare le lavorazioni a parità di diserbo o tutte le combinazioni dovremmo utilizzare una sintassi leggermente diversa:
@@ -4645,7 +4652,10 @@ multcomp::cld(medie, Letters=LETTERS)
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 3 estimates 
-## significance level used: alpha = 0.05
+## significance level used: alpha = 0.05 
+## NOTE: Compact letter displays can be misleading
+##       because they show NON-findings rather than findings.
+##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 medie <- emmeans(mod, ~Tillage:WeedControl)
 multcomp::cld(medie, Letters=LETTERS)
 ##  Tillage WeedControl emmean    SE df lower.CL upper.CL .group
@@ -4659,7 +4669,10 @@ multcomp::cld(medie, Letters=LETTERS)
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 6 estimates 
-## significance level used: alpha = 0.05
+## significance level used: alpha = 0.05 
+## NOTE: Compact letter displays can be misleading
+##       because they show NON-findings rather than findings.
+##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 ```
 
 Le tre analisi (contronti tra lavorazioni a parità di diserbo, tra diserbi a parità di lavorazione e tutti verso tutti) portano a risultati leggermente diversi per il diverso numero di confronti effettuati: tre nel primo caso, sei nel secondo e 15 nel terzo, che richiedono una diversa correzione per la molteplicità.
@@ -4818,7 +4831,10 @@ multcomp::cld(mfMeans, Letters = LETTERS)
 ## Confidence level used: 0.95 
 ## Results are averaged over some or all of the levels of: Block 
 ## P value adjustment: tukey method for comparing a family of 9 estimates 
-## significance level used: alpha = 0.05
+## significance level used: alpha = 0.05 
+## NOTE: Compact letter displays can be misleading
+##       because they show NON-findings rather than findings.
+##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
 ```
 
 In conclusione, vediamo che l'analisi dei disegni con due fattori innestati è piuttosto simile a quella per due fattori incrociati, con l'unica eccezione che l'effetto principale per il fattore innestato non è incluso nel modello.
@@ -5003,8 +5019,8 @@ Da un punto di vista pratico, è quindi fondamentale saper adattare ai dati funz
 ```r
 # Solo la prima volta
 # install.packages("devtools")
-# devtools::install_github("onofriandreapg/nlstools2")
-library(nlstools2)
+# devtools::install_github("onofriandreapg/aomisc")
+library(aomisc)
 ```
 
 
@@ -5207,7 +5223,8 @@ La Figura \@ref(fig:figName154) non mostra deviazioni rispetto agli assunti di b
 
 ```r
 library(lattice)
-plotfit(modNlin, smooth = T)
+plotnls(modNlin, type = "means",
+        xlab = "Tempo (giorni)", ylab = "Concentrazione (ng/g)")
 ```
 
 <div class="figure" style="text-align: center">
@@ -5217,7 +5234,7 @@ plotfit(modNlin, smooth = T)
 
 ### Test F per la mancanza di adattamento (approssimato)
 
-Se abbiamo le repliche (come nellesempio in studio) possiamo effettuare il fitting di un modello ANOVA. Come abbiamo detto nel capitolo precedente, nel modello ANOVA i valori attesi sono costituiti dalle medie dei trattamenti (tempi e livelli di densità, rispettivamente per i due esempi) e lo scostamento di ogni dato rispetto alla 'sua' media è evidentemente dovuto solo all'errore sperimentale 'puro'. Nel modello di regressione, invece, esiste una componente aggiuntiva di errore, cioè lo scostamento di ogni media dalla curva di regressione. Questa componente si chiama mancanza d'adattamento e può essere stimata per differenza.
+Se abbiamo le repliche (come nell'esempio in studio) possiamo effettuare il fitting di un modello ANOVA. Come abbiamo detto nel capitolo precedente, nel modello ANOVA i valori attesi sono costituiti dalle medie dei trattamenti (tempi e livelli di densità, rispettivamente per i due esempi) e lo scostamento di ogni dato rispetto alla 'sua' media è evidentemente dovuto solo all'errore sperimentale 'puro'. Nel modello di regressione, invece, esiste una componente aggiuntiva di errore, cioè lo scostamento di ogni media dalla curva di regressione. Questa componente si chiama mancanza d'adattamento e può essere stimata per differenza.
 
 
 ```r
@@ -5356,7 +5373,7 @@ Vediamo insomma che la semivita $t_{1/2}$ è una funzione non-lineare di $k$ e p
 
 Si pone ora il problema di ricavare l'errore standard di questa stima e/o i suoi intervalli di confidenza. La legge di propagazione degli errori ci insegna a calcolare gli errori standard per le combinazioni lineari dei parametri e ne abbiamo parlato nel capitolo 9. Per le combinazioni non-lineari, come quella che abbiamo utilizzato per calcolare la semivita, esiste un'estensione chiamata 'metodo delta'. Non ne parleremo in dettaglio, in quanto si tratta di un argomento che richiede alcune conoscenza di analisi matematica; tuttavia, mostreremo un esempio del codice R da utilizzare per applicarlo.
 
-In particolare, possiamo utilizzare la funzione deltaMethod() del package 'car'. Per evitare problemi, consiglio di estrarre le stime dei parametri dall'oggetto 'nls' ed assegnare a queste nomi corrispondenti a quelli utilizzati nella definizione della funzione di trasformazione, che deve essere fornita come stringa. 
+In particolare, possiamo utilizzare la funzione 'deltaMethod()' del package 'car'. Per evitare problemi, consiglio di estrarre le stime dei parametri dall'oggetto 'nls' ed assegnare a queste nomi corrispondenti a quelli utilizzati nella definizione della funzione di trasformazione, che deve essere fornita come stringa. 
 
 
 ```r
@@ -5505,7 +5522,6 @@ In alcuni casi abbiamo a disposizione modelli matamatici che non sono immediatam
 
 
 ```r
-library(aomisc)
 data(competition)
 head(competition)
 ##   Dens    Yield
@@ -5626,6 +5642,8 @@ Pur essendo entrambi gli approcci corretti, il secondo è certamente più elegan
 
 # Esercizi
 
+Le domande e gli esercizi che seguono sono organizzati per capitolo, in modo che possiate verificare, di volta in volta, se avete acquisito le competenze necessarie per passare al capitolo successivo.
+
 ## Capitolo 1
 
 ### Domanda 1
@@ -5634,7 +5652,7 @@ Quali sono le caratteristiche fondamentali di un esperimento scientifico, perch�
 
 ### Domanda 2
 
-Illustrare brevemente il motodo scientifico 'galileiano'.
+Illustrare brevemente il metodo scientifico 'galileiano'.
 
 ### Domanda 3
 
@@ -5840,7 +5858,7 @@ Assumendo che la relazione sia lineare (retta), stimare la pendenza e l'intercet
 
 ### Esercizio 1
 
-Uno sperimentatore ha impostato un esperimento verificare l'effetto di un fungicida (A) in confronto al testimone non trattato (B), in base al numero di colonie fungine sopravvissute. Il numero delle colonie trattate è di 200, mentre il numero di quelle non trattate è di 100. Le risposte (frequenze) sono come segue:
+Uno sperimentatore ha impostato un esperimento per verificare l'effetto di un fungicida (A) in confronto al testimone non trattato (B), in base al numero di colonie fungine sopravvissute. Il numero delle colonie trattate è di 200, mentre il numero di quelle non trattate è di 100. Le risposte (frequenze) sono come segue:
 
 |     | Morte | Sopravvissute |
 |-----|:-----:|:-------------:|
@@ -5905,7 +5923,7 @@ QI1 <- c(90.31, 112.63, 101.93, 121.47, 111.37, 100.37, 106.80,
          95.06, 104.88)
 ```
 
-Gli studenti provenienti da un'altra parte della stessa città hanno invece mostrato i seguenti Q.I.:
+Gli studenti provenienti da un altro quartiere della stessa città hanno invece mostrato i seguenti Q.I.:
 
 
 ```r
@@ -5913,7 +5931,7 @@ QI2 <- c(90.66, 101.41, 104.61,  91.77, 107.06,  89.51,  87.91,
          92.31, 112.96,  90.33,  99.86,  88.99,  98.97,  97.92)
 ```
 
-Esiste una differenza significativa tra i Q.I. dei due gruppi?
+Esiste una differenza significativa tra i Q.I. nei due quartieri della città?
 
 ### Esercizio 7
 
@@ -5980,11 +5998,18 @@ Al termine dell'esperimento, le produttività osservate erano le seguenti:
 Un botanico ha valutato il numero di semi germinati per colza sottoposto a due diversi regimi termici dopo l'imbibizione (15 e 25°C). Per la temperatura più bassa, su 400 semi posti in prova, ne sono germinati 358. Alla temperatura più alta, su 380 semi in prova, ne sono germinati 286.
 
 1. Descrivere i due campioni, in termini di proporzione di semi germinati
-2. Inferire la proporzione di germinati nell'intera popolazione di semi da cui è stato estratto il nostro campione casuale di 780 semi. Utilizzare opportunamente un intervallo di incertezza, sapendo che la varianza di una proporzione è una quantità fissa, che si calcola come $p ( 1- p)$.
+2. Inferire la proporzione di germinati nell'intera popolazione di semi da cui è stato estratto il nostro campione casuale di 780 semi. Utilizzare opportunamente un intervallo di incertezza, sapendo che la varianza di una proporzione è una quantità fissa, che si calcola come $p ( 1- p)$ (dove 'p' è la proporzione osservata.
 3. Esiste una differenza significativa tra le proporzioni delle due popolazioni? Esplicitare l'ipotesi nulla e calcolare la probabilità di errore relativa al suo rifiuto.
 
 
 
+### Esercizio 11
+
+Un veterinario ha organizzato un esperimento per valutare l'effetto di una dieta innovativa, sulla pressione arteriosa sistolica di cavalli da corsa. Ha selezionato a caso 16 animali, ne ha misurato la pressione arteriosa a riposo ed ha ripetuto la stessa misurazione dopo sei mesi di questa dieta. I risultati ottenuti sono i seguenti:
+
+
+
+Stabilire se la dieta è efficace, con una probabilità di errore P < 0.05.
 
 ---
 
