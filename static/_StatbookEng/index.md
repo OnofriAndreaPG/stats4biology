@@ -1,7 +1,7 @@
 ---
 title: "Experimental methods in agriculture"
 author: "Andrea Onofri and Dario Sacco"
-date: "Update: v. 1.001 (2022-10-08), compil. 2022-10-19"
+date: "Update: v. 1.001 (2022-10-08), compil. 2022-11-23"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -999,10 +999,9 @@ We have just listed some of the main stats that can be used to describe the prop
 
 
 ```r
-options(width = 60)
 dataset$var
-##  [1] "N" "S" "V" "V" "C" "N" "C" "C" "V" "N" "N" "N" "S" "C"
-## [15] "N" "C" "V" "S" "C" "C"
+##  [1] "N" "S" "V" "V" "C" "N" "C" "C" "V" "N" "N" "N" "S" "C" "N" "C"
+## [17] "V" "S" "C" "C"
 mu.height <- tapply(dataset$height, dataset$var, FUN = mean)
 mu.height
 ##      C      N      S      V 
@@ -2486,10 +2485,8 @@ and our point estimate is $\mu = m = 14.48375$. Next, we can estimate the $\alph
 ```r
 alpha <- treatMeans - mu
 alpha
-## Metribuzin__348     Mixture_378  Rimsulfuron_30 
-##        -5.30875        -9.35625         2.37625 
-##        Unweeded 
-##        12.28875
+## Metribuzin__348     Mixture_378  Rimsulfuron_30        Unweeded 
+##        -5.30875        -9.35625         2.37625        12.28875
 ```
 
 
@@ -2523,40 +2520,23 @@ tab <- data.frame(dataset$Treat, dataset$Weight, mu,
              alpha, Expected, Residuals)
 names(tab)[1] <- "Herbicide"
 print(tab, digits = 3)
-##          Herbicide dataset.Weight   mu alpha Expected
-## 1  Metribuzin__348          15.20 14.5 -5.31     9.18
-## 2  Metribuzin__348           4.38 14.5 -5.31     9.18
-## 3  Metribuzin__348          10.32 14.5 -5.31     9.18
-## 4  Metribuzin__348           6.80 14.5 -5.31     9.18
-## 5      Mixture_378           6.14 14.5 -9.36     5.13
-## 6      Mixture_378           1.95 14.5 -9.36     5.13
-## 7      Mixture_378           7.27 14.5 -9.36     5.13
-## 8      Mixture_378           5.15 14.5 -9.36     5.13
-## 9   Rimsulfuron_30          10.50 14.5  2.38    16.86
-## 10  Rimsulfuron_30          20.70 14.5  2.38    16.86
-## 11  Rimsulfuron_30          20.74 14.5  2.38    16.86
-## 12  Rimsulfuron_30          15.50 14.5  2.38    16.86
-## 13        Unweeded          24.62 14.5 12.29    26.77
-## 14        Unweeded          30.94 14.5 12.29    26.77
-## 15        Unweeded          24.02 14.5 12.29    26.77
-## 16        Unweeded          27.51 14.5 12.29    26.77
-##    Residuals
-## 1     6.0250
-## 2    -4.7950
-## 3     1.1450
-## 4    -2.3750
-## 5     1.0125
-## 6    -3.1775
-## 7     2.1425
-## 8     0.0225
-## 9    -6.3600
-## 10    3.8400
-## 11    3.8800
-## 12   -1.3600
-## 13   -2.1525
-## 14    4.1675
-## 15   -2.7525
-## 16    0.7375
+##          Herbicide dataset.Weight   mu alpha Expected Residuals
+## 1  Metribuzin__348          15.20 14.5 -5.31     9.18    6.0250
+## 2  Metribuzin__348           4.38 14.5 -5.31     9.18   -4.7950
+## 3  Metribuzin__348          10.32 14.5 -5.31     9.18    1.1450
+## 4  Metribuzin__348           6.80 14.5 -5.31     9.18   -2.3750
+## 5      Mixture_378           6.14 14.5 -9.36     5.13    1.0125
+## 6      Mixture_378           1.95 14.5 -9.36     5.13   -3.1775
+## 7      Mixture_378           7.27 14.5 -9.36     5.13    2.1425
+## 8      Mixture_378           5.15 14.5 -9.36     5.13    0.0225
+## 9   Rimsulfuron_30          10.50 14.5  2.38    16.86   -6.3600
+## 10  Rimsulfuron_30          20.70 14.5  2.38    16.86    3.8400
+## 11  Rimsulfuron_30          20.74 14.5  2.38    16.86    3.8800
+## 12  Rimsulfuron_30          15.50 14.5  2.38    16.86   -1.3600
+## 13        Unweeded          24.62 14.5 12.29    26.77   -2.1525
+## 14        Unweeded          30.94 14.5 12.29    26.77    4.1675
+## 15        Unweeded          24.02 14.5 12.29    26.77   -2.7525
+## 16        Unweeded          27.51 14.5 12.29    26.77    0.7375
 ```
 
 
@@ -2719,19 +2699,13 @@ summary(mod)
 ## -6.360 -2.469  0.380  2.567  6.025 
 ## 
 ## Coefficients:
-##                     Estimate Std. Error t value Pr(>|t|)
-## (Intercept)            9.175      1.959   4.684 0.000529
-## TreatMixture_378      -4.047      2.770  -1.461 0.169679
-## TreatRimsulfuron_30    7.685      2.770   2.774 0.016832
-## TreatUnweeded         17.598      2.770   6.352 3.65e-05
-##                        
-## (Intercept)         ***
-## TreatMixture_378       
-## TreatRimsulfuron_30 *  
-## TreatUnweeded       ***
+##                     Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)            9.175      1.959   4.684 0.000529 ***
+## TreatMixture_378      -4.047      2.770  -1.461 0.169679    
+## TreatRimsulfuron_30    7.685      2.770   2.774 0.016832 *  
+## TreatUnweeded         17.598      2.770   6.352 3.65e-05 ***
 ## ---
-## Signif. codes:  
-## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Residual standard error: 3.918 on 12 degrees of freedom
 ## Multiple R-squared:  0.8554,	Adjusted R-squared:  0.8193 
@@ -2795,8 +2769,7 @@ anova(mod)
 ## Treat      3 1089.53  363.18  23.663 2.509e-05 ***
 ## Residuals 12  184.18   15.35                      
 ## ---
-## Signif. codes:  
-## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 
@@ -2935,9 +2908,8 @@ With eleven values, we know that the sixth value is the median (50^th^ percentil
 ```r
 pval <- ppoints(1:11)
 pval
-##  [1] 0.04545455 0.13636364 0.22727273 0.31818182 0.40909091
-##  [6] 0.50000000 0.59090909 0.68181818 0.77272727 0.86363636
-## [11] 0.95454545
+##  [1] 0.04545455 0.13636364 0.22727273 0.31818182 0.40909091 0.50000000
+##  [7] 0.59090909 0.68181818 0.77272727 0.86363636 0.95454545
 ```
 
 We see that the first observation corresponds the 4.5^th^ percentile, the second observation is the 13.63^th^ percentile and so on, until the final observation that is the 95.45^th^ percentile. What are these percentiles in a standardised gaussian distribution? We can calculate them by using the `qnorm()` function:
@@ -2946,9 +2918,8 @@ We see that the first observation corresponds the 4.5^th^ percentile, the second
 ```r
 perc <- qnorm(pval)
 perc
-##  [1] -1.6906216 -1.0968036 -0.7478586 -0.4727891 -0.2298841
-##  [6]  0.0000000  0.2298841  0.4727891  0.7478586  1.0968036
-## [11]  1.6906216
+##  [1] -1.6906216 -1.0968036 -0.7478586 -0.4727891 -0.2298841  0.0000000
+##  [7]  0.2298841  0.4727891  0.7478586  1.0968036  1.6906216
 ```
 
 If our 11 standardised residuals are gaussian, they should match the behaviour of the respective percentiles in a gaussian population: the central residual should be close to 0, the smallest one should be close to -1.691, the second one should be close to -1.097 and so on. Furthermore, the number of negative values should be approximately equal to the number of positive values and the median should be approximately equal to the mean. 
@@ -3027,16 +2998,14 @@ anova(model)
 ## factor(treat)  1  5.1546  5.1546  5.8805 0.0249 *
 ## Residuals     20 17.5311  0.8766                 
 ## ---
-## Signif. codes:  
-## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 car::leveneTest(res ~ factor(treat), center = mean)
 ## Levene's Test for Homogeneity of Variance (center = mean)
 ##       Df F value Pr(>F)  
 ## group  1  5.8803 0.0249 *
 ##       20                 
 ## ---
-## Signif. codes:  
-## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 The Levene's test can also be performed by considering the medians of groups instead of the means ('center = median'), which gives us a more robust test, i.e. less sensible to possible outliers.
@@ -3171,15 +3140,14 @@ In this case we see clear signs of heteroscedastic (left plot) and right-skewed 
 
 ```r
 car::leveneTest(mod, center = mean )
-## Warning in leveneTest.default(y = y, group = group, ...):
-## group coerced to factor.
+## Warning in leveneTest.default(y = y, group = group, ...): group
+## coerced to factor.
 ## Levene's Test for Homogeneity of Variance (center = mean)
 ##       Df F value  Pr(>F)  
 ## group  2   3.941 0.04834 *
 ##       12                  
 ## ---
-## Signif. codes:  
-## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 shapiro.test(residuals(mod))
 ## 
 ## 	Shapiro-Wilk normality test
@@ -3230,8 +3198,7 @@ anova(modt)
 ## Insecticide  2 15.8200  7.9100  50.122 1.493e-06 ***
 ## Residuals   12  1.8938  0.1578                      
 ## ---
-## Signif. codes:  
-## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 The above table suggests that there are significant differences among insecticides (P = 1.493e-06). It may be interesting to compare the above output with the output obtained from the analysis of untransformed data:
@@ -3246,8 +3213,7 @@ anova(mod)
 ## Insecticide  2 714654  357327  18.161 0.0002345 ***
 ## Residuals   12 236105   19675                      
 ## ---
-## Signif. codes:  
-## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 Apart from the fact that this latter analysis is wrong, because the basic assumptions of linear models are not respected, we can see that the analysis on transformed data is more powerful, in the sense that it results in a lower P-value. In this example, the null hypothesis is rejected both with transformed and with untransformed data, but in other situations, whenever the P-value is close to the borderline of significance, making a wise selection of the transformation becomes fundamental.
@@ -3466,20 +3432,13 @@ The first situation implies a very high number of contrasts that is equal to $k 
 ```r
 # Pairwise contrasts
 contrast(treat.means, adjust="none", method="pairwise")
-##  contrast                         estimate   SE df t.ratio
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235
-##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578
-##  p.value
-##   0.1697
-##   0.0168
-##   <.0001
-##   0.0012
-##   <.0001
-##   0.0038
+##  contrast                         estimate   SE df t.ratio p.value
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  0.1697
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.0168
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  <.0001
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0012
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0038
 ```
 \normalsize
 
@@ -3491,14 +3450,10 @@ The second situation implies a lower number of contrasts and we can set the 'met
 ```r
 # Dunnett contrasts
 contrast(treat.means, adjust="none", method="dunnett", ref = 2)
-##  contrast                      estimate   SE df t.ratio
-##  Metribuzin__348 - Mixture_378     4.05 2.77 12   1.461
-##  Rimsulfuron_30 - Mixture_378     11.73 2.77 12   4.235
-##  Unweeded - Mixture_378           21.64 2.77 12   7.813
-##  p.value
-##   0.1697
-##   0.0012
-##   <.0001
+##  contrast                      estimate   SE df t.ratio p.value
+##  Metribuzin__348 - Mixture_378     4.05 2.77 12   1.461  0.1697
+##  Rimsulfuron_30 - Mixture_378     11.73 2.77 12   4.235  0.0012
+##  Unweeded - Mixture_378           21.64 2.77 12   7.813  <.0001
 ```
 \normalsize
 
@@ -3510,14 +3465,10 @@ We may have noted that the above contrasts do not fully answer our questions abo
 con <- contrast(treat.means, adjust="none", 
                 method="dunnett", ref = 2)
 confint(con)
-##  contrast                      estimate   SE df lower.CL
-##  Metribuzin__348 - Mixture_378     4.05 2.77 12    -1.99
-##  Rimsulfuron_30 - Mixture_378     11.73 2.77 12     5.70
-##  Unweeded - Mixture_378           21.64 2.77 12    15.61
-##  upper.CL
-##      10.1
-##      17.8
-##      27.7
+##  contrast                      estimate   SE df lower.CL upper.CL
+##  Metribuzin__348 - Mixture_378     4.05 2.77 12    -1.99     10.1
+##  Rimsulfuron_30 - Mixture_378     11.73 2.77 12     5.70     17.8
+##  Unweeded - Mixture_378           21.64 2.77 12    15.61     27.7
 ## 
 ## Confidence level used: 0.95
 ```
@@ -3589,24 +3540,17 @@ con <- contrast(treat.means, method = "pairwise", adjust = "none")
 Pc <- as.data.frame(con)[,6]
 Pf <- 1 - (1 - Pc)^6
 Pf
-## [1] 6.722991e-01 9.683462e-02 2.190543e-04 6.923077e-03
-## [5] 2.869757e-05 2.255183e-02
+## [1] 6.722991e-01 9.683462e-02 2.190543e-04 6.923077e-03 2.869757e-05
+## [6] 2.255183e-02
 # With R
 contrast(treat.means, method = "pairwise", adjust = "sidak")
-##  contrast                         estimate   SE df t.ratio
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235
-##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578
-##  p.value
-##   0.6723
-##   0.0968
-##   0.0002
-##   0.0069
-##   <.0001
-##   0.0226
+##  contrast                         estimate   SE df t.ratio p.value
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  0.6723
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.0968
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  0.0002
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0069
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0226
 ## 
 ## P value adjustment: sidak method for 6 tests
 ```
@@ -3621,23 +3565,16 @@ $$\alpha_E = \alpha_C \cdot k$$
 
 ```r
 Pc * 6
-## [1] 1.018071e+00 1.009900e-01 2.190743e-04 6.943132e-03
-## [5] 2.869792e-05 2.276671e-02
+## [1] 1.018071e+00 1.009900e-01 2.190743e-04 6.943132e-03 2.869792e-05
+## [6] 2.276671e-02
 contrast(treat.means, method = "pairwise", adjust = "bonferroni")
-##  contrast                         estimate   SE df t.ratio
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235
-##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578
-##  p.value
-##   1.0000
-##   0.1010
-##   0.0002
-##   0.0069
-##   <.0001
-##   0.0228
+##  contrast                         estimate   SE df t.ratio p.value
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  1.0000
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.1010
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  0.0002
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0069
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0228
 ## 
 ## P value adjustment: bonferroni method for 6 tests
 ```
@@ -3651,31 +3588,20 @@ In recent times, a group of American scientists has found the way of accounting 
 
 ```r
 contrast(treat.means, method="pairwise")
-##  contrast                         estimate   SE df t.ratio
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235
-##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578
-##  p.value
-##   0.4885
-##   0.0698
-##   0.0002
-##   0.0055
-##   <.0001
-##   0.0173
+##  contrast                         estimate   SE df t.ratio p.value
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  0.4885
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.0698
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  0.0002
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0055
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0173
 ## 
 ## P value adjustment: tukey method for comparing a family of 4 estimates
 contrast(treat.means, method="dunnett")
-##  contrast                         estimate   SE df t.ratio
-##  Mixture_378 - Metribuzin__348       -4.05 2.77 12  -1.461
-##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12   2.774
-##  Unweeded - Metribuzin__348          17.60 2.77 12   6.352
-##  p.value
-##   0.3711
-##   0.0442
-##   0.0001
+##  contrast                         estimate   SE df t.ratio p.value
+##  Mixture_378 - Metribuzin__348       -4.05 2.77 12  -1.461  0.3711
+##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12   2.774  0.0442
+##  Unweeded - Metribuzin__348          17.60 2.77 12   6.352  0.0001
 ## 
 ## P value adjustment: dunnettx method for 3 tests
 ```
@@ -3738,7 +3664,7 @@ What are these back-transformed means? Expectedly, we can see that they are diff
 
 
 ```r
-emmeans(mod, ~Insecticide)
+emmeans(lm(Count ~ Insecticide, data = dataset), ~Insecticide)
 ##  Insecticide emmean   SE df lower.CL upper.CL
 ##  T1           589.8 62.7 12    453.1      726
 ##  T2           357.4 62.7 12    220.7      494
@@ -3860,10 +3786,10 @@ bMeans <- tapply(dataset$Yield, dataset$Block, mean)
 allMean
 ## [1] 4.424583
 gMeans
-## COLOSSEO    CRESO   DUILIO   GRAZIA    IRIDE SANCARLO 
-## 4.893333 4.326667 4.240000 4.340000 4.963333 4.503333 
-##   SIMETO    SOLEX 
-## 3.340000 4.790000
+## COLOSSEO    CRESO   DUILIO   GRAZIA    IRIDE SANCARLO   SIMETO 
+## 4.893333 4.326667 4.240000 4.340000 4.963333 4.503333 3.340000 
+##    SOLEX 
+## 4.790000
 bMeans
 ##       A       B       C 
 ## 4.20625 4.41500 4.65250
@@ -3903,56 +3829,31 @@ epsilon <- dataset$Yield - YE
 lmod <- data.frame(dataset, mu, gamma, alpha, 
                    YE, epsilon)
 print(lmod, digits = 4)
-##    Plot Block Genotype Yield    mu     gamma    alpha    YE
-## 1    57     A COLOSSEO  4.31 4.425 -0.218333  0.46875 4.675
-## 2    61     B COLOSSEO  4.73 4.425 -0.009583  0.46875 4.884
-## 3    11     C COLOSSEO  5.64 4.425  0.227917  0.46875 5.121
-## 4    60     A    CRESO  3.99 4.425 -0.218333 -0.09792 4.108
-## 5    10     B    CRESO  4.82 4.425 -0.009583 -0.09792 4.317
-## 6    42     C    CRESO  4.17 4.425  0.227917 -0.09792 4.555
-## 7    29     A   DUILIO  4.24 4.425 -0.218333 -0.18458 4.022
-## 8    48     B   DUILIO  4.10 4.425 -0.009583 -0.18458 4.230
-## 9    81     C   DUILIO  4.38 4.425  0.227917 -0.18458 4.468
-## 10   32     A   GRAZIA  4.07 4.425 -0.218333 -0.08458 4.122
-## 11   65     B   GRAZIA  4.18 4.425 -0.009583 -0.08458 4.330
-## 12   28     C   GRAZIA  4.77 4.425  0.227917 -0.08458 4.568
-## 13   19     A    IRIDE  5.18 4.425 -0.218333  0.53875 4.745
-## 14   79     B    IRIDE  4.88 4.425 -0.009583  0.53875 4.954
-## 15   55     C    IRIDE  4.83 4.425  0.227917  0.53875 5.191
-## 16    5     A SANCARLO  4.34 4.425 -0.218333  0.07875 4.285
-## 17   37     B SANCARLO  4.41 4.425 -0.009583  0.07875 4.494
-## 18   70     C SANCARLO  4.76 4.425  0.227917  0.07875 4.731
-## 19    2     A   SIMETO  3.03 4.425 -0.218333 -1.08458 3.122
-## 20   34     B   SIMETO  3.21 4.425 -0.009583 -1.08458 3.330
-## 21   67     C   SIMETO  3.78 4.425  0.227917 -1.08458 3.568
-## 22   74     A    SOLEX  4.49 4.425 -0.218333  0.36542 4.572
-## 23    9     B    SOLEX  4.99 4.425 -0.009583  0.36542 4.780
-## 24   56     C    SOLEX  4.89 4.425  0.227917  0.36542 5.018
-##     epsilon
-## 1  -0.36500
-## 2  -0.15375
-## 3   0.51875
-## 4  -0.11833
-## 5   0.50292
-## 6  -0.38458
-## 7   0.21833
-## 8  -0.13042
-## 9  -0.08792
-## 10 -0.05167
-## 11 -0.15042
-## 12  0.20208
-## 13  0.43500
-## 14 -0.07375
-## 15 -0.36125
-## 16  0.05500
-## 17 -0.08375
-## 18  0.02875
-## 19 -0.09167
-## 20 -0.12042
-## 21  0.21208
-## 22 -0.08167
-## 23  0.20958
-## 24 -0.12792
+##    Plot Block Genotype Yield    mu     gamma    alpha    YE  epsilon
+## 1    57     A COLOSSEO  4.31 4.425 -0.218333  0.46875 4.675 -0.36500
+## 2    61     B COLOSSEO  4.73 4.425 -0.009583  0.46875 4.884 -0.15375
+## 3    11     C COLOSSEO  5.64 4.425  0.227917  0.46875 5.121  0.51875
+## 4    60     A    CRESO  3.99 4.425 -0.218333 -0.09792 4.108 -0.11833
+## 5    10     B    CRESO  4.82 4.425 -0.009583 -0.09792 4.317  0.50292
+## 6    42     C    CRESO  4.17 4.425  0.227917 -0.09792 4.555 -0.38458
+## 7    29     A   DUILIO  4.24 4.425 -0.218333 -0.18458 4.022  0.21833
+## 8    48     B   DUILIO  4.10 4.425 -0.009583 -0.18458 4.230 -0.13042
+## 9    81     C   DUILIO  4.38 4.425  0.227917 -0.18458 4.468 -0.08792
+## 10   32     A   GRAZIA  4.07 4.425 -0.218333 -0.08458 4.122 -0.05167
+## 11   65     B   GRAZIA  4.18 4.425 -0.009583 -0.08458 4.330 -0.15042
+## 12   28     C   GRAZIA  4.77 4.425  0.227917 -0.08458 4.568  0.20208
+## 13   19     A    IRIDE  5.18 4.425 -0.218333  0.53875 4.745  0.43500
+## 14   79     B    IRIDE  4.88 4.425 -0.009583  0.53875 4.954 -0.07375
+## 15   55     C    IRIDE  4.83 4.425  0.227917  0.53875 5.191 -0.36125
+## 16    5     A SANCARLO  4.34 4.425 -0.218333  0.07875 4.285  0.05500
+## 17   37     B SANCARLO  4.41 4.425 -0.009583  0.07875 4.494 -0.08375
+## 18   70     C SANCARLO  4.76 4.425  0.227917  0.07875 4.731  0.02875
+## 19    2     A   SIMETO  3.03 4.425 -0.218333 -1.08458 3.122 -0.09167
+## 20   34     B   SIMETO  3.21 4.425 -0.009583 -1.08458 3.330 -0.12042
+## 21   67     C   SIMETO  3.78 4.425  0.227917 -1.08458 3.568  0.21208
+## 22   74     A    SOLEX  4.49 4.425 -0.218333  0.36542 4.572 -0.08167
+## 23    9     B    SOLEX  4.99 4.425 -0.009583  0.36542 4.780  0.20958
+## 24   56     C    SOLEX  4.89 4.425  0.227917  0.36542 5.018 -0.12792
 ```
 \normalsize
 
@@ -4040,8 +3941,7 @@ anova(lm(abs(epsilon) ~ factor(Genotype), data = dataset))
 ## factor(Genotype)  7 0.24819 0.035455  2.2162 0.08887 .
 ## Residuals        16 0.25597 0.015998                  
 ## ---
-## Signif. codes:  
-## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 
@@ -4061,8 +3961,7 @@ anova(mod)
 ## Genotype   7 5.6305 0.80436  7.7651 0.0006252 ***
 ## Residuals 14 1.4502 0.10359                      
 ## ---
-## Signif. codes:  
-## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 The sum of squares are the same as those obtained by hand-calculations and they measure the amount of data variability that can be attributed to the different effects. Sum of squares cannot be directly compared, because they are based on different degrees of freedom and, therefore, we calculate the corresponding variances.
@@ -4177,8 +4076,7 @@ anova(mod)
 ## Shift       3 467.19 155.729 40.8470 0.0002185 ***
 ## Residuals   6  22.87   3.812                      
 ## ---
-## Signif. codes:  
-## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 The difference between protocols is significant, as well as the difference between shifts, while the technicians did not differ significantly. We might be interested in selecting the best working protocols, which can be done by using pairwise comparisons. I will leave this part to you, as an exercise.
@@ -4375,68 +4273,68 @@ With little patience, we can easily complete the calculations by hand and organi
 
 ```r
 print(tab, digits = 3)
-##    Block Genotype N Yield  mu   gamma  alpha    beta
-## 1      1        A 1  2.15 2.9 -0.1023 -0.343 -0.0926
-## 2      2        A 1  2.43 2.9  0.0566 -0.343 -0.0926
-## 3      3        A 1  2.58 2.9  0.0456 -0.343 -0.0926
-## 4      1        A 2  2.36 2.9 -0.1023 -0.343  0.0926
-## 5      2        A 2  2.92 2.9  0.0566 -0.343  0.0926
-## 6      3        A 2  2.91 2.9  0.0456 -0.343  0.0926
-## 7      1        B 1  2.94 2.9 -0.1023  0.175 -0.0926
-## 8      2        B 1  2.92 2.9  0.0566  0.175 -0.0926
-## 9      3        B 1  2.89 2.9  0.0456  0.175 -0.0926
-## 10     1        B 2  3.24 2.9 -0.1023  0.175  0.0926
-## 11     2        B 2  3.30 2.9  0.0566  0.175  0.0926
-## 12     3        B 2  3.17 2.9  0.0456  0.175  0.0926
-## 13     1        C 1  2.38 2.9 -0.1023 -0.540 -0.0926
-## 14     2        C 1  2.53 2.9  0.0566 -0.540 -0.0926
-## 15     3        C 1  2.69 2.9  0.0456 -0.540 -0.0926
-## 16     1        C 2  2.30 2.9 -0.1023 -0.540  0.0926
-## 17     2        C 2  2.19 2.9  0.0566 -0.540  0.0926
-## 18     3        C 2  2.08 2.9  0.0456 -0.540  0.0926
-## 19     1        D 1  2.69 2.9 -0.1023  0.249 -0.0926
-## 20     2        D 1  3.34 2.9  0.0566  0.249 -0.0926
-## 21     3        D 1  2.84 2.9  0.0456  0.249 -0.0926
-## 22     1        D 2  3.30 2.9 -0.1023  0.249  0.0926
-## 23     2        D 2  3.29 2.9  0.0566  0.249  0.0926
-## 24     3        D 2  3.45 2.9  0.0456  0.249  0.0926
-## 25     1        E 1  3.24 2.9 -0.1023  0.459 -0.0926
-## 26     2        E 1  3.06 2.9  0.0566  0.459 -0.0926
-## 27     3        E 1  3.46 2.9  0.0456  0.459 -0.0926
-## 28     1        E 2  3.41 2.9 -0.1023  0.459  0.0926
-## 29     2        E 2  3.60 2.9  0.0566  0.459  0.0926
-## 30     3        E 2  3.38 2.9  0.0456  0.459  0.0926
-##    alphaBeta residuals
-## 1    -0.0799  -0.13773
-## 2    -0.0799  -0.00963
-## 3    -0.0799   0.14737
-## 4     0.0799  -0.26673
-## 5     0.0799   0.13137
-## 6     0.0799   0.13537
-## 7    -0.0694   0.12193
-## 8    -0.0694  -0.05297
-## 9    -0.0694  -0.06897
-## 10    0.0694   0.10393
-## 11    0.0694   0.00803
-## 12    0.0694  -0.11197
-## 13    0.2638  -0.05407
-## 14    0.2638  -0.06097
-## 15    0.2638   0.11503
-## 16   -0.2638   0.20827
-## 17   -0.2638  -0.05663
-## 18   -0.2638  -0.15163
-## 19   -0.1024  -0.16873
-## 20   -0.1024   0.32837
-## 21   -0.1024  -0.15963
-## 22    0.1024   0.05527
-## 23    0.1024  -0.11563
-## 24    0.1024   0.06037
-## 25   -0.0122   0.08927
-## 26   -0.0122  -0.24963
-## 27   -0.0122   0.16037
-## 28    0.0122   0.04860
-## 29    0.0122   0.07770
-## 30    0.0122  -0.12630
+##    Block Genotype N Yield  mu   gamma  alpha    beta alphaBeta
+## 1      1        A 1  2.15 2.9 -0.1023 -0.343 -0.0926    0.4361
+## 2      2        A 1  2.43 2.9  0.0566 -0.343 -0.0926    0.4361
+## 3      3        A 1  2.58 2.9  0.0456 -0.343 -0.0926    0.4361
+## 4      1        A 2  2.36 2.9 -0.1023 -0.343  0.0926    0.2508
+## 5      2        A 2  2.92 2.9  0.0566 -0.343  0.0926    0.2508
+## 6      3        A 2  2.91 2.9  0.0456 -0.343  0.0926    0.2508
+## 7      1        B 1  2.94 2.9 -0.1023  0.175 -0.0926   -0.0827
+## 8      2        B 1  2.92 2.9  0.0566  0.175 -0.0926   -0.0827
+## 9      3        B 1  2.89 2.9  0.0456  0.175 -0.0926   -0.0827
+## 10     1        B 2  3.24 2.9 -0.1023  0.175  0.0926   -0.2680
+## 11     2        B 2  3.30 2.9  0.0566  0.175  0.0926   -0.2680
+## 12     3        B 2  3.17 2.9  0.0456  0.175  0.0926   -0.2680
+## 13     1        C 1  2.38 2.9 -0.1023 -0.540 -0.0926    0.6324
+## 14     2        C 1  2.53 2.9  0.0566 -0.540 -0.0926    0.6324
+## 15     3        C 1  2.69 2.9  0.0456 -0.540 -0.0926    0.6324
+## 16     1        C 2  2.30 2.9 -0.1023 -0.540  0.0926    0.4472
+## 17     2        C 2  2.19 2.9  0.0566 -0.540  0.0926    0.4472
+## 18     3        C 2  2.08 2.9  0.0456 -0.540  0.0926    0.4472
+## 19     1        D 1  2.69 2.9 -0.1023  0.249 -0.0926   -0.1564
+## 20     2        D 1  3.34 2.9  0.0566  0.249 -0.0926   -0.1564
+## 21     3        D 1  2.84 2.9  0.0456  0.249 -0.0926   -0.1564
+## 22     1        D 2  3.30 2.9 -0.1023  0.249  0.0926   -0.3417
+## 23     2        D 2  3.29 2.9  0.0566  0.249  0.0926   -0.3417
+## 24     3        D 2  3.45 2.9  0.0456  0.249  0.0926   -0.3417
+## 25     1        E 1  3.24 2.9 -0.1023  0.459 -0.0926   -0.3662
+## 26     2        E 1  3.06 2.9  0.0566  0.459 -0.0926   -0.3662
+## 27     3        E 1  3.46 2.9  0.0456  0.459 -0.0926   -0.3662
+## 28     1        E 2  3.41 2.9 -0.1023  0.459  0.0926   -0.5515
+## 29     2        E 2  3.60 2.9  0.0566  0.459  0.0926   -0.5515
+## 30     3        E 2  3.38 2.9  0.0456  0.459  0.0926   -0.5515
+##    residuals
+## 1    -0.6537
+## 2    -0.5256
+## 3    -0.3686
+## 4    -0.4377
+## 5    -0.0396
+## 6    -0.0356
+## 7     0.1353
+## 8    -0.0396
+## 9    -0.0556
+## 10    0.4413
+## 11    0.3454
+## 12    0.2254
+## 13   -0.4227
+## 14   -0.4296
+## 15   -0.2536
+## 16   -0.5027
+## 17   -0.7676
+## 18   -0.8626
+## 19   -0.1147
+## 20    0.3824
+## 21   -0.1056
+## 22    0.4993
+## 23    0.3284
+## 24    0.5044
+## 25    0.4433
+## 26    0.1044
+## 27    0.5144
+## 28    0.6123
+## 29    0.6414
+## 30    0.4374
 ```
 
 \normalsize
@@ -4450,7 +4348,7 @@ The table above shows all effects and permits the calculation of sum of squares,
 ```r
 RSS <- sum(tab$residuals ^ 2)
 RSS
-## [1] 0.5849906
+## [1] 5.666969
 ```
 
 while the sum of squares for blocks, genotype, nitrogen and interaction effects are calculated as:
@@ -4469,7 +4367,7 @@ NSS
 ## [1] 0.257428
 GNSS <- sum(tab$alphaBeta ^ 2)
 GNSS
-## [1] 0.5484518
+## [1] 4.533526
 ```
 
 Also in this case, we can see that the sum of all the above mentioned sum of squares is equal to the total deviance of all the observations.
@@ -4480,7 +4378,7 @@ Also in this case, we can see that the sum of all the above mentioned sum of squ
 sum((dataset$Yield - mu)^2)
 ## [1] 5.824451
 RSS + GSS + NSS + GNSS
-## [1] 5.666969
+## [1] 14.73402
 ```
 
 We clearly see that the whole variability of yield has been partitioned in four parts, one is due to the effect of blocks, another one is due to the effect of genotypes, another one is due to the effect of N fertilisation and, finally, the last one is due to all other unknown effects of random nature.
@@ -4538,8 +4436,7 @@ anova(mod)
 ## Genotype:N  4 0.5485 0.13711  4.2189  0.01392 *  
 ## Residuals  18 0.5850 0.03250                     
 ## ---
-## Signif. codes:  
-## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 \normalsize
 
@@ -4741,8 +4638,7 @@ anova(mod)
 ## Male:Female    6 575.16  95.860  33.239 1.742e-10 ***
 ## Residuals     24  69.21   2.884                      
 ## ---
-## Signif. codes:  
-## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 From the ANOVA table we see that all effects are significant; as before, we should read the ANOVA table from bottom up and we should consider that the main affect of 'father' is relatively unimportant, as the three lines are mated to different female lines.
@@ -4818,16 +4714,6 @@ dataset <- read.csv(file, header=T)
 ```
 
 
-```
-## 
-## Attaching package: 'reshape'
-## The following object is masked from 'package:dplyr':
-## 
-##     rename
-```
-
-
-
 Table: (\#tab:tabName141)Dataset relativo ad una prova di concimazione azotata su frumento
 
 | Dose|     1|     2|     3|     4|
@@ -4865,8 +4751,7 @@ anova(modelAov)
 ## factor(Dose)  3 1725.96  575.32  112.77 4.668e-09 ***
 ## Residuals    12   61.22    5.10                      
 ## ---
-## Signif. codes:  
-## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 
@@ -4940,8 +4825,7 @@ summary(modelReg)
 ## (Intercept) 23.793750   0.937906   25.37 4.19e-13 ***
 ## Dose         0.154417   0.008356   18.48 3.13e-11 ***
 ## ---
-## Signif. codes:  
-## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Residual standard error: 2.242 on 14 degrees of freedom
 ## Multiple R-squared:  0.9606,	Adjusted R-squared:  0.9578 
@@ -5007,8 +4891,7 @@ anova(modelReg)
 ## Dose       1 1716.80 1716.80  341.54 3.129e-11 ***
 ## Residuals 14   70.37    5.03                      
 ## ---
-## Signif. codes:  
-## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 Indeed, the ANOVA model appears to provide a better description of the experimental data, which is expected, as the residuals contain only the so-called pure error, i.e. the variability of each value around the group mean. On the other hand, the residuals from the regression model contain an additional component, represented by the distances from group means to the regression line. Such a component is the so-called **lack of fit** (LF) and it may be estimated as the following difference:
@@ -5068,8 +4951,7 @@ anova(modelReg)
 ## Dose       1 1716.80 1716.80  341.54 3.129e-11 ***
 ## Residuals 14   70.37    5.03                      
 ## ---
-## Signif. codes:  
-## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 The null hypothesis (the goodness of fit is not significant) is rejected and we confirm that the regression model is a good model.
@@ -5242,19 +5124,13 @@ After having made sure that the basic assumptions for linear models hold, we can
 ```r
 anova(mod.split, ddf="Kenward-Roger")
 ## Type III Analysis of Variance Table with Kenward-Roger's method
-##                      Sum Sq Mean Sq NumDF DenDF F value
-## Block                3.6596  1.2199     3     6  0.6521
-## Tillage             23.6565 11.8282     2     6  6.3228
-## WeedControl          3.3205  3.3205     1     9  1.7750
-## Tillage:WeedControl 19.4641  9.7321     2     9  5.2023
-##                      Pr(>F)  
-## Block               0.61016  
-## Tillage             0.03332 *
-## WeedControl         0.21552  
-## Tillage:WeedControl 0.03152 *
+##                      Sum Sq Mean Sq NumDF DenDF F value  Pr(>F)  
+## Block                3.6596  1.2199     3     6  0.6521 0.61016  
+## Tillage             23.6565 11.8282     2     6  6.3228 0.03332 *
+## WeedControl          3.3205  3.3205     1     9  1.7750 0.21552  
+## Tillage:WeedControl 19.4641  9.7321     2     9  5.2023 0.03152 *
 ## ---
-## Signif. codes:  
-## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 
@@ -5266,20 +5142,13 @@ From the above table we see that the 'tillage by weed control method' interactio
 library(emmeans)
 meansAB <- emmeans(mod.split, ~Tillage:WeedControl)
 multcomp::cld(meansAB, Letters = LETTERS)
-##  Tillage WeedControl emmean    SE   df lower.CL upper.CL
-##  MIN     PART          6.00 0.684 14.4     4.53     7.46
-##  SP      PART          8.48 0.684 14.4     7.01     9.94
-##  MIN     TOT           8.98 0.684 14.4     7.52    10.45
-##  SP      TOT           9.14 0.684 14.4     7.68    10.60
-##  DP      TOT           9.21 0.684 14.4     7.74    10.67
-##  DP      PART         10.63 0.684 14.4     9.17    12.09
-##  .group
-##   A    
-##   AB   
-##   AB   
-##   AB   
-##    B   
-##    B   
+##  Tillage WeedControl emmean    SE   df lower.CL upper.CL .group
+##  MIN     PART          6.00 0.684 14.4     4.53     7.46  A    
+##  SP      PART          8.48 0.684 14.4     7.01     9.94  AB   
+##  MIN     TOT           8.98 0.684 14.4     7.52    10.45  AB   
+##  SP      TOT           9.14 0.684 14.4     7.68    10.60  AB   
+##  DP      TOT           9.21 0.684 14.4     7.74    10.67   B   
+##  DP      PART         10.63 0.684 14.4     9.17    12.09   B   
 ## 
 ## Results are averaged over the levels of: Block 
 ## Degrees-of-freedom method: kenward-roger 
@@ -5347,19 +5216,13 @@ model.strip <- lmer(CropBiomass ~ Block + Herbicide*Crop +
     (1|Rows) + (1|Columns), data = dataset)
 anova(model.strip, ddf = "Kenward-Roger")
 ## Type III Analysis of Variance Table with Kenward-Roger's method
-##                Sum Sq Mean Sq NumDF  DenDF F value  Pr(>F)
-## Block           21451  7150.3     3 4.1367  2.5076 0.19387
-## Herbicide         148   147.9     1 3.0000  0.0519 0.83450
-## Crop            43874 21936.9     2 6.0000  7.6932 0.02208
-## Herbicide:Crop  12549  6274.4     2 6.0000  2.2004 0.19198
-##                 
-## Block           
-## Herbicide       
-## Crop           *
-## Herbicide:Crop  
+##                Sum Sq Mean Sq NumDF  DenDF F value  Pr(>F)  
+## Block           21451  7150.3     3 4.1367  2.5076 0.19387  
+## Herbicide         148   147.9     1 3.0000  0.0519 0.83450  
+## Crop            43874 21936.9     2 6.0000  7.6932 0.02208 *
+## Herbicide:Crop  12549  6274.4     2 6.0000  2.2004 0.19198  
 ## ---
-## Signif. codes:  
-## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 
@@ -5502,8 +5365,7 @@ summary(mod)
 ## (Intercept)  4.662874   0.257325   18.12 1.04e-14 ***
 ## Time        -0.071906   0.006151  -11.69 6.56e-11 ***
 ## ---
-## Signif. codes:  
-## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Residual standard error: 0.6905 on 22 degrees of freedom
 ## Multiple R-squared:  0.8613,	Adjusted R-squared:  0.855 
@@ -5573,8 +5435,7 @@ summary(modNlin)
 ## A 99.634902   1.461047   68.19   <2e-16 ***
 ## k  0.067039   0.001887   35.53   <2e-16 ***
 ## ---
-## Signif. codes:  
-## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Residual standard error: 2.621 on 22 degrees of freedom
 ## 
@@ -5591,49 +5452,6 @@ Instead of coding the mean model from the scratch, we can use one of the availab
 # library(devtools)
 # install_github("onofriandreapg/aomisc")
 library(aomisc)
-## Loading required package: drc
-## Loading required package: MASS
-## 
-## Attaching package: 'MASS'
-## The following object is masked from 'package:dplyr':
-## 
-##     select
-## Loading required package: drcData
-## 
-## 'drc' has been loaded.
-## Please cite R and 'drc' if used for a publication,
-## for references type 'citation()' and 'citation('drc')'.
-## 
-## Attaching package: 'drc'
-## The following objects are masked from 'package:stats':
-## 
-##     gaussian, getInitial
-## Loading required package: plyr
-## ----------------------------------------------------------
-## You have loaded plyr after dplyr - this is likely to cause problems.
-## If you need functions from both plyr and dplyr, please load plyr first, then dplyr:
-## library(plyr); library(dplyr)
-## ----------------------------------------------------------
-## 
-## Attaching package: 'plyr'
-## The following objects are masked from 'package:reshape':
-## 
-##     rename, round_any
-## The following objects are masked from 'package:dplyr':
-## 
-##     arrange, count, desc, failwith, id, mutate,
-##     rename, summarise, summarize
-## Loading required package: car
-## Loading required package: carData
-## 
-## Attaching package: 'car'
-## The following object is masked from 'package:dplyr':
-## 
-##     recode
-## Loading required package: multcompView
-## Registered S3 method overwritten by 'aomisc':
-##   method   from
-##   plot.nls nlme
 modNlin2 <- nls(Conc ~ NLS.expoDecay(Time, a, k),
                data = dataset)
 ```
@@ -5770,8 +5588,7 @@ summary(modNlin3)
 ## A 99.532761   4.625343   21.52 2.87e-16 ***
 ## k  0.067068   0.002749   24.40  < 2e-16 ***
 ## ---
-## Signif. codes:  
-## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Residual standard error: 0.9196 on 22 degrees of freedom
 ## 
@@ -5798,14 +5615,10 @@ In the box below we make predictions for the response at 5, 10 and 15 days after
 func <- list(~A * exp(-k * time))
 const <- data.frame(time = c(5, 10, 15)) 
 gnlht(modNlin, func,  const)
-##                 Form time Estimate        SE  t-value
-## 1 A * exp(-k * time)    5 71.25873 0.9505532 74.96553
-## 2 A * exp(-k * time)   10 50.96413 0.9100611 56.00078
-## 3 A * exp(-k * time)   15 36.44947 0.9205315 39.59611
-##        p-value
-## 1 5.340741e-28
-## 2 3.163518e-25
-## 3 6.029672e-22
+##                 Form time Estimate        SE  t-value      p-value
+## 1 A * exp(-k * time)    5 71.25873 0.9505532 74.96553 5.340741e-28
+## 2 A * exp(-k * time)   10 50.96413 0.9100611 56.00078 3.163518e-25
+## 3 A * exp(-k * time)   15 36.44947 0.9205315 39.59611 6.029672e-22
 ```
 
 The same method can be used to make inverse predictions. In our case, the inverse function is:
@@ -5821,12 +5634,9 @@ We can calculate the times required for the concentration to drop to, e.g., 10 a
 func <- list(~ -(log(Conc/A)/k))
 const <- data.frame(Conc = c(10, 20)) 
 gnlht(modNlin, func,  const)
-##               Form Conc Estimate        SE  t-value
-## 1 -(log(Conc/A)/k)   10 34.29237 0.8871429 38.65484
-## 2 -(log(Conc/A)/k)   20 23.95291 0.6065930 39.48761
-##        p-value
-## 1 1.016347e-21
-## 2 6.399715e-22
+##               Form Conc Estimate        SE  t-value      p-value
+## 1 -(log(Conc/A)/k)   10 34.29237 0.8871429 38.65484 1.016347e-21
+## 2 -(log(Conc/A)/k)   20 23.95291 0.6065930 39.48761 6.399715e-22
 ```
 
 In the same fashion, we can calculate the half-life (i.e. the time required for the concentration to drop to half of the initial value), by considering that:
@@ -5869,9 +5679,9 @@ The 'gnlht()' function provides standard errors based on the delta method, which
 
 # Exercises
 
-The following excercises are organised by section, each one corresponding to a book chapter. Use the exercises to verify your learning process, after studying each chapter and before proceeding to the next one.
+The following excercises are organised by section, each one corresponding to a book chapter. Use the exercises to verify your learning process, after studying each chapter and before proceeding to the next one. 
 
-## Ch 1: Introduction to biometry
+## Introduction to biometry (ch. 1)
 
 ### Question 1
 
@@ -5895,7 +5705,7 @@ What do we intend with the word 'confounding'? What is the role of 'confounding'
 
 ---
 
-## Ch. 2: Designing experiments
+## Designing experiments (ch. 2)
 
 ### Excercise 1
 
@@ -5915,7 +5725,7 @@ Describe the protocol of an experiment to determine the effect of nitrogen dose 
 
 ---
 
-## Ch. 3: describing the observations
+## Describing the observations (ch. 3)
 
 ### Exercise 1
 
@@ -5931,7 +5741,7 @@ Load the csv file 'students.csv' from [https://www.casaonofri.it/_datasets/stude
 
 ---
 
-## Ch. 4: modeling the experimental data 
+## Modeling the experimental data (ch. 4)
 
 ### Exercise 1
 
@@ -5987,7 +5797,7 @@ Consider the relationship between crop yield and density, as shown in Exercise 2
 
 ---
 
-## Ch. 5: Estimation of model parameters
+## Estimation of model parameters (ch. 5)
 
 ### Exercise 1
 
@@ -6025,7 +5835,7 @@ A sample of 400 insects was sprayed with an insecticide and 136 individuals surv
 
 ---
 
-## Ch. 6: making decisions under uncertainty
+## Making decisions under uncertainty (ch. 6)
 
 ### Exercise 1
 
@@ -6105,10 +5915,11 @@ A botanist counted the number of germinated seeds for oilseed rape at two differ
 
 
 
-
 ---
 
-## Ch. 7 to 9: one-way ANOVA models
+## One-way ANOVA models (ch. 7 to 9)
+
+The following exercises are based on slightly more complex datasets. You may not like to enter all the data in R and, therefore, we put all the dataset at your disposal in an Excel file, which you can download from the following link [https://www.casaonofri.it/_datasets/BookExercises.xlsx](https://www.casaonofri.it/_datasets/BookExercises.xlsx). Each dataset is in a different sheet and the sheet names are given in each exercise.
 
 ### Exercise 1
 
@@ -6130,7 +5941,8 @@ An experiment was conducted with a completely randomised design to compare the y
 4. Compare the means
 5. Present the results and comment on them
 
-The example is taken from: Le Clerg *et al*. (1962)
+The example is taken from: Le Clerg *et al*. (1962)    
+[Sheet: 7.1]
 
 ### Exercise 2
 
@@ -6148,7 +5960,8 @@ Control | Glucose | Fructose | Sucrose |
 2. Compute the ANOVA
 3. Check for the basic assumptions
 4. Compare the means
-5. Present the results and comment on them
+5. Present the results and comment on them   
+[Sheet: 7.2]
 
 
 ### Exercise 3
@@ -6183,7 +5996,8 @@ The results are as follows:
      1708                688
      1708                729
 
-Please, note that these are the only possible values for temperature. Determine the best operating temperature, in order to delay failure.
+Please, note that these are the only possible values for temperature. Determine the best operating temperature, in order to delay failure.    
+[Sheet: 7.3]
 
 ### Exercise 4
 
@@ -6207,11 +6021,12 @@ An entomologist counted the number of eggs laid from a lepidopter on three tobac
         14       0           0    566
         15     153         218    734
 
-Which is the most resistant genotype?
+Which is the most resistant genotype?    
+[Sheet: 7.4]
 
 ---
 
-## Ch. 10: multy-way ANOVA models
+## Multy-way ANOVA models (ch. 10)
 
 ### Exercise 1
 
@@ -6231,7 +6046,8 @@ Data were collected about 5 types of irrigation on orange trees in Spain. The ex
 2. Compute the ANOVA
 3. Check for the basic assumptions
 4. Compare the means
-5. Present the results and comment on them
+5. Present the results and comment on them    
+[Sheet: 10.1]
 
 ### Exercise 2
 
@@ -6249,7 +6065,8 @@ A fertilisation trial was conducted according to a RCBD with five replicates. On
 2. Calculate the ANOVA
 3. Check for the basic assumptions
 4. Calculate expected marginal means and compare to arithmetic means
-5. The addition of P~2~ O~5~ is a convenient practice, in terms of agronomic effect?
+5. The addition of P~2~ O~5~ is a convenient practice, in terms of agronomic effect?    
+[Sheet: 10.2]
 
 ### Exercise 3
 
@@ -6278,18 +6095,20 @@ A latin square experiment was planned to assess effect of four different fertili
 2. Compute the ANOVA
 3. Check for the basic assumptions
 4. Compare the means
-5. Present the results and comment on them: what is the best fertiliser?
+5. Present the results and comment on them: what is the best fertiliser?    
+[Sheet: 10.3]
 
 ---
 
-## Ch. 11 and 12: multi-way ANOVA models with interactions
+## Multi-way ANOVA models with interactions (ch. 11 and 13)
+
+Some of the following datasets were obtained by experiments designed as split-plots or strip-plots. If you do not understand these designs, you have not yet studied Chapter 13; therefore, you can disregard the information about the design and simply analyse the data as if they were obtained by simple randomised blocks designs. Please, note that, in practise, diregarding the information about the experimental design during data analysis is not admissible!
 
 ### Exercise 1
 
 A pot experiment was planned to evaluate the best timing for herbicide application against rhizome *Sorghum halepense*. Five timings were compared (2-3, 4-5, 6-7 and 8-9 leaves), including a splitted treatment in two timings (3-4/8-9 leaves) and the untreated control. In order to understand whether the application is effective against plants coming from rhizomes of different sizes, a second factor was included in the experiment, i.e. rhizome size (2, 4, six nodes). The design was a fully crossed two-way factorial, laid down as completely randomised with four replicates. The results (plant weights three weeks after the herbicide application) are as follows:
 
-
-| Sizes ↓ / Timing → | 2-3   | 4-5   | 6-7   | 8-9   | 3-4/8-9 | Untreated|
+| Sizes / Timings | 2-3   | 4-5   | 6-7   | 8-9   | 3-4/8-9 | Untreated|
 |:--------------|:-----:|:-----:|:-----:|:-----:|:-------:|:----:|
 | 2-nodes       | 34.03 | 0.10  | 30.91 | 33.21 | 2.89    | 41.63|
 |               | 22.31 | 6.08  | 35.34 | 43.44 | 19.06   | 22.96|
@@ -6308,7 +6127,8 @@ A pot experiment was planned to evaluate the best timing for herbicide applicati
 2. Compute the ANOVA
 3. Check for the basic assumptions
 4. Calculate marginal means and cell means
-5. Present the results and comment on them: what type of means should you report?
+5. Present the results and comment on them: what type of means should you report?    
+[Sheet: 11.1]
 
 
 ### Exercise 2
@@ -6336,7 +6156,8 @@ Six faba bean genotypes were tested in two sowing times, according to a plit-plo
 2. Compute the ANOVA
 3. Check for the basic assumptions
 4. Calculate marginal means and cell means
-5. Present the results and comment on them: what type of means should you report?
+5. Present the results and comment on them: what type of means should you report?    
+[Sheet: 11.2]
 
 ### Exercise 3
 
@@ -6366,7 +6187,8 @@ Four crops were sown in soil 20 days after the application of three herbicide tr
 2. Compute the ANOVA
 3. Check for the basic assumptions
 4. Calculate marginal means and cell means
-5. Present the results and comment on them: what type of means should you report?
+5. Present the results and comment on them: what type of means should you report?   
+[Sheet: 11.3]
 
 
 ### Exercise 4
@@ -6386,7 +6208,8 @@ A field experiment was conducted to evaluate the effect of fertilisation timing 
 2. Compute the ANOVA
 3. Check for the basic assumptions
 4. Calculate marginal means and cell means
-5. Present the results and comment on them: what type of means should you report?
+5. Present the results and comment on them: what type of means should you report?    
+[Sheet: 11.4]
 
 ### Exercise 5
 
@@ -6409,7 +6232,8 @@ Consider the temperature as a factor and:
 2. Compute the ANOVA
 3. Check for the basic assumptions
 4. Calculate marginal means and cell means
-5. Present the results and comment on them: what type of means should you report?
+5. Present the results and comment on them: what type of means should you report?    
+[Sheet: 11.5]
 
 ### Exercise 6
 
@@ -6430,11 +6254,12 @@ A chemical process requires one alcohol and one base. A study is organised to ev
 2. Compute the ANOVA
 3. Check for the basic assumptions
 4. Calculate marginal means and cell means
-5. Present the results and comment on them: what type of means should you report?
+5. Present the results and comment on them: what type of means should you report?     
+[Sheet: 11.6]
 
 ---
 
-## Ch. 13: simple linear regression
+## Simple linear regression (ch. 12)
 
 ### Exercise 1
 
@@ -6453,6 +6278,7 @@ A study was conducted to evaluate the effect of nitrogen fertilisation in lettuc
 3. Check for the basic assumptions
 4. What yield might be obtained by using 120 kg N ha^-1^?
 5. Present the results and comment on them?
+[Sheet: 12.1]
 
 ### Exercise 2
 
@@ -6489,9 +6315,12 @@ A study was conducted to evaluate the effect of increasing densities of a weed (
      38        4     27.114
      54        4     24.664
 
+
+[Sheet: 12.2]     
+
 ---
 
-## Ch. 14: nonlinear regression
+## Nonlinear regression (ch. 14)
 
 ### Exercise 1
 
@@ -6508,7 +6337,8 @@ Two soil samples were treated with two herbicides and put in a climatic chamber 
     60       2.00          5.10
     70       1.00          3.00
 
-Assuming that the degradation follows an exponential decay trend, determine the half-life for both herbicides.
+Assuming that the degradation follows an exponential decay trend, determine the half-life for both herbicides.    
+[Sheet: 14.1]
 
 
 ### Exercise 2
@@ -6525,6 +6355,8 @@ A microbial population grows exponentially over time. Considering the following 
     50     39
     60     94
     70     201
+    
+[Sheet: 14.2]    
 
 ### Exercise 3
 
@@ -6547,6 +6379,8 @@ $$Y = \frac{a X} {b + X}$$
 
 and make sure that model fit is good enough.
 
+[Sheet: 14.3]
+
 ### Exercise 4
 
 An experiment was conducted to determine the yield of sunflower at increasing densities of a weed (*Ammi majus*). Based on the following results, parameterise a rectangular hyperbola ($Y = (a \, X)/(b + X)$ and test for possible lack of fit. The results are:
@@ -6559,6 +6393,7 @@ An experiment was conducted to determine the yield of sunflower at increasing de
         39        26.9
         61        29.5
 
+[Sheet: 14.4]
 
 ### Exercise 5
 
@@ -6577,6 +6412,8 @@ An experiment was conducted in a pasture, to determine the effect of sampling ar
    256       22
 
 By using the above data, parameterise a power curve $Y = a \, X^b$ and test for lack of fit.
+
+[Sheet: 14.5]
 
 ### Exercise 6
 
@@ -6607,6 +6444,8 @@ Parameterise two Gompertz growth models (one for the weed-free crop and one for 
 
 $$Y = d \cdot exp\left\{- exp \left[ - b (X - e)\right] \right\}$$
 
+[Sheet: 14.6]
+
 ### Exercise 7
 
 Plants of *Tripleuspermum inodorum* in pots were treated with a sulphonylurea herbicide  (tribenuron-methyl) at increasing rates. Three weeks after the treatment the weight per pot was recorded, with the following results:
@@ -6634,6 +6473,8 @@ Assuming that the dose-response relationship can be described by using the follo
 $$Y = c + \frac{d - c}{1 + exp \left\{ - b \left[ log (X) - log (e) \right] \right\}}$$
 
 Parameterise the model and evaluate the goodnes of fit.
+
+[Sheet: 14.7]
 
 
 <!--chapter:end:15-Eng_Exercises.Rmd-->

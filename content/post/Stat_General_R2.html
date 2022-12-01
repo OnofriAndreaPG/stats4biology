@@ -1,0 +1,172 @@
+---
+title: 'The coefficient of determination: is it the R-squared or r-squared?'
+author: "Andrea Onofri"
+date: 2022-11-26
+slug: 'general'
+categories:
+  - R
+  - 'regression'
+tags:
+  - R
+  - 'linear_models'
+  - 'nonlinear_regression'
+  - 'regression'
+  - 'correlation'
+archives:
+  - 2022
+---
+
+
+
+<p>We often use the <strong>coefficient of determination</strong> as a swift ‘measure’ of goodness of fit for our regression models. Unfortunately, there is no unique symbol for such a coefficient and both <span class="math inline">\(R^2\)</span> and <span class="math inline">\(r^2\)</span> are used in literature, almost interchangeably. Such an interchangeability is also endorsed by the Wikipedia (see at: <a href="https://en.wikipedia.org/wiki/Coefficient_of_determination">https://en.wikipedia.org/wiki/Coefficient_of_determination</a> ), where both symbols are reported as the abbreviations for this statistical index.</p>
+<p>As an editor of several International Journals, I should not agree with such an approach; indeed, the two symbols <span class="math inline">\(R^2\)</span> and <span class="math inline">\(r^2\)</span> mean two different things, and they are not necessarily interchangeable, because, depending on the setting, either of the two may be wrong or ambiguous. Let’s pay a little attention to such an issue.</p>
+<div id="what-are-the-r-and-r-indices" class="section level1">
+<h1>What are the ‘r’ and ‘R’ indices?</h1>
+<p>When studying the relationship between quantitative variables, we have two main statistical indices:</p>
+<ol style="list-style-type: decimal">
+<li>the <strong>Pearson’s (simple linear) correlation coefficient</strong>, that is almost always indicated as the <span class="math inline">\(r\)</span> coefficient. Correlation is different from regression, as it does not assume any sort of dependency between two quantitative variables and it is only meant to express their joint variability;</li>
+<li>the <strong>coefficient of multiple correlation</strong>, that is usually indicated with <span class="math inline">\(R\)</span> and represents (definition from Wikipedia) a <em>measure of how well a given variable can be predicted using a linear function of a set of other variables</em>. Although <span class="math inline">\(R\)</span> is based on correlation (it is the correlation between the observed values for the dependent variable and the predictions made by the model), it is used in the context of multiple regression, where we are studying a dependency relationship.</li>
+</ol>
+<p>And, what about the <strong>coefficient of determination</strong>? It is yet another concept and another index, measuring (again from Wikipedia) the <em>proportion of the variation in the dependent variable that is predictable from the independent variable(s)</em>. As you see, we are still in the context of regression and our aim is to describe the goodness of fit.</p>
+<p>To start with, let’s abbreviate the coefficient of determination as <span class="math inline">\(CD\)</span>, in order to avoid any confusion with <span class="math inline">\(r\)</span> and <span class="math inline">\(R\)</span>; this index can be be obtained as:</p>
+<p><span class="math display">\[ CD_1 = \frac{SS_{reg}}{SS_{tot}}\]</span></p>
+<p>or as:</p>
+<p><span class="math display">\[ CD_2 = 1 - \frac{SS_{res}}{SS_{tot}}\]</span></p>
+<p>where: <span class="math inline">\(SS_{reg}\)</span> is the regression sum of squares, <span class="math inline">\(SS_{tot}\)</span> is the total sum of squares and <span class="math inline">\(SS_{res}\)</span> is the residual sum of squares, after a linear regression fit. The second formula is preferable: sum of squares are always positive and, thus, we clearly see that <span class="math inline">\(CD_2\)</span> may not be higher than 1 (this is less obvious, for <span class="math inline">\(CD_1\)</span>.</p>
+<p>So far, so good; we have three different indices and three different symbols: <span class="math inline">\(r\)</span>, <span class="math inline">\(R\)</span> and <span class="math inline">\(CD\)</span>. But, in practice, things did not go that smoothly! The early statisticians, instead of proposing a brand new symbol for the coefficient of determination, made the choice of highlighting the connections with <span class="math inline">\(r\)</span> and <span class="math inline">\(R\)</span>. For example, Sokal and Rohlf, in their very famous biometry book, at page 570 (2nd. Edition) demonstrated that the coefficient of determination could be obtained as the square of the coefficient of correlation and, thus, they used the symbol <span class="math inline">\(r^2\)</span>. Later, in the same book (pag. 660), these same authors demonstrated that the coefficient of multiple correlation <span class="math inline">\(R\)</span> was equal to the positive square root of the <strong>coefficient of multiple determination</strong>, for which they used the symbol <span class="math inline">\(R^2\)</span>.</p>
+<p>Obviously, Sokal and Rohlf (and other authors of other textbooks) meant to say that the coefficient of determination, depending on the context, can be obtained either as the square of the correlation coefficient, or as the square of the multiple correlation coefficient. An uncareful interpretation led to the idea that the coefficient of determination can be indicated either as the <span class="math inline">\(R^2\)</span> or as the <span class="math inline">\(r^2\)</span> and that the two symbols are always interchangeable. But, is this really true? No, it depends on the context.</p>
+</div>
+<div id="simple-linear-regression" class="section level1">
+<h1>Simple linear regression</h1>
+<p>Let’s have a look at the following example: we fit a simple linear regression model to a dataset and retrieve the coefficient of determination by using the <code>summary()</code> method.</p>
+<pre class="r"><code>X &lt;- 1:20
+Y &lt;- c(17.79, 18.81, 19.02, 14.14, 16.72, 16.05, 13.99, 13.26,
+       12.48, 11.33, 11.07, 9.68, 9.19, 9.44, 9.75, 7.71, 6.47, 
+       5.22, 4.55, 7.7)
+mod &lt;- lm(Y ~ X)
+summary(mod)$r.squared # Coeff. determination with R
+## [1] 0.9270622</code></pre>
+<p>It is very easy to see that <span class="math inline">\(R = |r|\)</span> and it is also easy to demonstrate that <span class="math inline">\(r^2 = CD_1\)</span> (look, e.g., at Sokal and Rohlf for a mathematical proof). Furthermore, due to the equality <span class="math inline">\(SS_{tot} = SS_{reg} + SS_{res}\)</span>, it is also easy to see that <span class="math inline">\(CD_1 = CD_2\)</span>. We are ready to draw our first conclusion.</p>
+<pre class="r"><code>SSreg &lt;- sum((predict(mod) - mean(Y))^2)
+SStot &lt;- sum((Y - mean(Y))^2)
+SSres &lt;- sum(residuals(mod)^2)
+SSreg/SStot
+## [1] 0.9270622
+1 - SSres/SStot
+## [1] 0.9270622
+r.coef &lt;- cor(X, Y)
+R.coef &lt;- cor(Y, fitted(mod))
+r.coef^2
+## [1] 0.9270622
+R.coef^2
+## [1] 0.9270622</code></pre>
+<p><strong>CONCLUSION 1. For simple linear regression, the coefficient of determination is always equal to <span class="math inline">\(R^2 = r^2\)</span> and both symbols are acceptable (and correct).</strong></p>
+</div>
+<div id="polynomial-regression-and-multiple-regression" class="section level1">
+<h1>Polynomial regression and multiple regression</h1>
+<p>Apart from simple linear regression, for all other types of linear models, provided that an intercept is fitted, it is not, in general, true that <span class="math inline">\(R = |r|\)</span>, while it is, in general, true that that the coefficient of determination is equal to the squared coefficient of multiple correlation <span class="math inline">\(R^2\)</span>. I’ll show a swift example with a polynomial regression in the box below.</p>
+<pre class="r"><code>mod2 &lt;- lm(Y ~ X + I(X^2))
+cor.coef &lt;- cor(X, Y)
+R.coef &lt;- cor(Y, fitted(mod2))
+
+# R and r are not equal
+cor.coef; R.coef
+## [1] -0.9628407
+## [1] 0.9652451
+# The coefficient of determination is R2
+R.coef^2; summary(mod2)$r.squared
+## [1] 0.931698
+## [1] 0.931698</code></pre>
+<p>Furthermore, when we have several predictors (e.g., multiple regression), the correlation coefficient is not unique and we could calculate as many <span class="math inline">\(r\)</span> values as there are predictors in the model.</p>
+<p>In the box below I show another example where I analysed the ‘mtcars’ dataset by using multiple regression; we see that <span class="math inline">\(R^2 = CD_1 = CD_2\)</span>.</p>
+<pre class="r"><code>data(mtcars)
+mod &lt;- lm(mpg ~ wt+disp+hp - 1, data = mtcars)  
+summary(mod)$r.squared # Coeff. determination with R
+## [1] 0.8328665
+SSreg &lt;- sum((predict(mod) - mean(mtcars$mpg))^2)
+SStot &lt;- sum((mtcars$mpg - mean(mtcars$mpg))^2)
+SSres &lt;- sum(residuals(mod)^2)
+SSreg/SStot
+## [1] 0.9852479
+1 - SSres/SStot
+## [1] -1.084229
+R.coef &lt;- cor(mtcars$mpg, fitted(mod))
+R.coef^2
+## [1] 0.002746157</code></pre>
+<p>We are now ready to draw our second conclusion.</p>
+<p><strong>CONCLUSION 2: with all linear models, apart from simple linear regression, the <span class="math inline">\(r^2\)</span> symbol should not be used for the coefficient of determination, because this latter index IS NOT, in general, equal to the square of the coefficient of correlation. The <span class="math inline">\(R^2\)</span> symbol is a much better choice.</strong></p>
+</div>
+<div id="linear-models-with-no-intercept" class="section level1">
+<h1>Linear models with no intercept</h1>
+<p>The situation becomes much more complex for linear models with no intercept. For these models, the squared multiple correlation coefficient IS NOT ALWAYS equal to the proportion of variance accounted for. Let’s look at the following example:</p>
+<pre class="r"><code>mod2 &lt;- lm(Y ~ - 1 + X)
+summary(mod2)$r.squared # Proportion of variance accounted for
+## [1] 0.4390065
+R.coef &lt;- cor(Y, fitted(mod2))
+R.coef^2
+## [1] 0.9270622</code></pre>
+<p>In other words, the coefficient of determination IS NOT ALWAYS the <span class="math inline">\(R^2\)</span>; however, the coefficient of determination can be calculated by using <span class="math inline">\(CD_1 = CD_2\)</span>, provided that <span class="math inline">\(SS_{tot}\)</span>, <span class="math inline">\(SS_{reg}\)</span> and <span class="math inline">\(SS_{res}\)</span> are obtained in a way that accounts for the missing intercept. Schabenberger and Pierce recommend the following equations and the symbols they use clearly reflect that those equations do not return the squared multiple correlation coefficient:</p>
+<p><span class="math display">\[R^2_{noint} = \frac{\sum_{i = 1}^{n}{\hat{y_i}^2}}{\sum_{i = 1}^{n}{y_i^2}} \quad \textrm{or} \quad R^{2*}_{noint} =1 - \frac{SS_{res}}{\sum_{i = 1}^{n}{y_i^2}}\]</span></p>
+<pre class="r"><code>SSreg &lt;- sum(fitted(mod2)^2)
+SStot &lt;- sum(Y^2)
+SSres &lt;- sum(residuals(mod2)^2)
+SSreg/SStot # R^2 ok
+## [1] 0.4390065
+1 - SSres/SStot # R^2 ok
+## [1] 0.4390065</code></pre>
+<p>We are ready for our third conclusion.</p>
+<p><strong>CONCLUSION 3: in the case of models with no intercept, neither the <span class="math inline">\(r^2\)</span> nor the <span class="math inline">\(R^2\)</span> symbols should be used for the coefficient of determination. The proportion of variability accounted for by the model can be calculated by using a modified formula and should be reported by using a different symbol (e.g. <span class="math inline">\(R^2_{noint}\)</span> or <span class="math inline">\(R^2_0\)</span> or similar).</strong></p>
+</div>
+<div id="nonlinear-regression" class="section level1">
+<h1>Nonlinear regression</h1>
+<p>With this class of models, we have two main problems:</p>
+<ol style="list-style-type: decimal">
+<li>they do not have an intercept term, at least, not in the usual sense. Consequently, the square of the multiple coefficient of correlation does not represent the proportion of variance accounted for by the model;</li>
+<li>the equality <span class="math inline">\(SS_{tot} = SS_{reg} + SS_{res}\)</span> may not hold and thus the equations for <span class="math inline">\(CD_1\)</span> and <span class="math inline">\(CD_2\)</span> may produce different results.</li>
+</ol>
+<p>In contrast to linear models with no intercept, for nonlinear models we do not have any general modified formula that consistently returns the proportion of variance accounted for by the model (i.e., the coefficient of determination). However, Schabenberger and Pierce (2002) suggested that we can still use <span class="math inline">\(CD_2\)</span> as a swift measure of goodness of fit, but they also proposed that we use the term ‘Pseudo-<span class="math inline">\(R^2\)</span>’ instead oft <span class="math inline">\(R^2\)</span>. Why ‘Pseudo’?. For two good reasons:</p>
+<ol style="list-style-type: decimal">
+<li>the ’Pseudo-<span class="math inline">\(R^2\)</span>’cannot exceed 1, but it may lower than 0;</li>
+<li>the ‘Pseudo-<span class="math inline">\(R^2\)</span>’ <strong>cannot be interpreted as the proportion of variance explained by the model</strong>.</li>
+</ol>
+<p>In R, the ‘Pseudo-R<sup>2</sup>’ can be calculated by using the <code>R2.nls()</code> function in the ‘aomisc’ package, for nonlinear models fitted with both the <code>nls()</code> and <code>drm()</code> functions (this latter function is in the ‘drc’ package).</p>
+<pre class="r"><code>library(aomisc)
+X &lt;- c(0.1, 5, 7, 22, 28, 39, 46, 200)
+Y &lt;- c(1, 13.66, 14.11, 14.43, 14.78, 14.86, 14.78, 14.91)
+
+# nls fit
+library(aomisc)
+model &lt;- nls(Y ~ SSmicmen(X, Vm, K))
+R2nls(model)$PseudoR2
+## [1] 0.9930399
+# It is not the R2, in strict sense
+R.coef &lt;- cor(Y, fitted(model))
+R.coef^2
+## [1] 0.9957255
+# It cannot be calculated by the usual expression!
+SSreg &lt;- sum(fitted(model) - mean(Y))
+SStot &lt;- sum( (Y - mean(Y))^2 )
+SSreg/SStot
+## [1] 0.003622004
+# It can be calculated by using the alternative form
+# that is no longer equivalent
+SSres &lt;- sum(residuals(model)^2)
+1 - SSres/SStot
+## [1] 0.9930399</code></pre>
+<p>We may now come to our final conclusion.</p>
+<p><strong>CONCLUSION 4. With nonlinear models, we should never use either <span class="math inline">\(r^2\)</span> or <span class="math inline">\(R^2\)</span> because they are both wrong. If we need a swift measure of goodness of fit, we can use the <span class="math inline">\(CD_2\)</span> index above, but we should not name it as the <span class="math inline">\(R^2\)</span>, because, in general, it does not correspond to the coefficient of determination. We should better use the term Pseudo-R<sup>2</sup>.</strong></p>
+<p>Hope this was useful; for those who are interested in the use of the Pseud-<span class="math inline">\(R^2\)</span> in nonlinear regression, I hav already published one post at this link: <a href="https://www.statforbiology.com/2021/stat_nls_r2/">https://www.statforbiology.com/2021/stat_nls_r2/</a> .</p>
+<p>Thanks for reading and happy coding!</p>
+<p>Andrea Onofri<br />
+Department of Agricultural, Food and Environmental Sciences<br />
+University of Perugia (Italy)<br />
+<a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<hr />
+</div>
+<div id="references" class="section level1">
+<h1>References</h1>
+<ol style="list-style-type: decimal">
+<li>Schabenberger, O., Pierce, F.J., 2002. Contemporary statistical models for the plant and soil sciences. Taylor &amp; Francis, CRC Press, Books.</li>
+<li>Sokal, R.R., Rohlf F.J., 1981. Biometry. Second Edition, W.H. Freeman and Company, USA.</li>
+</ol>
+</div>
