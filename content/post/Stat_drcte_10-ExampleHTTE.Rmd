@@ -1,0 +1,150 @@
+---
+title: 'Fitting a hydro-thermal-time-model to seed germination data'
+author: "Andrea Onofri"
+date: 2023-01-10
+slug: 'Time_to_event_models'
+categories:
+  - R
+  - 'Time_to_event_models'
+tags:
+  - R
+  - 'Time_to_event_models'
+  - 'Seed_germination'
+  - drcte
+  - drcSeedGerm
+archives:
+  - 2023
+---
+
+```{r setup, cache = F, echo = F}
+#Put at the beginning
+knitr::opts_chunk$set(echo = TRUE, message = F, warning = F)
+knitr::knit_hooks$set(document = function(x){ 
+  gsub("```\n*```r*\n*", "", x) 
+})
+```
+
+This is a follow-up post. If you are interested in other posts of this series, please go to: [https://www.statforbiology.com/tags/drcte/](https://www.statforbiology.com/tags/drcte/). All these posts exapand on a paper that we have recently published in the Journal 'Weed Science'; please follow [this link](https://doi.org/10.1017/wsc.2022.8) to the paper.
+
+# Germination assay
+
+This dataset was obtained from previously published work (Mesgaran et al., 2017) with *Hordeum spontaneum* [C. Koch] Thell. The germination assay was conducted using four replicates of 20 seeds tested at six different water potential levels (0, −0.3, −0.6, −0.9, −1.2 and −1.5 MPa). Osmotic potentials were produced using variable amount of polyethylene glycol (PEG, molecular weight 8000) adjusted for the temperature level. Petri dishes were incubated at six constant temperature levels (8, 12, 16, 20, 24 and 28 °C), under a photoperiod of 12 h. Germinated seeds (radicle protrusion > 3 mm) were counted and removed daily for 20 days.
+
+This dataset is available as `hordeum` in the `drcSeedGerm` package, which needs to be installed from github (see below), together the package `drcte`, which is necessary to fit time-to-event models. The following code loads the necessary packages, loads the dataset `rape` and shows the first six lines.
+
+```{r message=FALSE, warning=FALSE}
+# Installing packages (only at first instance)
+# library(devtools)
+# install_github("OnofriAndreaPG/drcSeedGerm")
+# install_github("OnofriAndreaPG/drcte")
+library(drcSeedGerm)
+library(tidyverse)
+data(hordeum)
+head(hordeum)
+```
+
+
+# Preliminary analyses
+
+First of all, it is necessary to mention that **this dataset was already analysed in Onofri et al. (2018; Example 2) by using the same methodology, although, in that paper, the R implementation was different (see Supplemental Material) and it is now outdated.**
+
+In the above data frame, 'timeAf' represents the moment when germinated seeds were counted, while ’timeBef’ represents the previous inspection time (or the beginning of the assay). The column ’nSeeds’ is the number of seeds that germinated during the time interval  between 'timeBef' and 'timeAf. The ’nCum’ column contains the cumulative number of germinated seeds and it is not necessary for time-to-event model fitting, although we can use it for plotting purposes.
+
+```{r message=FALSE, warning=FALSE}
+hordeum <- hordeum %>% 
+  mutate(propCum = nCum/nViable)
+
+ggplot(data = hordeum, mapping = aes(timeAf, propCum)) +
+  geom_point() +
+  facet_grid(temp ~ water) +
+  scale_x_continuous(name = "Time (d)") +
+  scale_y_continuous(name = "Cumulative proportion of germinated seeds")
+```
+
+We see that the germination time-course is strongly affected by both temperature and water potential in the substrate and, consequently, our obvious interest is to model the effects of those environmental covariates. In our manuscript, we started from the idea that a parametric time-to-event curve is defined as a cumulative probability function ($\Phi$), with three parameters:
+
+$$P(t) = \Phi \left( b, d, e \right)$$
+where $P(t)$ is the cumulative probability of germination at time $t$, $e$ is the median germination time, $b$ is the slope at the inflection point and $d$ is the maximum germinated proportion. The most obvious extension is to allow for different $b$, $d$ and $e$ values for each of the i^th^ combinations of water potential ($\Psi$) and temperature level ($T$):
+
+$$P(t, \Psi, T) = \Phi \left( b_i, d_i, e_i \right)$$
+From the graph above, we see several 'degenerated' time-to-event curves, where no germinations occurred (e.g., see the graph at -1.5 MPa and 28°C). In order to avoid problems with those curves, we can use the `drmte()` function and set the `separate = TRUE` argument, so that the different curves are fitted independently of one another and the degenerated curves are recognised and skipped, without stopping the execution in R. In particular, where no time-course of events can be estimated, it is assumed that there is no progress to germination during the study-period and that the cumulative proportion of germinated seeds remains constant across that period. Consequently, the `drmte()` function resorts to fitting a simpler model, where the only $d$ parameter is estimated (that is the maximum fraction of germinated seeds).
+
+```{r}
+hordeum <- hordeum %>% 
+  mutate(comb = factor( factor(water):factor(temp)))
+mod1 <- drmte(nSeeds ~ timeBef + timeAf, data = hordeum,
+             curveid = comb, fct = loglogistic(),
+             separate = TRUE)
+summary(mod1)
+```
+
+
+
+# A better modelling approach
+
+The previous approach is clearly sub-optimal, as the temperature and water potential levels are regarded as factors, i.e. as nominal classes with no intrinsic orderings and distances. It would be much better to recognise that temperature and water potential are continuous variables and, consequently, code a time-to-event model where the three parameters are expressed as continuous functions of $\Psi$ and $T$:
+
+$$P(t, \Psi, T) = \Phi \left[ b(\Psi, T), d(\Psi, T), e(\Psi, T) \right]$$
+
+In the above mentioned manuscript (Onofri et al., 2018; example 2) we used a log-logistic cumulative distribution function:
+
+$$P(t, \Psi, T) = \frac{ d(\Psi, T) }{1 + \exp \left\{ b \left[ \log(t) - \log( e(\Psi, T) ) \right] \right\} }$$
+
+Considering that the germination rate is the inverse of germination time, we replaced $e(\Psi, T) = 1/GR_{50}(\Psi, T)$ and used the following sub-models:
+
+$$d(\Psi, T) = \textrm{max} \left\{ G \, \left[ 1 - \exp \left( \frac{ \Psi - \Psi_b - k(T - T_b )}{\sigma_{\Psi_b}} \right) \right]; 0 \right\}$$
+
+$$GR_{50}(\Psi, T) = \textrm{max} \left\{ \frac{T - T_b }{\theta_{HT}} \left[\Psi - \Psi_b - k(T - T_b )\right]; 0 \right\}$$
+Please, note that the shape parameter $b$ has been regarded as independent from the environmental covariates. It may be useful to note that the the parameters are: 
+
+1. $\Psi_{b}$, that is the median base water potential in the seed lot,
+2. $T_{b}$, that is the base temperature for germination,
+3. $\theta_HT$, that is the hydro-thermal-time parameter,
+4. $\sigma_{\Psi_b}$, that represents the variability of $\Psi_b$ within the population,
+5. $G$, that is the germinable fraction, accounting for the fact that $d$ may not reach 1, regardless of time and water potential.
+6. $k$ and $b$ that are parameters of shape.
+
+You can get more information from our original paper (Onofri et al., 2018). This hydro-thermal-time model was implemented in R as the `HTTEM()` function, and it is available within the `drcSeedGerm` package; we can fit it by using the `drmte()` function in the `drcte` package, but we need to provide starting values for model parameters, because the self-starting routine is not yet available. Finally, the `summary()` method can be used to retrieve the parameter estimates.
+
+```{r message=FALSE, warning=FALSE}
+# Complex model and slow fitting
+modHTTE <- drmte(nSeeds ~ timeBef + timeAf + water + temp,
+                 data=hordeum,
+                 fct = HTTEM(),
+  start=c(0.8,-2, 0.05, 3, 0.2, 2000, 0.5))
+summary(modHTTE, robust = T, units = Dish)
+```
+
+It is always important not to neglect a graphical inspection of model fit. The `plot()` method does not work with time-to-event curves with additional covariates (apart from time). However, we can retrieve the fitted data by using the `plotData()` function and use those predictions within the `ggplot()` function. The box below shows the appropriate coding.
+
+```{r}
+tab <- plotData(modHTTE)
+
+ggplot() +
+  geom_point(data = tab$plotPoints, mapping = aes(x = timeAf, y = CDF),
+            col = "red") +
+  geom_line(data = tab$plotFits, mapping = aes(x = timeAf, y = CDF)) +
+  facet_grid(temp ~ water) +
+  scale_x_continuous(name = "Time (d)") +
+  scale_y_continuous(name = "Cumulative proportion of germinated seeds")
+```
+
+
+Thank you for reading!
+
+
+Prof. Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences    
+University of Perugia (Italy)    
+Send comments to: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)
+
+<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow @onofriandreapg</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+---
+
+# References
+
+1. Mesgaran, M.B., Mashhadi, H.R., Alizadeh, H., Hunt, J., Young, K.R., Cousens, R.D., 2013. Importance of distribution function selection for hydrothermal time models of seed germination. Weed Research 53, 89–101. https://doi.org/10.1111/wre.12008
+2. Onofri, A., Benincasa, P., Mesgaran, M.B., Ritz, C., 2018. Hydrothermal-time-to-event models for seed germination. European Journal of Agronomy 101, 129–139.
+

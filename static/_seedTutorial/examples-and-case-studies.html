@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Section 10 Examples and case-studies | Analysing seed germination and emergence data with R: a tutorial</title>
+  <meta name="description" content="This document describes a new framework for the analyses of seed germination and emergence data and it is associated to the new R packages ‘drcte’ and ‘drcSeedGerm’" />
+  <meta name="generator" content="bookdown 0.27 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Section 10 Examples and case-studies | Analysing seed germination and emergence data with R: a tutorial" />
+  <meta property="og:type" content="book" />
+  <meta property="og:image" content="/coversmall.png" />
+  <meta property="og:description" content="This document describes a new framework for the analyses of seed germination and emergence data and it is associated to the new R packages ‘drcte’ and ‘drcSeedGerm’" />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Section 10 Examples and case-studies | Analysing seed germination and emergence data with R: a tutorial" />
+  <meta name="twitter:site" content="@onofriandreapg" />
+  <meta name="twitter:description" content="This document describes a new framework for the analyses of seed germination and emergence data and it is associated to the new R packages ‘drcte’ and ‘drcSeedGerm’" />
+  <meta name="twitter:image" content="/coversmall.png" />
+
+<meta name="author" content="Andrea Onofri" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="quantiles-from-time-to-event-models.html"/>
+<link rel="next" href="references.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-131792052-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  
+    gtag('config', 'UA-131792052-1');
+  </script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Time-to-event analyses with R</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#the-r-package"><i class="fa fa-check"></i><b>1.1</b> The R package</a></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#our-purpose"><i class="fa fa-check"></i><b>1.2</b> Our purpose</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html"><i class="fa fa-check"></i><b>2</b> What is time-to-event data?</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#time-to-event-data-are-censored-data"><i class="fa fa-check"></i><b>2.1</b> Time-to-event data are censored data</a></li>
+<li class="chapter" data-level="2.2" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#motivating-example-a-simulated-dataset"><i class="fa fa-check"></i><b>2.2</b> Motivating example: a simulated dataset</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#step-1-the-ungerminated-fraction"><i class="fa fa-check"></i><b>2.2.1</b> Step 1: the ungerminated fraction</a></li>
+<li class="chapter" data-level="2.2.2" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#step-2-germination-times-for-the-germinated-fraction"><i class="fa fa-check"></i><b>2.2.2</b> Step 2: germination times for the germinated fraction</a></li>
+<li class="chapter" data-level="2.2.3" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#step-3-counts-of-germinated-seeds"><i class="fa fa-check"></i><b>2.2.3</b> Step 3: counts of germinated seeds</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#neglecting-censoring"><i class="fa fa-check"></i><b>2.3</b> Neglecting censoring</a></li>
+<li class="chapter" data-level="2.4" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#accounting-for-censoring"><i class="fa fa-check"></i><b>2.4</b> Accounting for censoring</a></li>
+<li class="chapter" data-level="2.5" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#neglecting-or-accounting-for-censoring"><i class="fa fa-check"></i><b>2.5</b> Neglecting or accounting for censoring?</a></li>
+<li class="chapter" data-level="2.6" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#take-home-message"><i class="fa fa-check"></i><b>2.6</b> Take-home message</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html"><i class="fa fa-check"></i><b>3</b> Reshaping time-to-event data</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html#motivating-example"><i class="fa fa-check"></i><b>3.1</b> Motivating example</a></li>
+<li class="chapter" data-level="3.2" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html#transforming-from-wide-to-long-grouped"><i class="fa fa-check"></i><b>3.2</b> Transforming from WIDE to LONG GROUPED</a></li>
+<li class="chapter" data-level="3.3" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html#transforming-from-wide-to-long-ungrouped"><i class="fa fa-check"></i><b>3.3</b> Transforming from WIDE to LONG UNGROUPED</a></li>
+<li class="chapter" data-level="3.4" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html#from-long-grouped-to-long-ungrouped-and-vice-versa"><i class="fa fa-check"></i><b>3.4</b> From LONG GROUPED to LONG UNGROUPED (and vice-versa)</a></li>
+<li class="chapter" data-level="3.5" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html#from-nonlinear-regression-to-long-grouped"><i class="fa fa-check"></i><b>3.5</b> From NONLINEAR REGRESSION to LONG GROUPED</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="time-to-event-models-for-seed-germinationemergence.html"><a href="time-to-event-models-for-seed-germinationemergence.html"><i class="fa fa-check"></i><b>4</b> Time-to-event models for seed germination/emergence</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="time-to-event-models-for-seed-germinationemergence.html"><a href="time-to-event-models-for-seed-germinationemergence.html#parametric-time-to-event-models"><i class="fa fa-check"></i><b>4.1</b> Parametric time-to-event models</a></li>
+<li class="chapter" data-level="4.2" data-path="time-to-event-models-for-seed-germinationemergence.html"><a href="time-to-event-models-for-seed-germinationemergence.html#nonparametric-time-to-event-models"><i class="fa fa-check"></i><b>4.2</b> Nonparametric time-to-event models</a></li>
+<li class="chapter" data-level="4.3" data-path="time-to-event-models-for-seed-germinationemergence.html"><a href="time-to-event-models-for-seed-germinationemergence.html#kernel-density-estimators"><i class="fa fa-check"></i><b>4.3</b> Kernel density estimators</a></li>
+<li class="chapter" data-level="4.4" data-path="time-to-event-models-for-seed-germinationemergence.html"><a href="time-to-event-models-for-seed-germinationemergence.html#ml-npmle-or-kde"><i class="fa fa-check"></i><b>4.4</b> ML, NPMLE or KDE?</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="comparing-the-time-course-of-events-for-several-groups.html"><a href="comparing-the-time-course-of-events-for-several-groups.html"><i class="fa fa-check"></i><b>5</b> Comparing the time course of events for several groups</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="comparing-the-time-course-of-events-for-several-groups.html"><a href="comparing-the-time-course-of-events-for-several-groups.html#a-motivating-example"><i class="fa fa-check"></i><b>5.1</b> A motivating example</a></li>
+<li class="chapter" data-level="5.2" data-path="comparing-the-time-course-of-events-for-several-groups.html"><a href="comparing-the-time-course-of-events-for-several-groups.html#fitting-several-time-to-event-curves"><i class="fa fa-check"></i><b>5.2</b> Fitting several time-to-event curves</a></li>
+<li class="chapter" data-level="5.3" data-path="comparing-the-time-course-of-events-for-several-groups.html"><a href="comparing-the-time-course-of-events-for-several-groups.html#comparing-non-parametric-curves"><i class="fa fa-check"></i><b>5.3</b> Comparing non-parametric curves</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html"><i class="fa fa-check"></i><b>6</b> Fitting time-to-event models with environmental covariates</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#hydro-time-to-event-models"><i class="fa fa-check"></i><b>6.1</b> Hydro-time-to-event models</a></li>
+<li class="chapter" data-level="6.2" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#a-better-modelling-approach"><i class="fa fa-check"></i><b>6.2</b> A better modelling approach</a></li>
+<li class="chapter" data-level="6.3" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#another-modelling-approach"><i class="fa fa-check"></i><b>6.3</b> Another modelling approach</a></li>
+<li class="chapter" data-level="6.4" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#further-detail"><i class="fa fa-check"></i><b>6.4</b> Further detail</a>
+<ul>
+<li class="chapter" data-level="6.4.1" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#htl"><i class="fa fa-check"></i><b>6.4.1</b> <code>HTL()</code></a></li>
+<li class="chapter" data-level="6.4.2" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#htg"><i class="fa fa-check"></i><b>6.4.2</b> <code>HTG()</code></a></li>
+<li class="chapter" data-level="6.4.3" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#htll"><i class="fa fa-check"></i><b>6.4.3</b> <code>HTLL()</code></a></li>
+<li class="chapter" data-level="6.4.4" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#htw1"><i class="fa fa-check"></i><b>6.4.4</b> <code>HTW1()</code></a></li>
+<li class="chapter" data-level="6.4.5" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#htw2"><i class="fa fa-check"></i><b>6.4.5</b> <code>HTW2()</code></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="exploring-the-results-of-a-time-to-event-fit-model-parameters.html"><a href="exploring-the-results-of-a-time-to-event-fit-model-parameters.html"><i class="fa fa-check"></i><b>7</b> Exploring the results of a time-to-event fit: model parameters</a></li>
+<li class="chapter" data-level="8" data-path="predictions-from-time-to-event-models.html"><a href="predictions-from-time-to-event-models.html"><i class="fa fa-check"></i><b>8</b> Predictions from time-to-event models</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="predictions-from-time-to-event-models.html"><a href="predictions-from-time-to-event-models.html#parametric-time-to-event-model"><i class="fa fa-check"></i><b>8.1</b> Parametric time-to-event model</a></li>
+<li class="chapter" data-level="8.2" data-path="predictions-from-time-to-event-models.html"><a href="predictions-from-time-to-event-models.html#non-parametric-time-to-event-models"><i class="fa fa-check"></i><b>8.2</b> Non-parametric time-to-event models</a></li>
+<li class="chapter" data-level="8.3" data-path="predictions-from-time-to-event-models.html"><a href="predictions-from-time-to-event-models.html#predictions-from-a-time-to-event-model-from-literature"><i class="fa fa-check"></i><b>8.3</b> Predictions from a time-to-event model from literature</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html"><i class="fa fa-check"></i><b>9</b> Quantiles from time-to-event models</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#peculiarities-of-seed-science-data"><i class="fa fa-check"></i><b>9.1</b> Peculiarities of seed science data</a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#quantiles-and-restricted-quantiles"><i class="fa fa-check"></i><b>9.1.1</b> Quantiles and ‘restricted’ quantiles</a></li>
+<li class="chapter" data-level="9.1.2" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#germinationemergence-rates"><i class="fa fa-check"></i><b>9.1.2</b> Germination/emergence rates</a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#getting-the-quantiles-with-drcte"><i class="fa fa-check"></i><b>9.2</b> Getting the quantiles with ‘drcte’</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#parametric-models"><i class="fa fa-check"></i><b>9.2.1</b> Parametric models</a></li>
+<li class="chapter" data-level="9.2.2" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#parametric-models-with-environmental-covariates"><i class="fa fa-check"></i><b>9.2.2</b> Parametric models with environmental covariates</a></li>
+<li class="chapter" data-level="9.2.3" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#non-parametric-npmle-models"><i class="fa fa-check"></i><b>9.2.3</b> Non-parametric (NPMLE) models</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#quantiles-and-effective-doses-ed"><i class="fa fa-check"></i><b>9.3</b> Quantiles and Effective Doses (ED)</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="examples-and-case-studies.html"><a href="examples-and-case-studies.html"><i class="fa fa-check"></i><b>10</b> Examples and case-studies</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="examples-and-case-studies.html"><a href="examples-and-case-studies.html#example-1-fitting-a-hydro-thermal-time-model-to-seed-germination-data"><i class="fa fa-check"></i><b>10.1</b> Example 1: Fitting a hydro-thermal-time-model to seed germination data</a>
+<ul>
+<li class="chapter" data-level="10.1.1" data-path="examples-and-case-studies.html"><a href="examples-and-case-studies.html#preliminary-analyses"><i class="fa fa-check"></i><b>10.1.1</b> Preliminary analyses</a></li>
+<li class="chapter" data-level="10.1.2" data-path="examples-and-case-studies.html"><a href="examples-and-case-studies.html#a-better-modelling-approach-1"><i class="fa fa-check"></i><b>10.1.2</b> A better modelling approach</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>11</b> References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Analysing seed germination and emergence data with R: a tutorial</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="examples-and-case-studies" class="section level1 hasAnchor" number="10">
+<h1><span class="header-section-number">Section 10</span> Examples and case-studies<a href="examples-and-case-studies.html#examples-and-case-studies" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="example-1-fitting-a-hydro-thermal-time-model-to-seed-germination-data" class="section level2 hasAnchor" number="10.1">
+<h2><span class="header-section-number">10.1</span> Example 1: Fitting a hydro-thermal-time-model to seed germination data<a href="examples-and-case-studies.html#example-1-fitting-a-hydro-thermal-time-model-to-seed-germination-data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>This dataset was obtained from previously published work (Mesgaran et al., 2017) with <em>Hordeum spontaneum</em> [C. Koch] Thell. The germination assay was conducted using four replicates of 20 seeds tested at six different water potential levels (0, −0.3, −0.6, −0.9, −1.2 and −1.5 MPa). Osmotic potentials were produced using variable amount of polyethylene glycol (PEG, molecular weight 8000) adjusted for the temperature level. Petri dishes were incubated at six constant temperature levels (8, 12, 16, 20, 24 and 28 °C), under a photoperiod of 12 h. Germinated seeds (radicle protrusion &gt; 3 mm) were counted and removed daily for 20 days.</p>
+<p>This dataset is available as <code>hordeum</code> in the <code>drcSeedGerm</code> package, which needs to be installed from github (see below), together the package <code>drcte</code>, which is necessary to fit time-to-event models. The following code loads the necessary packages, loads the dataset <code>rape</code> and shows the first six lines.</p>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="examples-and-case-studies.html#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Installing packages (only at first instance)</span></span>
+<span id="cb58-2"><a href="examples-and-case-studies.html#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="co"># library(devtools)</span></span>
+<span id="cb58-3"><a href="examples-and-case-studies.html#cb58-3" aria-hidden="true" tabindex="-1"></a><span class="co"># install_github(&quot;OnofriAndreaPG/drcSeedGerm&quot;)</span></span>
+<span id="cb58-4"><a href="examples-and-case-studies.html#cb58-4" aria-hidden="true" tabindex="-1"></a><span class="co"># install_github(&quot;OnofriAndreaPG/drcte&quot;)</span></span>
+<span id="cb58-5"><a href="examples-and-case-studies.html#cb58-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(drcSeedGerm)</span>
+<span id="cb58-6"><a href="examples-and-case-studies.html#cb58-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb58-7"><a href="examples-and-case-studies.html#cb58-7" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(hordeum)</span>
+<span id="cb58-8"><a href="examples-and-case-studies.html#cb58-8" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(hordeum)</span>
+<span id="cb58-9"><a href="examples-and-case-studies.html#cb58-9" aria-hidden="true" tabindex="-1"></a><span class="do">##   temp water Dish timeBef timeAf nViable nSeeds nCum</span></span>
+<span id="cb58-10"><a href="examples-and-case-studies.html#cb58-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 1    8  -1.5    1       0     24      20      0    0</span></span>
+<span id="cb58-11"><a href="examples-and-case-studies.html#cb58-11" aria-hidden="true" tabindex="-1"></a><span class="do">## 2    8  -1.5    1      24     48      20      0    0</span></span>
+<span id="cb58-12"><a href="examples-and-case-studies.html#cb58-12" aria-hidden="true" tabindex="-1"></a><span class="do">## 3    8  -1.5    1      48     72      20      0    0</span></span>
+<span id="cb58-13"><a href="examples-and-case-studies.html#cb58-13" aria-hidden="true" tabindex="-1"></a><span class="do">## 4    8  -1.5    1      72     96      20      0    0</span></span>
+<span id="cb58-14"><a href="examples-and-case-studies.html#cb58-14" aria-hidden="true" tabindex="-1"></a><span class="do">## 5    8  -1.5    1      96    120      20      0    0</span></span>
+<span id="cb58-15"><a href="examples-and-case-studies.html#cb58-15" aria-hidden="true" tabindex="-1"></a><span class="do">## 6    8  -1.5    1     120    144      20      1    1</span></span></code></pre></div>
+<div id="preliminary-analyses" class="section level3 hasAnchor" number="10.1.1">
+<h3><span class="header-section-number">10.1.1</span> Preliminary analyses<a href="examples-and-case-studies.html#preliminary-analyses" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>First of all, it is necessary to mention that <strong>this dataset was already analysed in Onofri et al. (2018; Example 2) by using the same methodology, although, in that paper, the R implementation was different (see Supplemental Material) and it is now outdated.</strong></p>
+<p>In the above data frame, ‘timeAf’ represents the moment when germinated seeds were counted, while ’timeBef’ represents the previous inspection time (or the beginning of the assay). The column ’nSeeds’ is the number of seeds that germinated during the time interval between ‘timeBef’ and ‘timeAf. The ’nCum’ column contains the cumulative number of germinated seeds and it is not necessary for time-to-event model fitting, although we can use it for plotting purposes.</p>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="examples-and-case-studies.html#cb59-1" aria-hidden="true" tabindex="-1"></a>hordeum <span class="ot">&lt;-</span> hordeum <span class="sc">%&gt;%</span> </span>
+<span id="cb59-2"><a href="examples-and-case-studies.html#cb59-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">propCum =</span> nCum<span class="sc">/</span>nViable)</span>
+<span id="cb59-3"><a href="examples-and-case-studies.html#cb59-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-4"><a href="examples-and-case-studies.html#cb59-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> hordeum, <span class="at">mapping =</span> <span class="fu">aes</span>(timeAf, propCum)) <span class="sc">+</span></span>
+<span id="cb59-5"><a href="examples-and-case-studies.html#cb59-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb59-6"><a href="examples-and-case-studies.html#cb59-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(temp <span class="sc">~</span> water) <span class="sc">+</span></span>
+<span id="cb59-7"><a href="examples-and-case-studies.html#cb59-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">name =</span> <span class="st">&quot;Time (d)&quot;</span>) <span class="sc">+</span></span>
+<span id="cb59-8"><a href="examples-and-case-studies.html#cb59-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">name =</span> <span class="st">&quot;Cumulative proportion of germinated seeds&quot;</span>)</span></code></pre></div>
+<p><img src="_seedGerminationTutorial_files/figure-html/unnamed-chunk-58-1.png" width="672" /></p>
+<p>We see that the germination time-course is strongly affected by both temperature and water potential in the substrate and, consequently, our obvious interest is to model the effects of those environmental covariates. In our manuscript, we started from the idea that a parametric time-to-event curve is defined as a cumulative probability function (<span class="math inline">\(\Phi\)</span>), with three parameters:</p>
+<p><span class="math display">\[P(t) = \Phi \left( b, d, e \right)\]</span>
+where <span class="math inline">\(P(t)\)</span> is the cumulative probability of germination at time <span class="math inline">\(t\)</span>, <span class="math inline">\(e\)</span> is the median germination time, <span class="math inline">\(b\)</span> is the slope at the inflection point and <span class="math inline">\(d\)</span> is the maximum germinated proportion. The most obvious extension is to allow for different <span class="math inline">\(b\)</span>, <span class="math inline">\(d\)</span> and <span class="math inline">\(e\)</span> values for each of the i<sup>th</sup> combinations of water potential (<span class="math inline">\(\Psi\)</span>) and temperature level (<span class="math inline">\(T\)</span>):</p>
+<p><span class="math display">\[P(t, \Psi, T) = \Phi \left( b_i, d_i, e_i \right)\]</span>
+From the graph above, we see several ‘degenerated’ time-to-event curves, where no germinations occurred (e.g., see the graph at -1.5 MPa and 28°C). In order to avoid problems with those curves, we can use the <code>drmte()</code> function and set the <code>separate = TRUE</code> argument, so that the different curves are fitted independently of one another and the degenerated curves are recognised and skipped, without stopping the execution in R. In particular, where no time-course of events can be estimated, it is assumed that there is no progress to germination during the study-period and that the cumulative proportion of germinated seeds remains constant across that period. Consequently, the <code>drmte()</code> function resorts to fitting a simpler model, where the only <span class="math inline">\(d\)</span> parameter is estimated (that is the maximum fraction of germinated seeds).</p>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="examples-and-case-studies.html#cb60-1" aria-hidden="true" tabindex="-1"></a>hordeum <span class="ot">&lt;-</span> hordeum <span class="sc">%&gt;%</span> </span>
+<span id="cb60-2"><a href="examples-and-case-studies.html#cb60-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">comb =</span> <span class="fu">factor</span>( <span class="fu">factor</span>(water)<span class="sc">:</span><span class="fu">factor</span>(temp)))</span>
+<span id="cb60-3"><a href="examples-and-case-studies.html#cb60-3" aria-hidden="true" tabindex="-1"></a>mod1 <span class="ot">&lt;-</span> <span class="fu">drmte</span>(nSeeds <span class="sc">~</span> timeBef <span class="sc">+</span> timeAf, <span class="at">data =</span> hordeum,</span>
+<span id="cb60-4"><a href="examples-and-case-studies.html#cb60-4" aria-hidden="true" tabindex="-1"></a>             <span class="at">curveid =</span> comb, <span class="at">fct =</span> <span class="fu">loglogistic</span>(),</span>
+<span id="cb60-5"><a href="examples-and-case-studies.html#cb60-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">separate =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb60-6"><a href="examples-and-case-studies.html#cb60-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mod1)</span>
+<span id="cb60-7"><a href="examples-and-case-studies.html#cb60-7" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb60-8"><a href="examples-and-case-studies.html#cb60-8" aria-hidden="true" tabindex="-1"></a><span class="do">## Model fitted: Separate fitting of several time-to-event curves</span></span>
+<span id="cb60-9"><a href="examples-and-case-studies.html#cb60-9" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb60-10"><a href="examples-and-case-studies.html#cb60-10" aria-hidden="true" tabindex="-1"></a><span class="do">## Robust estimation: no </span></span>
+<span id="cb60-11"><a href="examples-and-case-studies.html#cb60-11" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb60-12"><a href="examples-and-case-studies.html#cb60-12" aria-hidden="true" tabindex="-1"></a><span class="do">## Parameter estimates:</span></span>
+<span id="cb60-13"><a href="examples-and-case-studies.html#cb60-13" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb60-14"><a href="examples-and-case-studies.html#cb60-14" aria-hidden="true" tabindex="-1"></a><span class="do">##             Estimate Std. Error t-value   p-value    </span></span>
+<span id="cb60-15"><a href="examples-and-case-studies.html#cb60-15" aria-hidden="true" tabindex="-1"></a><span class="do">## b:-1.5:8    5.577670   0.671086  8.3114 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-16"><a href="examples-and-case-studies.html#cb60-16" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-1.5:8    0.705845   0.051801 13.6260 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-17"><a href="examples-and-case-studies.html#cb60-17" aria-hidden="true" tabindex="-1"></a><span class="do">## e:-1.5:8  203.532986   8.746552 23.2701 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-18"><a href="examples-and-case-studies.html#cb60-18" aria-hidden="true" tabindex="-1"></a><span class="do">## b:-1.5:12   4.036639   0.633750  6.3694 1.897e-10 ***</span></span>
+<span id="cb60-19"><a href="examples-and-case-studies.html#cb60-19" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-1.5:12   0.566163   0.061406  9.2201 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-20"><a href="examples-and-case-studies.html#cb60-20" aria-hidden="true" tabindex="-1"></a><span class="do">## e:-1.5:12 232.198040  17.347102 13.3854 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-21"><a href="examples-and-case-studies.html#cb60-21" aria-hidden="true" tabindex="-1"></a><span class="do">## b:-1.5:16   4.130712   1.174395  3.5173 0.0004359 ***</span></span>
+<span id="cb60-22"><a href="examples-and-case-studies.html#cb60-22" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-1.5:16   0.226248   0.057013  3.9683 7.238e-05 ***</span></span>
+<span id="cb60-23"><a href="examples-and-case-studies.html#cb60-23" aria-hidden="true" tabindex="-1"></a><span class="do">## e:-1.5:16 293.584384  41.294139  7.1096 1.164e-12 ***</span></span>
+<span id="cb60-24"><a href="examples-and-case-studies.html#cb60-24" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-1.5:20   0.000000   0.000000     NaN       NaN    </span></span>
+<span id="cb60-25"><a href="examples-and-case-studies.html#cb60-25" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-1.5:24   0.000000   0.000000     NaN       NaN    </span></span>
+<span id="cb60-26"><a href="examples-and-case-studies.html#cb60-26" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-1.5:28   0.000000   0.000000     NaN       NaN    </span></span>
+<span id="cb60-27"><a href="examples-and-case-studies.html#cb60-27" aria-hidden="true" tabindex="-1"></a><span class="do">## b:-1.2:8    4.761454   0.531157  8.9643 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-28"><a href="examples-and-case-studies.html#cb60-28" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-1.2:8    0.803436   0.044972 17.8653 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-29"><a href="examples-and-case-studies.html#cb60-29" aria-hidden="true" tabindex="-1"></a><span class="do">## e:-1.2:8  152.794391   7.123662 21.4489 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-30"><a href="examples-and-case-studies.html#cb60-30" aria-hidden="true" tabindex="-1"></a><span class="do">## b:-1.2:12   4.165847   0.518344  8.0368 9.050e-16 ***</span></span>
+<span id="cb60-31"><a href="examples-and-case-studies.html#cb60-31" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-1.2:12   0.667099   0.053329 12.5092 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-32"><a href="examples-and-case-studies.html#cb60-32" aria-hidden="true" tabindex="-1"></a><span class="do">## e:-1.2:12 145.571114   8.562685 17.0006 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-33"><a href="examples-and-case-studies.html#cb60-33" aria-hidden="true" tabindex="-1"></a><span class="do">## b:-1.2:16   3.848053   0.556564  6.9140 4.713e-12 ***</span></span>
+<span id="cb60-34"><a href="examples-and-case-studies.html#cb60-34" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-1.2:16   0.536017   0.057474  9.3262 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-35"><a href="examples-and-case-studies.html#cb60-35" aria-hidden="true" tabindex="-1"></a><span class="do">## e:-1.2:16 175.692653  13.009048 13.5054 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-36"><a href="examples-and-case-studies.html#cb60-36" aria-hidden="true" tabindex="-1"></a><span class="do">## b:-1.2:20   4.679284   1.377885  3.3960 0.0006838 ***</span></span>
+<span id="cb60-37"><a href="examples-and-case-studies.html#cb60-37" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-1.2:20   0.191881   0.049814  3.8520 0.0001172 ***</span></span>
+<span id="cb60-38"><a href="examples-and-case-studies.html#cb60-38" aria-hidden="true" tabindex="-1"></a><span class="do">## e:-1.2:20 291.173467  34.870683  8.3501 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-39"><a href="examples-and-case-studies.html#cb60-39" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-1.2:24   0.000000   0.000000     NaN       NaN    </span></span>
+<span id="cb60-40"><a href="examples-and-case-studies.html#cb60-40" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-1.2:28   0.000000   0.000000     NaN       NaN    </span></span>
+<span id="cb60-41"><a href="examples-and-case-studies.html#cb60-41" aria-hidden="true" tabindex="-1"></a><span class="do">## b:-0.9:8    5.237479   0.550871  9.5076 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-42"><a href="examples-and-case-studies.html#cb60-42" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-0.9:8    0.887920   0.035345 25.1218 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-43"><a href="examples-and-case-studies.html#cb60-43" aria-hidden="true" tabindex="-1"></a><span class="do">## e:-0.9:8  111.384281   4.427060 25.1599 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-44"><a href="examples-and-case-studies.html#cb60-44" aria-hidden="true" tabindex="-1"></a><span class="do">## b:-0.9:12   4.368990   0.475050  9.1969 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-45"><a href="examples-and-case-studies.html#cb60-45" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-0.9:12   0.850876   0.039968 21.2889 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-46"><a href="examples-and-case-studies.html#cb60-46" aria-hidden="true" tabindex="-1"></a><span class="do">## e:-0.9:12  99.501087   4.833892 20.5841 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-47"><a href="examples-and-case-studies.html#cb60-47" aria-hidden="true" tabindex="-1"></a><span class="do">## b:-0.9:16   3.581796   0.400722  8.9383 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-48"><a href="examples-and-case-studies.html#cb60-48" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-0.9:16   0.816041   0.043892 18.5922 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-49"><a href="examples-and-case-studies.html#cb60-49" aria-hidden="true" tabindex="-1"></a><span class="do">## e:-0.9:16 105.233306   6.461986 16.2850 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-50"><a href="examples-and-case-studies.html#cb60-50" aria-hidden="true" tabindex="-1"></a><span class="do">## b:-0.9:20   3.536663   0.502112  7.0436 1.874e-12 ***</span></span>
+<span id="cb60-51"><a href="examples-and-case-studies.html#cb60-51" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-0.9:20   0.572734   0.056895 10.0665 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-52"><a href="examples-and-case-studies.html#cb60-52" aria-hidden="true" tabindex="-1"></a><span class="do">## e:-0.9:20 154.543645  11.924187 12.9605 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-53"><a href="examples-and-case-studies.html#cb60-53" aria-hidden="true" tabindex="-1"></a><span class="do">## b:-0.9:24   3.113060   0.947598  3.2852 0.0010191 ** </span></span>
+<span id="cb60-54"><a href="examples-and-case-studies.html#cb60-54" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-0.9:24   0.233165   0.062870  3.7087 0.0002084 ***</span></span>
+<span id="cb60-55"><a href="examples-and-case-studies.html#cb60-55" aria-hidden="true" tabindex="-1"></a><span class="do">## e:-0.9:24 269.509412  55.515112  4.8547 1.206e-06 ***</span></span>
+<span id="cb60-56"><a href="examples-and-case-studies.html#cb60-56" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-0.9:28   0.000000   0.000000     NaN       NaN    </span></span>
+<span id="cb60-57"><a href="examples-and-case-studies.html#cb60-57" aria-hidden="true" tabindex="-1"></a><span class="do">## b:-0.6:8    5.077994   0.538321  9.4330 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-58"><a href="examples-and-case-studies.html#cb60-58" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-0.6:8    0.900202   0.033548 26.8334 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-59"><a href="examples-and-case-studies.html#cb60-59" aria-hidden="true" tabindex="-1"></a><span class="do">## e:-0.6:8   92.146203   3.725399 24.7346 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-60"><a href="examples-and-case-studies.html#cb60-60" aria-hidden="true" tabindex="-1"></a><span class="do">## b:-0.6:12   5.564019   0.586966  9.4793 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-61"><a href="examples-and-case-studies.html#cb60-61" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-0.6:12   0.937528   0.027059 34.6476 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-62"><a href="examples-and-case-studies.html#cb60-62" aria-hidden="true" tabindex="-1"></a><span class="do">## e:-0.6:12  74.982399   2.818636 26.6024 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-63"><a href="examples-and-case-studies.html#cb60-63" aria-hidden="true" tabindex="-1"></a><span class="do">## b:-0.6:16   4.144136   0.458813  9.0323 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-64"><a href="examples-and-case-studies.html#cb60-64" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-0.6:16   0.837853   0.041271 20.3014 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-65"><a href="examples-and-case-studies.html#cb60-65" aria-hidden="true" tabindex="-1"></a><span class="do">## e:-0.6:16  75.109147   3.897277 19.2722 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-66"><a href="examples-and-case-studies.html#cb60-66" aria-hidden="true" tabindex="-1"></a><span class="do">## b:-0.6:20   4.399408   0.510297  8.6213 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-67"><a href="examples-and-case-studies.html#cb60-67" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-0.6:20   0.725331   0.049946 14.5224 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-68"><a href="examples-and-case-studies.html#cb60-68" aria-hidden="true" tabindex="-1"></a><span class="do">## e:-0.6:20  83.735884   4.468212 18.7404 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-69"><a href="examples-and-case-studies.html#cb60-69" aria-hidden="true" tabindex="-1"></a><span class="do">## b:-0.6:24   3.269465   0.443121  7.3783 1.603e-13 ***</span></span>
+<span id="cb60-70"><a href="examples-and-case-studies.html#cb60-70" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-0.6:24   0.607528   0.055700 10.9071 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-71"><a href="examples-and-case-studies.html#cb60-71" aria-hidden="true" tabindex="-1"></a><span class="do">## e:-0.6:24 125.859897   9.985513 12.6042 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-72"><a href="examples-and-case-studies.html#cb60-72" aria-hidden="true" tabindex="-1"></a><span class="do">## b:-0.6:28   2.959772   0.767672  3.8555 0.0001155 ***</span></span>
+<span id="cb60-73"><a href="examples-and-case-studies.html#cb60-73" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-0.6:28   0.265633   0.059199  4.4871 7.220e-06 ***</span></span>
+<span id="cb60-74"><a href="examples-and-case-studies.html#cb60-74" aria-hidden="true" tabindex="-1"></a><span class="do">## e:-0.6:28 233.440197  40.981613  5.6962 1.225e-08 ***</span></span>
+<span id="cb60-75"><a href="examples-and-case-studies.html#cb60-75" aria-hidden="true" tabindex="-1"></a><span class="do">## b:-0.3:8    6.489283   0.700089  9.2692 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-76"><a href="examples-and-case-studies.html#cb60-76" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-0.3:8    0.962474   0.021243 45.3069 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-77"><a href="examples-and-case-studies.html#cb60-77" aria-hidden="true" tabindex="-1"></a><span class="do">## e:-0.3:8   72.248403   2.326579 31.0535 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-78"><a href="examples-and-case-studies.html#cb60-78" aria-hidden="true" tabindex="-1"></a><span class="do">## b:-0.3:12   5.571444   0.614984  9.0595 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-79"><a href="examples-and-case-studies.html#cb60-79" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-0.3:12   0.962476   0.021243 45.3075 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-80"><a href="examples-and-case-studies.html#cb60-80" aria-hidden="true" tabindex="-1"></a><span class="do">## e:-0.3:12  56.804335   2.154440 26.3662 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-81"><a href="examples-and-case-studies.html#cb60-81" aria-hidden="true" tabindex="-1"></a><span class="do">## b:-0.3:16   3.759741   0.406837  9.2414 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-82"><a href="examples-and-case-studies.html#cb60-82" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-0.3:16   0.925252   0.029452 31.4157 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-83"><a href="examples-and-case-studies.html#cb60-83" aria-hidden="true" tabindex="-1"></a><span class="do">## e:-0.3:16  53.997403   3.004606 17.9715 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-84"><a href="examples-and-case-studies.html#cb60-84" aria-hidden="true" tabindex="-1"></a><span class="do">## b:-0.3:20   3.455788   0.382078  9.0447 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-85"><a href="examples-and-case-studies.html#cb60-85" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-0.3:20   0.863032   0.038527 22.4004 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-86"><a href="examples-and-case-studies.html#cb60-86" aria-hidden="true" tabindex="-1"></a><span class="do">## e:-0.3:20  56.589306   3.525940 16.0494 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-87"><a href="examples-and-case-studies.html#cb60-87" aria-hidden="true" tabindex="-1"></a><span class="do">## b:-0.3:24   3.219012   0.384905  8.3631 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-88"><a href="examples-and-case-studies.html#cb60-88" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-0.3:24   0.739176   0.049321 14.9869 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-89"><a href="examples-and-case-studies.html#cb60-89" aria-hidden="true" tabindex="-1"></a><span class="do">## e:-0.3:24  72.448658   5.145402 14.0803 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-90"><a href="examples-and-case-studies.html#cb60-90" aria-hidden="true" tabindex="-1"></a><span class="do">## b:-0.3:28   3.384884   0.449578  7.5290 5.110e-14 ***</span></span>
+<span id="cb60-91"><a href="examples-and-case-studies.html#cb60-91" aria-hidden="true" tabindex="-1"></a><span class="do">## d:-0.3:28   0.591722   0.055517 10.6583 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-92"><a href="examples-and-case-studies.html#cb60-92" aria-hidden="true" tabindex="-1"></a><span class="do">## e:-0.3:28 111.482975   8.597283 12.9672 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-93"><a href="examples-and-case-studies.html#cb60-93" aria-hidden="true" tabindex="-1"></a><span class="do">## b:0:8       8.055166   0.890908  9.0415 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-94"><a href="examples-and-case-studies.html#cb60-94" aria-hidden="true" tabindex="-1"></a><span class="do">## d:0:8       0.962496   0.021229 45.3391 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-95"><a href="examples-and-case-studies.html#cb60-95" aria-hidden="true" tabindex="-1"></a><span class="do">## e:0:8      64.579539   1.810276 35.6739 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-96"><a href="examples-and-case-studies.html#cb60-96" aria-hidden="true" tabindex="-1"></a><span class="do">## b:0:12      4.597148   0.515642  8.9154 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-97"><a href="examples-and-case-studies.html#cb60-97" aria-hidden="true" tabindex="-1"></a><span class="do">## d:0:12      0.962502   0.021236 45.3239 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-98"><a href="examples-and-case-studies.html#cb60-98" aria-hidden="true" tabindex="-1"></a><span class="do">## e:0:12     45.258150   2.124034 21.3076 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-99"><a href="examples-and-case-studies.html#cb60-99" aria-hidden="true" tabindex="-1"></a><span class="do">## b:0:16      4.519281   0.504988  8.9493 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-100"><a href="examples-and-case-studies.html#cb60-100" aria-hidden="true" tabindex="-1"></a><span class="do">## d:0:16      0.937575   0.027033 34.6821 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-101"><a href="examples-and-case-studies.html#cb60-101" aria-hidden="true" tabindex="-1"></a><span class="do">## e:0:16     41.805944   2.052607 20.3672 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-102"><a href="examples-and-case-studies.html#cb60-102" aria-hidden="true" tabindex="-1"></a><span class="do">## b:0:20      3.833745   0.419743  9.1335 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-103"><a href="examples-and-case-studies.html#cb60-103" aria-hidden="true" tabindex="-1"></a><span class="do">## d:0:20      0.925095   0.029446 31.4163 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-104"><a href="examples-and-case-studies.html#cb60-104" aria-hidden="true" tabindex="-1"></a><span class="do">## e:0:20     43.588297   2.434550 17.9040 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-105"><a href="examples-and-case-studies.html#cb60-105" aria-hidden="true" tabindex="-1"></a><span class="do">## b:0:24      4.103341   0.467512  8.7770 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-106"><a href="examples-and-case-studies.html#cb60-106" aria-hidden="true" tabindex="-1"></a><span class="do">## d:0:24      0.875057   0.036978 23.6641 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-107"><a href="examples-and-case-studies.html#cb60-107" aria-hidden="true" tabindex="-1"></a><span class="do">## e:0:24     47.161280   2.550713 18.4894 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-108"><a href="examples-and-case-studies.html#cb60-108" aria-hidden="true" tabindex="-1"></a><span class="do">## b:0:28      2.895784   0.341099  8.4896 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-109"><a href="examples-and-case-studies.html#cb60-109" aria-hidden="true" tabindex="-1"></a><span class="do">## d:0:28      0.764633   0.047737 16.0176 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-110"><a href="examples-and-case-studies.html#cb60-110" aria-hidden="true" tabindex="-1"></a><span class="do">## e:0:28     63.034588   4.939641 12.7610 &lt; 2.2e-16 ***</span></span>
+<span id="cb60-111"><a href="examples-and-case-studies.html#cb60-111" aria-hidden="true" tabindex="-1"></a><span class="do">## ---</span></span>
+<span id="cb60-112"><a href="examples-and-case-studies.html#cb60-112" aria-hidden="true" tabindex="-1"></a><span class="do">## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span></code></pre></div>
+</div>
+<div id="a-better-modelling-approach-1" class="section level3 hasAnchor" number="10.1.2">
+<h3><span class="header-section-number">10.1.2</span> A better modelling approach<a href="examples-and-case-studies.html#a-better-modelling-approach-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The previous approach is clearly sub-optimal, as the temperature and water potential levels are regarded as factors, i.e. as nominal classes with no intrinsic orderings and distances. It would be much better to recognise that temperature and water potential are continuous variables and, consequently, code a time-to-event model where the three parameters are expressed as continuous functions of <span class="math inline">\(\Psi\)</span> and <span class="math inline">\(T\)</span>:</p>
+<p><span class="math display">\[P(t, \Psi, T) = \Phi \left[ b(\Psi, T), d(\Psi, T), e(\Psi, T) \right]\]</span></p>
+<p>In the above mentioned manuscript (Onofri et al., 2018; example 2) we used a log-logistic cumulative distribution function:</p>
+<p><span class="math display">\[P(t, \Psi, T) = \frac{ d(\Psi, T) }{1 + \exp \left\{ b \left[ \log(t) - \log( e(\Psi, T) ) \right] \right\} }\]</span></p>
+<p>Considering that the germination rate is the inverse of germination time, we replaced <span class="math inline">\(e(\Psi, T) = 1/GR_{50}(\Psi, T)\)</span> and used the following sub-models:</p>
+<p><span class="math display">\[d(\Psi, T) = \textrm{max} \left\{ G \, \left[ 1 - \exp \left( \frac{ \Psi - \Psi_b - k(T - T_b )}{\sigma_{\Psi_b}} \right) \right]; 0 \right\}\]</span></p>
+<p><span class="math display">\[GR_{50}(\Psi, T) = \textrm{max} \left\{ \frac{T - T_b }{\theta_{HT}} \left[\Psi - \Psi_b - k(T - T_b )\right]; 0 \right\}\]</span>
+Please, note that the shape parameter <span class="math inline">\(b\)</span> has been regarded as independent from the environmental covariates. It may be useful to note that the the parameters are:</p>
+<ol style="list-style-type: decimal">
+<li><span class="math inline">\(\Psi_{b}\)</span>, that is the median base water potential in the seed lot,</li>
+<li><span class="math inline">\(T_{b}\)</span>, that is the base temperature for germination,</li>
+<li><span class="math inline">\(\theta_HT\)</span>, that is the hydro-thermal-time parameter,</li>
+<li><span class="math inline">\(\sigma_{\Psi_b}\)</span>, that represents the variability of <span class="math inline">\(\Psi_b\)</span> within the population,</li>
+<li><span class="math inline">\(G\)</span>, that is the germinable fraction, accounting for the fact that <span class="math inline">\(d\)</span> may not reach 1, regardless of time and water potential.</li>
+<li><span class="math inline">\(k\)</span> and <span class="math inline">\(b\)</span> that are parameters of shape.</li>
+</ol>
+<p>You can get more information from our original paper (Onofri et al., 2018). This hydro-thermal-time model was implemented in R as the <code>HTTEM()</code> function, and it is available within the <code>drcSeedGerm</code> package; we can fit it by using the <code>drmte()</code> function in the <code>drcte</code> package, but we need to provide starting values for model parameters, because the self-starting routine is not yet available. Finally, the <code>summary()</code> method can be used to retrieve the parameter estimates.</p>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="examples-and-case-studies.html#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Complex model and slow fitting</span></span>
+<span id="cb61-2"><a href="examples-and-case-studies.html#cb61-2" aria-hidden="true" tabindex="-1"></a>modHTTE <span class="ot">&lt;-</span> <span class="fu">drmte</span>(nSeeds <span class="sc">~</span> timeBef <span class="sc">+</span> timeAf <span class="sc">+</span> water <span class="sc">+</span> temp,</span>
+<span id="cb61-3"><a href="examples-and-case-studies.html#cb61-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">data=</span>hordeum,</span>
+<span id="cb61-4"><a href="examples-and-case-studies.html#cb61-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">fct =</span> <span class="fu">HTTEM</span>(),</span>
+<span id="cb61-5"><a href="examples-and-case-studies.html#cb61-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">start=</span><span class="fu">c</span>(<span class="fl">0.8</span>,<span class="sc">-</span><span class="dv">2</span>, <span class="fl">0.05</span>, <span class="dv">3</span>, <span class="fl">0.2</span>, <span class="dv">2000</span>, <span class="fl">0.5</span>))</span>
+<span id="cb61-6"><a href="examples-and-case-studies.html#cb61-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(modHTTE, <span class="at">robust =</span> T, <span class="at">units =</span> Dish)</span>
+<span id="cb61-7"><a href="examples-and-case-studies.html#cb61-7" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb61-8"><a href="examples-and-case-studies.html#cb61-8" aria-hidden="true" tabindex="-1"></a><span class="do">## Model fitted: Hydro-thermal-time-model (Mesgaran et al., 2017)</span></span>
+<span id="cb61-9"><a href="examples-and-case-studies.html#cb61-9" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb61-10"><a href="examples-and-case-studies.html#cb61-10" aria-hidden="true" tabindex="-1"></a><span class="do">## Robust estimation: Cluster robust sandwich SEs </span></span>
+<span id="cb61-11"><a href="examples-and-case-studies.html#cb61-11" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb61-12"><a href="examples-and-case-studies.html#cb61-12" aria-hidden="true" tabindex="-1"></a><span class="do">## Parameter estimates:</span></span>
+<span id="cb61-13"><a href="examples-and-case-studies.html#cb61-13" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb61-14"><a href="examples-and-case-studies.html#cb61-14" aria-hidden="true" tabindex="-1"></a><span class="do">##                          Estimate  Std. Error  t value Pr(&gt;|t|)    </span></span>
+<span id="cb61-15"><a href="examples-and-case-studies.html#cb61-15" aria-hidden="true" tabindex="-1"></a><span class="do">## G:(Intercept)          9.8820e-01  1.1576e-02  85.3692   &lt;2e-16 ***</span></span>
+<span id="cb61-16"><a href="examples-and-case-studies.html#cb61-16" aria-hidden="true" tabindex="-1"></a><span class="do">## Psib:(Intercept)      -2.9133e+00  3.4812e-02 -83.6874   &lt;2e-16 ***</span></span>
+<span id="cb61-17"><a href="examples-and-case-studies.html#cb61-17" aria-hidden="true" tabindex="-1"></a><span class="do">## kt:(Intercept)         7.4228e-02  1.2666e-03  58.6015   &lt;2e-16 ***</span></span>
+<span id="cb61-18"><a href="examples-and-case-studies.html#cb61-18" aria-hidden="true" tabindex="-1"></a><span class="do">## Tb:(Intercept)        -7.4525e-01  3.5254e-01  -2.1139   0.0346 *  </span></span>
+<span id="cb61-19"><a href="examples-and-case-studies.html#cb61-19" aria-hidden="true" tabindex="-1"></a><span class="do">## sigmaPsib:(Intercept)  5.5284e-01  2.8976e-02  19.0790   &lt;2e-16 ***</span></span>
+<span id="cb61-20"><a href="examples-and-case-studies.html#cb61-20" aria-hidden="true" tabindex="-1"></a><span class="do">## ThetaHT:(Intercept)    1.3091e+03  4.0638e+01  32.2130   &lt;2e-16 ***</span></span>
+<span id="cb61-21"><a href="examples-and-case-studies.html#cb61-21" aria-hidden="true" tabindex="-1"></a><span class="do">## b:(Intercept)          4.1650e+00  1.1332e-01  36.7548   &lt;2e-16 ***</span></span>
+<span id="cb61-22"><a href="examples-and-case-studies.html#cb61-22" aria-hidden="true" tabindex="-1"></a><span class="do">## ---</span></span>
+<span id="cb61-23"><a href="examples-and-case-studies.html#cb61-23" aria-hidden="true" tabindex="-1"></a><span class="do">## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span></code></pre></div>
+<p>It is always important not to neglect a graphical inspection of model fit. The <code>plot()</code> method does not work with time-to-event curves with additional covariates (apart from time). However, we can retrieve the fitted data by using the <code>plotData()</code> function and use those predictions within the <code>ggplot()</code> function. The box below shows the appropriate coding.</p>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="examples-and-case-studies.html#cb62-1" aria-hidden="true" tabindex="-1"></a>tab <span class="ot">&lt;-</span> <span class="fu">plotData</span>(modHTTE)</span>
+<span id="cb62-2"><a href="examples-and-case-studies.html#cb62-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-3"><a href="examples-and-case-studies.html#cb62-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb62-4"><a href="examples-and-case-studies.html#cb62-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> tab<span class="sc">$</span>plotPoints, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> timeAf, <span class="at">y =</span> CDF),</span>
+<span id="cb62-5"><a href="examples-and-case-studies.html#cb62-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">col =</span> <span class="st">&quot;red&quot;</span>) <span class="sc">+</span></span>
+<span id="cb62-6"><a href="examples-and-case-studies.html#cb62-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> tab<span class="sc">$</span>plotFits, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> timeAf, <span class="at">y =</span> CDF)) <span class="sc">+</span></span>
+<span id="cb62-7"><a href="examples-and-case-studies.html#cb62-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(temp <span class="sc">~</span> water) <span class="sc">+</span></span>
+<span id="cb62-8"><a href="examples-and-case-studies.html#cb62-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">name =</span> <span class="st">&quot;Time (d)&quot;</span>) <span class="sc">+</span></span>
+<span id="cb62-9"><a href="examples-and-case-studies.html#cb62-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">name =</span> <span class="st">&quot;Cumulative proportion of germinated seeds&quot;</span>)</span></code></pre></div>
+<p><img src="_seedGerminationTutorial_files/figure-html/unnamed-chunk-61-1.png" width="672" /></p>
+
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="quantiles-from-time-to-event-models.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="references.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["_seedGerminationTutorial.pdf", "_seedGerminationTutorial.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

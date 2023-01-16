@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Section 5 Comparing the time course of events for several groups | Analysing seed germination and emergence data with R: a tutorial</title>
+  <meta name="description" content="This document describes a new framework for the analyses of seed germination and emergence data and it is associated to the new R packages ‘drcte’ and ‘drcSeedGerm’" />
+  <meta name="generator" content="bookdown 0.27 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Section 5 Comparing the time course of events for several groups | Analysing seed germination and emergence data with R: a tutorial" />
+  <meta property="og:type" content="book" />
+  <meta property="og:image" content="/coversmall.png" />
+  <meta property="og:description" content="This document describes a new framework for the analyses of seed germination and emergence data and it is associated to the new R packages ‘drcte’ and ‘drcSeedGerm’" />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Section 5 Comparing the time course of events for several groups | Analysing seed germination and emergence data with R: a tutorial" />
+  <meta name="twitter:site" content="@onofriandreapg" />
+  <meta name="twitter:description" content="This document describes a new framework for the analyses of seed germination and emergence data and it is associated to the new R packages ‘drcte’ and ‘drcSeedGerm’" />
+  <meta name="twitter:image" content="/coversmall.png" />
+
+<meta name="author" content="Andrea Onofri" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="time-to-event-models-for-seed-germinationemergence.html"/>
+<link rel="next" href="fitting-time-to-event-models-with-environmental-covariates.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-131792052-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  
+    gtag('config', 'UA-131792052-1');
+  </script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Time-to-event analyses with R</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#the-r-package"><i class="fa fa-check"></i><b>1.1</b> The R package</a></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#our-purpose"><i class="fa fa-check"></i><b>1.2</b> Our purpose</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html"><i class="fa fa-check"></i><b>2</b> What is time-to-event data?</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#time-to-event-data-are-censored-data"><i class="fa fa-check"></i><b>2.1</b> Time-to-event data are censored data</a></li>
+<li class="chapter" data-level="2.2" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#motivating-example-a-simulated-dataset"><i class="fa fa-check"></i><b>2.2</b> Motivating example: a simulated dataset</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#step-1-the-ungerminated-fraction"><i class="fa fa-check"></i><b>2.2.1</b> Step 1: the ungerminated fraction</a></li>
+<li class="chapter" data-level="2.2.2" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#step-2-germination-times-for-the-germinated-fraction"><i class="fa fa-check"></i><b>2.2.2</b> Step 2: germination times for the germinated fraction</a></li>
+<li class="chapter" data-level="2.2.3" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#step-3-counts-of-germinated-seeds"><i class="fa fa-check"></i><b>2.2.3</b> Step 3: counts of germinated seeds</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#neglecting-censoring"><i class="fa fa-check"></i><b>2.3</b> Neglecting censoring</a></li>
+<li class="chapter" data-level="2.4" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#accounting-for-censoring"><i class="fa fa-check"></i><b>2.4</b> Accounting for censoring</a></li>
+<li class="chapter" data-level="2.5" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#neglecting-or-accounting-for-censoring"><i class="fa fa-check"></i><b>2.5</b> Neglecting or accounting for censoring?</a></li>
+<li class="chapter" data-level="2.6" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#take-home-message"><i class="fa fa-check"></i><b>2.6</b> Take-home message</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html"><i class="fa fa-check"></i><b>3</b> Reshaping time-to-event data</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html#motivating-example"><i class="fa fa-check"></i><b>3.1</b> Motivating example</a></li>
+<li class="chapter" data-level="3.2" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html#transforming-from-wide-to-long-grouped"><i class="fa fa-check"></i><b>3.2</b> Transforming from WIDE to LONG GROUPED</a></li>
+<li class="chapter" data-level="3.3" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html#transforming-from-wide-to-long-ungrouped"><i class="fa fa-check"></i><b>3.3</b> Transforming from WIDE to LONG UNGROUPED</a></li>
+<li class="chapter" data-level="3.4" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html#from-long-grouped-to-long-ungrouped-and-vice-versa"><i class="fa fa-check"></i><b>3.4</b> From LONG GROUPED to LONG UNGROUPED (and vice-versa)</a></li>
+<li class="chapter" data-level="3.5" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html#from-nonlinear-regression-to-long-grouped"><i class="fa fa-check"></i><b>3.5</b> From NONLINEAR REGRESSION to LONG GROUPED</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="time-to-event-models-for-seed-germinationemergence.html"><a href="time-to-event-models-for-seed-germinationemergence.html"><i class="fa fa-check"></i><b>4</b> Time-to-event models for seed germination/emergence</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="time-to-event-models-for-seed-germinationemergence.html"><a href="time-to-event-models-for-seed-germinationemergence.html#parametric-time-to-event-models"><i class="fa fa-check"></i><b>4.1</b> Parametric time-to-event models</a></li>
+<li class="chapter" data-level="4.2" data-path="time-to-event-models-for-seed-germinationemergence.html"><a href="time-to-event-models-for-seed-germinationemergence.html#nonparametric-time-to-event-models"><i class="fa fa-check"></i><b>4.2</b> Nonparametric time-to-event models</a></li>
+<li class="chapter" data-level="4.3" data-path="time-to-event-models-for-seed-germinationemergence.html"><a href="time-to-event-models-for-seed-germinationemergence.html#kernel-density-estimators"><i class="fa fa-check"></i><b>4.3</b> Kernel density estimators</a></li>
+<li class="chapter" data-level="4.4" data-path="time-to-event-models-for-seed-germinationemergence.html"><a href="time-to-event-models-for-seed-germinationemergence.html#ml-npmle-or-kde"><i class="fa fa-check"></i><b>4.4</b> ML, NPMLE or KDE?</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="comparing-the-time-course-of-events-for-several-groups.html"><a href="comparing-the-time-course-of-events-for-several-groups.html"><i class="fa fa-check"></i><b>5</b> Comparing the time course of events for several groups</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="comparing-the-time-course-of-events-for-several-groups.html"><a href="comparing-the-time-course-of-events-for-several-groups.html#a-motivating-example"><i class="fa fa-check"></i><b>5.1</b> A motivating example</a></li>
+<li class="chapter" data-level="5.2" data-path="comparing-the-time-course-of-events-for-several-groups.html"><a href="comparing-the-time-course-of-events-for-several-groups.html#fitting-several-time-to-event-curves"><i class="fa fa-check"></i><b>5.2</b> Fitting several time-to-event curves</a></li>
+<li class="chapter" data-level="5.3" data-path="comparing-the-time-course-of-events-for-several-groups.html"><a href="comparing-the-time-course-of-events-for-several-groups.html#comparing-non-parametric-curves"><i class="fa fa-check"></i><b>5.3</b> Comparing non-parametric curves</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html"><i class="fa fa-check"></i><b>6</b> Fitting time-to-event models with environmental covariates</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#hydro-time-to-event-models"><i class="fa fa-check"></i><b>6.1</b> Hydro-time-to-event models</a></li>
+<li class="chapter" data-level="6.2" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#a-better-modelling-approach"><i class="fa fa-check"></i><b>6.2</b> A better modelling approach</a></li>
+<li class="chapter" data-level="6.3" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#another-modelling-approach"><i class="fa fa-check"></i><b>6.3</b> Another modelling approach</a></li>
+<li class="chapter" data-level="6.4" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#further-detail"><i class="fa fa-check"></i><b>6.4</b> Further detail</a>
+<ul>
+<li class="chapter" data-level="6.4.1" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#htl"><i class="fa fa-check"></i><b>6.4.1</b> <code>HTL()</code></a></li>
+<li class="chapter" data-level="6.4.2" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#htg"><i class="fa fa-check"></i><b>6.4.2</b> <code>HTG()</code></a></li>
+<li class="chapter" data-level="6.4.3" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#htll"><i class="fa fa-check"></i><b>6.4.3</b> <code>HTLL()</code></a></li>
+<li class="chapter" data-level="6.4.4" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#htw1"><i class="fa fa-check"></i><b>6.4.4</b> <code>HTW1()</code></a></li>
+<li class="chapter" data-level="6.4.5" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#htw2"><i class="fa fa-check"></i><b>6.4.5</b> <code>HTW2()</code></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="exploring-the-results-of-a-time-to-event-fit-model-parameters.html"><a href="exploring-the-results-of-a-time-to-event-fit-model-parameters.html"><i class="fa fa-check"></i><b>7</b> Exploring the results of a time-to-event fit: model parameters</a></li>
+<li class="chapter" data-level="8" data-path="predictions-from-time-to-event-models.html"><a href="predictions-from-time-to-event-models.html"><i class="fa fa-check"></i><b>8</b> Predictions from time-to-event models</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="predictions-from-time-to-event-models.html"><a href="predictions-from-time-to-event-models.html#parametric-time-to-event-model"><i class="fa fa-check"></i><b>8.1</b> Parametric time-to-event model</a></li>
+<li class="chapter" data-level="8.2" data-path="predictions-from-time-to-event-models.html"><a href="predictions-from-time-to-event-models.html#non-parametric-time-to-event-models"><i class="fa fa-check"></i><b>8.2</b> Non-parametric time-to-event models</a></li>
+<li class="chapter" data-level="8.3" data-path="predictions-from-time-to-event-models.html"><a href="predictions-from-time-to-event-models.html#predictions-from-a-time-to-event-model-from-literature"><i class="fa fa-check"></i><b>8.3</b> Predictions from a time-to-event model from literature</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html"><i class="fa fa-check"></i><b>9</b> Quantiles from time-to-event models</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#peculiarities-of-seed-science-data"><i class="fa fa-check"></i><b>9.1</b> Peculiarities of seed science data</a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#quantiles-and-restricted-quantiles"><i class="fa fa-check"></i><b>9.1.1</b> Quantiles and ‘restricted’ quantiles</a></li>
+<li class="chapter" data-level="9.1.2" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#germinationemergence-rates"><i class="fa fa-check"></i><b>9.1.2</b> Germination/emergence rates</a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#getting-the-quantiles-with-drcte"><i class="fa fa-check"></i><b>9.2</b> Getting the quantiles with ‘drcte’</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#parametric-models"><i class="fa fa-check"></i><b>9.2.1</b> Parametric models</a></li>
+<li class="chapter" data-level="9.2.2" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#parametric-models-with-environmental-covariates"><i class="fa fa-check"></i><b>9.2.2</b> Parametric models with environmental covariates</a></li>
+<li class="chapter" data-level="9.2.3" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#non-parametric-npmle-models"><i class="fa fa-check"></i><b>9.2.3</b> Non-parametric (NPMLE) models</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html#quantiles-and-effective-doses-ed"><i class="fa fa-check"></i><b>9.3</b> Quantiles and Effective Doses (ED)</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="examples-and-case-studies.html"><a href="examples-and-case-studies.html"><i class="fa fa-check"></i><b>10</b> Examples and case-studies</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="examples-and-case-studies.html"><a href="examples-and-case-studies.html#example-1-fitting-a-hydro-thermal-time-model-to-seed-germination-data"><i class="fa fa-check"></i><b>10.1</b> Example 1: Fitting a hydro-thermal-time-model to seed germination data</a>
+<ul>
+<li class="chapter" data-level="10.1.1" data-path="examples-and-case-studies.html"><a href="examples-and-case-studies.html#preliminary-analyses"><i class="fa fa-check"></i><b>10.1.1</b> Preliminary analyses</a></li>
+<li class="chapter" data-level="10.1.2" data-path="examples-and-case-studies.html"><a href="examples-and-case-studies.html#a-better-modelling-approach-1"><i class="fa fa-check"></i><b>10.1.2</b> A better modelling approach</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>11</b> References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Analysing seed germination and emergence data with R: a tutorial</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="comparing-the-time-course-of-events-for-several-groups" class="section level1 hasAnchor" number="5">
+<h1><span class="header-section-number">Section 5</span> Comparing the time course of events for several groups<a href="comparing-the-time-course-of-events-for-several-groups.html#comparing-the-time-course-of-events-for-several-groups" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>Very often, seed scientists need to compare the germination behavior of different seed populations, e.g., different plant species, or one single plant species submitted to different temperatures, light conditions, priming treatments and so on. How should such a comparison be performed? For example, if we have submitted several seed samples to different environmental conditions, how do we decide whether the germinative response is affected by those environmental conditions?</p>
+<p>If the case that we have replicates for all experimental treatments, e.g. several Petri dishes, one possible line of attack is to take a summary measure for each dish and use that for further analyses, in a two-steps fashion. For example, we could take the total number of germinated seeds (Pmax) in each dish and use the resulting values to parameterise some sort of ANOVA-like model and test the significance of all effects.</p>
+<p>This method of data analysis is known as ‘response feature analysis’ and it may be regarded as ‘very traditional’, in the sense that it is often found in literature; although it is not wrong, it is, undoubtedly, sub-optimal. Indeed, two seed lots submitted to different treatments may show the same total number of germinated seeds, but a different velocity or uniformity of germination. In other words, if we only consider, e.g., the Pmax, we can answer the question: “do the seed lots differ for their germination capability?”, but not the more general question: “are the seed lots different?”.</p>
+<p>In order to answer this latter question, we should consider the entire time-course of germination and not only one single summary statistic. <strong>In other words, we need a method to fit and compare several time-to-event curves.</strong></p>
+<div id="a-motivating-example" class="section level2 hasAnchor" number="5.1">
+<h2><span class="header-section-number">5.1</span> A motivating example<a href="comparing-the-time-course-of-events-for-several-groups.html#a-motivating-example" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Let’s take a practical approach and start from an example: a few years ago, some colleagues of mine studied the germination behavior of a plant species (<em>Verbascum arcturus</em>), in different conditions. In detail, they considered the factorial combination of two storage periods (LONG and SHORT storage) and two temperature regimes (FIX: constant daily temperature of 20°C; ALT: alternating daily temperature regime, with 25°C during daytime and 15°C during night time, with a 12:12h photoperiod). If you are a seed scientist and are interested in this experiment, you’ll find detail in Catara <em>et al.</em> (2016).</p>
+<p>If you are not a seed scientist, you may wonder why my colleagues made such an assay; well, there is evidence that, for some plant species, the germination ability improves over time, after seed maturation. Therefore, if we take seeds and store them for different periods of time, there might be an effect on their germination traits. Likewise, there is also evidence that germinations may be hindered if seed is not submitted to daily temperature fluctuations. For seed scientists, all these mechanisms are very important, as they permit to trigger the germinations when the environmental conditions are favorable for seedling survival.</p>
+<p>Let’s go back to our assay: the experimental design consisted of four experimental ‘combinations’ (LONG-FIX, LONG-ALT, SHORT-FIX and SHORT-ALT) and four replicates for each combination. One replicate consisted of a Petri dish, that is a small plastic box containing humid blotting paper, with 25 seeds of <em>V. arcturus</em>. In all, there were 16 Petri dishes, which were put in climatic chambers with the appropriate conditions. During the assay, my colleagues made daily inspections: germinated seeds were counted and removed from the dishes. Inspections were made for 15 days, until no more germinations could be observed.</p>
+<p>The original dataset is available from a gitHub repository: let’s load and have a look at it.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span>
+<span id="cb24-2"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb24-2" aria-hidden="true" tabindex="-1"></a>datasetOr <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/OnofriAndreaPG/agroBioData/master/TempStorage.csv&quot;</span>, <span class="at">header =</span> T, <span class="at">check.names =</span> F)</span>
+<span id="cb24-3"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(datasetOr)</span>
+<span id="cb24-4"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="do">##   Dish Storage Temp 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15</span></span>
+<span id="cb24-5"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="do">## 1    1     Low  Fix 0 0 0 0 0 0 0 0 3  4  6  0  1  0  3</span></span>
+<span id="cb24-6"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="do">## 2    2     Low  Fix 0 0 0 0 1 0 0 0 2  7  2  3  0  5  1</span></span>
+<span id="cb24-7"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 3    3     Low  Fix 0 0 0 0 1 0 0 1 3  5  2  4  0  1  3</span></span>
+<span id="cb24-8"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 4    4     Low  Fix 0 0 0 0 1 0 3 0 0  3  1  1  0  4  4</span></span>
+<span id="cb24-9"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 5    5    High  Fix 0 0 0 0 0 0 0 0 1  2  5  4  2  3  0</span></span>
+<span id="cb24-10"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 6    6    High  Fix 0 0 0 0 0 0 0 0 2  2  7  8  1  2  1</span></span></code></pre></div>
+<p>We have one row per Petri dish; the first three columns show, respectively, the dish number, storage and temperature conditions. The next 15 columns represent the inspection times (from 1 to 15) and contain the counts of germinated seeds. The research question is:</p>
+<p><em>Is germination behavior affected by storage and temperature conditions?</em></p>
+</div>
+<div id="fitting-several-time-to-event-curves" class="section level2 hasAnchor" number="5.2">
+<h2><span class="header-section-number">5.2</span> Fitting several time-to-event curves<a href="comparing-the-time-course-of-events-for-several-groups.html#fitting-several-time-to-event-curves" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The original dataset for our example is in a WIDE format and, as we have shown earlier in this tutorial, it is necessary to reshape it in LONG GROUPED format, by using the <code>melt_te()</code> function in the ‘drcte’ package.</p>
+<p>The <code>melt_te()</code> function needs to receive the columns storing the counts (‘count_cols = 4:18’), the columns storing the factor variables (‘treat_cols = c(“Dish”, “Storage”, “Temp”)’), a vector of monitoring times (‘monitimes = 1:15’) and a vector with the total number of seeds in each Petri dish (‘n.subjects = rep(25,16)’).</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(drcte)</span>
+<span id="cb25-2"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb25-2" aria-hidden="true" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> <span class="fu">melt_te</span>(datasetOr, <span class="at">count_cols =</span> <span class="dv">4</span><span class="sc">:</span><span class="dv">18</span>, </span>
+<span id="cb25-3"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb25-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">treat_cols =</span> <span class="fu">c</span>(<span class="st">&quot;Dish&quot;</span>, <span class="st">&quot;Storage&quot;</span>, <span class="st">&quot;Temp&quot;</span>), </span>
+<span id="cb25-4"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb25-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">monitimes =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">15</span>, <span class="at">n.subjects =</span> <span class="fu">rep</span>(<span class="dv">25</span>, <span class="dv">16</span>))</span>
+<span id="cb25-5"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dataset, <span class="dv">16</span>)</span>
+<span id="cb25-6"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="do">##    Dish Storage Temp Units timeBef timeAf count nCum propCum</span></span>
+<span id="cb25-7"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 1     1     Low  Fix     1       0      1     0    0    0.00</span></span>
+<span id="cb25-8"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 2     1     Low  Fix     1       1      2     0    0    0.00</span></span>
+<span id="cb25-9"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 3     1     Low  Fix     1       2      3     0    0    0.00</span></span>
+<span id="cb25-10"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 4     1     Low  Fix     1       3      4     0    0    0.00</span></span>
+<span id="cb25-11"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="do">## 5     1     Low  Fix     1       4      5     0    0    0.00</span></span>
+<span id="cb25-12"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="do">## 6     1     Low  Fix     1       5      6     0    0    0.00</span></span>
+<span id="cb25-13"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb25-13" aria-hidden="true" tabindex="-1"></a><span class="do">## 7     1     Low  Fix     1       6      7     0    0    0.00</span></span>
+<span id="cb25-14"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb25-14" aria-hidden="true" tabindex="-1"></a><span class="do">## 8     1     Low  Fix     1       7      8     0    0    0.00</span></span>
+<span id="cb25-15"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb25-15" aria-hidden="true" tabindex="-1"></a><span class="do">## 9     1     Low  Fix     1       8      9     3    3    0.12</span></span>
+<span id="cb25-16"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb25-16" aria-hidden="true" tabindex="-1"></a><span class="do">## 10    1     Low  Fix     1       9     10     4    7    0.28</span></span>
+<span id="cb25-17"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb25-17" aria-hidden="true" tabindex="-1"></a><span class="do">## 11    1     Low  Fix     1      10     11     6   13    0.52</span></span>
+<span id="cb25-18"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb25-18" aria-hidden="true" tabindex="-1"></a><span class="do">## 12    1     Low  Fix     1      11     12     0   13    0.52</span></span>
+<span id="cb25-19"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb25-19" aria-hidden="true" tabindex="-1"></a><span class="do">## 13    1     Low  Fix     1      12     13     1   14    0.56</span></span>
+<span id="cb25-20"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb25-20" aria-hidden="true" tabindex="-1"></a><span class="do">## 14    1     Low  Fix     1      13     14     0   14    0.56</span></span>
+<span id="cb25-21"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb25-21" aria-hidden="true" tabindex="-1"></a><span class="do">## 15    1     Low  Fix     1      14     15     3   17    0.68</span></span>
+<span id="cb25-22"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb25-22" aria-hidden="true" tabindex="-1"></a><span class="do">## 16    1     Low  Fix     1      15    Inf     8   NA      NA</span></span></code></pre></div>
+<p>In the resulting data frame, the column ‘timeAf’ contains the time when the inspection was made and the column ‘count’ contains the number of germinated seeds (e.g. 9 seeds were counted at day 9). These seeds did not germinate exactly at day 9; they germinated within the interval between two inspections, that is between day 8 and day 9. The beginning of the interval is given as the variable ‘timeBef’. Apart from these three columns, we have the columns for the blocking factor (‘Dish’ and ‘Units’; this latter column is added by the R function, but it is not useful in this case) and for the treatment factors (‘Storage’ and ‘Temp’) plus two other additional columns (‘nCum’ and ‘propCum’), which we are not going to use for our analyses.</p>
+<p>In this case, we have reasons to believe that the germination time-course can be described by using a parametric log-logistic time-to-event model, which can be estimated by using either the <code>drm()</code> function in the ‘drc’ package (Ritz et al., 2019) or the <code>drmte()</code> function in the ‘drcte’ package (Onofri et al., 2022). In both cases, we have to include the experimental factor (‘curveid’ argument), to specify that we want to fit a different curve for each combination of storage and temperature.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb26-2"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(drcte)</span>
+<span id="cb26-3"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-4" aria-hidden="true" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> dataset <span class="sc">%&gt;%</span> </span>
+<span id="cb26-5"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="at">.fns =</span> factor))</span>
+<span id="cb26-6"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-6" aria-hidden="true" tabindex="-1"></a>mod1 <span class="ot">&lt;-</span> <span class="fu">drmte</span>(count <span class="sc">~</span> timeBef <span class="sc">+</span> timeAf, <span class="at">fct =</span> <span class="fu">loglogistic</span>(),</span>
+<span id="cb26-7"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> dataset, </span>
+<span id="cb26-8"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">curveid =</span> Temp<span class="sc">:</span>Storage)</span>
+<span id="cb26-9"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mod1)</span>
+<span id="cb26-10"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb26-11"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="do">## Model fitted: Log-logistic distribution of event times</span></span>
+<span id="cb26-12"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb26-13"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-13" aria-hidden="true" tabindex="-1"></a><span class="do">## Robust estimation: no </span></span>
+<span id="cb26-14"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-14" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb26-15"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-15" aria-hidden="true" tabindex="-1"></a><span class="do">## Parameter estimates:</span></span>
+<span id="cb26-16"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-16" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb26-17"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-17" aria-hidden="true" tabindex="-1"></a><span class="do">##             Estimate Std. Error t-value   p-value    </span></span>
+<span id="cb26-18"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-18" aria-hidden="true" tabindex="-1"></a><span class="do">## b:Fix:Low   4.974317   0.819632  6.0690 1.287e-09 ***</span></span>
+<span id="cb26-19"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-19" aria-hidden="true" tabindex="-1"></a><span class="do">## b:Fix:High 11.476618   1.254439  9.1488 &lt; 2.2e-16 ***</span></span>
+<span id="cb26-20"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-20" aria-hidden="true" tabindex="-1"></a><span class="do">## b:Alt:Low   7.854558   5.239825  1.4990    0.1339    </span></span>
+<span id="cb26-21"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-21" aria-hidden="true" tabindex="-1"></a><span class="do">## b:Alt:High 10.600439   1.014061 10.4534 &lt; 2.2e-16 ***</span></span>
+<span id="cb26-22"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-22" aria-hidden="true" tabindex="-1"></a><span class="do">## d:Fix:Low   0.998474   0.150189  6.6481 2.968e-11 ***</span></span>
+<span id="cb26-23"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-23" aria-hidden="true" tabindex="-1"></a><span class="do">## d:Fix:High  0.861711   0.038987 22.1027 &lt; 2.2e-16 ***</span></span>
+<span id="cb26-24"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-24" aria-hidden="true" tabindex="-1"></a><span class="do">## d:Alt:Low   1.405930   5.607576  0.2507    0.8020    </span></span>
+<span id="cb26-25"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-25" aria-hidden="true" tabindex="-1"></a><span class="do">## d:Alt:High  0.948113   0.024298 39.0208 &lt; 2.2e-16 ***</span></span>
+<span id="cb26-26"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-26" aria-hidden="true" tabindex="-1"></a><span class="do">## e:Fix:Low  12.009974   0.987039 12.1677 &lt; 2.2e-16 ***</span></span>
+<span id="cb26-27"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-27" aria-hidden="true" tabindex="-1"></a><span class="do">## e:Fix:High 10.906963   0.190532 57.2447 &lt; 2.2e-16 ***</span></span>
+<span id="cb26-28"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-28" aria-hidden="true" tabindex="-1"></a><span class="do">## e:Alt:Low  17.014976  13.214513  1.2876    0.1979    </span></span>
+<span id="cb26-29"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-29" aria-hidden="true" tabindex="-1"></a><span class="do">## e:Alt:High  9.585255   0.166937 57.4183 &lt; 2.2e-16 ***</span></span>
+<span id="cb26-30"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-30" aria-hidden="true" tabindex="-1"></a><span class="do">## ---</span></span>
+<span id="cb26-31"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb26-31" aria-hidden="true" tabindex="-1"></a><span class="do">## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span></code></pre></div>
+<p>In a previous post I have described a log-logistic time-to-event model (<a href="https://www.statforbiology.com/2021/stat_drcte_4-time-to-eventcurves/">see here</a>), which has a sygmoidal shape, with the three parameters <span class="math inline">\(b\)</span>, <span class="math inline">\(d\)</span> and <span class="math inline">\(e\)</span>. These parameters represent, respectively, the slope at inflection point, the higher asymptote (i.e. the maximum proportion of germinated seeds) and the median germination time. As we have four curves, we have a number of 12 estimated parameters.</p>
+<p>We see that the optimization routines returns an unreasonable value for the higher asymptote for one of the curves (<span class="math inline">\(d\)</span> = 1.40 with Alt:Low); it is unreasonable because the maximum proportion of germinated seeds may not exceed 1. Therefore, we should refit the model by adding a constraint (<span class="math inline">\(d \le 1\)</span>) for all the four curves. We can do so by setting the ‘upperl’ argument to 1 for the 5<sup>th</sup> through 8<sup>th</sup> estimands.</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-1" aria-hidden="true" tabindex="-1"></a>mod1 <span class="ot">&lt;-</span> <span class="fu">drmte</span>(count <span class="sc">~</span> timeBef <span class="sc">+</span> timeAf, <span class="at">fct =</span> <span class="fu">loglogistic</span>(),</span>
+<span id="cb27-2"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-2" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> dataset, </span>
+<span id="cb27-3"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">curveid =</span> Temp<span class="sc">:</span>Storage,</span>
+<span id="cb27-4"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">upperl =</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>))</span>
+<span id="cb27-5"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mod1)</span>
+<span id="cb27-6"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb27-7"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Model fitted: Log-logistic distribution of event times</span></span>
+<span id="cb27-8"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb27-9"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-9" aria-hidden="true" tabindex="-1"></a><span class="do">## Robust estimation: no </span></span>
+<span id="cb27-10"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb27-11"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="do">## Parameter estimates:</span></span>
+<span id="cb27-12"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-12" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb27-13"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-13" aria-hidden="true" tabindex="-1"></a><span class="do">##             Estimate Std. Error t-value   p-value    </span></span>
+<span id="cb27-14"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-14" aria-hidden="true" tabindex="-1"></a><span class="do">## b:Fix:Low   4.979665   0.818414  6.0845 1.168e-09 ***</span></span>
+<span id="cb27-15"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-15" aria-hidden="true" tabindex="-1"></a><span class="do">## b:Fix:High 11.471625   1.254025  9.1478 &lt; 2.2e-16 ***</span></span>
+<span id="cb27-16"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-16" aria-hidden="true" tabindex="-1"></a><span class="do">## b:Alt:Low   8.408186   2.232712  3.7659 0.0001659 ***</span></span>
+<span id="cb27-17"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-17" aria-hidden="true" tabindex="-1"></a><span class="do">## b:Alt:High 10.605807   1.014523 10.4540 &lt; 2.2e-16 ***</span></span>
+<span id="cb27-18"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-18" aria-hidden="true" tabindex="-1"></a><span class="do">## d:Fix:Low   0.997284   0.149235  6.6826 2.347e-11 ***</span></span>
+<span id="cb27-19"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-19" aria-hidden="true" tabindex="-1"></a><span class="do">## d:Fix:High  0.861709   0.038999 22.0955 &lt; 2.2e-16 ***</span></span>
+<span id="cb27-20"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-20" aria-hidden="true" tabindex="-1"></a><span class="do">## d:Alt:Low   1.000000   0.881644  1.1342 0.2566920    </span></span>
+<span id="cb27-21"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-21" aria-hidden="true" tabindex="-1"></a><span class="do">## d:Alt:High  0.948132   0.024282 39.0468 &lt; 2.2e-16 ***</span></span>
+<span id="cb27-22"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-22" aria-hidden="true" tabindex="-1"></a><span class="do">## e:Fix:Low  12.004534   0.981279 12.2336 &lt; 2.2e-16 ***</span></span>
+<span id="cb27-23"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-23" aria-hidden="true" tabindex="-1"></a><span class="do">## e:Fix:High 10.907108   0.190613 57.2213 &lt; 2.2e-16 ***</span></span>
+<span id="cb27-24"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-24" aria-hidden="true" tabindex="-1"></a><span class="do">## e:Alt:Low  15.903079   2.872327  5.5367 3.083e-08 ***</span></span>
+<span id="cb27-25"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-25" aria-hidden="true" tabindex="-1"></a><span class="do">## e:Alt:High  9.585297   0.166873 57.4406 &lt; 2.2e-16 ***</span></span>
+<span id="cb27-26"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-26" aria-hidden="true" tabindex="-1"></a><span class="do">## ---</span></span>
+<span id="cb27-27"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-27" aria-hidden="true" tabindex="-1"></a><span class="do">## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span>
+<span id="cb27-28"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb27-28" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(mod1, <span class="at">log =</span> <span class="st">&quot;&quot;</span>, <span class="at">legendPos =</span> <span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">1</span>))</span></code></pre></div>
+<p><img src="_seedGerminationTutorial_files/figure-html/unnamed-chunk-25-1.png" width="672" /></p>
+<p>From the graph we see that there are visible differences between the fitted curves (the legend considers the curves in alphabetical order, i.e. 1: Fix-Low, 2: Fix-High, 3: Alt-Low and 4: Alt-High). Now, the question is: could we say that those differences are only due to chance (null hypothesis)?</p>
+<p>In order to make such a test, we could compare the logarithm of the likelihood for the fitted model with the logarithm of the likelihood for a ‘reduced’ model, where all curves have been pooled into one common curve for all treatment levels. The higher the log-likelihood difference, the lowest the probability that the null is true (Likelihood Ratio Test; LRT).</p>
+<p>A LRT for parametric models can be done with the <code>compCDF()</code> function in the ‘drcte’ package, as shown in the box below.</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">compCDF</span>(mod1)</span>
+<span id="cb28-2"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb28-3"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb28-4"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Likelihood ratio test</span></span>
+<span id="cb28-5"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="do">## NULL: time-to-event curves are equal</span></span>
+<span id="cb28-6"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb28-7"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Observed LR value:  202.8052</span></span>
+<span id="cb28-8"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="do">## Degrees of freedom:  9</span></span>
+<span id="cb28-9"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="do">## P-value:  8.551556e-39</span></span></code></pre></div>
+<p>We see that the LR value, that relates to the difference between the two log-likelihoods, is rather high and equal to 202; when the null is true, this LR value has an approximate Chi-square distribution; accordingly, we see that the P-level is very low and, thus, the null should be rejected.</p>
+<p>It general, the results of LRTs should be taken with care, particularly when the observed data are not independent from one another. Unfortunately, the lack of independence is an intrinsic characteristic of germination/emergence assays, where seeds are, most often, clustered within Petri dishes or other types of containers.</p>
+<p>In this example, we got a very low p-level, which leaves us rather confident that the difference between time-to-event curves is significant. More generally, instead of relying on a chi-square approximation, we should better use a grouped-permutation approach. This technique is based on the idea that, when the difference between curves is not significant, we should be able to freely permute the labels (treatment level) among Petri dishes (clustering units) and, consequently, build an empirical distribution for the LR statistic under the null (permutation distribution). The p-level is related to the proportion of LR values in the permutation distribution that are higher than the observed value (i.e.: 202.8)</p>
+<p>In the code below, we show how we can do this. The code is rather slow and, therefore, we should not use a very high number of permutation; the default is 199, that gives us a minimum p-value of 0.005. We see that we can confirm that the difference between curves is highly significant.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">compCDF</span>(mod1, <span class="at">type =</span> <span class="st">&quot;permutation&quot;</span>, <span class="at">units =</span> dataset<span class="sc">$</span>Dishes)</span>
+<span id="cb29-2"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb29-3"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb29-3" aria-hidden="true" tabindex="-1"></a>Likelihood ratio <span class="fu">test</span> (permutation based)</span>
+<span id="cb29-4"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="do">## NULL: time-to-event curves are equal</span></span>
+<span id="cb29-5"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb29-6"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="do">## Observed LR value:  202.8052</span></span>
+<span id="cb29-7"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Degrees of freedom:  9</span></span>
+<span id="cb29-8"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb29-8" aria-hidden="true" tabindex="-1"></a><span class="do">## Naive P-value:  8.551556e-39</span></span>
+<span id="cb29-9"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="do">## Permutation P-value (B = 199): 0.005</span></span></code></pre></div>
+</div>
+<div id="comparing-non-parametric-curves" class="section level2 hasAnchor" number="5.3">
+<h2><span class="header-section-number">5.3</span> Comparing non-parametric curves<a href="comparing-the-time-course-of-events-for-several-groups.html#comparing-non-parametric-curves" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In the above example, we have decided to fit a parametric time-to-event model. However, in other situations, we might be interested in fitting a non-parametric time-to-event model (NPMLE; <a href="https://www.statforbiology.com/2021/stat_drcte_4-time-to-eventcurves/">see here</a>) and compare the curves for different treatment levels. In practice, nothing changes with respect to the approach I have shown above: first of all, we fit the NPMLEs with the following code:</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb30-1" aria-hidden="true" tabindex="-1"></a>modNP <span class="ot">&lt;-</span> <span class="fu">drmte</span>(count <span class="sc">~</span> timeBef <span class="sc">+</span> timeAf, <span class="at">fct =</span> <span class="fu">NPMLE</span>(),</span>
+<span id="cb30-2"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb30-2" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> dataset, </span>
+<span id="cb30-3"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb30-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">curveid =</span> Temp<span class="sc">:</span>Storage)</span>
+<span id="cb30-4"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(modNP, <span class="at">log =</span> <span class="st">&quot;&quot;</span>, <span class="at">legendPos =</span> <span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">1</span>))</span></code></pre></div>
+<p><img src="_seedGerminationTutorial_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
+<p>Next, we compare the non-parametric curves, in the very same fashion as above:</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">compCDF</span>(modNP, <span class="at">units =</span> dataset<span class="sc">$</span>Units)</span>
+<span id="cb31-2"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Exact Wilcoxon test (permutation form)</span></span>
+<span id="cb31-3"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="do">## NULL: time-to-event curves are equal</span></span>
+<span id="cb31-4"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb31-5"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="do">##      level   n   Scores</span></span>
+<span id="cb31-6"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="do">## 1  Fix:Low 100   2.5350</span></span>
+<span id="cb31-7"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 2 Fix:High 100   6.4600</span></span>
+<span id="cb31-8"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb31-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 3  Alt:Low 100 -51.2275</span></span>
+<span id="cb31-9"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb31-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 4 Alt:High 100  42.2325</span></span>
+<span id="cb31-10"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb31-10" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb31-11"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb31-11" aria-hidden="true" tabindex="-1"></a><span class="do">## Observed T value:  44.56</span></span>
+<span id="cb31-12"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb31-12" aria-hidden="true" tabindex="-1"></a><span class="do">## Permutation P-value (B = 199): 0.005</span></span></code></pre></div>
+<p>Obviously, with NPMLEs, a different test statistic is used in the background; the default one is the Wilcoxon rank sum score, although two types of log-rank scores are also implemented (Sun’s scores and Finkelstein’s scores; see Fay and Shaw 2010). Permutation based P-values are calculated and reported.</p>
+<p>The approach is exactly the same with Kernel Density Estimators (KDE; <a href="https://www.statforbiology.com/2021/stat_drcte_4-time-to-eventcurves/">see here</a>). First we fit the four curves curves, by including the experimental factor as the ‘curveid’ argument:</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb32-1" aria-hidden="true" tabindex="-1"></a>modKD <span class="ot">&lt;-</span> <span class="fu">drmte</span>(count <span class="sc">~</span> timeBef <span class="sc">+</span> timeAf, <span class="at">fct =</span> <span class="fu">KDE</span>(),</span>
+<span id="cb32-2"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb32-2" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> dataset, </span>
+<span id="cb32-3"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb32-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">curveid =</span> Temp<span class="sc">:</span>Storage)</span>
+<span id="cb32-4"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(modKD, <span class="at">log =</span> <span class="st">&quot;&quot;</span>, <span class="at">legendPos =</span> <span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">1</span>))</span></code></pre></div>
+<p><img src="_seedGerminationTutorial_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
+<p>Second, we compare those curves, by using the <code>compCDF()</code> function:</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">compCDF</span>(modKD, <span class="at">units =</span> dataset<span class="sc">$</span>Units)</span>
+<span id="cb33-2"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Permuting groups</span></span>
+<span id="cb33-3"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="do">## 1% 1% 2% 2% 3% 3% 4% 4% 5% 5% 6% 6% 7% 7% 8% 8% 9% 9% 10% 10% 11% 11%</span></span>
+<span id="cb33-4"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="do">## 12% 12% 13% 13% 14% 14% 15% 15% 16% 16% 17% 17% 18% 18% 19% 19% 20%</span></span>
+<span id="cb33-5"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="do">## 20% 21% 21% 22% 22% 23% 23% 24% 24% 25% 25% 26% 26% 27% 27% 28% 28%</span></span>
+<span id="cb33-6"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="do">## 29% 29% 30% 30% 31% 31% 32% 32% 33% 33% 34% 34% 35% 35% 36% 36% 37%</span></span>
+<span id="cb33-7"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 37% 38% 38% 39% 39% 40% 40% 41% 41% 42% 42% 43% 43% 44% 44% 45% 45%</span></span>
+<span id="cb33-8"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb33-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 46% 46% 47% 47% 48% 48% 49% 49% 50% 50% 51% 51% 52% 52% 53% 53% 54%</span></span>
+<span id="cb33-9"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb33-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 54% 55% 55% 56% 56% 57% 57% 58% 58% 59% 59% 60% 60% 61% 61% 62% 62%</span></span>
+<span id="cb33-10"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb33-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 63% 63% 64% 64% 65% 65% 66% 66% 67% 67% 68% 68% 69% 69% 70% 70% 71%</span></span>
+<span id="cb33-11"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb33-11" aria-hidden="true" tabindex="-1"></a><span class="do">## 71% 72% 72% 73% 73% 74% 74% 75% 75% 76% 76% 77% 77% 78% 78% 79% 79%</span></span>
+<span id="cb33-12"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb33-12" aria-hidden="true" tabindex="-1"></a><span class="do">## 80% 80% 81% 81% 82% 82% 83% 83% 84% 84% 85% 85% 86% 86% 87% 87% 88%</span></span>
+<span id="cb33-13"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb33-13" aria-hidden="true" tabindex="-1"></a><span class="do">## 88% 89% 89% 90% 90% 91% 91% 92% 92% 93% 93% 94% 94% 95% 95% 96% 96%</span></span>
+<span id="cb33-14"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb33-14" aria-hidden="true" tabindex="-1"></a><span class="do">## 97% 97% 98% 98% 99% 99% 100%</span></span>
+<span id="cb33-15"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb33-15" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb33-16"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb33-16" aria-hidden="true" tabindex="-1"></a>Permutation test based on a Cramer<span class="sc">-</span>von<span class="sc">-</span>Mises type <span class="fu">distance</span> (Barreiro<span class="sc">-</span>Ures et al., <span class="dv">2019</span>)</span>
+<span id="cb33-17"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb33-17" aria-hidden="true" tabindex="-1"></a><span class="do">## NULL HYPOTHESIS: time-to-event curves are equal</span></span>
+<span id="cb33-18"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb33-18" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb33-19"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb33-19" aria-hidden="true" tabindex="-1"></a><span class="do">##      level   n         D</span></span>
+<span id="cb33-20"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb33-20" aria-hidden="true" tabindex="-1"></a><span class="do">## 1  Fix:Low 100 0.0579661</span></span>
+<span id="cb33-21"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb33-21" aria-hidden="true" tabindex="-1"></a><span class="do">## 2 Fix:High 100 0.1347005</span></span>
+<span id="cb33-22"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb33-22" aria-hidden="true" tabindex="-1"></a><span class="do">## 3  Alt:Low 100 4.1378209</span></span>
+<span id="cb33-23"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb33-23" aria-hidden="true" tabindex="-1"></a><span class="do">## 4 Alt:High 100 3.8581487</span></span>
+<span id="cb33-24"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb33-24" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb33-25"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb33-25" aria-hidden="true" tabindex="-1"></a><span class="do">## Observed D value =  2.0472</span></span>
+<span id="cb33-26"><a href="comparing-the-time-course-of-events-for-several-groups.html#cb33-26" aria-hidden="true" tabindex="-1"></a><span class="do">## P value =  0.005</span></span></code></pre></div>
+<p>In this case, a Cramér‐von Mises type distance among curves is used (Barreiro-Ures et al., 2019), which, roughly speaking, is based on the integrated distance between the KDEs for the different groups and the pooled KDE for all groups. Permutation based P-values are also calculated and reported.</p>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="time-to-event-models-for-seed-germinationemergence.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="fitting-time-to-event-models-with-environmental-covariates.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["_seedGerminationTutorial.pdf", "_seedGerminationTutorial.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

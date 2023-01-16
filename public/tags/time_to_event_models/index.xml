@@ -5,10 +5,285 @@
     <description>Recent content in Time_to_event_models on The broken bridge between biologists and statisticians</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2018, @AndreaOnofri</copyright>
-    <lastBuildDate>Tue, 18 Jan 2022 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 10 Jan 2023 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://www.statforbiology.com/tags/time_to_event_models/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Fitting a hydro-thermal-time-model to seed germination data</title>
+      <link>https://www.statforbiology.com/2023/stat_drcte_10-examplehtte/</link>
+      <pubDate>Tue, 10 Jan 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.statforbiology.com/2023/stat_drcte_10-examplehtte/</guid>
+      <description>
+
+
+&lt;p&gt;This is a follow-up post. If you are interested in other posts of this series, please go to: &lt;a href=&#34;https://www.statforbiology.com/tags/drcte/&#34;&gt;https://www.statforbiology.com/tags/drcte/&lt;/a&gt;. All these posts exapand on a paper that we have recently published in the Journal ‘Weed Science’; please follow &lt;a href=&#34;https://doi.org/10.1017/wsc.2022.8&#34;&gt;this link&lt;/a&gt; to the paper.&lt;/p&gt;
+&lt;div id=&#34;germination-assay&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Germination assay&lt;/h1&gt;
+&lt;p&gt;This dataset was obtained from previously published work (Mesgaran et al., 2017) with &lt;em&gt;Hordeum spontaneum&lt;/em&gt; [C. Koch] Thell. The germination assay was conducted using four replicates of 20 seeds tested at six different water potential levels (0, −0.3, −0.6, −0.9, −1.2 and −1.5 MPa). Osmotic potentials were produced using variable amount of polyethylene glycol (PEG, molecular weight 8000) adjusted for the temperature level. Petri dishes were incubated at six constant temperature levels (8, 12, 16, 20, 24 and 28 °C), under a photoperiod of 12 h. Germinated seeds (radicle protrusion &amp;gt; 3 mm) were counted and removed daily for 20 days.&lt;/p&gt;
+&lt;p&gt;This dataset is available as &lt;code&gt;hordeum&lt;/code&gt; in the &lt;code&gt;drcSeedGerm&lt;/code&gt; package, which needs to be installed from github (see below), together the package &lt;code&gt;drcte&lt;/code&gt;, which is necessary to fit time-to-event models. The following code loads the necessary packages, loads the dataset &lt;code&gt;rape&lt;/code&gt; and shows the first six lines.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Installing packages (only at first instance)
+# library(devtools)
+# install_github(&amp;quot;OnofriAndreaPG/drcSeedGerm&amp;quot;)
+# install_github(&amp;quot;OnofriAndreaPG/drcte&amp;quot;)
+library(drcSeedGerm)
+library(tidyverse)
+data(hordeum)
+head(hordeum)
+##   temp water Dish timeBef timeAf nViable nSeeds nCum
+## 1    8  -1.5    1       0     24      20      0    0
+## 2    8  -1.5    1      24     48      20      0    0
+## 3    8  -1.5    1      48     72      20      0    0
+## 4    8  -1.5    1      72     96      20      0    0
+## 5    8  -1.5    1      96    120      20      0    0
+## 6    8  -1.5    1     120    144      20      1    1&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;preliminary-analyses&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Preliminary analyses&lt;/h1&gt;
+&lt;p&gt;First of all, it is necessary to mention that &lt;strong&gt;this dataset was already analysed in Onofri et al. (2018; Example 2) by using the same methodology, although, in that paper, the R implementation was different (see Supplemental Material) and it is now outdated.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;In the above data frame, ‘timeAf’ represents the moment when germinated seeds were counted, while ’timeBef’ represents the previous inspection time (or the beginning of the assay). The column ’nSeeds’ is the number of seeds that germinated during the time interval between ‘timeBef’ and ‘timeAf. The ’nCum’ column contains the cumulative number of germinated seeds and it is not necessary for time-to-event model fitting, although we can use it for plotting purposes.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;hordeum &amp;lt;- hordeum %&amp;gt;% 
+  mutate(propCum = nCum/nViable)
+
+ggplot(data = hordeum, mapping = aes(timeAf, propCum)) +
+  geom_point() +
+  facet_grid(temp ~ water) +
+  scale_x_continuous(name = &amp;quot;Time (d)&amp;quot;) +
+  scale_y_continuous(name = &amp;quot;Cumulative proportion of germinated seeds&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_drcte_10-ExampleHTTE_files/figure-html/unnamed-chunk-2-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;We see that the germination time-course is strongly affected by both temperature and water potential in the substrate and, consequently, our obvious interest is to model the effects of those environmental covariates. In our manuscript, we started from the idea that a parametric time-to-event curve is defined as a cumulative probability function (&lt;span class=&#34;math inline&#34;&gt;\(\Phi\)&lt;/span&gt;), with three parameters:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[P(t) = \Phi \left( b, d, e \right)\]&lt;/span&gt;
+where &lt;span class=&#34;math inline&#34;&gt;\(P(t)\)&lt;/span&gt; is the cumulative probability of germination at time &lt;span class=&#34;math inline&#34;&gt;\(t\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt; is the median germination time, &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; is the slope at the inflection point and &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; is the maximum germinated proportion. The most obvious extension is to allow for different &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt; values for each of the i&lt;sup&gt;th&lt;/sup&gt; combinations of water potential (&lt;span class=&#34;math inline&#34;&gt;\(\Psi\)&lt;/span&gt;) and temperature level (&lt;span class=&#34;math inline&#34;&gt;\(T\)&lt;/span&gt;):&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[P(t, \Psi, T) = \Phi \left( b_i, d_i, e_i \right)\]&lt;/span&gt;
+From the graph above, we see several ‘degenerated’ time-to-event curves, where no germinations occurred (e.g., see the graph at -1.5 MPa and 28°C). In order to avoid problems with those curves, we can use the &lt;code&gt;drmte()&lt;/code&gt; function and set the &lt;code&gt;separate = TRUE&lt;/code&gt; argument, so that the different curves are fitted independently of one another and the degenerated curves are recognised and skipped, without stopping the execution in R. In particular, where no time-course of events can be estimated, it is assumed that there is no progress to germination during the study-period and that the cumulative proportion of germinated seeds remains constant across that period. Consequently, the &lt;code&gt;drmte()&lt;/code&gt; function resorts to fitting a simpler model, where the only &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; parameter is estimated (that is the maximum fraction of germinated seeds).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;hordeum &amp;lt;- hordeum %&amp;gt;% 
+  mutate(comb = factor( factor(water):factor(temp)))
+mod1 &amp;lt;- drmte(nSeeds ~ timeBef + timeAf, data = hordeum,
+             curveid = comb, fct = loglogistic(),
+             separate = TRUE)
+summary(mod1)
+## 
+## Model fitted: Separate fitting of several time-to-event curves
+## 
+## Robust estimation: no 
+## 
+## Parameter estimates:
+## 
+##             Estimate Std. Error t-value   p-value    
+## b:-1.5:8    5.577670   0.671086  8.3114 &amp;lt; 2.2e-16 ***
+## d:-1.5:8    0.705845   0.051801 13.6260 &amp;lt; 2.2e-16 ***
+## e:-1.5:8  203.532986   8.746552 23.2701 &amp;lt; 2.2e-16 ***
+## b:-1.5:12   4.036639   0.633750  6.3694 1.897e-10 ***
+## d:-1.5:12   0.566163   0.061406  9.2201 &amp;lt; 2.2e-16 ***
+## e:-1.5:12 232.198040  17.347102 13.3854 &amp;lt; 2.2e-16 ***
+## b:-1.5:16   4.130712   1.174395  3.5173 0.0004359 ***
+## d:-1.5:16   0.226248   0.057013  3.9683 7.238e-05 ***
+## e:-1.5:16 293.584384  41.294139  7.1096 1.164e-12 ***
+## d:-1.5:20   0.000000   0.000000     NaN       NaN    
+## d:-1.5:24   0.000000   0.000000     NaN       NaN    
+## d:-1.5:28   0.000000   0.000000     NaN       NaN    
+## b:-1.2:8    4.761454   0.531157  8.9643 &amp;lt; 2.2e-16 ***
+## d:-1.2:8    0.803436   0.044972 17.8653 &amp;lt; 2.2e-16 ***
+## e:-1.2:8  152.794391   7.123662 21.4489 &amp;lt; 2.2e-16 ***
+## b:-1.2:12   4.165847   0.518344  8.0368 9.050e-16 ***
+## d:-1.2:12   0.667099   0.053329 12.5092 &amp;lt; 2.2e-16 ***
+## e:-1.2:12 145.571114   8.562685 17.0006 &amp;lt; 2.2e-16 ***
+## b:-1.2:16   3.848053   0.556564  6.9140 4.713e-12 ***
+## d:-1.2:16   0.536017   0.057474  9.3262 &amp;lt; 2.2e-16 ***
+## e:-1.2:16 175.692653  13.009048 13.5054 &amp;lt; 2.2e-16 ***
+## b:-1.2:20   4.679284   1.377885  3.3960 0.0006838 ***
+## d:-1.2:20   0.191881   0.049814  3.8520 0.0001172 ***
+## e:-1.2:20 291.173467  34.870683  8.3501 &amp;lt; 2.2e-16 ***
+## d:-1.2:24   0.000000   0.000000     NaN       NaN    
+## d:-1.2:28   0.000000   0.000000     NaN       NaN    
+## b:-0.9:8    5.237479   0.550871  9.5076 &amp;lt; 2.2e-16 ***
+## d:-0.9:8    0.887920   0.035345 25.1218 &amp;lt; 2.2e-16 ***
+## e:-0.9:8  111.384281   4.427060 25.1599 &amp;lt; 2.2e-16 ***
+## b:-0.9:12   4.368990   0.475050  9.1969 &amp;lt; 2.2e-16 ***
+## d:-0.9:12   0.850876   0.039968 21.2889 &amp;lt; 2.2e-16 ***
+## e:-0.9:12  99.501087   4.833892 20.5841 &amp;lt; 2.2e-16 ***
+## b:-0.9:16   3.581796   0.400722  8.9383 &amp;lt; 2.2e-16 ***
+## d:-0.9:16   0.816041   0.043892 18.5922 &amp;lt; 2.2e-16 ***
+## e:-0.9:16 105.233306   6.461986 16.2850 &amp;lt; 2.2e-16 ***
+## b:-0.9:20   3.536663   0.502112  7.0436 1.874e-12 ***
+## d:-0.9:20   0.572734   0.056895 10.0665 &amp;lt; 2.2e-16 ***
+## e:-0.9:20 154.543645  11.924187 12.9605 &amp;lt; 2.2e-16 ***
+## b:-0.9:24   3.113060   0.947598  3.2852 0.0010191 ** 
+## d:-0.9:24   0.233165   0.062870  3.7087 0.0002084 ***
+## e:-0.9:24 269.509412  55.515112  4.8547 1.206e-06 ***
+## d:-0.9:28   0.000000   0.000000     NaN       NaN    
+## b:-0.6:8    5.077994   0.538321  9.4330 &amp;lt; 2.2e-16 ***
+## d:-0.6:8    0.900202   0.033548 26.8334 &amp;lt; 2.2e-16 ***
+## e:-0.6:8   92.146203   3.725399 24.7346 &amp;lt; 2.2e-16 ***
+## b:-0.6:12   5.564019   0.586966  9.4793 &amp;lt; 2.2e-16 ***
+## d:-0.6:12   0.937528   0.027059 34.6476 &amp;lt; 2.2e-16 ***
+## e:-0.6:12  74.982399   2.818636 26.6024 &amp;lt; 2.2e-16 ***
+## b:-0.6:16   4.144136   0.458813  9.0323 &amp;lt; 2.2e-16 ***
+## d:-0.6:16   0.837853   0.041271 20.3014 &amp;lt; 2.2e-16 ***
+## e:-0.6:16  75.109147   3.897277 19.2722 &amp;lt; 2.2e-16 ***
+## b:-0.6:20   4.399408   0.510297  8.6213 &amp;lt; 2.2e-16 ***
+## d:-0.6:20   0.725331   0.049946 14.5224 &amp;lt; 2.2e-16 ***
+## e:-0.6:20  83.735884   4.468212 18.7404 &amp;lt; 2.2e-16 ***
+## b:-0.6:24   3.269465   0.443121  7.3783 1.603e-13 ***
+## d:-0.6:24   0.607528   0.055700 10.9071 &amp;lt; 2.2e-16 ***
+## e:-0.6:24 125.859897   9.985513 12.6042 &amp;lt; 2.2e-16 ***
+## b:-0.6:28   2.959772   0.767672  3.8555 0.0001155 ***
+## d:-0.6:28   0.265633   0.059199  4.4871 7.220e-06 ***
+## e:-0.6:28 233.440197  40.981613  5.6962 1.225e-08 ***
+## b:-0.3:8    6.489283   0.700089  9.2692 &amp;lt; 2.2e-16 ***
+## d:-0.3:8    0.962474   0.021243 45.3069 &amp;lt; 2.2e-16 ***
+## e:-0.3:8   72.248403   2.326579 31.0535 &amp;lt; 2.2e-16 ***
+## b:-0.3:12   5.571444   0.614984  9.0595 &amp;lt; 2.2e-16 ***
+## d:-0.3:12   0.962476   0.021243 45.3075 &amp;lt; 2.2e-16 ***
+## e:-0.3:12  56.804335   2.154440 26.3662 &amp;lt; 2.2e-16 ***
+## b:-0.3:16   3.759741   0.406837  9.2414 &amp;lt; 2.2e-16 ***
+## d:-0.3:16   0.925252   0.029452 31.4157 &amp;lt; 2.2e-16 ***
+## e:-0.3:16  53.997403   3.004606 17.9715 &amp;lt; 2.2e-16 ***
+## b:-0.3:20   3.455788   0.382078  9.0447 &amp;lt; 2.2e-16 ***
+## d:-0.3:20   0.863032   0.038527 22.4004 &amp;lt; 2.2e-16 ***
+## e:-0.3:20  56.589306   3.525940 16.0494 &amp;lt; 2.2e-16 ***
+## b:-0.3:24   3.219012   0.384905  8.3631 &amp;lt; 2.2e-16 ***
+## d:-0.3:24   0.739176   0.049321 14.9869 &amp;lt; 2.2e-16 ***
+## e:-0.3:24  72.448658   5.145402 14.0803 &amp;lt; 2.2e-16 ***
+## b:-0.3:28   3.384884   0.449578  7.5290 5.110e-14 ***
+## d:-0.3:28   0.591722   0.055517 10.6583 &amp;lt; 2.2e-16 ***
+## e:-0.3:28 111.482975   8.597283 12.9672 &amp;lt; 2.2e-16 ***
+## b:0:8       8.055166   0.890908  9.0415 &amp;lt; 2.2e-16 ***
+## d:0:8       0.962496   0.021229 45.3391 &amp;lt; 2.2e-16 ***
+## e:0:8      64.579539   1.810276 35.6739 &amp;lt; 2.2e-16 ***
+## b:0:12      4.597148   0.515642  8.9154 &amp;lt; 2.2e-16 ***
+## d:0:12      0.962502   0.021236 45.3239 &amp;lt; 2.2e-16 ***
+## e:0:12     45.258150   2.124034 21.3076 &amp;lt; 2.2e-16 ***
+## b:0:16      4.519281   0.504988  8.9493 &amp;lt; 2.2e-16 ***
+## d:0:16      0.937575   0.027033 34.6821 &amp;lt; 2.2e-16 ***
+## e:0:16     41.805944   2.052607 20.3672 &amp;lt; 2.2e-16 ***
+## b:0:20      3.833745   0.419743  9.1335 &amp;lt; 2.2e-16 ***
+## d:0:20      0.925095   0.029446 31.4163 &amp;lt; 2.2e-16 ***
+## e:0:20     43.588297   2.434550 17.9040 &amp;lt; 2.2e-16 ***
+## b:0:24      4.103341   0.467512  8.7770 &amp;lt; 2.2e-16 ***
+## d:0:24      0.875057   0.036978 23.6641 &amp;lt; 2.2e-16 ***
+## e:0:24     47.161280   2.550713 18.4894 &amp;lt; 2.2e-16 ***
+## b:0:28      2.895784   0.341099  8.4896 &amp;lt; 2.2e-16 ***
+## d:0:28      0.764633   0.047737 16.0176 &amp;lt; 2.2e-16 ***
+## e:0:28     63.034588   4.939641 12.7610 &amp;lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;a-better-modelling-approach&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;A better modelling approach&lt;/h1&gt;
+&lt;p&gt;The previous approach is clearly sub-optimal, as the temperature and water potential levels are regarded as factors, i.e. as nominal classes with no intrinsic orderings and distances. It would be much better to recognise that temperature and water potential are continuous variables and, consequently, code a time-to-event model where the three parameters are expressed as continuous functions of &lt;span class=&#34;math inline&#34;&gt;\(\Psi\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(T\)&lt;/span&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[P(t, \Psi, T) = \Phi \left[ b(\Psi, T), d(\Psi, T), e(\Psi, T) \right]\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;In the above mentioned manuscript (Onofri et al., 2018; example 2) we used a log-logistic cumulative distribution function:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[P(t, \Psi, T) = \frac{ d(\Psi, T) }{1 + \exp \left\{ b \left[ \log(t) - \log( e(\Psi, T) ) \right] \right\} }\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Considering that the germination rate is the inverse of germination time, we replaced &lt;span class=&#34;math inline&#34;&gt;\(e(\Psi, T) = 1/GR_{50}(\Psi, T)\)&lt;/span&gt; and used the following sub-models:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[d(\Psi, T) = \textrm{max} \left\{ G \, \left[ 1 - \exp \left( \frac{ \Psi - \Psi_b - k(T - T_b )}{\sigma_{\Psi_b}} \right) \right]; 0 \right\}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[GR_{50}(\Psi, T) = \textrm{max} \left\{ \frac{T - T_b }{\theta_{HT}} \left[\Psi - \Psi_b - k(T - T_b )\right]; 0 \right\}\]&lt;/span&gt;
+Please, note that the shape parameter &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; has been regarded as independent from the environmental covariates. It may be useful to note that the the parameters are:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(\Psi_{b}\)&lt;/span&gt;, that is the median base water potential in the seed lot,&lt;/li&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(T_{b}\)&lt;/span&gt;, that is the base temperature for germination,&lt;/li&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(\theta_HT\)&lt;/span&gt;, that is the hydro-thermal-time parameter,&lt;/li&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(\sigma_{\Psi_b}\)&lt;/span&gt;, that represents the variability of &lt;span class=&#34;math inline&#34;&gt;\(\Psi_b\)&lt;/span&gt; within the population,&lt;/li&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(G\)&lt;/span&gt;, that is the germinable fraction, accounting for the fact that &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; may not reach 1, regardless of time and water potential.&lt;/li&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(k\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; that are parameters of shape.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;You can get more information from our original paper (Onofri et al., 2018). This hydro-thermal-time model was implemented in R as the &lt;code&gt;HTTEM()&lt;/code&gt; function, and it is available within the &lt;code&gt;drcSeedGerm&lt;/code&gt; package; we can fit it by using the &lt;code&gt;drmte()&lt;/code&gt; function in the &lt;code&gt;drcte&lt;/code&gt; package, but we need to provide starting values for model parameters, because the self-starting routine is not yet available. Finally, the &lt;code&gt;summary()&lt;/code&gt; method can be used to retrieve the parameter estimates.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Complex model and slow fitting
+modHTTE &amp;lt;- drmte(nSeeds ~ timeBef + timeAf + water + temp,
+                 data=hordeum,
+                 fct = HTTEM(),
+  start=c(0.8,-2, 0.05, 3, 0.2, 2000, 0.5))
+summary(modHTTE, robust = T, units = Dish)
+## 
+## Model fitted: Hydro-thermal-time-model (Mesgaran et al., 2017)
+## 
+## Robust estimation: Cluster robust sandwich SEs 
+## 
+## Parameter estimates:
+## 
+##                          Estimate  Std. Error  t value Pr(&amp;gt;|t|)    
+## G:(Intercept)          9.8820e-01  1.1576e-02  85.3692   &amp;lt;2e-16 ***
+## Psib:(Intercept)      -2.9133e+00  3.4812e-02 -83.6874   &amp;lt;2e-16 ***
+## kt:(Intercept)         7.4228e-02  1.2666e-03  58.6015   &amp;lt;2e-16 ***
+## Tb:(Intercept)        -7.4525e-01  3.5254e-01  -2.1139   0.0346 *  
+## sigmaPsib:(Intercept)  5.5284e-01  2.8976e-02  19.0790   &amp;lt;2e-16 ***
+## ThetaHT:(Intercept)    1.3091e+03  4.0638e+01  32.2130   &amp;lt;2e-16 ***
+## b:(Intercept)          4.1650e+00  1.1332e-01  36.7548   &amp;lt;2e-16 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It is always important not to neglect a graphical inspection of model fit. The &lt;code&gt;plot()&lt;/code&gt; method does not work with time-to-event curves with additional covariates (apart from time). However, we can retrieve the fitted data by using the &lt;code&gt;plotData()&lt;/code&gt; function and use those predictions within the &lt;code&gt;ggplot()&lt;/code&gt; function. The box below shows the appropriate coding.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;tab &amp;lt;- plotData(modHTTE)
+
+ggplot() +
+  geom_point(data = tab$plotPoints, mapping = aes(x = timeAf, y = CDF),
+            col = &amp;quot;red&amp;quot;) +
+  geom_line(data = tab$plotFits, mapping = aes(x = timeAf, y = CDF)) +
+  facet_grid(temp ~ water) +
+  scale_x_continuous(name = &amp;quot;Time (d)&amp;quot;) +
+  scale_y_continuous(name = &amp;quot;Cumulative proportion of germinated seeds&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_drcte_10-ExampleHTTE_files/figure-html/unnamed-chunk-5-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Thank you for reading!&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Mesgaran, M.B., Mashhadi, H.R., Alizadeh, H., Hunt, J., Young, K.R., Cousens, R.D., 2013. Importance of distribution function selection for hydrothermal time models of seed germination. Weed Research 53, 89–101. &lt;a href=&#34;https://doi.org/10.1111/wre.12008&#34; class=&#34;uri&#34;&gt;https://doi.org/10.1111/wre.12008&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Onofri, A., Benincasa, P., Mesgaran, M.B., Ritz, C., 2018. Hydrothermal-time-to-event models for seed germination. European Journal of Agronomy 101, 129–139.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;further-detail&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Further detail&lt;/h1&gt;
+&lt;p&gt;Let us conclude this page by giving some detail on all other models in Mesgaran et al (2913; slightly reparameterised). In same cases &lt;span class=&#34;math inline&#34;&gt;\(\Psi_b\)&lt;/span&gt; has been replaced by &lt;span class=&#34;math inline&#34;&gt;\(\mu\)&lt;/span&gt;, that is the location parameter of the cumulative distribution function of base water potential, but it is not the median value. On the other hand, &lt;span class=&#34;math inline&#34;&gt;\(\delta\)&lt;/span&gt; is the shifting parameter for all logarithm based distributions; indeed, logarithm based distribution are only defined for strictly positive variables, while we know that water potential usually assumes negative values. The shifting parameters is used to shift the cumulative distribution function to the right, so that negative values are allowed.&lt;/p&gt;
+&lt;div id=&#34;htl&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;code&gt;HTL()&lt;/code&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ G(t, \Psi) = \frac{1}{1 + exp \left[ - \frac{  \Psi  - \left( \theta _H/t \right) - \Psi_{b} } {\sigma}  \right] }\]&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;htg&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;code&gt;HTG()&lt;/code&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ G(t, \Psi) = \exp \left\{ { - \exp \left[ { - \left( {\frac{{\Psi - (\theta _H / t ) - \mu }}{\sigma }} \right)} \right]} \right\} \]&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;htll&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;code&gt;HTLL()&lt;/code&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ G(t, \Psi) = \frac{1}{1 + \exp \left\{ \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b} + \delta)  }{\sigma}\right\} }\]&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;htw1&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;code&gt;HTW1()&lt;/code&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ G(t, \Psi) = exp \left\{ - \exp \left[ - \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b} + \delta)  }{\sigma}\right] \right\}\]&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;htw2&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;code&gt;HTW2()&lt;/code&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ G(t, \Psi) = 1 - exp \left\{ - \exp \left[ \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b} + \delta)  }{\sigma}\right] \right\}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references-1&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Bradford KJ (2002) Applications of hydrothermal time to quantifying and modeling seed germination and dormancy. Weed Sci 50:248–260&lt;/li&gt;
+&lt;li&gt;Davison, A.C., Hinkley, D.V., 1997. Bootstrap methods and their application. Cambridge University Press, UK.&lt;/li&gt;
+&lt;li&gt;Keshtkar E, Kudsk P, Mesgaran MB (2021) Perspective: Common errors in dose–response analysis and how to avoid them. Pest Manag Sci 77:2599–2608&lt;/li&gt;
+&lt;li&gt;Onofri, A., Mesgaran, M., &amp;amp; Ritz, C. (2022). A unified framework for the analysis of germination, emergence, and other time-to-event data in weed science. Weed Science, 1-13. &lt;a href=&#34;doi:10.1017/wsc.2022.8&#34; class=&#34;uri&#34;&gt;doi:10.1017/wsc.2022.8&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Zeileis, A., Köll, S., Graham, N., 2020. Various Versatile Variances: An Object-Oriented Implementation of Clustered Covariances in R. J. Stat. Soft. 95. &lt;a href=&#34;https://doi.org/10.18637/jss.v095.i01&#34; class=&#34;uri&#34;&gt;https://doi.org/10.18637/jss.v095.i01&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Analysing seed germination and emergence data with R (a tutorial). Part 6</title>
