@@ -1,0 +1,147 @@
+---
+title: 'Fitting thermal-time-models to seed germination data'
+author: "Andrea Onofri"
+date: 2023-02-10
+slug: 'Time_to_event_models'
+categories:
+  - R
+  - 'Time_to_event_models'
+tags:
+  - R
+  - 'Time_to_event_models'
+  - 'Seed_germination'
+  - drcte
+  - drcSeedGerm
+archives:
+  - 2023
+---
+
+
+
+<p>This is a follow-up post. If you are interested in other posts of this series, please go to: <a href="https://www.statforbiology.com/tags/drcte/">https://www.statforbiology.com/tags/drcte/</a>. All these posts exapand on a paper that we have recently published in the Journal ‘Weed Science’; please follow <a href="https://doi.org/10.1017/wsc.2022.8">this link</a> to the paper.</p>
+<div id="a-motivating-examples" class="section level1">
+<h1>A motivating examples</h1>
+<p>In recent times, we wanted to model the effect of temperature on seed germination for <em>Hordeum vulgare</em> and we made an assay with three replicated Petri dishes (50 seeds each) at 9 constant temperature levels (1, 3, 7, 10, 15, 20, 25, 30, 35, 40 °C). Germinated seeds were counted and removed daily for 10 days. This unpublished dataset is available as <code>barley</code> in the <code>drcSeedGerm</code> package, which needs to be installed from github (see below), together with the <code>drcte</code> package for time-to-event model fitting. The following code loads the necessary packages, loads the datasets and shows the first six lines.</p>
+<pre class="r"><code># Installing packages (only at first instance)
+# library(devtools)
+# install_github(&quot;OnofriAndreaPG/drcSeedGerm&quot;)
+# install_github(&quot;OnofriAndreaPG/drcte&quot;)
+library(drcSeedGerm)
+library(tidyverse)
+data(barley)
+head(barley)
+##   Dish Temp timeBef timeAf nSeeds nCum propCum
+## 1    1    1       0      1      0    0       0
+## 2    1    1       1      2      0    0       0
+## 3    1    1       2      3      0    0       0
+## 4    1    1       3      4      0    0       0
+## 5    1    1       4      5      0    0       0
+## 6    1    1       5      6      0    0       0</code></pre>
+<p>In this dataset, ‘timeAf’ represents the moment when germinated seeds were counted, while ’timeBef’ represents the previous inspection time (or the beginning of the assay). The column ’nSeeds’ is the number of seeds that germinated during each time interval between ‘timeBef’ and ‘timeAf. For the analyses, we will also make use of the ’Temp’ (temperature) and ‘Dish’ (Petri dish) columns.</p>
+<p>This dataset was already analysed in Onofri et al. (2018; Example 3 and 4) by using the same methodology, but a different R coding (see the Supplemental Material in that paper), that is now outdated. This post will show you the updated coding.</p>
+</div>
+<div id="a-first-thermal-time-model" class="section level1">
+<h1>A first thermal-time model</h1>
+<p>As we have shown in previous posts (see <a href="https://www.statforbiology.com/2022/stat_drcte_6-ht1step/">here</a> and <a href="https://www.statforbiology.com/2023/stat_drcte_10-examplehtte/">here</a>), the effect of environmental covariates (temperature, in this case) can be simply included by independently coding a different time-to-event curve to each level of that covariate. In other words, considering that a parametric time-to-event curve is defined as a cumulative probability function (<span class="math inline">\(\Phi\)</span>), with three parameters:</p>
+<p><span class="math display">\[P(t) = \Phi \left( b, d, e \right)\]</span>
+where <span class="math inline">\(P(t)\)</span> is the cumulative probability of germination at time <span class="math inline">\(t\)</span>, <span class="math inline">\(e\)</span> is the median germination time, <span class="math inline">\(b\)</span> is the slope at the inflection point and <span class="math inline">\(d\)</span> is the maximum germinated proportion, the most obvious extension is to allow for different <span class="math inline">\(b\)</span>, <span class="math inline">\(d\)</span> and <span class="math inline">\(e\)</span> values for each of the i<sup>th</sup> temperature levels (<span class="math inline">\(T\)</span>):</p>
+<p><span class="math display">\[P(t, T) = \Phi \left( b_i, d_i, e_i \right)\]</span>
+Although the above approach is possible, we will not purse it here, as it is clearly sub-optimal; indeed, such an approach wrongly considers the temperature as a factor, i.e. a set of nominal classes with no intrinsic orderings and distances. Obviosly, we should better regard the temperature as a continuous variable, by coding a time-to-event model where the three parameters are expressed as continuous functions of <span class="math inline">\(T\)</span>:</p>
+<p><span class="math display">\[P(t, T) = \Phi \left[ b(T), d(T), e(T) \right]\]</span></p>
+<p>For the ‘phalaris’ dataset (Onofri et al., 2018; example 3) we used a log-logistic cumulative distribution function, with the following sub-models:</p>
+<p><span class="math display">\[ \left\{ {\begin{array}{{l}}
+P(t, T) = \frac{ d(T) }{1 + \exp \left\{ b \left[ \log(t) - \log( e(T) ) \right] \right\} } \\
+d(T) = G \, \left[ 1 - \exp \left( - \frac{ T_c - T }{\sigma_{T_c}} \right) \right] \\
+1/[e(T)] = GR_{50}(T) = \frac{T - T_b }{\theta_T} \left[1 - \frac{T - T_b}{T_c - T_b}\right]  \\
+\end{array}} \right. \quad \quad (\textrm{TTEM})\]</span></p>
+<p>Please, note that the shape parameter <span class="math inline">\(b\)</span> has been regarded as independent from temperature; the parameters are:</p>
+<ol style="list-style-type: decimal">
+<li><span class="math inline">\(G\)</span>, that is the germinable fraction, accounting for the fact that <span class="math inline">\(d\)</span> may not reach 1, regardless of time and temperature;</li>
+<li><span class="math inline">\(T_c\)</span>, that is the ceiling temperature for germination;</li>
+<li><span class="math inline">\(\sigma_{T_c}\)</span>, that represents the variability of <span class="math inline">\(T_c\)</span> within the seed lot;</li>
+<li><span class="math inline">\(T_b\)</span>, that is the base temperature for germination;</li>
+<li><span class="math inline">\(\theta_T\)</span>, that is the thermal-time parameter;</li>
+<li><span class="math inline">\(b\)</span>, that is the scale parameters for the log-logistic distribution.</li>
+</ol>
+<p>You can get more information from our original paper (Onofri et al., 2018). This thermal-time model was implemented in R as the <code>TTEM()</code> function, and it is available within the <code>drcSeedGerm</code> package; we can fit it by using the <code>drmte()</code> function in the <code>drcte</code> package, with no need to provide starting values for model parameters, because a self-starting routine is available. The <code>summary()</code> method can be used to retrieve the parameter estimates.</p>
+<pre class="r"><code># Thermal-Time-to-event model fit
+modTTEM &lt;- drmte( nSeeds ~ timeBef + timeAf + Temp, data=barley,
+               fct=TTEM())
+summary(modTTEM, units = Dish)
+## 
+## Model fitted: Thermal-time model with shifted exponential for Pmax and Mesgaran model for GR50
+## 
+## Robust estimation: Cluster robust sandwich SEs 
+## 
+## Parameter estimates:
+## 
+##                       Estimate Std. Error t value  Pr(&gt;|t|)    
+## G:(Intercept)         12.46391    2.40502  5.1825 2.772e-07 ***
+## Tc:(Intercept)        82.66899   23.47042  3.5223  0.000452 ***
+## sigmaTc:(Intercept) 1018.92708  322.67791  3.1577  0.001649 ** 
+## Tb:(Intercept)        -1.89327    0.38741 -4.8870 1.236e-06 ***
+## ThetaT:(Intercept)    43.41025    4.37185  9.9295 &lt; 2.2e-16 ***
+## b:(Intercept)          5.62759    0.69149  8.1383 1.520e-15 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>It is always important not to neglect a graphical inspection of model fit. The <code>plot()</code> method does not work with time-to-event curves with additional covariates (apart from time). However, we can retrieve the fitted data by using the <code>plotData()</code> function and use those predictions within the <code>ggplot()</code> function. The box below shows the appropriate coding; the red circles in the graphs represent the observed means, while the black lines are model predictions).</p>
+<pre class="r"><code>tab &lt;- plotData(modTTEM)
+
+ggplot() +
+  geom_point(data = tab$plotPoints, mapping = aes(x = timeAf, y = CDF),
+            col = &quot;red&quot;) +
+  geom_line(data = tab$plotFits, mapping = aes(x = timeAf, y = CDF)) +
+  facet_wrap( ~ Temp) +
+  scale_x_continuous(name = &quot;Time (d)&quot;) +
+  scale_y_continuous(name = &quot;Cumulative proportion of germinated seeds&quot;)</code></pre>
+<p><img src="/post/Stat_drcte_11-ExampleTTE_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>The previous graph shows that the <code>TTEM()</code> model, that we had successfully used with other datasets, failed to provide an adequate description of the germination time-course for barley. Therefore, we modified one of the sub-models, by adopting the approach highlighted in Rowse and Finch-Savage (2003), where:</p>
+<p><span class="math display">\[1/[e(T)] = GR_{50}(T) = \left\{ {\begin{array}{ll}
+\frac{T - T_b}{\theta_T} &amp; \textrm{if} \,\,\, T_b &lt; T &lt; T_d \\
+\frac{T - T_b}{\theta_T} \left[ 1 - \frac{T - T_d}{T_c - T_d}  \right] &amp; \textrm{if} \,\,\, T_d &lt; T &lt; T_c \\
+0 &amp; \textrm{if} \,\,\, T \leq T_b \,\,\, or \,\,\, T \geq T_c
+\end{array}} \right. \]</span></p>
+<p>Furthermore, we also made a further improvement, by coding another model where also the <span class="math inline">\(b\)</span> parameter was allowed to change with temperature, according to the following equation:</p>
+<p><span class="math display">\[ \sigma(T) = \frac{1}{b(T)} = \frac{1}{b_0} + s (T - T_b)\]</span></p>
+<p>These two improved models were coded as the <code>TTERF()</code> function (with the only change in the ‘e’ submodel), and as the <code>TTERFc()</code> function (with a change in both the ‘b’ and ‘e’ submodels), which are available within the <code>drcSeedGerm</code> package. The code below is used to fit both models and explore the resulting fits: the symbols show the observed means, the blue line represents the ‘TTERF’ fit and the red line represents the ‘TTERFc’ fit.</p>
+<pre class="r"><code>modTTERF &lt;- drmte( nSeeds ~ timeBef + timeAf + Temp, data=barley,
+               fct=TTERF())
+modTTERFc &lt;- drmte(nSeeds ~ timeBef + timeAf + Temp, data=barley,
+               fct=TTERFc())
+AIC(modTTEM, modTTERF, modTTERFc)
+##            df      AIC
+## modTTEM   804 6478.917
+## modTTERF  803 5730.622
+## modTTERFc 802 5602.532
+tab2 &lt;- plotData(modTTERF)
+tab3 &lt;- plotData(modTTERFc)
+
+ggplot() +
+  geom_point(data = tab$plotPoints, mapping = aes(x = timeAf, y = CDF),
+            col = &quot;red&quot;) +
+  geom_line(data = tab2$plotFits, mapping = aes(x = timeAf, y = CDF),
+            col = &quot;blue&quot;) +
+  geom_line(data = tab3$plotFits, mapping = aes(x = timeAf, y = CDF),
+            col = &quot;red&quot;) +
+  facet_wrap( ~ Temp) +
+  scale_x_continuous(name = &quot;Time (d)&quot;) +
+  scale_y_continuous(name = &quot;Cumulative proportion of germinated seeds&quot;)</code></pre>
+<p><img src="/post/Stat_drcte_11-ExampleTTE_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>We see that, with respect to the TTEM model, both the two improved models provide a better fit.</p>
+<p>It should be clear that this modelling approach is rather flexible, by appropriately changing one or more submodels, and it can fit the germination pattern of several species in several environmental conditions.</p>
+<p>Thank you for reading!</p>
+<p>Prof. Andrea Onofri<br />
+Department of Agricultural, Food and Environmental Sciences<br />
+University of Perugia (Italy)<br />
+Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow <span class="citation">@onofriandreapg</span></a>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<hr />
+</div>
+<div id="references" class="section level1">
+<h1>References</h1>
+<ol style="list-style-type: decimal">
+<li>Onofri, A., Benincasa, P., Mesgaran, M.B., Ritz, C., 2018. Hydrothermal-time-to-event models for seed germination. European Journal of Agronomy 101, 129–139.</li>
+<li>Rowse, H.R., Finch-Savage, W.E., 2003. Hydrothermal threshold models can describe the germination response of carrot (Daucus carota) and onion (Allium cepa) seed populations across both sub- and supra-optimal temperatures. New Phytologist 158, 101–108.</li>
+</ol>
+</div>

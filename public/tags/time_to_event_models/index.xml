@@ -5,10 +5,149 @@
     <description>Recent content in Time_to_event_models on The broken bridge between biologists and statisticians</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2018, @AndreaOnofri</copyright>
-    <lastBuildDate>Tue, 10 Jan 2023 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 10 Feb 2023 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://www.statforbiology.com/tags/time_to_event_models/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Fitting thermal-time-models to seed germination data</title>
+      <link>https://www.statforbiology.com/2023/stat_drcte_11-examplette/</link>
+      <pubDate>Fri, 10 Feb 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.statforbiology.com/2023/stat_drcte_11-examplette/</guid>
+      <description>
+
+
+&lt;p&gt;This is a follow-up post. If you are interested in other posts of this series, please go to: &lt;a href=&#34;https://www.statforbiology.com/tags/drcte/&#34;&gt;https://www.statforbiology.com/tags/drcte/&lt;/a&gt;. All these posts exapand on a paper that we have recently published in the Journal ‘Weed Science’; please follow &lt;a href=&#34;https://doi.org/10.1017/wsc.2022.8&#34;&gt;this link&lt;/a&gt; to the paper.&lt;/p&gt;
+&lt;div id=&#34;a-motivating-examples&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;A motivating examples&lt;/h1&gt;
+&lt;p&gt;In recent times, we wanted to model the effect of temperature on seed germination for &lt;em&gt;Hordeum vulgare&lt;/em&gt; and we made an assay with three replicated Petri dishes (50 seeds each) at 9 constant temperature levels (1, 3, 7, 10, 15, 20, 25, 30, 35, 40 °C). Germinated seeds were counted and removed daily for 10 days. This unpublished dataset is available as &lt;code&gt;barley&lt;/code&gt; in the &lt;code&gt;drcSeedGerm&lt;/code&gt; package, which needs to be installed from github (see below), together with the &lt;code&gt;drcte&lt;/code&gt; package for time-to-event model fitting. The following code loads the necessary packages, loads the datasets and shows the first six lines.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Installing packages (only at first instance)
+# library(devtools)
+# install_github(&amp;quot;OnofriAndreaPG/drcSeedGerm&amp;quot;)
+# install_github(&amp;quot;OnofriAndreaPG/drcte&amp;quot;)
+library(drcSeedGerm)
+library(tidyverse)
+data(barley)
+head(barley)
+##   Dish Temp timeBef timeAf nSeeds nCum propCum
+## 1    1    1       0      1      0    0       0
+## 2    1    1       1      2      0    0       0
+## 3    1    1       2      3      0    0       0
+## 4    1    1       3      4      0    0       0
+## 5    1    1       4      5      0    0       0
+## 6    1    1       5      6      0    0       0&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In this dataset, ‘timeAf’ represents the moment when germinated seeds were counted, while ’timeBef’ represents the previous inspection time (or the beginning of the assay). The column ’nSeeds’ is the number of seeds that germinated during each time interval between ‘timeBef’ and ‘timeAf. For the analyses, we will also make use of the ’Temp’ (temperature) and ‘Dish’ (Petri dish) columns.&lt;/p&gt;
+&lt;p&gt;This dataset was already analysed in Onofri et al. (2018; Example 3 and 4) by using the same methodology, but a different R coding (see the Supplemental Material in that paper), that is now outdated. This post will show you the updated coding.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;a-first-thermal-time-model&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;A first thermal-time model&lt;/h1&gt;
+&lt;p&gt;As we have shown in previous posts (see &lt;a href=&#34;https://www.statforbiology.com/2022/stat_drcte_6-ht1step/&#34;&gt;here&lt;/a&gt; and &lt;a href=&#34;https://www.statforbiology.com/2023/stat_drcte_10-examplehtte/&#34;&gt;here&lt;/a&gt;), the effect of environmental covariates (temperature, in this case) can be simply included by independently coding a different time-to-event curve to each level of that covariate. In other words, considering that a parametric time-to-event curve is defined as a cumulative probability function (&lt;span class=&#34;math inline&#34;&gt;\(\Phi\)&lt;/span&gt;), with three parameters:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[P(t) = \Phi \left( b, d, e \right)\]&lt;/span&gt;
+where &lt;span class=&#34;math inline&#34;&gt;\(P(t)\)&lt;/span&gt; is the cumulative probability of germination at time &lt;span class=&#34;math inline&#34;&gt;\(t\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt; is the median germination time, &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; is the slope at the inflection point and &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; is the maximum germinated proportion, the most obvious extension is to allow for different &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt; values for each of the i&lt;sup&gt;th&lt;/sup&gt; temperature levels (&lt;span class=&#34;math inline&#34;&gt;\(T\)&lt;/span&gt;):&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[P(t, T) = \Phi \left( b_i, d_i, e_i \right)\]&lt;/span&gt;
+Although the above approach is possible, we will not purse it here, as it is clearly sub-optimal; indeed, such an approach wrongly considers the temperature as a factor, i.e. a set of nominal classes with no intrinsic orderings and distances. Obviosly, we should better regard the temperature as a continuous variable, by coding a time-to-event model where the three parameters are expressed as continuous functions of &lt;span class=&#34;math inline&#34;&gt;\(T\)&lt;/span&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[P(t, T) = \Phi \left[ b(T), d(T), e(T) \right]\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;For the ‘phalaris’ dataset (Onofri et al., 2018; example 3) we used a log-logistic cumulative distribution function, with the following sub-models:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ \left\{ {\begin{array}{{l}}
+P(t, T) = \frac{ d(T) }{1 + \exp \left\{ b \left[ \log(t) - \log( e(T) ) \right] \right\} } \\
+d(T) = G \, \left[ 1 - \exp \left( - \frac{ T_c - T }{\sigma_{T_c}} \right) \right] \\
+1/[e(T)] = GR_{50}(T) = \frac{T - T_b }{\theta_T} \left[1 - \frac{T - T_b}{T_c - T_b}\right]  \\
+\end{array}} \right. \quad \quad (\textrm{TTEM})\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Please, note that the shape parameter &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; has been regarded as independent from temperature; the parameters are:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(G\)&lt;/span&gt;, that is the germinable fraction, accounting for the fact that &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; may not reach 1, regardless of time and temperature;&lt;/li&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(T_c\)&lt;/span&gt;, that is the ceiling temperature for germination;&lt;/li&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(\sigma_{T_c}\)&lt;/span&gt;, that represents the variability of &lt;span class=&#34;math inline&#34;&gt;\(T_c\)&lt;/span&gt; within the seed lot;&lt;/li&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(T_b\)&lt;/span&gt;, that is the base temperature for germination;&lt;/li&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(\theta_T\)&lt;/span&gt;, that is the thermal-time parameter;&lt;/li&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt;, that is the scale parameters for the log-logistic distribution.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;You can get more information from our original paper (Onofri et al., 2018). This thermal-time model was implemented in R as the &lt;code&gt;TTEM()&lt;/code&gt; function, and it is available within the &lt;code&gt;drcSeedGerm&lt;/code&gt; package; we can fit it by using the &lt;code&gt;drmte()&lt;/code&gt; function in the &lt;code&gt;drcte&lt;/code&gt; package, with no need to provide starting values for model parameters, because a self-starting routine is available. The &lt;code&gt;summary()&lt;/code&gt; method can be used to retrieve the parameter estimates.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Thermal-Time-to-event model fit
+modTTEM &amp;lt;- drmte( nSeeds ~ timeBef + timeAf + Temp, data=barley,
+               fct=TTEM())
+summary(modTTEM, units = Dish)
+## 
+## Model fitted: Thermal-time model with shifted exponential for Pmax and Mesgaran model for GR50
+## 
+## Robust estimation: Cluster robust sandwich SEs 
+## 
+## Parameter estimates:
+## 
+##                       Estimate Std. Error t value  Pr(&amp;gt;|t|)    
+## G:(Intercept)         12.46391    2.40502  5.1825 2.772e-07 ***
+## Tc:(Intercept)        82.66899   23.47042  3.5223  0.000452 ***
+## sigmaTc:(Intercept) 1018.92708  322.67791  3.1577  0.001649 ** 
+## Tb:(Intercept)        -1.89327    0.38741 -4.8870 1.236e-06 ***
+## ThetaT:(Intercept)    43.41025    4.37185  9.9295 &amp;lt; 2.2e-16 ***
+## b:(Intercept)          5.62759    0.69149  8.1383 1.520e-15 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It is always important not to neglect a graphical inspection of model fit. The &lt;code&gt;plot()&lt;/code&gt; method does not work with time-to-event curves with additional covariates (apart from time). However, we can retrieve the fitted data by using the &lt;code&gt;plotData()&lt;/code&gt; function and use those predictions within the &lt;code&gt;ggplot()&lt;/code&gt; function. The box below shows the appropriate coding; the red circles in the graphs represent the observed means, while the black lines are model predictions).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;tab &amp;lt;- plotData(modTTEM)
+
+ggplot() +
+  geom_point(data = tab$plotPoints, mapping = aes(x = timeAf, y = CDF),
+            col = &amp;quot;red&amp;quot;) +
+  geom_line(data = tab$plotFits, mapping = aes(x = timeAf, y = CDF)) +
+  facet_wrap( ~ Temp) +
+  scale_x_continuous(name = &amp;quot;Time (d)&amp;quot;) +
+  scale_y_continuous(name = &amp;quot;Cumulative proportion of germinated seeds&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_drcte_11-ExampleTTE_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;The previous graph shows that the &lt;code&gt;TTEM()&lt;/code&gt; model, that we had successfully used with other datasets, failed to provide an adequate description of the germination time-course for barley. Therefore, we modified one of the sub-models, by adopting the approach highlighted in Rowse and Finch-Savage (2003), where:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[1/[e(T)] = GR_{50}(T) = \left\{ {\begin{array}{ll}
+\frac{T - T_b}{\theta_T} &amp;amp; \textrm{if} \,\,\, T_b &amp;lt; T &amp;lt; T_d \\
+\frac{T - T_b}{\theta_T} \left[ 1 - \frac{T - T_d}{T_c - T_d}  \right] &amp;amp; \textrm{if} \,\,\, T_d &amp;lt; T &amp;lt; T_c \\
+0 &amp;amp; \textrm{if} \,\,\, T \leq T_b \,\,\, or \,\,\, T \geq T_c
+\end{array}} \right. \]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Furthermore, we also made a further improvement, by coding another model where also the &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; parameter was allowed to change with temperature, according to the following equation:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ \sigma(T) = \frac{1}{b(T)} = \frac{1}{b_0} + s (T - T_b)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;These two improved models were coded as the &lt;code&gt;TTERF()&lt;/code&gt; function (with the only change in the ‘e’ submodel), and as the &lt;code&gt;TTERFc()&lt;/code&gt; function (with a change in both the ‘b’ and ‘e’ submodels), which are available within the &lt;code&gt;drcSeedGerm&lt;/code&gt; package. The code below is used to fit both models and explore the resulting fits: the symbols show the observed means, the blue line represents the ‘TTERF’ fit and the red line represents the ‘TTERFc’ fit.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;modTTERF &amp;lt;- drmte( nSeeds ~ timeBef + timeAf + Temp, data=barley,
+               fct=TTERF())
+modTTERFc &amp;lt;- drmte(nSeeds ~ timeBef + timeAf + Temp, data=barley,
+               fct=TTERFc())
+AIC(modTTEM, modTTERF, modTTERFc)
+##            df      AIC
+## modTTEM   804 6478.917
+## modTTERF  803 5730.622
+## modTTERFc 802 5602.532
+tab2 &amp;lt;- plotData(modTTERF)
+tab3 &amp;lt;- plotData(modTTERFc)
+
+ggplot() +
+  geom_point(data = tab$plotPoints, mapping = aes(x = timeAf, y = CDF),
+            col = &amp;quot;red&amp;quot;) +
+  geom_line(data = tab2$plotFits, mapping = aes(x = timeAf, y = CDF),
+            col = &amp;quot;blue&amp;quot;) +
+  geom_line(data = tab3$plotFits, mapping = aes(x = timeAf, y = CDF),
+            col = &amp;quot;red&amp;quot;) +
+  facet_wrap( ~ Temp) +
+  scale_x_continuous(name = &amp;quot;Time (d)&amp;quot;) +
+  scale_y_continuous(name = &amp;quot;Cumulative proportion of germinated seeds&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_drcte_11-ExampleTTE_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;We see that, with respect to the TTEM model, both the two improved models provide a better fit.&lt;/p&gt;
+&lt;p&gt;It should be clear that this modelling approach is rather flexible, by appropriately changing one or more submodels, and it can fit the germination pattern of several species in several environmental conditions.&lt;/p&gt;
+&lt;p&gt;Thank you for reading!&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Onofri, A., Benincasa, P., Mesgaran, M.B., Ritz, C., 2018. Hydrothermal-time-to-event models for seed germination. European Journal of Agronomy 101, 129–139.&lt;/li&gt;
+&lt;li&gt;Rowse, H.R., Finch-Savage, W.E., 2003. Hydrothermal threshold models can describe the germination response of carrot (Daucus carota) and onion (Allium cepa) seed populations across both sub- and supra-optimal temperatures. New Phytologist 158, 101–108.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Fitting a hydro-thermal-time-model to seed germination data</title>
@@ -238,48 +377,6 @@ Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.o
 &lt;ol style=&#34;list-style-type: decimal&#34;&gt;
 &lt;li&gt;Mesgaran, M.B., Mashhadi, H.R., Alizadeh, H., Hunt, J., Young, K.R., Cousens, R.D., 2013. Importance of distribution function selection for hydrothermal time models of seed germination. Weed Research 53, 89–101. &lt;a href=&#34;https://doi.org/10.1111/wre.12008&#34; class=&#34;uri&#34;&gt;https://doi.org/10.1111/wre.12008&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;Onofri, A., Benincasa, P., Mesgaran, M.B., Ritz, C., 2018. Hydrothermal-time-to-event models for seed germination. European Journal of Agronomy 101, 129–139.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;hr /&gt;
-&lt;/div&gt;
-&lt;div id=&#34;further-detail&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;Further detail&lt;/h1&gt;
-&lt;p&gt;Let us conclude this page by giving some detail on all other models in Mesgaran et al (2913; slightly reparameterised). In same cases &lt;span class=&#34;math inline&#34;&gt;\(\Psi_b\)&lt;/span&gt; has been replaced by &lt;span class=&#34;math inline&#34;&gt;\(\mu\)&lt;/span&gt;, that is the location parameter of the cumulative distribution function of base water potential, but it is not the median value. On the other hand, &lt;span class=&#34;math inline&#34;&gt;\(\delta\)&lt;/span&gt; is the shifting parameter for all logarithm based distributions; indeed, logarithm based distribution are only defined for strictly positive variables, while we know that water potential usually assumes negative values. The shifting parameters is used to shift the cumulative distribution function to the right, so that negative values are allowed.&lt;/p&gt;
-&lt;div id=&#34;htl&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;&lt;code&gt;HTL()&lt;/code&gt;&lt;/h2&gt;
-&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ G(t, \Psi) = \frac{1}{1 + exp \left[ - \frac{  \Psi  - \left( \theta _H/t \right) - \Psi_{b} } {\sigma}  \right] }\]&lt;/span&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div id=&#34;htg&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;&lt;code&gt;HTG()&lt;/code&gt;&lt;/h2&gt;
-&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ G(t, \Psi) = \exp \left\{ { - \exp \left[ { - \left( {\frac{{\Psi - (\theta _H / t ) - \mu }}{\sigma }} \right)} \right]} \right\} \]&lt;/span&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div id=&#34;htll&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;&lt;code&gt;HTLL()&lt;/code&gt;&lt;/h2&gt;
-&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ G(t, \Psi) = \frac{1}{1 + \exp \left\{ \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b} + \delta)  }{\sigma}\right\} }\]&lt;/span&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div id=&#34;htw1&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;&lt;code&gt;HTW1()&lt;/code&gt;&lt;/h2&gt;
-&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ G(t, \Psi) = exp \left\{ - \exp \left[ - \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b} + \delta)  }{\sigma}\right] \right\}\]&lt;/span&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div id=&#34;htw2&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;&lt;code&gt;HTW2()&lt;/code&gt;&lt;/h2&gt;
-&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ G(t, \Psi) = 1 - exp \left\{ - \exp \left[ \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b} + \delta)  }{\sigma}\right] \right\}\]&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
-Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
-University of Perugia (Italy)&lt;br /&gt;
-Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
-&lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
-&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
-&lt;hr /&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div id=&#34;references-1&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;References&lt;/h1&gt;
-&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
-&lt;li&gt;Bradford KJ (2002) Applications of hydrothermal time to quantifying and modeling seed germination and dormancy. Weed Sci 50:248–260&lt;/li&gt;
-&lt;li&gt;Davison, A.C., Hinkley, D.V., 1997. Bootstrap methods and their application. Cambridge University Press, UK.&lt;/li&gt;
-&lt;li&gt;Keshtkar E, Kudsk P, Mesgaran MB (2021) Perspective: Common errors in dose–response analysis and how to avoid them. Pest Manag Sci 77:2599–2608&lt;/li&gt;
-&lt;li&gt;Onofri, A., Mesgaran, M., &amp;amp; Ritz, C. (2022). A unified framework for the analysis of germination, emergence, and other time-to-event data in weed science. Weed Science, 1-13. &lt;a href=&#34;doi:10.1017/wsc.2022.8&#34; class=&#34;uri&#34;&gt;doi:10.1017/wsc.2022.8&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Zeileis, A., Köll, S., Graham, N., 2020. Various Versatile Variances: An Object-Oriented Implementation of Clustered Covariances in R. J. Stat. Soft. 95. &lt;a href=&#34;https://doi.org/10.18637/jss.v095.i01&#34; class=&#34;uri&#34;&gt;https://doi.org/10.18637/jss.v095.i01&lt;/a&gt;&lt;/li&gt;
 &lt;/ol&gt;
 &lt;/div&gt;
 </description>

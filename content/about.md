@@ -20,6 +20,8 @@ Borgo XX Giugno 74
 I-06121 - PERUGIA   
 Email: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)   
 My ORCID: [https://orcid.org/0000-0002-6603-329X](https://orcid.org/0000-0002-6603-329X)   
-SCOPUS preview: [https://www.scopus.com/authid/detail.uri?authorId=57193769604](https://www.scopus.com/authid/detail.uri?authorId=57193769604)   
+SCOPUS preview: [https://www.scopus.com/authid/detail.uri?authorId=57193769604](https://www.scopus.com/authid/detail.uri?authorId=57193769604)
+
+<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow @onofriandreapg</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 
