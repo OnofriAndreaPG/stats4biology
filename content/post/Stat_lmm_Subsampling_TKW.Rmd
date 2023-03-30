@@ -1,0 +1,148 @@
+---
+title: "Subsampling in field experiments"
+author: "Andrea Onofri"
+date: 2023-03-29
+slug: 'Mixed models'
+categories:
+  - R
+  - 'Mixed_models'
+tags:
+  - R
+  - 'Mixed_models'
+  - 'Subsampling'
+archives:
+  - 2023
+---
+
+
+```{r setup, cache = F, echo = F}
+#Put at the beginning
+knitr::opts_chunk$set(echo = TRUE, message = F, warning = F)
+knitr::knit_hooks$set(document = function(x){ 
+  gsub("```\n*```r*\n*", "", x) 
+})
+```
+
+
+Subsampling is very common in field experiments in agriculture. It happens when we collect several random samples from each plot and we submit them to some sort of measurement process. Some examples? Let's look at the following (very incomplete) list.
+
+1. We collect the whole grain yield in each plot, select four subsamples and measure, in each subsample, the oil content or some other relevant chemical property.
+2. We collect, from each plot, four plants and measure their height.
+3. We collect a representative soil samples from each plot and analyse the residual content in some xenobiotic substance, by making four repeated measurements.
+
+The presence of sub-samples is a good thing, as long as true-replicates are also available. Indeed, the precision of our experiment increases, although the process of data analysis must be run properly. We should bear in mind that, if the experimental design is, e.g., a Randomised Complete Block with four replicates, for all the above examples we end up with sixteen values for each experimental treatment (four replicates and four sub-samples per replicate). It must be clear that the four sub-samples are not like true-replicates, because the experimental treatments were not independently allocated to each of them. The four subsamples are sub-replicates (or pseudo-replicates) and we should account for this when we analyse our data.
+
+# A motivating example
+
+Let's consider a dataset from an experiment where we had 30 genotypes in three blocks and recorded the Weight of Thousand Kernels (TKW) in three subsamples per plot, which were labelled by using the 'Sample' variable. In the box below, we load the data and all the necessary packages.
+
+```{r message=FALSE, warning=FALSE}
+rm(list=ls())
+library(tidyverse)
+library(nlme)
+library(emmeans)
+
+filePath <- "https://www.casaonofri.it/_datasets/TKW.csv"
+TKW <- read.csv(filePath)
+TKW <- TKW %>% 
+  mutate(across(1:4, .fns = factor))
+head(TKW)
+```
+
+# The wrong analysis
+
+A naive analysis would be to perform an ANOVA on all data, without making any distinction between true-replicates and sub-replicates. Let's do this by using the code shown in the box below.
+
+
+```{r}
+# Naive analysis
+mod <- lm(TKW ~ Block + Genotype, data=TKW)
+anova(mod)
+summary(mod)$sigma
+pairwise <- as.data.frame(pairs(emmeans(mod, ~Genotype)))
+sum(pairwise$p.value < 0.05)
+```
+
+We see that the Root Mean Square Error is 2.71, the F test for the genotypes is highly significant and there are 225 significant pairwise comparisons among the 30 genotypes.
+
+As we said, this is simple, but it is also **terribly wrong**. By putting true-replicates and pseudo-replicates on an equal footing, we have forgotten that the 270 observations are grouped by plot and that the observations in the same plot are more alike than the observations in different plots, because they share the same 'origin'. We say that the observations in each plot are correlated and, therefore, the basic assumption of independence of residuals is violated. Our analysis is invalid and our manuscript can be very likely rejected.
+
+But, why are the editors so critical when we mistake pseudo-replicates for true-replicates? We'll see this in a few minutes.
+
+# The correct way to go
+
+A fully correct model for our dataset is:
+
+$$ y_{ijks} = \mu + \alpha_i + \beta_j + \gamma_{k} + \varepsilon_{s}$$
+
+where $y$ is the thousand kernel weight for the i^th^ genotype, j^th^ block, k^th^ plot and s^th^ sub-sample, $\alpha$ is the effect of the i^th^ genotype, $\beta$ is the effect of the j^th^ block, $\gamma$ is the effect of the the k^th^ plot and $\varepsilon$ is the effect of the s^th^ subsample. The presence of the $\gamma$ element accounts for the plot as a grouping factor and restores the independence of model residuals.
+
+Obviously, the difference between plots (for a given genotype and block) must be regarded as a random effect, as well as the difference between subplots, within each plot. Indeed. we have two random effects and, therefore, this is a mixed model. These two random effects are assumed to be normal, independent from each other, with mean equal to 0 and variances respectively equal to $\sigma^2_p$ and $\sigma^2_e$. (BTW: I am regarding the block as fixed! You may not agree, but this does not change what I am going to say later...).
+
+We can fit this mixed model by using the `lme()` function in the `nlme` package.
+
+```{r}
+# Mixed model fit
+mod.mix <- lme(TKW ~ Block + Genotype, 
+               random=~1|Plot, data=TKW)
+sigma2.p <- as.numeric( VarCorr(mod.mix) )[1]
+sigma2.e <- as.numeric( VarCorr(mod.mix) )[2]
+sigma2.p
+sigma2.e
+anova(mod.mix)
+pairwise <- as.data.frame(pairs(emmeans(mod.mix, ~Genotype)))
+sum(pairwise$p.value < 0.05)
+```
+
+We already see several differences with respect to the previous fit:
+
+1. in the 'naive' model, we have only one estimate for $\sigma^2$, that is 7.346 with 238 DF. In this case the correct term to test for the genotype effect is $\sigma^2_p$, that is equal to 8.892 with 58 DF. Clearly, the naive analysis strongly overestimates the number of DF: the observations taken in the same plot are correlated and they do not contribute full information.
+2. The RMSE for the mixed model is equal to 2.98 and it is higher than that from the 'naive' fit. The variability within plot is much smaller.
+3. The number of significant pairwise comparisons between genotypes has dropped to 91.
+
+You may wonder why $\sigma^2_p$, instead of $\sigma$ or $\sigma^2_e$ is the correct error term for the genotypes. Because it is the only correct estimate of the random difference between the true-replicates that were independently submitted to the same treatment.
+
+We can now understand why the editors reject our manuscript if we do not analyse the data properly: we may strongly overestimate the precision of our experiment and, consequently, commit a lot of false positive errors!
+
+# A simpler alternative
+
+We strongly recommend the previous method of data analysis. But, should you like to avoid the use of mixed models by all means (tell me,... why?), whenever the number of sub-samples is the same for all plots, we can also reach correct results by proceeding in two-steps. In the first step, we calculate the means of sub-samples for each plot and, in the second step, we submit the plot means to ANOVA, by considering the genotype and the block as fixed factors.
+
+```{r}
+# First step, to get an estimate of the within plot error
+mod1step <- lm(TKW ~ Plot, data=TKW)
+summary(mod1step)$sigma^2
+
+# Calculate the means per plot
+avgTKW <- as.data.frame(emmeans(mod1step, ~Plot))
+head(avgTKW)
+
+# Recover infos on experimental design
+Genotype <- plyr::ddply(TKW, ~Plot,                   
+        function(dataSet){as.character(dataSet[["Genotype"]][1])} )[,2]
+Block <-  plyr::ddply(TKW, ~Plot, 
+                  function(dataSet){as.factor(dataSet[["Block"]][1])} )[,2]
+dataset2step <- data.frame(Block, Genotype, TKW = avgTKW$emmean)
+dataset2step$Block <- factor(dataset2step$Block)
+
+#Second step
+mod2step <- lm(TKW ~ Genotype + Block, data = dataset2step)
+anova(mod2step)
+pairwise <- as.data.frame(pairs(emmeans(mod2step, ~Genotype)))
+sum(pairwise$p.value < 0.05)
+```
+
+We see that the results are totally the same as with a mixed model fit, although all Mean Squares in ANOVA are fractions of those obtained by mixed model analyses.
+
+**Please, remember that this simple solution is only feasible when we have the same number of subsamples per each plot**.
+
+Thanks for reading and happy coding!
+
+Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences        
+University of Perugia (Italy)        
+[andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)  
+
+<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow @onofriandreapg</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+

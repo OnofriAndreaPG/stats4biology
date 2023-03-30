@@ -1,7 +1,7 @@
 ---
-title: 'Fitting a hydro-thermal-time-model to seed germination data'
+title: 'Fitting hydro-thermal-time-models to seed germination data'
 author: "Andrea Onofri"
-date: 2023-01-10
+date: 2023-02-10
 slug: 'Time_to_event_models'
 categories:
   - R
@@ -41,7 +41,7 @@ head(hordeum)
 </div>
 <div id="preliminary-analyses" class="section level1">
 <h1>Preliminary analyses</h1>
-<p>First of all, it is necessary to mention that <strong>this dataset was already analysed in Onofri et al. (2018; Example 2) by using the same methodology, although, in that paper, the R implementation was different (see Supplemental Material) and it is now outdated.</strong></p>
+<p>First of all, it is necessary to mention that <strong>this dataset was already analysed in Onofri et al. (2018; Example 2) by using the same methodology, but with a different R coding (see the Supplemental Material for the above paper), which is now outdated.</strong> In this post, we’ll provide you with the updated coding.</p>
 <p>In the above data frame, ‘timeAf’ represents the moment when germinated seeds were counted, while ’timeBef’ represents the previous inspection time (or the beginning of the assay). The column ’nSeeds’ is the number of seeds that germinated during the time interval between ‘timeBef’ and ‘timeAf. The ’nCum’ column contains the cumulative number of germinated seeds and it is not necessary for time-to-event model fitting, although we can use it for plotting purposes.</p>
 <pre class="r"><code>hordeum &lt;- hordeum %&gt;% 
   mutate(propCum = nCum/nViable)
@@ -174,19 +174,20 @@ summary(mod1)
 <h1>A better modelling approach</h1>
 <p>The previous approach is clearly sub-optimal, as the temperature and water potential levels are regarded as factors, i.e. as nominal classes with no intrinsic orderings and distances. It would be much better to recognise that temperature and water potential are continuous variables and, consequently, code a time-to-event model where the three parameters are expressed as continuous functions of <span class="math inline">\(\Psi\)</span> and <span class="math inline">\(T\)</span>:</p>
 <p><span class="math display">\[P(t, \Psi, T) = \Phi \left[ b(\Psi, T), d(\Psi, T), e(\Psi, T) \right]\]</span></p>
-<p>In the above mentioned manuscript (Onofri et al., 2018; example 2) we used a log-logistic cumulative distribution function:</p>
-<p><span class="math display">\[P(t, \Psi, T) = \frac{ d(\Psi, T) }{1 + \exp \left\{ b \left[ \log(t) - \log( e(\Psi, T) ) \right] \right\} }\]</span></p>
-<p>Considering that the germination rate is the inverse of germination time, we replaced <span class="math inline">\(e(\Psi, T) = 1/GR_{50}(\Psi, T)\)</span> and used the following sub-models:</p>
-<p><span class="math display">\[d(\Psi, T) = \textrm{max} \left\{ G \, \left[ 1 - \exp \left( \frac{ \Psi - \Psi_b - k(T - T_b )}{\sigma_{\Psi_b}} \right) \right]; 0 \right\}\]</span></p>
-<p><span class="math display">\[GR_{50}(\Psi, T) = \textrm{max} \left\{ \frac{T - T_b }{\theta_{HT}} \left[\Psi - \Psi_b - k(T - T_b )\right]; 0 \right\}\]</span>
-Please, note that the shape parameter <span class="math inline">\(b\)</span> has been regarded as independent from the environmental covariates. It may be useful to note that the the parameters are:</p>
+<p>In the above mentioned manuscript (Onofri et al., 2018; example 2) we used a log-logistic cumulative distribution function, with three distinc sub-models, as shown below:</p>
+<p><span class="math display">\[ \left\{ {\begin{array}{{l}}
+P(t, \Psi, T) = \frac{ d(\Psi, T) }{1 + \exp \left\{ b \left[ \log(t) - \log( e(\Psi, T) ) \right] \right\} } \\
+d(\Psi, T) = \textrm{max} \left\{ G \, \left[ 1 - \exp \left( \frac{ \Psi - \Psi_b - k(T - T_b )}{\sigma_{\Psi_b}} \right) \right]; 0 \right\} \\
+1/[e(\Psi, T)] = GR_{50}(\Psi, T) = \textrm{max} \left\{ \frac{T - T_b }{\theta_{HT}} \left[\Psi - \Psi_b - K_T(T - T_b )\right]; 0 \right\} \\
+\end{array}} \right. \quad \quad (\textrm{HTTEM})\]</span></p>
+<p>Please, note that the shape parameter <span class="math inline">\(b\)</span> has been regarded as independent from the environmental covariates. It may be useful to note that the the parameters are:</p>
 <ol style="list-style-type: decimal">
 <li><span class="math inline">\(\Psi_{b}\)</span>, that is the median base water potential in the seed lot,</li>
 <li><span class="math inline">\(T_{b}\)</span>, that is the base temperature for germination,</li>
 <li><span class="math inline">\(\theta_HT\)</span>, that is the hydro-thermal-time parameter,</li>
 <li><span class="math inline">\(\sigma_{\Psi_b}\)</span>, that represents the variability of <span class="math inline">\(\Psi_b\)</span> within the population,</li>
-<li><span class="math inline">\(G\)</span>, that is the germinable fraction, accounting for the fact that <span class="math inline">\(d\)</span> may not reach 1, regardless of time and water potential.</li>
-<li><span class="math inline">\(k\)</span> and <span class="math inline">\(b\)</span> that are parameters of shape.</li>
+<li><span class="math inline">\(G\)</span>, that is the germinable fraction, accounting for the fact that <span class="math inline">\(d\)</span> may not reach 1, regardless of time, temperature and water potential.</li>
+<li><span class="math inline">\(K_T\)</span> and <span class="math inline">\(b\)</span>, that are parameters of shape.</li>
 </ol>
 <p>You can get more information from our original paper (Onofri et al., 2018). This hydro-thermal-time model was implemented in R as the <code>HTTEM()</code> function, and it is available within the <code>drcSeedGerm</code> package; we can fit it by using the <code>drmte()</code> function in the <code>drcte</code> package, but we need to provide starting values for model parameters, because the self-starting routine is not yet available. Finally, the <code>summary()</code> method can be used to retrieve the parameter estimates.</p>
 <pre class="r"><code># Complex model and slow fitting
@@ -212,7 +213,7 @@ summary(modHTTE, robust = T, units = Dish)
 ## b:(Intercept)          4.1650e+00  1.1332e-01  36.7548   &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<p>It is always important not to neglect a graphical inspection of model fit. The <code>plot()</code> method does not work with time-to-event curves with additional covariates (apart from time). However, we can retrieve the fitted data by using the <code>plotData()</code> function and use those predictions within the <code>ggplot()</code> function. The box below shows the appropriate coding.</p>
+<p>It is always important not to neglect a graphical inspection of model fit. The <code>plot()</code> method does not work with time-to-event curves with additional covariates (apart from time). However, we can retrieve the fitted data by using the <code>plotData()</code> function and use those predictions within the <code>ggplot()</code> function. The box below shows the appropriate coding; the red circles in the graphs represent the observed means, while the black lines are model predictions).</p>
 <pre class="r"><code>tab &lt;- plotData(modHTTE)
 
 ggplot() +
@@ -223,6 +224,113 @@ ggplot() +
   scale_x_continuous(name = &quot;Time (d)&quot;) +
   scale_y_continuous(name = &quot;Cumulative proportion of germinated seeds&quot;)</code></pre>
 <p><img src="/post/Stat_drcte_10-ExampleHTTE_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+</div>
+<div id="other-htt-models" class="section level1">
+<h1>Other HTT models</h1>
+<p>Mohsen Mesgaran, in an earlier paper (Mesgaran et al., 2017), used a different modelling approach, where he did not directly consider the distribution of germination times within the seed lot, but modelled the distribution of base water potential levels within the lot, under the idea that different germination times arise as the result of the fact that each seed has its ‘intrinsic’ water potential level (Bradford, 1992). We do not give any further biological detail, because this is only meant to be a post about R coding; you can refer to Bradford (1992), Mesgaran et al. (2013) and Mesgaran et al. (2017) for this detail. The following equation describes the time-course of germination depending on temperature and water potential level, assuming that the distribution of base water potential in the seed lot is gaussian:</p>
+<p><span class="math display">\[ P(t, T, \Psi) = \Phi \left\{ \frac{\Psi - \left[ \frac{\theta_{HT}}{t (T - T_b)} \right] - \left[\Psi_b + K_t (T - T_b) \right] }{\sigma_{\Psi_b}} \right\}   \quad \quad (\textrm{HTTnorm.M})\]</span></p>
+<p>where <span class="math inline">\(P\)</span> is the proportion of germinated seeds, depending on the time <span class="math inline">\(t\)</span>, temperature <span class="math inline">\(T\)</span> and base water potential <span class="math inline">\(\Psi\)</span>, <span class="math inline">\(\Phi\)</span> is a gaussian cumulative distribution function, <span class="math inline">\(\theta_HT\)</span> is the hydro-thermal-time parameter, <span class="math inline">\(\Psi_{b}\)</span> is the median base water potential in the seed lot, <span class="math inline">\(K_t\)</span> is a parameter that measures the effect of temperature on base water potential, <span class="math inline">\(T_{b}\)</span> is the base temperature for germination and <span class="math inline">\(\sigma_{\Psi_b}\)</span> represents the variability of <span class="math inline">\(\Psi_b\)</span> within the population.</p>
+<p>This model was coded in the <code>drcSeedGerm</code> package as the <code>HTTnorm.M()</code> function, which was also modified to fit alternative biological assumptions. For example, if <span class="math inline">\(\Phi\)</span> is not gaussian, but it is log-logistic, the model becomes:</p>
+<p><span class="math display">\[ P(t, T, \Psi) = \frac{1}{1 + \exp \left\{ -  \frac{ \log \left[ \Psi - \left( \frac{\theta_{HT}}{t ( T - T_b )} \right) + \delta \right] - \log \left[ \Psi_b + K_t (T - T_b) + \delta \right] }{\sigma_{\Psi_b}} \right\} } \quad \quad (\textrm{HTTLL.M})\]</span></p>
+<p>where <span class="math inline">\(\delta\)</span> is a shifting parameter, to allow for negative water potential levels. This model was coded in the <code>drcSeedGerm</code> package as the <code>HTTLL.M()</code> function.</p>
+<p>In both models the term <span class="math inline">\(K_T(T - T_b)\)</span> can be modified as <span class="math inline">\(K_t[max(T,T_o) - T_o]\)</span>, which changes the way how the germination rate is affected by increasing temperature levels. In the two modified models, the optimal temperature <span class="math inline">\(T_o\)</span> is included as an explicit parameter; the corresponding R functions are <code>HTTnorm.BS()</code> and <code>HTTLL.BS()</code>.</p>
+<p>Let’s fit these four models.</p>
+<pre class="r"><code># HTTnorm.M
+modHTTnorm.M &lt;- drmte(nSeeds ~ timeBef + timeAf + water + temp,
+                 data=hordeum,
+                 fct = HTTnorm.M(),
+  start=c(932,-2.5, -3, 0.07, 0.5))
+summary(modHTTnorm.M)
+## 
+## Model fitted: Hydrothermal-time model with normal distribution of Psib (Bradford et al., 2002)
+## 
+## Robust estimation: no 
+## 
+## Parameter estimates:
+## 
+##                          Estimate  Std. Error  t-value p-value    
+## thetaHT:(Intercept)   850.5394623  33.7608043  25.1931  &lt;2e-16 ***
+## Tb:(Intercept)          0.5713169   0.3710553   1.5397  0.1236    
+## Psib50:(Intercept)     -2.3777692   0.0385119 -61.7412  &lt;2e-16 ***
+## Kt:(Intercept)          0.0738569   0.0020037  36.8600  &lt;2e-16 ***
+## sigmaPsib:(Intercept)   0.4049049   0.0094797  42.7130  &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+# HTTnorm.BS
+modHTTnorm.BS &lt;- drmte(nSeeds ~ timeBef + timeAf + water + temp,
+                 data=hordeum,
+                 fct = HTTnorm.BS(),
+  start=c(932,-2.5, 15, -3, 0.07, 0.5))
+summary(modHTTnorm.BS)
+## 
+## Model fitted: Hydrothermal-time model with normal distribution of Psib (Bradford et al., 2002)
+## 
+## Robust estimation: no 
+## 
+## Parameter estimates:
+## 
+##                          Estimate  Std. Error  t-value p-value    
+## thetaHT:(Intercept)   906.3324894  43.7165251  20.7320  &lt;2e-16 ***
+## Tb:(Intercept)         -0.2197905   0.5362506  -0.4099  0.6819    
+## To:(Intercept)          9.2700969   0.4781515  19.3874  &lt;2e-16 ***
+## Psib50:(Intercept)     -1.7649662   0.0357594 -49.3567  &lt;2e-16 ***
+## Kt:(Intercept)          0.0755795   0.0021308  35.4696  &lt;2e-16 ***
+## sigmaPsib:(Intercept)   0.4042633   0.0094506  42.7767  &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+# HTTLL.M
+modHTTLL.M &lt;- drmte(nSeeds ~ timeBef + timeAf + water + temp,
+                 data=hordeum,
+                 fct = HTTLL.M(),
+  start=c(832,-2.5, -3, 0.07, 3, 0.5))
+summary(modHTTLL.M)
+## 
+## Model fitted: Hydrothermal-time model (Mesgaran et al., 2017)
+## 
+## Robust estimation: no 
+## 
+## Parameter estimates:
+## 
+##                          Estimate  Std. Error  t-value   p-value    
+## thetaHT:(Intercept)   942.3812703  41.8239049  22.5321 &lt; 2.2e-16 ***
+## Tb:(Intercept)         -0.6678997   0.4900833  -1.3628    0.1729    
+## Psib50:(Intercept)     -2.4978431   0.0383909 -65.0635 &lt; 2.2e-16 ***
+## Kt:(Intercept)          0.0732105   0.0020206  36.2313 &lt; 2.2e-16 ***
+## delta:(Intercept)       3.4981909   0.2535617  13.7962 &lt; 2.2e-16 ***
+## sigmaPsib:(Intercept)   0.1038773   0.0131166   7.9195 2.414e-15 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+# HTTLL.BS
+modHTTLL.BS &lt;- drmte(nSeeds ~ timeBef + timeAf + water + temp,
+                 data=hordeum,
+                 fct = HTTLL.BS(),
+  start=c(932,-2.5, 15, -3, 0.07, 3, 0.5))
+summary(modHTTLL.BS)
+## 
+## Model fitted: Hydrothermal-time model (Mesgaran et al., 2017)
+## 
+## Robust estimation: no 
+## 
+## Parameter estimates:
+## 
+##                          Estimate  Std. Error  t-value   p-value    
+## thetaHT:(Intercept)    1.4770e+03  8.7763e+01  16.8292 &lt; 2.2e-16 ***
+## Tb:(Intercept)        -7.8060e+00  1.1189e+00  -6.9765 3.027e-12 ***
+## To:(Intercept)         1.3159e+01  3.5960e-01  36.5937 &lt; 2.2e-16 ***
+## Psib50:(Intercept)    -1.6545e+00  1.9710e-02 -83.9418 &lt; 2.2e-16 ***
+## Kt:(Intercept)         8.7877e-02  3.8001e-03  23.1247 &lt; 2.2e-16 ***
+## delta:(Intercept)      2.6333e+00  9.6670e-02  27.2400 &lt; 2.2e-16 ***
+## sigmaPsib:(Intercept)  1.8527e-01  1.6898e-02  10.9641 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>The AIC value tells us that, for this dataset, the <code>HTTLL.BS()</code> function produced the best fit, confirming its underlying biological assumptions.</p>
+<pre class="r"><code>AIC(modHTTE, modHTTnorm.M, modHTTnorm.BS, modHTTLL.M, modHTTLL.BS)
+##                 df      AIC
+## modHTTE       3017 14714.05
+## modHTTnorm.M  3019 14737.48
+## modHTTnorm.BS 3018 14728.87
+## modHTTLL.M    3018 14582.64
+## modHTTLL.BS   3017 14548.58</code></pre>
 <p>Thank you for reading!</p>
 <p>Prof. Andrea Onofri<br />
 Department of Agricultural, Food and Environmental Sciences<br />

@@ -16,7 +16,6 @@ archives:
   - 2021
 ---
 
-<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
 <p>This is a follow-up post. If you are interested in other posts of this series, please go to: <a href="https://www.statforbiology.com/tags/drcte/">https://www.statforbiology.com/tags/drcte/</a>. All these posts exapand on a paper that we have recently published in the Journal ‘Weed Science’; please follow <a href="https://doi.org/10.1017/wsc.2022.8">this link</a> to the paper.</p>
@@ -24,7 +23,10 @@ archives:
 <h1>Reshaping time-to-event data</h1>
 <p>The first thing we should consider before working through this tutorial is the structure of germination/emergence data. To our experience, seed scientists are used to storing their datasets in several formats, that may not be immediately usable with the ‘drcte’ and ‘drc’ packages, which this tutorial is built upon. The figure below shows some of the possible formats that I have often encountered in my consulting work.</p>
 <p style="text-align:center">
-<img src="/_Figures/Stat_drcte_3-method-data.png" title="fig:" style="width:90.0%" alt="Possible data structures for seed germination/emergence data" />
+<div class="figure">
+<img src="/_Figures/Stat_drcte_3-method-data.png" style="width:90.0%" alt="" />
+<p class="caption">Possible data structures for seed germination/emergence data</p>
+</div>
 </p>
 <p>Both the ‘drcte’ and ‘drc’ packages require that the data is stored in LONG GROUPED format, as shown in the figure above (panel A, top left). Each row represents a time interval, the columns ‘timeBef’ and ‘timeAf’ represent the beginning and ending of the interval, while the column ‘count’ represents the seeds that germinated/emerged during that interval of time. Other columns may be needed, to represent, e.g., the randomisation unit (e.g., Petri dish) within which the count was made and the experimental treatment level that was allocated to that unit.</p>
 <p>Apart from the LONG GROUPED format, other time-to-event packages, such as ‘survival’ (Therneau, 2021) or ‘interval’ (Fay and Shaw, 2010) require a different data format, which could be named as LONG UNGROUPED (Figure above, panel B, top right). In this format, each row represents a seed, while the columns ‘timeBef’ and ‘timeAf’ represent the beginning and ending of the interval during which that seed germinated/emerged. The column ‘count’ is not necessary, while other columns may be necessary, as for the LONG GROUPED format. Apart from the above mentioned ‘survival’ and ‘interval’ packages, this format is also compatible with the ‘drcte’ package.</p>
@@ -35,7 +37,10 @@ archives:
 <h1>Motivating example</h1>
 <p>Seeds of <em>L. ornithopodioides</em> were collected from natural populations, at three different maturation stages, i.e. at 27 Days After Anthesis (DAA), when seeds were still green (Stage A), at 35 DAA, when seeds were brown and soft (Stage B) and at 41 DAA, when seeds were brown and moderately hard (Stage C). Germination assays were performed by placing four replicates of 25 seeds on filter paper (Whatman no. 3) in 9-cm diameter Petri dishes, in the dark and at a constant temperature of 20°C. The filter paper was initially moistened with 5 mL of distilled water and replenished as needed during the assay. Germinated seeds were counted daily over 15 days and removed from the Petri dishes. This dataset is a subset of a bigger dataset, aimed at assessing the time when the hard coat imposes dormancy in seeds of different legume species (Gresta et al., 2011).</p>
 <p>The authors of the above study sent me the above dataset in WIDE format, where the rows represented each Petri dish and the columns represented all information about each dish, including the counts of germinated seeds, which were listed in different columns. The dataset is shown in the table below and it is available as the ‘lotusOr’ dataframe in the ‘drcte’ package.</p>
-<pre><code>##  Stage Dish 1  2 3 4 5 6 7 8 9 10 11 12 13 14 15
+<pre class="r"><code>library(drcte)
+data(lotusOr)
+print(lotusOr, row.names = F)
+##  Stage Dish 1  2 3 4 5 6 7 8 9 10 11 12 13 14 15
 ##      A    1 0  0 0 0 0 1 2 1 1  1  3  1  1  4  2
 ##      A    2 0  0 0 0 0 1 1 1 1  2  1  2  3  1  1
 ##      A    3 0  0 0 0 0 3 4 4 3  1  2  1  1  0  1
