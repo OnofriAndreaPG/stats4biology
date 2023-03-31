@@ -77,7 +77,7 @@ $$ y_{ijks} = \mu + \alpha_i + \beta_j + \gamma_{k} + \varepsilon_{s}$$
 
 where $y$ is the thousand kernel weight for the i^th^ genotype, j^th^ block, k^th^ plot and s^th^ sub-sample, $\alpha$ is the effect of the i^th^ genotype, $\beta$ is the effect of the j^th^ block, $\gamma$ is the effect of the the k^th^ plot and $\varepsilon$ is the effect of the s^th^ subsample. The presence of the $\gamma$ element accounts for the plot as a grouping factor and restores the independence of model residuals.
 
-Obviously, the difference between plots (for a given genotype and block) must be regarded as a random effect, as well as the difference between subplots, within each plot. Indeed. we have two random effects and, therefore, this is a mixed model. These two random effects are assumed to be normal, independent from each other, with mean equal to 0 and variances respectively equal to $\sigma^2_p$ and $\sigma^2_e$. (BTW: I am regarding the block as fixed! You may not agree, but this does not change what I am going to say later...).
+Obviously, the difference between plots (for a given genotype and block) must be regarded as a random effect, as well as the difference between sub-plots, within each plot. Indeed. we have two random effects and, therefore, this is a mixed model. These two random effects are assumed to be normal, independent from each other, with mean equal to 0 and variances respectively equal to $\sigma^2_p$ and $\sigma^2_e$. (BTW: I am regarding the block as fixed! You may not agree, but this does not change what I am going to say later...).
 
 We can fit this mixed model by using the `lme()` function in the `nlme` package.
 
@@ -96,11 +96,11 @@ sum(pairwise$p.value < 0.05)
 
 We already see several differences with respect to the previous fit:
 
-1. in the 'naive' model, we have only one estimate for $\sigma^2$, that is 7.346 with 238 DF. In this case the correct term to test for the genotype effect is $\sigma^2_p$, that is equal to 8.892 with 58 DF. Clearly, the naive analysis strongly overestimates the number of DF: the observations taken in the same plot are correlated and they do not contribute full information.
+1. in the 'naive' model, we have only one estimate for $\sigma^2$, that is 7.346 with 238 DF. In this case the correct term to test for the genotype effect contains $\sigma^2_p$ (that is equal to 8.892) and has only 58 DF. Clearly, the naive analysis strongly overestimates the number of DF: the observations taken in the same plot are correlated and they do not contribute full information.
 2. The RMSE for the mixed model is equal to 2.98 and it is higher than that from the 'naive' fit. The variability within plot is much smaller.
 3. The number of significant pairwise comparisons between genotypes has dropped to 91.
 
-You may wonder why $\sigma^2_p$, instead of $\sigma$ or $\sigma^2_e$ is the correct error term for the genotypes. Because it is the only correct estimate of the random difference between the true-replicates that were independently submitted to the same treatment.
+You may wonder why the correct error term to test for the genotype effect is calculated from $\sigma^2_p$ and it is not the MS~e~ from the 'naive' model. Indeed, the  genotypes were allocated to the plots and the correct error term must should be obtained by considering the whole plot-to-plot variability (the expected Mean Square for the plot effect would be equal to $3 \times \sigma^2_p + \sigma^2_e$) and not the overall subplot-to-subplot variability (the MS~e~ from the 'naive' model), that overweights the difference between sub-plots with respect to the differences between plots.
 
 We can now understand why the editors reject our manuscript if we do not analyse the data properly: we may strongly overestimate the precision of our experiment and, consequently, commit a lot of false positive errors!
 
