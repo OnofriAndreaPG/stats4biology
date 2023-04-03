@@ -1,0 +1,182 @@
+---
+title: "Repeated measures with perennial crops"
+author: "Andrea Onofri"
+date: 2023-03-30
+slug: 'Mixed models'
+categories:
+  - R
+  - 'Mixed_models'
+tags:
+  - R
+  - 'Mixed_models'
+  - 'Repeated_measures'
+archives:
+  - 2023
+---
+
+
+
+<p>In this post, I want to discuss a concept that is often mistaken by some of my collegues. With all crops, we are used to repeating experiments across years to obtain multi-year data; the structure of the resulting dataset is always the same and it is exemplified in the box below, that refers to a multi-year genotype experiment with winter wheat.</p>
+<pre class="r"><code>rm(list = ls())
+library(tidyverse)
+library(nlme)
+library(emmeans)
+filePath &lt;- &quot;https://www.casaonofri.it/_datasets/WinterWheat.csv&quot;
+dataset &lt;- read.csv(filePath)
+dataset &lt;- dataset %&gt;%
+  mutate(across(c(1:3, 5), .fns = factor))
+head(dataset)
+##   Plot Block Genotype Yield Year
+## 1    2     1 COLOSSEO  6.73 1996
+## 2  110     2 COLOSSEO  6.96 1996
+## 3  181     3 COLOSSEO  5.35 1996
+## 4    2     1 COLOSSEO  6.26 1997
+## 5  110     2 COLOSSEO  7.01 1997
+## 6  181     3 COLOSSEO  6.11 1997</code></pre>
+<p>We can see that we have a column for the blocks, a column for the experimental factor (the genotype, in this instance), a column for the year and a column for the response variable (the yield, in this instance).</p>
+<p>If we intend to take the genotype, year and block effects as fixed, we can fit the correct model with the <code>lm()</code> function and the resulting ANOVA table looks like the following one.</p>
+<pre class="r"><code>mod1 &lt;- lm(Yield ~ Year/Block + Genotype*Year, data = dataset)
+anova(mod1)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##               Df  Sum Sq Mean Sq  F value    Pr(&gt;F)    
+## Year           6 159.279 26.5466 178.3996 &lt; 2.2e-16 ***
+## Genotype       7  11.544  1.6491  11.0824 2.978e-10 ***
+## Year:Block    14   3.922  0.2801   1.8826   0.03738 *  
+## Year:Genotype 42  27.713  0.6598   4.4342 6.779e-10 ***
+## Residuals     98  14.583  0.1488                       
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>As we have made different experiments in different years (and with a different randomisation in each year, hopefully), the block effect can only be considered as nested within each year (‘Year/Block’ and not ’Year*Block’). As for the rest, the ANOVA table is very close to that for any types of two-factors factorial experiments.</p>
+<p>The things change dramatically if we have a perennial crop, or a crop with a cycle lasting for more than one year, because yield measurements are taken repeatedly in the same plots across years. For this reason, even though the dataset looks very much like the previous one, it must be analysed in a totally different manner. Based on my experience as an editor of International Journals, I can say that several authors, still today, tend to forget this, resulting in several rejections or, at least, delays in publication.</p>
+<p>Let’s consider the dataset below, that refers to the yield of lucerne genotypes in three consecutive years, taken from the same plots in a single experiment lasting for three years.</p>
+<pre class="r"><code>filePath &lt;- &quot;https://www.casaonofri.it/_datasets/alfalfa3years.csv&quot;
+dataset &lt;- read.csv(filePath)
+dataset &lt;- dataset %&gt;%
+  mutate(across(c(1:3), .fns = factor))
+head(dataset)
+##   Block Genotype Year     Yield
+## 1     1 4cascine 2006  6.631775
+## 2     2 4cascine 2006  6.705397
+## 3     3 4cascine 2006  6.499588
+## 4     4 4cascine 2006  7.087686
+## 5     1 4cascine 2007 14.964927
+## 6     2 4cascine 2007 13.584865</code></pre>
+<p>If we analyse tha data as in the winter wheat example, we neglect that the observations are grouped within the same plots and, therefore, they are correlated. Consequently, the independence assumption is broken and it is no wonder that the manuscript must be rejected. What should we do, then?</p>
+<p>First of all, we should build a new variable to uniquely identify each plot; it is easy, if we think that yield values taken for the same genotype in the same block must have been taken in the same plot.</p>
+<pre class="r"><code># Refernce the plots
+dataset$Plot &lt;- dataset$Block:dataset$Genotype</code></pre>
+<p>Next, we can follow the usual rules to build the model (Piepho et al., 2004):</p>
+<ol style="list-style-type: decimal">
+<li>Consider one single year and build the treatment model</li>
+<li>Consider one single year and build the block model</li>
+<li>Include the year factor into the model and combine the year with all the effects in the treatment model, by crossing or nesting as appropriate.</li>
+<li>Consider that the ‘plot’ factor in the block model references the randomisation units, i.e. those units which received the the genotypes by a randomisation process. Assign to this plot factor a random effect.</li>
+<li>Excluding the terms for randomisation units, nest the year in all the other terms in the block model.</li>
+<li>Combine random effects for randomisation units with the repeated factor, by using the colon operator, in order to derive the correct error terms to accommodate correlation structures.</li>
+</ol>
+<p>The models at the different steps are as follows (with R notation):</p>
+<ol style="list-style-type: decimal">
+<li>treatment model: YIELD ~ GENOTYPE</li>
+<li>block model: YIELD ~ BLOCK + BLOCK:PLOT</li>
+<li>treatment model: YIELD ~ GENOTYPE * YEAR</li>
+<li>block model: YIELD ~ BLOCK + (1|BLOCK:PLOT)</li>
+<li>block model: YIELD ~ BLOCK + BLOCK:YEAR + (1|BLOCK:PLOT)</li>
+<li>block model: YIELD ~ BLOCK + BLOCK:YEAR + (1|BLOCK:PLOT) + (1|BLOCK:PLOT:YEAR)</li>
+</ol>
+<p>For analogy with the winter wheat experiment we take the block, year and genotype effects as fixed (but you can change this), so that the final model is:</p>
+<p>YIELD ~ BLOCK + BLOCK:YEAR + GENOTYPE * YEAR + (1|BLOCK:PLOT) + (1|BLOCK:PLOT:YEAR)</p>
+<p>where the last term does not need to be fitted in R, as it is the residual term, that is fitted by default. The resulting analysis (with ‘lme’) is:</p>
+<pre class="r"><code>mod2 &lt;- lme(Yield ~ Block + Block:Year + Genotype*Year, 
+           random = ~1|Plot,
+           data = dataset)
+anova(mod2)
+##               numDF denDF   F-value p-value
+## (Intercept)       1   114 27080.051  &lt;.0001
+## Block             3    57     2.139  0.1053
+## Genotype         19    57     4.602  &lt;.0001
+## Year              2   114  2107.322  &lt;.0001
+## Block:Year        6   114     3.818  0.0017
+## Year:Genotype    38   114     1.356  0.1115
+emmeans(mod2, ~Genotype)
+##  Genotype          emmean    SE df lower.CL upper.CL
+##  4cascine           11.59 0.315 57    10.96     12.2
+##  casalina           12.46 0.315 57    11.83     13.1
+##  classe             11.59 0.315 57    10.96     12.2
+##  costanza            9.89 0.315 57     9.26     10.5
+##  dimitra            11.75 0.315 57    11.12     12.4
+##  FDL0101            12.22 0.315 57    11.59     12.9
+##  garisenda          11.76 0.315 57    11.13     12.4
+##  LaBellaCampagnola  12.17 0.315 57    11.54     12.8
+##  LaTorre            11.36 0.315 57    10.73     12.0
+##  linfa              11.23 0.315 57    10.60     11.9
+##  marina             11.76 0.315 57    11.13     12.4
+##  Palladiana         10.89 0.315 57    10.26     11.5
+##  PicenaGR           12.12 0.315 57    11.49     12.8
+##  PR56S82            11.56 0.315 57    10.93     12.2
+##  PR57Q53            11.70 0.315 57    11.07     12.3
+##  prosementi         11.79 0.315 57    11.15     12.4
+##  RivieraVicentina    9.98 0.315 57     9.35     10.6
+##  robot              12.11 0.315 57    11.48     12.7
+##  Selene             12.11 0.315 57    11.48     12.7
+##  Zenith             11.94 0.315 57    11.31     12.6
+## 
+## Results are averaged over the levels of: Block, Year 
+## Degrees-of-freedom method: containment 
+## Confidence level used: 0.95</code></pre>
+<p>If we compare the above analyses with a ‘naive’ (wrong) analysis that neglects the repeated measures, we see big differences and, especially, we see that the SE for genotype means is much higher in the correct analysis.</p>
+<pre class="r"><code>mod3 &lt;- lm(Yield ~ Year/Block + Genotype*Year, 
+           data = dataset)
+anova(mod3)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##                Df  Sum Sq Mean Sq   F value    Pr(&gt;F)    
+## Year            2 2602.53 1301.27 1608.2407 &lt; 2.2e-16 ***
+## Genotype       19  104.27    5.49    6.7824 4.256e-13 ***
+## Year:Block      9   21.80    2.42    2.9930  0.002449 ** 
+## Year:Genotype  38   31.83    0.84    1.0351  0.424687    
+## Residuals     171  138.36    0.81                        
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+emmeans(mod3, ~Genotype)
+##  Genotype          emmean   SE  df lower.CL upper.CL
+##  4cascine           11.59 0.26 171    11.07     12.1
+##  casalina           12.46 0.26 171    11.94     13.0
+##  classe             11.59 0.26 171    11.08     12.1
+##  costanza            9.89 0.26 171     9.38     10.4
+##  dimitra            11.75 0.26 171    11.24     12.3
+##  FDL0101            12.22 0.26 171    11.71     12.7
+##  garisenda          11.76 0.26 171    11.24     12.3
+##  LaBellaCampagnola  12.17 0.26 171    11.66     12.7
+##  LaTorre            11.36 0.26 171    10.84     11.9
+##  linfa              11.23 0.26 171    10.72     11.7
+##  marina             11.76 0.26 171    11.25     12.3
+##  Palladiana         10.89 0.26 171    10.38     11.4
+##  PicenaGR           12.12 0.26 171    11.61     12.6
+##  PR56S82            11.56 0.26 171    11.05     12.1
+##  PR57Q53            11.70 0.26 171    11.19     12.2
+##  prosementi         11.79 0.26 171    11.27     12.3
+##  RivieraVicentina    9.98 0.26 171     9.47     10.5
+##  robot              12.11 0.26 171    11.59     12.6
+##  Selene             12.11 0.26 171    11.60     12.6
+##  Zenith             11.94 0.26 171    11.42     12.5
+## 
+## Results are averaged over the levels of: Block, Year 
+## Confidence level used: 0.95</code></pre>
+<p>I just want to conclude by saying that the above mixed model analyses regards the design as a sort of ‘split-plot in time’ and it is not necessarily correct, as it assumes that the within-plot correlation is the same for all pairs of observations, regardless of their distance in time. Further analyses might be necessary to assess whether serial correlation structures are necessary. But we’ll consider this in a future post.</p>
+<p>Thanks for reading and happy coding!</p>
+<p>Andrea Onofri<br />
+Department of Agricultural, Food and Environmental Sciences<br />
+University of Perugia (Italy)<br />
+<a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow <span class="citation">@onofriandreapg</span></a>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<hr />
+<div id="reference" class="section level1">
+<h1>Reference</h1>
+<ol style="list-style-type: decimal">
+<li>Piepho, H.-P., Büchse, A., Richter, C., 2004. A Mixed Modelling Approach for Randomized Experiments with Repeated Measures. Journal of Agronomy and Crop Science 190, 230–247.</li>
+</ol>
+</div>

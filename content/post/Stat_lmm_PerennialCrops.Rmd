@@ -1,0 +1,133 @@
+---
+title: "Repeated measures with perennial crops"
+author: "Andrea Onofri"
+date: 2023-03-30
+slug: 'Mixed models'
+categories:
+  - R
+  - 'Mixed_models'
+tags:
+  - R
+  - 'Mixed_models'
+  - 'Repeated_measures'
+archives:
+  - 2023
+---
+
+
+```{r setup, cache = F, echo = F}
+#Put at the beginning
+knitr::opts_chunk$set(echo = TRUE, message = F, warning = F)
+knitr::knit_hooks$set(document = function(x){ 
+  gsub("```\n*```r*\n*", "", x) 
+})
+```
+
+
+In this post, I want to discuss a concept that is often mistaken by some of my collegues. With all crops, we are used to repeating experiments across years to obtain multi-year data; the structure of the resulting dataset is always the same and it is exemplified in the box below, that refers to a multi-year genotype experiment with winter wheat.
+
+
+```{r}
+rm(list = ls())
+library(tidyverse)
+library(nlme)
+library(emmeans)
+filePath <- "https://www.casaonofri.it/_datasets/WinterWheat.csv"
+dataset <- read.csv(filePath)
+dataset <- dataset %>%
+  mutate(across(c(1:3, 5), .fns = factor))
+head(dataset)
+```
+
+We can see that we have a column for the blocks, a column for the experimental factor (the genotype, in this instance), a column for the year and a column for the response variable (the yield, in this instance).
+
+If we intend to take the genotype, year and block effects as fixed, we can fit the correct model with the `lm()` function and the resulting ANOVA table looks like the following one.
+
+```{r}
+mod1 <- lm(Yield ~ Year/Block + Genotype*Year, data = dataset)
+anova(mod1)
+```
+
+As we have made different experiments in different years (and with a different randomisation in each year, hopefully), the block effect can only be considered as nested within each year ('Year/Block' and not 'Year*Block'). As for the rest, the ANOVA table is very close to that for any types of two-factors factorial experiments.
+
+The things change dramatically if we have a perennial crop, or a crop with a cycle lasting for more than one year, because yield measurements are taken repeatedly in the same plots across years. For this reason, even though the dataset looks very much like the previous one, it must be analysed in a totally different manner. Based on my experience as an editor of International Journals, I can say that several authors, still today, tend to forget this, resulting in several rejections or, at least, delays in publication.
+
+Let's consider the dataset below, that refers to the yield of lucerne genotypes in three consecutive years, taken from the same plots in a single experiment lasting for three years.
+
+```{r}
+filePath <- "https://www.casaonofri.it/_datasets/alfalfa3years.csv"
+dataset <- read.csv(filePath)
+dataset <- dataset %>%
+  mutate(across(c(1:3), .fns = factor))
+head(dataset)
+```
+
+If we analyse tha data as in the winter wheat example, we neglect that the observations are grouped within the same plots and, therefore, they are correlated. Consequently, the independence assumption is broken and it is no wonder that the manuscript must be rejected. What should we do, then?
+
+First of all, we should build a new variable to uniquely identify each plot; it is easy, if we think that yield values taken for the same genotype in the same block must have been taken in the same plot.
+
+```{r}
+# Refernce the plots
+dataset$Plot <- dataset$Block:dataset$Genotype
+```
+
+Next, we can follow the usual rules to build the model (Piepho et al., 2004):
+
+1. Consider one single year and build the treatment model
+2. Consider one single year and build the block model
+3. Include the year factor into the model and combine the year with all the effects in the treatment model, by crossing or nesting as appropriate. 
+4. Consider that the 'plot' factor in the block model references the randomisation units, i.e. those units which received the the genotypes by a randomisation process. Assign to this plot factor a random effect.
+5. Excluding the terms for randomisation units, nest the year in all the other terms in the block model.
+6. Combine random effects for randomisation units with the repeated factor, by using the colon operator, in order to derive the correct error terms to accommodate correlation structures.
+
+The models at the different steps are as follows (with R notation):
+
+1. treatment model: YIELD ~ GENOTYPE
+2. block model: YIELD ~ BLOCK + BLOCK:PLOT
+3. treatment model: YIELD ~ GENOTYPE * YEAR
+4. block model: YIELD ~ BLOCK + (1|BLOCK:PLOT)
+5. block model: YIELD ~ BLOCK + BLOCK:YEAR + (1|BLOCK:PLOT)
+6. block model: YIELD ~ BLOCK + BLOCK:YEAR + (1|BLOCK:PLOT) + (1|BLOCK:PLOT:YEAR)
+
+For analogy with the winter wheat experiment we take the block, year and genotype effects as fixed (but you can change this), so that the final model is:
+
+YIELD ~ BLOCK + BLOCK:YEAR + GENOTYPE * YEAR + (1|BLOCK:PLOT) + (1|BLOCK:PLOT:YEAR)
+
+where the last term does not need to be fitted in R, as it is the residual term, that is fitted by default. The resulting analysis (with 'lme') is:
+
+```{r}
+mod2 <- lme(Yield ~ Block + Block:Year + Genotype*Year, 
+           random = ~1|Plot,
+           data = dataset)
+anova(mod2)
+emmeans(mod2, ~Genotype)
+```
+
+If we compare the above analyses with a 'naive' (wrong) analysis that neglects the repeated measures, we see big differences and, especially, we see that the SE for genotype means is much higher in the correct analysis.
+
+```{r}
+mod3 <- lm(Yield ~ Year/Block + Genotype*Year, 
+           data = dataset)
+anova(mod3)
+emmeans(mod3, ~Genotype)
+```
+
+I just want to conclude by saying that the above mixed model analyses regards the design as a sort of 'split-plot in time' and it is not necessarily correct, as it assumes that the within-plot correlation is the same for all pairs of observations, regardless of their distance in time. Further analyses might be necessary to assess whether serial correlation structures are necessary. But we'll consider this in a future post.
+
+Thanks for reading and happy coding!
+
+Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences        
+University of Perugia (Italy)        
+[andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)  
+
+<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow @onofriandreapg</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+---
+
+# Reference
+
+1. Piepho, H.-P., Büchse, A., Richter, C., 2004. A Mixed Modelling Approach for Randomized Experiments with Repeated Measures. Journal of Agronomy and Crop Science 190, 230–247.
+
+
+

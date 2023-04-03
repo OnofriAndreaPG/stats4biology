@@ -5,10 +5,186 @@
     <description>Recent content in mixed_models on The broken bridge between biologists and statisticians</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2018, @AndreaOnofri</copyright>
-    <lastBuildDate>Wed, 29 Mar 2023 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 30 Mar 2023 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://www.statforbiology.com/tags/mixed_models/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Repeated measures with perennial crops</title>
+      <link>https://www.statforbiology.com/2023/stat_lmm_perennialcrops/</link>
+      <pubDate>Thu, 30 Mar 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.statforbiology.com/2023/stat_lmm_perennialcrops/</guid>
+      <description>
+
+
+&lt;p&gt;In this post, I want to discuss a concept that is often mistaken by some of my collegues. With all crops, we are used to repeating experiments across years to obtain multi-year data; the structure of the resulting dataset is always the same and it is exemplified in the box below, that refers to a multi-year genotype experiment with winter wheat.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rm(list = ls())
+library(tidyverse)
+library(nlme)
+library(emmeans)
+filePath &amp;lt;- &amp;quot;https://www.casaonofri.it/_datasets/WinterWheat.csv&amp;quot;
+dataset &amp;lt;- read.csv(filePath)
+dataset &amp;lt;- dataset %&amp;gt;%
+  mutate(across(c(1:3, 5), .fns = factor))
+head(dataset)
+##   Plot Block Genotype Yield Year
+## 1    2     1 COLOSSEO  6.73 1996
+## 2  110     2 COLOSSEO  6.96 1996
+## 3  181     3 COLOSSEO  5.35 1996
+## 4    2     1 COLOSSEO  6.26 1997
+## 5  110     2 COLOSSEO  7.01 1997
+## 6  181     3 COLOSSEO  6.11 1997&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We can see that we have a column for the blocks, a column for the experimental factor (the genotype, in this instance), a column for the year and a column for the response variable (the yield, in this instance).&lt;/p&gt;
+&lt;p&gt;If we intend to take the genotype, year and block effects as fixed, we can fit the correct model with the &lt;code&gt;lm()&lt;/code&gt; function and the resulting ANOVA table looks like the following one.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod1 &amp;lt;- lm(Yield ~ Year/Block + Genotype*Year, data = dataset)
+anova(mod1)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##               Df  Sum Sq Mean Sq  F value    Pr(&amp;gt;F)    
+## Year           6 159.279 26.5466 178.3996 &amp;lt; 2.2e-16 ***
+## Genotype       7  11.544  1.6491  11.0824 2.978e-10 ***
+## Year:Block    14   3.922  0.2801   1.8826   0.03738 *  
+## Year:Genotype 42  27.713  0.6598   4.4342 6.779e-10 ***
+## Residuals     98  14.583  0.1488                       
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;As we have made different experiments in different years (and with a different randomisation in each year, hopefully), the block effect can only be considered as nested within each year (‘Year/Block’ and not ’Year*Block’). As for the rest, the ANOVA table is very close to that for any types of two-factors factorial experiments.&lt;/p&gt;
+&lt;p&gt;The things change dramatically if we have a perennial crop, or a crop with a cycle lasting for more than one year, because yield measurements are taken repeatedly in the same plots across years. For this reason, even though the dataset looks very much like the previous one, it must be analysed in a totally different manner. Based on my experience as an editor of International Journals, I can say that several authors, still today, tend to forget this, resulting in several rejections or, at least, delays in publication.&lt;/p&gt;
+&lt;p&gt;Let’s consider the dataset below, that refers to the yield of lucerne genotypes in three consecutive years, taken from the same plots in a single experiment lasting for three years.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;filePath &amp;lt;- &amp;quot;https://www.casaonofri.it/_datasets/alfalfa3years.csv&amp;quot;
+dataset &amp;lt;- read.csv(filePath)
+dataset &amp;lt;- dataset %&amp;gt;%
+  mutate(across(c(1:3), .fns = factor))
+head(dataset)
+##   Block Genotype Year     Yield
+## 1     1 4cascine 2006  6.631775
+## 2     2 4cascine 2006  6.705397
+## 3     3 4cascine 2006  6.499588
+## 4     4 4cascine 2006  7.087686
+## 5     1 4cascine 2007 14.964927
+## 6     2 4cascine 2007 13.584865&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If we analyse tha data as in the winter wheat example, we neglect that the observations are grouped within the same plots and, therefore, they are correlated. Consequently, the independence assumption is broken and it is no wonder that the manuscript must be rejected. What should we do, then?&lt;/p&gt;
+&lt;p&gt;First of all, we should build a new variable to uniquely identify each plot; it is easy, if we think that yield values taken for the same genotype in the same block must have been taken in the same plot.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Refernce the plots
+dataset$Plot &amp;lt;- dataset$Block:dataset$Genotype&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Next, we can follow the usual rules to build the model (Piepho et al., 2004):&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Consider one single year and build the treatment model&lt;/li&gt;
+&lt;li&gt;Consider one single year and build the block model&lt;/li&gt;
+&lt;li&gt;Include the year factor into the model and combine the year with all the effects in the treatment model, by crossing or nesting as appropriate.&lt;/li&gt;
+&lt;li&gt;Consider that the ‘plot’ factor in the block model references the randomisation units, i.e. those units which received the the genotypes by a randomisation process. Assign to this plot factor a random effect.&lt;/li&gt;
+&lt;li&gt;Excluding the terms for randomisation units, nest the year in all the other terms in the block model.&lt;/li&gt;
+&lt;li&gt;Combine random effects for randomisation units with the repeated factor, by using the colon operator, in order to derive the correct error terms to accommodate correlation structures.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The models at the different steps are as follows (with R notation):&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;treatment model: YIELD ~ GENOTYPE&lt;/li&gt;
+&lt;li&gt;block model: YIELD ~ BLOCK + BLOCK:PLOT&lt;/li&gt;
+&lt;li&gt;treatment model: YIELD ~ GENOTYPE * YEAR&lt;/li&gt;
+&lt;li&gt;block model: YIELD ~ BLOCK + (1|BLOCK:PLOT)&lt;/li&gt;
+&lt;li&gt;block model: YIELD ~ BLOCK + BLOCK:YEAR + (1|BLOCK:PLOT)&lt;/li&gt;
+&lt;li&gt;block model: YIELD ~ BLOCK + BLOCK:YEAR + (1|BLOCK:PLOT) + (1|BLOCK:PLOT:YEAR)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;For analogy with the winter wheat experiment we take the block, year and genotype effects as fixed (but you can change this), so that the final model is:&lt;/p&gt;
+&lt;p&gt;YIELD ~ BLOCK + BLOCK:YEAR + GENOTYPE * YEAR + (1|BLOCK:PLOT) + (1|BLOCK:PLOT:YEAR)&lt;/p&gt;
+&lt;p&gt;where the last term does not need to be fitted in R, as it is the residual term, that is fitted by default. The resulting analysis (with ‘lme’) is:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod2 &amp;lt;- lme(Yield ~ Block + Block:Year + Genotype*Year, 
+           random = ~1|Plot,
+           data = dataset)
+anova(mod2)
+##               numDF denDF   F-value p-value
+## (Intercept)       1   114 27080.051  &amp;lt;.0001
+## Block             3    57     2.139  0.1053
+## Genotype         19    57     4.602  &amp;lt;.0001
+## Year              2   114  2107.322  &amp;lt;.0001
+## Block:Year        6   114     3.818  0.0017
+## Year:Genotype    38   114     1.356  0.1115
+emmeans(mod2, ~Genotype)
+##  Genotype          emmean    SE df lower.CL upper.CL
+##  4cascine           11.59 0.315 57    10.96     12.2
+##  casalina           12.46 0.315 57    11.83     13.1
+##  classe             11.59 0.315 57    10.96     12.2
+##  costanza            9.89 0.315 57     9.26     10.5
+##  dimitra            11.75 0.315 57    11.12     12.4
+##  FDL0101            12.22 0.315 57    11.59     12.9
+##  garisenda          11.76 0.315 57    11.13     12.4
+##  LaBellaCampagnola  12.17 0.315 57    11.54     12.8
+##  LaTorre            11.36 0.315 57    10.73     12.0
+##  linfa              11.23 0.315 57    10.60     11.9
+##  marina             11.76 0.315 57    11.13     12.4
+##  Palladiana         10.89 0.315 57    10.26     11.5
+##  PicenaGR           12.12 0.315 57    11.49     12.8
+##  PR56S82            11.56 0.315 57    10.93     12.2
+##  PR57Q53            11.70 0.315 57    11.07     12.3
+##  prosementi         11.79 0.315 57    11.15     12.4
+##  RivieraVicentina    9.98 0.315 57     9.35     10.6
+##  robot              12.11 0.315 57    11.48     12.7
+##  Selene             12.11 0.315 57    11.48     12.7
+##  Zenith             11.94 0.315 57    11.31     12.6
+## 
+## Results are averaged over the levels of: Block, Year 
+## Degrees-of-freedom method: containment 
+## Confidence level used: 0.95&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If we compare the above analyses with a ‘naive’ (wrong) analysis that neglects the repeated measures, we see big differences and, especially, we see that the SE for genotype means is much higher in the correct analysis.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod3 &amp;lt;- lm(Yield ~ Year/Block + Genotype*Year, 
+           data = dataset)
+anova(mod3)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##                Df  Sum Sq Mean Sq   F value    Pr(&amp;gt;F)    
+## Year            2 2602.53 1301.27 1608.2407 &amp;lt; 2.2e-16 ***
+## Genotype       19  104.27    5.49    6.7824 4.256e-13 ***
+## Year:Block      9   21.80    2.42    2.9930  0.002449 ** 
+## Year:Genotype  38   31.83    0.84    1.0351  0.424687    
+## Residuals     171  138.36    0.81                        
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+emmeans(mod3, ~Genotype)
+##  Genotype          emmean   SE  df lower.CL upper.CL
+##  4cascine           11.59 0.26 171    11.07     12.1
+##  casalina           12.46 0.26 171    11.94     13.0
+##  classe             11.59 0.26 171    11.08     12.1
+##  costanza            9.89 0.26 171     9.38     10.4
+##  dimitra            11.75 0.26 171    11.24     12.3
+##  FDL0101            12.22 0.26 171    11.71     12.7
+##  garisenda          11.76 0.26 171    11.24     12.3
+##  LaBellaCampagnola  12.17 0.26 171    11.66     12.7
+##  LaTorre            11.36 0.26 171    10.84     11.9
+##  linfa              11.23 0.26 171    10.72     11.7
+##  marina             11.76 0.26 171    11.25     12.3
+##  Palladiana         10.89 0.26 171    10.38     11.4
+##  PicenaGR           12.12 0.26 171    11.61     12.6
+##  PR56S82            11.56 0.26 171    11.05     12.1
+##  PR57Q53            11.70 0.26 171    11.19     12.2
+##  prosementi         11.79 0.26 171    11.27     12.3
+##  RivieraVicentina    9.98 0.26 171     9.47     10.5
+##  robot              12.11 0.26 171    11.59     12.6
+##  Selene             12.11 0.26 171    11.60     12.6
+##  Zenith             11.94 0.26 171    11.42     12.5
+## 
+## Results are averaged over the levels of: Block, Year 
+## Confidence level used: 0.95&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I just want to conclude by saying that the above mixed model analyses regards the design as a sort of ‘split-plot in time’ and it is not necessarily correct, as it assumes that the within-plot correlation is the same for all pairs of observations, regardless of their distance in time. Further analyses might be necessary to assess whether serial correlation structures are necessary. But we’ll consider this in a future post.&lt;/p&gt;
+&lt;p&gt;Thanks for reading and happy coding!&lt;/p&gt;
+&lt;p&gt;Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+&lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;hr /&gt;
+&lt;div id=&#34;reference&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Reference&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Piepho, H.-P., Büchse, A., Richter, C., 2004. A Mixed Modelling Approach for Randomized Experiments with Repeated Measures. Journal of Agronomy and Crop Science 190, 230–247.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Subsampling in field experiments</title>
@@ -19,13 +195,13 @@
       <description>
 
 
-&lt;p&gt;Subsampling is very common in field experiments in agriculture. It happens when we collect several random samples from each plot and we submit them to some sort of measurement process. Some examples? Let’s look at the following (very incomplete) list.&lt;/p&gt;
+&lt;p&gt;Subsampling is very common in field experiments in agriculture. It happens when we collect several random samples from each plot and we submit them to some sort of measurement process. Some examples? Let’s imagine that we have randomised field experiments with three replicates and, either,:&lt;/p&gt;
 &lt;ol style=&#34;list-style-type: decimal&#34;&gt;
-&lt;li&gt;We collect the whole grain yield in each plot, select four subsamples and measure, in each subsample, the oil content or some other relevant chemical property.&lt;/li&gt;
-&lt;li&gt;We collect, from each plot, four plants and measure their height.&lt;/li&gt;
-&lt;li&gt;We collect a representative soil samples from each plot and analyse the residual content in some xenobiotic substance, by making four repeated measurements.&lt;/li&gt;
+&lt;li&gt;we collect the whole grain yield in each plot, select four subsamples and measure, in each subsample, the oil content or some other relevant chemical property, or&lt;/li&gt;
+&lt;li&gt;we collect, from each plot, four plants and measure their heights, or&lt;/li&gt;
+&lt;li&gt;we collect a representative soil sample from each plot and perform chemical analyses in triplicate.&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;The presence of sub-samples is a good thing, as long as true-replicates are also available. Indeed, the precision of our experiment increases, although the process of data analysis must be run properly. We should bear in mind that, if the experimental design is, e.g., a Randomised Complete Block with four replicates, for all the above examples we end up with sixteen values for each experimental treatment (four replicates and four sub-samples per replicate). It must be clear that the four sub-samples are not like true-replicates, because the experimental treatments were not independently allocated to each of them. The four subsamples are sub-replicates (or pseudo-replicates) and we should account for this when we analyse our data.&lt;/p&gt;
+&lt;p&gt;For all the above examples, we end up with 3 by 4 equal 12 data for each treatment level. The question is: do we have 12 replicates? This is exactly the point: &lt;strong&gt;subsamples should never be mistaken for true-replicates, as the experimental treatments were not independently allocated to each one of them&lt;/strong&gt;. In literature, subsamples are usually known as sub-replicates or pseudo-replicates: for the above examples, we have three true-replicates and four pseudo-replicates per true-replicate. Let’s see how to handle pseudo-replicates in data analysis. But, first of all, do not forget that: &lt;strong&gt;experiments with pseudo-replicates are valid only when we also have true-replicates!&lt;/strong&gt; If we only have pseudo-replicates… well, there is nothing we can do in data analysis that transforms our experiment into a valid one…&lt;/p&gt;
 &lt;div id=&#34;a-motivating-example&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;A motivating example&lt;/h1&gt;
 &lt;p&gt;Let’s consider a dataset from an experiment where we had 30 genotypes in three blocks and recorded the Weight of Thousand Kernels (TKW) in three subsamples per plot, which were labelled by using the ‘Sample’ variable. In the box below, we load the data and all the necessary packages.&lt;/p&gt;
@@ -49,7 +225,7 @@ head(TKW)
 &lt;/div&gt;
 &lt;div id=&#34;the-wrong-analysis&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;The wrong analysis&lt;/h1&gt;
-&lt;p&gt;A naive analysis would be to perform an ANOVA on all data, without making any distinction between true-replicates and sub-replicates. Let’s do this by using the code shown in the box below.&lt;/p&gt;
+&lt;p&gt;A ‘naive’ analysis would be to perform an ANOVA on all data, without making any distinction between true-replicates and sub-replicates. Let’s do this by using the code shown in the box below.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Naive analysis
 mod &amp;lt;- lm(TKW ~ Block + Genotype, data=TKW)
 anova(mod)
@@ -62,75 +238,133 @@ anova(mod)
 ## Residuals 238 1748.4   7.346                      
 ## ---
 ## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
-summary(mod)$sigma
-## [1] 2.710373
+muG &amp;lt;- emmeans(mod, ~Genotype)
+muG
+##  Genotype   emmean    SE  df lower.CL upper.CL
+##  Achille      34.7 0.903 238     32.9     36.4
+##  Alemanno     41.6 0.903 238     39.8     43.4
+##  AncoMarzio   32.7 0.903 238     31.0     34.5
+##  Arnacoris    24.5 0.903 238     22.7     26.3
+##  Casanova     38.6 0.903 238     36.9     40.4
+##  Chiara       30.0 0.903 238     28.2     31.8
+##  Ciccio       33.5 0.903 238     31.7     35.2
+##  Ciclope      37.4 0.903 238     35.6     39.1
+##  Claudio      40.7 0.903 238     38.9     42.5
+##  Creso        37.8 0.903 238     36.0     39.6
+##  Dario        30.9 0.903 238     29.1     32.7
+##  Duilio       32.1 0.903 238     30.3     33.9
+##  Dylan        36.5 0.903 238     34.8     38.3
+##  Imhotep      34.8 0.903 238     33.1     36.6
+##  Iride        30.8 0.903 238     29.0     32.6
+##  Isildur      26.0 0.903 238     24.2     27.8
+##  K26          33.5 0.903 238     31.7     35.2
+##  Latinur      37.5 0.903 238     35.7     39.3
+##  Liberdur     22.8 0.903 238     21.1     24.6
+##  Meridiano    30.8 0.903 238     29.0     32.6
+##  Neolatino    36.9 0.903 238     35.1     38.7
+##  Normanno     36.8 0.903 238     35.0     38.6
+##  PR22D40      26.2 0.903 238     24.4     28.0
+##  PR22D89      44.0 0.903 238     42.3     45.8
+##  Principe     37.2 0.903 238     35.4     39.0
+##  Saragolla    35.9 0.903 238     34.1     37.6
+##  Sfinge       40.5 0.903 238     38.8     42.3
+##  Simeto       41.1 0.903 238     39.3     42.9
+##  Solex        34.6 0.903 238     32.9     36.4
+##  Virgilio     29.5 0.903 238     27.7     31.2
+## 
+## Results are averaged over the levels of: Block 
+## Confidence level used: 0.95
 pairwise &amp;lt;- as.data.frame(pairs(emmeans(mod, ~Genotype)))
 sum(pairwise$p.value &amp;lt; 0.05)
 ## [1] 225&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;We see that the Root Mean Square Error is 2.71, the F test for the genotypes is highly significant and there are 225 significant pairwise comparisons among the 30 genotypes.&lt;/p&gt;
-&lt;p&gt;As we said, this is simple, but it is also &lt;strong&gt;terribly wrong&lt;/strong&gt;. By putting true-replicates and pseudo-replicates on an equal footing, we have forgotten that the 270 observations are grouped by plot and that the observations in the same plot are more alike than the observations in different plots, because they share the same ‘origin’. We say that the observations in each plot are correlated and, therefore, the basic assumption of independence of residuals is violated. Our analysis is invalid and our manuscript can be very likely rejected.&lt;/p&gt;
+&lt;p&gt;We see that the SE for genotype means is 0.903, the F test for the genotypes is highly significant and there are 225 significant pairwise comparisons among the 30 genotypes.&lt;/p&gt;
+&lt;p&gt;As we said, this is simple, but it is also &lt;strong&gt;terribly wrong&lt;/strong&gt;. By putting true-replicates and pseudo-replicates on an equal footing, we have forgotten that the 270 observations are grouped by plot and that the observations in the same plot are more alike than the observations in different plots, because they share the same ‘origin’. We say that the observations in each plot are correlated and, therefore, the basic assumption of independence of residuals is broken. Our analysis is invalid and our manuscript can be very likely rejected.&lt;/p&gt;
 &lt;p&gt;But, why are the editors so critical when we mistake pseudo-replicates for true-replicates? We’ll see this in a few minutes.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;the-correct-way-to-go&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;The correct way to go&lt;/h1&gt;
 &lt;p&gt;A fully correct model for our dataset is:&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ y_{ijks} = \mu + \alpha_i + \beta_j + \gamma_{k} + \varepsilon_{s}\]&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(y\)&lt;/span&gt; is the thousand kernel weight for the i&lt;sup&gt;th&lt;/sup&gt; genotype, j&lt;sup&gt;th&lt;/sup&gt; block, k&lt;sup&gt;th&lt;/sup&gt; plot and s&lt;sup&gt;th&lt;/sup&gt; sub-sample, &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt; is the effect of the i&lt;sup&gt;th&lt;/sup&gt; genotype, &lt;span class=&#34;math inline&#34;&gt;\(\beta\)&lt;/span&gt; is the effect of the j&lt;sup&gt;th&lt;/sup&gt; block, &lt;span class=&#34;math inline&#34;&gt;\(\gamma\)&lt;/span&gt; is the effect of the the k&lt;sup&gt;th&lt;/sup&gt; plot and &lt;span class=&#34;math inline&#34;&gt;\(\varepsilon\)&lt;/span&gt; is the effect of the s&lt;sup&gt;th&lt;/sup&gt; subsample. The presence of the &lt;span class=&#34;math inline&#34;&gt;\(\gamma\)&lt;/span&gt; element accounts for the plot as a grouping factor and restores the independence of model residuals.&lt;/p&gt;
-&lt;p&gt;Obviously, the difference between plots (for a given genotype and block) must be regarded as a random effect, as well as the difference between subplots, within each plot. Indeed. we have two random effects and, therefore, this is a mixed model. These two random effects are assumed to be normal, independent from each other, with mean equal to 0 and variances respectively equal to &lt;span class=&#34;math inline&#34;&gt;\(\sigma^2_p\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(\sigma^2_e\)&lt;/span&gt;. (BTW: I am regarding the block as fixed! You may not agree, but this does not change what I am going to say later…).&lt;/p&gt;
-&lt;p&gt;We can fit this mixed model by using the &lt;code&gt;lme()&lt;/code&gt; function in the &lt;code&gt;nlme&lt;/code&gt; package.&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(y\)&lt;/span&gt; is the thousand kernel weight for the i&lt;sup&gt;th&lt;/sup&gt; genotype, j&lt;sup&gt;th&lt;/sup&gt; block, k&lt;sup&gt;th&lt;/sup&gt; plot and s&lt;sup&gt;th&lt;/sup&gt; subsample, &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt; is the effect of the i&lt;sup&gt;th&lt;/sup&gt; genotype, &lt;span class=&#34;math inline&#34;&gt;\(\beta\)&lt;/span&gt; is the effect of the j&lt;sup&gt;th&lt;/sup&gt; block, &lt;span class=&#34;math inline&#34;&gt;\(\gamma\)&lt;/span&gt; is the effect of the the k&lt;sup&gt;th&lt;/sup&gt; plot and &lt;span class=&#34;math inline&#34;&gt;\(\varepsilon\)&lt;/span&gt; is the effect of the s&lt;sup&gt;th&lt;/sup&gt; subsample. The presence of the &lt;span class=&#34;math inline&#34;&gt;\(\gamma\)&lt;/span&gt; element accounts for the effects of plots as a grouping factor and restores the independence of model residuals.&lt;/p&gt;
+&lt;p&gt;Obviously, the difference between plots (for a given genotype and block) must be regarded as a random effect, as well as the difference between subsamples, within each plot. Indeed. we have two random effects and, therefore, this is a mixed model. These two random effects are assumed to be normal, independent from each other, with mean equal to 0 and variances respectively equal to &lt;span class=&#34;math inline&#34;&gt;\(\sigma^2_p\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(\sigma^2_e\)&lt;/span&gt;. (BTW: I am regarding the block effect as fixed! You may not agree, but this does not change what I am going to say later…).&lt;/p&gt;
+&lt;p&gt;We can fit this mixed model by using the &lt;code&gt;lme()&lt;/code&gt; function in the &lt;code&gt;nlme&lt;/code&gt; package, including the ‘Plot’ (i.e. the grouping factor) as a random effect. Obviously, we need to have a variable in the dataset that uniquely identifies each plot.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Mixed model fit
 mod.mix &amp;lt;- lme(TKW ~ Block + Genotype, 
-               random=~1|Plot, data=TKW)
-sigma2.p &amp;lt;- as.numeric( VarCorr(mod.mix) )[1]
-sigma2.e &amp;lt;- as.numeric( VarCorr(mod.mix) )[2]
-sigma2.p
-## [1] 8.891984
-sigma2.e
-## [1] 0.8452593
+               random = ~1|Plot, data=TKW)
 anova(mod.mix)
 ##             numDF denDF   F-value p-value
 ## (Intercept)     1   180 11563.536  &amp;lt;.0001
 ## Block           2    58     2.005  0.1439
 ## Genotype       29    58     9.052  &amp;lt;.0001
+emmeans(mod.mix, ~Genotype)
+##  Genotype   emmean   SE df lower.CL upper.CL
+##  Achille      34.7 1.75 58     31.2     38.2
+##  Alemanno     41.6 1.75 58     38.1     45.1
+##  AncoMarzio   32.7 1.75 58     29.2     36.2
+##  Arnacoris    24.5 1.75 58     21.0     28.0
+##  Casanova     38.6 1.75 58     35.1     42.1
+##  Chiara       30.0 1.75 58     26.5     33.5
+##  Ciccio       33.5 1.75 58     30.0     37.0
+##  Ciclope      37.4 1.75 58     33.9     40.9
+##  Claudio      40.7 1.75 58     37.2     44.2
+##  Creso        37.8 1.75 58     34.3     41.3
+##  Dario        30.9 1.75 58     27.4     34.4
+##  Duilio       32.1 1.75 58     28.6     35.6
+##  Dylan        36.5 1.75 58     33.0     40.0
+##  Imhotep      34.8 1.75 58     31.3     38.3
+##  Iride        30.8 1.75 58     27.3     34.3
+##  Isildur      26.0 1.75 58     22.5     29.5
+##  K26          33.5 1.75 58     30.0     37.0
+##  Latinur      37.5 1.75 58     34.0     41.0
+##  Liberdur     22.8 1.75 58     19.3     26.3
+##  Meridiano    30.8 1.75 58     27.3     34.3
+##  Neolatino    36.9 1.75 58     33.4     40.4
+##  Normanno     36.8 1.75 58     33.3     40.3
+##  PR22D40      26.2 1.75 58     22.7     29.7
+##  PR22D89      44.0 1.75 58     40.5     47.5
+##  Principe     37.2 1.75 58     33.7     40.7
+##  Saragolla    35.9 1.75 58     32.4     39.4
+##  Sfinge       40.5 1.75 58     37.0     44.0
+##  Simeto       41.1 1.75 58     37.6     44.6
+##  Solex        34.6 1.75 58     31.1     38.1
+##  Virgilio     29.5 1.75 58     26.0     33.0
+## 
+## Results are averaged over the levels of: Block 
+## Degrees-of-freedom method: containment 
+## Confidence level used: 0.95
 pairwise &amp;lt;- as.data.frame(pairs(emmeans(mod.mix, ~Genotype)))
 sum(pairwise$p.value &amp;lt; 0.05)
 ## [1] 91&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;We already see several differences with respect to the previous fit:&lt;/p&gt;
+&lt;p&gt;We see several differences with respect to the previous fit:&lt;/p&gt;
 &lt;ol style=&#34;list-style-type: decimal&#34;&gt;
-&lt;li&gt;in the ‘naive’ model, we have only one estimate for &lt;span class=&#34;math inline&#34;&gt;\(\sigma^2\)&lt;/span&gt;, that is 7.346 with 238 DF. In this case the correct term to test for the genotype effect is &lt;span class=&#34;math inline&#34;&gt;\(\sigma^2_p\)&lt;/span&gt;, that is equal to 8.892 with 58 DF. Clearly, the naive analysis strongly overestimates the number of DF: the observations taken in the same plot are correlated and they do not contribute full information.&lt;/li&gt;
-&lt;li&gt;The RMSE for the mixed model is equal to 2.98 and it is higher than that from the ‘naive’ fit. The variability within plot is much smaller.&lt;/li&gt;
+&lt;li&gt;in the ‘naive’ model, the error term for the genotype effect (MS&lt;sub&gt;e&lt;/sub&gt;) is 7.346 with 238 DF and it represents the whole subsample-to-subsample variability. In the mixed model, the error term for the genotype effect is not shown, but it has only 58 degrees of freedom.&lt;/li&gt;
+&lt;li&gt;The SE for genotype means is 1.75 and it is much higher than that from the ‘naive’ fit.&lt;/li&gt;
 &lt;li&gt;The number of significant pairwise comparisons between genotypes has dropped to 91.&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;You may wonder why &lt;span class=&#34;math inline&#34;&gt;\(\sigma^2_p\)&lt;/span&gt;, instead of &lt;span class=&#34;math inline&#34;&gt;\(\sigma\)&lt;/span&gt; or &lt;span class=&#34;math inline&#34;&gt;\(\sigma^2_e\)&lt;/span&gt; is the correct error term for the genotypes. Because it is the only correct estimate of the random difference between the true-replicates that were independently submitted to the same treatment.&lt;/p&gt;
-&lt;p&gt;We can now understand why the editors reject our manuscript if we do not analyse the data properly: we may strongly overestimate the precision of our experiment and, consequently, commit a lot of false positive errors!&lt;/p&gt;
+&lt;p&gt;Let’s concentrate on the correct error term for the genotype effect; we know that the &lt;em&gt;error term must be obtained by a comparison of plots treated alike&lt;/em&gt; (see Fisher, 1937. The design of experiments). From this, it is immediately clear that the MS&lt;sub&gt;e&lt;/sub&gt; from te ‘naive’ analysis compares the subsamples treated alike (and not the plots). Now, if we take the ‘naive’ analysis and include the ‘plot’ among the experimental factors, we get:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod2 &amp;lt;- lm(TKW ~ Block + Genotype + Plot, data=TKW)
+anova(mod2)
+## Analysis of Variance Table
+## 
+## Response: TKW
+##            Df Sum Sq Mean Sq F value    Pr(&amp;gt;F)    
+## Block       2  110.3  55.169  65.269 &amp;lt; 2.2e-16 ***
+## Genotype   29 7224.7 249.129 294.736 &amp;lt; 2.2e-16 ***
+## Plot       58 1596.2  27.521  32.559 &amp;lt; 2.2e-16 ***
+## Residuals 180  152.1   0.845                      
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We see that the ‘plot’ effect, once the genotype and block effects have been removed, takes 58 DFs and leave us with 180 DFs in the residuals. Indeed, we have decomposed the MS&lt;sub&gt;e&lt;/sub&gt; from the ‘naive’ analysis in two parts, one measuring the plot-to-plot variability and the other one measuring the subsample-to-subsample variability, within each plot. The MS for this latter element is equal to &lt;span class=&#34;math inline&#34;&gt;\(\sigma_e\)&lt;/span&gt; from mixed model analysis, while the MS for the former element is the correct error term to test for the genotype effect, because it &lt;em&gt;compares the plots treated alike&lt;/em&gt;. It is equal to &lt;span class=&#34;math inline&#34;&gt;\(3 \times \sigma^2_p + \sigma^2_e\)&lt;/span&gt; and it should be used to calculate the SEs for genotype means, as &lt;span class=&#34;math inline&#34;&gt;\(\sqrt{27.521/9} = 1.748689\)&lt;/span&gt; and not as &lt;span class=&#34;math inline&#34;&gt;\(\sqrt{7.346/9} = 0.90345\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;We can now understand why the editors reject our manuscripts if we do not analyse the data properly: we may strongly overestimate the precision of our experiment and, consequently, commit a lot of false positive errors!&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;a-simpler-alternative&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;A simpler alternative&lt;/h1&gt;
-&lt;p&gt;We strongly recommend the previous method of data analysis. But, should you like to avoid the use of mixed models by all means (tell me,… why?), whenever the number of sub-samples is the same for all plots, we can also reach correct results by proceeding in two-steps. In the first step, we calculate the means of sub-samples for each plot and, in the second step, we submit the plot means to ANOVA, by considering the genotype and the block as fixed factors.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# First step, to get an estimate of the within plot error
-mod1step &amp;lt;- lm(TKW ~ Plot, data=TKW)
-summary(mod1step)$sigma^2
-## [1] 0.8452593
-# Calculate the means per plot
-avgTKW &amp;lt;- as.data.frame(emmeans(mod1step, ~Plot))
-head(avgTKW)
-##   Plot   emmean        SE  df lower.CL upper.CL
-## 1    1 28.56667 0.5308042 180 27.51927 29.61407
-## 2    2 34.86667 0.5308042 180 33.81927 35.91407
-## 3    3 23.66667 0.5308042 180 22.61927 24.71407
-## 4    4 29.40000 0.5308042 180 28.35260 30.44740
-## 5    5 27.30000 0.5308042 180 26.25260 28.34740
-## 6    6 34.96667 0.5308042 180 33.91927 36.01407
-# Recover infos on experimental design
-Genotype &amp;lt;- plyr::ddply(TKW, ~Plot,                   
-        function(dataSet){as.character(dataSet[[&amp;quot;Genotype&amp;quot;]][1])} )[,2]
-Block &amp;lt;-  plyr::ddply(TKW, ~Plot, 
-                  function(dataSet){as.factor(dataSet[[&amp;quot;Block&amp;quot;]][1])} )[,2]
-dataset2step &amp;lt;- data.frame(Block, Genotype, TKW = avgTKW$emmean)
-dataset2step$Block &amp;lt;- factor(dataset2step$Block)
+&lt;p&gt;In presence of subsampling, we strongly recommend the previous method of data analysis. But, a simpler alternative exists, which is feasible whenever the number of subsamples is the same for all plots: we can proceed in two-steps. In the first step, we calculate the means of subsamples for each plot and, in the second step, we submit the plot means to ANOVA, by considering the genotypes and the blocks as fixed factors.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# First step
+TKWm &amp;lt;- aggregate(TKW ~ Block + Genotype, data = TKW, mean)
 
 #Second step
-mod2step &amp;lt;- lm(TKW ~ Genotype + Block, data = dataset2step)
+mod2step &amp;lt;- lm(TKW ~ Genotype + Block, data = TKWm)
 anova(mod2step)
 ## Analysis of Variance Table
 ## 
@@ -141,10 +375,45 @@ anova(mod2step)
 ## Residuals 58  532.08   9.174                      
 ## ---
 ## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+emmeans(mod2step, ~Genotype)
+##  Genotype   emmean   SE df lower.CL upper.CL
+##  Achille      34.7 1.75 58     31.2     38.2
+##  Alemanno     41.6 1.75 58     38.1     45.1
+##  AncoMarzio   32.7 1.75 58     29.2     36.2
+##  Arnacoris    24.5 1.75 58     21.0     28.0
+##  Casanova     38.6 1.75 58     35.1     42.1
+##  Chiara       30.0 1.75 58     26.5     33.5
+##  Ciccio       33.5 1.75 58     30.0     37.0
+##  Ciclope      37.4 1.75 58     33.9     40.9
+##  Claudio      40.7 1.75 58     37.2     44.2
+##  Creso        37.8 1.75 58     34.3     41.3
+##  Dario        30.9 1.75 58     27.4     34.4
+##  Duilio       32.1 1.75 58     28.6     35.6
+##  Dylan        36.5 1.75 58     33.0     40.0
+##  Imhotep      34.8 1.75 58     31.3     38.3
+##  Iride        30.8 1.75 58     27.3     34.3
+##  Isildur      26.0 1.75 58     22.5     29.5
+##  K26          33.5 1.75 58     30.0     37.0
+##  Latinur      37.5 1.75 58     34.0     41.0
+##  Liberdur     22.8 1.75 58     19.3     26.3
+##  Meridiano    30.8 1.75 58     27.3     34.3
+##  Neolatino    36.9 1.75 58     33.4     40.4
+##  Normanno     36.8 1.75 58     33.3     40.3
+##  PR22D40      26.2 1.75 58     22.7     29.7
+##  PR22D89      44.0 1.75 58     40.5     47.5
+##  Principe     37.2 1.75 58     33.7     40.7
+##  Saragolla    35.9 1.75 58     32.4     39.4
+##  Sfinge       40.5 1.75 58     37.0     44.0
+##  Simeto       41.1 1.75 58     37.6     44.6
+##  Solex        34.6 1.75 58     31.1     38.1
+##  Virgilio     29.5 1.75 58     26.0     33.0
+## 
+## Results are averaged over the levels of: Block 
+## Confidence level used: 0.95
 pairwise &amp;lt;- as.data.frame(pairs(emmeans(mod2step, ~Genotype)))
 sum(pairwise$p.value &amp;lt; 0.05)
 ## [1] 91&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;We see that the results are totally the same as with a mixed model fit, although all Mean Squares in ANOVA are fractions of those obtained by mixed model analyses.&lt;/p&gt;
+&lt;p&gt;We see that the results are totally the same as with a mixed model fit, although all Mean Squares in ANOVA are fractions of those obtained by mixed model analysis.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Please, remember that this simple solution is only feasible when we have the same number of subsamples per each plot&lt;/strong&gt;.&lt;/p&gt;
 &lt;p&gt;Thanks for reading and happy coding!&lt;/p&gt;
 &lt;p&gt;Andrea Onofri&lt;br /&gt;
@@ -153,6 +422,14 @@ University of Perugia (Italy)&lt;br /&gt;
 &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
 &lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
 &lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Fisher, R.A., 1937. The design of experiments, 2nd ed. Oliver and Boyd, Edinburgh, UK.&lt;/li&gt;
+&lt;li&gt;Hurlbert, S.H., 1984. Pseudoreplication and the design of ecological experiments. Ecological Monographs 54, 187–211.&lt;/li&gt;
+&lt;/ol&gt;
 &lt;/div&gt;
 </description>
     </item>
