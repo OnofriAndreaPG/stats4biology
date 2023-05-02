@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.12 (Anno Accademico 2021-2022), compil. 2022-11-15"
+date: "Update: v. 1.12 (Anno Accademico 2021-2022), compil. 2023-05-02"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -5644,7 +5644,7 @@ Pur essendo entrambi gli approcci corretti, il secondo è certamente più elegan
 
 Le domande e gli esercizi che seguono sono organizzati per capitolo, in modo che possiate verificare, di volta in volta, se avete acquisito le competenze necessarie per passare al capitolo successivo.
 
-## Capitolo 1
+## Introduzione alla biometria (Cap. 1)
 
 ### Domanda 1
 
@@ -5667,7 +5667,7 @@ Qual è la differenza tra repliche vere e pseudo-repliche?
 Cosa è il confounding e come può rendere distorti i risultati di un esperimento scientifico?
 
 
-## Capitolo 2
+## Disegno sperimentale (Cap. 2)
 
 ### Esercizio 1
 
@@ -5698,7 +5698,7 @@ Descrivete lo schema sperimentale che utilizzereste per organizzare una prova su
 
 ---
 
-## Capitolo 3
+## Statistica descrittiva (Cap. 3)
 
 ### Esercizio 1
 
@@ -5736,7 +5736,7 @@ Caricare il datasets 'students' disponibile al link: 'https://www.casaonofri.it/
 
 ---
 
-## Capitolo 4
+## Modelli statistici (Cap. 4)
 
 ### Esercizio 1
 
@@ -5812,7 +5812,7 @@ Considerando il testo dell'esercizio 6, simulare un esperimento in cui l'insetti
 
 ---
 
-## Capitolo 5
+## Stima dei parametri (Cap. 5)
 
 ### Esercizio 1
 
@@ -5854,7 +5854,7 @@ Assumendo che la relazione sia lineare (retta), stimare la pendenza e l'intercet
 
 ---
 
-## Capitolo 6
+## Inferenza (Cap. 6)
 
 ### Esercizio 1
 
@@ -6013,9 +6013,11 @@ Stabilire se la dieta è efficace, con una probabilità di errore P < 0.05.
 
 ---
 
-## Capitoli da 7 a 9
+## Modelli ANOVA ad una via (Cap. da 7 a 9)
 
-### Esercizio 1
+Gli esercizi che seguono sono basati su una serie di dataset, disponibili in un file Excel, che può essere scaricato da [questo link](https://www.casaonofri.it/_datasets/EserciziTesto.xlsx). Ogni dataset è in un foglio a parte, il cui nome viene fornito nel testo di ciascun esercizio.
+
+### Esercizio 1 
 
 Un esperimento a randomizzazione completa relativo ad una prova varietale di frumento ha l'obiettivo di porre a confronto la produzione di 5 varietà. Le produzioni (in bushels per acre) osservate siano le seguenti:
 
@@ -6028,6 +6030,7 @@ Un esperimento a randomizzazione completa relativo ad una prova varietale di fru
 |    E    | 21.7 | 24.5 | 23.4 |
 
 Eseguire l'ANOVA, presentare i risultati e commentarli (esempio tratto da Le Clerg *et al*., 1962)
+[Sheet: 7.1]
 
 ### Esercizio 2
 
@@ -6042,6 +6045,7 @@ Colture di tessuto di pomodoro sono state allevate su capsule Petri trattate con
 |   42    |   33    |    27    |   34    |
 
 Calcolare le medie ed eseguire l'ANOVA. Eseguire i test di confronto multiplo. Commentare i risultati.
+[Sheet: 7.2]
 
 ### Esercizio 3
 
@@ -6075,6 +6079,7 @@ E'stato impostato un test di durata su un impianto di riscaldamento, per verific
 |  1708 |              729 |
 
 Valutare se la temperatura di esercizio infleunza significativamente la durata del riscaldatore. Quale/i temperatura/e consentono la maggior durata?
+[Sheet: 7.3]
 
 ### Esercizio 4
 
@@ -6099,10 +6104,11 @@ Un entomologo ha contato il numero di uova deposte da un lepidottero sulle fogli
 |     15 |   153 |       218 |  734 |
 
 Eseguite l'ANOVA. Quali sono le assunzioni necessarie per l'ANOVA? Sono rispettate? Vi sono outliers? Calcolate SEM e SED in modo attendibile.
+[Sheet: 7.4]
 
 ---
 
-## Capitolo 10
+## ANOVA a due vie (Cap. 10)
 
 ### Esercizio 1
 
@@ -6117,6 +6123,7 @@ E' stato impostanto un esperimento a blocchi randomizzati per confrontare sei ti
 |       Sommersione | 403 | 380 | 336 | 101 | 293 |
 
 Eseguire l'ANOVA. Quali sono le assunzioni necessarie per l'ANOVA? Sono rispettate? Calcolate SEM e SED ed eseguite il confronto multiplo. Qual è il metodo di irrigazione migliore?
+[Sheet: 10.1]
 
 ### Esercizio 2
 
@@ -6130,7 +6137,8 @@ E' stato impostato un esperimento di fertilizzazione secondo uno schema a blocch
 |  50 lb N + 75 lb P2O5 | 10.8 | 11.2 | 8.8 | 12.9 | 10.4 |
 | 100 lb N + 75 lb P205 |  9.6 |  9.3 |  12 | 10.6 | 11.6 |
 
-Eseguire l'ANOVA, considerando il dato mancante. Calcolare SEM e SED. Qual è il trattamento migliore? Aumentare il dosaggio di N senza P2O5 è conveniente? E in presenza di P2O5?
+Eseguire l'ANOVA, considerando il dato mancante. Calcolare SEM e SED. Qual è il trattamento migliore? Aumentare il dosaggio di N senza P~2~ O~5~ è conveniente? E in presenza di P~2~ O~5~?
+[Sheet: 10.2]
 
 ### Esercizio 3
 
@@ -6156,10 +6164,11 @@ Eseguire l'ANOVA, considerando il dato mancante. Calcolare SEM e SED. Qual è il
 |          D |  4  |   3    |  163  |
 
 Analizzate i dati e commentate i risultati ottenuti
+[Sheet: 10.2]
 
 ---
 
-## Capitolo 11
+## Regressione (Cap. 11)
 
 ### Esercizio 1
 
@@ -6174,12 +6183,13 @@ Analizzate i dati e commentate i risultati ottenuti
 |   200   | 163 | 156 | 156 | 171 |
 
 Analizzare i dati e commentare i risultati
+[Sheet: 11.1]
 
 ### Esercizio 2
 
 Per valutare la soglia economica d'intervento, è necessario definire la relazione tra la densità di una pianta infestante e la perdita produttiva della coltura. Ipotizziamo che, nel range di densità osservato, il modello di competizione sia una retta. Per parametrizzare questo modello e verificarne la validità, è stato organizzato un esperimento a blocchi randomizzati, dove sono stati inclusi sette diversi livelli di infestazione di *Sinapis arvensis* ed è stata rilevata la produzione di acheni del girasole. I risultati sono:
 
-| density | Rep y | ield   |
+| density | Rep   | Yield  |
 |:-------:|------:|:-------|
 |    0    |     1 | 36.63  |
 |   14    |     1 | 29.73  |
@@ -6211,31 +6221,33 @@ Per valutare la soglia economica d'intervento, è necessario definire la relazio
 |   54    |     4 | 24.664 |
 
 Eseguire l'ANOVA e verificare il rispetto delle assunzioni di base. E'corretto eseguire un test di confronto multiplo e perchè? Eseguire l'analisi di regressione lineare, verificando la bontà di adattamento del modello. Definire il modello parametrizzato. Stabilire la soglia d'intervento, ipotizzando il costo del prodotto e dell'intervento diserbante.
+[Sheet: 11.2]
 
 ---
 
-## Capitoli 12 e 13
+## ANOVA a due vie con interazione (Cap. 12 e 13)
 
 ### Esercizio 1
 
 La biologia di *Sorghum halepense* da rizoma mostra che il peso dei rizomi raggiunge un minimo intorno alla quarta foglia. Di conseguenza, eseguire un trattamento in quest'epoca dovrebbe minimizzare le possibilità di ripresa degli individui trattati, portando anche ad un certo risanamento del terreno. Tuttavia, ci si attende che gli effetti siano maggiori quando le piante provengono da rizomi più piccoli, con un minor contenuto di sostanze di riserva. Per affrontare questi argomenti è stata organizzata una prova in vaso, secondo un disegno a randomizzazione completa con quattro repliche. I risultati sono i seguenti:
 
-| Sizes ↓ / Timing → |  2-3  |  4-5  |  6-7  |  8-9  | 3-4/8-9 | Untreated |
-|:-------------------|:-----:|:-----:|:-----:|:-----:|:-------:|:---------:|
-| 2-nodes            | 34.03 | 0.10  | 30.91 | 33.21 |  2.89   |   41.63   |
-|                    | 22.31 | 6.08  | 35.34 | 43.44 |  19.06  |   22.96   |
-|                    | 21.70 | 3.73  | 24.23 | 44.06 |  0.10   |   52.14   |
-|                    | 14.90 | 9.15  | 28.27 | 35.34 |  0.68   |   59.81   |
-| 4-nodes            | 42.19 | 14.86 | 52.34 | 39.06 |  8.62   |   68.15   |
-|                    | 51.06 | 36.03 | 43.17 | 61.59 |  0.05   |   42.75   |
-|                    | 43.77 | 21.85 | 57.28 | 48.89 |  0.10   |   57.77   |
-|                    | 31.74 | 8.71  | 29.71 | 49.14 |  9.65   |   44.85   |
-| 6-nodes            | 20.84 | 11.37 | 55.00 | 41.77 |  9.80   |   43.20   |
-|                    | 26.12 | 2.24  | 28.46 | 37.38 |  0.10   |   40.68   |
-|                    | 35.24 | 14.17 | 21.81 | 39.55 |  1.42   |   34.11   |
-|                    | 13.32 | 23.93 | 60.72 | 48.37 |  6.83   |   32.21   |
+| Sizes / Timings | 2-3   | 4-5   | 6-7   | 8-9   | 3-4/8-9 | Untreated|
+|:--------------|:-----:|:-----:|:-----:|:-----:|:-------:|:----:|
+| 2-nodes       | 34.03 | 0.10  | 30.91 | 33.21 | 2.89    | 41.63|
+|               | 22.31 | 6.08  | 35.34 | 43.44 | 19.06   | 22.96|
+|               | 21.70 | 3.73  | 24.23 | 44.06 | 0.10    | 52.14|
+|               | 14.90 | 9.15  | 28.27 | 35.34 | 0.68    | 59.81|
+| 4-nodes       | 42.19 | 14.86 | 52.34 | 39.06 | 8.62    | 68.15|
+|               | 51.06 | 36.03 | 43.17 | 61.59 | 0.05    | 42.75|
+|               | 43.77 | 21.85 | 57.28 | 48.89 | 0.10    | 57.77|
+|               | 31.74 | 8.71  | 29.71 | 49.14 | 9.65    | 44.85|
+| 6-nodes       | 20.84 | 11.37 | 55.00 | 41.77 | 9.80    | 43.20|
+|               | 26.12 | 2.24  | 28.46 | 37.38 | 0.10    | 40.68|
+|               | 35.24 | 14.17 | 21.81 | 39.55 | 1.42    | 34.11|
+|               | 13.32 | 23.93 | 60.72 | 48.37 | 6.83    | 32.21|
 
 Eseguite l'ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente.
+[Sheet: 12-13.1]
 
 ### Esercizio 2
 
@@ -6257,6 +6269,7 @@ Un agronomo ha organizzato un confronto varietale in favino, considerando due ep
 |             |   Vesuvio | 2.34 | 2.44 | 1.71 | 2.00 |
 
 Eseguite l'ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente.
+[Sheet: 12-13.2]
 
 ### Esercizio 3
 
@@ -6282,6 +6295,7 @@ Gli erbicidi mostrano sempre un certo grado di persistenza nel terreno. Di conse
 |               |   4   |   171   | 134  |   137    |    180    |
 
 Eseguite l'ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente.
+[Sheet: 12-13.3]
 
 ### Esercizio 4
 
@@ -6297,6 +6311,7 @@ E' stato condotto un esperimento parcellare per valutare l'interazione tra il mo
 |          |   3   | 40.1  | 57.9 | 62.0 |
 
 Analizzare i dati e commentare i risultati
+[Sheet: 12-13.4]
 
 ### Esercizio 5
 
@@ -6314,6 +6329,7 @@ E' stato organizzato un esperimento per valutare l'effetto della temperatura di 
 |        |  3.6   |  3.5   |  5.8   |  11.1  |
 
 Analizzare i dati e commentare i risultati
+[Sheet: 12-13.5]
 
 ### Esercizio 6
 
@@ -6331,13 +6347,11 @@ Un processo di sintesi chimica prevede due reazioni, la prima richiede un alcool
 |      |   94.7    |   91.5    |   89.8    |
 
 Analizzare i dati e commentare i risultati
-
+[Sheet: 12-13.6]
 
 ---
 
-
-
-## Capitolo 14
+## Regressione non-lineare (Cap. 14)
 
 ### Esercizio 1
 
@@ -6355,6 +6369,7 @@ Due campioni di terreno sono stati trattati con due erbicidi diversi e sono stat
 |  70  |    1.00     |    3.00     |
 
 Ipotizzando che la degradazione dei due erbicidi segue una cinetica del primo ordine, parametrizzare la relativa equazione e determinare la semivita dei due erbicidi. Quale sostanza degrada più velocemente?
+[Sheet: 14.1]
 
 ### Esercizio 2
 
@@ -6372,6 +6387,7 @@ Un popolazione microbica in condizioni non-limitanti di substrato cresce seguend
 |  70  |  201  |
 
 Parametrizzare un modello esponenziale e calcolarne la bontà di adattamento.
+[Sheet: 14.2]
 
 ### Esercizio 3
 
@@ -6393,6 +6409,7 @@ Parametrizzare il modello iperbolico di Michaelis-Menten:
 $$y = \frac{a x} {b + x}$$
 
 Valutarne la bontà di adattamento.
+[Sheet: 14.3]
 
 ### Esercizio 4
 
@@ -6411,6 +6428,7 @@ Parametrizzare l'iperbole di Cousens:
 $$Y_W  = Y_{WF} \left( 1 - \frac{i \cdot x}{100\left( 1 + \frac{i \cdot x}{a} \right)} \right)$$
 
 Valutarne la bontà di adattamento. Determinare la soglia economica di intervento.
+[Sheet: 14.4]
 
 ### Esercizio 5
 
@@ -6433,6 +6451,7 @@ Parametrizzare una curva 'di potenza' (power curve):
 $$a \cdot x^b$$
 
 Valutarne la bontà di adattamento. Determinare l'area minima di campionamento.
+[Sheet: 14.5]
 
 ### Esercizio 6
 
@@ -6464,12 +6483,13 @@ Parametrizzare il modello di Gompertz:
 $$a \cdot exp(-b \cdot exp(-c \cdot x))$$
 
 e verificarne la bontà di adattamento nelle due situazioni. Quali parametri del modello di Gompertz sono maggiormente influenzati dalle piante infestanti? Abbiamo elementi per ritenere che la crescita segua un'equazione di Gompertz piuttosto che una logistica simmetrica?
+[Sheet: 14.6]
 
 ### Esercizio 7
 
 Piante di *Tripleuspermum inodorum* in vaso sono state trattate con erbicida sulfonilureico (tribenuron-methyl) a dosi crescenti. Tre settimano deopo il trattamento è stato registrato il peso delle piante sopravvissute, ottenendo i risulti riportati nella tabella seguente:
 
-| Dose (g a.i. ha$^{-1}$) | Fresh weight (g pot $^{-1}$) |
+| Dose (g/ha) | Fresh weight (g/pot) |
 |:-----------------------:|:----------------------------:|
 |            0            |            115.83            |
 |            0            |            102.90            |
@@ -6492,6 +6512,7 @@ Si ipotizza che la relazione dose-effetto possa essere descritta con un modello 
 $$c + \frac{d - c}{1 + exp(b ( log (x) - log (a))}$$
 
 Parametrizzare questo modello e verificarne la bontà d'adattamento.
+[Sheet: 14.7]
 
 <!--chapter:end:15-Esercizi.Rmd-->
 
