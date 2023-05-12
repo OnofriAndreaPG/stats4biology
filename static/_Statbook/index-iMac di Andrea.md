@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.23 (Anno Accademico 2022-2023), compil. 2023-05-12"
+date: "Update: v. 1.12 (Anno Accademico 2021-2022), compil. 2023-05-02"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -4319,101 +4319,6 @@ car::deltaMethod(modelReg, "(45 - b0)/b1",
 
 Il procedimento sopra descritto è molto comune, per esempio nei laboratori chimici, dove viene utilizzato nella fase di calibrazione di uno strumento. Una volta che la retta di calibrazione è stata individuate, essa viene utilizzata per determinare le concentrazioni incognite di campioni per i quali sia stata misurata la risposta.
 
-## Disegni a blocchi randomizzati
-
-Come abbiamo gà detto, la gran parte degli esperimenti agronomici, inclusi quelli in cui si organizzano per studiare l'effetto di una variabile quantitativa, sono disegnati a blocchi randomizzati. In questo caso, oltre all'effetto in studio, esiste anche l'effetto del blocco, che non può essere trascurato, altrimenti si viene ad inficiare l'indipendenza dei residui, come abbiamo evidenziato nel capitolo precedente.
-
-Per una banale esempio, potremmo immaginare che nel dataset 'NWheat, le quattro repliche di ogni dose siano state ottenute, nell'ordine, nei blocchi 1, 2, 3 e 4. Il modello lineare risulterebbe così modificato:
-
-$$Y_{ij} = b_0 + \gamma_j + b_1 X_{ij} + \varepsilon_{ij}$$
-vale a dire: la produzione per la i-esima dose di azoto nel j-esimo blocco è ottenuta attraverso un modello lineare, in cui l'effetto del blocco si ripercuote sull'intercetta, che, nei diversi blocchi è pari, rispettivamente, a $b_0 + \gamma_1$, $b_0 + \gamma_2$, $b_0 + \gamma_3$ e $b_0 + \gamma_4$. In questo modo l'effetto del blocco è fisso ed additivo; ovviamente si possono anche adottare approcci più complessi, che però esulano dagli scopi del nostro testo introduttivo.
-
-Il fitting di questo modello è semplice, utilizzando il codice seguente:
-
-
-
-```r
-# creazione della variabile blocco
-dataset$Block <- factor(rep(1:4, 4))
-model <- lm(Yield ~ Dose + Block, data = dataset)
-```
-
-Ovviamente, il riferimento per testare la mancanza di adattamento sarà il modello ANOVA corrispondente, a blocchi randomizzati; per il resto, non cambia nulla. Resta però la necessità di conoscere i parametri della curva dose-risposta media per i diversi blocchi, che sarà quella da utilizzare per fare previsioni. Utilizziamo quindi il metodo 'summary()' come abbiamo visto in precedenza.
-
-
-```r
-summary(model)
-## 
-## Call:
-## lm(formula = Yield ~ Dose + Block, data = dataset)
-## 
-## Residuals:
-##    Min     1Q Median     3Q    Max 
-## -2.960 -1.455 -0.170  1.394  2.527 
-## 
-## Coefficients:
-##              Estimate Std. Error t value Pr(>|t|)    
-## (Intercept) 23.277500   1.247516  18.659 1.12e-09 ***
-## Dose         0.154417   0.007722  19.997 5.35e-10 ***
-## Block2       1.297500   1.465133   0.886    0.395    
-## Block3       1.945000   1.465133   1.328    0.211    
-## Block4      -1.177500   1.465133  -0.804    0.439    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 2.072 on 11 degrees of freedom
-## Multiple R-squared:  0.9736,	Adjusted R-squared:  0.964 
-## F-statistic: 101.3 on 4 and 11 DF,  p-value: 1.331e-08
-```
-
-Vediamo che la pendenza è pari a 0.1544 ed è esattamente identica a quella stimata senza considerare l'effetto del blocco. L'intercetta, invece, cambia al cambiare del blocco. In particolare, R impiega una parametrizzazionecon vincolo sul trattamento e quindi il valore 23.2775, che vediamo identificato come intercetta, corrisponde al primo blocco (in quanto il vincolo è $\gamma_1 = 0$).
-
-Dobbiamo quindi calcolare un'intercetta media dei blocchi, ad esempio utilizzando la solita funzione 'emmeans()', che fornisce la risposta produttiva attesa (media) per un livello di concimazione pari a 0. Il codice è il seguente:
-
-
-```r
-library(emmeans)
-emmeans(model, ~1, at = list(Dose = 0))
-##  1       emmean    SE df lower.CL upper.CL
-##  overall   23.8 0.867 11     21.9     25.7
-## 
-## Results are averaged over the levels of: Block 
-## Confidence level used: 0.95
-```
-
-Il valore è identico a quello ottenuto senza considerare l'effetto del blocco, anche se l'errore standard è diverso in quanto parte del residuo è stata spiegata appunto attraverso l'effetto del blocco.
-
-Prima di concludere, vorremmo menzionare un'approccio alternativo, che consiste nell'utilizzare una parametrizzazione con vincolo sulla somma, invece che sul trattamento. Con questo vincolo, analogamente a quanto abbiamo visto nel capitolo 7, l'intercetta stimata con la regressione rappresenta il valor medio e gli effetti dei blocchi sono stimati come scostamenti rispetto al valor medio. Per imporre un vincolo sulla somma basta modificare il codice di fitting nel modo indicato di seguito. Nell'output non è presente l'effetto del quarto blocco, in quanto, per il vincolo prescelto, deve essere tale che sommato agli altri tre restituisca 0.
-
-
-```r
-model <- lm(Yield ~ Dose + Block, data = dataset,
-            contrasts = list(Block = "contr.sum"))
-summary(model)
-## 
-## Call:
-## lm(formula = Yield ~ Dose + Block, data = dataset, contrasts = list(Block = "contr.sum"))
-## 
-## Residuals:
-##    Min     1Q Median     3Q    Max 
-## -2.960 -1.455 -0.170  1.394  2.527 
-## 
-## Coefficients:
-##              Estimate Std. Error t value Pr(>|t|)    
-## (Intercept) 23.793750   0.866785  27.451 1.75e-11 ***
-## Dose         0.154417   0.007722  19.997 5.35e-10 ***
-## Block1      -0.516250   0.897207  -0.575    0.577    
-## Block2       0.781250   0.897207   0.871    0.402    
-## Block3       1.428750   0.897207   1.592    0.140    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 2.072 on 11 degrees of freedom
-## Multiple R-squared:  0.9736,	Adjusted R-squared:  0.964 
-## F-statistic: 101.3 on 4 and 11 DF,  p-value: 1.331e-08
-```
-
-
 ---
 
 ## Altre letture
@@ -5108,7 +5013,7 @@ Anche in questo caso, il calcolo delle medie e i confronti multipli vengono effe
 
 I fenomeni biologici, come ad esempio la crescita di una coltura, la cinetica degradativa degli erbicidi nel terreno, la risposta produttiva delle colture a densità crescenti di malerbe o a dosi crescenti di concime, la risposta fitotossica di una specie infestante alla dose di un erbicida, hanno in genere andamenti curvilinei, posseggono punti di massimo o minimo, flessi e, soprattutto, hanno frequentemente asintoti. Pertanto, difficilmente possono essere descritti con funzioni lineari, a meno che non ci accontentiamo di approssimare localmente l'andamento dei dati, in un intervallo ristretto della variabile indipendente.
 
-Da un punto di vista pratico, è quindi fondamentale saper adattare ai dati funzioni curvilinee di ogni tipo. Introduciamo il problema con un esempio, per il quale avremo bisogno di un package aggiuntivo che potremo installare da github (la prima volta) e caricare con il codice riportato più sotto.
+Da un punto di vista pratico, è quindi fondamentale saper adattare ai dati funzioni curvilinee di ogni tipo. Introduciamo il problema con un esempio, per il quale avremo bisogno di un package aggiuntivo che potremo installare (la prima volta) e caricare con il codice riportato più sotto.
 
 
 ```r
@@ -5158,27 +5063,16 @@ In questa funzione, $X$ è il tempo, $Y$ la concentrazione, $\theta$ sono i para
 
 ## Scelta della funzione
 
-Uno dei criteri fondamentali, seppur empirico, per la selezione di una funzione $f$ non-lineare  è quello di considerarne la forma, in relazione al fenomeno biologico in studio. Abbiamo dato informazioni più dettagliate altrove ([vedi questo link](https://www.statforbiology.com/2020/stat_nls_usefulfunctions/)) e, per brevità, possiamo considerare la Figura \@ref(fig:figName151b), dove si vedono gli andamenti delle funzioni non-lineari più diffuse in agricoltura. Distinguiamo andamenti:
+Uno dei criteri fondamentali, seppur empirico, per la selezione di una funzione non-lineare  è quello di considerarne la forma, in relazione al fenomeno biologico in studio. Per questo scopo, le equazioni sno spesso classificate in base alla forma, come:
 
-1. convesse/concave (es. parabola, curva di crescita/decadimento esponenziale, curva di crescita asintotica, curva di potenza, iperbole rettangolare)
-3. sigmoidali (es. crescita logistica, crescita di Gompertz, curva log-logistica dose-risposta)
-4. con massimi/minimi (curva di Braggs)
+1. Lineari (es. retta)
+2. Convesse/concave (es. funzione esponenziale, funzione di potenza, funzione logaritmica, iperbole)
+3. Sigmoidali (es. funzione logistica, funzione di Gompertz)
+4. Curve con massimi/minimi (esequazione di Brain-Cousens, equazione di Braggs)
 
-Nella lista precedente, la parabola è un modello non-lineare nella risposta, ma lineare nei parametri, e quindi può essere adattato con la usuale funzione 'lm()', come vedremo tra poco.
+La descrizione di queste equazioni esula dallo scopo di questo libro, anche se il loro studio può essere di notevole interesse, anche per un biologo o un agronomo. Infatti, riuscire a tradurre nel linguaggio matematico un fenomeno biologico è forse uno degli obiettivi più affascinanti che un ricercatore si possa porre. Per chi fosse interessato, riportiamo in calce al capitolo alcuni interessanti riferimenti.
 
-<div class="figure" style="text-align: center">
-<img src="_images/nonLinearCurves.png" alt="Curve più diffuse per la descrizione di fenomeni di interesse agrario" width="95%" />
-<p class="caption">(\#fig:figName151b)Curve più diffuse per la descrizione di fenomeni di interesse agrario</p>
-</div>
-
-Ad ognuna delle curve evidenziate in figura corrisponde un'equazione, come indicato nella Figura \@ref(fig:figName151bis) ).
-
-<div class="figure" style="text-align: center">
-<img src="_images/nonLinearEquations.png" alt="Lista delle funzioni per la regressione non-lineare con R (equazione e funzione da utilizzare in R)." width="95%" />
-<p class="caption">(\#fig:figName151bis)Lista delle funzioni per la regressione non-lineare con R (equazione e funzione da utilizzare in R).</p>
-</div>
-
-Per il nostro caso-studio, le conoscenze relative alla cinetica di degradazione dei composti chimici ci suggeriscono un'equazione di decadimento esponenziale (cinetica del primo ordine), così definita:
+Noi ci poniamo nella situazione più comune, quella in cui la scelta del modello viene fatta in base all'esperienza o alle informazioni disponibili in letteratura. In questo caso, le conoscenze relative alla cinetica di degradazione dei composti chimici ci suggeriscono un'equazione di decadimento esponenziale (cinetica del primo ordine), così definita:
 
 $$Y_i = A e^{-k \,X_i} + \varepsilon_i$$ 
 
@@ -5280,9 +5174,10 @@ La terza strada, quella più percorsa, è utilizzare metodiche di regressione no
 La funzione più comune in R per la parametrizzazione di funzioni non-lineari è `nls()`. Nella chiamata alla funzione dobbiamo anche fornire stime iniziali per i valori dei parametri. Ottenere queste stime è facile pensando al loro significato biologico: $A$ è la concentrazione iniziale e quindi una stima ragionevole è data dal valor medio osservato al tempo 0 (100). Il parametro $k$ è invece il tasso di degradazione relativo; possiamo notare che nei primi 10 giorni la concentrazione si riduce della metà circa, cioè si abbassa mediamente un po' più del 5% al giorno. Possiamo quindi assegnare a $k$ un valore iniziale pari a 0.05.
 
 
+
 ```r
 modNlin <- nls(Conc ~ A*exp(-k*Time), 
-               start = list(A=100, k=0.05), 
+               start=list(A=100, k=0.05), 
                data=degradation)
 summary(modNlin)
 ## 
@@ -5301,13 +5196,6 @@ summary(modNlin)
 ## Achieved convergence tolerance: 4.33e-07
 ```
 
-Invece che codificare il modello non-lineare a mano, possiamo ricorrere ad una delle funzioni R indicate in Figura \@ref(fig:figName151bis), che sono associate ad appositi algoritmi di self-startin e non necessitano dell'individuazione di valori iniziali (almeno nella gran parte dei casi). Queste funzioni sono disponibili nel package 'aomisc' che deve quindi essere installato da 'github'. 
-
-
-```r
-modNlin2 <- nls(Conc ~ NLS.expoDecay(Time, a, k),
-               data = degradation)
-```
 
 ## Verifica della bontà del modello
 
@@ -5334,7 +5222,8 @@ La Figura \@ref(fig:figName154) non mostra deviazioni rispetto agli assunti di b
 
 
 ```r
-plot(modNlin, type = "means", which = 3,
+library(lattice)
+plotnls(modNlin, type = "means",
         xlab = "Tempo (giorni)", ylab = "Concentrazione (ng/g)")
 ```
 
@@ -5420,7 +5309,7 @@ anova(modNlin, modAov)
 
 Un'altra valutazione importante da fare è quella relativa agli errori standard delle stime dei parametri, che non debbono mai essere superiori alla metà del valore del parametro stimato, cosa che in questo caso è pienamente verificata. Abbiamo già spiegato come, se l'intervallo di confidenza del parametro contiene lo zero, evidentemente quel parametro potrebbe essere rimosso dal modello senza che il fitting peggiori significativamente. Nel nostro esempio, se il tasso di degradazione fosse stato non significativamente diverso da zero, avremmo avuto un'indicazione per sostenere che l'erbicida, di fatto, non mostra degradazione nel tempo.
 
-### Coefficiente di determinazione
+### Coefficienti di determinazione
 
 Abbiamo visto che il residuo della regressione è pari a 151.2 con 16 gradi di libertà. La devianza totale dei dati (somma dei quadrati degli scarti rispetto alla media generale) è invece:
 
@@ -5454,7 +5343,7 @@ I due coefficienti di determinazione (tradizionale e corretto) possono essere ot
 
 
 ```r
-# library(aomisc)
+library(aomisc)
 R2nls(modNlin)
 ## $PseudoR2
 ## [1] 0.9939126
@@ -5568,6 +5457,8 @@ Con un oggetto 'nls', possiamo utilizzare la funzione 'boxcox' nel package 'aomi
 
 
 ```r
+class(modNlin)
+## [1] "nls"
 modNlin2 <- boxcox(modNlin)
 modNlin2
 ## Nonlinear regression model
@@ -5654,7 +5545,7 @@ Dove $YL$ sta per perdite produttive (Yield Loss) percentuali, $D$ è la densit�
 <p class="caption">(\#fig:figName25131)Relazione iperbolica tra fittezza delle piante infestanti e perdite produttive. È  visualizzata la pendenza iniziale (i) e la perdita produttiva massima asintotica (A).</p>
 </div>
 
-Normalmente, in campo non vengono determinate le perdite produttive, bensì le produzioni, come nel caso dell'esperimento relativo al dataset d'esempio. Di conseguenza, il modello iperbolico presentato più sopra non è adatto ai nostri dati, in quanto rappresenta una funzione crescente, mentre i nostri dati mostrano una variabile dipendente (produzione) che decresce al crescera della variabile indipendente (fittezza dell piante infestanti). Pertanto, abbiamo due possibilità:
+Normalmente, in campo non vengono determinate le perdite produttive, bensì le produzioni, come nel caso dell'esperimento relativo al dataset d'esempio. Di conseguenza, il modello iperbolico presentato più sopra non è adatto ai nostri dati,  in quanto rappresenta una funzione crescente, mentre i nostri dati mostrano una variabile dipendente (produzione) che decresce al crescera della variabile indipendente (fittezza dell piante infestanti). Pertanto, abbiamo due possibilità:
 
 1. modificare il dataset, esprimendo i dati in termini di perdite produttive percentuali;
 2. modificare il modello, per utilizzare la produzione come variabile dipendente, al posto della perdita produttiva.
@@ -6281,7 +6172,7 @@ Analizzate i dati e commentate i risultati ottenuti
 
 ### Esercizio 1
 
-È stato condotto uno studio per verificare l'effetto della concimazione azotata (in kg/ha) sulla produzione (in quintali per ettaro) della lattuga, utilizzando uno schema a blocchi randomizzati. I risultati sono i seguenti:
+È stato condotto uno studio per verificare l'effetto della concimazione azotata sulla lattuga, utilizzando uno schema a blocchi randomizzati. I risultat sono i seguenti:
 
 | N level | B1  | B2  | B3  | B4  |
 |:-------:|:---:|:---:|:---:|:---:|
@@ -6291,14 +6182,14 @@ Analizzate i dati e commentate i risultati ottenuti
 |   150   | 157 | 150 | 140 | 163 |
 |   200   | 163 | 156 | 156 | 171 |
 
-Analizzare i dati, adattare un modello di regressione, verificarne la bontà di adattamento e commentare i risultati
+Analizzare i dati e commentare i risultati
 [Sheet: 11.1]
 
 ### Esercizio 2
 
-Per valutare la soglia economica d'intervento, è necessario definire la relazione tra la densità di una pianta infestante (*Sinapis arvensis*) e la produzione della coltura. Ipotizziamo che, nel range di densità osservato, il modello di competizione sia una retta. Per parametrizzare questo modello e verificarne la validità, è stato organizzato un esperimento a blocchi randomizzati, dove sono stati inclusi sette diversi livelli di infestazione di *Sinapis arvensis* , (in piante per metro quadrato) ed è stata rilevata la produzione di acheni del girasole (in quintali per ettaro). I risultati sono:
+Per valutare la soglia economica d'intervento, è necessario definire la relazione tra la densità di una pianta infestante e la perdita produttiva della coltura. Ipotizziamo che, nel range di densità osservato, il modello di competizione sia una retta. Per parametrizzare questo modello e verificarne la validità, è stato organizzato un esperimento a blocchi randomizzati, dove sono stati inclusi sette diversi livelli di infestazione di *Sinapis arvensis* ed è stata rilevata la produzione di acheni del girasole. I risultati sono:
 
-| density | Block | Yield  |
+| density | Rep   | Yield  |
 |:-------:|------:|:-------|
 |    0    |     1 | 36.63  |
 |   14    |     1 | 29.73  |

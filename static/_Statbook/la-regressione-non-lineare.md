@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.12 (Anno Accademico 2021-2022), compil. 2023-05-02"
+date: "Update: v. 1.23 (Anno Accademico 2022-2023), compil. 2023-05-12"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -282,6 +282,7 @@ Placeholder
 ### Test F per la mancanza d'adattamento
 ### Test F per la bontà di adattamento e coefficiente di determinazione
 ## Previsioni
+## Disegni a blocchi randomizzati
 ## Altre letture
 
 <!--chapter:end:11-LinearRegression.Rmd-->
@@ -330,7 +331,7 @@ Placeholder
 
 I fenomeni biologici, come ad esempio la crescita di una coltura, la cinetica degradativa degli erbicidi nel terreno, la risposta produttiva delle colture a densità crescenti di malerbe o a dosi crescenti di concime, la risposta fitotossica di una specie infestante alla dose di un erbicida, hanno in genere andamenti curvilinei, posseggono punti di massimo o minimo, flessi e, soprattutto, hanno frequentemente asintoti. Pertanto, difficilmente possono essere descritti con funzioni lineari, a meno che non ci accontentiamo di approssimare localmente l'andamento dei dati, in un intervallo ristretto della variabile indipendente.
 
-Da un punto di vista pratico, è quindi fondamentale saper adattare ai dati funzioni curvilinee di ogni tipo. Introduciamo il problema con un esempio, per il quale avremo bisogno di un package aggiuntivo che potremo installare (la prima volta) e caricare con il codice riportato più sotto.
+Da un punto di vista pratico, è quindi fondamentale saper adattare ai dati funzioni curvilinee di ogni tipo. Introduciamo il problema con un esempio, per il quale avremo bisogno di un package aggiuntivo che potremo installare da github (la prima volta) e caricare con il codice riportato più sotto.
 
 
 ```r
@@ -383,16 +384,27 @@ In questa funzione, $X$ è il tempo, $Y$ la concentrazione, $\theta$ sono i para
 
 ## Scelta della funzione
 
-Uno dei criteri fondamentali, seppur empirico, per la selezione di una funzione non-lineare  è quello di considerarne la forma, in relazione al fenomeno biologico in studio. Per questo scopo, le equazioni sno spesso classificate in base alla forma, come:
+Uno dei criteri fondamentali, seppur empirico, per la selezione di una funzione $f$ non-lineare  è quello di considerarne la forma, in relazione al fenomeno biologico in studio. Abbiamo dato informazioni più dettagliate altrove ([vedi questo link](https://www.statforbiology.com/2020/stat_nls_usefulfunctions/)) e, per brevità, possiamo considerare la Figura \@ref(fig:figName151b), dove si vedono gli andamenti delle funzioni non-lineari più diffuse in agricoltura. Distinguiamo andamenti:
 
-1. Lineari (es. retta)
-2. Convesse/concave (es. funzione esponenziale, funzione di potenza, funzione logaritmica, iperbole)
-3. Sigmoidali (es. funzione logistica, funzione di Gompertz)
-4. Curve con massimi/minimi (esequazione di Brain-Cousens, equazione di Braggs)
+1. convesse/concave (es. parabola, curva di crescita/decadimento esponenziale, curva di crescita asintotica, curva di potenza, iperbole rettangolare)
+3. sigmoidali (es. crescita logistica, crescita di Gompertz, curva log-logistica dose-risposta)
+4. con massimi/minimi (curva di Braggs)
 
-La descrizione di queste equazioni esula dallo scopo di questo libro, anche se il loro studio può essere di notevole interesse, anche per un biologo o un agronomo. Infatti, riuscire a tradurre nel linguaggio matematico un fenomeno biologico è forse uno degli obiettivi più affascinanti che un ricercatore si possa porre. Per chi fosse interessato, riportiamo in calce al capitolo alcuni interessanti riferimenti.
+Nella lista precedente, la parabola è un modello non-lineare nella risposta, ma lineare nei parametri, e quindi può essere adattato con la usuale funzione 'lm()', come vedremo tra poco.
 
-Noi ci poniamo nella situazione più comune, quella in cui la scelta del modello viene fatta in base all'esperienza o alle informazioni disponibili in letteratura. In questo caso, le conoscenze relative alla cinetica di degradazione dei composti chimici ci suggeriscono un'equazione di decadimento esponenziale (cinetica del primo ordine), così definita:
+<div class="figure" style="text-align: center">
+<img src="_images/nonLinearCurves.png" alt="Curve più diffuse per la descrizione di fenomeni di interesse agrario" width="95%" />
+<p class="caption">(\#fig:figName151b)Curve più diffuse per la descrizione di fenomeni di interesse agrario</p>
+</div>
+
+Ad ognuna delle curve evidenziate in figura corrisponde un'equazione, come indicato nella Figura \@ref(fig:figName151bis) ).
+
+<div class="figure" style="text-align: center">
+<img src="_images/nonLinearEquations.png" alt="Lista delle funzioni per la regressione non-lineare con R (equazione e funzione da utilizzare in R)." width="95%" />
+<p class="caption">(\#fig:figName151bis)Lista delle funzioni per la regressione non-lineare con R (equazione e funzione da utilizzare in R).</p>
+</div>
+
+Per il nostro caso-studio, le conoscenze relative alla cinetica di degradazione dei composti chimici ci suggeriscono un'equazione di decadimento esponenziale (cinetica del primo ordine), così definita:
 
 $$Y_i = A e^{-k \,X_i} + \varepsilon_i$$ 
 
@@ -497,10 +509,9 @@ La terza strada, quella più percorsa, è utilizzare metodiche di regressione no
 La funzione più comune in R per la parametrizzazione di funzioni non-lineari è `nls()`. Nella chiamata alla funzione dobbiamo anche fornire stime iniziali per i valori dei parametri. Ottenere queste stime è facile pensando al loro significato biologico: $A$ è la concentrazione iniziale e quindi una stima ragionevole è data dal valor medio osservato al tempo 0 (100). Il parametro $k$ è invece il tasso di degradazione relativo; possiamo notare che nei primi 10 giorni la concentrazione si riduce della metà circa, cioè si abbassa mediamente un po' più del 5% al giorno. Possiamo quindi assegnare a $k$ un valore iniziale pari a 0.05.
 
 
-
 ```r
 modNlin <- nls(Conc ~ A*exp(-k*Time), 
-               start=list(A=100, k=0.05), 
+               start = list(A=100, k=0.05), 
                data=degradation)
 summary(modNlin)
 ```
@@ -522,6 +533,13 @@ summary(modNlin)
 ## Achieved convergence tolerance: 4.33e-07
 ```
 
+Invece che codificare il modello non-lineare a mano, possiamo ricorrere ad una delle funzioni R indicate in Figura \@ref(fig:figName151bis), che sono associate ad appositi algoritmi di self-startin e non necessitano dell'individuazione di valori iniziali (almeno nella gran parte dei casi). Queste funzioni sono disponibili nel package 'aomisc' che deve quindi essere installato da 'github'. 
+
+
+```r
+modNlin2 <- nls(Conc ~ NLS.expoDecay(Time, a, k),
+               data = degradation)
+```
 
 ## Verifica della bontà del modello
 
@@ -548,8 +566,7 @@ La Figura \@ref(fig:figName154) non mostra deviazioni rispetto agli assunti di b
 
 
 ```r
-library(lattice)
-plotnls(modNlin, type = "means",
+plot(modNlin, type = "means", which = 3,
         xlab = "Tempo (giorni)", ylab = "Concentrazione (ng/g)")
 ```
 
@@ -665,7 +682,7 @@ anova(modNlin, modAov)
 
 Un'altra valutazione importante da fare è quella relativa agli errori standard delle stime dei parametri, che non debbono mai essere superiori alla metà del valore del parametro stimato, cosa che in questo caso è pienamente verificata. Abbiamo già spiegato come, se l'intervallo di confidenza del parametro contiene lo zero, evidentemente quel parametro potrebbe essere rimosso dal modello senza che il fitting peggiori significativamente. Nel nostro esempio, se il tasso di degradazione fosse stato non significativamente diverso da zero, avremmo avuto un'indicazione per sostenere che l'erbicida, di fatto, non mostra degradazione nel tempo.
 
-### Coefficienti di determinazione
+### Coefficiente di determinazione
 
 Abbiamo visto che il residuo della regressione è pari a 151.2 con 16 gradi di libertà. La devianza totale dei dati (somma dei quadrati degli scarti rispetto alla media generale) è invece:
 
@@ -702,7 +719,7 @@ I due coefficienti di determinazione (tradizionale e corretto) possono essere ot
 
 
 ```r
-library(aomisc)
+# library(aomisc)
 R2nls(modNlin)
 ```
 
@@ -846,14 +863,6 @@ Con un oggetto 'nls', possiamo utilizzare la funzione 'boxcox' nel package 'aomi
 
 
 ```r
-class(modNlin)
-```
-
-```
-## [1] "nls"
-```
-
-```r
 modNlin2 <- boxcox(modNlin)
 modNlin2
 ```
@@ -955,7 +964,7 @@ Dove $YL$ sta per perdite produttive (Yield Loss) percentuali, $D$ è la densit�
 <p class="caption">(\#fig:figName25131)Relazione iperbolica tra fittezza delle piante infestanti e perdite produttive. È  visualizzata la pendenza iniziale (i) e la perdita produttiva massima asintotica (A).</p>
 </div>
 
-Normalmente, in campo non vengono determinate le perdite produttive, bensì le produzioni, come nel caso dell'esperimento relativo al dataset d'esempio. Di conseguenza, il modello iperbolico presentato più sopra non è adatto ai nostri dati,  in quanto rappresenta una funzione crescente, mentre i nostri dati mostrano una variabile dipendente (produzione) che decresce al crescera della variabile indipendente (fittezza dell piante infestanti). Pertanto, abbiamo due possibilità:
+Normalmente, in campo non vengono determinate le perdite produttive, bensì le produzioni, come nel caso dell'esperimento relativo al dataset d'esempio. Di conseguenza, il modello iperbolico presentato più sopra non è adatto ai nostri dati, in quanto rappresenta una funzione crescente, mentre i nostri dati mostrano una variabile dipendente (produzione) che decresce al crescera della variabile indipendente (fittezza dell piante infestanti). Pertanto, abbiamo due possibilità:
 
 1. modificare il dataset, esprimendo i dati in termini di perdite produttive percentuali;
 2. modificare il modello, per utilizzare la produzione come variabile dipendente, al posto della perdita produttiva.
