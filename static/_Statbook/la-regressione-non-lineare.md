@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.23 (Anno Accademico 2022-2023), compil. 2023-05-12"
+date: "Update: v. 1.23 (Anno Accademico 2022-2023), compil. 2023-05-15"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -280,7 +280,8 @@ Placeholder
 ### Valutazione grafica
 ### Errori standard dei parametri
 ### Test F per la mancanza d'adattamento
-### Test F per la bontà di adattamento e coefficiente di determinazione
+### Test F per la bontà di adattamento
+### Coefficiente di determinazione
 ## Previsioni
 ## Disegni a blocchi randomizzati
 ## Altre letture
@@ -339,6 +340,58 @@ Da un punto di vista pratico, è quindi fondamentale saper adattare ai dati funz
 # install.packages("devtools")
 # devtools::install_github("onofriandreapg/aomisc")
 library(aomisc)
+```
+
+```
+## Loading required package: drc
+```
+
+```
+## Loading required package: MASS
+```
+
+```
+## Loading required package: drcData
+```
+
+```
+## 
+## 'drc' has been loaded.
+```
+
+```
+## Please cite R and 'drc' if used for a publication,
+```
+
+```
+## for references type 'citation()' and 'citation('drc')'.
+```
+
+```
+## 
+## Attaching package: 'drc'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     gaussian, getInitial
+```
+
+```
+## Loading required package: plyr
+```
+
+```
+## Loading required package: car
+```
+
+```
+## Loading required package: carData
+```
+
+```
+## Loading required package: multcompView
 ```
 
 
@@ -684,36 +737,36 @@ Un'altra valutazione importante da fare è quella relativa agli errori standard 
 
 ### Coefficiente di determinazione
 
-Abbiamo visto che il residuo della regressione è pari a 151.2 con 16 gradi di libertà. La devianza totale dei dati (somma dei quadrati degli scarti rispetto alla media generale) è invece:
+Come abbiamo visto per la regressione lineare, anche nella regressione non-lineare si sente l'esigenza di una statistica che rappresenti in modo sintetico la bontà di adattamento. L'argomento è molto dibattuto e molti autori sono contrari all'impiego del coefficiente di determinazione, prevalentemente per due motivi:
+
+1. i modelli di regressione non-lineare non hanno una vera e propria intercetta (almeno non nel senso usuale);
+2. la somma della devianza della regressione e della devianza del residuo non è necessariamente uguale alla devianza totale.
+
+Tuttavia, molti altri autori sono dell'opinione che, per la sua semplicità, una statistica analoga al coefficiente di determinazione possa risultare molto utile, purché utilizzata con la necessaria prudenza. In particolare viene suggerito l'impiego della statistica:
+
+$$\textrm{Pseudo-R}^2 = 1 - \frac{SSr}{SSt}$$
+
+che, nel caso della regressione lineare, sarebbe analoga alla formula già vista per l'R^2^ nel capitolo precedente, ma che, nel caso della regressione non-lineare, fornisce risultati diversi. In particolare, lo Pseudo-R^2^ può essere, al massimo, pari ad 1 per un modello con una bontà di adattamento perfetta, ma che, al contrario dell'$R^2$, può divenire negativo, anche se in situazioni nelle quali vi sono da sospettare gravi problemi con il modello prescelto per descrivere i dati.
+
+Nel caso in esempio, il residuo della regressione è pari a 151.2 con 16 gradi di libertà, mentre la devianza totale dei dati (somma dei quadrati degli scarti rispetto alla media generale) è:
 
 
 ```r
 SSt <- deviance(lm(Conc ~ 1, data=degradation))
 ```
 
-ed ha 23 gradi di libertà. La differenza:
+ed ha 23 gradi di libertà. Il valore di Pseudo-R^2^ è:
 
 
 ```r
-SSt - SSr
+1 - SSr/SSt
 ```
 
 ```
-## [1] 24683.13
+## [1] 0.9939126
 ```
 
-costituisce la devianza spiegata dalla regressione. Il coefficente di determinazione $R^2$ è quindi:
-
-$$R^2 = \frac{SSt - SSr}{SSt} = \frac{24683.13}{24834.3} = 0.994$$
- 
-Il valore ottenuto attesta un ottimo adattamento, in quanto è vicino ad 1. Bisogna ricordare che, pur essendo utilizzato in modo pressoché ubiquitario, il coefficiente di determinazione per i modelli non-lineari fornisce solo un'indicazione abbastanza grezza sulla bontà del modello, in quanto può rimanere alto anche quando vi sono sistematiche violazioni rispetto alla forma della funzione.
-
-Oltre al coefficiente di determinazione tradizionale, può essere utilizzato anche il coefficiente di determinazione corretto, dato dalla proporzione di varianza (MS) spiegata dalla regressione: 
-
-
-$$R_a^2  = 1 - \frac{MS_{residuo} }{MS_{tot} } = 0.9936$$
-
-L'$R^2$ corretto è sempre più basso dell $R^2$ e tende a penalizzare i modelli con molti parametri. Di conseguenza, favorisce i modelli semplici, nel rispetto del principio del rasoio di Occam.
+ed attesta un ottimo adattamento, in quanto è vicino ad 1. Bisogna ricordare che, pur essendo utilizzato in modo pressoché ubiquitario, il coefficiente di determinazione per i modelli non-lineari fornisce solo un'indicazione abbastanza grezza sulla bontà del modello, in quanto può rimanere alto anche quando vi sono sistematiche violazioni rispetto alla forma della funzione. Inoltre, al contrario del coefficiente di determinazione tradizionale, lo Pseudo-R^2^ non può (e non deve) essere interpretato come la quota di devianza spiegata dalla regressione.
 
 I due coefficienti di determinazione (tradizionale e corretto) possono essere ottenuti con la funzione 'R2nls()', disponibile nel package 'aomisc'.
 

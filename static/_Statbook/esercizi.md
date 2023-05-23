@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.12 (Anno Accademico 2021-2022), compil. 2023-05-02"
+date: "Update: v. 1.23 (Anno Accademico 2022-2023), compil. 2023-05-15"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -280,8 +280,10 @@ Placeholder
 ### Valutazione grafica
 ### Errori standard dei parametri
 ### Test F per la mancanza d'adattamento
-### Test F per la bontà di adattamento e coefficiente di determinazione
+### Test F per la bontà di adattamento
+### Coefficiente di determinazione
 ## Previsioni
+## Disegni a blocchi randomizzati
 ## Altre letture
 
 <!--chapter:end:11-LinearRegression.Rmd-->
@@ -342,7 +344,7 @@ Placeholder
 ### Analisi grafica dei residui
 ### Test F per la mancanza di adattamento (approssimato)
 ### Errori standard dei parametri
-### Coefficienti di determinazione
+### Coefficiente di determinazione
 ## Funzioni lineari e nonlineari dei parametri
 ## Previsioni		 
 ## Gestione delle situazioni 'patologiche'
@@ -729,7 +731,7 @@ Stabilire se la dieta è efficace, con una probabilità di errore P < 0.05.
 
 ## Modelli ANOVA ad una via (Cap. da 7 a 9)
 
-Gli esercizi che seguono sono basati su una serie di dataset, disponibili in un file Excel, che può essere scaricato dal seguente link: [https://www.casaonofri.it/_datasets/EserciziTesto.xlsx](https://www.casaonofri.it/_datasets/EserciziTesto.xlsx). Ogni dataset è in un foglio a parte, il cui nome viene fornito nel testo di ciascun esercizio.
+Gli esercizi che seguono sono basati su una serie di dataset, disponibili in un file Excel, che può essere scaricato da [questo link](https://www.casaonofri.it/_datasets/EserciziTesto.xlsx). Ogni dataset è in un foglio a parte, il cui nome viene fornito nel testo di ciascun esercizio.
 
 ### Esercizio 1 
 
@@ -886,7 +888,7 @@ Analizzate i dati e commentate i risultati ottenuti
 
 ### Esercizio 1
 
-È stato condotto uno studio per verificare l'effetto della concimazione azotata sulla lattuga, utilizzando uno schema a blocchi randomizzati. I risultat sono i seguenti:
+È stato condotto uno studio per verificare l'effetto della concimazione azotata (in kg/ha) sulla produzione (in quintali per ettaro) della lattuga, utilizzando uno schema a blocchi randomizzati. I risultati sono i seguenti:
 
 | N level | B1  | B2  | B3  | B4  |
 |:-------:|:---:|:---:|:---:|:---:|
@@ -896,14 +898,14 @@ Analizzate i dati e commentate i risultati ottenuti
 |   150   | 157 | 150 | 140 | 163 |
 |   200   | 163 | 156 | 156 | 171 |
 
-Analizzare i dati e commentare i risultati
+Analizzare i dati, adattare un modello di regressione, verificarne la bontà di adattamento e commentare i risultati
 [Sheet: 11.1]
 
 ### Esercizio 2
 
-Per valutare la soglia economica d'intervento, è necessario definire la relazione tra la densità di una pianta infestante e la perdita produttiva della coltura. Ipotizziamo che, nel range di densità osservato, il modello di competizione sia una retta. Per parametrizzare questo modello e verificarne la validità, è stato organizzato un esperimento a blocchi randomizzati, dove sono stati inclusi sette diversi livelli di infestazione di *Sinapis arvensis* ed è stata rilevata la produzione di acheni del girasole. I risultati sono:
+Per valutare la soglia economica d'intervento, è necessario definire la relazione tra la densità di una pianta infestante (*Sinapis arvensis*) e la produzione della coltura. Ipotizziamo che, nel range di densità osservato, il modello di competizione sia una retta. Per parametrizzare questo modello e verificarne la validità, è stato organizzato un esperimento a blocchi randomizzati, dove sono stati inclusi sette diversi livelli di infestazione di *Sinapis arvensis* , (in piante per metro quadrato) ed è stata rilevata la produzione di acheni del girasole (in quintali per ettaro). I risultati sono:
 
-| density | Rep y | ield   |
+| density | Block | Yield  |
 |:-------:|------:|:-------|
 |    0    |     1 | 36.63  |
 |   14    |     1 | 29.73  |
@@ -945,20 +947,20 @@ Eseguire l'ANOVA e verificare il rispetto delle assunzioni di base. E'corretto e
 
 La biologia di *Sorghum halepense* da rizoma mostra che il peso dei rizomi raggiunge un minimo intorno alla quarta foglia. Di conseguenza, eseguire un trattamento in quest'epoca dovrebbe minimizzare le possibilità di ripresa degli individui trattati, portando anche ad un certo risanamento del terreno. Tuttavia, ci si attende che gli effetti siano maggiori quando le piante provengono da rizomi più piccoli, con un minor contenuto di sostanze di riserva. Per affrontare questi argomenti è stata organizzata una prova in vaso, secondo un disegno a randomizzazione completa con quattro repliche. I risultati sono i seguenti:
 
-| Sizes ↓ / Timing → |  2-3  |  4-5  |  6-7  |  8-9  | 3-4/8-9 | Untreated |
-|:-------------------|:-----:|:-----:|:-----:|:-----:|:-------:|:---------:|
-| 2-nodes            | 34.03 | 0.10  | 30.91 | 33.21 |  2.89   |   41.63   |
-|                    | 22.31 | 6.08  | 35.34 | 43.44 |  19.06  |   22.96   |
-|                    | 21.70 | 3.73  | 24.23 | 44.06 |  0.10   |   52.14   |
-|                    | 14.90 | 9.15  | 28.27 | 35.34 |  0.68   |   59.81   |
-| 4-nodes            | 42.19 | 14.86 | 52.34 | 39.06 |  8.62   |   68.15   |
-|                    | 51.06 | 36.03 | 43.17 | 61.59 |  0.05   |   42.75   |
-|                    | 43.77 | 21.85 | 57.28 | 48.89 |  0.10   |   57.77   |
-|                    | 31.74 | 8.71  | 29.71 | 49.14 |  9.65   |   44.85   |
-| 6-nodes            | 20.84 | 11.37 | 55.00 | 41.77 |  9.80   |   43.20   |
-|                    | 26.12 | 2.24  | 28.46 | 37.38 |  0.10   |   40.68   |
-|                    | 35.24 | 14.17 | 21.81 | 39.55 |  1.42   |   34.11   |
-|                    | 13.32 | 23.93 | 60.72 | 48.37 |  6.83   |   32.21   |
+| Sizes / Timings | 2-3   | 4-5   | 6-7   | 8-9   | 3-4/8-9 | Untreated|
+|:--------------|:-----:|:-----:|:-----:|:-----:|:-------:|:----:|
+| 2-nodes       | 34.03 | 0.10  | 30.91 | 33.21 | 2.89    | 41.63|
+|               | 22.31 | 6.08  | 35.34 | 43.44 | 19.06   | 22.96|
+|               | 21.70 | 3.73  | 24.23 | 44.06 | 0.10    | 52.14|
+|               | 14.90 | 9.15  | 28.27 | 35.34 | 0.68    | 59.81|
+| 4-nodes       | 42.19 | 14.86 | 52.34 | 39.06 | 8.62    | 68.15|
+|               | 51.06 | 36.03 | 43.17 | 61.59 | 0.05    | 42.75|
+|               | 43.77 | 21.85 | 57.28 | 48.89 | 0.10    | 57.77|
+|               | 31.74 | 8.71  | 29.71 | 49.14 | 9.65    | 44.85|
+| 6-nodes       | 20.84 | 11.37 | 55.00 | 41.77 | 9.80    | 43.20|
+|               | 26.12 | 2.24  | 28.46 | 37.38 | 0.10    | 40.68|
+|               | 35.24 | 14.17 | 21.81 | 39.55 | 1.42    | 34.11|
+|               | 13.32 | 23.93 | 60.72 | 48.37 | 6.83    | 32.21|
 
 Eseguite l'ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente.
 [Sheet: 12-13.1]
@@ -1082,12 +1084,12 @@ Due campioni di terreno sono stati trattati con due erbicidi diversi e sono stat
 |  60  |    2.00     |    5.10     |
 |  70  |    1.00     |    3.00     |
 
-Ipotizzando che la degradazione dei due erbicidi segue una cinetica del primo ordine, parametrizzare la relativa equazione e determinare la semivita dei due erbicidi. Quale sostanza degrada più velocemente?
+Ipotizzando che la degradazione dei due erbicidi segue una cinetica di decadimento esponenziale del primo ordine (vale a dire: $y = a \exp \left\{ - bx \right\}$), parametrizzare la relativa equazione e determinare la semivita dei due erbicidi. Quale sostanza degrada più velocemente?
 [Sheet: 14.1]
 
 ### Esercizio 2
 
-Un popolazione microbica in condizioni non-limitanti di substrato cresce seguendo una cinetica del primo ordine. Un esperimento da i seguenti risultati:
+Un popolazione microbica in condizioni non-limitanti di substrato cresce seguendo un ritmo esponenziale. Un esperimento da i seguenti risultati:
 
 | Time | Cells |
 |:----:|:-----:|
@@ -1100,7 +1102,7 @@ Un popolazione microbica in condizioni non-limitanti di substrato cresce seguend
 |  60  |  94   |
 |  70  |  201  |
 
-Parametrizzare un modello esponenziale e calcolarne la bontà di adattamento.
+Parametrizzare un modello di crescita esponenziale e valutarne la bontà di adattamento.
 [Sheet: 14.2]
 
 ### Esercizio 3
@@ -1162,7 +1164,7 @@ Uno degli aspetti fondamentali degli studi relativi alla diversità degli ambien
 
 Parametrizzare una curva 'di potenza' (power curve):
 
-$$a \cdot x^b$$
+$$y = a \cdot x^b$$
 
 Valutarne la bontà di adattamento. Determinare l'area minima di campionamento.
 [Sheet: 14.5]
@@ -1194,7 +1196,7 @@ Si ritiene che la crescita di una coltura possa essere descritta accuratamente c
 
 Parametrizzare il modello di Gompertz:
 
-$$a \cdot exp(-b \cdot exp(-c \cdot x))$$
+$$y = a \cdot exp(-b \cdot exp(-c \cdot x))$$
 
 e verificarne la bontà di adattamento nelle due situazioni. Quali parametri del modello di Gompertz sono maggiormente influenzati dalle piante infestanti? Abbiamo elementi per ritenere che la crescita segua un'equazione di Gompertz piuttosto che una logistica simmetrica?
 [Sheet: 14.6]
@@ -1203,7 +1205,7 @@ e verificarne la bontà di adattamento nelle due situazioni. Quali parametri del
 
 Piante di *Tripleuspermum inodorum* in vaso sono state trattate con erbicida sulfonilureico (tribenuron-methyl) a dosi crescenti. Tre settimano deopo il trattamento è stato registrato il peso delle piante sopravvissute, ottenendo i risulti riportati nella tabella seguente:
 
-| Dose (g a.i. ha$^{-1}$) | Fresh weight (g pot $^{-1}$) |
+| Dose (g/ha) | Fresh weight (g/pot) |
 |:-----------------------:|:----------------------------:|
 |            0            |            115.83            |
 |            0            |            102.90            |
@@ -1223,7 +1225,7 @@ Piante di *Tripleuspermum inodorum* in vaso sono state trattate con erbicida sul
 
 Si ipotizza che la relazione dose-effetto possa essere descritta con un modello log-logistico:
 
-$$c + \frac{d - c}{1 + exp(b ( log (x) - log (a))}$$
+$$y = c + \frac{d - c}{1 + exp(b ( log (x) - log (a))}$$
 
 Parametrizzare questo modello e verificarne la bontà d'adattamento.
 [Sheet: 14.7]

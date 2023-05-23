@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.23 (Anno Accademico 2022-2023), compil. 2023-05-12"
+date: "Update: v. 1.23 (Anno Accademico 2022-2023), compil. 2023-05-23"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -3489,9 +3489,9 @@ multcomp::cld(medie, adjust="none", Letters=LETTERS)
 ## 
 ## Confidence level used: 0.95 
 ## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.
 ```
 
 
@@ -3937,9 +3937,9 @@ multcomp::cld(medie, Letters = LETTERS, reverse = T)
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 16 estimates 
 ## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.
 ```
 
 \normalsize
@@ -4215,7 +4215,7 @@ anova(modelReg, model)
 
 Vediamo che non otteniamo risultati significativi (P = 0.4334). Ciò supporta l'idea che non vi sia mancanza d'adattamento e quindi la regressione fornisca una descrizione altrettanto adeguata dei dati sperimentali rispetto al più 'complesso' modello ANOVA. Scegliamo quindi il modello di regressione, in quanto più semplice, nel rispetto del principio del rasoio di Occam.
 
-### Test F per la bontà di adattamento e coefficiente di determinazione
+### Test F per la bontà di adattamento
 
 Abbiamo dimostrato che il modello di regressione non è significativamente peggiore del modello ANOVA corrispondente. Un approccio alternativo per dimostrare la bontà di adattamento è verificare se il modello di regressione è significativamente migliore di un modello 'nullo'. Ricordiamo che con il modello 'nullo' ($Y_i = \mu + \varepsilon_i$) si assume che la risposta sia costante e pari alla media di tutti i dati, escludendo così ogni effetto della dose di concimazione. La devianza del residuo di un modello nullo non è altro che la devianza totale dei dati, che risulta pari a 1787.178:
 
@@ -4247,11 +4247,13 @@ anova(modelReg)
 
 Vediamo che in questo caso l'ipotesi nulla deve essere rifiutata: la varianza spiegata dalla regressione è significativamente maggiore di quella del residuo.
 
-Più frequentemente, la devianza spiegata dalla regressione viene rapportata alla devianza totale, per individuare quanta parte della variabilità dei dati è spiegata dal modello prescelto. Questa proporzione definisce il cosiddetto **coefficiente di determinazione** o R^2^:
+### Coefficiente di determinazione
+
+Nella letteratura scientifica si è sempre sentita l'esigenza di una statistica che rappresentasse, in modo sintetico, la bontà della regressione. Per questo scopo si è sempre utilizzato il rapporto tra la devianza spiegata dalla regressione e la devianza totale, detto **coefficiente di determinazione** o R^2^:
 
 $$R^2 = \frac{SS_{reg}}{SS_{tot}} = \frac{1716.81}{1787.18} = 0.961$$
  
-Questa statistica varia da 0 ad 1 e la regressione è tanto migliore quanto più essa si avvicina ad 1. In realtà il coefficiente di determinazione è visibile nell'output della funzione `summary()` applicata all'oggetto 'modelReg' (vedi più sopra).
+Questa statistica varia da 0 ad 1; in quest'ambito, più è alto il valore tanto migliore è la bontà della regressione. Il coefficiente di determinazione è visibile nell'output della funzione `summary()` applicata all'oggetto 'modelReg' (vedi più sopra).
 
 ## Previsioni
 
@@ -4721,9 +4723,9 @@ multcomp::cld(medie, Letters = LETTERS)
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
 ## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.
 ```
 
 Se volessimo confrontare le lavorazioni a parità di diserbo o tutte le combinazioni dovremmo utilizzare una sintassi leggermente diversa:
@@ -4748,9 +4750,9 @@ multcomp::cld(medie, Letters=LETTERS)
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 3 estimates 
 ## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.
 medie <- emmeans(mod, ~Tillage:WeedControl)
 multcomp::cld(medie, Letters=LETTERS)
 ##  Tillage WeedControl emmean    SE df lower.CL upper.CL .group
@@ -4765,9 +4767,9 @@ multcomp::cld(medie, Letters=LETTERS)
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 6 estimates 
 ## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.
 ```
 
 Le tre analisi (contronti tra lavorazioni a parità di diserbo, tra diserbi a parità di lavorazione e tutti verso tutti) portano a risultati leggermente diversi per il diverso numero di confronti effettuati: tre nel primo caso, sei nel secondo e 15 nel terzo, che richiedono una diversa correzione per la molteplicità.
@@ -4927,9 +4929,9 @@ multcomp::cld(mfMeans, Letters = LETTERS)
 ## Results are averaged over some or all of the levels of: Block 
 ## P value adjustment: tukey method for comparing a family of 9 estimates 
 ## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.
 ```
 
 In conclusione, vediamo che l'analisi dei disegni con due fattori innestati è piuttosto simile a quella per due fattori incrociati, con l'unica eccezione che l'effetto principale per il fattore innestato non è incluso nel modello.
@@ -5301,7 +5303,7 @@ summary(modNlin)
 ## Achieved convergence tolerance: 4.33e-07
 ```
 
-Invece che codificare il modello non-lineare a mano, possiamo ricorrere ad una delle funzioni R indicate in Figura \@ref(fig:figName151bis), che sono associate ad appositi algoritmi di self-startin e non necessitano dell'individuazione di valori iniziali (almeno nella gran parte dei casi). Queste funzioni sono disponibili nel package 'aomisc' che deve quindi essere installato da 'github'. 
+Invece che codificare il modello non-lineare a mano, possiamo ricorrere ad una delle funzioni R indicate in Figura \@ref(fig:figName151bis), che sono associate ad appositi algoritmi di self-starting e non necessitano dell'individuazione di valori iniziali (almeno nella gran parte dei casi). Queste funzioni sono disponibili nel package 'aomisc' che deve quindi essere installato da 'github'. 
 
 
 ```r
@@ -5325,11 +5327,11 @@ plot(modNlin, which = 2)
 ```
 
 <div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName154-1.png" alt="Analisi grafica dei residui per la regressione non-lineare, relativa alla degradazione di metamitron nel suolo" width="90%" />
-<p class="caption">(\#fig:figName154)Analisi grafica dei residui per la regressione non-lineare, relativa alla degradazione di metamitron nel suolo</p>
+<img src="_main_files/figure-html/figName154res-1.png" alt="Analisi grafica dei residui per la regressione non-lineare, relativa alla degradazione di metamitron nel suolo" width="90%" />
+<p class="caption">(\#fig:figName154res)Analisi grafica dei residui per la regressione non-lineare, relativa alla degradazione di metamitron nel suolo</p>
 </div>
 
-La Figura \@ref(fig:figName154) non mostra deviazioni rispetto agli assunti di base. Pertanto, proseguiamo l'analisi grafica della bontà di adattamento, verificando il plot dei valori attesi e di quelli osservati (Figure \@ref(fig:figName155)). Questo grafico, per gli oggetti 'nls' può essere ottenuto velocemente utilizzando la funzione 'plotnls()', nel package 'aomisc'.
+La Figura \@ref(fig:figName154res) non mostra deviazioni rispetto agli assunti di base. Pertanto, proseguiamo l'analisi grafica della bontà di adattamento, verificando il plot dei valori attesi e di quelli osservati (Figure \@ref(fig:figName155)). Questo grafico, per gli oggetti 'nls' può essere ottenuto velocemente utilizzando la funzione 'plotnls()', nel package 'aomisc'.
 
 
 
@@ -5422,33 +5424,33 @@ Un'altra valutazione importante da fare è quella relativa agli errori standard 
 
 ### Coefficiente di determinazione
 
-Abbiamo visto che il residuo della regressione è pari a 151.2 con 16 gradi di libertà. La devianza totale dei dati (somma dei quadrati degli scarti rispetto alla media generale) è invece:
+Come abbiamo visto per la regressione lineare, anche nella regressione non-lineare si sente l'esigenza di una statistica che rappresenti in modo sintetico la bontà di adattamento. L'argomento è molto dibattuto e molti autori sono contrari all'impiego del coefficiente di determinazione, prevalentemente per due motivi:
+
+1. i modelli di regressione non-lineare non hanno una vera e propria intercetta (almeno non nel senso usuale);
+2. la somma della devianza della regressione e della devianza del residuo non è necessariamente uguale alla devianza totale.
+
+Tuttavia, molti altri autori sono dell'opinione che, per la sua semplicità, una statistica analoga al coefficiente di determinazione possa risultare molto utile, purché utilizzata con la necessaria prudenza. In particolare viene suggerito l'impiego della statistica:
+
+$$\textrm{Pseudo-R}^2 = 1 - \frac{SSr}{SSt}$$
+
+che, nel caso della regressione lineare, sarebbe analoga alla formula già vista per l'R^2^ nel capitolo precedente, ma che, nel caso della regressione non-lineare, fornisce risultati diversi. In particolare, lo Pseudo-R^2^ può essere, al massimo, pari ad 1 per un modello con una bontà di adattamento perfetta, ma che, al contrario dell'$R^2$, può divenire negativo, anche se in situazioni nelle quali vi sono da sospettare gravi problemi con il modello prescelto per descrivere i dati.
+
+Nel caso in esempio, il residuo della regressione è pari a 151.2 con 16 gradi di libertà, mentre la devianza totale dei dati (somma dei quadrati degli scarti rispetto alla media generale) è:
 
 
 ```r
 SSt <- deviance(lm(Conc ~ 1, data=degradation))
 ```
 
-ed ha 23 gradi di libertà. La differenza:
+ed ha 23 gradi di libertà. Il valore di Pseudo-R^2^ è:
 
 
 ```r
-SSt - SSr
-## [1] 24683.13
+1 - SSr/SSt
+## [1] 0.9939126
 ```
 
-costituisce la devianza spiegata dalla regressione. Il coefficente di determinazione $R^2$ è quindi:
-
-$$R^2 = \frac{SSt - SSr}{SSt} = \frac{24683.13}{24834.3} = 0.994$$
- 
-Il valore ottenuto attesta un ottimo adattamento, in quanto è vicino ad 1. Bisogna ricordare che, pur essendo utilizzato in modo pressoché ubiquitario, il coefficiente di determinazione per i modelli non-lineari fornisce solo un'indicazione abbastanza grezza sulla bontà del modello, in quanto può rimanere alto anche quando vi sono sistematiche violazioni rispetto alla forma della funzione.
-
-Oltre al coefficiente di determinazione tradizionale, può essere utilizzato anche il coefficiente di determinazione corretto, dato dalla proporzione di varianza (MS) spiegata dalla regressione: 
-
-
-$$R_a^2  = 1 - \frac{MS_{residuo} }{MS_{tot} } = 0.9936$$
-
-L'$R^2$ corretto è sempre più basso dell $R^2$ e tende a penalizzare i modelli con molti parametri. Di conseguenza, favorisce i modelli semplici, nel rispetto del principio del rasoio di Occam.
+ed attesta un ottimo adattamento, in quanto è vicino ad 1. Bisogna ricordare che, pur essendo utilizzato in modo pressoché ubiquitario, il coefficiente di determinazione per i modelli non-lineari fornisce solo un'indicazione abbastanza grezza sulla bontà del modello, in quanto può rimanere alto anche quando vi sono sistematiche violazioni rispetto alla forma della funzione. Inoltre, al contrario del coefficiente di determinazione tradizionale, lo Pseudo-R^2^ non può (e non deve) essere interpretato come la quota di devianza spiegata dalla regressione.
 
 I due coefficienti di determinazione (tradizionale e corretto) possono essere ottenuti con la funzione 'R2nls()', disponibile nel package 'aomisc'.
 
@@ -5568,20 +5570,13 @@ Con un oggetto 'nls', possiamo utilizzare la funzione 'boxcox' nel package 'aomi
 
 
 ```r
-modNlin2 <- boxcox(modNlin)
-modNlin2
-## Nonlinear regression model
-##   model: bcFct1(Conc) ~ bcFct2(A * exp(-k * Time))
-##    data: degradation
-##        A        k 
-## 99.41873  0.06665 
-##  residual sum-of-squares: 51.88
-## 
-## Number of iterations to convergence: 2 
-## Achieved convergence tolerance: 7.511e-06
+modNlin2 <- boxcox(modNlin, plotit = F)
 summary(modNlin2)
 ## 
-## Formula: bcFct1(Conc) ~ bcFct2(A * exp(-k * Time))
+## Estimated lambda: 0.8 
+## Confidence interval for lambda: [0.56,0.96]
+## 
+## Formula: newRes ~ eval(parse(text = newFormula), df)
 ## 
 ## Parameters:
 ##    Estimate Std. Error t value Pr(>|t|)    
@@ -5601,10 +5596,13 @@ Invece che far scegliere alla funzione 'boxcox' il valore di $\lambda$ ottimale,
 
 
 ```r
-modNlin3 <- boxcox(modNlin, lambda = 0.5)
+modNlin3 <- boxcox(modNlin, lambda = 0.5, plotit = F)
 summary(modNlin3)
 ## 
-## Formula: bcFct1(Conc) ~ bcFct2(A * exp(-k * Time))
+## Estimated lambda: 0.5 
+## Confidence interval for lambda: [NA,NA]
+## 
+## Formula: newRes ~ eval(parse(text = newFormula), df)
 ## 
 ## Parameters:
 ##    Estimate Std. Error t value Pr(>|t|)    
@@ -5919,6 +5917,7 @@ Considerando il testo dell'esercizio 5, simulare un esperimento in cui la coltur
 
 Considerando il testo dell'esercizio 6, simulare un esperimento in cui l'insetticida viene utilizzato a cinque dosi crescenti (a vostra scelta), con quattro repliche.
 
+
 ---
 
 ## Stima dei parametri (Cap. 5)
@@ -5960,6 +5959,10 @@ Un campione di 400 insetti a cui è stato somministrato un certo insetticida mos
 |120  | 5.50 |
 
 Assumendo che la relazione sia lineare (retta), stimare la pendenza e l'intercetta della popolazione di riferimento, dalla quale è stato estratto il campione in studio. Utilizzare la funzione `lm(Yield ~ Dose)` ed estrarre gli errori standard con il metodo `summary()`.
+
+### Esercizio 6
+
+Utilizzando una simulazione Monte Carlo opportunamente pianificata, mostrare che la varianza del campione (uguale alla devianza divisa per il numero di individui meno uno) fornisce una stima più accurata della varianza della popolazione, rispetto allo scarto quadratico medio (devianza divisa per il numero di soggetti) che è invece uno stimatore distorto. Suggerimento: ricordare che uno stimatore accurato ha una distribuzione campionaria (*sampling distribution*) il cui valore atteso coincide con il valore da stimare.
 
 ---
 
@@ -6477,12 +6480,12 @@ Due campioni di terreno sono stati trattati con due erbicidi diversi e sono stat
 |  60  |    2.00     |    5.10     |
 |  70  |    1.00     |    3.00     |
 
-Ipotizzando che la degradazione dei due erbicidi segue una cinetica del primo ordine, parametrizzare la relativa equazione e determinare la semivita dei due erbicidi. Quale sostanza degrada più velocemente?
+Ipotizzando che la degradazione dei due erbicidi segue una cinetica di decadimento esponenziale del primo ordine (vale a dire: $y = a \exp \left\{ - bx \right\}$), parametrizzare la relativa equazione e determinare la semivita dei due erbicidi. Quale sostanza degrada più velocemente?
 [Sheet: 14.1]
 
 ### Esercizio 2
 
-Un popolazione microbica in condizioni non-limitanti di substrato cresce seguendo una cinetica del primo ordine. Un esperimento da i seguenti risultati:
+Un popolazione microbica in condizioni non-limitanti di substrato cresce seguendo un ritmo esponenziale. Un esperimento da i seguenti risultati:
 
 | Time | Cells |
 |:----:|:-----:|
@@ -6495,7 +6498,7 @@ Un popolazione microbica in condizioni non-limitanti di substrato cresce seguend
 |  60  |  94   |
 |  70  |  201  |
 
-Parametrizzare un modello esponenziale e calcolarne la bontà di adattamento.
+Parametrizzare un modello di crescita esponenziale e valutarne la bontà di adattamento.
 [Sheet: 14.2]
 
 ### Esercizio 3
@@ -6557,7 +6560,7 @@ Uno degli aspetti fondamentali degli studi relativi alla diversità degli ambien
 
 Parametrizzare una curva 'di potenza' (power curve):
 
-$$a \cdot x^b$$
+$$y = a \cdot x^b$$
 
 Valutarne la bontà di adattamento. Determinare l'area minima di campionamento.
 [Sheet: 14.5]
@@ -6589,7 +6592,7 @@ Si ritiene che la crescita di una coltura possa essere descritta accuratamente c
 
 Parametrizzare il modello di Gompertz:
 
-$$a \cdot exp(-b \cdot exp(-c \cdot x))$$
+$$y = a \cdot exp(-b \cdot exp(-c \cdot x))$$
 
 e verificarne la bontà di adattamento nelle due situazioni. Quali parametri del modello di Gompertz sono maggiormente influenzati dalle piante infestanti? Abbiamo elementi per ritenere che la crescita segua un'equazione di Gompertz piuttosto che una logistica simmetrica?
 [Sheet: 14.6]
@@ -6618,7 +6621,7 @@ Piante di *Tripleuspermum inodorum* in vaso sono state trattate con erbicida sul
 
 Si ipotizza che la relazione dose-effetto possa essere descritta con un modello log-logistico:
 
-$$c + \frac{d - c}{1 + exp(b ( log (x) - log (a))}$$
+$$y = c + \frac{d - c}{1 + exp(b ( log (x) - log (a))}$$
 
 Parametrizzare questo modello e verificarne la bontà d'adattamento.
 [Sheet: 14.7]
