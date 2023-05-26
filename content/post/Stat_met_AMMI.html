@@ -1,7 +1,7 @@
 ---
-title: "AMMI analyses for GE interactions"
+title: "AMMI analyses for multi-environment studies"
 author: "Andrea Onofri"
-date: 2020-05-12
+date: 2023-05-26
 slug: 'Multi_environment_studies'
 categories:
   - R
@@ -12,18 +12,17 @@ tags:
   - 'Multi_environment_studies'
   - 'aomisc'
 archives:
-  - 2020
+  - 2023
 ---
 
 
 
-<p>The CoViD-19 situation in Italy is little by little improving and I feel a bit more optimistic. It’s time for a new post! I will go back to a subject that is rather important for most agronomists, i.e. the selection of crop varieties.</p>
-<p>All farmers are perfectly aware that crop performances are affected both by the genotype and by the environment. These two effects are not purely additive and they often show a significant interaction. By this word, we mean that a genotype can give particularly good/bad performances in some specific environmental situations, which we may not expect, considering its average behaviour in other environmental conditions. The Genotype by Environment (GE) interaction may cause changes in the ranking of genotypes, depending on the environment and may play a key role in varietal recommendation, for a given mega-environment.</p>
-<p>GE interactions are usually studied by way of Multi-Environment Trials (MET), where experiments are repeated across several years, locations or any combinations of those. Traditional techniques of data analyses, such as two-way ANOVA, give very little insight on the stability/reliability of genotypes across environments and, thus, other specialised techniques are necessary to shed light on interaction effects. I have already talked about stability analyses in other posts, such as <a href="https://www.statforbiology.com/2019/stat_lmm_stabilityvariance/">in this post about the stability variance</a> or in this <a href="https://www.statforbiology.com/2019/stat_lmm_environmentalvariance/">other post about the environmental variance</a>. Now, I would like to propose some simple explanations about AMMI analysis. AMMI stands for: <strong>Additive Main effect Multiplicative Interaction</strong> and it has become very much in fashion in the last 20-25 years.</p>
+<p>Again into a subject that is rather important for most agronomists, i.e. the selection of crop varieties. All farmers are perfectly aware that crop performances are affected both by the genotype and by the environment. These two effects are not purely additive and they often show a significant interaction. By this word, we mean that a genotype can give particularly good/bad performances in some specific environmental situations, which we may not expect, considering its average behaviour in other environmental conditions. The Genotype by Environment (GE) interaction may cause changes in the ranking of genotypes, depending on the environment and may play a key role in varietal recommendation, for a given mega-environment.</p>
+<p>GE interactions are usually studied by way of Multi-Environment Trials (MET), where experiments are repeated across several years, locations or any combinations of those. Traditional techniques of data analyses, such as two-way ANOVA, give very little insight on the stability/reliability of genotypes across environments and, thus, other specialised techniques are necessary, to shed light on interaction effects. I have already talked about stability analyses in other posts, such as <a href="https://www.statforbiology.com/2019/stat_lmm_stabilityvariance/">in this post about the stability variance</a> or in this <a href="https://www.statforbiology.com/2019/stat_lmm_environmentalvariance/">other post about the environmental variance</a>. Now, I would like to propose some simple explanation about the AMMI analysis. AMMI stands for: <strong>Additive Main effect Multiplicative Interaction</strong> and it has become very much in fashion in the last 20-25 years.</p>
 <p>Let’s start with a real MET example.</p>
 <div id="a-met-with-faba-bean" class="section level1">
 <h1>A MET with faba bean</h1>
-<p>This experiment consists of 12 faba bean genotypes (well, it was, indeed, 6 genotypes in two sowing dates; but, let’s disregard this detail from now on) in four blocks, two locations and three years (six environments, in all). The dataset is online available as ‘fabaBean.csv’. It has been published by Stagnari et al. (2007).</p>
+<p>This experiment consists of 12 faba bean genotypes (well, it was, indeed, 6 genotypes in two sowing dates; but, let’s disregard this detail from now on) in four blocks, two locations and three years (six environments, in all). The dataset is online available as ‘fabaBean.csv’ and it has been published by Stagnari et al. (2007).</p>
 <p>First of all, let’s load the dataset and transform the block variable into a factor. Let’s also inspect the two-way table of means, together with the marginal means for genotypes and environments, which will be useful later. In this post, we will make use of the packages ‘dplyr’ (Wickham <em>et al</em>., 2020), ‘emmeans’ (Lenth, 2020) and ‘aomisc’; this latter is the companion package for this website and must have been installed as detailed in this <a href="https://www.statforbiology.com/rpackages/">page here</a>.</p>
 <pre class="r"><code># options(width = 70)
 
@@ -237,7 +236,7 @@ print ( round(GE2, 3) )
 </div>
 <div id="why-is-this-useful" class="section level1">
 <h1>Why is this useful?</h1>
-<p>Did you get lost? Hope you didn’t, but let’s make a stop and see where we are standing now. We started from the interaction matrix GE and found a way to decompose it as the product of two matrices, i.e. <span class="math inline">\(S_g\)</span> and <span class="math inline">\(S_e\)</span>, a matrix of genotype scores and a matrix of environment scores. We discovered that we could obtain a good approximation of GE by working in reduced rank space and we only used two genotypic scores and two environment scores, in place of the available six.</p>
+<p>Did you get lost? Hope you didn’t, but let’s make a stop and see where we are standing now. We started from the interaction matrix GE and found a way to decompose it as the product of two matrices, i.e. <span class="math inline">\(S_g\)</span> and <span class="math inline">\(S_e\)</span>, a matrix of genotype scores and a matrix of environment scores. We discovered that we could obtain a good approximation of GE by working in reduced rank space and we only used two genotypic scores and two environment scores, in place of the available six.</p>
 <p>This is great! Now we have the ability of drawing a biplot, i.e. we can plot both genotypic scores and environmental scores in a dispersion graph (biplot: two plots in one), as we see below.</p>
 <pre class="r"><code>biplot(Sg[,1:2], Se[,1:2], xlim = c(-1, 1), ylim = c(-1, 1),
        xlab = &quot;PC 1&quot;, ylab = &quot;PC 2&quot;)
@@ -274,8 +273,8 @@ sum(GE2^2)
 </div>
 <div id="simple-ammi-analysis-with-r" class="section level1">
 <h1>Simple AMMI analysis with R</h1>
-<p>We have seen that AMMI analysis, under the hood, is a sort of PCA. Therefore, it could be performed, in R by using one of the available packages for PCA. For the sake of simplicity, I have coded a couple of functions, i.e. ‘AMMI()’ and ‘AMMImeans()’ and they are both available in the ‘aomisc’ package. I have described the first one a few years ago in an R news paper (<a href="https://www.researchgate.net/publication/289419258_Using_R_to_perform_the_AMMI_analysis_on_agriculture_variety_trials">Onofri and Ciriciofolo, 2007</a>).</p>
-<p>Here, I will describe the second one, which permits to handle a small degree of unbalance (a few plots, missing at random). The analysis proceeds in two steps.</p>
+<p>We have seen that AMMI analysis, under the hood, is a sort of PCA. Therefore, it could be performed, in R by using one of the available packages for PCA. For the sake of simplicity, I have coded the simple <code>AMMI()</code> function, that is available in the ‘aomisc’ package. I have described an earlier version of this function in an ‘R news’ paper (<a href="https://www.researchgate.net/publication/289419258_Using_R_to_perform_the_AMMI_analysis_on_agriculture_variety_trials">Onofri and Ciriciofolo, 2007</a>).</p>
+<p>Tha above function works equally well with raw MET data, containing all replicated values, or with the ‘genotype by environment’ average values. In this second case, the analyses proceed in two-steps, as I will describe below.</p>
 <div id="first-step-on-raw-data" class="section level2">
 <h2>First step on raw data</h2>
 <p>During the first step we need to obtain a reliable matrix of means for the ‘genotype x environment’ combinations. If the environment is fixed, we can use least squares means, which are unbiased, also when some observations are missing. If the environment effect is random, we could use the BLUPs, but we will not consider such an option here.</p>
@@ -287,8 +286,8 @@ ge.lsm &lt;- data.frame(ge.lsm)[,1:3]</code></pre>
 </div>
 <div id="second-step-on-least-square-means" class="section level2">
 <h2>Second step on least square means</h2>
-<p>This second step assumes that the residual variances for all environments are homogeneous. If so (we’d better check this), we can take the expected marginal means (‘ge.lsm’) and submit them to AMMI analysis, by using the ‘AMMImeans()’ function. The syntax is fairly obvious; we also pass to it the RMSE and its degrees of freedom. The resulting object can be explored, by using the appropriate slots.</p>
-<pre class="r"><code>AMMIobj &lt;- AMMImeans(yield = ge.lsm$emmean, 
+<p>This second step assumes that the residual variances for all environments are homogeneous. If so (we’d better check this), we can take the expected marginal means (‘ge.lsm’) and submit them to AMMI analysis, by using the <code>AMMI()</code> function. The syntax is fairly obvious; we also pass to it the RMSE and its degrees of freedom. The resulting object can be explored, by using the appropriate slots.</p>
+<pre class="r"><code>AMMIobj &lt;- AMMI(yield = ge.lsm$emmean, 
                      genotype = ge.lsm$Genotype, 
                      environment = ge.lsm$Environment, 
                      MSE = RMSE, dfr = dfr)
@@ -317,36 +316,23 @@ AMMIobj$environment_scores
 ## pap_2 -0.06863235 -0.62703224
 ## pap_3  0.84633965  0.56736492
 #
-round(AMMIobj$summary, 4)
-##   PC Singular_value  PC_SS Perc_of_Total_SS cum_perc
-## 1  1         2.3000 5.2902          68.3220  68.3220
-## 2  2         1.1785 1.3888          17.9364  86.2584
-## 3  3         0.8035 0.6456           8.3375  94.5959
-## 4  4         0.5119 0.2621           3.3846  97.9806
-## 5  5         0.3954 0.1564           2.0194 100.0000
-## 6  6         0.0000 0.0000           0.0000 100.0000
-#
-round(AMMIobj$anova, 4)
-##   PC     SS DF     MS       F P.value
-## 1  1 5.2902 15 0.3527 12.9437  0.0000
-## 2  2 1.3888 13 0.1068  3.9208  0.0000
-## 3  3 0.6456 11 0.0587  2.1539  0.0184
-## 4  4 0.2621  9 0.0291  1.0687  0.3876
-## 5  5 0.1564  7 0.0223  0.8198  0.5718
-## 6  6 0.0000  5 0.0000  0.0000  1.0000</code></pre>
+AMMIobj$mult_Interaction
+##      Effect       SS DF        MS         F        Prob. Perc_of_Total_SS
+## 1       PC1 5.290174 15 0.3526782 12.943700 2.926881e-22        0.6832205
+## 2       PC2 1.388812 13 0.1068317  3.920847 1.135641e-05        0.1793636
+## 3 Residuals 1.064011 27 0.0394078  1.446312 8.056050e-02        0.1374159</code></pre>
 <p>In detail, we can retrieve the genotype and environment scores, the proportion of the GE variance explained by each component and the significance of PCs.</p>
-<p>Just to show you, the box below reports the code for AMMI analysis on raw data. Please, note that this only works with balanced data.</p>
-<pre class="r"><code>AMMIobj2 &lt;- AMMI(yield = dataset$Yield, 
-                 genotype = dataset$Genotype,
-                 environment = dataset$Environment, 
-                 block = dataset$Block)</code></pre>
-<p>I agree, these functions are not very ambitious. However, they are simple enough to be usable and give reliable results, as long as the basic assumptions for the method are respected. You may also consider to explore other more comprehensive R packages, such as ‘agricolae’ (de Mendiburu, 2020).</p>
+<p>I agree, the <code>AMMI()</code> function is not very ambitious. However, it is simple enough to be usable and give reliable results, as long as the basic assumptions for the method are respected. Furthermore, there is also a complimentary <code>biplot()</code> method, that draws either the biplot type 1 (PC1 for genotypes and environments against genotypic/environment means) or the biplot type 2 (PC1 against PC2). The code is shown below.</p>
+<pre><code>biplot(AMMIobj, xlab = &quot;Yield&quot;)
+biplot(AMMIobj, biplot = 2)</code></pre>
+<p>You may also consider to explore other more comprehensive R packages, such as ‘agricolae’ (de Mendiburu, 2020).</p>
 <p>Thank you for reading, so far, and… happy coding!</p>
 <p>Prof. Andrea Onofri<br />
 Department of Agricultural, Food and Environmental Sciences<br />
 University of Perugia (Italy)<br />
-Borgo XX Giugno 74<br />
-I-06121 - PERUGIA</p>
+Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow <span class="citation">@onofriandreapg</span></a>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 <hr />
 </div>
 </div>

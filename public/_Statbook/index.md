@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.12 (Anno Accademico 2021-2022), compil. 2022-11-15"
+date: "Update: v. 1.23 (Anno Accademico 2022-2023), compil. 2023-05-23"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -3489,9 +3489,9 @@ multcomp::cld(medie, adjust="none", Letters=LETTERS)
 ## 
 ## Confidence level used: 0.95 
 ## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.
 ```
 
 
@@ -3937,9 +3937,9 @@ multcomp::cld(medie, Letters = LETTERS, reverse = T)
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 16 estimates 
 ## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.
 ```
 
 \normalsize
@@ -4215,7 +4215,7 @@ anova(modelReg, model)
 
 Vediamo che non otteniamo risultati significativi (P = 0.4334). Ciò supporta l'idea che non vi sia mancanza d'adattamento e quindi la regressione fornisca una descrizione altrettanto adeguata dei dati sperimentali rispetto al più 'complesso' modello ANOVA. Scegliamo quindi il modello di regressione, in quanto più semplice, nel rispetto del principio del rasoio di Occam.
 
-### Test F per la bontà di adattamento e coefficiente di determinazione
+### Test F per la bontà di adattamento
 
 Abbiamo dimostrato che il modello di regressione non è significativamente peggiore del modello ANOVA corrispondente. Un approccio alternativo per dimostrare la bontà di adattamento è verificare se il modello di regressione è significativamente migliore di un modello 'nullo'. Ricordiamo che con il modello 'nullo' ($Y_i = \mu + \varepsilon_i$) si assume che la risposta sia costante e pari alla media di tutti i dati, escludendo così ogni effetto della dose di concimazione. La devianza del residuo di un modello nullo non è altro che la devianza totale dei dati, che risulta pari a 1787.178:
 
@@ -4247,11 +4247,13 @@ anova(modelReg)
 
 Vediamo che in questo caso l'ipotesi nulla deve essere rifiutata: la varianza spiegata dalla regressione è significativamente maggiore di quella del residuo.
 
-Più frequentemente, la devianza spiegata dalla regressione viene rapportata alla devianza totale, per individuare quanta parte della variabilità dei dati è spiegata dal modello prescelto. Questa proporzione definisce il cosiddetto **coefficiente di determinazione** o R^2^:
+### Coefficiente di determinazione
+
+Nella letteratura scientifica si è sempre sentita l'esigenza di una statistica che rappresentasse, in modo sintetico, la bontà della regressione. Per questo scopo si è sempre utilizzato il rapporto tra la devianza spiegata dalla regressione e la devianza totale, detto **coefficiente di determinazione** o R^2^:
 
 $$R^2 = \frac{SS_{reg}}{SS_{tot}} = \frac{1716.81}{1787.18} = 0.961$$
  
-Questa statistica varia da 0 ad 1 e la regressione è tanto migliore quanto più essa si avvicina ad 1. In realtà il coefficiente di determinazione è visibile nell'output della funzione `summary()` applicata all'oggetto 'modelReg' (vedi più sopra).
+Questa statistica varia da 0 ad 1; in quest'ambito, più è alto il valore tanto migliore è la bontà della regressione. Il coefficiente di determinazione è visibile nell'output della funzione `summary()` applicata all'oggetto 'modelReg' (vedi più sopra).
 
 ## Previsioni
 
@@ -4318,6 +4320,101 @@ car::deltaMethod(modelReg, "(45 - b0)/b1",
 
 
 Il procedimento sopra descritto è molto comune, per esempio nei laboratori chimici, dove viene utilizzato nella fase di calibrazione di uno strumento. Una volta che la retta di calibrazione è stata individuate, essa viene utilizzata per determinare le concentrazioni incognite di campioni per i quali sia stata misurata la risposta.
+
+## Disegni a blocchi randomizzati
+
+Come abbiamo gà detto, la gran parte degli esperimenti agronomici, inclusi quelli in cui si organizzano per studiare l'effetto di una variabile quantitativa, sono disegnati a blocchi randomizzati. In questo caso, oltre all'effetto in studio, esiste anche l'effetto del blocco, che non può essere trascurato, altrimenti si viene ad inficiare l'indipendenza dei residui, come abbiamo evidenziato nel capitolo precedente.
+
+Per una banale esempio, potremmo immaginare che nel dataset 'NWheat, le quattro repliche di ogni dose siano state ottenute, nell'ordine, nei blocchi 1, 2, 3 e 4. Il modello lineare risulterebbe così modificato:
+
+$$Y_{ij} = b_0 + \gamma_j + b_1 X_{ij} + \varepsilon_{ij}$$
+vale a dire: la produzione per la i-esima dose di azoto nel j-esimo blocco è ottenuta attraverso un modello lineare, in cui l'effetto del blocco si ripercuote sull'intercetta, che, nei diversi blocchi è pari, rispettivamente, a $b_0 + \gamma_1$, $b_0 + \gamma_2$, $b_0 + \gamma_3$ e $b_0 + \gamma_4$. In questo modo l'effetto del blocco è fisso ed additivo; ovviamente si possono anche adottare approcci più complessi, che però esulano dagli scopi del nostro testo introduttivo.
+
+Il fitting di questo modello è semplice, utilizzando il codice seguente:
+
+
+
+```r
+# creazione della variabile blocco
+dataset$Block <- factor(rep(1:4, 4))
+model <- lm(Yield ~ Dose + Block, data = dataset)
+```
+
+Ovviamente, il riferimento per testare la mancanza di adattamento sarà il modello ANOVA corrispondente, a blocchi randomizzati; per il resto, non cambia nulla. Resta però la necessità di conoscere i parametri della curva dose-risposta media per i diversi blocchi, che sarà quella da utilizzare per fare previsioni. Utilizziamo quindi il metodo 'summary()' come abbiamo visto in precedenza.
+
+
+```r
+summary(model)
+## 
+## Call:
+## lm(formula = Yield ~ Dose + Block, data = dataset)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -2.960 -1.455 -0.170  1.394  2.527 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) 23.277500   1.247516  18.659 1.12e-09 ***
+## Dose         0.154417   0.007722  19.997 5.35e-10 ***
+## Block2       1.297500   1.465133   0.886    0.395    
+## Block3       1.945000   1.465133   1.328    0.211    
+## Block4      -1.177500   1.465133  -0.804    0.439    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 2.072 on 11 degrees of freedom
+## Multiple R-squared:  0.9736,	Adjusted R-squared:  0.964 
+## F-statistic: 101.3 on 4 and 11 DF,  p-value: 1.331e-08
+```
+
+Vediamo che la pendenza è pari a 0.1544 ed è esattamente identica a quella stimata senza considerare l'effetto del blocco. L'intercetta, invece, cambia al cambiare del blocco. In particolare, R impiega una parametrizzazionecon vincolo sul trattamento e quindi il valore 23.2775, che vediamo identificato come intercetta, corrisponde al primo blocco (in quanto il vincolo è $\gamma_1 = 0$).
+
+Dobbiamo quindi calcolare un'intercetta media dei blocchi, ad esempio utilizzando la solita funzione 'emmeans()', che fornisce la risposta produttiva attesa (media) per un livello di concimazione pari a 0. Il codice è il seguente:
+
+
+```r
+library(emmeans)
+emmeans(model, ~1, at = list(Dose = 0))
+##  1       emmean    SE df lower.CL upper.CL
+##  overall   23.8 0.867 11     21.9     25.7
+## 
+## Results are averaged over the levels of: Block 
+## Confidence level used: 0.95
+```
+
+Il valore è identico a quello ottenuto senza considerare l'effetto del blocco, anche se l'errore standard è diverso in quanto parte del residuo è stata spiegata appunto attraverso l'effetto del blocco.
+
+Prima di concludere, vorremmo menzionare un'approccio alternativo, che consiste nell'utilizzare una parametrizzazione con vincolo sulla somma, invece che sul trattamento. Con questo vincolo, analogamente a quanto abbiamo visto nel capitolo 7, l'intercetta stimata con la regressione rappresenta il valor medio e gli effetti dei blocchi sono stimati come scostamenti rispetto al valor medio. Per imporre un vincolo sulla somma basta modificare il codice di fitting nel modo indicato di seguito. Nell'output non è presente l'effetto del quarto blocco, in quanto, per il vincolo prescelto, deve essere tale che sommato agli altri tre restituisca 0.
+
+
+```r
+model <- lm(Yield ~ Dose + Block, data = dataset,
+            contrasts = list(Block = "contr.sum"))
+summary(model)
+## 
+## Call:
+## lm(formula = Yield ~ Dose + Block, data = dataset, contrasts = list(Block = "contr.sum"))
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -2.960 -1.455 -0.170  1.394  2.527 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) 23.793750   0.866785  27.451 1.75e-11 ***
+## Dose         0.154417   0.007722  19.997 5.35e-10 ***
+## Block1      -0.516250   0.897207  -0.575    0.577    
+## Block2       0.781250   0.897207   0.871    0.402    
+## Block3       1.428750   0.897207   1.592    0.140    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 2.072 on 11 degrees of freedom
+## Multiple R-squared:  0.9736,	Adjusted R-squared:  0.964 
+## F-statistic: 101.3 on 4 and 11 DF,  p-value: 1.331e-08
+```
+
 
 ---
 
@@ -4626,9 +4723,9 @@ multcomp::cld(medie, Letters = LETTERS)
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
 ## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.
 ```
 
 Se volessimo confrontare le lavorazioni a parità di diserbo o tutte le combinazioni dovremmo utilizzare una sintassi leggermente diversa:
@@ -4653,9 +4750,9 @@ multcomp::cld(medie, Letters=LETTERS)
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 3 estimates 
 ## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.
 medie <- emmeans(mod, ~Tillage:WeedControl)
 multcomp::cld(medie, Letters=LETTERS)
 ##  Tillage WeedControl emmean    SE df lower.CL upper.CL .group
@@ -4670,9 +4767,9 @@ multcomp::cld(medie, Letters=LETTERS)
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 6 estimates 
 ## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.
 ```
 
 Le tre analisi (contronti tra lavorazioni a parità di diserbo, tra diserbi a parità di lavorazione e tutti verso tutti) portano a risultati leggermente diversi per il diverso numero di confronti effettuati: tre nel primo caso, sei nel secondo e 15 nel terzo, che richiedono una diversa correzione per la molteplicità.
@@ -4832,9 +4929,9 @@ multcomp::cld(mfMeans, Letters = LETTERS)
 ## Results are averaged over some or all of the levels of: Block 
 ## P value adjustment: tukey method for comparing a family of 9 estimates 
 ## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.
 ```
 
 In conclusione, vediamo che l'analisi dei disegni con due fattori innestati è piuttosto simile a quella per due fattori incrociati, con l'unica eccezione che l'effetto principale per il fattore innestato non è incluso nel modello.
@@ -5013,7 +5110,7 @@ Anche in questo caso, il calcolo delle medie e i confronti multipli vengono effe
 
 I fenomeni biologici, come ad esempio la crescita di una coltura, la cinetica degradativa degli erbicidi nel terreno, la risposta produttiva delle colture a densità crescenti di malerbe o a dosi crescenti di concime, la risposta fitotossica di una specie infestante alla dose di un erbicida, hanno in genere andamenti curvilinei, posseggono punti di massimo o minimo, flessi e, soprattutto, hanno frequentemente asintoti. Pertanto, difficilmente possono essere descritti con funzioni lineari, a meno che non ci accontentiamo di approssimare localmente l'andamento dei dati, in un intervallo ristretto della variabile indipendente.
 
-Da un punto di vista pratico, è quindi fondamentale saper adattare ai dati funzioni curvilinee di ogni tipo. Introduciamo il problema con un esempio, per il quale avremo bisogno di un package aggiuntivo che potremo installare (la prima volta) e caricare con il codice riportato più sotto.
+Da un punto di vista pratico, è quindi fondamentale saper adattare ai dati funzioni curvilinee di ogni tipo. Introduciamo il problema con un esempio, per il quale avremo bisogno di un package aggiuntivo che potremo installare da github (la prima volta) e caricare con il codice riportato più sotto.
 
 
 ```r
@@ -5063,16 +5160,27 @@ In questa funzione, $X$ è il tempo, $Y$ la concentrazione, $\theta$ sono i para
 
 ## Scelta della funzione
 
-Uno dei criteri fondamentali, seppur empirico, per la selezione di una funzione non-lineare  è quello di considerarne la forma, in relazione al fenomeno biologico in studio. Per questo scopo, le equazioni sno spesso classificate in base alla forma, come:
+Uno dei criteri fondamentali, seppur empirico, per la selezione di una funzione $f$ non-lineare  è quello di considerarne la forma, in relazione al fenomeno biologico in studio. Abbiamo dato informazioni più dettagliate altrove ([vedi questo link](https://www.statforbiology.com/2020/stat_nls_usefulfunctions/)) e, per brevità, possiamo considerare la Figura \@ref(fig:figName151b), dove si vedono gli andamenti delle funzioni non-lineari più diffuse in agricoltura. Distinguiamo andamenti:
 
-1. Lineari (es. retta)
-2. Convesse/concave (es. funzione esponenziale, funzione di potenza, funzione logaritmica, iperbole)
-3. Sigmoidali (es. funzione logistica, funzione di Gompertz)
-4. Curve con massimi/minimi (esequazione di Brain-Cousens, equazione di Braggs)
+1. convesse/concave (es. parabola, curva di crescita/decadimento esponenziale, curva di crescita asintotica, curva di potenza, iperbole rettangolare)
+3. sigmoidali (es. crescita logistica, crescita di Gompertz, curva log-logistica dose-risposta)
+4. con massimi/minimi (curva di Braggs)
 
-La descrizione di queste equazioni esula dallo scopo di questo libro, anche se il loro studio può essere di notevole interesse, anche per un biologo o un agronomo. Infatti, riuscire a tradurre nel linguaggio matematico un fenomeno biologico è forse uno degli obiettivi più affascinanti che un ricercatore si possa porre. Per chi fosse interessato, riportiamo in calce al capitolo alcuni interessanti riferimenti.
+Nella lista precedente, la parabola è un modello non-lineare nella risposta, ma lineare nei parametri, e quindi può essere adattato con la usuale funzione 'lm()', come vedremo tra poco.
 
-Noi ci poniamo nella situazione più comune, quella in cui la scelta del modello viene fatta in base all'esperienza o alle informazioni disponibili in letteratura. In questo caso, le conoscenze relative alla cinetica di degradazione dei composti chimici ci suggeriscono un'equazione di decadimento esponenziale (cinetica del primo ordine), così definita:
+<div class="figure" style="text-align: center">
+<img src="_images/nonLinearCurves.png" alt="Curve più diffuse per la descrizione di fenomeni di interesse agrario" width="95%" />
+<p class="caption">(\#fig:figName151b)Curve più diffuse per la descrizione di fenomeni di interesse agrario</p>
+</div>
+
+Ad ognuna delle curve evidenziate in figura corrisponde un'equazione, come indicato nella Figura \@ref(fig:figName151bis) ).
+
+<div class="figure" style="text-align: center">
+<img src="_images/nonLinearEquations.png" alt="Lista delle funzioni per la regressione non-lineare con R (equazione e funzione da utilizzare in R)." width="95%" />
+<p class="caption">(\#fig:figName151bis)Lista delle funzioni per la regressione non-lineare con R (equazione e funzione da utilizzare in R).</p>
+</div>
+
+Per il nostro caso-studio, le conoscenze relative alla cinetica di degradazione dei composti chimici ci suggeriscono un'equazione di decadimento esponenziale (cinetica del primo ordine), così definita:
 
 $$Y_i = A e^{-k \,X_i} + \varepsilon_i$$ 
 
@@ -5174,10 +5282,9 @@ La terza strada, quella più percorsa, è utilizzare metodiche di regressione no
 La funzione più comune in R per la parametrizzazione di funzioni non-lineari è `nls()`. Nella chiamata alla funzione dobbiamo anche fornire stime iniziali per i valori dei parametri. Ottenere queste stime è facile pensando al loro significato biologico: $A$ è la concentrazione iniziale e quindi una stima ragionevole è data dal valor medio osservato al tempo 0 (100). Il parametro $k$ è invece il tasso di degradazione relativo; possiamo notare che nei primi 10 giorni la concentrazione si riduce della metà circa, cioè si abbassa mediamente un po' più del 5% al giorno. Possiamo quindi assegnare a $k$ un valore iniziale pari a 0.05.
 
 
-
 ```r
 modNlin <- nls(Conc ~ A*exp(-k*Time), 
-               start=list(A=100, k=0.05), 
+               start = list(A=100, k=0.05), 
                data=degradation)
 summary(modNlin)
 ## 
@@ -5196,6 +5303,13 @@ summary(modNlin)
 ## Achieved convergence tolerance: 4.33e-07
 ```
 
+Invece che codificare il modello non-lineare a mano, possiamo ricorrere ad una delle funzioni R indicate in Figura \@ref(fig:figName151bis), che sono associate ad appositi algoritmi di self-starting e non necessitano dell'individuazione di valori iniziali (almeno nella gran parte dei casi). Queste funzioni sono disponibili nel package 'aomisc' che deve quindi essere installato da 'github'. 
+
+
+```r
+modNlin2 <- nls(Conc ~ NLS.expoDecay(Time, a, k),
+               data = degradation)
+```
 
 ## Verifica della bontà del modello
 
@@ -5213,17 +5327,16 @@ plot(modNlin, which = 2)
 ```
 
 <div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName154-1.png" alt="Analisi grafica dei residui per la regressione non-lineare, relativa alla degradazione di metamitron nel suolo" width="90%" />
-<p class="caption">(\#fig:figName154)Analisi grafica dei residui per la regressione non-lineare, relativa alla degradazione di metamitron nel suolo</p>
+<img src="_main_files/figure-html/figName154res-1.png" alt="Analisi grafica dei residui per la regressione non-lineare, relativa alla degradazione di metamitron nel suolo" width="90%" />
+<p class="caption">(\#fig:figName154res)Analisi grafica dei residui per la regressione non-lineare, relativa alla degradazione di metamitron nel suolo</p>
 </div>
 
-La Figura \@ref(fig:figName154) non mostra deviazioni rispetto agli assunti di base. Pertanto, proseguiamo l'analisi grafica della bontà di adattamento, verificando il plot dei valori attesi e di quelli osservati (Figure \@ref(fig:figName155)). Questo grafico, per gli oggetti 'nls' può essere ottenuto velocemente utilizzando la funzione 'plotnls()', nel package 'aomisc'.
+La Figura \@ref(fig:figName154res) non mostra deviazioni rispetto agli assunti di base. Pertanto, proseguiamo l'analisi grafica della bontà di adattamento, verificando il plot dei valori attesi e di quelli osservati (Figure \@ref(fig:figName155)). Questo grafico, per gli oggetti 'nls' può essere ottenuto velocemente utilizzando la funzione 'plotnls()', nel package 'aomisc'.
 
 
 
 ```r
-library(lattice)
-plotnls(modNlin, type = "means",
+plot(modNlin, type = "means", which = 3,
         xlab = "Tempo (giorni)", ylab = "Concentrazione (ng/g)")
 ```
 
@@ -5309,41 +5422,41 @@ anova(modNlin, modAov)
 
 Un'altra valutazione importante da fare è quella relativa agli errori standard delle stime dei parametri, che non debbono mai essere superiori alla metà del valore del parametro stimato, cosa che in questo caso è pienamente verificata. Abbiamo già spiegato come, se l'intervallo di confidenza del parametro contiene lo zero, evidentemente quel parametro potrebbe essere rimosso dal modello senza che il fitting peggiori significativamente. Nel nostro esempio, se il tasso di degradazione fosse stato non significativamente diverso da zero, avremmo avuto un'indicazione per sostenere che l'erbicida, di fatto, non mostra degradazione nel tempo.
 
-### Coefficienti di determinazione
+### Coefficiente di determinazione
 
-Abbiamo visto che il residuo della regressione è pari a 151.2 con 16 gradi di libertà. La devianza totale dei dati (somma dei quadrati degli scarti rispetto alla media generale) è invece:
+Come abbiamo visto per la regressione lineare, anche nella regressione non-lineare si sente l'esigenza di una statistica che rappresenti in modo sintetico la bontà di adattamento. L'argomento è molto dibattuto e molti autori sono contrari all'impiego del coefficiente di determinazione, prevalentemente per due motivi:
+
+1. i modelli di regressione non-lineare non hanno una vera e propria intercetta (almeno non nel senso usuale);
+2. la somma della devianza della regressione e della devianza del residuo non è necessariamente uguale alla devianza totale.
+
+Tuttavia, molti altri autori sono dell'opinione che, per la sua semplicità, una statistica analoga al coefficiente di determinazione possa risultare molto utile, purché utilizzata con la necessaria prudenza. In particolare viene suggerito l'impiego della statistica:
+
+$$\textrm{Pseudo-R}^2 = 1 - \frac{SSr}{SSt}$$
+
+che, nel caso della regressione lineare, sarebbe analoga alla formula già vista per l'R^2^ nel capitolo precedente, ma che, nel caso della regressione non-lineare, fornisce risultati diversi. In particolare, lo Pseudo-R^2^ può essere, al massimo, pari ad 1 per un modello con una bontà di adattamento perfetta, ma che, al contrario dell'$R^2$, può divenire negativo, anche se in situazioni nelle quali vi sono da sospettare gravi problemi con il modello prescelto per descrivere i dati.
+
+Nel caso in esempio, il residuo della regressione è pari a 151.2 con 16 gradi di libertà, mentre la devianza totale dei dati (somma dei quadrati degli scarti rispetto alla media generale) è:
 
 
 ```r
 SSt <- deviance(lm(Conc ~ 1, data=degradation))
 ```
 
-ed ha 23 gradi di libertà. La differenza:
+ed ha 23 gradi di libertà. Il valore di Pseudo-R^2^ è:
 
 
 ```r
-SSt - SSr
-## [1] 24683.13
+1 - SSr/SSt
+## [1] 0.9939126
 ```
 
-costituisce la devianza spiegata dalla regressione. Il coefficente di determinazione $R^2$ è quindi:
-
-$$R^2 = \frac{SSt - SSr}{SSt} = \frac{24683.13}{24834.3} = 0.994$$
- 
-Il valore ottenuto attesta un ottimo adattamento, in quanto è vicino ad 1. Bisogna ricordare che, pur essendo utilizzato in modo pressoché ubiquitario, il coefficiente di determinazione per i modelli non-lineari fornisce solo un'indicazione abbastanza grezza sulla bontà del modello, in quanto può rimanere alto anche quando vi sono sistematiche violazioni rispetto alla forma della funzione.
-
-Oltre al coefficiente di determinazione tradizionale, può essere utilizzato anche il coefficiente di determinazione corretto, dato dalla proporzione di varianza (MS) spiegata dalla regressione: 
-
-
-$$R_a^2  = 1 - \frac{MS_{residuo} }{MS_{tot} } = 0.9936$$
-
-L'$R^2$ corretto è sempre più basso dell $R^2$ e tende a penalizzare i modelli con molti parametri. Di conseguenza, favorisce i modelli semplici, nel rispetto del principio del rasoio di Occam.
+ed attesta un ottimo adattamento, in quanto è vicino ad 1. Bisogna ricordare che, pur essendo utilizzato in modo pressoché ubiquitario, il coefficiente di determinazione per i modelli non-lineari fornisce solo un'indicazione abbastanza grezza sulla bontà del modello, in quanto può rimanere alto anche quando vi sono sistematiche violazioni rispetto alla forma della funzione. Inoltre, al contrario del coefficiente di determinazione tradizionale, lo Pseudo-R^2^ non può (e non deve) essere interpretato come la quota di devianza spiegata dalla regressione.
 
 I due coefficienti di determinazione (tradizionale e corretto) possono essere ottenuti con la funzione 'R2nls()', disponibile nel package 'aomisc'.
 
 
 ```r
-library(aomisc)
+# library(aomisc)
 R2nls(modNlin)
 ## $PseudoR2
 ## [1] 0.9939126
@@ -5457,22 +5570,13 @@ Con un oggetto 'nls', possiamo utilizzare la funzione 'boxcox' nel package 'aomi
 
 
 ```r
-class(modNlin)
-## [1] "nls"
-modNlin2 <- boxcox(modNlin)
-modNlin2
-## Nonlinear regression model
-##   model: bcFct1(Conc) ~ bcFct2(A * exp(-k * Time))
-##    data: degradation
-##        A        k 
-## 99.41873  0.06665 
-##  residual sum-of-squares: 51.88
-## 
-## Number of iterations to convergence: 2 
-## Achieved convergence tolerance: 7.511e-06
+modNlin2 <- boxcox(modNlin, plotit = F)
 summary(modNlin2)
 ## 
-## Formula: bcFct1(Conc) ~ bcFct2(A * exp(-k * Time))
+## Estimated lambda: 0.8 
+## Confidence interval for lambda: [0.56,0.96]
+## 
+## Formula: newRes ~ eval(parse(text = newFormula), df)
 ## 
 ## Parameters:
 ##    Estimate Std. Error t value Pr(>|t|)    
@@ -5492,10 +5596,13 @@ Invece che far scegliere alla funzione 'boxcox' il valore di $\lambda$ ottimale,
 
 
 ```r
-modNlin3 <- boxcox(modNlin, lambda = 0.5)
+modNlin3 <- boxcox(modNlin, lambda = 0.5, plotit = F)
 summary(modNlin3)
 ## 
-## Formula: bcFct1(Conc) ~ bcFct2(A * exp(-k * Time))
+## Estimated lambda: 0.5 
+## Confidence interval for lambda: [NA,NA]
+## 
+## Formula: newRes ~ eval(parse(text = newFormula), df)
 ## 
 ## Parameters:
 ##    Estimate Std. Error t value Pr(>|t|)    
@@ -5545,7 +5652,7 @@ Dove $YL$ sta per perdite produttive (Yield Loss) percentuali, $D$ è la densit�
 <p class="caption">(\#fig:figName25131)Relazione iperbolica tra fittezza delle piante infestanti e perdite produttive. È  visualizzata la pendenza iniziale (i) e la perdita produttiva massima asintotica (A).</p>
 </div>
 
-Normalmente, in campo non vengono determinate le perdite produttive, bensì le produzioni, come nel caso dell'esperimento relativo al dataset d'esempio. Di conseguenza, il modello iperbolico presentato più sopra non è adatto ai nostri dati,  in quanto rappresenta una funzione crescente, mentre i nostri dati mostrano una variabile dipendente (produzione) che decresce al crescera della variabile indipendente (fittezza dell piante infestanti). Pertanto, abbiamo due possibilità:
+Normalmente, in campo non vengono determinate le perdite produttive, bensì le produzioni, come nel caso dell'esperimento relativo al dataset d'esempio. Di conseguenza, il modello iperbolico presentato più sopra non è adatto ai nostri dati, in quanto rappresenta una funzione crescente, mentre i nostri dati mostrano una variabile dipendente (produzione) che decresce al crescera della variabile indipendente (fittezza dell piante infestanti). Pertanto, abbiamo due possibilità:
 
 1. modificare il dataset, esprimendo i dati in termini di perdite produttive percentuali;
 2. modificare il modello, per utilizzare la produzione come variabile dipendente, al posto della perdita produttiva.
@@ -5644,7 +5751,7 @@ Pur essendo entrambi gli approcci corretti, il secondo è certamente più elegan
 
 Le domande e gli esercizi che seguono sono organizzati per capitolo, in modo che possiate verificare, di volta in volta, se avete acquisito le competenze necessarie per passare al capitolo successivo.
 
-## Capitolo 1
+## Introduzione alla biometria (Cap. 1)
 
 ### Domanda 1
 
@@ -5667,7 +5774,7 @@ Qual è la differenza tra repliche vere e pseudo-repliche?
 Cosa è il confounding e come può rendere distorti i risultati di un esperimento scientifico?
 
 
-## Capitolo 2
+## Disegno sperimentale (Cap. 2)
 
 ### Esercizio 1
 
@@ -5698,7 +5805,7 @@ Descrivete lo schema sperimentale che utilizzereste per organizzare una prova su
 
 ---
 
-## Capitolo 3
+## Statistica descrittiva (Cap. 3)
 
 ### Esercizio 1
 
@@ -5736,7 +5843,7 @@ Caricare il datasets 'students' disponibile al link: 'https://www.casaonofri.it/
 
 ---
 
-## Capitolo 4
+## Modelli statistici (Cap. 4)
 
 ### Esercizio 1
 
@@ -5810,9 +5917,10 @@ Considerando il testo dell'esercizio 5, simulare un esperimento in cui la coltur
 
 Considerando il testo dell'esercizio 6, simulare un esperimento in cui l'insetticida viene utilizzato a cinque dosi crescenti (a vostra scelta), con quattro repliche.
 
+
 ---
 
-## Capitolo 5
+## Stima dei parametri (Cap. 5)
 
 ### Esercizio 1
 
@@ -5852,9 +5960,13 @@ Un campione di 400 insetti a cui è stato somministrato un certo insetticida mos
 
 Assumendo che la relazione sia lineare (retta), stimare la pendenza e l'intercetta della popolazione di riferimento, dalla quale è stato estratto il campione in studio. Utilizzare la funzione `lm(Yield ~ Dose)` ed estrarre gli errori standard con il metodo `summary()`.
 
+### Esercizio 6
+
+Utilizzando una simulazione Monte Carlo opportunamente pianificata, mostrare che la varianza del campione (uguale alla devianza divisa per il numero di individui meno uno) fornisce una stima più accurata della varianza della popolazione, rispetto allo scarto quadratico medio (devianza divisa per il numero di soggetti) che è invece uno stimatore distorto. Suggerimento: ricordare che uno stimatore accurato ha una distribuzione campionaria (*sampling distribution*) il cui valore atteso coincide con il valore da stimare.
+
 ---
 
-## Capitolo 6
+## Inferenza (Cap. 6)
 
 ### Esercizio 1
 
@@ -6013,9 +6125,11 @@ Stabilire se la dieta è efficace, con una probabilità di errore P < 0.05.
 
 ---
 
-## Capitoli da 7 a 9
+## Modelli ANOVA ad una via (Cap. da 7 a 9)
 
-### Esercizio 1
+Gli esercizi che seguono sono basati su una serie di dataset, disponibili in un file Excel, che può essere scaricato da [questo link](https://www.casaonofri.it/_datasets/EserciziTesto.xlsx). Ogni dataset è in un foglio a parte, il cui nome viene fornito nel testo di ciascun esercizio.
+
+### Esercizio 1 
 
 Un esperimento a randomizzazione completa relativo ad una prova varietale di frumento ha l'obiettivo di porre a confronto la produzione di 5 varietà. Le produzioni (in bushels per acre) osservate siano le seguenti:
 
@@ -6028,6 +6142,7 @@ Un esperimento a randomizzazione completa relativo ad una prova varietale di fru
 |    E    | 21.7 | 24.5 | 23.4 |
 
 Eseguire l'ANOVA, presentare i risultati e commentarli (esempio tratto da Le Clerg *et al*., 1962)
+[Sheet: 7.1]
 
 ### Esercizio 2
 
@@ -6042,6 +6157,7 @@ Colture di tessuto di pomodoro sono state allevate su capsule Petri trattate con
 |   42    |   33    |    27    |   34    |
 
 Calcolare le medie ed eseguire l'ANOVA. Eseguire i test di confronto multiplo. Commentare i risultati.
+[Sheet: 7.2]
 
 ### Esercizio 3
 
@@ -6075,6 +6191,7 @@ E'stato impostato un test di durata su un impianto di riscaldamento, per verific
 |  1708 |              729 |
 
 Valutare se la temperatura di esercizio infleunza significativamente la durata del riscaldatore. Quale/i temperatura/e consentono la maggior durata?
+[Sheet: 7.3]
 
 ### Esercizio 4
 
@@ -6099,10 +6216,11 @@ Un entomologo ha contato il numero di uova deposte da un lepidottero sulle fogli
 |     15 |   153 |       218 |  734 |
 
 Eseguite l'ANOVA. Quali sono le assunzioni necessarie per l'ANOVA? Sono rispettate? Vi sono outliers? Calcolate SEM e SED in modo attendibile.
+[Sheet: 7.4]
 
 ---
 
-## Capitolo 10
+## ANOVA a due vie (Cap. 10)
 
 ### Esercizio 1
 
@@ -6117,6 +6235,7 @@ E' stato impostanto un esperimento a blocchi randomizzati per confrontare sei ti
 |       Sommersione | 403 | 380 | 336 | 101 | 293 |
 
 Eseguire l'ANOVA. Quali sono le assunzioni necessarie per l'ANOVA? Sono rispettate? Calcolate SEM e SED ed eseguite il confronto multiplo. Qual è il metodo di irrigazione migliore?
+[Sheet: 10.1]
 
 ### Esercizio 2
 
@@ -6130,7 +6249,8 @@ E' stato impostato un esperimento di fertilizzazione secondo uno schema a blocch
 |  50 lb N + 75 lb P2O5 | 10.8 | 11.2 | 8.8 | 12.9 | 10.4 |
 | 100 lb N + 75 lb P205 |  9.6 |  9.3 |  12 | 10.6 | 11.6 |
 
-Eseguire l'ANOVA, considerando il dato mancante. Calcolare SEM e SED. Qual è il trattamento migliore? Aumentare il dosaggio di N senza P2O5 è conveniente? E in presenza di P2O5?
+Eseguire l'ANOVA, considerando il dato mancante. Calcolare SEM e SED. Qual è il trattamento migliore? Aumentare il dosaggio di N senza P~2~ O~5~ è conveniente? E in presenza di P~2~ O~5~?
+[Sheet: 10.2]
 
 ### Esercizio 3
 
@@ -6156,14 +6276,15 @@ Eseguire l'ANOVA, considerando il dato mancante. Calcolare SEM e SED. Qual è il
 |          D |  4  |   3    |  163  |
 
 Analizzate i dati e commentate i risultati ottenuti
+[Sheet: 10.2]
 
 ---
 
-## Capitolo 11
+## Regressione (Cap. 11)
 
 ### Esercizio 1
 
-È stato condotto uno studio per verificare l'effetto della concimazione azotata sulla lattuga, utilizzando uno schema a blocchi randomizzati. I risultat sono i seguenti:
+È stato condotto uno studio per verificare l'effetto della concimazione azotata (in kg/ha) sulla produzione (in quintali per ettaro) della lattuga, utilizzando uno schema a blocchi randomizzati. I risultati sono i seguenti:
 
 | N level | B1  | B2  | B3  | B4  |
 |:-------:|:---:|:---:|:---:|:---:|
@@ -6173,13 +6294,14 @@ Analizzate i dati e commentate i risultati ottenuti
 |   150   | 157 | 150 | 140 | 163 |
 |   200   | 163 | 156 | 156 | 171 |
 
-Analizzare i dati e commentare i risultati
+Analizzare i dati, adattare un modello di regressione, verificarne la bontà di adattamento e commentare i risultati
+[Sheet: 11.1]
 
 ### Esercizio 2
 
-Per valutare la soglia economica d'intervento, è necessario definire la relazione tra la densità di una pianta infestante e la perdita produttiva della coltura. Ipotizziamo che, nel range di densità osservato, il modello di competizione sia una retta. Per parametrizzare questo modello e verificarne la validità, è stato organizzato un esperimento a blocchi randomizzati, dove sono stati inclusi sette diversi livelli di infestazione di *Sinapis arvensis* ed è stata rilevata la produzione di acheni del girasole. I risultati sono:
+Per valutare la soglia economica d'intervento, è necessario definire la relazione tra la densità di una pianta infestante (*Sinapis arvensis*) e la produzione della coltura. Ipotizziamo che, nel range di densità osservato, il modello di competizione sia una retta. Per parametrizzare questo modello e verificarne la validità, è stato organizzato un esperimento a blocchi randomizzati, dove sono stati inclusi sette diversi livelli di infestazione di *Sinapis arvensis* , (in piante per metro quadrato) ed è stata rilevata la produzione di acheni del girasole (in quintali per ettaro). I risultati sono:
 
-| density | Rep y | ield   |
+| density | Block | Yield  |
 |:-------:|------:|:-------|
 |    0    |     1 | 36.63  |
 |   14    |     1 | 29.73  |
@@ -6211,31 +6333,33 @@ Per valutare la soglia economica d'intervento, è necessario definire la relazio
 |   54    |     4 | 24.664 |
 
 Eseguire l'ANOVA e verificare il rispetto delle assunzioni di base. E'corretto eseguire un test di confronto multiplo e perchè? Eseguire l'analisi di regressione lineare, verificando la bontà di adattamento del modello. Definire il modello parametrizzato. Stabilire la soglia d'intervento, ipotizzando il costo del prodotto e dell'intervento diserbante.
+[Sheet: 11.2]
 
 ---
 
-## Capitoli 12 e 13
+## ANOVA a due vie con interazione (Cap. 12 e 13)
 
 ### Esercizio 1
 
 La biologia di *Sorghum halepense* da rizoma mostra che il peso dei rizomi raggiunge un minimo intorno alla quarta foglia. Di conseguenza, eseguire un trattamento in quest'epoca dovrebbe minimizzare le possibilità di ripresa degli individui trattati, portando anche ad un certo risanamento del terreno. Tuttavia, ci si attende che gli effetti siano maggiori quando le piante provengono da rizomi più piccoli, con un minor contenuto di sostanze di riserva. Per affrontare questi argomenti è stata organizzata una prova in vaso, secondo un disegno a randomizzazione completa con quattro repliche. I risultati sono i seguenti:
 
-| Sizes ↓ / Timing → |  2-3  |  4-5  |  6-7  |  8-9  | 3-4/8-9 | Untreated |
-|:-------------------|:-----:|:-----:|:-----:|:-----:|:-------:|:---------:|
-| 2-nodes            | 34.03 | 0.10  | 30.91 | 33.21 |  2.89   |   41.63   |
-|                    | 22.31 | 6.08  | 35.34 | 43.44 |  19.06  |   22.96   |
-|                    | 21.70 | 3.73  | 24.23 | 44.06 |  0.10   |   52.14   |
-|                    | 14.90 | 9.15  | 28.27 | 35.34 |  0.68   |   59.81   |
-| 4-nodes            | 42.19 | 14.86 | 52.34 | 39.06 |  8.62   |   68.15   |
-|                    | 51.06 | 36.03 | 43.17 | 61.59 |  0.05   |   42.75   |
-|                    | 43.77 | 21.85 | 57.28 | 48.89 |  0.10   |   57.77   |
-|                    | 31.74 | 8.71  | 29.71 | 49.14 |  9.65   |   44.85   |
-| 6-nodes            | 20.84 | 11.37 | 55.00 | 41.77 |  9.80   |   43.20   |
-|                    | 26.12 | 2.24  | 28.46 | 37.38 |  0.10   |   40.68   |
-|                    | 35.24 | 14.17 | 21.81 | 39.55 |  1.42   |   34.11   |
-|                    | 13.32 | 23.93 | 60.72 | 48.37 |  6.83   |   32.21   |
+| Sizes / Timings | 2-3   | 4-5   | 6-7   | 8-9   | 3-4/8-9 | Untreated|
+|:--------------|:-----:|:-----:|:-----:|:-----:|:-------:|:----:|
+| 2-nodes       | 34.03 | 0.10  | 30.91 | 33.21 | 2.89    | 41.63|
+|               | 22.31 | 6.08  | 35.34 | 43.44 | 19.06   | 22.96|
+|               | 21.70 | 3.73  | 24.23 | 44.06 | 0.10    | 52.14|
+|               | 14.90 | 9.15  | 28.27 | 35.34 | 0.68    | 59.81|
+| 4-nodes       | 42.19 | 14.86 | 52.34 | 39.06 | 8.62    | 68.15|
+|               | 51.06 | 36.03 | 43.17 | 61.59 | 0.05    | 42.75|
+|               | 43.77 | 21.85 | 57.28 | 48.89 | 0.10    | 57.77|
+|               | 31.74 | 8.71  | 29.71 | 49.14 | 9.65    | 44.85|
+| 6-nodes       | 20.84 | 11.37 | 55.00 | 41.77 | 9.80    | 43.20|
+|               | 26.12 | 2.24  | 28.46 | 37.38 | 0.10    | 40.68|
+|               | 35.24 | 14.17 | 21.81 | 39.55 | 1.42    | 34.11|
+|               | 13.32 | 23.93 | 60.72 | 48.37 | 6.83    | 32.21|
 
 Eseguite l'ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente.
+[Sheet: 12-13.1]
 
 ### Esercizio 2
 
@@ -6257,6 +6381,7 @@ Un agronomo ha organizzato un confronto varietale in favino, considerando due ep
 |             |   Vesuvio | 2.34 | 2.44 | 1.71 | 2.00 |
 
 Eseguite l'ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente.
+[Sheet: 12-13.2]
 
 ### Esercizio 3
 
@@ -6282,6 +6407,7 @@ Gli erbicidi mostrano sempre un certo grado di persistenza nel terreno. Di conse
 |               |   4   |   171   | 134  |   137    |    180    |
 
 Eseguite l'ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente.
+[Sheet: 12-13.3]
 
 ### Esercizio 4
 
@@ -6297,6 +6423,7 @@ E' stato condotto un esperimento parcellare per valutare l'interazione tra il mo
 |          |   3   | 40.1  | 57.9 | 62.0 |
 
 Analizzare i dati e commentare i risultati
+[Sheet: 12-13.4]
 
 ### Esercizio 5
 
@@ -6314,6 +6441,7 @@ E' stato organizzato un esperimento per valutare l'effetto della temperatura di 
 |        |  3.6   |  3.5   |  5.8   |  11.1  |
 
 Analizzare i dati e commentare i risultati
+[Sheet: 12-13.5]
 
 ### Esercizio 6
 
@@ -6331,13 +6459,11 @@ Un processo di sintesi chimica prevede due reazioni, la prima richiede un alcool
 |      |   94.7    |   91.5    |   89.8    |
 
 Analizzare i dati e commentare i risultati
-
+[Sheet: 12-13.6]
 
 ---
 
-
-
-## Capitolo 14
+## Regressione non-lineare (Cap. 14)
 
 ### Esercizio 1
 
@@ -6354,11 +6480,12 @@ Due campioni di terreno sono stati trattati con due erbicidi diversi e sono stat
 |  60  |    2.00     |    5.10     |
 |  70  |    1.00     |    3.00     |
 
-Ipotizzando che la degradazione dei due erbicidi segue una cinetica del primo ordine, parametrizzare la relativa equazione e determinare la semivita dei due erbicidi. Quale sostanza degrada più velocemente?
+Ipotizzando che la degradazione dei due erbicidi segue una cinetica di decadimento esponenziale del primo ordine (vale a dire: $y = a \exp \left\{ - bx \right\}$), parametrizzare la relativa equazione e determinare la semivita dei due erbicidi. Quale sostanza degrada più velocemente?
+[Sheet: 14.1]
 
 ### Esercizio 2
 
-Un popolazione microbica in condizioni non-limitanti di substrato cresce seguendo una cinetica del primo ordine. Un esperimento da i seguenti risultati:
+Un popolazione microbica in condizioni non-limitanti di substrato cresce seguendo un ritmo esponenziale. Un esperimento da i seguenti risultati:
 
 | Time | Cells |
 |:----:|:-----:|
@@ -6371,7 +6498,8 @@ Un popolazione microbica in condizioni non-limitanti di substrato cresce seguend
 |  60  |  94   |
 |  70  |  201  |
 
-Parametrizzare un modello esponenziale e calcolarne la bontà di adattamento.
+Parametrizzare un modello di crescita esponenziale e valutarne la bontà di adattamento.
+[Sheet: 14.2]
 
 ### Esercizio 3
 
@@ -6393,6 +6521,7 @@ Parametrizzare il modello iperbolico di Michaelis-Menten:
 $$y = \frac{a x} {b + x}$$
 
 Valutarne la bontà di adattamento.
+[Sheet: 14.3]
 
 ### Esercizio 4
 
@@ -6411,6 +6540,7 @@ Parametrizzare l'iperbole di Cousens:
 $$Y_W  = Y_{WF} \left( 1 - \frac{i \cdot x}{100\left( 1 + \frac{i \cdot x}{a} \right)} \right)$$
 
 Valutarne la bontà di adattamento. Determinare la soglia economica di intervento.
+[Sheet: 14.4]
 
 ### Esercizio 5
 
@@ -6430,9 +6560,10 @@ Uno degli aspetti fondamentali degli studi relativi alla diversità degli ambien
 
 Parametrizzare una curva 'di potenza' (power curve):
 
-$$a \cdot x^b$$
+$$y = a \cdot x^b$$
 
 Valutarne la bontà di adattamento. Determinare l'area minima di campionamento.
+[Sheet: 14.5]
 
 ### Esercizio 6
 
@@ -6461,15 +6592,16 @@ Si ritiene che la crescita di una coltura possa essere descritta accuratamente c
 
 Parametrizzare il modello di Gompertz:
 
-$$a \cdot exp(-b \cdot exp(-c \cdot x))$$
+$$y = a \cdot exp(-b \cdot exp(-c \cdot x))$$
 
 e verificarne la bontà di adattamento nelle due situazioni. Quali parametri del modello di Gompertz sono maggiormente influenzati dalle piante infestanti? Abbiamo elementi per ritenere che la crescita segua un'equazione di Gompertz piuttosto che una logistica simmetrica?
+[Sheet: 14.6]
 
 ### Esercizio 7
 
 Piante di *Tripleuspermum inodorum* in vaso sono state trattate con erbicida sulfonilureico (tribenuron-methyl) a dosi crescenti. Tre settimano deopo il trattamento è stato registrato il peso delle piante sopravvissute, ottenendo i risulti riportati nella tabella seguente:
 
-| Dose (g a.i. ha$^{-1}$) | Fresh weight (g pot $^{-1}$) |
+| Dose (g/ha) | Fresh weight (g/pot) |
 |:-----------------------:|:----------------------------:|
 |            0            |            115.83            |
 |            0            |            102.90            |
@@ -6489,9 +6621,10 @@ Piante di *Tripleuspermum inodorum* in vaso sono state trattate con erbicida sul
 
 Si ipotizza che la relazione dose-effetto possa essere descritta con un modello log-logistico:
 
-$$c + \frac{d - c}{1 + exp(b ( log (x) - log (a))}$$
+$$y = c + \frac{d - c}{1 + exp(b ( log (x) - log (a))}$$
 
 Parametrizzare questo modello e verificarne la bontà d'adattamento.
+[Sheet: 14.7]
 
 <!--chapter:end:15-Esercizi.Rmd-->
 
