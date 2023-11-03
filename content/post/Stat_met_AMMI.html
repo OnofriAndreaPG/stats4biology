@@ -11,6 +11,8 @@ tags:
   - 'AMMI_analysis'
   - 'Multi_environment_studies'
   - 'aomisc'
+  - 'PCA'
+  - 'biplot'
 archives:
   - 2023
 ---
@@ -85,13 +87,16 @@ mean(as.matrix(GEmedie))
 <p>What model could we possibly fit to the above data? The basic two-way ANOVA model is:</p>
 <p><span class="math display">\[Y_{ijk} = \mu + \gamma_{jk} + g_i + e_j + ge_{ij} + \varepsilon_{ijk} \quad \quad (1)\]</span></p>
 <p>where the yield <span class="math inline">\(Y\)</span> for given block <span class="math inline">\(k\)</span>, environment <span class="math inline">\(j\)</span> and genotype <span class="math inline">\(i\)</span> is described as a function of the effects of blocks within environments (<span class="math inline">\(\gamma\)</span>), genotypes (<span class="math inline">\(g\)</span>), environments (<span class="math inline">\(e\)</span>) and GE interaction (<span class="math inline">\(ge\)</span>). The residual error term <span class="math inline">\(\varepsilon\)</span> is assumed to be normal and homoscedastic, with standard deviation equal to <span class="math inline">\(\sigma\)</span>. Let’s also assume that both the genotype and environment effects are fixed: this is useful for teaching purposes and it is reasonable, as we intend to study the behaviour of specific genotypes in several specific environments.</p>
+</div>
+<div id="the-interaction-effects-and-ge-matrix" class="section level1">
+<h1>The interaction effects (and GE matrix)</h1>
 <p>The interaction effect <span class="math inline">\(ge\)</span>, under some important assumptions (i.e. balanced data, no missing cells and homoscedastic errors), is given by:</p>
 <p><span class="math display">\[ge_{ij} = Y_{ij.} - \left( \mu + g_i + e_j \right) = Y_{ij.} - Y_{i..} - Y_{.j.} + \mu \quad \quad (2)\]</span></p>
 <p>where <span class="math inline">\(Y_{ij.}\)</span> is the mean of the combination between the genotype <span class="math inline">\(i\)</span> and the environment <span class="math inline">\(j\)</span>, <span class="math inline">\(Y_{i..}\)</span> is the mean for the genotype <span class="math inline">\(i\)</span> and <span class="math inline">\(Y_{.j.}\)</span> is the mean for the environment <span class="math inline">\(j\)</span>. For example, for the genotype ‘Chiaro_A’ in the environment ‘bad_1’, the interaction effect was:</p>
 <pre class="r"><code>4.1050 - 3.577 - 3.22 + 3.103
 ## [1] 0.411</code></pre>
 <p>We see that the interaction was positive, in the sense that ‘Chiaro_A’, gave 0.411 tons per hectare more than we could have expected, considering its average performances across environments and the average performances of all genotypes in ‘bad_1’.</p>
-<p>More generally, the two-way table of interaction effects can be obtained by doubly centring the matrix of means, as shown in the following box.</p>
+<p>It may be very handy to organise the interaction effects in a two-way table, with the genotypes along the rows and environments along the columns (or vice-versa, as you prefer). Such a two-way table can be simply obtained by doubly centring the matrix of means, as shown in the following box.</p>
 <pre class="r"><code>GE &lt;- as.data.frame(t(scale( t(scale(GEmedie, center=T,
  scale=F)), center=T, scale=F)))
 print(round(GE, 3))
@@ -246,7 +251,7 @@ abline(v = 0, lty = 2)</code></pre>
 <p>This graph provides a very effective description of GE interaction effects. I will not go into detail, here. Just a few simple comments:</p>
 <ol style="list-style-type: decimal">
 <li>genotypes and environments lying close to the origin of the axes do not interact with each other (the product of scores would be close to 0)</li>
-<li>genotype and environments lying far away from the origin of axes show very big interaction and, therefore, high yield instability. Someone says that the euclidean distance from the origin should be taken as a measure of instability</li>
+<li>genotypes and environments lying far away from the origin of axes show very big interaction and, therefore, high yield instability. Someone says that the euclidean distance from the origin should be taken as a measure of instability</li>
 <li>the interaction is positive, when genotypes and environments are close to each other. If two objects are close, their scores (co-ordinates) will have the same signs and thus their product will be positive.</li>
 <li>the interaction is negative, when genotypes and environments are far away from each other. If two objects are distant, their scores (co-ordinates) will have opposte signs and thus their product will be negative.</li>
 <li>For instance, ‘Palomb_P’, ‘Scuro_P’, ‘Chiaro_P’ and ‘Collameno_P’ gave particularly good yields in the environments ‘pap_3’ and ‘bad_3’, while ‘Scuro_A’, ‘Palomb_A’ and ‘Vesuvio_A’ gave particularly good yields (compared to their average) in the environments ‘pap_1’ and ‘bad_1’. ‘Sicania_A’ and ‘Collameno_A’ gave good yields in ‘bad_2’ and ‘pap_2’.</li>

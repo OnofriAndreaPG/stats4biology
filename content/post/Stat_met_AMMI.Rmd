@@ -11,6 +11,8 @@ tags:
   - 'AMMI_analysis'
   - 'Multi_environment_studies'
   - 'aomisc'
+  - 'PCA'
+  - 'biplot'
 archives:
   - 2023
 ---
@@ -74,7 +76,9 @@ What model could we possibly fit to the above data? The basic two-way ANOVA mode
 
  $$Y_{ijk} = \mu + \gamma_{jk} + g_i + e_j + ge_{ij} + \varepsilon_{ijk} \quad \quad (1)$$
 
-where the yield $Y$ for given block $k$, environment $j$ and genotype $i$ is described as a function of the effects of blocks within environments ($\gamma$), genotypes ($g$), environments ($e$) and GE interaction ($ge$). The residual error term $\varepsilon$ is assumed to be normal and homoscedastic, with standard deviation equal to $\sigma$. Let's also assume that both the genotype and environment effects are fixed: this is useful for teaching purposes and it is reasonable, as we intend to study the behaviour of specific genotypes in several specific environments. 
+where the yield $Y$ for given block $k$, environment $j$ and genotype $i$ is described as a function of the effects of blocks within environments ($\gamma$), genotypes ($g$), environments ($e$) and GE interaction ($ge$). The residual error term $\varepsilon$ is assumed to be normal and homoscedastic, with standard deviation equal to $\sigma$. Let's also assume that both the genotype and environment effects are fixed: this is useful for teaching purposes and it is reasonable, as we intend to study the behaviour of specific genotypes in several specific environments.
+
+# The interaction effects (and GE matrix)
 
 The interaction effect $ge$, under some important assumptions (i.e. balanced data, no missing cells and homoscedastic errors), is given by:
 
@@ -86,11 +90,9 @@ where $Y_{ij.}$ is the mean of the combination between the genotype $i$ and the 
 4.1050 - 3.577 - 3.22 + 3.103
 ```
 
-
 We see that the interaction was positive, in the sense that 'Chiaro_A', gave 0.411 tons per hectare more than we could have expected, considering its average performances across environments and the average performances of all genotypes in 'bad_1'.
 
-More generally, the two-way table of interaction effects can be obtained by doubly centring the matrix of means, as shown in the following box.
-
+It may be very handy to organise the interaction effects in a two-way table, with the genotypes along the rows and environments along the columns (or vice-versa, as you prefer). Such a two-way table can be simply obtained by doubly centring the matrix of means, as shown in the following box.
 
 ```{r}
 GE <- as.data.frame(t(scale( t(scale(GEmedie, center=T,
@@ -226,7 +228,7 @@ abline(v = 0, lty = 2)
 This graph provides a very effective description of GE interaction effects. I will not go into detail, here. Just a few simple comments:
 
 1. genotypes and environments lying close to the origin of the axes do not interact with each other (the product of scores would be close to 0)
-2. genotype and environments lying far away from the origin of axes show very big interaction and, therefore, high yield instability. Someone says that the euclidean distance from the origin should be taken as a measure of instability
+2. genotypes and environments lying far away from the origin of axes show very big interaction and, therefore, high yield instability. Someone says that the euclidean distance from the origin should be taken as a measure of instability
 3. the interaction is positive, when genotypes and environments are close to each other. If two objects are close, their scores (co-ordinates) will have the same signs and thus their product will be positive. 
 3. the interaction is negative, when genotypes and environments are far away from each other. If two objects are distant, their scores (co-ordinates) will have opposte signs and thus their product will be negative. 
 4. For instance, 'Palomb_P', 'Scuro_P', 'Chiaro_P' and 'Collameno_P' gave particularly good yields in the environments 'pap_3' and 'bad_3', while 'Scuro_A', 'Palomb_A' and 'Vesuvio_A' gave particularly good yields (compared to their average) in the environments 'pap_1' and 'bad_1'. 'Sicania_A' and 'Collameno_A' gave good yields in 'bad_2' and 'pap_2'.

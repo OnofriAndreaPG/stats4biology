@@ -1,0 +1,218 @@
+---
+title: "GGE analyses for multi-environment studies"
+author: "Andrea Onofri"
+date: 2023-05-31
+slug: 'Multi_environment_studies'
+categories:
+  - R
+  - 'Multi_environment_studies'
+tags:
+  - R
+  - 'GGE_analysis'
+  - 'Multi_environment_studies'
+  - 'aomisc'
+  - 'PCA'
+  - 'biplot'
+archives:
+  - 2023
+---
+
+In a recent post we have seen that we can use Principal Component Analyses (PCA) to elucidate the 'genotype by environment' relationship ([see this post](https://www.statforbiology.com/2023/stat_met_ammi/)). Whenever the starting point for PCA is the doubly-centered (centered by rows and columns) matrix of yields across environments, we talk about AMMI analysis, which is often used to get insight into the stability of genotype yields across environments.
+
+By changing the starting matrix, we can obtain a different perspective and put focus on the definition of macroenvironments and on the selection of winning genotypes. In particular, if the two-way matrix of yields across environments is only column-centered before PCA, we talk about GGE analysis (Yan et al., 2000). In spite of some academic debate (see Gauch, 2006, Yan et al., 2007, Gauch et al., 2008), AMMI and GGE analyses are both useful and can be used as two complementary tools for the analysis of multi-environment genotype data.
+
+In order to discover the main peculiarities of GGE analysis, we will use the same example as in the previous post about AMMI analysis.
+
+# A MET with faba bean
+
+This experiment consists of 12 faba bean genotypes (well, it was, indeed, 6 genotypes in two sowing dates; but, let's disregard this detail from now on) in four blocks, two locations and three years (six environments, in all). The dataset is online available as 'fabaBean.csv' and it has been published by Stagnari et al. (2007).
+
+We have seen that the starting point for AMMI analyses is the two-way matrix of yields across environments, which is obtained in the box below, by using a few functions from the `tidyverse`.
+
+```{r setup, cache = F, echo = F}
+#Put at the beginning
+knitr::knit_hooks$set(document = function(x){ 
+  gsub("```\n*```r*\n*", "", x) 
+})
+```
+
+```{r message=FALSE, warning=FALSE, R.options = list(width=70)}
+rm(list=ls())
+library(tidyverse)
+
+fileName <- "https://www.casaonofri.it/_datasets/fabaBean.csv"
+dataset <- read.csv(fileName, header=T)
+GEmedie <- dataset %>% 
+  group_by(Genotype, Environment) %>% 
+  dplyr::summarise(Yield = mean(Yield)) %>% 
+  pivot_wider(names_from = Environment,
+              values_from = Yield,
+              id_cols = Genotype)
+GEmedie
+```
+
+While with AMMI analysis the above matrix is doubly-centered (by rows and columns), with GGE analysis it is only column-centered, to remove the overall mean and the environment main effect. As the result, the centered matrix will contain the Genotype main effect (G) and the Genotype by Environment interaction (GE), that is why this technique is named GGE analysis. Let's do such centering.
+
+```{r}
+# Means for environments
+envMeans <- apply(GEmedie[,-1], 2, mean)
+GGEmatrix <- sweep(GEmedie[,-1], 2, envMeans)
+rownames(GGEmatrix) <- unlist(GEmedie[,1])
+```
+
+What do the above values mean? For each genotype, they are the yield differences (in tons per hectare) with respect to the average yield in each environment; for example, 'Scuro_P' shows a value of 0.0077 at 'bad_2', which is close to zero and indicates that the yield of this genotype was exactly equal to the environmental average in that location. On the other hand, 'Scuro_A' at 'bad_1', gave a value of 1.15, which is very high and indicates that this genotype outperformed all the others in that location.
+
+The importance of the GGE matrix is that it contains both the genotype and the genotype by environment effects, which are fundamental to compare the performances of genotypes across anvironments.
+
+
+# Decomposing the GGE matrix
+
+Once we have understood the importance of the GGE matrix, we might be willing to summarise it by way of some appropriate statistical method. Thinking of a Principal Component Analysis (PCA) is fairly obvious, as we did for AMMI analysis in the previous post.
+
+Thus, we can use Singular Value Decomposition (SVD), to decompose our GGE matrix into the product of two matrices:
+
+$$GGE = S_g \, S_e^T$$
+
+where $S_g$ is a matrix of genotype scores and $S_e$ is a matrix of environment scores. It does not matter much how (and why) we obtain these matrices, I will just show you a swift R solution in the box below.
+
+```{r}
+U <- svd(GGEmatrix)$u
+V <- svd(GGEmatrix)$v
+D <- diag(svd(GGEmatrix)$d)
+Sg <- U %*% sqrt(D)
+Se <- V %*% sqrt(D)
+row.names(Sg) <- rownames(GGEmatrix)
+row.names(Se) <- colnames(GGEmatrix)
+colnames(Sg) <- colnames(Se) <- paste("PC", 1:6, sep ="")
+round(Sg, 3)
+round(Se, 3)
+```
+
+
+Let's have a look at $S_g$ and $S_e$: they are two interesting entities. Both matrices have 6 columns (that is the minimum between the number of genotypes and the number of environments). $S_g$ has 12 rows, one per genotype: these are the so-called genotype scores: each genotype has six scores. $S_e$ has six rows, one per environment (environment scores) and, analogously to each genotype, each environment has six scores.
+
+The most interesting thing to note is that, as expected, these two matrices, by multiplication, return the original GGE matrix.
+
+```{r}
+round(Sg %*% t(Se), 3)
+```
+
+If you some memories about matrix multiplication, you will remeber that the GGE value for each genotype in each environment can be obtained as the sum of products of genotype scores and environments scores:
+
+$$gge_{ij} = \sum_{z = 1}^n \left[ S_{g(iz)} \cdot S_{e(jz)} \right]$$
+
+For example, let's consider the first genotype and the first environment. The genotype and environments scores are in the first columns of $S_g$ and $S_e$; if we multiply the elements in the same positioning (1st with 1st, 2nd with 2nd, and so on) and sum up, we get:
+
+
+```{r}
+-0.682 * -1.283 +
+-0.064 * -0.410 +
+-0.441 * -0.242 +
+-0.274 *  0.431 +
+ 0.022 * -0.305 + 
+ 0.051 *  0.040
+```
+
+It's done: we have transformed the GGE effect for 'Chiaro_A' in 'bad_1' into the sum of multiplicative terms. The final product will be the highest whenever the genotype and environment scores have the same signs, within each couple in the box above.
+
+# Reducing the rank
+
+Instead of taking all available columns in $S_g$ and $S_e$,  for the sake of simplicity, we could have taken only a subset of those columns. The  Eckart-Young (1936) theorem says that, if we take $m < 6$ columns, we obtain the best possible approximation of GGE in reduced rank space. For example, let's use the first two columns of $S_g$ and $S_e$ (the first two principal component scores):
+
+
+```{r}
+PC <- 2
+Sg2 <- Sg[,1:PC]
+Se2 <- Se[,1:PC]
+GGE2 <- Sg2 %*% t(Se2)
+print ( round(GGE2, 3) )
+```
+
+GGE2 is not equal to GGE, but it is a close approximation. A close approximation in the least squares sense: the sum of squared elements in GGE2 is as close as possible (with $n = 2$) to the sum of squared elements in GGE:
+
+```{r}
+sum(GGE2^2)
+sum(GGEmatrix^2)
+```
+
+We see that the sum of squares in GGE2 is 94% of the sum of squares in GGE. A very good approximation, isn't it? It means that the variability of yields across environments is described well enough by using a relatively low number of parameters (scores).
+
+# Simple GGE analysis with R
+
+Although there are certainly more exhaustive solutions, for the sake of simplicity, I have coded the `GGE()` function, that is available in the `aomisc` package; it works equally well with raw MET data, containing all replicated values, or with the 'genotype by environment' average values. The `aomisc` package is the companion package for this website and must have been installed as detailed in this [page here](https://www.statforbiology.com/rpackages/). In the box below, I am using the `GGE()` function on raw data.
+
+```{r message=FALSE, warning=FALSE}
+library(aomisc)
+tab <- with(dataset, GGE(Yield, Genotype, Environment, Block, PC = 2))
+tab$genotype_scores
+tab$environment_scores
+tab$GGE_summary
+```
+
+
+# Why is this useful?
+
+Did you get lost? Hope you didn't, but let's make a stop and see where we are standing now. We started from the GGE matrix and found a way to decompose it as the product of two matrices, i.e. $S_g$ and $S_e$, a matrix of genotype scores and a matrix of environment scores. We discovered that we could obtain a good approximation of GGE by working in reduced rank space and we only used two genotypic scores and two environment scores, in place of the available six.
+
+This is great! Now we have the ability of drawing a biplot, i.e.  we can plot both genotypic scores and environmental scores in a dispersion graph (biplot: two plots into one), as we see below. We can use the swift `biplot()` method for AMMI and GGE objects, as available in the `aomisc` package.
+
+```{r fig.height=6, fig.width=6}
+biplot(tab, xlim = c(-1.5, 1.5), ylim = c(-1.5, 1.5),
+       xlab = "PC 1", ylab = "PC 2")
+```
+
+This graph provides a very effective description of GE interaction effects. I will not go into detail, here. Just a few simple comments:
+
+1. genotypes lying close to the origin of the axes tend to have average behaviours across environments (their genotypic scores will be close to zero).
+2. environments lying close to the origin of the axes tend neither to be favourable nor unfavourable to most of the genotypes and will not be very discriminating.
+3. genotypes lying far away from the origin of axes tend to be far from the average yield in several environments, either in a positive or negative sense.
+4. environments lying far away from the origin of axes tend to be very discriminating (favourable for some genotypes and unfavourable for others).
+5. when genotype and environment markers are far away from the origin and close to each other, their scores will be high and of same sign. This is an indicator of very good performances.
+
+# Augmenting the biplot
+
+The above biplot can be augmented in several ways (see Yan and Tinker, 2006). The 'which-won-where' pattern is rather useful and it consists of:
+
+1. drawing a polygon with vertices on the genotypes that are furthest away from the origin of axes, so that all other genotypes are contained within the polygon. In this case we can select: 'Collameno_A', 'Palombino_A', 'Scuro_A', 'Sicania_P', 'Palomb_P' and 'Collameno_P' (i.e. the 3^rd^, 5^th^, 7^th^, 10^th^, 6^th^ and 4^th^ genotypes);
+2. drawing the perpendicular lines to each side of the polygon, starting from the origin of axes.
+
+We can use the `biplot.polygon()` function in the `aomisc` package 
+
+
+```{r fig.height=6, fig.width=6}
+biplot(tab, xlim = c(-1.5, 1.5), ylim = c(-1.5, 1.5),
+       xlab = "PC 1", ylab = "PC 2")
+biplot.polygon(tab, vertex = c(3,5,7,10,6, 4))
+```
+
+Based on the above graph we can make the following conclusions.
+
+1. Genotypes located on the vertices of the polygon were the best/worst in some environments.
+2. The perpendicular lines divide the biplot into sectors, and the winning genotype for each sector is the one located on the respective vertex. In this example, 'Palomb_A' is the winning genotype in 'bad_2', 'pap_2' and 'pap_3', while 'Collameno_A, is the winner in 'bad_3'. 'Scuro_A' is the winner in 'bad_1' and 'pap_1'.
+
+
+Thank you for reading, and... happy coding!
+
+
+Prof. Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences    
+University of Perugia (Italy)    
+Send comments to: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)
+
+<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow @onofriandreapg</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+---
+
+# Literature references
+
+1. Gauch, H.G., 2006. Statistical Analysis of Yield Trials by AMMI and GGE. Crop Science 46, 1488–1500.
+2. Gauch, H.G., Piepho, H.-P., Annicchiarico, P., 2008. Statistical Analysis of Yield Trials by AMMI and GGE: Further Considerations. Crop Science 48, 866–889.
+3. Yan, W., 2002. Singular-Value Partitioning in Biplot Analysis of Multienvironment Trial Data. Agronomy Journal 94, 990–996.
+4. Yan, W., 2001. GGEbiplot–A Windows Application for Graphical Analysis of Multienvironment Trial Data and Other Types of Two-Way Data. Agronomy Journal 93, 1111–1118.
+5. Yan, W., Cornelius, P.L., Crossa, J., Hunt, L.A., 2001. Two Types of GGE Biplots for Analyzing Multi-Environment Trial Data. Crop Science 41, 656–663.
+6. Yan, W., Hunt, L.A., Sheng, Q., Szlavnics, Z., 2000. Cultivar Evaluation and Mega-Environment Investigation Based on the GGE Biplot. Crop Science 40, 597–605.
+7. Yan, W., Kang, M.S., Ma, B., Woods, S., Cornelius, P.L., 2007. GGE Biplot vs. AMMI Analysis of Genotype-by-Environment Data. Crop Science 47, 643–653.
+8. Yan, W., Tinker, N.A., 2006. Biplot analysis of multi-environment trial data: Principles and applications. Canadian Journal of Plant Science 86, 1–9.
+9. Yan, W., Tinker, N.A., 2005. An Integrated Biplot Analysis System for Displaying, Interpreting, and Exploring Genotype x Environment Interaction. Crop Science 45, 1004–1016.
+

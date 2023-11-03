@@ -1469,7 +1469,7 @@ I-06121 - PERUGIA&lt;/p&gt;
       <description>
 
 
-&lt;p&gt;In R, the &lt;code&gt;drc&lt;/code&gt; package represents one of the main solutions for nonlinear regression and dose-response analyses (Ritz et al., 2015). It comes with a lot of nonlinear models, which are useful to describe several biological processes, from plant growth to bioassays, from herbicide degradation to seed germination. These models are provided with self-starting functions, which free the user from the hassle of providing initial guesses for model parameters. Indeed, getting these guesses may be a tricky task, both for students and for practitioners.&lt;/p&gt;
+&lt;p&gt;(Post updated on 17/07/2023) In R, the &lt;code&gt;drc&lt;/code&gt; package represents one of the main solutions for nonlinear regression and dose-response analyses (Ritz et al., 2015). It comes with a lot of nonlinear models, which are useful to describe several biological processes, from plant growth to bioassays, from herbicide degradation to seed germination. These models are provided with self-starting functions, which free the user from the hassle of providing initial guesses for model parameters. Indeed, getting these guesses may be a tricky task, both for students and for practitioners.&lt;/p&gt;
 &lt;p&gt;Obviously, we should not expect that all possible models and parameterisations are included in the ‘drc’ package; therefore, sooner or later, we may all find ourselves in the need of building a user-defined function, for some peculiar tasks of nonlinear regression analysis. I found myself in that position several times in the past and it took me awhile to figure out a solution.&lt;/p&gt;
 &lt;p&gt;In this post, I’ll describe how we can simply build self-starters for our nonlinear regression analyses, to be used in connection with the ‘drm()’ function in the ‘drc’ package. In the end, I will also extend the approach to work with the ‘nls()’ function in the ‘stats’ package.&lt;/p&gt;
 &lt;p&gt;Let’s consider the following dataset, depicting the relationship between temperature and growth rate. We may note that the response reaches a maximum value around 30°C, while it is lower below and above such an optimal value.&lt;/p&gt;
@@ -1589,10 +1589,10 @@ plot(mod, log = &amp;quot;&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
                start = list (b = 0.01, d = 27, e = 30))&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;However, we are forced to provide starting values for all estimands, which might be a tricky task, unless we build a self-starting routine, as we did before for the &lt;code&gt;drc&lt;/code&gt; platform. This is not an impossible task and we can also re-use part of the code we have already written above. We have to:&lt;/p&gt;
 &lt;ol style=&#34;list-style-type: decimal&#34;&gt;
-&lt;li&gt;build a self-starting function by using the appropriate coding (see below). In this step we should be careful to the command &lt;code&gt;sortedXyData(mCall[[&amp;quot;X&amp;quot;]], LHS, data)&lt;/code&gt;. The part in quotation marks (“X”) should correspond to the name of the predictor in the &lt;code&gt;bragg.3.fun()&lt;/code&gt; function definition.&lt;/li&gt;
+&lt;li&gt;build a self-starting function by using the appropriate coding (see below). In this step we should be careful to the command &lt;code&gt;sortedXyData(mCall[[&#34;X&#34;]], LHS, data)&lt;/code&gt;. The part in quotation marks (“X”) should correspond to the name of the predictor in the &lt;code&gt;bragg.3.fun()&lt;/code&gt; function definition.&lt;/li&gt;
 &lt;li&gt;Use the &lt;code&gt;selfStart()&lt;/code&gt; function to combine the function with its self-starting routine.&lt;/li&gt;
 &lt;/ol&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;bragg.3.init &amp;lt;- function(mCall, LHS, data) {
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;bragg.3.init &amp;lt;- function(mCall, LHS, data, ...) {
     xy &amp;lt;- sortedXyData(mCall[[&amp;quot;X&amp;quot;]], LHS, data)
     x &amp;lt;-  xy[, &amp;quot;x&amp;quot;]; y &amp;lt;- xy[, &amp;quot;y&amp;quot;]
     

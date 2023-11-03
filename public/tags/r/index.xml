@@ -5,10 +5,540 @@
     <description>Recent content in R on The broken bridge between biologists and statisticians</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2018, @AndreaOnofri</copyright>
-    <lastBuildDate>Fri, 26 May 2023 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 02 Nov 2023 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://www.statforbiology.com/tags/r/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Designed experiments with replicates: Principal components or Canonical Variates?</title>
+      <link>https://www.statforbiology.com/2023/stat_multivar_cva/</link>
+      <pubDate>Thu, 02 Nov 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.statforbiology.com/2023/stat_multivar_cva/</guid>
+      <description>
+
+
+&lt;p&gt;A few days ago, a colleague of mine wanted to hear my opinion about what multivariate method would be the best for a randomised field experiment with replicates. We had a nice discussion and I thought that such a case-study might be generally interesting for the agricultural sciences; thus, I decided to take my &lt;a href=&#34;https://capitaloneshopping.com/p/apple-2022-mac-book-pro-laptop-w/MGSN7BZ7SG?run=9185f0b4-5744-4a08-8635-301807e6268e&#34;&gt;Apple Mac-Book PRO&lt;/a&gt;, sit down, relax and write a new post on this matter.&lt;/p&gt;
+&lt;p&gt;My colleague’s research study was similar to this one: a randomised block field experiment (three replicates) with 16 durum wheat genotypes, which was repeated in four years. The quality of grain yield was assessed by recording the following four traits:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;kernel weight per hectoliter (WPH)&lt;/li&gt;
+&lt;li&gt;percentage of yellow berries (YB)&lt;/li&gt;
+&lt;li&gt;kernel weight (grams per 1000 kernels; TKW)&lt;/li&gt;
+&lt;li&gt;protein content (% d.m.; PC)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;My colleague had averaged the three replicates for each genotype in each year, so that the final dataset consisted of a matrix of 64 rows (i.e. 16 varieties x 4 years) and 4 columns (the 4 response variables). Taking the year effect as random, we have &lt;strong&gt;four random replicates for each genotype, across the experimental seasons.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;You can have a look at this dataset by loading the ‘WheatQuality4years.csv’ file, that is online available, as shown in the following box.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rm(list=ls())
+fileName &amp;lt;- &amp;quot;https://www.casaonofri.it/_datasets/WheatQuality4years.csv&amp;quot;
+dataset &amp;lt;- read.csv(fileName)
+dataset$Year &amp;lt;- factor(dataset$Year)
+head(dataset)
+##     Genotype Year   WPH    YB   TKW    PC
+## 1 ARCOBALENO 1999 81.67 46.67 44.67 12.71
+## 2 ARCOBALENO 2000 82.83 19.67 43.32 11.90
+## 3 ARCOBALENO 2001 83.50 38.67 46.78 13.00
+## 4 ARCOBALENO 2002 78.60 82.67 43.03 12.40
+## 5       BAIO 1999 80.30 41.00 51.83 13.91
+## 6       BAIO 2000 81.40 20.00 41.43 12.80&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;my-colleagues-question&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;My colleague’s question&lt;/h1&gt;
+&lt;p&gt;My colleague’s question was: “&lt;em&gt;can I use a PCA biplot, to have a clear graphical understanding about (i) which qualitative trait gave the best contribution to the discrimination of genotypes and (ii) which genotypes were high/low in which qualitative traits?&lt;/em&gt;”.&lt;/p&gt;
+&lt;p&gt;I think that the above question may be translated into the more general question: “&lt;em&gt;can we use PCA with data from designed experiments with replicates?&lt;/em&gt;”. For this general question my general answer has to be NO; it very much depends on the situation and aims. In this post I would like to show my point of view, although I am open to discussion, as usual.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;independent-subjects-or-not&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Independent subjects or not?&lt;/h1&gt;
+&lt;p&gt;I must admit that I appreciated that my colleague wanted to use a multivariate method; indeed, the quality of winter wheat is a ‘multivariable’ problem and the four recorded traits are very likely correlated to each other. Univariate analyses, such as a set of four separate ANOVAs (one per trait) would lead us to neglect all the reciprocal relationships between the variables, which is not an efficient way to go.&lt;/p&gt;
+&lt;p&gt;PCA is a very widespread multivariate method and it is useful whenever the data matrix is composed by a set of independent subjects, for which we have recorded a number of variables and we are only interested in the differences between those independent subjects. In contrast to this, data from experiments with replicates are not composed by independent subjects, but there are groups of subjects treated alike. For example, in our case study we have four replicates per genotype and these replicates are not independent, because they share the same genotype. Our primary interest is not to study the differences between replicates, but, rather, the differences between genotypes, that are groups of replicates.&lt;/p&gt;
+&lt;p&gt;What happens if we submit our matrix of raw data to PCA? The subjects are regarded as totally independent from one another and no effort is made to keep them together, depending on the group (genotype) they belong to. Consequently, a PCA biplot (left side, below) offers little insight: when we isolate, e.g., the genotypes ARCOBALENO and COLORADO, we see that the four replicates are spread around the space spanned by the PC axes, so that we have no idea about whether and how these two groups are discriminated (right side, below).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# PCA with raw data
+par(mfrow = c(1,2))
+pcdata &amp;lt;- dataset[,3:6]
+row.names(pcdata) &amp;lt;- paste(abbreviate(dataset$Genotype, 3),
+                           dataset$Year, sep = &amp;quot;-&amp;quot;)
+pcaobj &amp;lt;- vegan::rda(pcdata, scale = T)
+biplot(summary(pcaobj)$sites,
+       summary(pcaobj)$species, 
+       cex = 0.5, xlim = c(-1,1), ylim =c(-2,2),
+       expand = 0.5)
+biplot(summary(pcaobj)$sites[c(1:4, 13:16),],
+       summary(pcaobj)$species, 
+       cex = 0.5, xlim = c(-1,1), ylim =c(-2,2),
+       expand = 3)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_multivar_CVA_files/figure-html/unnamed-chunk-2-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;After seeing this, my colleague came out with his next question: “&lt;em&gt;what if we work on the genotype means?&lt;/em&gt;”. Well, when we make a PCA on genotype means, the resulting biplot appears to be clearer (see below), but such clarity is not to be trusted. Indeed, the year-to-year variability of genotypes has been totally ‘erased’ and played no role in the construction of such biplot. Therefore, there is no guarantee that, for each genotype, all the replicates can be found in the close vicinity of the genotype mark. For example, in the biplot below we see that COLORADO and ARCOBALENO are very distant, although we have previously seen that the replicates were not very well discriminated.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# PCA with genotype means
+par(mfrow = c(1,1))
+avgs &amp;lt;- aggregate(dataset[,3:6], list(dataset$Genotype),
+                  mean)
+rownames(avgs) &amp;lt;- avgs[,1]
+avgs &amp;lt;- avgs[,-1]
+pcaobj2 &amp;lt;- vegan::rda(avgs, scale = T)
+biplot(pcaobj2, scaling = 2)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_multivar_CVA_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;In simple words, PCA is not the right tool, because it looks at the distance between individuals, but we are more concerned about the distance between groups of individuals, which is a totally different concept.&lt;/p&gt;
+&lt;p&gt;Obviously, the next question is: “&lt;em&gt;if PCA is not the right tool, what is the right tool, then?&lt;/em&gt;”. My proposal is that Canonical Variate Analysis (CVA) is much better suited to the purpose of group discrimination.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;what-is-cva&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;What is CVA?&lt;/h1&gt;
+&lt;p&gt;Canonical variates (CVs) are similar to principal components, in the sense that they are obtained by using a linear transformation of the original variables (&lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt;), such as:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[CV = Y \times V\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(V\)&lt;/span&gt; is the matrix of transformation coefficients. Unlike PCA, the matrix &lt;span class=&#34;math inline&#34;&gt;\(V\)&lt;/span&gt; is selected in a way that, in the resulting variables, the subjects belonging to the same group are kept close together and, thus, the discrimination of groups is ‘enhanced’.&lt;/p&gt;
+&lt;p&gt;This is clearly visible if we compare the previous PCA biplot with a CVA biplot. Therefore, let’s skip the detail (so far) and perform a CVA, by using the &lt;code&gt;CVA()&lt;/code&gt; function in the &lt;code&gt;aomisc&lt;/code&gt; package, that is the companion package for this blog. Please, note that, dealing with variables in different scales and measurement units, I decided to perform a preliminary standardisation process, by using the &lt;code&gt;scale()&lt;/code&gt; function.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Loads the packages
+library(aomisc)
+
+# Standardise the data
+groups &amp;lt;- dataset$Genotype
+Z &amp;lt;- apply(dataset[,3:6], 2, scale, center=T, scale=T)
+head(Z)
+##             WPH           YB         TKW         PC
+## [1,]  0.3375814 -0.003873758 -0.37675661 -0.5193726
+## [2,]  0.7681267 -1.154020460 -0.59544503 -1.5621410
+## [3,]  1.0168038 -0.344657966 -0.03495471 -0.1460358
+## [4,] -0.8018791  1.529655178 -0.64242254 -0.9184568
+## [5,] -0.1709075 -0.245404565  0.78310197  1.0254693
+## [6,]  0.2373683 -1.139963112 -0.90160881 -0.4035095
+# Perform a CVA with the aomisc package
+cvaobj &amp;lt;- CVA(Z, groups)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;the-cva-biplot&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;The CVA biplot&lt;/h1&gt;
+&lt;p&gt;The main results of a CVA consist of a matrix of &lt;strong&gt;canonical coefficients&lt;/strong&gt; and a matrix of &lt;strong&gt;canonical scores&lt;/strong&gt;. Both these entities are available as the output of the &lt;code&gt;CVA()&lt;/code&gt; function.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Vst &amp;lt;- cvaobj$coef # canonical coefficients
+CVst &amp;lt;- cvaobj$scores # canonical scores&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;These two entities resemble, respectively, the rotation matrix and principal component scores from PCA and, although they have different properties, they can be used to draw a CVA biplot.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# biplot code
+par(mfrow = c(1, 2))
+row.names(CVst) &amp;lt;- paste(abbreviate(dataset$Genotype, 3),
+                           dataset$Year, sep = &amp;quot;-&amp;quot;)
+biplot(CVst[,1:2], Vst[,1:2], cex = 0.5,
+       xlim = c(-3,4), ylim = c(-3, 4))
+abline(h=0, lty = 2)
+abline(v=0, lty = 2)
+biplot(CVst[c(1:4, 13:16),1:2], Vst[,1:2], cex = 0.5,
+       xlim = c(-3,4), ylim = c(-3, 4),
+       expand = 24)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_multivar_CVA_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;We see that, in contrast to the PCA biplot, the four replicates of each variable are ‘kept’ relatively close together, so that the groups are well discriminated. For example, we see that the genotype COLORADO is mainly found on the second quadrant and it is pretty well discriminated by the genotype ARCOBALENO, which is mainly found on the third quadrant.&lt;/p&gt;
+&lt;p&gt;Furthermore, we can also plot the &lt;strong&gt;scores of centroids&lt;/strong&gt; for all groups, that are available as the output of the &lt;code&gt;CVA()&lt;/code&gt; function.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cscores &amp;lt;- cvaobj$centroids
+
+# biplot code
+par(mfrow = c(1,1))
+biplot(cscores[,1:2], Vst[,1:2], cex = 0.5,
+       xlim = c(-3,3.5), ylim = c(-3, 3.5))
+abline(h=0, lty = 2)
+abline(v=0, lty = 2)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_multivar_CVA_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Due to the fact that the groups are mostly kept together in a CVA biplot, we can expect that subjects belonging to a certain group, with highest probability, are found in the close proximity of the respective centroid (which is not true for a PCA biplot, obtained from group means). As the reverse, we can say that the group centroid is a good representative of the whole group and the distances between the centroids will reflect how well the respective groups are discriminated.&lt;/p&gt;
+&lt;p&gt;Having said so, we can read the biplot by using the usual ‘inner product rule’ (see this &lt;a href=&#34;https://www.statforbiology.com/2021/stat_multivar_svd_biplots/&#34;&gt;post here&lt;/a&gt;: the average value of one genotype in one specific variable can be approximated by considering how long are the respective trait-arrow and the projection of the group-marker on the trait-arrow.&lt;/p&gt;
+&lt;p&gt;We can see that COLORADO, BAIO and SANCARLO are mainly discriminated by high protein content (PC) and low number of yellow berries (YB). On the other hand, CLAUDIO and COLOSSEO are discriminated by their low PC and high number of YB.&lt;/p&gt;
+&lt;p&gt;GRAZIA showed high weight per hectoliter (WPH), together with high PC and low Thousand Kernel Weight (TKW). ARCOBALENO and IRIDE were discriminated by high WPH, high number of YB, low PC and low TKW.&lt;/p&gt;
+&lt;p&gt;Other genotypes were very close to the origin of axes, and thus they were very little discriminated, showing average values for most of the qualitative traits.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;nasty-detail-about-cva&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Nasty detail about CVA&lt;/h1&gt;
+&lt;p&gt;With this swift example I hope that I have managed to convince my colleague (and you) that, while a PCA biplot is more suited to focus on the differences between subjects, a CVA biplot is more suited to focus on the differences between groups and, therefore, it is preferable for designed experiments with replicates.&lt;/p&gt;
+&lt;p&gt;In the next part I would like to give you some ‘nasty’ detail about how the &lt;code&gt;CVA()&lt;/code&gt; function works; if you are not interested in such detail, you can safely skip this and I thank you anyway for having followed me up to this point!&lt;/p&gt;
+&lt;p&gt;Performing a CVA is a four step process:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;data standardisation&lt;/li&gt;
+&lt;li&gt;ANOVA/MANOVA&lt;/li&gt;
+&lt;li&gt;eigenvalue decomposition&lt;/li&gt;
+&lt;li&gt;linear transformation&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div id=&#34;step-1-standardisation&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Step 1: standardisation&lt;/h2&gt;
+&lt;p&gt;As we said, standardisation is often made as the preliminary step, by taking the values in each column, subtracting the respective column mean and dividing by the respective column standard deviation. Although this is the most widespread method, it is also possible to standardise by using the within group standard deviation (Root Mean Squared Error from one-way ANOVA), as done, for example, in SPSS. In this post we stick to the usual technique, but, please, take this difference in mind if you intend to compare the results obtained with R with those obtained with other statistical packages.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;step-2-anovamanova&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Step 2: ANOVA/MANOVA&lt;/h2&gt;
+&lt;p&gt;The central point to CVA is to define the discriminating ability of the original variables. In the univariate realm, we use one-way ANOVA to split the total sum of squares into two components, the between-groups sum of squares (&lt;span class=&#34;math inline&#34;&gt;\(SS_b\)&lt;/span&gt;; roughly speaking, the amount of variability between group means) and the within-groups sum of squares (&lt;span class=&#34;math inline&#34;&gt;\(SS_w\)&lt;/span&gt;; roughly speaking, the amount of variability within each treatment group). We know that the total sum of squares &lt;span class=&#34;math inline&#34;&gt;\(SS_T\)&lt;/span&gt; is equal to the sum &lt;span class=&#34;math inline&#34;&gt;\(SS_b + SS_w\)&lt;/span&gt; and, therefore, we could use the ratio &lt;span class=&#34;math inline&#34;&gt;\(SS_w/SS_b\)&lt;/span&gt; as a measure of the discriminating ability of each variable.&lt;/p&gt;
+&lt;p&gt;The multivariate analogous to ANOVA is MANOVA, where we should also consider the relationships (codeviances) between all pairs af variables. In particular, with four variables, we have a &lt;span class=&#34;math inline&#34;&gt;\(4 \times 4\)&lt;/span&gt; matrix of total deviances-codeviances (&lt;span class=&#34;math inline&#34;&gt;\(T\)&lt;/span&gt;), that needs to be split into the sum of two components, i.e. the matrix of between-groups deviances-codeviances (&lt;span class=&#34;math inline&#34;&gt;\(B\)&lt;/span&gt;) and the matrix of within-groups deviances-codeviances (&lt;span class=&#34;math inline&#34;&gt;\(W\)&lt;/span&gt;), so that:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ T = B + W \]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;These three matrices (&lt;span class=&#34;math inline&#34;&gt;\(T\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(B\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(W\)&lt;/span&gt;) can be obtained by matrix multiplication, starting from, respectively, (i) the &lt;span class=&#34;math inline&#34;&gt;\(Z\)&lt;/span&gt; matrix of standardised data, (ii) the &lt;span class=&#34;math inline&#34;&gt;\(Z\)&lt;/span&gt; matrix where each value has been replaced by the mean of the corresponding variable and genotype and (iii) the matrix of residuals from the group means. More easily, we can derive these matrices from the output of the &lt;code&gt;CVA()&lt;/code&gt; function.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Solution with &amp;#39;CVA()&amp;#39; function in &amp;#39;aomisc&amp;#39; package
+TOT &amp;lt;- cvaobj$TOT
+B &amp;lt;- cvaobj$B
+W &amp;lt;- cvaobj$W
+
+print(TOT, digits = 4)
+##         WPH      YB    TKW     PC
+## WPH  63.000 -26.212 34.639 -1.293
+## YB  -26.212  63.000 -3.271 -7.053
+## TKW  34.639  -3.271 63.000 30.501
+## PC   -1.293  -7.053 30.501 63.000
+print(B, digits = 4)
+##         WPH     YB    TKW      PC
+## WPH 20.7760 -2.707  7.986 -0.7946
+## YB  -2.7071 12.009  2.640 -8.5455
+## TKW  7.9862  2.640 27.191 11.6353
+## PC  -0.7946 -8.545 11.635 21.0150
+print(W, digits = 4)
+##          WPH      YB    TKW      PC
+## WPH  42.2240 -23.505 26.652 -0.4986
+## YB  -23.5053  50.991 -5.911  1.4928
+## TKW  26.6524  -5.911 35.809 18.8661
+## PC   -0.4986   1.493 18.866 41.9850&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Analogously to one-way ANOVA, we can calculate the ratio &lt;span class=&#34;math inline&#34;&gt;\(WB = W^{-1} B\)&lt;/span&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;WB &amp;lt;- solve(W) %*% B 
+print(WB, digits = 4)
+##         WPH      YB     TKW      PC
+## WPH  1.2427 -0.4432 -1.0966 -0.5767
+## YB   0.4149  0.1283 -0.2258 -0.3764
+## TKW -0.8169  0.7038  1.8276  0.5567
+## PC   0.3481 -0.5296 -0.5491  0.2569&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;What do the previous matrices tell us? First of all, there are notable total, between-groups and within-groups codeviances between the four quality traits which suggests that these traits are correlated and the contributions they give to the discrimination of genotypes are, partly, overlapping and, thus, redundant.&lt;/p&gt;
+&lt;p&gt;The diagonal elements in &lt;span class=&#34;math inline&#34;&gt;\(WB\)&lt;/span&gt; can be regarded as measures of the ‘discriminating power’ for each of the four variables: the higher the value the higher the differences between the behaviour of genotypes across years. The total ‘discriminating power’ of the four variables is, respectively, &lt;span class=&#34;math inline&#34;&gt;\(1.243 + 0.128 + 1.828 + 0.257 = 3.456\)&lt;/span&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;step-3-eigenvalue-decomposition&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Step 3: eigenvalue decomposition&lt;/h2&gt;
+&lt;p&gt;While total deviances-codeviances are central to PCA, the &lt;span class=&#34;math inline&#34;&gt;\(WB\)&lt;/span&gt; matrix is central to CVA, because it contains relevant information for group discrimination. Therefore, we submit this matrix to eigenvalue decomposition and calculate its scaled eigenvectors (see code below), to obtain the so-called &lt;em&gt;canonical coefficients&lt;/em&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Eigenvalue decomposition
+V1 &amp;lt;- eigen(WB)$vectors
+
+# get the centered canonical variates and their RMSEs
+VCC &amp;lt;- Z %*% V1
+aovList &amp;lt;- apply(VCC, 2, function(col) lm(col ~ groups))
+RMSE &amp;lt;- lapply(aovList, function(mod) summary(mod)$sigma)
+
+# Scaling process
+scaling &amp;lt;- diag(1/unlist(RMSE))
+Vst &amp;lt;- V1 %*% scaling
+Vst
+##            [,1]       [,2]       [,3]       [,4]
+## [1,] -1.9722706 -0.5941660 0.73150227  0.2436692
+## [2,] -0.4953078 -0.7217420 0.06457254  0.8815688
+## [3,]  2.3158763 -0.3791882 0.13441587 -0.4566838
+## [4,] -0.8919442  0.7719516 0.66575788  0.6881214&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;step-4-linear-transformation&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Step 4: linear transformation&lt;/h2&gt;
+&lt;p&gt;The &lt;em&gt;canonical coefficients&lt;/em&gt; can be used to transform the original variables into a set of new variables, the so-called &lt;strong&gt;canonical variates&lt;/strong&gt; or &lt;strong&gt;canonical scores&lt;/strong&gt;:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;CVst &amp;lt;- Z %*% Vst
+colnames(CVst) &amp;lt;- c(&amp;quot;CV1&amp;quot;, &amp;quot;CV2&amp;quot;, &amp;quot;CV3&amp;quot;, &amp;quot;CV4&amp;quot;)
+head(CVst)
+##             CV1        CV2        CV3         CV4
+## [1,] -1.0731535 -0.4558524 -0.1497271 -0.10648959
+## [2,] -0.9289930 -0.6036012 -0.6326765 -1.63319215
+## [3,] -1.7853954 -0.4548743  0.6196159 -0.14060305
+## [4,]  0.1553135 -1.0929723 -1.1856243  0.81447716
+## [5,]  1.3575325  0.7733359  0.6471100  0.09003153
+## [6,] -1.6316285  0.7121127 -0.2898050 -0.81303000&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now, we have four new canonical variates in place of the original quality traits. What did we gain? If we calculate the matrices of total, between-groups and within-groups deviances-codeviances for the CVs, we see that the off-diagonal elements are all 0 which implies that canonical variates are uncorrelated.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Deviances-codeviances for the canonical variates
+# $Total
+#               CV1           CV2          CV3           CV4
+# CV1  1.515993e+02 -5.329071e-15 4.152234e-14  4.884981e-15
+# CV2 -5.329071e-15  8.418391e+01 4.019007e-14 -1.287859e-14
+# CV3  4.152234e-14  4.019007e-14 7.090742e+01  2.398082e-14
+# CV4  4.884981e-15 -1.287859e-14 2.398082e-14  5.117518e+01
+# 
+# $Between-groups
+#              CV1           CV2          CV3           CV4
+# CV1 1.035993e+02  2.886580e-15 2.797762e-14  1.976197e-14
+# CV2 2.886580e-15  3.618391e+01 3.330669e-15 -3.774758e-15
+# CV3 2.797762e-14  3.330669e-15 2.290742e+01  8.326673e-15
+# CV4 1.976197e-14 -3.774758e-15 8.326673e-15  3.175176e+00
+# 
+# $Within-groups
+#               CV1           CV2          CV3           CV4
+# CV1  4.800000e+01 -4.329870e-15 6.217249e-15 -1.260103e-14
+# CV2 -4.329870e-15  4.800000e+01 3.674838e-14 -1.443290e-14
+# CV3  6.217249e-15  3.674838e-14 4.800000e+01  1.776357e-14
+# CV4 -1.260103e-14 -1.443290e-14 1.776357e-14  4.800000e+01
+# 
+# $`B/W`
+#              CV1           CV2           CV3           CV4
+# CV1 2.158318e+00  1.281369e-16  5.210524e-16  4.290734e-16
+# CV2 2.548295e-16  7.538314e-01 -2.959802e-16 -5.875061e-17
+# CV3 3.033087e-16 -5.077378e-16  4.772379e-01  1.489921e-16
+# CV4 9.783126e-16  1.480253e-16 -3.141157e-18  6.614950e-02&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Furthermore, the &lt;span class=&#34;math inline&#34;&gt;\(BW\)&lt;/span&gt; matrix above shows that the ratios of ‘between-groups/within-groups’ deviances are in decreasing order and their sum is equal to the sum of the diagonal elements of the &lt;span class=&#34;math inline&#34;&gt;\(BW\)&lt;/span&gt; matrix for the original variables.&lt;/p&gt;
+&lt;p&gt;In simpler words, the total ‘discriminating power’ of the CVs is the same as that of the original variables, but the first CV, on itself, has a very high ‘discriminating power’, that is equal to 62.5% of the ‘discriminating power’ of the original variables (&lt;span class=&#34;math inline&#34;&gt;\(2.155/3.540 \cdot 100\)&lt;/span&gt;). If we add a second CV, the ‘discriminating power’ raises to the 85% of the original variables. It means that, if we use two CVs in place of the four original variables, the discrimination of genotypes across years is almost as good as that of the original four variables. Therefore, we can conclude that the biplot above is relevant.&lt;/p&gt;
+&lt;p&gt;Please, note that the output of the &lt;code&gt;CVA()&lt;/code&gt; function also contains the proportion of total discriminating ability that is contributed by each canonical variate (see box below).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cvaobj$proportion
+## [1] 0.62459704 0.21815174 0.13810817 0.01914304&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;As the final remark, the &lt;em&gt;canonical coefficients&lt;/em&gt; can be used to calculate the &lt;strong&gt;canonical scores for centroids&lt;/strong&gt;, which we used for the biplot above:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;avg &amp;lt;- aggregate(Z, list(groups), mean)
+row.names(avg) &amp;lt;- avg[,1]
+avg &amp;lt;- as.matrix(avg[,-1])
+
+head(avg %*% Vst)
+##                  [,1]       [,2]       [,3]        [,4]
+## ARCOBALENO -0.9080571 -0.6518251 -0.3371030 -0.26645191
+## BAIO       -0.7823965  0.8928011  0.5747970  0.32086167
+## CLAUDIO    -0.5496314 -1.3845288  0.3590569  0.16423169
+## COLORADO   -1.1481765  1.4231696 -0.5535939 -0.13201115
+## COLOSSEO    1.0654126 -1.3108147 -0.1201515 -0.05709275
+## CRESO       0.3070820 -0.3947049  0.6469757 -0.09565658&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In conclusion, canonical variate analysis is the best way to represent the multivariate data in reduced rank space, preserving the discrimination between groups. Therefore, it may be much more suitable than PCA with designed experiments with replicates.&lt;/p&gt;
+&lt;p&gt;Thanks for reading!&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;further-readings&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Further readings&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Crossa, J., 1990. Advances in Agronomy 44, 55-85.&lt;/li&gt;
+&lt;li&gt;NIST/SEMATECH, 2004. In “e-Handbook of Statistical Methods”. NIST/SEMATECH, &lt;a href=&#34;http://www.itl.nist.gov/div898/handbook/&#34; class=&#34;uri&#34;&gt;http://www.itl.nist.gov/div898/handbook/&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Manly F.J., 1986. Multivariate statistical methods: a primer. Chapman &amp;amp; Hall, London, pp. 159.&lt;/li&gt;
+&lt;li&gt;Adugna W. e Labuschagne M. T., 2003. Cluster and canonical variate analyses in multilocation trials of linseed. Journal of Agricultural Science (140), 297-304.&lt;/li&gt;
+&lt;li&gt;Barberi P., Silvestri N. e Bonari E., 1997. Weed communities of winter wheat as influenced by input level and rotation. Weed Research 37, 301-313.&lt;/li&gt;
+&lt;li&gt;Casini P. e Proietti C., 2002. Morphological characterisation and production of Quinoa genotypes (Chenopodium quinoa Willd.) in the Mediterranean environment. Agricoltura Mediterranea 132, 15-26.&lt;/li&gt;
+&lt;li&gt;Onofri A. e Ciriciofolo E., 2004. Characterisation of yield quality in durum wheat by canonical variate anaysis. Proceedings VIII ESA Congress “European Agriculture in a global context”, Copenhagen, 11-15 July 2004, 541-542.&lt;/li&gt;
+&lt;li&gt;Shresta A., Knezevic S. Z., Roy R. C., Ball-Cohelo B. R. e Swanton C. J., 2002. Effect of tillage, cover crop and crop rotation on the composition of weed flora in a sandy soil. Weed Research 42 (1), 76-87.&lt;/li&gt;
+&lt;li&gt;Streit B., Rieger S. B., Stamp P. e Richner W., 2003. Weed population in winter wheat as affected by crop sequence, intensity of tillage and time of herbicide application in a cool and humid climate. Weed Research 43, 20-32.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>GGE analyses for multi-environment studies</title>
+      <link>https://www.statforbiology.com/2023/stat_met_gge/</link>
+      <pubDate>Wed, 31 May 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.statforbiology.com/2023/stat_met_gge/</guid>
+      <description>
+
+
+&lt;p&gt;In a recent post we have seen that we can use Principal Component Analyses (PCA) to elucidate the ‘genotype by environment’ relationship (&lt;a href=&#34;https://www.statforbiology.com/2023/stat_met_ammi/&#34;&gt;see this post&lt;/a&gt;). Whenever the starting point for PCA is the doubly-centered (centered by rows and columns) matrix of yields across environments, we talk about AMMI analysis, which is often used to get insight into the stability of genotype yields across environments.&lt;/p&gt;
+&lt;p&gt;By changing the starting matrix, we can obtain a different perspective and put focus on the definition of macroenvironments and on the selection of winning genotypes. In particular, if the two-way matrix of yields across environments is only column-centered before PCA, we talk about GGE analysis (Yan et al., 2000). In spite of some academic debate (see Gauch, 2006, Yan et al., 2007, Gauch et al., 2008), AMMI and GGE analyses are both useful and can be used as two complementary tools for the analysis of multi-environment genotype data.&lt;/p&gt;
+&lt;p&gt;In order to discover the main peculiarities of GGE analysis, we will use the same example as in the previous post about AMMI analysis.&lt;/p&gt;
+&lt;div id=&#34;a-met-with-faba-bean&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;A MET with faba bean&lt;/h1&gt;
+&lt;p&gt;This experiment consists of 12 faba bean genotypes (well, it was, indeed, 6 genotypes in two sowing dates; but, let’s disregard this detail from now on) in four blocks, two locations and three years (six environments, in all). The dataset is online available as ‘fabaBean.csv’ and it has been published by Stagnari et al. (2007).&lt;/p&gt;
+&lt;p&gt;We have seen that the starting point for AMMI analyses is the two-way matrix of yields across environments, which is obtained in the box below, by using a few functions from the &lt;code&gt;tidyverse&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rm(list=ls())
+library(tidyverse)
+
+fileName &amp;lt;- &amp;quot;https://www.casaonofri.it/_datasets/fabaBean.csv&amp;quot;
+dataset &amp;lt;- read.csv(fileName, header=T)
+GEmedie &amp;lt;- dataset %&amp;gt;% 
+  group_by(Genotype, Environment) %&amp;gt;% 
+  dplyr::summarise(Yield = mean(Yield)) %&amp;gt;% 
+  pivot_wider(names_from = Environment,
+              values_from = Yield,
+              id_cols = Genotype)
+GEmedie
+## # A tibble: 12 × 7
+## # Groups:   Genotype [12]
+##    Genotype    bad_1 bad_2 bad_3 pap_1 pap_2 pap_3
+##    &amp;lt;chr&amp;gt;       &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt;
+##  1 Chiaro_A     4.11 2.34   4.12  4.63 2.41   3.85
+##  2 Chiaro_P     2.51 1.33   4.20  3.32 1.40   4.32
+##  3 Collameno_A  3.25 2.11   4.38  3.85 2.23   4.07
+##  4 Collameno_P  1.91 0.848  3.86  2.52 0.985  4.05
+##  5 Palomb_A     3.84 2.08   4.20  5.05 2.68   4.67
+##  6 Palomb_P     2.25 0.972  3.26  3.27 0.883  4.01
+##  7 Scuro_A      4.37 2.10   4.15  4.86 2.13   4.20
+##  8 Scuro_P      3.05 1.64   3.93  3.72 1.75   4.51
+##  9 Sicania_A    3.83 1.94   4.50  3.96 2.24   4.24
+## 10 Sicania_P    3.27 0.99   3.73  4.05 0.822  3.90
+## 11 Vesuvio_A    4.14 2.02   4.03  4.50 2.26   4.32
+## 12 Vesuvio_P    2.12 1.18   3.52  3.10 0.938  3.63&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;While with AMMI analysis the above matrix is doubly-centered (by rows and columns), with GGE analysis it is only column-centered, to remove the overall mean and the environment main effect. As the result, the centered matrix will contain the Genotype main effect (G) and the Genotype by Environment interaction (GE), that is why this technique is named GGE analysis. Let’s do such centering.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Means for environments
+envMeans &amp;lt;- apply(GEmedie[,-1], 2, mean)
+GGEmatrix &amp;lt;- sweep(GEmedie[,-1], 2, envMeans)
+rownames(GGEmatrix) &amp;lt;- unlist(GEmedie[,1])&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;What do the above values mean? For each genotype, they are the yield differences (in tons per hectare) with respect to the average yield in each environment; for example, ‘Scuro_P’ shows a value of 0.0077 at ‘bad_2’, which is close to zero and indicates that the yield of this genotype was exactly equal to the environmental average in that location. On the other hand, ‘Scuro_A’ at ‘bad_1’, gave a value of 1.15, which is very high and indicates that this genotype outperformed all the others in that location.&lt;/p&gt;
+&lt;p&gt;The importance of the GGE matrix is that it contains both the genotype and the genotype by environment effects, which are fundamental to compare the performances of genotypes across anvironments.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;decomposing-the-gge-matrix&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Decomposing the GGE matrix&lt;/h1&gt;
+&lt;p&gt;Once we have understood the importance of the GGE matrix, we might be willing to summarise it by way of some appropriate statistical method. Thinking of a Principal Component Analysis (PCA) is fairly obvious, as we did for AMMI analysis in the previous post.&lt;/p&gt;
+&lt;p&gt;Thus, we can use Singular Value Decomposition (SVD), to decompose our GGE matrix into the product of two matrices:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[GGE = S_g \, S_e^T\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(S_g\)&lt;/span&gt; is a matrix of genotype scores and &lt;span class=&#34;math inline&#34;&gt;\(S_e\)&lt;/span&gt; is a matrix of environment scores. It does not matter much how (and why) we obtain these matrices, I will just show you a swift R solution in the box below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;U &amp;lt;- svd(GGEmatrix)$u
+V &amp;lt;- svd(GGEmatrix)$v
+D &amp;lt;- diag(svd(GGEmatrix)$d)
+Sg &amp;lt;- U %*% sqrt(D)
+Se &amp;lt;- V %*% sqrt(D)
+row.names(Sg) &amp;lt;- rownames(GGEmatrix)
+row.names(Se) &amp;lt;- colnames(GGEmatrix)
+colnames(Sg) &amp;lt;- colnames(Se) &amp;lt;- paste(&amp;quot;PC&amp;quot;, 1:6, sep =&amp;quot;&amp;quot;)
+round(Sg, 3)
+##                PC1    PC2    PC3    PC4    PC5    PC6
+## Chiaro_A    -0.682 -0.064 -0.441 -0.274  0.022  0.051
+## Chiaro_P     0.431  0.326  0.182  0.217  0.225 -0.177
+## Collameno_A -0.211  0.494 -0.267 -0.116  0.157 -0.099
+## Collameno_P  0.999  0.332  0.003  0.180 -0.065  0.221
+## Palomb_A    -0.766  0.080  0.595 -0.268  0.254  0.170
+## Palomb_P     0.775 -0.320  0.166 -0.306 -0.211  0.015
+## Scuro_A     -0.729 -0.340 -0.068  0.135 -0.020 -0.160
+## Scuro_P      0.075  0.175  0.308  0.003 -0.263 -0.232
+## Sicania_A   -0.387  0.325 -0.197  0.386 -0.091  0.130
+## Sicania_P    0.281 -0.784 -0.010  0.357  0.223  0.029
+## Vesuvio_A   -0.588 -0.116  0.029  0.039 -0.336  0.080
+## Vesuvio_P    0.801 -0.107 -0.299 -0.352  0.106 -0.028
+round(Se, 3)
+##          PC1    PC2    PC3    PC4    PC5    PC6
+## bad_1 -1.283 -0.410 -0.242  0.431 -0.305  0.040
+## bad_2 -0.773  0.362 -0.311 -0.323 -0.073 -0.344
+## bad_3 -0.373  0.557 -0.119  0.531  0.400 -0.035
+## pap_1 -1.118 -0.591  0.318 -0.230  0.369 -0.020
+## pap_2 -0.978  0.659  0.080 -0.293 -0.074  0.286
+## pap_3 -0.204  0.270  0.796  0.205 -0.201 -0.148&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Let’s have a look at &lt;span class=&#34;math inline&#34;&gt;\(S_g\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(S_e\)&lt;/span&gt;: they are two interesting entities. Both matrices have 6 columns (that is the minimum between the number of genotypes and the number of environments). &lt;span class=&#34;math inline&#34;&gt;\(S_g\)&lt;/span&gt; has 12 rows, one per genotype: these are the so-called genotype scores: each genotype has six scores. &lt;span class=&#34;math inline&#34;&gt;\(S_e\)&lt;/span&gt; has six rows, one per environment (environment scores) and, analogously to each genotype, each environment has six scores.&lt;/p&gt;
+&lt;p&gt;The most interesting thing to note is that, as expected, these two matrices, by multiplication, return the original GGE matrix.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;round(Sg %*% t(Se), 3)
+##              bad_1  bad_2  bad_3  pap_1  pap_2  pap_3
+## Chiaro_A     0.885  0.710  0.133  0.730  0.682 -0.297
+## Chiaro_P    -0.712 -0.297  0.210 -0.580 -0.323  0.170
+## Collameno_A  0.030  0.485  0.390 -0.055  0.505 -0.077
+## Collameno_P -1.312 -0.782 -0.127 -1.382 -0.743 -0.095
+## Palomb_A     0.620  0.445  0.213  1.150  0.957  0.520
+## Palomb_P    -0.970 -0.657 -0.735 -0.632 -0.845 -0.135
+## Scuro_A      1.150  0.475  0.160  0.960  0.400  0.058
+## Scuro_P     -0.170  0.008 -0.062 -0.182  0.020  0.365
+## Sicania_A    0.610  0.315  0.513  0.053  0.507  0.088
+## Sicania_P    0.050 -0.640 -0.262  0.145 -0.905 -0.252
+## Vesuvio_A    0.917  0.388  0.035  0.600  0.537  0.175
+## Vesuvio_P   -1.097 -0.450 -0.467 -0.807 -0.790 -0.520&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If you some memories about matrix multiplication, you will remeber that the GGE value for each genotype in each environment can be obtained as the sum of products of genotype scores and environments scores:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[gge_{ij} = \sum_{z = 1}^n \left[ S_{g(iz)} \cdot S_{e(jz)} \right]\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;For example, let’s consider the first genotype and the first environment. The genotype and environments scores are in the first columns of &lt;span class=&#34;math inline&#34;&gt;\(S_g\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(S_e\)&lt;/span&gt;; if we multiply the elements in the same positioning (1st with 1st, 2nd with 2nd, and so on) and sum up, we get:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;-0.682 * -1.283 +
+-0.064 * -0.410 +
+-0.441 * -0.242 +
+-0.274 *  0.431 +
+ 0.022 * -0.305 + 
+ 0.051 *  0.040
+## [1] 0.885204&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It’s done: we have transformed the GGE effect for ‘Chiaro_A’ in ‘bad_1’ into the sum of multiplicative terms. The final product will be the highest whenever the genotype and environment scores have the same signs, within each couple in the box above.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;reducing-the-rank&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Reducing the rank&lt;/h1&gt;
+&lt;p&gt;Instead of taking all available columns in &lt;span class=&#34;math inline&#34;&gt;\(S_g\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(S_e\)&lt;/span&gt;, for the sake of simplicity, we could have taken only a subset of those columns. The Eckart-Young (1936) theorem says that, if we take &lt;span class=&#34;math inline&#34;&gt;\(m &amp;lt; 6\)&lt;/span&gt; columns, we obtain the best possible approximation of GGE in reduced rank space. For example, let’s use the first two columns of &lt;span class=&#34;math inline&#34;&gt;\(S_g\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(S_e\)&lt;/span&gt; (the first two principal component scores):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;PC &amp;lt;- 2
+Sg2 &amp;lt;- Sg[,1:PC]
+Se2 &amp;lt;- Se[,1:PC]
+GGE2 &amp;lt;- Sg2 %*% t(Se2)
+print ( round(GGE2, 3) )
+##              bad_1  bad_2  bad_3  pap_1  pap_2  pap_3
+## Chiaro_A     0.901  0.504  0.219  0.800  0.624  0.122
+## Chiaro_P    -0.686 -0.215  0.020 -0.674 -0.207  0.000
+## Collameno_A  0.068  0.342  0.354 -0.057  0.532  0.176
+## Collameno_P -1.418 -0.652 -0.189 -1.313 -0.758 -0.114
+## Palomb_A     0.950  0.621  0.330  0.809  0.801  0.178
+## Palomb_P    -0.863 -0.715 -0.467 -0.677 -0.968 -0.244
+## Scuro_A      1.076  0.441  0.083  1.017  0.489  0.057
+## Scuro_P     -0.168  0.006  0.070 -0.187  0.043  0.032
+## Sicania_A    0.363  0.417  0.325  0.240  0.592  0.167
+## Sicania_P   -0.040 -0.501 -0.541  0.149 -0.791 -0.269
+## Vesuvio_A    0.802  0.412  0.155  0.726  0.498  0.089
+## Vesuvio_P   -0.985 -0.658 -0.359 -0.833 -0.854 -0.192&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;GGE2 is not equal to GGE, but it is a close approximation. A close approximation in the least squares sense: the sum of squared elements in GGE2 is as close as possible (with &lt;span class=&#34;math inline&#34;&gt;\(n = 2\)&lt;/span&gt;) to the sum of squared elements in GGE:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sum(GGE2^2)
+## [1] 23.60912
+sum(GGEmatrix^2)
+## [1] 25.24985&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We see that the sum of squares in GGE2 is 94% of the sum of squares in GGE. A very good approximation, isn’t it? It means that the variability of yields across environments is described well enough by using a relatively low number of parameters (scores).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;simple-gge-analysis-with-r&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Simple GGE analysis with R&lt;/h1&gt;
+&lt;p&gt;Although there are certainly more exhaustive solutions, for the sake of simplicity, I have coded the &lt;code&gt;GGE()&lt;/code&gt; function, that is available in the &lt;code&gt;aomisc&lt;/code&gt; package; it works equally well with raw MET data, containing all replicated values, or with the ‘genotype by environment’ average values. The &lt;code&gt;aomisc&lt;/code&gt; package is the companion package for this website and must have been installed as detailed in this &lt;a href=&#34;https://www.statforbiology.com/rpackages/&#34;&gt;page here&lt;/a&gt;. In the box below, I am using the &lt;code&gt;GGE()&lt;/code&gt; function on raw data.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(aomisc)
+tab &amp;lt;- with(dataset, GGE(Yield, Genotype, Environment, Block, PC = 2))
+tab$genotype_scores
+##                     PC1         PC2
+## Chiaro_A    -0.68155278 -0.06429886
+## Chiaro_P     0.43068275  0.32576146
+## Collameno_A -0.21061911  0.49449808
+## Collameno_P  0.99907773  0.33159670
+## Palomb_A    -0.76575818  0.07957138
+## Palomb_P     0.77465315 -0.32010018
+## Scuro_A     -0.72947712 -0.34046924
+## Scuro_P      0.07462862  0.17542914
+## Sicania_A   -0.38653879  0.32490370
+## Sicania_P    0.28122610 -0.78391426
+## Vesuvio_A   -0.58767986 -0.11584246
+## Vesuvio_P    0.80135748 -0.10713545
+tab$environment_scores
+##              PC1        PC2
+## bad_1 -1.2834363 -0.4099307
+## bad_2 -0.7732097  0.3621530
+## bad_3 -0.3734263  0.5565962
+## pap_1 -1.1182795 -0.5910472
+## pap_2 -0.9778134  0.6587901
+## pap_3 -0.2038688  0.2699500
+tab$GGE_summary
+##   PC Singular_value       PC_SS Perc_of_Total_SS
+## 1  1      4.6327397 21.46227711       84.9996363
+## 2  2      1.4652115  2.14684465        8.5024070
+## 3  3      0.9099052  0.82792745        3.2789406
+## 4  4      0.7535488  0.56783584        2.2488685
+## 5  5      0.4405921  0.19412143        0.7688024
+## 6  6      0.2254758  0.05083935        0.2013452&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;why-is-this-useful&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Why is this useful?&lt;/h1&gt;
+&lt;p&gt;Did you get lost? Hope you didn’t, but let’s make a stop and see where we are standing now. We started from the GGE matrix and found a way to decompose it as the product of two matrices, i.e. &lt;span class=&#34;math inline&#34;&gt;\(S_g\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(S_e\)&lt;/span&gt;, a matrix of genotype scores and a matrix of environment scores. We discovered that we could obtain a good approximation of GGE by working in reduced rank space and we only used two genotypic scores and two environment scores, in place of the available six.&lt;/p&gt;
+&lt;p&gt;This is great! Now we have the ability of drawing a biplot, i.e. we can plot both genotypic scores and environmental scores in a dispersion graph (biplot: two plots into one), as we see below. We can use the swift &lt;code&gt;biplot()&lt;/code&gt; method for AMMI and GGE objects, as available in the &lt;code&gt;aomisc&lt;/code&gt; package.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;biplot(tab, xlim = c(-1.5, 1.5), ylim = c(-1.5, 1.5),
+       xlab = &amp;quot;PC 1&amp;quot;, ylab = &amp;quot;PC 2&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_met_GGE_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;576&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;This graph provides a very effective description of GE interaction effects. I will not go into detail, here. Just a few simple comments:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;genotypes lying close to the origin of the axes tend to have average behaviours across environments (their genotypic scores will be close to zero).&lt;/li&gt;
+&lt;li&gt;environments lying close to the origin of the axes tend neither to be favourable nor unfavourable to most of the genotypes and will not be very discriminating.&lt;/li&gt;
+&lt;li&gt;genotypes lying far away from the origin of axes tend to be far from the average yield in several environments, either in a positive or negative sense.&lt;/li&gt;
+&lt;li&gt;environments lying far away from the origin of axes tend to be very discriminating (favourable for some genotypes and unfavourable for others).&lt;/li&gt;
+&lt;li&gt;when genotype and environment markers are far away from the origin and close to each other, their scores will be high and of same sign. This is an indicator of very good performances.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div id=&#34;augmenting-the-biplot&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Augmenting the biplot&lt;/h1&gt;
+&lt;p&gt;The above biplot can be augmented in several ways (see Yan and Tinker, 2006). The ‘which-won-where’ pattern is rather useful and it consists of:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;drawing a polygon with vertices on the genotypes that are furthest away from the origin of axes, so that all other genotypes are contained within the polygon. In this case we can select: ‘Collameno_A’, ‘Palombino_A’, ‘Scuro_A’, ‘Sicania_P’, ‘Palomb_P’ and ‘Collameno_P’ (i.e. the 3&lt;sup&gt;rd&lt;/sup&gt;, 5&lt;sup&gt;th&lt;/sup&gt;, 7&lt;sup&gt;th&lt;/sup&gt;, 10&lt;sup&gt;th&lt;/sup&gt;, 6&lt;sup&gt;th&lt;/sup&gt; and 4&lt;sup&gt;th&lt;/sup&gt; genotypes);&lt;/li&gt;
+&lt;li&gt;drawing the perpendicular lines to each side of the polygon, starting from the origin of axes.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;We can use the &lt;code&gt;biplot.polygon()&lt;/code&gt; function in the &lt;code&gt;aomisc&lt;/code&gt; package&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;biplot(tab, xlim = c(-1.5, 1.5), ylim = c(-1.5, 1.5),
+       xlab = &amp;quot;PC 1&amp;quot;, ylab = &amp;quot;PC 2&amp;quot;)
+biplot.polygon(tab, vertex = c(3,5,7,10,6, 4))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_met_GGE_files/figure-html/unnamed-chunk-10-1.png&#34; width=&#34;576&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Based on the above graph we can make the following conclusions.&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Genotypes located on the vertices of the polygon were the best/worst in some environments.&lt;/li&gt;
+&lt;li&gt;The perpendicular lines divide the biplot into sectors, and the winning genotype for each sector is the one located on the respective vertex. In this example, ‘Palomb_A’ is the winning genotype in ‘bad_2’, ‘pap_2’ and ‘pap_3’, while ‘Collameno_A, is the winner in ’bad_3’. ‘Scuro_A’ is the winner in ‘bad_1’ and ‘pap_1’.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Thank you for reading, and… happy coding!&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;literature-references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Literature references&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Gauch, H.G., 2006. Statistical Analysis of Yield Trials by AMMI and GGE. Crop Science 46, 1488–1500.&lt;/li&gt;
+&lt;li&gt;Gauch, H.G., Piepho, H.-P., Annicchiarico, P., 2008. Statistical Analysis of Yield Trials by AMMI and GGE: Further Considerations. Crop Science 48, 866–889.&lt;/li&gt;
+&lt;li&gt;Yan, W., 2002. Singular-Value Partitioning in Biplot Analysis of Multienvironment Trial Data. Agronomy Journal 94, 990–996.&lt;/li&gt;
+&lt;li&gt;Yan, W., 2001. GGEbiplot–A Windows Application for Graphical Analysis of Multienvironment Trial Data and Other Types of Two-Way Data. Agronomy Journal 93, 1111–1118.&lt;/li&gt;
+&lt;li&gt;Yan, W., Cornelius, P.L., Crossa, J., Hunt, L.A., 2001. Two Types of GGE Biplots for Analyzing Multi-Environment Trial Data. Crop Science 41, 656–663.&lt;/li&gt;
+&lt;li&gt;Yan, W., Hunt, L.A., Sheng, Q., Szlavnics, Z., 2000. Cultivar Evaluation and Mega-Environment Investigation Based on the GGE Biplot. Crop Science 40, 597–605.&lt;/li&gt;
+&lt;li&gt;Yan, W., Kang, M.S., Ma, B., Woods, S., Cornelius, P.L., 2007. GGE Biplot vs. AMMI Analysis of Genotype-by-Environment Data. Crop Science 47, 643–653.&lt;/li&gt;
+&lt;li&gt;Yan, W., Tinker, N.A., 2006. Biplot analysis of multi-environment trial data: Principles and applications. Canadian Journal of Plant Science 86, 1–9.&lt;/li&gt;
+&lt;li&gt;Yan, W., Tinker, N.A., 2005. An Integrated Biplot Analysis System for Displaying, Interpreting, and Exploring Genotype x Environment Interaction. Crop Science 45, 1004–1016.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>AMMI analyses for multi-environment studies</title>
@@ -87,13 +617,16 @@ mean(as.matrix(GEmedie))
 &lt;p&gt;What model could we possibly fit to the above data? The basic two-way ANOVA model is:&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[Y_{ijk} = \mu + \gamma_{jk} + g_i + e_j + ge_{ij} + \varepsilon_{ijk} \quad \quad (1)\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;where the yield &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; for given block &lt;span class=&#34;math inline&#34;&gt;\(k\)&lt;/span&gt;, environment &lt;span class=&#34;math inline&#34;&gt;\(j\)&lt;/span&gt; and genotype &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt; is described as a function of the effects of blocks within environments (&lt;span class=&#34;math inline&#34;&gt;\(\gamma\)&lt;/span&gt;), genotypes (&lt;span class=&#34;math inline&#34;&gt;\(g\)&lt;/span&gt;), environments (&lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt;) and GE interaction (&lt;span class=&#34;math inline&#34;&gt;\(ge\)&lt;/span&gt;). The residual error term &lt;span class=&#34;math inline&#34;&gt;\(\varepsilon\)&lt;/span&gt; is assumed to be normal and homoscedastic, with standard deviation equal to &lt;span class=&#34;math inline&#34;&gt;\(\sigma\)&lt;/span&gt;. Let’s also assume that both the genotype and environment effects are fixed: this is useful for teaching purposes and it is reasonable, as we intend to study the behaviour of specific genotypes in several specific environments.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;the-interaction-effects-and-ge-matrix&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;The interaction effects (and GE matrix)&lt;/h1&gt;
 &lt;p&gt;The interaction effect &lt;span class=&#34;math inline&#34;&gt;\(ge\)&lt;/span&gt;, under some important assumptions (i.e. balanced data, no missing cells and homoscedastic errors), is given by:&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ge_{ij} = Y_{ij.} - \left( \mu + g_i + e_j \right) = Y_{ij.} - Y_{i..} - Y_{.j.} + \mu \quad \quad (2)\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(Y_{ij.}\)&lt;/span&gt; is the mean of the combination between the genotype &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt; and the environment &lt;span class=&#34;math inline&#34;&gt;\(j\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(Y_{i..}\)&lt;/span&gt; is the mean for the genotype &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(Y_{.j.}\)&lt;/span&gt; is the mean for the environment &lt;span class=&#34;math inline&#34;&gt;\(j\)&lt;/span&gt;. For example, for the genotype ‘Chiaro_A’ in the environment ‘bad_1’, the interaction effect was:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;4.1050 - 3.577 - 3.22 + 3.103
 ## [1] 0.411&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;We see that the interaction was positive, in the sense that ‘Chiaro_A’, gave 0.411 tons per hectare more than we could have expected, considering its average performances across environments and the average performances of all genotypes in ‘bad_1’.&lt;/p&gt;
-&lt;p&gt;More generally, the two-way table of interaction effects can be obtained by doubly centring the matrix of means, as shown in the following box.&lt;/p&gt;
+&lt;p&gt;It may be very handy to organise the interaction effects in a two-way table, with the genotypes along the rows and environments along the columns (or vice-versa, as you prefer). Such a two-way table can be simply obtained by doubly centring the matrix of means, as shown in the following box.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;GE &amp;lt;- as.data.frame(t(scale( t(scale(GEmedie, center=T,
  scale=F)), center=T, scale=F)))
 print(round(GE, 3))
@@ -248,7 +781,7 @@ abline(v = 0, lty = 2)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;This graph provides a very effective description of GE interaction effects. I will not go into detail, here. Just a few simple comments:&lt;/p&gt;
 &lt;ol style=&#34;list-style-type: decimal&#34;&gt;
 &lt;li&gt;genotypes and environments lying close to the origin of the axes do not interact with each other (the product of scores would be close to 0)&lt;/li&gt;
-&lt;li&gt;genotype and environments lying far away from the origin of axes show very big interaction and, therefore, high yield instability. Someone says that the euclidean distance from the origin should be taken as a measure of instability&lt;/li&gt;
+&lt;li&gt;genotypes and environments lying far away from the origin of axes show very big interaction and, therefore, high yield instability. Someone says that the euclidean distance from the origin should be taken as a measure of instability&lt;/li&gt;
 &lt;li&gt;the interaction is positive, when genotypes and environments are close to each other. If two objects are close, their scores (co-ordinates) will have the same signs and thus their product will be positive.&lt;/li&gt;
 &lt;li&gt;the interaction is negative, when genotypes and environments are far away from each other. If two objects are distant, their scores (co-ordinates) will have opposte signs and thus their product will be negative.&lt;/li&gt;
 &lt;li&gt;For instance, ‘Palomb_P’, ‘Scuro_P’, ‘Chiaro_P’ and ‘Collameno_P’ gave particularly good yields in the environments ‘pap_3’ and ‘bad_3’, while ‘Scuro_A’, ‘Palomb_A’ and ‘Vesuvio_A’ gave particularly good yields (compared to their average) in the environments ‘pap_1’ and ‘bad_1’. ‘Sicania_A’ and ‘Collameno_A’ gave good yields in ‘bad_2’ and ‘pap_2’.&lt;/li&gt;
@@ -9445,7 +9978,7 @@ I-06121 - PERUGIA&lt;/p&gt;
       <description>
 
 
-&lt;p&gt;In R, the &lt;code&gt;drc&lt;/code&gt; package represents one of the main solutions for nonlinear regression and dose-response analyses (Ritz et al., 2015). It comes with a lot of nonlinear models, which are useful to describe several biological processes, from plant growth to bioassays, from herbicide degradation to seed germination. These models are provided with self-starting functions, which free the user from the hassle of providing initial guesses for model parameters. Indeed, getting these guesses may be a tricky task, both for students and for practitioners.&lt;/p&gt;
+&lt;p&gt;(Post updated on 17/07/2023) In R, the &lt;code&gt;drc&lt;/code&gt; package represents one of the main solutions for nonlinear regression and dose-response analyses (Ritz et al., 2015). It comes with a lot of nonlinear models, which are useful to describe several biological processes, from plant growth to bioassays, from herbicide degradation to seed germination. These models are provided with self-starting functions, which free the user from the hassle of providing initial guesses for model parameters. Indeed, getting these guesses may be a tricky task, both for students and for practitioners.&lt;/p&gt;
 &lt;p&gt;Obviously, we should not expect that all possible models and parameterisations are included in the ‘drc’ package; therefore, sooner or later, we may all find ourselves in the need of building a user-defined function, for some peculiar tasks of nonlinear regression analysis. I found myself in that position several times in the past and it took me awhile to figure out a solution.&lt;/p&gt;
 &lt;p&gt;In this post, I’ll describe how we can simply build self-starters for our nonlinear regression analyses, to be used in connection with the ‘drm()’ function in the ‘drc’ package. In the end, I will also extend the approach to work with the ‘nls()’ function in the ‘stats’ package.&lt;/p&gt;
 &lt;p&gt;Let’s consider the following dataset, depicting the relationship between temperature and growth rate. We may note that the response reaches a maximum value around 30°C, while it is lower below and above such an optimal value.&lt;/p&gt;
@@ -9565,10 +10098,10 @@ plot(mod, log = &amp;quot;&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
                start = list (b = 0.01, d = 27, e = 30))&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;However, we are forced to provide starting values for all estimands, which might be a tricky task, unless we build a self-starting routine, as we did before for the &lt;code&gt;drc&lt;/code&gt; platform. This is not an impossible task and we can also re-use part of the code we have already written above. We have to:&lt;/p&gt;
 &lt;ol style=&#34;list-style-type: decimal&#34;&gt;
-&lt;li&gt;build a self-starting function by using the appropriate coding (see below). In this step we should be careful to the command &lt;code&gt;sortedXyData(mCall[[&amp;quot;X&amp;quot;]], LHS, data)&lt;/code&gt;. The part in quotation marks (“X”) should correspond to the name of the predictor in the &lt;code&gt;bragg.3.fun()&lt;/code&gt; function definition.&lt;/li&gt;
+&lt;li&gt;build a self-starting function by using the appropriate coding (see below). In this step we should be careful to the command &lt;code&gt;sortedXyData(mCall[[&#34;X&#34;]], LHS, data)&lt;/code&gt;. The part in quotation marks (“X”) should correspond to the name of the predictor in the &lt;code&gt;bragg.3.fun()&lt;/code&gt; function definition.&lt;/li&gt;
 &lt;li&gt;Use the &lt;code&gt;selfStart()&lt;/code&gt; function to combine the function with its self-starting routine.&lt;/li&gt;
 &lt;/ol&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;bragg.3.init &amp;lt;- function(mCall, LHS, data) {
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;bragg.3.init &amp;lt;- function(mCall, LHS, data, ...) {
     xy &amp;lt;- sortedXyData(mCall[[&amp;quot;X&amp;quot;]], LHS, data)
     x &amp;lt;-  xy[, &amp;quot;x&amp;quot;]; y &amp;lt;- xy[, &amp;quot;y&amp;quot;]
     

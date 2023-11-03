@@ -1,0 +1,331 @@
+---
+title: "Designed experiments with replicates: Principal components or Canonical Variates?"
+author: "Andrea Onofri"
+date: 2023-11-02
+slug: 'Multivariate'
+categories:
+  - R
+  - 'Multivariate_stat'
+tags:
+  - R
+  - 'Multivariate_stat'
+  - 'CVA'
+  - 'biplot'
+archives:
+  - 2023
+---
+
+```{r setup, cache = F, echo = F}
+#Put at the beginning
+knitr::opts_chunk$set(echo = TRUE, message = F, warning = F)
+knitr::knit_hooks$set(document = function(x){ 
+  gsub("```\n*```r*\n*", "", x) 
+})
+```
+
+
+A few days ago, a colleague of mine wanted to hear my opinion about what multivariate method would be the best for a randomised field experiment with replicates. We had a nice discussion and I thought that such a case-study might be generally interesting for the agricultural sciences; thus, I decided to take my [Apple Mac-Book PRO](https://capitaloneshopping.com/p/apple-2022-mac-book-pro-laptop-w/MGSN7BZ7SG?run=9185f0b4-5744-4a08-8635-301807e6268e), sit down, relax and write a new post on this matter.
+
+My colleague's research study was similar to this one: a randomised block field experiment (three replicates) with 16 durum wheat genotypes, which was repeated in four years. The quality of grain yield was assessed by recording the following four traits:
+
+1. kernel weight per hectoliter (WPH)
+2. percentage of yellow berries (YB)
+3. kernel weight (grams per 1000 kernels; TKW)
+4. protein content (% d.m.; PC)
+
+My colleague had averaged the three replicates for each genotype in each year, so that the final dataset consisted of a matrix of 64 rows (i.e. 16 varieties x 4 years) and 4 columns (the 4 response variables). Taking the year effect as random, we have **four random replicates for each genotype, across the experimental seasons.**
+
+You can have a look at this dataset by loading the 'WheatQuality4years.csv' file, that is online available, as shown in the following box.
+
+
+```{r message=FALSE, warning=FALSE}
+rm(list=ls())
+fileName <- "https://www.casaonofri.it/_datasets/WheatQuality4years.csv"
+dataset <- read.csv(fileName)
+dataset$Year <- factor(dataset$Year)
+head(dataset)
+```
+
+# My colleague's question
+
+My colleague's question was: "*can I use a PCA biplot, to have a clear graphical understanding about (i) which qualitative trait gave the best contribution to the discrimination of genotypes and (ii) which genotypes were high/low in which qualitative traits?*".
+
+I think that the above question may be translated into the more general question: "*can we use PCA with data from designed experiments with replicates?*". For this general question my general answer has to be NO; it very much depends on the situation and aims. In this post I would like to show my point of view, although I am open to discussion, as usual.
+
+# Independent subjects or not?
+
+I must admit that I appreciated that my colleague wanted to use a multivariate method; indeed, the quality of winter wheat is a 'multivariable' problem and the four recorded traits are very likely correlated to each other. Univariate analyses, such as a set of four separate ANOVAs (one per trait) would lead us to neglect all the reciprocal relationships between the variables, which is not an efficient way to go.
+
+PCA is a very widespread multivariate method and it is useful whenever the data matrix is composed by a set of independent subjects, for which we have recorded a number of variables and we are only interested in the differences between those independent subjects. In contrast to this, data from experiments with replicates are not composed by independent subjects, but there are groups of subjects treated alike. For example, in our case study we have four replicates per genotype and these replicates are not independent, because they share the same genotype. Our primary interest is not to study the differences between replicates, but, rather, the differences between genotypes, that are groups of replicates.
+
+What happens if we submit our matrix of raw data to PCA? The subjects are regarded as totally independent from one another and no effort is made to keep them together, depending on the group (genotype) they belong to. Consequently, a PCA biplot (left side, below) offers little insight: when we isolate, e.g., the genotypes ARCOBALENO and COLORADO, we see that the four replicates are spread around the space spanned by the PC axes, so that we have no idea about whether and how these two groups are discriminated (right side, below).
+
+```{r}
+# PCA with raw data
+par(mfrow = c(1,2))
+pcdata <- dataset[,3:6]
+row.names(pcdata) <- paste(abbreviate(dataset$Genotype, 3),
+                           dataset$Year, sep = "-")
+pcaobj <- vegan::rda(pcdata, scale = T)
+biplot(summary(pcaobj)$sites,
+       summary(pcaobj)$species, 
+       cex = 0.5, xlim = c(-1,1), ylim =c(-2,2),
+       expand = 0.5)
+biplot(summary(pcaobj)$sites[c(1:4, 13:16),],
+       summary(pcaobj)$species, 
+       cex = 0.5, xlim = c(-1,1), ylim =c(-2,2),
+       expand = 3)
+```
+
+After seeing this, my colleague came out with his next question: "*what if we work on the genotype means?*". Well, when we make a PCA on genotype means, the resulting biplot appears to be clearer (see below), but such clarity is not to be trusted. Indeed, the year-to-year variability of genotypes has been totally 'erased' and played no role in the construction of such biplot. Therefore, there is no guarantee that, for each genotype, all the replicates can be found in the close vicinity of the genotype mark. For example, in the biplot below we see that COLORADO and ARCOBALENO are very distant, although we have previously seen that the replicates were not very well discriminated. 
+
+```{r}
+# PCA with genotype means
+par(mfrow = c(1,1))
+avgs <- aggregate(dataset[,3:6], list(dataset$Genotype),
+                  mean)
+rownames(avgs) <- avgs[,1]
+avgs <- avgs[,-1]
+pcaobj2 <- vegan::rda(avgs, scale = T)
+biplot(pcaobj2, scaling = 2)
+```
+
+In simple words, PCA is not the right tool, because it looks at the distance between individuals, but we are more concerned about the distance between groups of individuals, which is a totally different concept.
+
+Obviously, the next question is: "*if PCA is not the right tool, what is the right tool, then?*". My proposal is that Canonical Variate Analysis (CVA) is much better suited to the purpose of group discrimination.
+
+# What is CVA?
+
+Canonical variates (CVs) are similar to principal components, in the sense that they are obtained by using a linear transformation of the original variables ($Y$), such as:
+
+$$CV = Y \times V$$
+
+where $V$ is the matrix of transformation coefficients. Unlike PCA, the matrix $V$ is selected in a way that, in the resulting variables, the subjects belonging to the same group are kept close together and, thus, the discrimination of groups is 'enhanced'.
+
+This is clearly visible if we compare the previous PCA biplot with a CVA biplot. Therefore, let's skip the detail (so far) and perform a CVA, by using the `CVA()` function in the `aomisc` package, that is the companion package for this blog. Please, note that, dealing with variables in different scales and measurement units, I decided to perform a preliminary standardisation process, by using the `scale()` function.
+
+
+```{r}
+# Loads the packages
+library(aomisc)
+
+# Standardise the data
+groups <- dataset$Genotype
+Z <- apply(dataset[,3:6], 2, scale, center=T, scale=T)
+head(Z)
+
+# Perform a CVA with the aomisc package
+cvaobj <- CVA(Z, groups)
+```
+
+# The CVA biplot
+
+The main results of a CVA consist of a matrix of **canonical coefficients** and a matrix of **canonical scores**. Both these entities are available as the output of the `CVA()` function.
+
+```{r}
+Vst <- cvaobj$coef # canonical coefficients
+CVst <- cvaobj$scores # canonical scores
+```
+
+These two entities resemble, respectively, the rotation matrix and principal component scores from PCA and, although they have different properties, they can be used to draw a CVA biplot.
+
+```{r}
+# biplot code
+par(mfrow = c(1, 2))
+row.names(CVst) <- paste(abbreviate(dataset$Genotype, 3),
+                           dataset$Year, sep = "-")
+biplot(CVst[,1:2], Vst[,1:2], cex = 0.5,
+       xlim = c(-3,4), ylim = c(-3, 4))
+abline(h=0, lty = 2)
+abline(v=0, lty = 2)
+biplot(CVst[c(1:4, 13:16),1:2], Vst[,1:2], cex = 0.5,
+       xlim = c(-3,4), ylim = c(-3, 4),
+       expand = 24)
+```
+
+We see that, in contrast to the PCA biplot, the four replicates of each variable are 'kept' relatively close together, so that the groups are well discriminated. For example, we see that the genotype COLORADO is mainly found on the second quadrant and it is pretty well discriminated by the genotype ARCOBALENO, which is mainly found on the third quadrant.
+
+Furthermore, we can also plot the **scores of centroids** for all groups, that are available as the output of the `CVA()` function.
+
+```{r}
+cscores <- cvaobj$centroids
+
+# biplot code
+par(mfrow = c(1,1))
+biplot(cscores[,1:2], Vst[,1:2], cex = 0.5,
+       xlim = c(-3,3.5), ylim = c(-3, 3.5))
+abline(h=0, lty = 2)
+abline(v=0, lty = 2)
+```
+
+Due to the fact that the groups are mostly kept together in a CVA biplot, we can expect that subjects belonging to a certain group, with highest probability, are found in the close proximity of the respective centroid (which is not true for a PCA biplot, obtained from group means). As the reverse, we can say that the group centroid is a good representative of the whole group and the distances between the centroids will reflect how well the respective groups are discriminated.
+
+Having said so, we can read the biplot by using the usual 'inner product rule' (see this [post here](https://www.statforbiology.com/2021/stat_multivar_svd_biplots/): the average value of one genotype in one specific variable can be approximated by considering how long are the respective trait-arrow and the projection of the group-marker on the trait-arrow.
+
+We can see that COLORADO, BAIO and SANCARLO are mainly discriminated by high protein content (PC) and low number of yellow berries (YB). On the other hand, CLAUDIO and COLOSSEO are discriminated by their low PC and high number of YB.
+
+GRAZIA showed high weight per hectoliter (WPH), together with high PC and low Thousand Kernel Weight (TKW). ARCOBALENO and IRIDE were discriminated by high WPH, high number of YB, low PC and low TKW.
+
+Other genotypes were very close to the origin of axes, and thus they were very little discriminated, showing average values for most of the qualitative traits.
+
+# Nasty detail about CVA
+
+With this swift example I hope that I have managed to convince my colleague (and you) that, while a PCA biplot is more suited to focus on the differences between subjects, a CVA biplot is more suited to focus on the differences between groups and, therefore, it is preferable for designed experiments with replicates. 
+
+In the next part I would like to give you some 'nasty' detail about how the `CVA()` function works; if you are not interested in such detail, you can safely skip this and I thank you anyway for having followed me up to this point!
+
+Performing a CVA is a four step process:
+
+1. data standardisation
+2. ANOVA/MANOVA
+3. eigenvalue decomposition
+4. linear transformation
+
+## Step 1: standardisation
+
+As we said, standardisation is often made as the preliminary step, by taking the values in each column, subtracting the respective column mean and dividing by the respective column standard deviation. Although this is the most widespread method, it is also possible to standardise by using the within group standard deviation (Root Mean Squared Error from one-way ANOVA), as done, for example, in SPSS. In this post we stick to the usual technique, but, please, take this difference in mind if you intend to compare the results obtained with R with those obtained with other statistical packages.
+
+## Step 2: ANOVA/MANOVA
+
+The central point to CVA is to define the discriminating ability of the original variables. In the univariate realm, we use one-way ANOVA to split the total sum of squares into two components, the between-groups sum of squares ($SS_b$; roughly speaking, the amount of variability between group means) and the within-groups sum of squares ($SS_w$; roughly speaking, the amount of variability within each treatment group). We know that the total sum of squares $SS_T$ is equal to the sum $SS_b + SS_w$ and, therefore, we could use the ratio $SS_w/SS_b$ as a measure of the discriminating ability of each variable.
+
+The multivariate analogous to ANOVA is MANOVA, where we should also consider the relationships (codeviances) between all pairs af variables. In particular, with four variables, we have a $4 \times 4$ matrix of total deviances-codeviances ($T$), that needs to be split into the sum of two components, i.e. the matrix of between-groups deviances-codeviances ($B$) and the matrix of within-groups deviances-codeviances ($W$), so that:
+
+$$ T = B + W $$
+
+These three matrices ($T$, $B$ and $W$) can be obtained by matrix multiplication, starting from, respectively, (i) the $Z$ matrix of standardised data, (ii) the $Z$ matrix where each value has been replaced by the mean of the corresponding variable and genotype and (iii) the matrix of residuals from the group means. More easily, we can derive these matrices from the output of the `CVA()` function.
+
+```{r}
+# Solution with 'CVA()' function in 'aomisc' package
+TOT <- cvaobj$TOT
+B <- cvaobj$B
+W <- cvaobj$W
+
+print(TOT, digits = 4)
+print(B, digits = 4)
+print(W, digits = 4)
+```
+
+Analogously to one-way ANOVA, we can calculate the ratio $WB = W^{-1} B$:
+
+```{r}
+WB <- solve(W) %*% B 
+print(WB, digits = 4)
+```
+
+What do the previous matrices tell us? First of all, there are notable total, between-groups and within-groups codeviances between the four quality traits which suggests that these traits are correlated and the contributions they give to the discrimination of genotypes are, partly, overlapping and, thus, redundant.
+
+The diagonal elements in $WB$ can be regarded as measures of the 'discriminating power' for each of the four variables: the higher the value the higher the differences between the behaviour of genotypes across years. The total 'discriminating power' of the four variables is, respectively, $1.243 + 0.128 + 1.828 + 0.257 = 3.456$.
+
+## Step 3: eigenvalue decomposition
+
+While total deviances-codeviances are central to PCA, the $WB$ matrix is central to CVA, because it contains relevant information for group discrimination. Therefore, we submit this matrix to eigenvalue decomposition and calculate its scaled eigenvectors (see code below), to obtain the so-called *canonical coefficients*.
+
+```{r}
+# Eigenvalue decomposition
+V1 <- eigen(WB)$vectors
+
+# get the centered canonical variates and their RMSEs
+VCC <- Z %*% V1
+aovList <- apply(VCC, 2, function(col) lm(col ~ groups))
+RMSE <- lapply(aovList, function(mod) summary(mod)$sigma)
+
+# Scaling process
+scaling <- diag(1/unlist(RMSE))
+Vst <- V1 %*% scaling
+Vst
+```
+
+
+## Step 4: linear transformation
+
+The *canonical coefficients* can be used to transform the original variables into a set of new variables, the so-called **canonical variates** or **canonical scores**:
+
+```{r}
+CVst <- Z %*% Vst
+colnames(CVst) <- c("CV1", "CV2", "CV3", "CV4")
+head(CVst)
+```
+
+
+Now, we have four new canonical variates in place of the original quality traits. What did we gain? If we calculate the matrices of total, between-groups and within-groups deviances-codeviances for the CVs, we see that the off-diagonal elements are all 0 which implies that canonical variates are uncorrelated.  
+
+```{r}
+# Deviances-codeviances for the canonical variates
+# $Total
+#               CV1           CV2          CV3           CV4
+# CV1  1.515993e+02 -5.329071e-15 4.152234e-14  4.884981e-15
+# CV2 -5.329071e-15  8.418391e+01 4.019007e-14 -1.287859e-14
+# CV3  4.152234e-14  4.019007e-14 7.090742e+01  2.398082e-14
+# CV4  4.884981e-15 -1.287859e-14 2.398082e-14  5.117518e+01
+# 
+# $Between-groups
+#              CV1           CV2          CV3           CV4
+# CV1 1.035993e+02  2.886580e-15 2.797762e-14  1.976197e-14
+# CV2 2.886580e-15  3.618391e+01 3.330669e-15 -3.774758e-15
+# CV3 2.797762e-14  3.330669e-15 2.290742e+01  8.326673e-15
+# CV4 1.976197e-14 -3.774758e-15 8.326673e-15  3.175176e+00
+# 
+# $Within-groups
+#               CV1           CV2          CV3           CV4
+# CV1  4.800000e+01 -4.329870e-15 6.217249e-15 -1.260103e-14
+# CV2 -4.329870e-15  4.800000e+01 3.674838e-14 -1.443290e-14
+# CV3  6.217249e-15  3.674838e-14 4.800000e+01  1.776357e-14
+# CV4 -1.260103e-14 -1.443290e-14 1.776357e-14  4.800000e+01
+# 
+# $`B/W`
+#              CV1           CV2           CV3           CV4
+# CV1 2.158318e+00  1.281369e-16  5.210524e-16  4.290734e-16
+# CV2 2.548295e-16  7.538314e-01 -2.959802e-16 -5.875061e-17
+# CV3 3.033087e-16 -5.077378e-16  4.772379e-01  1.489921e-16
+# CV4 9.783126e-16  1.480253e-16 -3.141157e-18  6.614950e-02
+
+```
+
+Furthermore, the $BW$ matrix above shows that the ratios of 'between-groups/within-groups' deviances are in decreasing order and their sum is equal to the sum of the diagonal elements of the $BW$ matrix for the original variables. 
+
+In simpler words, the total 'discriminating power' of the CVs is the same as that of the original variables, but the first CV, on itself, has a very high 'discriminating power', that is equal to 62.5% of the 'discriminating power' of the original variables ($2.155/3.540 \cdot 100$). If we add a second CV, the 'discriminating power' raises to the 85% of the original variables. It means that, if we use two CVs in place of the four original variables, the discrimination of genotypes across years is almost as good as that of the original four variables. Therefore, we can conclude that the biplot above is relevant.
+
+Please, note that the output of the `CVA()` function also contains the proportion of total discriminating ability that is contributed by each canonical variate (see box below). 
+
+```{r}
+cvaobj$proportion
+```
+
+
+As the final remark, the *canonical coefficients* can be used to calculate the **canonical scores for centroids**, which we used for the biplot above:
+
+```{r}
+avg <- aggregate(Z, list(groups), mean)
+row.names(avg) <- avg[,1]
+avg <- as.matrix(avg[,-1])
+
+head(avg %*% Vst)
+```
+
+
+In conclusion, canonical variate analysis is the best way to represent the multivariate data in reduced rank space, preserving the discrimination between groups. Therefore, it may be much more suitable than PCA with designed experiments with replicates.
+
+
+Thanks for reading!
+
+Prof. Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences    
+University of Perugia (Italy)    
+Send comments to: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)
+
+<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow @onofriandreapg</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+---
+
+# Further readings
+
+1. Crossa, J., 1990. Advances in Agronomy 44, 55-85.
+2. NIST/SEMATECH, 2004. In "e-Handbook of Statistical Methods". NIST/SEMATECH, http://www.itl.nist.gov/div898/handbook/.
+3. Manly F.J., 1986. Multivariate statistical methods: a primer. Chapman \& Hall, London, pp. 159.
+4. Adugna W. e Labuschagne M. T., 2003. Cluster and canonical variate analyses in multilocation trials of linseed. Journal of Agricultural Science  (140), 297-304.
+5. Barberi P., Silvestri N. e Bonari E., 1997. Weed communities of winter wheat as influenced by input level and rotation. Weed Research 37, 301-313.
+6. Casini P. e Proietti C., 2002. Morphological characterisation and production of Quinoa genotypes (Chenopodium quinoa Willd.) in the Mediterranean environment. Agricoltura Mediterranea 132, 15-26.
+7. Onofri A. e Ciriciofolo E., 2004. Characterisation of yield quality in durum wheat by canonical variate anaysis. Proceedings VIII ESA Congress "European Agriculture in a global context", Copenhagen, 11-15 July 2004, 541-542.
+8. Shresta A., Knezevic S. Z., Roy R. C., Ball-Cohelo B. R. e Swanton C. J., 2002. Effect of tillage, cover crop and crop rotation on the composition of weed flora in a sandy soil. Weed Research 42 (1), 76-87.
+9. Streit B., Rieger S. B., Stamp P. e Richner W., 2003. Weed population in winter wheat as affected by crop sequence, intensity of tillage and time of herbicide application in a cool and humid climate. Weed Research 43, 20-32.

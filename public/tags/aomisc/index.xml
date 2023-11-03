@@ -5,10 +5,249 @@
     <description>Recent content in aomisc on The broken bridge between biologists and statisticians</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2018, @AndreaOnofri</copyright>
-    <lastBuildDate>Fri, 26 May 2023 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 31 May 2023 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://www.statforbiology.com/tags/aomisc/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>GGE analyses for multi-environment studies</title>
+      <link>https://www.statforbiology.com/2023/stat_met_gge/</link>
+      <pubDate>Wed, 31 May 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.statforbiology.com/2023/stat_met_gge/</guid>
+      <description>
+
+
+&lt;p&gt;In a recent post we have seen that we can use Principal Component Analyses (PCA) to elucidate the ‘genotype by environment’ relationship (&lt;a href=&#34;https://www.statforbiology.com/2023/stat_met_ammi/&#34;&gt;see this post&lt;/a&gt;). Whenever the starting point for PCA is the doubly-centered (centered by rows and columns) matrix of yields across environments, we talk about AMMI analysis, which is often used to get insight into the stability of genotype yields across environments.&lt;/p&gt;
+&lt;p&gt;By changing the starting matrix, we can obtain a different perspective and put focus on the definition of macroenvironments and on the selection of winning genotypes. In particular, if the two-way matrix of yields across environments is only column-centered before PCA, we talk about GGE analysis (Yan et al., 2000). In spite of some academic debate (see Gauch, 2006, Yan et al., 2007, Gauch et al., 2008), AMMI and GGE analyses are both useful and can be used as two complementary tools for the analysis of multi-environment genotype data.&lt;/p&gt;
+&lt;p&gt;In order to discover the main peculiarities of GGE analysis, we will use the same example as in the previous post about AMMI analysis.&lt;/p&gt;
+&lt;div id=&#34;a-met-with-faba-bean&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;A MET with faba bean&lt;/h1&gt;
+&lt;p&gt;This experiment consists of 12 faba bean genotypes (well, it was, indeed, 6 genotypes in two sowing dates; but, let’s disregard this detail from now on) in four blocks, two locations and three years (six environments, in all). The dataset is online available as ‘fabaBean.csv’ and it has been published by Stagnari et al. (2007).&lt;/p&gt;
+&lt;p&gt;We have seen that the starting point for AMMI analyses is the two-way matrix of yields across environments, which is obtained in the box below, by using a few functions from the &lt;code&gt;tidyverse&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rm(list=ls())
+library(tidyverse)
+
+fileName &amp;lt;- &amp;quot;https://www.casaonofri.it/_datasets/fabaBean.csv&amp;quot;
+dataset &amp;lt;- read.csv(fileName, header=T)
+GEmedie &amp;lt;- dataset %&amp;gt;% 
+  group_by(Genotype, Environment) %&amp;gt;% 
+  dplyr::summarise(Yield = mean(Yield)) %&amp;gt;% 
+  pivot_wider(names_from = Environment,
+              values_from = Yield,
+              id_cols = Genotype)
+GEmedie
+## # A tibble: 12 × 7
+## # Groups:   Genotype [12]
+##    Genotype    bad_1 bad_2 bad_3 pap_1 pap_2 pap_3
+##    &amp;lt;chr&amp;gt;       &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt;
+##  1 Chiaro_A     4.11 2.34   4.12  4.63 2.41   3.85
+##  2 Chiaro_P     2.51 1.33   4.20  3.32 1.40   4.32
+##  3 Collameno_A  3.25 2.11   4.38  3.85 2.23   4.07
+##  4 Collameno_P  1.91 0.848  3.86  2.52 0.985  4.05
+##  5 Palomb_A     3.84 2.08   4.20  5.05 2.68   4.67
+##  6 Palomb_P     2.25 0.972  3.26  3.27 0.883  4.01
+##  7 Scuro_A      4.37 2.10   4.15  4.86 2.13   4.20
+##  8 Scuro_P      3.05 1.64   3.93  3.72 1.75   4.51
+##  9 Sicania_A    3.83 1.94   4.50  3.96 2.24   4.24
+## 10 Sicania_P    3.27 0.99   3.73  4.05 0.822  3.90
+## 11 Vesuvio_A    4.14 2.02   4.03  4.50 2.26   4.32
+## 12 Vesuvio_P    2.12 1.18   3.52  3.10 0.938  3.63&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;While with AMMI analysis the above matrix is doubly-centered (by rows and columns), with GGE analysis it is only column-centered, to remove the overall mean and the environment main effect. As the result, the centered matrix will contain the Genotype main effect (G) and the Genotype by Environment interaction (GE), that is why this technique is named GGE analysis. Let’s do such centering.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Means for environments
+envMeans &amp;lt;- apply(GEmedie[,-1], 2, mean)
+GGEmatrix &amp;lt;- sweep(GEmedie[,-1], 2, envMeans)
+rownames(GGEmatrix) &amp;lt;- unlist(GEmedie[,1])&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;What do the above values mean? For each genotype, they are the yield differences (in tons per hectare) with respect to the average yield in each environment; for example, ‘Scuro_P’ shows a value of 0.0077 at ‘bad_2’, which is close to zero and indicates that the yield of this genotype was exactly equal to the environmental average in that location. On the other hand, ‘Scuro_A’ at ‘bad_1’, gave a value of 1.15, which is very high and indicates that this genotype outperformed all the others in that location.&lt;/p&gt;
+&lt;p&gt;The importance of the GGE matrix is that it contains both the genotype and the genotype by environment effects, which are fundamental to compare the performances of genotypes across anvironments.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;decomposing-the-gge-matrix&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Decomposing the GGE matrix&lt;/h1&gt;
+&lt;p&gt;Once we have understood the importance of the GGE matrix, we might be willing to summarise it by way of some appropriate statistical method. Thinking of a Principal Component Analysis (PCA) is fairly obvious, as we did for AMMI analysis in the previous post.&lt;/p&gt;
+&lt;p&gt;Thus, we can use Singular Value Decomposition (SVD), to decompose our GGE matrix into the product of two matrices:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[GGE = S_g \, S_e^T\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(S_g\)&lt;/span&gt; is a matrix of genotype scores and &lt;span class=&#34;math inline&#34;&gt;\(S_e\)&lt;/span&gt; is a matrix of environment scores. It does not matter much how (and why) we obtain these matrices, I will just show you a swift R solution in the box below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;U &amp;lt;- svd(GGEmatrix)$u
+V &amp;lt;- svd(GGEmatrix)$v
+D &amp;lt;- diag(svd(GGEmatrix)$d)
+Sg &amp;lt;- U %*% sqrt(D)
+Se &amp;lt;- V %*% sqrt(D)
+row.names(Sg) &amp;lt;- rownames(GGEmatrix)
+row.names(Se) &amp;lt;- colnames(GGEmatrix)
+colnames(Sg) &amp;lt;- colnames(Se) &amp;lt;- paste(&amp;quot;PC&amp;quot;, 1:6, sep =&amp;quot;&amp;quot;)
+round(Sg, 3)
+##                PC1    PC2    PC3    PC4    PC5    PC6
+## Chiaro_A    -0.682 -0.064 -0.441 -0.274  0.022  0.051
+## Chiaro_P     0.431  0.326  0.182  0.217  0.225 -0.177
+## Collameno_A -0.211  0.494 -0.267 -0.116  0.157 -0.099
+## Collameno_P  0.999  0.332  0.003  0.180 -0.065  0.221
+## Palomb_A    -0.766  0.080  0.595 -0.268  0.254  0.170
+## Palomb_P     0.775 -0.320  0.166 -0.306 -0.211  0.015
+## Scuro_A     -0.729 -0.340 -0.068  0.135 -0.020 -0.160
+## Scuro_P      0.075  0.175  0.308  0.003 -0.263 -0.232
+## Sicania_A   -0.387  0.325 -0.197  0.386 -0.091  0.130
+## Sicania_P    0.281 -0.784 -0.010  0.357  0.223  0.029
+## Vesuvio_A   -0.588 -0.116  0.029  0.039 -0.336  0.080
+## Vesuvio_P    0.801 -0.107 -0.299 -0.352  0.106 -0.028
+round(Se, 3)
+##          PC1    PC2    PC3    PC4    PC5    PC6
+## bad_1 -1.283 -0.410 -0.242  0.431 -0.305  0.040
+## bad_2 -0.773  0.362 -0.311 -0.323 -0.073 -0.344
+## bad_3 -0.373  0.557 -0.119  0.531  0.400 -0.035
+## pap_1 -1.118 -0.591  0.318 -0.230  0.369 -0.020
+## pap_2 -0.978  0.659  0.080 -0.293 -0.074  0.286
+## pap_3 -0.204  0.270  0.796  0.205 -0.201 -0.148&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Let’s have a look at &lt;span class=&#34;math inline&#34;&gt;\(S_g\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(S_e\)&lt;/span&gt;: they are two interesting entities. Both matrices have 6 columns (that is the minimum between the number of genotypes and the number of environments). &lt;span class=&#34;math inline&#34;&gt;\(S_g\)&lt;/span&gt; has 12 rows, one per genotype: these are the so-called genotype scores: each genotype has six scores. &lt;span class=&#34;math inline&#34;&gt;\(S_e\)&lt;/span&gt; has six rows, one per environment (environment scores) and, analogously to each genotype, each environment has six scores.&lt;/p&gt;
+&lt;p&gt;The most interesting thing to note is that, as expected, these two matrices, by multiplication, return the original GGE matrix.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;round(Sg %*% t(Se), 3)
+##              bad_1  bad_2  bad_3  pap_1  pap_2  pap_3
+## Chiaro_A     0.885  0.710  0.133  0.730  0.682 -0.297
+## Chiaro_P    -0.712 -0.297  0.210 -0.580 -0.323  0.170
+## Collameno_A  0.030  0.485  0.390 -0.055  0.505 -0.077
+## Collameno_P -1.312 -0.782 -0.127 -1.382 -0.743 -0.095
+## Palomb_A     0.620  0.445  0.213  1.150  0.957  0.520
+## Palomb_P    -0.970 -0.657 -0.735 -0.632 -0.845 -0.135
+## Scuro_A      1.150  0.475  0.160  0.960  0.400  0.058
+## Scuro_P     -0.170  0.008 -0.062 -0.182  0.020  0.365
+## Sicania_A    0.610  0.315  0.513  0.053  0.507  0.088
+## Sicania_P    0.050 -0.640 -0.262  0.145 -0.905 -0.252
+## Vesuvio_A    0.917  0.388  0.035  0.600  0.537  0.175
+## Vesuvio_P   -1.097 -0.450 -0.467 -0.807 -0.790 -0.520&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If you some memories about matrix multiplication, you will remeber that the GGE value for each genotype in each environment can be obtained as the sum of products of genotype scores and environments scores:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[gge_{ij} = \sum_{z = 1}^n \left[ S_{g(iz)} \cdot S_{e(jz)} \right]\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;For example, let’s consider the first genotype and the first environment. The genotype and environments scores are in the first columns of &lt;span class=&#34;math inline&#34;&gt;\(S_g\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(S_e\)&lt;/span&gt;; if we multiply the elements in the same positioning (1st with 1st, 2nd with 2nd, and so on) and sum up, we get:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;-0.682 * -1.283 +
+-0.064 * -0.410 +
+-0.441 * -0.242 +
+-0.274 *  0.431 +
+ 0.022 * -0.305 + 
+ 0.051 *  0.040
+## [1] 0.885204&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It’s done: we have transformed the GGE effect for ‘Chiaro_A’ in ‘bad_1’ into the sum of multiplicative terms. The final product will be the highest whenever the genotype and environment scores have the same signs, within each couple in the box above.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;reducing-the-rank&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Reducing the rank&lt;/h1&gt;
+&lt;p&gt;Instead of taking all available columns in &lt;span class=&#34;math inline&#34;&gt;\(S_g\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(S_e\)&lt;/span&gt;, for the sake of simplicity, we could have taken only a subset of those columns. The Eckart-Young (1936) theorem says that, if we take &lt;span class=&#34;math inline&#34;&gt;\(m &amp;lt; 6\)&lt;/span&gt; columns, we obtain the best possible approximation of GGE in reduced rank space. For example, let’s use the first two columns of &lt;span class=&#34;math inline&#34;&gt;\(S_g\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(S_e\)&lt;/span&gt; (the first two principal component scores):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;PC &amp;lt;- 2
+Sg2 &amp;lt;- Sg[,1:PC]
+Se2 &amp;lt;- Se[,1:PC]
+GGE2 &amp;lt;- Sg2 %*% t(Se2)
+print ( round(GGE2, 3) )
+##              bad_1  bad_2  bad_3  pap_1  pap_2  pap_3
+## Chiaro_A     0.901  0.504  0.219  0.800  0.624  0.122
+## Chiaro_P    -0.686 -0.215  0.020 -0.674 -0.207  0.000
+## Collameno_A  0.068  0.342  0.354 -0.057  0.532  0.176
+## Collameno_P -1.418 -0.652 -0.189 -1.313 -0.758 -0.114
+## Palomb_A     0.950  0.621  0.330  0.809  0.801  0.178
+## Palomb_P    -0.863 -0.715 -0.467 -0.677 -0.968 -0.244
+## Scuro_A      1.076  0.441  0.083  1.017  0.489  0.057
+## Scuro_P     -0.168  0.006  0.070 -0.187  0.043  0.032
+## Sicania_A    0.363  0.417  0.325  0.240  0.592  0.167
+## Sicania_P   -0.040 -0.501 -0.541  0.149 -0.791 -0.269
+## Vesuvio_A    0.802  0.412  0.155  0.726  0.498  0.089
+## Vesuvio_P   -0.985 -0.658 -0.359 -0.833 -0.854 -0.192&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;GGE2 is not equal to GGE, but it is a close approximation. A close approximation in the least squares sense: the sum of squared elements in GGE2 is as close as possible (with &lt;span class=&#34;math inline&#34;&gt;\(n = 2\)&lt;/span&gt;) to the sum of squared elements in GGE:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sum(GGE2^2)
+## [1] 23.60912
+sum(GGEmatrix^2)
+## [1] 25.24985&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We see that the sum of squares in GGE2 is 94% of the sum of squares in GGE. A very good approximation, isn’t it? It means that the variability of yields across environments is described well enough by using a relatively low number of parameters (scores).&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;simple-gge-analysis-with-r&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Simple GGE analysis with R&lt;/h1&gt;
+&lt;p&gt;Although there are certainly more exhaustive solutions, for the sake of simplicity, I have coded the &lt;code&gt;GGE()&lt;/code&gt; function, that is available in the &lt;code&gt;aomisc&lt;/code&gt; package; it works equally well with raw MET data, containing all replicated values, or with the ‘genotype by environment’ average values. The &lt;code&gt;aomisc&lt;/code&gt; package is the companion package for this website and must have been installed as detailed in this &lt;a href=&#34;https://www.statforbiology.com/rpackages/&#34;&gt;page here&lt;/a&gt;. In the box below, I am using the &lt;code&gt;GGE()&lt;/code&gt; function on raw data.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(aomisc)
+tab &amp;lt;- with(dataset, GGE(Yield, Genotype, Environment, Block, PC = 2))
+tab$genotype_scores
+##                     PC1         PC2
+## Chiaro_A    -0.68155278 -0.06429886
+## Chiaro_P     0.43068275  0.32576146
+## Collameno_A -0.21061911  0.49449808
+## Collameno_P  0.99907773  0.33159670
+## Palomb_A    -0.76575818  0.07957138
+## Palomb_P     0.77465315 -0.32010018
+## Scuro_A     -0.72947712 -0.34046924
+## Scuro_P      0.07462862  0.17542914
+## Sicania_A   -0.38653879  0.32490370
+## Sicania_P    0.28122610 -0.78391426
+## Vesuvio_A   -0.58767986 -0.11584246
+## Vesuvio_P    0.80135748 -0.10713545
+tab$environment_scores
+##              PC1        PC2
+## bad_1 -1.2834363 -0.4099307
+## bad_2 -0.7732097  0.3621530
+## bad_3 -0.3734263  0.5565962
+## pap_1 -1.1182795 -0.5910472
+## pap_2 -0.9778134  0.6587901
+## pap_3 -0.2038688  0.2699500
+tab$GGE_summary
+##   PC Singular_value       PC_SS Perc_of_Total_SS
+## 1  1      4.6327397 21.46227711       84.9996363
+## 2  2      1.4652115  2.14684465        8.5024070
+## 3  3      0.9099052  0.82792745        3.2789406
+## 4  4      0.7535488  0.56783584        2.2488685
+## 5  5      0.4405921  0.19412143        0.7688024
+## 6  6      0.2254758  0.05083935        0.2013452&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;why-is-this-useful&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Why is this useful?&lt;/h1&gt;
+&lt;p&gt;Did you get lost? Hope you didn’t, but let’s make a stop and see where we are standing now. We started from the GGE matrix and found a way to decompose it as the product of two matrices, i.e. &lt;span class=&#34;math inline&#34;&gt;\(S_g\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(S_e\)&lt;/span&gt;, a matrix of genotype scores and a matrix of environment scores. We discovered that we could obtain a good approximation of GGE by working in reduced rank space and we only used two genotypic scores and two environment scores, in place of the available six.&lt;/p&gt;
+&lt;p&gt;This is great! Now we have the ability of drawing a biplot, i.e. we can plot both genotypic scores and environmental scores in a dispersion graph (biplot: two plots into one), as we see below. We can use the swift &lt;code&gt;biplot()&lt;/code&gt; method for AMMI and GGE objects, as available in the &lt;code&gt;aomisc&lt;/code&gt; package.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;biplot(tab, xlim = c(-1.5, 1.5), ylim = c(-1.5, 1.5),
+       xlab = &amp;quot;PC 1&amp;quot;, ylab = &amp;quot;PC 2&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_met_GGE_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;576&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;This graph provides a very effective description of GE interaction effects. I will not go into detail, here. Just a few simple comments:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;genotypes lying close to the origin of the axes tend to have average behaviours across environments (their genotypic scores will be close to zero).&lt;/li&gt;
+&lt;li&gt;environments lying close to the origin of the axes tend neither to be favourable nor unfavourable to most of the genotypes and will not be very discriminating.&lt;/li&gt;
+&lt;li&gt;genotypes lying far away from the origin of axes tend to be far from the average yield in several environments, either in a positive or negative sense.&lt;/li&gt;
+&lt;li&gt;environments lying far away from the origin of axes tend to be very discriminating (favourable for some genotypes and unfavourable for others).&lt;/li&gt;
+&lt;li&gt;when genotype and environment markers are far away from the origin and close to each other, their scores will be high and of same sign. This is an indicator of very good performances.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div id=&#34;augmenting-the-biplot&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Augmenting the biplot&lt;/h1&gt;
+&lt;p&gt;The above biplot can be augmented in several ways (see Yan and Tinker, 2006). The ‘which-won-where’ pattern is rather useful and it consists of:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;drawing a polygon with vertices on the genotypes that are furthest away from the origin of axes, so that all other genotypes are contained within the polygon. In this case we can select: ‘Collameno_A’, ‘Palombino_A’, ‘Scuro_A’, ‘Sicania_P’, ‘Palomb_P’ and ‘Collameno_P’ (i.e. the 3&lt;sup&gt;rd&lt;/sup&gt;, 5&lt;sup&gt;th&lt;/sup&gt;, 7&lt;sup&gt;th&lt;/sup&gt;, 10&lt;sup&gt;th&lt;/sup&gt;, 6&lt;sup&gt;th&lt;/sup&gt; and 4&lt;sup&gt;th&lt;/sup&gt; genotypes);&lt;/li&gt;
+&lt;li&gt;drawing the perpendicular lines to each side of the polygon, starting from the origin of axes.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;We can use the &lt;code&gt;biplot.polygon()&lt;/code&gt; function in the &lt;code&gt;aomisc&lt;/code&gt; package&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;biplot(tab, xlim = c(-1.5, 1.5), ylim = c(-1.5, 1.5),
+       xlab = &amp;quot;PC 1&amp;quot;, ylab = &amp;quot;PC 2&amp;quot;)
+biplot.polygon(tab, vertex = c(3,5,7,10,6, 4))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_met_GGE_files/figure-html/unnamed-chunk-10-1.png&#34; width=&#34;576&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Based on the above graph we can make the following conclusions.&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Genotypes located on the vertices of the polygon were the best/worst in some environments.&lt;/li&gt;
+&lt;li&gt;The perpendicular lines divide the biplot into sectors, and the winning genotype for each sector is the one located on the respective vertex. In this example, ‘Palomb_A’ is the winning genotype in ‘bad_2’, ‘pap_2’ and ‘pap_3’, while ‘Collameno_A, is the winner in ’bad_3’. ‘Scuro_A’ is the winner in ‘bad_1’ and ‘pap_1’.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Thank you for reading, and… happy coding!&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;literature-references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Literature references&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Gauch, H.G., 2006. Statistical Analysis of Yield Trials by AMMI and GGE. Crop Science 46, 1488–1500.&lt;/li&gt;
+&lt;li&gt;Gauch, H.G., Piepho, H.-P., Annicchiarico, P., 2008. Statistical Analysis of Yield Trials by AMMI and GGE: Further Considerations. Crop Science 48, 866–889.&lt;/li&gt;
+&lt;li&gt;Yan, W., 2002. Singular-Value Partitioning in Biplot Analysis of Multienvironment Trial Data. Agronomy Journal 94, 990–996.&lt;/li&gt;
+&lt;li&gt;Yan, W., 2001. GGEbiplot–A Windows Application for Graphical Analysis of Multienvironment Trial Data and Other Types of Two-Way Data. Agronomy Journal 93, 1111–1118.&lt;/li&gt;
+&lt;li&gt;Yan, W., Cornelius, P.L., Crossa, J., Hunt, L.A., 2001. Two Types of GGE Biplots for Analyzing Multi-Environment Trial Data. Crop Science 41, 656–663.&lt;/li&gt;
+&lt;li&gt;Yan, W., Hunt, L.A., Sheng, Q., Szlavnics, Z., 2000. Cultivar Evaluation and Mega-Environment Investigation Based on the GGE Biplot. Crop Science 40, 597–605.&lt;/li&gt;
+&lt;li&gt;Yan, W., Kang, M.S., Ma, B., Woods, S., Cornelius, P.L., 2007. GGE Biplot vs. AMMI Analysis of Genotype-by-Environment Data. Crop Science 47, 643–653.&lt;/li&gt;
+&lt;li&gt;Yan, W., Tinker, N.A., 2006. Biplot analysis of multi-environment trial data: Principles and applications. Canadian Journal of Plant Science 86, 1–9.&lt;/li&gt;
+&lt;li&gt;Yan, W., Tinker, N.A., 2005. An Integrated Biplot Analysis System for Displaying, Interpreting, and Exploring Genotype x Environment Interaction. Crop Science 45, 1004–1016.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>AMMI analyses for multi-environment studies</title>
@@ -87,13 +326,16 @@ mean(as.matrix(GEmedie))
 &lt;p&gt;What model could we possibly fit to the above data? The basic two-way ANOVA model is:&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[Y_{ijk} = \mu + \gamma_{jk} + g_i + e_j + ge_{ij} + \varepsilon_{ijk} \quad \quad (1)\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;where the yield &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; for given block &lt;span class=&#34;math inline&#34;&gt;\(k\)&lt;/span&gt;, environment &lt;span class=&#34;math inline&#34;&gt;\(j\)&lt;/span&gt; and genotype &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt; is described as a function of the effects of blocks within environments (&lt;span class=&#34;math inline&#34;&gt;\(\gamma\)&lt;/span&gt;), genotypes (&lt;span class=&#34;math inline&#34;&gt;\(g\)&lt;/span&gt;), environments (&lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt;) and GE interaction (&lt;span class=&#34;math inline&#34;&gt;\(ge\)&lt;/span&gt;). The residual error term &lt;span class=&#34;math inline&#34;&gt;\(\varepsilon\)&lt;/span&gt; is assumed to be normal and homoscedastic, with standard deviation equal to &lt;span class=&#34;math inline&#34;&gt;\(\sigma\)&lt;/span&gt;. Let’s also assume that both the genotype and environment effects are fixed: this is useful for teaching purposes and it is reasonable, as we intend to study the behaviour of specific genotypes in several specific environments.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;the-interaction-effects-and-ge-matrix&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;The interaction effects (and GE matrix)&lt;/h1&gt;
 &lt;p&gt;The interaction effect &lt;span class=&#34;math inline&#34;&gt;\(ge\)&lt;/span&gt;, under some important assumptions (i.e. balanced data, no missing cells and homoscedastic errors), is given by:&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ge_{ij} = Y_{ij.} - \left( \mu + g_i + e_j \right) = Y_{ij.} - Y_{i..} - Y_{.j.} + \mu \quad \quad (2)\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(Y_{ij.}\)&lt;/span&gt; is the mean of the combination between the genotype &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt; and the environment &lt;span class=&#34;math inline&#34;&gt;\(j\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(Y_{i..}\)&lt;/span&gt; is the mean for the genotype &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(Y_{.j.}\)&lt;/span&gt; is the mean for the environment &lt;span class=&#34;math inline&#34;&gt;\(j\)&lt;/span&gt;. For example, for the genotype ‘Chiaro_A’ in the environment ‘bad_1’, the interaction effect was:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;4.1050 - 3.577 - 3.22 + 3.103
 ## [1] 0.411&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;We see that the interaction was positive, in the sense that ‘Chiaro_A’, gave 0.411 tons per hectare more than we could have expected, considering its average performances across environments and the average performances of all genotypes in ‘bad_1’.&lt;/p&gt;
-&lt;p&gt;More generally, the two-way table of interaction effects can be obtained by doubly centring the matrix of means, as shown in the following box.&lt;/p&gt;
+&lt;p&gt;It may be very handy to organise the interaction effects in a two-way table, with the genotypes along the rows and environments along the columns (or vice-versa, as you prefer). Such a two-way table can be simply obtained by doubly centring the matrix of means, as shown in the following box.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;GE &amp;lt;- as.data.frame(t(scale( t(scale(GEmedie, center=T,
  scale=F)), center=T, scale=F)))
 print(round(GE, 3))
@@ -248,7 +490,7 @@ abline(v = 0, lty = 2)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;This graph provides a very effective description of GE interaction effects. I will not go into detail, here. Just a few simple comments:&lt;/p&gt;
 &lt;ol style=&#34;list-style-type: decimal&#34;&gt;
 &lt;li&gt;genotypes and environments lying close to the origin of the axes do not interact with each other (the product of scores would be close to 0)&lt;/li&gt;
-&lt;li&gt;genotype and environments lying far away from the origin of axes show very big interaction and, therefore, high yield instability. Someone says that the euclidean distance from the origin should be taken as a measure of instability&lt;/li&gt;
+&lt;li&gt;genotypes and environments lying far away from the origin of axes show very big interaction and, therefore, high yield instability. Someone says that the euclidean distance from the origin should be taken as a measure of instability&lt;/li&gt;
 &lt;li&gt;the interaction is positive, when genotypes and environments are close to each other. If two objects are close, their scores (co-ordinates) will have the same signs and thus their product will be positive.&lt;/li&gt;
 &lt;li&gt;the interaction is negative, when genotypes and environments are far away from each other. If two objects are distant, their scores (co-ordinates) will have opposte signs and thus their product will be negative.&lt;/li&gt;
 &lt;li&gt;For instance, ‘Palomb_P’, ‘Scuro_P’, ‘Chiaro_P’ and ‘Collameno_P’ gave particularly good yields in the environments ‘pap_3’ and ‘bad_3’, while ‘Scuro_A’, ‘Palomb_A’ and ‘Vesuvio_A’ gave particularly good yields (compared to their average) in the environments ‘pap_1’ and ‘bad_1’. ‘Sicania_A’ and ‘Collameno_A’ gave good yields in ‘bad_2’ and ‘pap_2’.&lt;/li&gt;
@@ -1290,7 +1532,7 @@ I-06121 - PERUGIA&lt;/p&gt;
       <description>
 
 
-&lt;p&gt;In R, the &lt;code&gt;drc&lt;/code&gt; package represents one of the main solutions for nonlinear regression and dose-response analyses (Ritz et al., 2015). It comes with a lot of nonlinear models, which are useful to describe several biological processes, from plant growth to bioassays, from herbicide degradation to seed germination. These models are provided with self-starting functions, which free the user from the hassle of providing initial guesses for model parameters. Indeed, getting these guesses may be a tricky task, both for students and for practitioners.&lt;/p&gt;
+&lt;p&gt;(Post updated on 17/07/2023) In R, the &lt;code&gt;drc&lt;/code&gt; package represents one of the main solutions for nonlinear regression and dose-response analyses (Ritz et al., 2015). It comes with a lot of nonlinear models, which are useful to describe several biological processes, from plant growth to bioassays, from herbicide degradation to seed germination. These models are provided with self-starting functions, which free the user from the hassle of providing initial guesses for model parameters. Indeed, getting these guesses may be a tricky task, both for students and for practitioners.&lt;/p&gt;
 &lt;p&gt;Obviously, we should not expect that all possible models and parameterisations are included in the ‘drc’ package; therefore, sooner or later, we may all find ourselves in the need of building a user-defined function, for some peculiar tasks of nonlinear regression analysis. I found myself in that position several times in the past and it took me awhile to figure out a solution.&lt;/p&gt;
 &lt;p&gt;In this post, I’ll describe how we can simply build self-starters for our nonlinear regression analyses, to be used in connection with the ‘drm()’ function in the ‘drc’ package. In the end, I will also extend the approach to work with the ‘nls()’ function in the ‘stats’ package.&lt;/p&gt;
 &lt;p&gt;Let’s consider the following dataset, depicting the relationship between temperature and growth rate. We may note that the response reaches a maximum value around 30°C, while it is lower below and above such an optimal value.&lt;/p&gt;
@@ -1410,10 +1652,10 @@ plot(mod, log = &amp;quot;&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
                start = list (b = 0.01, d = 27, e = 30))&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;However, we are forced to provide starting values for all estimands, which might be a tricky task, unless we build a self-starting routine, as we did before for the &lt;code&gt;drc&lt;/code&gt; platform. This is not an impossible task and we can also re-use part of the code we have already written above. We have to:&lt;/p&gt;
 &lt;ol style=&#34;list-style-type: decimal&#34;&gt;
-&lt;li&gt;build a self-starting function by using the appropriate coding (see below). In this step we should be careful to the command &lt;code&gt;sortedXyData(mCall[[&amp;quot;X&amp;quot;]], LHS, data)&lt;/code&gt;. The part in quotation marks (“X”) should correspond to the name of the predictor in the &lt;code&gt;bragg.3.fun()&lt;/code&gt; function definition.&lt;/li&gt;
+&lt;li&gt;build a self-starting function by using the appropriate coding (see below). In this step we should be careful to the command &lt;code&gt;sortedXyData(mCall[[&#34;X&#34;]], LHS, data)&lt;/code&gt;. The part in quotation marks (“X”) should correspond to the name of the predictor in the &lt;code&gt;bragg.3.fun()&lt;/code&gt; function definition.&lt;/li&gt;
 &lt;li&gt;Use the &lt;code&gt;selfStart()&lt;/code&gt; function to combine the function with its self-starting routine.&lt;/li&gt;
 &lt;/ol&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;bragg.3.init &amp;lt;- function(mCall, LHS, data) {
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;bragg.3.init &amp;lt;- function(mCall, LHS, data, ...) {
     xy &amp;lt;- sortedXyData(mCall[[&amp;quot;X&amp;quot;]], LHS, data)
     x &amp;lt;-  xy[, &amp;quot;x&amp;quot;]; y &amp;lt;- xy[, &amp;quot;y&amp;quot;]
     
@@ -1658,7 +1900,6 @@ I-06121 - PERUGIA&lt;/p&gt;
       
       <guid>https://www.statforbiology.com/rpackages/</guid>
       <description>
-&lt;script src=&#34;https://www.statforbiology.com/rmarkdown-libs/header-attrs/header-attrs.js&#34;&gt;&lt;/script&gt;
 
 
 &lt;p&gt;This blog is supported by a few R packages containing all functions, datasets and other utilities, which are necessary to work through posts, tutorials and books. The packages are:&lt;/p&gt;
@@ -1666,10 +1907,12 @@ I-06121 - PERUGIA&lt;/p&gt;
 &lt;li&gt;&lt;a href=&#34;https://github.com/OnofriAndreaPG/aomisc&#34;&gt;aomisc&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;https://github.com/OnofriAndreaPG/agriCensData&#34;&gt;AgriCensData&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;https://github.com/OnofriAndreaPG/drcSeedGerm&#34;&gt;drcSeedGerm&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/OnofriAndreaPG/drcte&#34;&gt;drcte&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;https://github.com/OnofriAndreaPG/lmDiallel&#34;&gt;lmDiallel&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;All packages are hosted on gitHub and can be installed from there. To do so, you need the ‘devtools’ package, so, if necessary, install this package first. Next, load this library and use the ‘install_github()’ function to install the three packages. For any problem, please, &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;email me&lt;/a&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;install.packages(&amp;quot;devtools&amp;quot;)
+&lt;p&gt;The three packages ‘drcSeedGerm’, ‘drcte’ and ‘lmDiallel’ are already hosted on CRAN and they can be installed from within RStudio, by using the usual ‘install.package()’ function. For all packages, the development versions are hosted on gitHub and they can be installed from there. To do so, you need the ‘devtools’ package, so, if necessary, install this package first. Next, load this library and use the ‘install_github()’ function to install the three packages. For any problem, please, &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;email me&lt;/a&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# Installing the development versions
+install.packages(&amp;quot;devtools&amp;quot;)
 library(devtools)
 install_github(&amp;quot;OnofriAndreaPG/aomisc&amp;quot;)
 install_github(&amp;quot;OnofriAndreaPG/agriCensData&amp;quot;)
