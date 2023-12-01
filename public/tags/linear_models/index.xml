@@ -1,14 +1,120 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Linear_models on The broken bridge between biologists and statisticians</title>
+    <title>linear_models on The broken bridge between biologists and statisticians</title>
     <link>https://www.statforbiology.com/tags/linear_models/</link>
-    <description>Recent content in Linear_models on The broken bridge between biologists and statisticians</description>
+    <description>Recent content in linear_models on The broken bridge between biologists and statisticians</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2018, @AndreaOnofri</copyright>
-    <lastBuildDate>Sat, 26 Nov 2022 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 30 Nov 2023 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://www.statforbiology.com/tags/linear_models/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Back-transformations with emmeans()</title>
+      <link>https://www.statforbiology.com/2023/stat_emmeans_backtransform/</link>
+      <pubDate>Thu, 30 Nov 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.statforbiology.com/2023/stat_emmeans_backtransform/</guid>
+      <description>
+
+
+&lt;p&gt;I am one of those old guys who still uses the stabilising transformations, when the data do not conform to the basic assumptions for ANOVA. Indeed, apart from counts and proportions, where GLMs can be very useful, I have not yet found a simple way to deal with heteroscedasticity for continuous variables, such as yield, weight, height and so on. Yes, I know, Generalised Least Squares (GLS) can be useful to fit heteroscedastic models, but I would argue that stabilising transformations are, conceptually, very much simpler and they can be easily thought to PhD students and practitioners, with only a basic level of knowledge about statistics.&lt;/p&gt;
+&lt;p&gt;In the recent past, the package &lt;code&gt;emmeans&lt;/code&gt; gave me a big boost for its useful way to handle back-transformations. For example, in the box below, I have perfomed an ANOVA on log-transformed data and retreived the back-transformed means on the original count scale.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(emmeans)
+fileName &amp;lt;- &amp;quot;http://www.casaonofri.it/_datasets/insects.csv&amp;quot;
+dataset &amp;lt;- read.csv(fileName)
+head(dataset)
+##   Insecticide Rep Count
+## 1          T1   1   448
+## 2          T1   2   906
+## 3          T1   3   484
+## 4          T1   4   477
+## 5          T1   5   634
+## 6          T2   1   211
+model &amp;lt;- lm(log(Count) ~ Insecticide, data = dataset)
+emmeans(model, ~Insecticide, type = &amp;quot;response&amp;quot;)
+##  Insecticide response     SE df lower.CL upper.CL
+##  T1             568.6 101.01 12    386.1    837.3
+##  T2             335.1  59.54 12    227.6    493.5
+##  T3              51.9   9.22 12     35.2     76.4
+## 
+## Confidence level used: 0.95 
+## Intervals are back-transformed from the log scale&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It is very simple: &lt;code&gt;emmeans&lt;/code&gt; auto-detects the transformation function (which is made inside the model specification) and automatically produces the back-transformation, when this is requested by using the ‘&lt;code&gt;type = &#34;response&#34;&lt;/code&gt;’ argument (we can also use the argument ‘&lt;code&gt;regrid = &#34;response&#34;&lt;/code&gt;’, with slight differences that I will discuss in a future post).&lt;/p&gt;
+&lt;p&gt;Unfortunately, not all transformations are auto-detected; for example, let’s consider the dataset ‘Hours_to_failure.csv’, where we have the time-to-failure (in hours) for a device, as affected by the operating temperature. If we regard the temperature as a factor, we can fit an ANOVA model; a check with the &lt;code&gt;boxcox()&lt;/code&gt; function in the MASS package suggests that this dataset might require a stabilising transformation into the inverse value.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(MASS)
+library(emmeans)
+fileName &amp;lt;- &amp;quot;http://www.casaonofri.it/_datasets/Hours_to_failure.csv&amp;quot;
+dataset &amp;lt;- read.csv(fileName)
+dataset$Temp &amp;lt;- factor(dataset$Temp)
+head(dataset)
+##   Temp Hours_to_failure
+## 1 1520             1953
+## 2 1520             2135
+## 3 1520             2471
+## 4 1520             4727
+## 5 1520             6134
+## 6 1520             6314
+model &amp;lt;- lm(Hours_to_failure ~ Temp, data = dataset)
+tp &amp;lt;- boxcox(model)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_emmeans_backTransform_files/figure-html/unnamed-chunk-2-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;As we see below, the inverse transformation is not auto-detected.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model2 &amp;lt;- lm(I(1/Hours_to_failure) ~ Temp, data = dataset)
+emmeans(model2, ~ Temp, type = &amp;quot;response&amp;quot;)
+##  Temp response       SE df lower.CL upper.CL
+##  1520 0.000320 9.52e-05 20 0.000121 0.000518
+##  1620 0.000579 9.52e-05 20 0.000381 0.000778
+##  1660 0.001043 9.52e-05 20 0.000844 0.001241
+##  1708 0.001565 9.52e-05 20 0.001366 0.001763
+## 
+## Confidence level used: 0.95 
+## Intervals are back-transformed from the identity scale&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In this situation, an alternative approach must be used. The transformation can be made prior to fitting the model; next, we need to update the ‘reference grid’ for the model, specifying what type of transformation we have made (&lt;code&gt;tran = &#34;inverse&#34;&lt;/code&gt;). Finally, we can pass the updated grid into the &lt;code&gt;emmeans()&lt;/code&gt; function. And … the back-transformation is served!&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dataset$invHours &amp;lt;- 1/dataset$Hours_to_failure
+model3 &amp;lt;- lm(invHours ~ Temp, data = dataset)
+updGrid &amp;lt;- update(ref_grid(model3), tran = &amp;quot;inverse&amp;quot;)
+emmeans(updGrid, ~Temp, type = &amp;quot;response&amp;quot;)
+##  Temp response    SE df lower.CL upper.CL
+##  1520     3128 931.6 20     1930     8258
+##  1620     1726 283.6 20     1285     2626
+##  1660      959  87.6 20      806     1185
+##  1708      639  38.9 20      567      732
+## 
+## Confidence level used: 0.95 
+## Intervals are back-transformed from the inverse scale&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I can use this method with several functions, such as: “identity”, “1/mu^2”, “inverse”, “reciprocal”, “log10”, “log2”, “asin.sqrt”, and “asinh.sqrt”.&lt;/p&gt;
+&lt;p&gt;Sometimes, I need extra-flexibility. For example, if we look at ‘boxcox’ graph above, we see that the inverse transformation, although acceptable (the value &lt;span class=&#34;math inline&#34;&gt;\(-1\)&lt;/span&gt; is within the confidence limits for &lt;span class=&#34;math inline&#34;&gt;\(\lambda\)&lt;/span&gt;) is not the best one. Indeed, the maximum likelihood value is -0.62:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;tp$x[which.max(tp$y)]
+## [1] -0.6262626&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Therefore, we might like to use the following transformation, that is within the ‘boxcox’ family:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[W = \frac{Y^{-0.62} - 1}{-0.62}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;This type of transformation is not menageable with the previous code and we need to use the &lt;code&gt;make.tran()&lt;/code&gt; function, specifying the value of &lt;span class=&#34;math inline&#34;&gt;\(\lambda\)&lt;/span&gt; (&lt;code&gt;alpha = -0.62&lt;/code&gt;) and the value of the diplacement parameter (&lt;code&gt;beta = 1&lt;/code&gt;).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dataset$bcHours &amp;lt;- (dataset$Hours_to_failure^(-0.62) - 1)/(-0.62)
+model4 &amp;lt;- lm(bcHours ~ Temp, data = dataset)
+updGrid &amp;lt;- update(ref_grid(model4), 
+                  tran = make.tran(&amp;quot;boxcox&amp;quot;, alpha = -0.62,
+                                   beta = 1))
+emmeans(updGrid, ~Temp, type = &amp;quot;response&amp;quot;)
+##  Temp response    SE df lower.CL upper.CL
+##  1520     3265 708.8 20     2191     5556
+##  1620     1763 260.9 20     1329     2483
+##  1660      976 100.0 20      798     1227
+##  1708      642  50.7 20      549      764
+## 
+## Confidence level used: 0.95 
+## Intervals are back-transformed from the Box-Cox (lambda = -0.62) of (y - 1) scale&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The function &lt;code&gt;make.tran()&lt;/code&gt; can be used to specify several other transformation functions, such as the angular transformation that is often used for percentages and proportions. You can get a full list by serching help (‘?make.tran’) from inside R.&lt;/p&gt;
+&lt;p&gt;In conclusion, stabilising transformations, in spite of their age, can still be useful to fit heteroscedastic models; do not underrate them, just because they are no longer in fashion!&lt;/p&gt;
+&lt;p&gt;Thanks for reading!&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+</description>
+    </item>
     
     <item>
       <title>The coefficient of determination: is it the R-squared or r-squared?</title>
