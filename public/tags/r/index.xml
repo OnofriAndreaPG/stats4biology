@@ -5,10 +5,100 @@
     <description>Recent content in R on The broken bridge between biologists and statisticians</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2018, @AndreaOnofri</copyright>
-    <lastBuildDate>Thu, 30 Nov 2023 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 04 Dec 2023 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://www.statforbiology.com/tags/r/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Repeated measures and subsampling with perennial crops</title>
+      <link>https://www.statforbiology.com/2023/stat_lmm_perennialcropssubsampling/</link>
+      <pubDate>Mon, 04 Dec 2023 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.statforbiology.com/2023/stat_lmm_perennialcropssubsampling/</guid>
+      <description>
+
+
+&lt;p&gt;In a recent post, I have talked about repeated measures, for a case where measurements were taken repeatedly in the same plots across years &lt;a href=&#34;https://www.statforbiology.com/2023/stat_lmm_perennialcrops/&#34;&gt;see here&lt;/a&gt;. Previously, in another post, I had talked about subsampling, for a case where several random samples were taken from the same plot &lt;a href=&#34;https://www.statforbiology.com/2023/stat_lmm_subsampling_tkw/&#34;&gt;see here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Repeated measures and subsampling are vastly different: in the first case I am specifically interested in the ‘evolution’ of the response over time (or space, sometimes). In the second case (subsampling), I only want to improve the precision/accuracy of my measurements, by taking multiple random samples in each plot.&lt;/p&gt;
+&lt;p&gt;In this post, I decided to consider a situation where we have both repeated measures and subsampling. I have been prompted to work on this post by a colleague, that is struggling to find the appropriate model for such a situation; I hope that I can lend him/her a hand to get over this (thanks for your request, Gal!).&lt;/p&gt;
+&lt;p&gt;Let’s consider the dataset below, that refers to the yield of lucerne genotypes in three consecutive years, taken from the same plots in a single experiment lasting for three years. The situation is similar to that of my previous post, but, in this case, in each year, we took two subsamples of 1 m&lt;sup&gt;2&lt;/sup&gt; from each plot to obtain two separate yield measurements.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rm(list = ls())
+library(nlme)
+library(dplyr)
+filePath &amp;lt;- &amp;quot;https://www.casaonofri.it/_datasets/alfalfa3years_subs.csv&amp;quot;
+dataset &amp;lt;- read.csv(filePath)
+dataset[,1:4] &amp;lt;- lapply(dataset[,1:4],
+                        function(col) factor(col))
+head(dataset)
+##   Block Genotype Year SubSample     Yield
+## 1     1 4cascine 2006         1  5.967228
+## 2     1 4cascine 2006         2  5.021836
+## 3     1 4cascine 2007         1 11.319587
+## 4     1 4cascine 2007         2 11.917985
+## 5     1 4cascine 2008         1 10.534574
+## 6     1 4cascine 2008         2 10.374413&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;For this dataset, we need to consider that the observations taken in different years come from the same plots (repeated measures), so that there are three ‘subplots in time’. In each of these subplots (i.e., in each year), we take two subsamples. By considering this, we can follow the usual rules to build the model (Piepho et al., 2004):&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Consider one single year and build the treatment model&lt;/li&gt;
+&lt;li&gt;Consider one single year and build the block model&lt;/li&gt;
+&lt;li&gt;Consider that the ‘plot’ factor in the block model references the randomisation units, i.e. those units which received the the genotypes by a randomisation process. Assign to this plot factor a random effect.&lt;/li&gt;
+&lt;li&gt;Include the year factor into the model and combine the year with all the effects in the treatment model, by crossing or nesting as appropriate.&lt;/li&gt;
+&lt;li&gt;Excluding the terms for randomisation units, nest the year in all the other terms in the block model.&lt;/li&gt;
+&lt;li&gt;Combine random effects for randomisation units with the repeated factor, by using the colon operator, in order to derive the correct error terms to accommodate correlation structures.&lt;/li&gt;
+&lt;li&gt;Introduce subsamples, nested within plots and within years. These subsamples must receive a random effect, because they were randomly sampled.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The models at the different steps are as follows (with R notation):&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;treatment model: YIELD ~ GENOTYPE&lt;/li&gt;
+&lt;li&gt;block model: YIELD ~ BLOCK + BLOCK:PLOT&lt;/li&gt;
+&lt;li&gt;block model: YIELD ~ BLOCK + (1|BLOCK:PLOT)&lt;/li&gt;
+&lt;li&gt;treatment model: YIELD ~ GENOTYPE * YEAR&lt;/li&gt;
+&lt;li&gt;block model: YIELD ~ BLOCK + BLOCK:YEAR + (1|BLOCK:PLOT)&lt;/li&gt;
+&lt;li&gt;block model: YIELD ~ BLOCK + BLOCK:YEAR + (1|BLOCK:PLOT) + (1|BLOCK:PLOT:YEAR)&lt;/li&gt;
+&lt;li&gt;block model: YIELD ~ BLOCK + BLOCK:YEAR + (1|BLOCK:PLOT) + (1|BLOCK:PLOT:YEAR) + (1|BLOCK:PLOT:YEAR:SUBSAMPLES)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;In this case, we take the block, year and genotype effects as fixed (but you can change this as you please), so that the final model is:&lt;/p&gt;
+&lt;p&gt;YIELD ~ GENOTYPE * YEAR + BLOCK + BLOCK:YEAR + (1|BLOCK:PLOT) + (1|BLOCK:PLOT:YEAR) + (1|BLOCK:PLOT:YEAR:SUBSAMPLE)&lt;/p&gt;
+&lt;p&gt;where the last term does not need to be fitted in R, as it is the residual term, that is fitted by default.&lt;/p&gt;
+&lt;p&gt;We start the analysis by building a new variable to uniquely identify each plot; it is easy, if we think that yield values taken for the same genotype in the same block must have been taken in the same plot. Although this is not strictly necessary, we build another variable to uniquely identify, in each plot, the three ‘subplots in time’, within which subsamples were taken (this facilitates the fitting process in R).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Reference the plots
+dataset$Plot &amp;lt;- dataset$Block:dataset$Genotype
+dataset$Subplot &amp;lt;- dataset$Plot:dataset$Year&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now we can fit the model with the &lt;code&gt;lme()&lt;/code&gt; function (we also show the fit with the &lt;code&gt;lmer()&lt;/code&gt; function, just in case):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod &amp;lt;- lme(Yield ~ Block + Block:Year + Genotype*Year, 
+           random = ~1|Plot/Subplot,
+           data = dataset)
+anova(mod)
+##               numDF denDF  F-value p-value
+## (Intercept)       1   240 7374.988  &amp;lt;.0001
+## Block             3    57    0.241  0.8676
+## Genotype         19    57    2.361  0.0066
+## Year              2   114 3124.566  &amp;lt;.0001
+## Block:Year        6   114    7.192  &amp;lt;.0001
+## Year:Genotype    38   114    2.524  0.0001
+# library(lme4)
+# mod1 &amp;lt;- lmer(Yield ~ Genotype*Year + Block + Block:Year
+#              + (1|Plot) + (1|Subplot), 
+#              data = dataset)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;As we said in our previous post, the above mixed model analyses regards the design as a sort of ‘split-plot in time’ with sub-replicates and it is not necessarily correct, as it assumes that the within-plot correlation is the same for all pairs of observations, regardless of their distance in time. Further analyses might be necessary to assess whether serial correlation structures are necessary.&lt;/p&gt;
+&lt;p&gt;Please, also note that the above model works equally well with annual crops, if we repeat the experiment in several years by using exactly the same plots.&lt;/p&gt;
+&lt;p&gt;Thanks for reading and happy coding!&lt;/p&gt;
+&lt;p&gt;Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+&lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;hr /&gt;
+&lt;div id=&#34;reference&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Reference&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Piepho, H.-P., Büchse, A., Richter, C., 2004. A Mixed Modelling Approach for Randomized Experiments with Repeated Measures. Journal of Agronomy and Crop Science 190, 230–247.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Back-transformations with emmeans()</title>
@@ -20,7 +110,7 @@
 
 
 &lt;p&gt;I am one of those old guys who still uses the stabilising transformations, when the data do not conform to the basic assumptions for ANOVA. Indeed, apart from counts and proportions, where GLMs can be very useful, I have not yet found a simple way to deal with heteroscedasticity for continuous variables, such as yield, weight, height and so on. Yes, I know, Generalised Least Squares (GLS) can be useful to fit heteroscedastic models, but I would argue that stabilising transformations are, conceptually, very much simpler and they can be easily thought to PhD students and practitioners, with only a basic level of knowledge about statistics.&lt;/p&gt;
-&lt;p&gt;In the recent past, the package &lt;code&gt;emmeans&lt;/code&gt; gave me a big boost for its useful way to handle back-transformations. For example, in the box below, I have perfomed an ANOVA on log-transformed data and retreived the back-transformed means on the original count scale.&lt;/p&gt;
+&lt;p&gt;In the recent past, the package &lt;code&gt;emmeans&lt;/code&gt; gave me a big boost for its useful way to handle back-transformations. For example, in the box below, I have performed an ANOVA on log-transformed data and retrieved the back-transformed means on the original count scale.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(emmeans)
 fileName &amp;lt;- &amp;quot;http://www.casaonofri.it/_datasets/insects.csv&amp;quot;
 dataset &amp;lt;- read.csv(fileName)
@@ -89,7 +179,7 @@ emmeans(updGrid, ~Temp, type = &amp;quot;response&amp;quot;)
 ## [1] -0.6262626&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Therefore, we might like to use the following transformation, that is within the ‘boxcox’ family:&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[W = \frac{Y^{-0.62} - 1}{-0.62}\]&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;This type of transformation is not menageable with the previous code and we need to use the &lt;code&gt;make.tran()&lt;/code&gt; function, specifying the value of &lt;span class=&#34;math inline&#34;&gt;\(\lambda\)&lt;/span&gt; (&lt;code&gt;alpha = -0.62&lt;/code&gt;) and the value of the diplacement parameter (&lt;code&gt;beta = 1&lt;/code&gt;).&lt;/p&gt;
+&lt;p&gt;This type of transformation is not manageable with the previous code and we need to use the &lt;code&gt;make.tran()&lt;/code&gt; function, specifying the value of &lt;span class=&#34;math inline&#34;&gt;\(\lambda\)&lt;/span&gt; (&lt;code&gt;alpha = -0.62&lt;/code&gt;) and the value of the displacement parameter (&lt;code&gt;beta = 1&lt;/code&gt;).&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dataset$bcHours &amp;lt;- (dataset$Hours_to_failure^(-0.62) - 1)/(-0.62)
 model4 &amp;lt;- lm(bcHours ~ Temp, data = dataset)
 updGrid &amp;lt;- update(ref_grid(model4), 
@@ -104,7 +194,7 @@ emmeans(updGrid, ~Temp, type = &amp;quot;response&amp;quot;)
 ## 
 ## Confidence level used: 0.95 
 ## Intervals are back-transformed from the Box-Cox (lambda = -0.62) of (y - 1) scale&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;The function &lt;code&gt;make.tran()&lt;/code&gt; can be used to specify several other transformation functions, such as the angular transformation that is often used for percentages and proportions. You can get a full list by serching help (‘?make.tran’) from inside R.&lt;/p&gt;
+&lt;p&gt;The function &lt;code&gt;make.tran()&lt;/code&gt; can be used to specify several other transformation functions, such as the angular transformation that is often used for percentages and proportions. You can get a full list by searching help (‘?make.tran’) from inside R.&lt;/p&gt;
 &lt;p&gt;In conclusion, stabilising transformations, in spite of their age, can still be useful to fit heteroscedastic models; do not underrate them, just because they are no longer in fashion!&lt;/p&gt;
 &lt;p&gt;Thanks for reading!&lt;/p&gt;
 &lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
