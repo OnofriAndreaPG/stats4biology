@@ -1,7 +1,7 @@
 ---
 title: "Experimental methods in agriculture"
 author: "Andrea Onofri and Dario Sacco"
-date: "Update: v. 1.001 (2022-10-08), compil. 2022-11-23"
+date: "Update: v. 1.1 (2023-12-06), compil. 2023-12-07"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -64,13 +64,13 @@ Andrea is Associate Professor at the Department of Agricultural, Food and Enviro
 
 # Science and pseudoscience
 
+
+*A witty saying proves nothing (Voltaire)*
+
+
 In the age of 'information overload', we have plenty of knowledge at our fingertips. We can 'google' for a topic and our computer screen is filled with thousands of links, where we can find every piece of information we are looking for. However, one important question remains unanswered: which information is reliable and scientifically sound? We know by experience that the web is full of personal views, opinions, beliefs or, even worse, fake-news; we have nothing against opinions (although we would rather stay away from fake-news), but we need to be able to distinguish between subjective opinions and objective facts. Let’s refer to the body of reliable and objective knowledge by using the term 'science', while all the rest is 'non-science' or 'pseudoscience'; the question is: “How can we draw the line between science and pseudoscience?”. It is a relevant question in these days, isn’t it?
 
-A theory, in itself, is not necessarily science. It may be well-substantiated, it can incorporate good laws and/or equations, it may come either from a brilliant intuition or from a meticulous research work; it may come from a common man or from a very authoritative scientist... it does not matter: theories do not necessarily represent objective facts. A few aphorisms can help us get to the point:
-
-1. Analogy cannot serve as proof (Pasteur)
-2. The interest I have in believing a thing is not a proof of the existence of that thing (Voltaire)
-3. A witty saying proves nothing (Voltaire)
+A theory, in itself, is not necessarily science. It may be well-substantiated, it can incorporate good laws and/or equations, it may come either from a brilliant intuition or from a meticulous research work; it may come from a common man or from a very authoritative scientist... it does not matter: theories do not necessarily represent objective facts.
 
 ## Science needs data
 
@@ -352,6 +352,11 @@ In practice, making sure that the methods were appropriate may require a specifi
 <!--chapter:end:01-Eng_introBiometry.Rmd-->
 
 # Designing experiments
+
+
+*The interest I have in believing a thing is not a proof of the existence of that thing (Voltaire)*
+
+
 
 ## The elements of research
 
@@ -651,6 +656,11 @@ In this chapter we have seen the fundamental elements of a research and we have 
 <!--chapter:end:02-Eng_ResProject.Rmd-->
 
 # Describing the observations
+
+
+*Statistics is the grammar of science (K. Pearson)*
+
+
 
 The final outcome of every manipulative/comparative experiment is a **dataset**, consisting of a set of measures/observations taken on several experimental subjects, in relation to one or more properties (e.g., height, weight, concentration, sex, color). We have seen that the list of values for one of those properties is called a variable; our first task is to describe that variable, by using the most appropriate descriptive stats. In this respect, the different types of variables (see Chapter 2) will require different approaches, as we will see in this chapter.
 
@@ -1211,6 +1221,10 @@ pie(table(mtcars$gear))
 # Modeling the experimental data
 
 
+*Models are wrong, but some are useful (G. Box)*
+
+
+
 In the previous chapter we have seen that we can use simple stats to describe, summarise and present our experimental data, which is usually the very first step of data analyses. However, we are more ambitious: we want to model our experimental data. Perhaps this term sounds unfamiliar to some of you and, therefore, we should better start by defining the terms 'model' and 'modeling'.
 
 A mathematical model is the description of a system using the mathematical language and the process of developing a model is named mathematical modeling. In practice, we want to write an equation where our experimental observations are obtained as the result of a set of predictors and operators.
@@ -1619,6 +1633,12 @@ In this chapter we have only considered one stochastic model, that is the Gaussi
 
 # Estimation of model parameters
 
+
+
+*Death is a fact. All else is inference (W. Farr)*
+
+
+
 In chapter 4 we have shown that the experimental data can be regarded as the outcome of a deterministic cause-effect process, where a given stimulus is expected to produce a well defined response. Unfortunately, the stochastic effects of experimental errors (random noise) 'distort' the response, so that the observed result does not fully reflect the expected outcome of the cause-effect relationship. We have also shown (Chapter 1) that a main part of such noise relates to the fact that the experimental units are sampled from a wider population and the characteristics of such sample do not necessarily match the characteristics of the whole population. Consequently, all samples are different from one another and we always obtain different results, even if we repeat the same experiment in the same conditions.
 
 How should we cope with such a variability? We should always bear in mind that, usually, although we look at a sample, our primary interest is to retrieve information about the whole population, by using a process named **statistical inference**, as summarised in Figure \@ref(fig:figName61). This process is based on the theories by Karl Pearson (1857-1936), his son Egon Pearson (1895-1980) and Jarzy Neyman (1894-1981), as well as Ronald Fisher, about whom we spoke at the beginning of this book.
@@ -1936,6 +1956,10 @@ Points 2 and 3 above imply that confidence intervals protect ourselves from the 
 <!--chapter:end:05-Eng_InferenzaStatistica.Rmd-->
 
 # Making Decisions under uncertainty
+
+
+*"... the null hypothesis is never proved or established, but it is possibly disproved, in the course of experimentation. Every experiment may be said to exist only to give the facts a chance of disproving the null hypothesis. (R. A. Fisher)*
+
 
 In Chapter 5 we have seen that experimental errors and, above all, sampling errors, produce uncertainty in the estimation process, which we have to account for by determining and displaying standard errors and confidence intervals. In the very same fashion, we need to be able to make decisions in presence of uncertainty; is the effect of a treatment statistically significant? Is the effect of a treatment higher/lower than the effect of another treatment?
 
@@ -2324,6 +2348,10 @@ Please, also note that the two error types are interrelated and the highest the 
 <!--chapter:end:06-Eng_TestIpotesi.Rmd-->
 
 # One-way ANOVA models
+
+
+*To find out what happens when you change something, it is necessary to change it (Box, Hunter and Hunter)*
+
 
 In Chapter 4 we have seen that the experimental observations can be described by way of models with both a deterministic and a stochastic component. With specific reference to the former component, we have already introduced an example of an ANOVA model, belonging to a very important class of linear models, where the response variable is quantitative, while the predictors are represented by one or several nominal explanatory factors. It is necessary to state that, strictly speaking, the term 'ANOVA model' is slightly imprecise; indeed, ANOVA stands for ANalysis Of VAriance and it is a method for decomposing the variance of a group of observations, which was invented by Ronald Fisher, almost one century ago. However, the models we are discussing here are strongly connected to the Fisherian ANOVA, which motivates their name.
 
@@ -2818,6 +2846,13 @@ Finally, it is very important to point out that **all the above reasoning is onl
 
 # Checking for the basic assumptions
 
+
+
+*An approximate answer to the right problem is worth a good deal more than an exact answer to an approximate problem (J. Tukey)*
+
+   
+      
+
 Let's take a further look at the ANOVA model we fitted in the previous chapter:
 
 $$Y_i = \mu + \alpha_j + \varepsilon_i$$
@@ -2935,8 +2970,8 @@ Hence, if we plot our standardised residuals against the respective percentiles 
 Any deviations from the diagonal suggests that the residuals do not come from a normal distribution, but they come from other distributions with different shapes. For example, we know that the gaussian distribution is symmetric, while residuals might come from a right-skewed distribution (leaning to the left).  In such asymmetric distribution, the mean is higher than the median and negative residuals are more numerous, but lower in absolute value than positive residuals (see Figure \@ref(fig:figName106), left). Therefore, the QQ-plot looks like the one in Figure \@ref(fig:figName106)(right).
 
 <div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName106-1.png" alt="QQ-plot for residuals coming from a right-skewed distribution (e.g., log-normal)" width="85%" />
-<p class="caption">(\#fig:figName106)QQ-plot for residuals coming from a right-skewed distribution (e.g., log-normal)</p>
+<img src="_main_files/figure-html/figName106-1.png" alt="QQ-plot for residuals coming from a right-skewed distribution (e.g., shifted log-normal)" width="85%" />
+<p class="caption">(\#fig:figName106)QQ-plot for residuals coming from a right-skewed distribution (e.g., shifted log-normal)</p>
 </div>
 
 Otherwise, when the residuals come from a left-skewed distribution (asymmetric and leaning to the right), their mean is lower than the median and there are a lot of positive residuals with low absolute values (Figure \@ref(fig:figName107), left). Therefore, the QQ-plot looks like that in Figure \@ref(fig:figName107) (right).
@@ -3244,6 +3279,9 @@ GLM, GLS and non-parametric methods are pretty advanced and they are not conside
 # Contrasts and multiple comparison testing
 
 
+*All we know about the world teaches us that the effects of A and B are always different in some decimal place for any A and B. Thus asking "are the effects different?" is foolish (John Tukey)*
+
+
 In Chapter 7 we have shown how to fit an ANOVA model to the observed data, which is very often the first step of data analysis, with two fundamental aims:
 
 1. determining the variance of the residual (unexplained) effects, that is the basis of statistical inference;
@@ -3257,7 +3295,7 @@ After the inspection of model residuals and after the adoption of possible corre
 2. is A better/worse than B?
 3. what is the difference between A and B?
 
-In other words, for any pairs of treatments, we might be willing to assess the existence of significant differences (question 1), their sign (positive/negative; question 2) and their size (**effect size**; question 3). According to the English scientist John Tukey, the first question is 'foolish' as there are no two treatments whose effects can be regarded as totally equal^[All we know about the world teaches us that the effects of A and B are always different in some decimal place for any A and B. Thus asking "are the effects different?" is foolish (John Tukey).], while the other two questions, particularly the third one, are much more relevant.
+In other words, for any pairs of treatments, we might be willing to assess the existence of significant differences (question 1), their sign (positive/negative; question 2) and their size (**effect size**; question 3). According to the English scientist John Tukey, the first question is 'foolish' as there are no two treatments whose effects can be regarded as totally equal (see the beginning of this Chapter), while the other two questions, particularly the third one, are much more relevant.
 
 In order to ask the above questions, we can apply **linear contrasts** or **Multiple Comparison Procedures** (MCP). We will explore these methods by using the 'mixture.csv' dataset, which we have started analysing in Chapters 7 and 8.
 
@@ -3498,9 +3536,9 @@ multcomp::cld(treat.means, adjust="none", Letters=LETTERS)
 ## 
 ## Confidence level used: 0.95 
 ## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.
 ```
 
 The letter display is handy, but it can only answer questions about the significance of differences, while it gives no hints about the direction and size of differences. For this reason, using the letter display is often regarded as a poor practice in the presentation of experimental results. 
@@ -3646,18 +3684,20 @@ The best suggestion is to back-transform the above means by using the inverse tr
 
 $$e^{6.34} = 566.7963$$
 
-Getting the back-trasfomed means for all treatments is easy, by using the `emmeans()` function and setting the 'transform' argument to "response", as shown below.
+Getting the back-trasfomed means for all treatments is easy, by using the `emmeans()` function and setting the 'type' argument to "response", as shown below.
 
 
 ```r
-retroMedie <- emmeans(modt, ~Insecticide, regrid = "response")
+retroMedie <- emmeans(modt, ~Insecticide, 
+                      type = "response")
 retroMedie
 ##  Insecticide response     SE df lower.CL upper.CL
-##  T1             568.6 101.01 12    348.5      789
-##  T2             335.1  59.54 12    205.4      465
-##  T3              51.9   9.22 12     31.8       72
+##  T1             568.6 101.01 12    386.1    837.3
+##  T2             335.1  59.54 12    227.6    493.5
+##  T3              51.9   9.22 12     35.2     76.4
 ## 
-## Confidence level used: 0.95
+## Confidence level used: 0.95 
+## Intervals are back-transformed from the log scale
 ```
 
 What are these back-transformed means? Expectedly, we can see that they are different from the arithmetic means on the original (untrasformed) scale:
@@ -3674,6 +3714,39 @@ emmeans(lm(Count ~ Insecticide, data = dataset), ~Insecticide)
 ```
 
 Indeed, back-transformed means are lower than arithmetic means and they are regarded as estimators of the medians in the original scale, which are not influenced by the transformation. Indeed, we should think that monotonic transformations do not alter the ordering of observations and, thus, the central value remains the same. Consequently, when we report back-transformed means we are indeed reporting an estimate of the medians of the populations that generated our samples. However, estimating the medians instead of the means may not be a bad idea, considering that the populations are non-normal and might be asymmetric.
+
+Finally, I have to point out that, in practice, things may become more complex if the transformation is not auto-detected, as we have shown before for the logarithmic transformation. For example, a reciprocal transformation is not detected and the back-transformation is not executed.
+
+
+```r
+modt2 <- lm(1/Count ~ Insecticide, data = dataset)
+emmeans(modt2, ~Insecticide, type = "response")
+##  Insecticide  emmean      SE df lower.CL upper.CL
+##  T1          0.00182 0.00279 12 -0.00426  0.00789
+##  T2          0.00317 0.00279 12 -0.00291  0.00924
+##  T3          0.02120 0.00279 12  0.01513  0.02727
+## 
+## Confidence level used: 0.95
+```
+
+In this case, the transformation can be made prior to fitting the model; next, we need to update the 'reference grid' for the model, specifying what type of transformation we have made (`tran = "inverse"`). Finally, we can pass the updated grid into the `emmeans()` function.
+
+
+```r
+dataset$invCount <- 1/dataset$Count
+modt3 <- lm(invCount ~ Insecticide, data = dataset)
+updGrid <- update(ref_grid(modt3), tran = "inverse")
+emmeans(updGrid, ~Insecticide, type = "response")
+##  Insecticide response    SE df lower.CL upper.CL
+##  T1             550.9 845.9 12    126.8      Inf
+##  T2             315.8 278.0 12    108.2      Inf
+##  T3              47.2   6.2 12     36.7       66
+## 
+## Confidence level used: 0.95 
+## Intervals are back-transformed from the inverse scale
+```
+
+We can use this method with several functions, such as: "identity", "1/mu^2", "inverse", "reciprocal", "log10", "log2", "asin.sqrt", and "asinh.sqrt".
 
 ## What about the traditional MCPs?
 
@@ -3719,6 +3792,9 @@ Pairwise contrasts and MCPs have been often abused in previous years and, still 
 <!--chapter:end:09-Eng_ConfrontoMultiplo.Rmd-->
 
 # Multi-way ANOVA models 
+
+
+*Statisticians, like artists, have the bad habit of falling in love with their models (G. Box)*
 
 
 In Chapter 7 we showed how we can fit linear models with one categorical predictor and one response variable (one-way ANOVA models). With those models, apart from differences due to the experimental treatments, all units must be completely independent and there should not be any other systematic sources of variability. On the contrary, with the most common experiments laid down as Randomised Complete Blocks (RCBDs) or, less commonly, as Latin Square (LSD), apart from the treatment factor, we also have, respectively, one and two blocking factors, which represent additional sources of systematic variability. Indeed, the block effect produces a more or less relevant increase/decrease in the observed response, with respect to the overall mean; for example, in a field experiment with two blocks, the most fertile one might might produce a yield increase of 1 t/ha, while the other one will produce a corresponding yield decrease of the same amount. Such yield variations will be systematically shared by all plots located in the same block. 
@@ -4012,9 +4088,9 @@ multcomp::cld(medie, Letters = LETTERS, reverse = T)
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 8 estimates 
 ## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.
 ```
 \normalsize
 
@@ -4084,6 +4160,9 @@ The difference between protocols is significant, as well as the difference betwe
 <!--chapter:end:10-Eng_MultiWayANOVAModels.Rmd-->
 
 # Multi-way ANOVA models with interactions
+
+
+*A theory is just a mathematical model to describe the observations (K. Popper)*
 
 
 In the previous Chapter we have seen models with more than one explanatory factor, that are used to describe data from Randomised Complete Block Designs and Latin Square designs, where we have one treatment factor and, respectively, one or two blocking factors. Most often, with these designs we have only one value for each combination between the experimental factor and the blocking factor; e.g., there is usually only one observation per treatment in each block in a Randomised Complete Block Design.
@@ -4274,67 +4353,67 @@ With little patience, we can easily complete the calculations by hand and organi
 ```r
 print(tab, digits = 3)
 ##    Block Genotype N Yield  mu   gamma  alpha    beta alphaBeta
-## 1      1        A 1  2.15 2.9 -0.1023 -0.343 -0.0926    0.4361
-## 2      2        A 1  2.43 2.9  0.0566 -0.343 -0.0926    0.4361
-## 3      3        A 1  2.58 2.9  0.0456 -0.343 -0.0926    0.4361
-## 4      1        A 2  2.36 2.9 -0.1023 -0.343  0.0926    0.2508
-## 5      2        A 2  2.92 2.9  0.0566 -0.343  0.0926    0.2508
-## 6      3        A 2  2.91 2.9  0.0456 -0.343  0.0926    0.2508
-## 7      1        B 1  2.94 2.9 -0.1023  0.175 -0.0926   -0.0827
-## 8      2        B 1  2.92 2.9  0.0566  0.175 -0.0926   -0.0827
-## 9      3        B 1  2.89 2.9  0.0456  0.175 -0.0926   -0.0827
-## 10     1        B 2  3.24 2.9 -0.1023  0.175  0.0926   -0.2680
-## 11     2        B 2  3.30 2.9  0.0566  0.175  0.0926   -0.2680
-## 12     3        B 2  3.17 2.9  0.0456  0.175  0.0926   -0.2680
-## 13     1        C 1  2.38 2.9 -0.1023 -0.540 -0.0926    0.6324
-## 14     2        C 1  2.53 2.9  0.0566 -0.540 -0.0926    0.6324
-## 15     3        C 1  2.69 2.9  0.0456 -0.540 -0.0926    0.6324
-## 16     1        C 2  2.30 2.9 -0.1023 -0.540  0.0926    0.4472
-## 17     2        C 2  2.19 2.9  0.0566 -0.540  0.0926    0.4472
-## 18     3        C 2  2.08 2.9  0.0456 -0.540  0.0926    0.4472
-## 19     1        D 1  2.69 2.9 -0.1023  0.249 -0.0926   -0.1564
-## 20     2        D 1  3.34 2.9  0.0566  0.249 -0.0926   -0.1564
-## 21     3        D 1  2.84 2.9  0.0456  0.249 -0.0926   -0.1564
-## 22     1        D 2  3.30 2.9 -0.1023  0.249  0.0926   -0.3417
-## 23     2        D 2  3.29 2.9  0.0566  0.249  0.0926   -0.3417
-## 24     3        D 2  3.45 2.9  0.0456  0.249  0.0926   -0.3417
-## 25     1        E 1  3.24 2.9 -0.1023  0.459 -0.0926   -0.3662
-## 26     2        E 1  3.06 2.9  0.0566  0.459 -0.0926   -0.3662
-## 27     3        E 1  3.46 2.9  0.0456  0.459 -0.0926   -0.3662
-## 28     1        E 2  3.41 2.9 -0.1023  0.459  0.0926   -0.5515
-## 29     2        E 2  3.60 2.9  0.0566  0.459  0.0926   -0.5515
-## 30     3        E 2  3.38 2.9  0.0456  0.459  0.0926   -0.5515
+## 1      1        A 1  2.15 2.9 -0.1023 -0.343 -0.0926   -0.0799
+## 2      2        A 1  2.43 2.9  0.0566 -0.343 -0.0926   -0.0799
+## 3      3        A 1  2.58 2.9  0.0456 -0.343 -0.0926   -0.0799
+## 4      1        A 2  2.36 2.9 -0.1023 -0.343  0.0926    0.0799
+## 5      2        A 2  2.92 2.9  0.0566 -0.343  0.0926    0.0799
+## 6      3        A 2  2.91 2.9  0.0456 -0.343  0.0926    0.0799
+## 7      1        B 1  2.94 2.9 -0.1023  0.175 -0.0926   -0.0694
+## 8      2        B 1  2.92 2.9  0.0566  0.175 -0.0926   -0.0694
+## 9      3        B 1  2.89 2.9  0.0456  0.175 -0.0926   -0.0694
+## 10     1        B 2  3.24 2.9 -0.1023  0.175  0.0926    0.0694
+## 11     2        B 2  3.30 2.9  0.0566  0.175  0.0926    0.0694
+## 12     3        B 2  3.17 2.9  0.0456  0.175  0.0926    0.0694
+## 13     1        C 1  2.38 2.9 -0.1023 -0.540 -0.0926    0.2638
+## 14     2        C 1  2.53 2.9  0.0566 -0.540 -0.0926    0.2638
+## 15     3        C 1  2.69 2.9  0.0456 -0.540 -0.0926    0.2638
+## 16     1        C 2  2.30 2.9 -0.1023 -0.540  0.0926   -0.2638
+## 17     2        C 2  2.19 2.9  0.0566 -0.540  0.0926   -0.2638
+## 18     3        C 2  2.08 2.9  0.0456 -0.540  0.0926   -0.2638
+## 19     1        D 1  2.69 2.9 -0.1023  0.249 -0.0926   -0.1024
+## 20     2        D 1  3.34 2.9  0.0566  0.249 -0.0926   -0.1024
+## 21     3        D 1  2.84 2.9  0.0456  0.249 -0.0926   -0.1024
+## 22     1        D 2  3.30 2.9 -0.1023  0.249  0.0926    0.1024
+## 23     2        D 2  3.29 2.9  0.0566  0.249  0.0926    0.1024
+## 24     3        D 2  3.45 2.9  0.0456  0.249  0.0926    0.1024
+## 25     1        E 1  3.24 2.9 -0.1023  0.459 -0.0926   -0.0122
+## 26     2        E 1  3.06 2.9  0.0566  0.459 -0.0926   -0.0122
+## 27     3        E 1  3.46 2.9  0.0456  0.459 -0.0926   -0.0122
+## 28     1        E 2  3.41 2.9 -0.1023  0.459  0.0926    0.0122
+## 29     2        E 2  3.60 2.9  0.0566  0.459  0.0926    0.0122
+## 30     3        E 2  3.38 2.9  0.0456  0.459  0.0926    0.0122
 ##    residuals
-## 1    -0.6537
-## 2    -0.5256
-## 3    -0.3686
-## 4    -0.4377
-## 5    -0.0396
-## 6    -0.0356
-## 7     0.1353
-## 8    -0.0396
-## 9    -0.0556
-## 10    0.4413
-## 11    0.3454
-## 12    0.2254
-## 13   -0.4227
-## 14   -0.4296
-## 15   -0.2536
-## 16   -0.5027
-## 17   -0.7676
-## 18   -0.8626
-## 19   -0.1147
-## 20    0.3824
-## 21   -0.1056
-## 22    0.4993
-## 23    0.3284
-## 24    0.5044
-## 25    0.4433
-## 26    0.1044
-## 27    0.5144
-## 28    0.6123
-## 29    0.6414
-## 30    0.4374
+## 1   -0.13773
+## 2   -0.00963
+## 3    0.14737
+## 4   -0.26673
+## 5    0.13137
+## 6    0.13537
+## 7    0.12193
+## 8   -0.05297
+## 9   -0.06897
+## 10   0.10393
+## 11   0.00803
+## 12  -0.11197
+## 13  -0.05407
+## 14  -0.06097
+## 15   0.11503
+## 16   0.20827
+## 17  -0.05663
+## 18  -0.15163
+## 19  -0.16873
+## 20   0.32837
+## 21  -0.15963
+## 22   0.05527
+## 23  -0.11563
+## 24   0.06037
+## 25   0.08927
+## 26  -0.24963
+## 27   0.16037
+## 28   0.04860
+## 29   0.07770
+## 30  -0.12630
 ```
 
 \normalsize
@@ -4348,7 +4427,7 @@ The table above shows all effects and permits the calculation of sum of squares,
 ```r
 RSS <- sum(tab$residuals ^ 2)
 RSS
-## [1] 5.666969
+## [1] 0.5849906
 ```
 
 while the sum of squares for blocks, genotype, nitrogen and interaction effects are calculated as:
@@ -4367,7 +4446,7 @@ NSS
 ## [1] 0.257428
 GNSS <- sum(tab$alphaBeta ^ 2)
 GNSS
-## [1] 4.533526
+## [1] 0.5484518
 ```
 
 Also in this case, we can see that the sum of all the above mentioned sum of squares is equal to the total deviance of all the observations.
@@ -4378,7 +4457,7 @@ Also in this case, we can see that the sum of all the above mentioned sum of squ
 sum((dataset$Yield - mu)^2)
 ## [1] 5.824451
 RSS + GSS + NSS + GNSS
-## [1] 14.73402
+## [1] 5.666969
 ```
 
 We clearly see that the whole variability of yield has been partitioned in four parts, one is due to the effect of blocks, another one is due to the effect of genotypes, another one is due to the effect of N fertilisation and, finally, the last one is due to all other unknown effects of random nature.
@@ -4517,9 +4596,9 @@ multcomp::cld(GNmeans, Letters=LETTERS)
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 10 estimates 
 ## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.
 ```
 
 In the above output, multiplicity correction has been made for $10 \time 9 / 2 = 45$ comparisons. If we were only interested in comparing, e.g., the genotypes within each N level, we would have a lower number of comparisons ($5 \times 4/2 \times 2 = 20$) and, consequently, we would need a lower degree of multiplicity correction. We can specify such an analysis by using the following code (please note the use of the nesting operator '|').
@@ -4549,9 +4628,9 @@ multcomp::cld(GNmeans2, Letters=LETTERS)
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 5 estimates 
 ## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.
 ```
 
 From the table above, we note that the ranking of genotypes is strongly dependent on N fertilisation (C is better than A with N = 2, while it is not significantly different with A = 1), which is explained by the presence of cross-over interaction.
@@ -4674,9 +4753,9 @@ multcomp::cld(mfMeans, Letters = LETTERS)
 ## Results are averaged over some or all of the levels of: Block 
 ## P value adjustment: tukey method for comparing a family of 9 estimates 
 ## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.
 ```
 
 In conclusion, we see that the analyses of nested factorial experiments is almost the same as for fully crossed factorial experiments, with the only exception that the main effect for the 'within' factor is not included in the model.
@@ -4695,6 +4774,10 @@ Before concluding, we need to point out that, for a plant breeder, most often th
 
 # Simple linear regression
 
+
+*Regression analysis is the hydrogen bomb of the statistics arsenal (C. Wheelan)*
+
+
 In the previous chapters we have presented several ANOVA models to describe the results of experiments characterised by one or more explanatory factors, in the form of nominal variables. We gave ample space to these models because they are widely used in agriculture research and plant breeding, where the aim is, most often, to compare genotypes. However, experiments are often planned to study the effect of quantitative variables, such as a sequence of doses, time elapsed from an event, the density of seeds and so on. In these cases, factor levels represent quantities and the interest is to describe the whole range of responses, beyond the levels that were actually included in the experimental design.
 
 In those conditions, ANOVA models do not fully respect the dataset characteristics, as they concentrate exclusively on the responses to the selected levels for the factors under investigation. Therefore, we need another class of models, usually known as **regression models**, which we will introduce in these two final chapters.
@@ -4712,6 +4795,16 @@ fileName <- "NWheat.csv"
 file <- paste(filePath, fileName, sep = "")
 dataset <- read.csv(file, header=T)
 ```
+
+
+```
+## 
+## Attaching package: 'reshape'
+## The following object is masked from 'package:dplyr':
+## 
+##     rename
+```
+
 
 
 Table: (\#tab:tabName141)Dataset relativo ad una prova di concimazione azotata su frumento
@@ -5018,13 +5111,21 @@ The above inverse predictions are often used in chemical laboratories for the pr
 
 # A brief intro to mixed models
 
-In this book we have, so far, encountered models with only one random effect, i.e. the residual error term. These models are named 'fixed effect models' and they represent the main topic of this book. However, we should not forget that several experiments in agriculture and biology may be affected by two or more sources of random variability and, therefore, we should also be able to fit models with more than one random term. These latter models are named 'mixed effect models' and, since the advent of personal computers in the 70s of the previous century, they are usually fitted by using more complex algorithms, with respect to the least square algorithm that we have, so far, used for 'fixed effect models'.
 
-In this chapter we will show how we can fit some simple mixed models to datasets resulting from several common types of field experiments. For the sake of brevity, we will not give any detail about the theory of mixed models; for those who are intersted in this subject, we recommend the wonderful book 'Linear mixed-effects models using R: a step-by-step approach' (Gałecki and Burzykowski, 2013).
+*... the actual and physical conduct of an experiment must govern the statistical procedure of its interpretation (R. A. Fisher)*
 
-## Plots of different sizes
 
-Factorial experiments are not only laid down with completely randomised designs or in complete blocks. In chapter 2, we have already introduced split-plot or strip-plot designs, where treatment levels are allocated to the experimental units in groups. We have seen that this is advantageous in some circumstances, e.g., when one of the factors is better allocated to bigger plots, compared to the other factors. When factor levels are allocated to groups of individuals, the independency of residuals is broken, as the individuals within the group are more alike than the individuals in different groups. For example, let's consider a field experiment: if one group of plots is, e.g., more fertile than the other groups, all plots within that group will share such a positive effect and, therefore, their yields will be correlated. In this case, we talk about **intra-class correlation**, that is a similar concept to the Pearson correlation, which we have encountered in Chapter 3.
+Although the previous chapters have covered the analysis of data from a wide array of agricultural experiments, there are still a few important situations, which require some more advanced knowledge. In particular, we have, so far, encountered only the so-called *fixed factors*. An experimental factor is 'fixed' when its levels are purposely selected (not sampled), repeatable (we could make a new experiment with the very same levels) and of unique and direct interest, in the sense that we are not interested in any other level apart from those we have decided to include in the experiment. As we have seen in the previous chapters, fixed factors produce fixed effects, which can be expressed as differences (increases/decreases) with respect to the overall mean. Models containing only fixed effects and the residual random error term are named **fixed models**.
+
+Apart from fixed factors, experiments in agriculture and biology may require the inclusion of *random factors*, that produce effects of random nature. An experimental factor is 'random' when its levels are not interesting in themselves, but they are sampled from a wider population of possible levels. Even if the levels are selected on purpose, they are, anyway, not 'repeatable' in the sense that, if we repeat the experiment, we cannot select the very same factor levels.
+
+As an example of a random factor, we can imagine that we are interested in studying the variability of yield in a certain environment and, to this aim, we sample twenty representative fields at random within that environment to measure the yield level. The field factor is random, in the sense that we are not specifically interested in those twenty fields, but we are interested in the overall variability that the field effect produces on yield. Provided that the levels of the yield factor are not interesting in themselves, estimating their fixed effects (increase/decrease with respect to the overall mean) is meaningless; on the contrary, we are more interested in estimating the amount of variability, as measured by the corresponding variance (*variance component*). Models containing random factors together with fixed factors and the residual error term are named **mixed models** and, since the advent of personal computers in the 70s of the previous century, they represent a very important class of models, which require specific algorithms and fitting methods.
+
+Mixed models are far beyond the scope of this book; for those who are interested in this subject, we recommend the wonderful book 'Linear mixed-effects models using R: a step-by-step approach' (Gałecki and Burzykowski, 2013). In this chapter we will only give a few examples relating to several common types of field experiments, that require the inclusion of random effects and, thus, the adoption of mixed models.
+
+## Split-plot or strip-plot experiments
+
+We have seen in Chapter 2 that factorial experiments can be designed as split-plots or strip-plots, where treatment levels are allocated to the experimental units in groups. We have seen that this is advantageous in some circumstances, e.g., when one of the factors is better allocated to bigger plots, compared to the other factor. When factor levels are allocated to groups of individuals, the independency of residuals is broken, as the individuals within the group are more alike than the individuals in different groups. For example, let's consider a field experiment: if one group of plots is, e.g., more fertile than the other groups, all plots within that group will share such a positive effect and, therefore, their yields will be correlated. In this case, we talk about *intra-class correlation*, that is a similar concept to the Pearson correlation, which we have encountered in Chapter 3.
 
 In order to respect the basic assumption of independent residuals, data from  split-plot and strip-plot experiments cannot be analysed by using the methods proposed in Chapter 11 (multi-way ANOVA models), but they require a different approach.
 
@@ -5057,7 +5158,7 @@ By looking at the map in Figure \@ref(fig:figName38), it is easy to see that the
 1. each replicate of the six combinations was allocated to each block
 2. the two weed control methods were allocated to each main plot
 
-As the consequence, apart from treatment factors, we have two blocking factors, i.e. the blocks and the main-plots within each block; Both this blocking factors should be included in the model, in order to ensure the independence of residuals.
+As the consequence, apart from treatment factors, we have two blocking factors, i.e. the blocks and the main-plots within each block; both this blocking factors should be included in the model, in order to ensure the independence of residuals.
 
 #### Model definition
 
@@ -5067,13 +5168,9 @@ $$Y_{ijk} = \mu + \gamma_k + \alpha_i + \theta_{ik} + \beta_j + \alpha\beta_{ij}
 
 where $\gamma$ is the effect of the $k$^th^ block, $\alpha$ is the effect of the $i$^th^ tillage, $\beta$ is the effect of $j$^th^ weed control method, $\alpha\beta$ is the interaction between the $i$^th^ tillage method and $j$^th^  weed control method. Apart from these effects, which are totally the same as those used in Chapter 11, we also include the main-plot effect $\theta$, where we use the $i$ and $k$ subscripts, as each main-plot is uniquely identified by the block to which it belongs and by the tillage method with which it was treated (see Figure \@ref(fig:figName38)). Obviously, the main plots can be labelled in any other way, as long as each one is uniquely identified.
 
-Now, let's concentrate on the main-plots and forget the sub-plots for awhile; we see that the split-plot design in Figure \@ref(fig:figName38), without considering the sub-plots, is totally similar to a Randomised Complete Block Design. Consequently, the differences between main-plots treated alike (same tillage method), once the block effect has been removed, are only due to random factors, as there is no other known systematic source of variability. Furthermore, the levels of the tillage factor were independently allocated to main-plots, which, therefore, represent true-replicates for this factor. For these reasons, we say that the **main-plot effect is random**.
+Now, let's concentrate on the main-plots and forget the sub-plots for awhile; we see that the split-plot design in Figure \@ref(fig:figName38), without considering the sub-plots, is totally similar to a Randomised Complete Block Design. Consequently, we are not really interested in the main-plots we have included in the experiment, they are simply a random sample selected from a wider universe. Furthermore, the differences between main-plots treated alike (same tillage method), once the block effect has been removed, are only due to random factors, as there is no other known systematic source of variability. Last, but not least, the levels of the tillage factor were independently allocated to main-plots, which, therefore, represent true-replicates for this factor. If we consider all previous comments, we have to conclude that the main-plot factor has to be regarded as a random factor.
 
-Apart from the main-plot effect, the differences between sub-plots treated alike (same 'tillage by weed control method' combination) are only due to random effects (unknown sources of variability); therefore, **the sub-plot effect is also random**.
-
-In the end, in split-plot designs we have two random effects: $\theta$ (main-plot effect) and $\varepsilon$ (sub-plot effect), which are assumed as gaussian, with means equal to 0 and standard deviations equal to, respectively, $\sigma_{\theta}$ and $\sigma$. Models with more than one random effect are named **mixed models** and, consequently, data from split-plot designs need to be modelled by using a mixed model.
-
-The platform of mixed models is very important and, for a number of reasons, it is conceptually very different from the usual platform of fixed effects models. We do not intend to introduce mixed models in this book, but we thought that it might be appropriate to show how to fit split-plot (and strip-plot) models and how to interpret the resulting R output. Indeed, split-plot (and strip-plot) experiments are rather common in agriculture and plant breeding.
+Likewise, the subplot effect is also random, as subplots were sampled from a wider universe and the differences between sub-plots treated alike (same 'tillage by weed control method' combination) are only due to random effects (unknown sources of variability). In the end, in split-plot designs we have two random factors and, consequently, two random effects: $\theta$ (main-plot effect) and $\varepsilon$ (sub-plot effect), which are assumed as gaussian, with means equal to 0 and standard deviations equal to, respectively, $\sigma_{\theta}$ and $\sigma$. Therefore, we need to fit a mixed model.
 
 
 #### Model fitting with R
@@ -5085,7 +5182,7 @@ First of all, we need to build a new variable to uniquely identify the main plot
 dataset$mainPlot <- with(dataset, factor(Block:Tillage))
 ```
 
-Due to the presence of two random effects, we cannot use the `lm()` function for model fitting, which is only able to accomodate one residual random term. In R, there are several mixed model fitting function; in this book, we propose the use of the `lmer()` function, which requires two additional packages, i.e. 'lme4' and 'lmerTest', which we need to install,  unless we have already done so. These two packages need to be loaded in the environment before model fitting.
+Due to the presence of two random effects, we cannot use the `lm()` function for model fitting, which is only able to accomodate one residual random term. In R, there are several mixed model fitting function; in this book, we propose the use of the `lmer()` function, which requires two additional packages, i.e. 'lme4' and 'lmerTest'. These two packages need to be installed, unless we have already done so and loaded in the environment before model fitting.
 
 The syntax of the `lmer()` function is rather similar to that of the `lm()` function, although the random main-plot effect is entered by using the '1|' operator and it is put in brackets, in order to better mark the difference with fixed effects. See the box below for the exact coding.
 
@@ -5155,9 +5252,9 @@ multcomp::cld(meansAB, Letters = LETTERS)
 ## Confidence level used: 0.95 
 ## P value adjustment: tukey method for comparing a family of 6 estimates 
 ## significance level used: alpha = 0.05 
-## NOTE: Compact letter displays can be misleading
-##       because they show NON-findings rather than findings.
-##       Consider using 'pairs()', 'pwpp()', or 'pwpm()' instead.
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.
 ```
 
 We see that we should avoid controlling the weeds only along the crop rows, if we have not plowed the soil, at least to a shallow depth.
@@ -5229,25 +5326,682 @@ anova(model.strip, ddf = "Kenward-Roger")
 
 We see that only the crop effect is significant and, thus, we can be reasonably sure that the herbicide did not provoke unwanted carry-over effects to the crops sown in treated soil 40 days after the treatment.
 
-## Subsampling designs
+## Sub-sampling designs
 
-To be added
+Sub-sampling is another very common practice in field experiments. It happens when we collect several random samples from each plot and we submit them to some sort of measurement process. An example is shown in Figure \@ref(fig:figName13.1): we have a latin square design with four treatment levels and four replicates and, for each plot, we collect four subsamples from the grain yield and submit them separately to the determination of, e.g., oil content. 
 
-## Repeated measures in perennial crops
+<div class="figure" style="text-align: center">
+<img src="_images/subsampling2.png" alt="An example of subsampling: from the grain yield of each plot, four samples are randomly collected and separately submitted to chemical analyses" width="90%" />
+<p class="caption">(\#fig:figName13.2)An example of subsampling: from the grain yield of each plot, four samples are randomly collected and separately submitted to chemical analyses</p>
+</div>
 
-To be added
+The presence of sub-samples is a good thing, as long as true-replicates are also available. It must be clear, as we discussed in Chapter 2, that sub-samples are not to be regarded as true replicates, because the experimental treatments were not independently allocated to each of them. The four sub-samples must be regarded as sub-replicates (or pseudo-replicates) and, in absence of true-replicates, the design is to be considered as invalid. 
+
+### Example 3: A RCBD with sub-sampling
+
+Let's consider a dataset from an experiment where we had 30 genotypes in three blocks and recorded the Weight of Thousand Kernels (TKW) in three sub-samples per plot. This dataset contains the 'Sample' variable, that is used to label the three samples in each plot. In the box below, we load the 'TKW' dataset from the usual repository and transform all the explanatory variables into factors.
+
+
+```r
+rm(list=ls())
+library(nlme)
+library(emmeans)
+
+filePath <- "https://www.casaonofri.it/_datasets/TKW.csv"
+TKW <- read.csv(filePath)
+TKW$Block <- factor(TKW$Block)
+TKW$Genotype <- factor(TKW$Genotype)
+TKW$Sample <- factor(TKW$Sample)
+head(TKW)
+##   Plot Block  Genotype Sample  TKW
+## 1    1     1 Meridiano      1 28.6
+## 2    2     1     Solex      1 33.3
+## 3    3     1  Liberdur      1 22.3
+## 4    4     1  Virgilio      1 28.1
+## 5    5     1   PR22D40      1 26.7
+## 6    6     1    Ciccio      1 34.2
+```
+
+It may be useful to look at the 'naive' analysis, that makes no distinction between true-replicates and sub-replicates and, consequently, regard the design as a RCB with 9 replicates.
+
+
+
+```r
+# Naive analysis
+mod <- lm(TKW ~ Block + Genotype, data=TKW)
+anova(mod)
+## Analysis of Variance Table
+## 
+## Response: TKW
+##            Df Sum Sq Mean Sq F value    Pr(>F)    
+## Block       2  110.3  55.169   7.510 0.0006875 ***
+## Genotype   29 7224.7 249.129  33.913 < 2.2e-16 ***
+## Residuals 238 1748.4   7.346                      
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+summary(mod)$sigma
+## [1] 2.710373
+pairwise <- as.data.frame(pairs(emmeans(mod, ~Genotype)))
+sum(pairwise$p.value < 0.05)
+## [1] 225
+```
+
+We see that the Root Mean Square Error is 2.71, the F test for the genotypes is highly significant and there are 225 significant pairwise comparisons among the 30 genotypes.
+
+#### Model definition
+
+The above analysis is simple, but it is also **terribly wrong**. By putting true-replicates and pseudo-replicates on an equal footing, we have forgotten that the 270 observations are grouped by plot and that the observations in the same plot are more alike than the observations in different plots, because they share the same 'origin'. In other words, the observations in each plot are correlated and, therefore, the basic assumption of independence of residuals is broken. Furthermore, we pretend a higher degree of precision then we actually have: the three sub-samples are correlated and they do not contribute three full pieces of information.
+
+A fully correct model must make the distinction between replicates and sub-replicates, by including an extra-term for the plots, that are the 'grouping' units:
+
+$$ Y_{ijks} = \mu + \alpha_i + \beta_j + \gamma_{k} + \varepsilon_{s}$$
+
+In the above model, $Y$ is the thousand kernel weight for the i^th^ genotype, j^th^ block, k^th^ plot and s^th^ sub-sample, $\alpha$ is the effect of the i^th^ genotype, $\beta$ is the effect of the j^th^ block, $\gamma$ is the effect of the the k^th^ plot and $\varepsilon$ is the effect of the s^th^ subsample. The presence of the $\gamma$ element accounts for the the plot-to-plot differences, so that the independence of model residuals is restored.
+
+Obviously, the difference between plots (for a given genotype and block) must be regarded as purely random, as well as the difference between subplots, within each plot. Consequently, this is a mixed model: the two variance components are $\sigma^2_p$ and $\sigma^2_e$ and we see that the second one is much smaller, as it does not contain some important sources of experimental error, such as the variability due to the soil, or to the cropping practices. Obviously the first component should be given the proper weight when building the correct error term to test for the genotypes.
+
+#### Model fitting with R
+
+We can fit this mixed model by using the `lmer()` function in the `lme4` package.
+
+
+```r
+# Mixed model fit
+mod.mix <- lmer(TKW ~ Block + Genotype + (1|Plot), data=TKW)
+print(VarCorr(mod.mix), comp = "Variance")
+##  Groups   Name        Variance
+##  Plot     (Intercept) 8.89201 
+##  Residual             0.84526
+anova(mod.mix, ddf = "Kenward-Roger")
+## Type III Analysis of Variance Table with Kenward-Roger's method
+##           Sum Sq Mean Sq NumDF DenDF F value    Pr(>F)    
+## Block      3.389  1.6944     2    58  2.0046    0.1439    
+## Genotype 221.892  7.6515    29    58  9.0522 9.944e-13 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+pairwise <- as.data.frame(pairs(emmeans(mod.mix, ~Genotype)))
+sum(pairwise$p.value < 0.05)
+## [1] 91
+```
+
+We do not show the results of pairwise comparisons for the sake of brevity; however, we point out that there are several differences with respect to the previous 'naive' fit:
+
+1. in the 'naive' model, we have only one estimate for $\sigma^2$, that is 7.346 with 238 DF. In this case the correct term to test for the genotype effect is $\sigma^2_p$, that is equal to 8.892 with 58 DF. Clearly, the naive analysis strongly overestimates the number of DF: the observations taken in the same plot are correlated and they do not contribute full information.
+2. The RMSE for the mixed model is equal to 2.98 and it is higher than that from the 'naive' fit. The variability within plots is much smaller.
+3. The number of significant pairwise comparisons between genotypes has dropped to 91.
+
+#### A simpler alternative
+
+We strongly recommend the previous method of data analysis, but, whenever the number of sub-samples is the same for all plots, we can also reach correct results by proceeding in two-steps. In the first step, we calculate the means of sub-samples for each plot and, in the second step, we submit the plot means to ANOVA, by considering the genotype and the block as fixed factors. In the box below we can see that the results are exactly the same as with the mixed model fit.
+
+
+```r
+# First step
+TKWm <- aggregate(TKW ~ Block + Genotype, data = TKW, mean)
+
+#Second step
+mod2step <- lm(TKW ~ Genotype + Block, data = TKWm)
+anova(mod2step)
+## Analysis of Variance Table
+## 
+## Response: TKW
+##           Df  Sum Sq Mean Sq F value    Pr(>F)    
+## Genotype  29 2408.24  83.043  9.0522 9.943e-13 ***
+## Block      2   36.78  18.390  2.0046    0.1439    
+## Residuals 58  532.08   9.174                      
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 ## Repeated experiments
 
-To be added
+In Chapter 1 we mentioned that results need to be replicable and, hopefully, reproducible. The presence of true replicates ensures replicability, i.e. that the results can be reproduced in the same conditions. However, true replication does not ensure that the results are reproducible in different conditions.
 
----
+For this reason, experiments should be usually repeated in different runs, sites, years or, more generally, in different environments. This is a fundamental key to scientific progress in agriculture and permits sound generalisation; otherwise, the results are specific to the conditions in which they were obtained and their scope is rather limited. Multi-year or multi-site experiments are very common, e.g., in plant breeding and they may involve wide groups of research units across countries or continents. These research units usually employ a commone core of genotypes and the same experimental design (e.g.: randomised complete blocks with 3-4 replicates), while innovative genotypes are progressively introduced in each year and the old ones tend to be abandoned.
+
+Apart from genotype trials, all types of field experiments should be usually repeated at least in two-three different environments (sites or years) to have a minimum appraisal of the reproducibility of results. More generally, we should not underrate the importance of repeating all types of experiments, including those performed in the greenhouse or in controlled conditions, especially when we make use of sampled units from populations with a high degree of spatial or temporal variability (e.g.: seeds, plants, leaves and so on). Based on our experience, we suggest that the variability of results across different runs of the same experiment may be pretty high and, therefore, we argue that a single experiment in agriculture proves nothing.
+
+### A model for pooling the results
+
+In general, each repeated experiment produces data that can be analysed on its own, by using one of the methods described in the previous chapters. However, a pooled analysis is in order, to consolidate the results over the runs and assess their reproducibility. When we pool a set of one-factor experiments, the pooled dataset becomes similar to a two-factor factorial experiment; analogously to what we have described in Chapter 11, a possible model is:
+
+$$ y_{ijk} = \mu + \alpha_i + \beta_j + \alpha\beta_{ij} + \varepsilon_{ijk}$$
+
+where $y$ is the response for the i^th^ run, j^th^ treatment level and k^th^ replicate, $\mu$ is the intercept (the overall mean, when the sum-to-zero constraint is adopted), $\alpha$ is the effect of the i^th^ run, $\beta$ is the effect of the j^th^ treatment level, $\alpha\beta$ is the 'treatment x run' interaction effect and $\varepsilon$ is the residual random effect for each observation, which we assume as normally distributed ($\epsilon_{ijk} \sim N(0, \sigma_{\varepsilon})$)
+
+One difference with two-factor factorial experiments is that, when we repeat experiments laid down in complete blocks, we need to add to the model the term $\gamma_{ik}$, that is the effect of the k^th^ block in the i^th^ run. Indeed, the block effect is nested within runs, as the block levels are usually different in different runs.
+
+Obviously, if we need to pool a set of multi-factorial experiments, the model becomes more complex and we need to include all possible interactions between the treatment factors and their combinations with the run factor. For example, if we have a set of two-factor (A and B) factorial experiments, we need to consider the following effects (in R notation): 'A + B + A:B + A:run + B:run + A:B:run', that is equivalent to writing 'A * B * run'.
+
+### Preliminary analyses
+
+It is always convenient to start with a preliminary evaluation of each single experiment and, afterwards, perform a pooled fit. We would suggest this process:
+
+1.  fit an ANOVA model to each experiment (as shown in previous Chapters);
+2.  inspect the data to assess whether we have good data for all runs. Search for possible outliers and for heteroscedasticity of within-run errors (as shown in Chapter 8);
+3. if possible, fit a pooled model;
+4.  inspect the residuals from the pooled model, with particular reference to possible heteroscedasticy across runs.
+
+
+### Fixed or random runs?
+
+What is peculiar about repeated experiments is that we always need to take a decision about the nature of the run effect, whether it is 'fixed' or 'random'. Such decision is specific to each experiment and it is up to the researcher, who should give solid reasons to support it. It is not easy to give suggestions; as the rule of thumb, whenever the experiment is repeated in a small number of runs (e.g. 2 or 3), we could think of taking the run effect as fixed. Indeed, a reliable estimation of variance components requires that the number of levels for the random factor is sufficiently high (roughly 4, at least).  
+
+With field experiments repeated in a relatively high number of years/locations, the year effect seems to be reasonably random. Indeed, although the years are not sampled (we cannot sample years, we can only take them in the same order as they come), the effects they produce are not repeatable and they are clearly of random nature. On the other hand, the location effect is more dubious: sometimes, the locations are selected on purpose and they are interesting on themselves, so that the location effect is fixed. In other instances, locations are sampled to represent a macro-environment and, therefore, their effect is random.
+
+Selecting the run factor as fixed or random has an impact on the results of data analyses, as we will see in the following two examples.
+
+
+### Example 4: a seed germination experiment in two runs
+
+The germination of three genotypes of oilseed rape was assessed by a greenhouse bioassay with six replicated Petri dishes per genotype (18 dishes in total). Fifty seeds were put in each dish and the number of germinated seeds was counted after 15 days and expressed as the Final Proportion of Germinated seeds (FGP). The assay was repeated twice in slightly different conditions, because the environmental parameters in the greenhouse were not under full control. The results are online available as the 'FGP_rape.csv' text file and they can be loaded by using the code below. 
+
+
+```r
+fileName <- "https://www.casaonofri.it/_datasets/FGP_rape.csv"
+dataset <- read.csv(fileName)
+dataset[,1:5] <- lapply(dataset[,1:5], factor)
+```
+
+Preliminarily, in order to fit the ANOVA models to each single run, we can very much simplify the coding by using the 'by()' and 'lapply()' functions. The first one, operates on subsets of the selected dataset, according to a classification variable (the run, in this case) and produces a list with the resulting model objects. 'Lapply()' applies a function to all elements in a list and, in the following code, we used it to perform a Levene's test for homoscedasticity and a Shapiro-Wilks test for normality.
+
+
+
+```r
+library(MASS)
+lmFits <- by(dataset, dataset$Run,  
+      function(df) lm(FGP ~ Genotype, data = df) )
+
+# Check for within-experiments homoscedasticity/normality
+lapply(lmFits, function(mods) car::leveneTest(mods))
+## $`1`
+## Levene's Test for Homogeneity of Variance (center = median)
+##       Df F value Pr(>F)
+## group  2  2.6856 0.1007
+##       15               
+## 
+## $`2`
+## Levene's Test for Homogeneity of Variance (center = median)
+##       Df F value Pr(>F)
+## group  2   1.222 0.3224
+##       15
+lapply(lmFits, function(mods) shapiro.test(residuals(mods)))
+## $`1`
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  residuals(mods)
+## W = 0.94221, p-value = 0.316
+## 
+## 
+## $`2`
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  residuals(mods)
+## W = 0.93291, p-value = 0.2184
+# Variance partitioning
+lapply(lmFits, function(mods) anova(mods))
+## $`1`
+## Analysis of Variance Table
+## 
+## Response: FGP
+##           Df   Sum Sq   Mean Sq F value   Pr(>F)   
+## Genotype   2 0.033011 0.0165056  8.1353 0.004047 **
+## Residuals 15 0.030433 0.0020289                    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## $`2`
+## Analysis of Variance Table
+## 
+## Response: FGP
+##           Df   Sum Sq   Mean Sq F value    Pr(>F)    
+## Genotype   2 0.042544 0.0212722   22.34 3.177e-05 ***
+## Residuals 15 0.014283 0.0009522                      
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+The previous results demonstrate that the basic assumptions for linear models are reasonably met and that the two assays produced significant results, in relation to the genotype effect. Therefore, we move on to pooling the data from the two experiments.
+
+#### Model fitting with R
+
+As we have only two runs in similar (not totally equivalent) environmental conditions, it might be appropriate to regard the 'run' effect as fixed: are the results comparable across these two specific runs? Consequently, we have a fixed effects model, that can be fitted by using the `lm()` function, as shown in the box below:
+
+
+```r
+mod <- lm(FGP ~ Genotype * Run, data = dataset)
+```
+
+Before looking at the results, we need to check the whole model and, in particular, we need to check that the residuals from the different runs have homogeneous variances. We do so by using a likelihood approach that is available in the 'check.hom()' function in the aomisc package. 
+
+
+```r
+library(nlme)
+library(aomisc)
+## Loading required package: drc
+## Loading required package: drcData
+## 
+## 'drc' has been loaded.
+## Please cite R and 'drc' if used for a publication,
+## for references type 'citation()' and 'citation('drc')'.
+## 
+## Attaching package: 'drc'
+## The following objects are masked from 'package:stats':
+## 
+##     gaussian, getInitial
+## Loading required package: plyr
+## --------------------------------------------------------------------
+## You have loaded plyr after dplyr - this is likely to cause problems.
+## If you need functions from both plyr and dplyr, please load plyr first, then dplyr:
+## library(plyr); library(dplyr)
+## --------------------------------------------------------------------
+## 
+## Attaching package: 'plyr'
+## The following objects are masked from 'package:reshape':
+## 
+##     rename, round_any
+## The following objects are masked from 'package:dplyr':
+## 
+##     arrange, count, desc, failwith, id, mutate, rename,
+##     summarise, summarize
+## Loading required package: car
+## Loading required package: carData
+## 
+## Attaching package: 'car'
+## The following object is masked from 'package:dplyr':
+## 
+##     recode
+## Loading required package: multcompView
+## Registered S3 method overwritten by 'aomisc':
+##   method   from
+##   plot.nls nlme
+check <- check.hom(mod, Run)
+check$aovtable
+##      Model df       AIC       BIC   logLik   Test  L.Ratio p-value
+## mod1     1  7 -85.37132 -75.56294 49.68566                        
+## mod2     2  8 -85.46782 -74.25824 50.73391 1 vs 2 2.096495  0.1476
+```
+
+We see that the null hypothesis of no heteroscedasticity of residuals across runs can be accepted and, therefore, we inspect the ANOVA table for the model fit.
+
+
+
+
+
+
+```r
+anova(mod)
+## Analysis of Variance Table
+## 
+## Response: FGP
+##              Df   Sum Sq  Mean Sq F value    Pr(>F)    
+## Genotype      2 0.074289 0.037144 24.9199 4.203e-07 ***
+## Run           1 0.003025 0.003025  2.0294    0.1646    
+## Genotype:Run  2 0.001267 0.000633  0.4249    0.6577    
+## Residuals    30 0.044717 0.001491                      
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+In general, inspecting the ANOVA table gives us the possibility of veryifing to what extent the results of the first run were reproducible in the second run. When the run effect is fixed, the interpretation is very much like that for a two-factor factorial experiment; indeed, we can encounter the following situations:
+
+1. the 'run by treatment' interaction is significant. In this case, we ought to conclude that the effects of treatment levels and, possibly, their ranking, changed in each run. Consequently, the results of our experiment were not reproducible and it makes no sense to try to pool them: **we should only display and compare the means of treatment levels within each environment/run**. 
+2. The interaction is not significant, but the run main effect is significant. We ought to conclude that the treatment effect and the run effect were independent and additive; consequently, the means for treatment levels changed across repetitions, but treatment effects were fully reproducible. It is up to the researcher to decide whether it is appropriate and meaningful to calculate and display the means for treatment levels.
+3. Neither the interaction, nor the run main effects are significant. The results of the repeated experiments are fully reproducible and it is usually appropriate to report only the means for treatment levels.
+
+For our example, we see that the 'run' and 'run by treatment' effects are not significant, which means that the results are fully reproducible. Therefore, we are allowed to pool the two runs and compare the genotypes across runs, by using the usual 'emmeans()' function in the 'emmeans()' package.
+
+
+```r
+library(emmeans)
+library(multcomp)
+## Loading required package: mvtnorm
+## Loading required package: survival
+## Loading required package: TH.data
+## 
+## Attaching package: 'TH.data'
+## The following object is masked from 'package:MASS':
+## 
+##     geyser
+cld(emmeans(mod, ~ Genotype), Letters = LETTERS)
+## NOTE: Results may be misleading due to involvement in interactions
+##  Genotype emmean     SE df lower.CL upper.CL .group
+##  C         0.781 0.0111 30    0.758    0.804  A    
+##  A         0.871 0.0111 30    0.848    0.894   B   
+##  B         0.882 0.0111 30    0.860    0.905   B   
+## 
+## Results are averaged over the levels of: Run 
+## Confidence level used: 0.95 
+## P value adjustment: tukey method for comparing a family of 3 estimates 
+## significance level used: alpha = 0.05 
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.
+```
+
+
+### Example 5: a multi-year winter wheat experiment
+
+Let's consider a field experiment to compare eight winter wheat genotypes, laid down in complete blocks, with three replicates. The experiment was repeated in seven years; please, note that part of this dataset has already been used for the example at Chapter 10. The response variable is the yield, in tons per hectare.
+
+
+```r
+rm(list = ls())
+fileName <- "https://www.casaonofri.it/_datasets/WinterWheat.csv"
+WinterWheat <- read.csv(fileName)
+WinterWheat$Block <- as.factor(WinterWheat$Block)
+WinterWheat$Year <- as.factor(WinterWheat$Year)
+head(WinterWheat, 8)
+##   Plot Block Genotype Yield Year
+## 1    2     1 COLOSSEO  6.73 1996
+## 2  110     2 COLOSSEO  6.96 1996
+## 3  181     3 COLOSSEO  5.35 1996
+## 4    2     1 COLOSSEO  6.26 1997
+## 5  110     2 COLOSSEO  7.01 1997
+## 6  181     3 COLOSSEO  6.11 1997
+## 7   17     1 COLOSSEO  6.75 1998
+## 8  110     2 COLOSSEO  6.82 1998
+```
+
+
+For the sake of simplicity and brevity, we disregard the preliminary analyses of each single experiment, which could be performed by using the same code as given for the previous example.
+
+#### Model fitting with R
+
+We have a relatively high number of years and, as we explained, the year effect is intrinsically of random nature, because it is 'not repeatable'. Therefore, we take the year effect as random and we assume that it is guassian, with mean equal 0 and standard deviation equal to $\sigma_E$:
+
+$$\alpha_i \sim N(0, \sigma_E)$$
+
+The corresponding variance ($\sigma^2_E$) is the so-called 'variance component' for the year effect. If the year is random, also the 'genotype x year' and the 'block|year' effects are random and they are defined as:
+
+$$\alpha\beta_{i,j} \sim N(0, \sigma_{GE})$$
+
+$$\gamma_{i,k} \sim N(0, \sigma_{EB})$$
+
+Before fitting a mixed model, we decide to fit a fixed model, for a preliminary evaluation of model residuals and to compare with the results of a mixed model fit.
+
+
+```r
+modfix <- lm(Yield ~ Year/Block + Genotype * Year,
+             data = WinterWheat)
+check <- check.hom(modfix, Year)
+check$aovtable
+##      Model df      AIC      BIC    logLik   Test  L.Ratio p-value
+## mod1     1 71 316.3539 499.8865 -87.17693                        
+## mod2     2 77 319.4480 518.4904 -82.72398 1 vs 2 8.905903  0.1789
+anova(modfix)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##               Df  Sum Sq Mean Sq  F value    Pr(>F)    
+## Year           6 159.279 26.5466 178.3996 < 2.2e-16 ***
+## Genotype       7  11.544  1.6491  11.0824 2.978e-10 ***
+## Year:Block    14   3.922  0.2801   1.8826   0.03738 *  
+## Year:Genotype 42  27.713  0.6598   4.4342 6.779e-10 ***
+## Residuals     98  14.583  0.1488                       
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+The previous box suggests that there is no problem with the heteroscedasticity of model residuals across years. The 'genotype by year' interaction is significant and, therefore, if the 'year effect' is taken as fixed, we could only compare genotypes within years, which is rather meaningless, due to the unreplicability of the year effect. Therefore, it is much more useful to switch to a mixed model fit.
+
+This latter can be fitted by using the `lmer()` function, as shown below:
+
+
+```r
+mod <- lmer(Yield ~ (1|Year) + (1|Year:Block) + Genotype +
+               (1|Year:Genotype),
+             data = WinterWheat)
+```
+
+
+
+
+
+First of all, we inspect the estimates of variance components, because they represent the sources of random variability. With balanced data (as in this case), these variance components could also be obtained by using the method of moments, starting from the ANOVA table from a fixed model fit:
+
+$$\sigma^2_{\varepsilon} = MS_{\varepsilon}$$
+
+$$ \sigma^2_{GE} = \frac{MS_{GE} - \sigma^2_{\varepsilon}}{n_B} = \frac{0.6598 - 0.1488}{3} = 0.1703$$
+
+$$ \sigma^2_{EB} = \frac{MS_{EB} - \sigma^2_{\varepsilon}}{n_G} = \frac{0.2801 - 0.1488}{8} = 0.0164$$
+
+$$ \sigma^2_{E} = \frac{MS_E - 8 \, \sigma^2_{EB} - 3 \, \sigma^2_{GE} -   \sigma^2_{\varepsilon}}{n_{GB}} = $$
+
+$$ = \frac{26.55 - 8 \times 0.0164 - 3 \times 0.1703 - 0.1488}{24} = 1.073$$
+
+where $n_B$, $n_G$ and $n_{GB}$ are, respectively, the number of blocks, the number of genotypes and the number of 'genotype by block' combinations, while $\textrm{MS}_{\varepsilon}$, $\textrm{MS}_E$, $\textrm{MS}_{EB}$ and $\textrm{MS}_{GE}$ are the mean squares from a fixed effect fit, respectively, for the residual error, the years, the blocks within years and the genotype by year interaction. However, the REstricted Maximum Likelihood (REML) estimates provided by the 'lmer()' function are simpler to obtain, also with unbalance data.
+
+
+```r
+# Variance components
+print( VarCorr(mod), comp=c("Variance", "Std.Dev.") )
+##  Groups        Name        Variance Std.Dev.
+##  Year:Genotype (Intercept) 0.170341 0.41272 
+##  Year:Block    (Intercept) 0.016418 0.12813 
+##  Year          (Intercept) 1.073146 1.03593 
+##  Residual                  0.148804 0.38575
+```
+
+The variance component estimates show that the overall yield variability is mainly due to the year effect (year-to-year variability: $\sigma_E = 1.04$), which was the same for all genotypes. This source of variability impacts on genotype mean yields (which changes depending on the year), but it does not impact on genotype effects and differences. Another important source of variability is the genotype-by-year interaction ($\sigma_{GE} = 0.41$), which is additional to the year-to-year variability and it is highly specific to each genotype. It impacts on genotype mean, but it also impact on genotype effects (and differences), that change depending on the years. The within year plot-to-plot variability is smaller ($\sigma = 0.39$), although it is clear that it impacts on genotype means, effects and differences. Last, block-to-block variability ($\sigma_{EB} = 0.13$) is the smallest component and, similarly to year-to-year variability, it is the same for all genotypes and it impacts only on their mean value across blocks.
+
+
+```r
+# ANOVA table
+anova(mod)
+## Type III Analysis of Variance Table with Satterthwaite's method
+##          Sum Sq Mean Sq NumDF DenDF F value  Pr(>F)  
+## Genotype 2.6033  0.3719     7    42  2.4993 0.03058 *
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+The ANOVA table only includes the genotype effect, because all other effects are random and it makes no sense to test for the existence of a significant difference between the means for the different factor levels. We see that the F ratio for the genotype effect is smaller than that from a fixed model fit, because it needs to consider, at the denominator, all the main sources of variability that can impact on the genotype effects (i.e.: plot-to-plot variability and the genotype-by-year interaction). In particular, the F ratio is obtained as:
+
+$$F = \frac{MS_G}{n_B \times \sigma^2_{GE} + \sigma^2_{\varepsilon}} = \frac{MS_G}{MS_{GE}} = \frac{1.6491}{0.6598} = 2.499$$
+
+
+When the year effect is random, we can always consider and compare the means of genotypes across years and we are not restrained by a significant genotype-by-year interaction. However, SEMs and SEDs are usually higher than those from a fixed model fit, because they have to consider all possible sources of variability. In particular, with a fixed effects model, the standard errors for the genotype means is ($r$ is the number of replicates and $n_e$ is the number of environments):
+
+$$SEM_f = \sqrt{ \frac{\sigma^2}{r\,n_e} } = \sqrt{ \frac{0.1488}{3 \cdot 7}} = 0.0842$$
+
+With mixed models, the SEM is calculated by considering all sources of random variability:
+
+$$SEM_m = \sqrt \frac{r \, \sigma^2_E  + \sigma^2_{EB} + r \sigma^2_{GE} + \sigma^2 }{re} = \sqrt \frac{3 \cdot 1.073  + 0.016 + 3 \cdot 0.170 + 0.1488 }{3 \cdot 7} = 0.431$$
+
+Likewise, the Standard Error of a Difference (SED), for the mixed model, is calculated by considering the plot-to-plot variability and the genotype-by-environment variability, while the year-to-year variability and the block-to-block variability are not considered, because they impact on all the means in the same way and, therefore, they do not impact on the differences. The expressions are:
+
+$$SED_f = \sqrt{2 \, \frac{\sigma^2}{r \, n_e} } \quad \quad SED_m = \sqrt {2 \, \frac{r \, \sigma^2_{ge}  + \sigma^2 }{r \, n_e} }$$
+
+Marginal means and significance letters can be easily obtained as shown in previous examples and chapters:
+
+
+
+```r
+cld(emmeans(mod, ~Genotype), Letters = letters,
+    adjust = "none")
+##  Genotype emmean    SE   df lower.CL upper.CL .group
+##  SIMETO     5.93 0.431 8.23     4.94     6.91  a    
+##  CRESO      5.97 0.431 8.23     4.99     6.96  a    
+##  GRAZIA     6.08 0.431 8.23     5.09     7.07  a    
+##  SANCARLO   6.22 0.431 8.23     5.23     7.21  ab   
+##  SOLEX      6.23 0.431 8.23     5.24     7.22  ab   
+##  COLOSSEO   6.41 0.431 8.23     5.43     7.40  ab   
+##  DUILIO     6.59 0.431 8.23     5.60     7.58   b   
+##  IRIDE      6.70 0.431 8.23     5.71     7.68   b   
+## 
+## Degrees-of-freedom method: kenward-roger 
+## Confidence level used: 0.95 
+## significance level used: alpha = 0.05 
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.
+```
+
+We see that the correction of multiplicity and the need to consider all sources of random yield variability, does not permit to prove the existence of any significant difference between genotypes.
+
+## Repeated measures in perennial crops
+
+With perennial crops measures are taken repeatedly in the same plots across years. For this reason, even though the dataset looks very much like that for the winter wheat experiment repeated in several years, it must be analysed in a totally different manner.
+
+In particular, we should not neglect that, in contrast to the winter wheat example, the observations are grouped within the same plots and, therefore, they are not independent, because the observations taken on the same plot are more alike than observations taken on different plots. We have seen a similar situation with the subsampling experiment given before, with an important difference: while subsamples were taken at random within each plot, repeated measures may not be sampled at random, they may be specifically taken to evaluate the yield in different moments of plant life.
+
+### Example 5: genotype experiment with lucerne
+
+Let's consider the dataset below, that refers to the yield of lucerne genotypes in three consecutive years, taken from the same plots in a single experiment lasting for three years. In the box below we load the data and make the necessary transformations. We also build a new variable to uniquely identify each plot, which is easy, considering that yield values taken for the same genotype in the same block must have been taken in the same plot.
+
+
+```r
+filePath <- "https://www.casaonofri.it/_datasets/alfalfa3years.csv"
+dataset <- read.csv(filePath)
+dataset$Block <- factor(dataset$Block)
+dataset$Genotype <- factor(dataset$Genotype)
+dataset$Year <- factor(dataset$Year)
+head(dataset)
+##   Block Genotype Year     Yield
+## 1     1 4cascine 2006  6.631775
+## 2     2 4cascine 2006  6.705397
+## 3     3 4cascine 2006  6.499588
+## 4     4 4cascine 2006  7.087686
+## 5     1 4cascine 2007 14.964927
+## 6     2 4cascine 2007 13.584865
+# Reference the plots
+dataset$Plot <- dataset$Block:dataset$Genotype
+```
+
+#### Model definition
+
+For repeated measures designs, models can be built by using the rules in Piepho et al. (2004):
+
+1. Consider one single year and build the treatment model
+2. Consider one single year and build the block model
+3. Include the year factor into the model and combine the year with all the effects in the treatment model, by crossing or nesting as appropriate. 
+4. Consider that the 'plot' factor in the block model references the randomisation units, i.e. those units which received the the genotypes by a randomisation process. Assign to this plot factor a random effect.
+5. Excluding the terms for randomisation units, nest the year in all the other terms in the block model.
+6. Combine random effects for randomisation units with the repeated factor, by using the colon operator, in order to derive the correct error terms to accommodate correlation structures.
+
+The models at the different steps are as follows (with R notation):
+
+1. treatment model: YIELD ~ GENOTYPE
+2. block model: YIELD ~ BLOCK + BLOCK:PLOT
+3. treatment model: YIELD ~ GENOTYPE * YEAR
+4. block model: YIELD ~ BLOCK + (1|BLOCK:PLOT)
+5. block model: YIELD ~ BLOCK + BLOCK:YEAR + (1|BLOCK:PLOT)
+6. block model: YIELD ~ BLOCK + BLOCK:YEAR + (1|BLOCK:PLOT) + (1|BLOCK:PLOT:YEAR)
+
+In this case, considering that lucerne lasts, on average, for three years and follows a specific pattern of yield across these three years, we decided to take the block, year and genotype effects as fixed; therefore, the final model, with R notation, is:
+
+YIELD ~ BLOCK + BLOCK:YEAR + GENOTYPE * YEAR + (1|BLOCK:PLOT) + (1|BLOCK:PLOT:YEAR)
+
+where the last term does not need to be fitted in R, as it is the residual term, that is fitted by default. The resulting analysis (with 'lmer') is:
+
+
+```r
+mod <- lmer(Yield ~ Block + Block:Year + Genotype*Year +
+            (1|Plot:Block),
+           data = dataset)
+anova(mod)
+## Type III Analysis of Variance Table with Satterthwaite's method
+##                Sum Sq Mean Sq NumDF DenDF   F value    Pr(>F)    
+## Block            3.96    1.32     3    57    2.1389  0.105316    
+## Genotype        54.00    2.84    19    57    4.6024  3.75e-06 ***
+## Year          2602.53 1301.27     2   114 2107.3223 < 2.2e-16 ***
+## Block:Year      14.14    2.36     6   114    3.8176  0.001667 ** 
+## Year:Genotype   31.83    0.84    38   114    1.3563  0.111546    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+emmeans(mod, ~Genotype)
+## NOTE: Results may be misleading due to involvement in interactions
+##  Genotype          emmean    SE df lower.CL upper.CL
+##  4cascine           11.59 0.315 57    10.96     12.2
+##  casalina           12.46 0.315 57    11.83     13.1
+##  classe             11.59 0.315 57    10.96     12.2
+##  costanza            9.89 0.315 57     9.26     10.5
+##  dimitra            11.75 0.315 57    11.12     12.4
+##  FDL0101            12.22 0.315 57    11.59     12.9
+##  garisenda          11.76 0.315 57    11.13     12.4
+##  LaBellaCampagnola  12.17 0.315 57    11.54     12.8
+##  LaTorre            11.36 0.315 57    10.73     12.0
+##  linfa              11.23 0.315 57    10.60     11.9
+##  marina             11.76 0.315 57    11.13     12.4
+##  Palladiana         10.89 0.315 57    10.26     11.5
+##  PicenaGR           12.12 0.315 57    11.49     12.8
+##  PR56S82            11.56 0.315 57    10.93     12.2
+##  PR57Q53            11.70 0.315 57    11.07     12.3
+##  prosementi         11.79 0.315 57    11.15     12.4
+##  RivieraVicentina    9.98 0.315 57     9.35     10.6
+##  robot              12.11 0.315 57    11.48     12.7
+##  Selene             12.11 0.315 57    11.48     12.7
+##  Zenith             11.94 0.315 57    11.31     12.6
+## 
+## Results are averaged over the levels of: Block, Year 
+## Degrees-of-freedom method: kenward-roger 
+## Confidence level used: 0.95
+```
+
+We see that the 'genotype x year' interaction is not significant, so that we can proceed to comparing the means of genotypes across years, which can be done with the 'emmeans()' function in the usual fashion.
+
+It may be useful to compare this analysis with a 'naive' (and wrong) analysis that neglects the repeated measures (i.e., that neglects the 'plot' random effect). Wee see big differences and, especially, we see that the SEs for genotype means are much higher in the correct analysis.
+
+
+```r
+mod2 <- lm(Yield ~ Year/Block + Genotype*Year, 
+           data = dataset)
+anova(mod2)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##                Df  Sum Sq Mean Sq   F value    Pr(>F)    
+## Year            2 2602.53 1301.27 1608.2407 < 2.2e-16 ***
+## Genotype       19  104.27    5.49    6.7824 4.256e-13 ***
+## Year:Block      9   21.80    2.42    2.9930  0.002449 ** 
+## Year:Genotype  38   31.83    0.84    1.0351  0.424687    
+## Residuals     171  138.36    0.81                        
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+emmeans(mod2, ~Genotype)
+## NOTE: A nesting structure was detected in the fitted model:
+##     Block %in% Year
+## NOTE: Results may be misleading due to involvement in interactions
+##  Genotype          emmean   SE  df lower.CL upper.CL
+##  4cascine           11.59 0.26 171    11.07     12.1
+##  casalina           12.46 0.26 171    11.94     13.0
+##  classe             11.59 0.26 171    11.08     12.1
+##  costanza            9.89 0.26 171     9.38     10.4
+##  dimitra            11.75 0.26 171    11.24     12.3
+##  FDL0101            12.22 0.26 171    11.71     12.7
+##  garisenda          11.76 0.26 171    11.24     12.3
+##  LaBellaCampagnola  12.17 0.26 171    11.66     12.7
+##  LaTorre            11.36 0.26 171    10.84     11.9
+##  linfa              11.23 0.26 171    10.72     11.7
+##  marina             11.76 0.26 171    11.25     12.3
+##  Palladiana         10.89 0.26 171    10.38     11.4
+##  PicenaGR           12.12 0.26 171    11.61     12.6
+##  PR56S82            11.56 0.26 171    11.05     12.1
+##  PR57Q53            11.70 0.26 171    11.19     12.2
+##  prosementi         11.79 0.26 171    11.27     12.3
+##  RivieraVicentina    9.98 0.26 171     9.47     10.5
+##  robot              12.11 0.26 171    11.59     12.6
+##  Selene             12.11 0.26 171    11.60     12.6
+##  Zenith             11.94 0.26 171    11.42     12.5
+## 
+## Results are averaged over the levels of: Block, Year 
+## Confidence level used: 0.95
+```
+
+We just want to conclude by saying that the above mixed model analyses regards the design as a sort of 'split-plot in time' and it is not necessarily correct, as it assumes that the within-plot correlation is the same for all pairs of observations, regardless of their distance in time. Further analyses might be necessary to assess whether serial correlation structures are necessary, although such an aspect is far beyond the scope of this book.
+
 
 ## Further readings
 
-1. Bates, D., Mächler, M., Bolker, B., Walker, S., 2015. Fitting Linear Mixed-Effects Models Using lme4. Journal of Statistical Software 67. https://doi.org/10.18637/jss.v067.i01
-2. Gałecki, A., Burzykowski, T., 2013. Linear mixed-effects models using R: a step-by-step approach. Springer, Berlin.
-3. Kuznetsova, A., Brockhoff, P.B., Christensen, H.B., 2017. lmerTest Package: Tests in Linear Mixed Effects Models. Journal of Statistical Software 82, 1--26.
+1. Annichiarico, P., 2002. Genotype x Environment Interactions - Challenges and Opportunities for Plant Breeding and Cultivar Recommendations. FAO, 1, 1-115 (This is on-line available. Just make a google search!)
+2. Bates, D., Mächler, M., Bolker, B., Walker, S., 2015. Fitting Linear Mixed-Effects Models Using lme4. Journal of Statistical Software 67. https://doi.org/10.18637/jss.v067.i01
+3. Gałecki, A., Burzykowski, T., 2013. Linear mixed-effects models using R: a step-by-step approach. Springer, Berlin.
+4. Kuznetsova, A., Brockhoff, P.B., Christensen, H.B., 2017. lmerTest Package: Tests in Linear Mixed Effects Models. Journal of Statistical Software 82, 1--26.
+5. Piepho, H.-P., Büchse, A., Richter, C., 2004. A Mixed Modelling Approach for Randomized Experiments with Repeated Measures. Journal of Agronomy and Crop Science 190, 230–247.
+
 
 
 
@@ -5258,6 +6012,10 @@ To be added
 <!--chapter:end:13-Eng_SplitStrip.Rmd-->
 
 # Nonlinear regression
+
+
+*The aim of science is to seek the simplest explanation of complex facts.  Seek simplicity and distrust it (A.N. Whitehead)*
+
 
 Biological processes, very rarely follow linear trends. Just think about how a crop grows, or responds to increasing doses of fertilisers/xenobiotics. Or, think about how an herbicide degrades in the soil, or about the germination pattern of a seed population. It is very easy to realise that curvilinear trends, asymptotes and/or inflection points are far more common, in nature. In practice, linear equations in biology are nothing more than a quick way to approximate a response over a very narrow range of the independent variable.
 
@@ -5468,8 +6226,8 @@ First of all, we check the basic assumptions of normality and homoscedasticity o
 
 ```r
 par(mfrow=c(1,2))
-plotnls(modNlin, which = 1)
-plotnls(modNlin, which = 2)
+plot(modNlin, which = 1)
+plot(modNlin, which = 2)
 ```
 
 <div class="figure" style="text-align: center">
@@ -5482,7 +6240,7 @@ Figure \@ref(fig:figName154) does not show any visible deviations and, thus, we 
 
 
 ```r
-plotnls(modNlin, type = "means",
+plot(modNlin, type = "means",
         xlab = "Time (d)", ylab = "Concentration (ng/g)")
 ```
 
@@ -5554,12 +6312,20 @@ In order to use this technique in R, we can use the `boxcox.nls()` method in the
 
 ```r
 bc <- boxcox(modNlin)
+```
+
+![](_main_files/figure-html/unnamed-chunk-205-1.png)<!-- -->
+
+```r
 bc$lambda
 ## $lambda
 ## [1] 0.8
 ## 
 ## $ci
 ## [1] 0.5619080 0.9637162
+## 
+## $loglik
+## [1] -31.55224
 ```
 
 
@@ -5579,9 +6345,17 @@ From Figure \@ref(fig:figName156), we see that the transformation is not require
 
 ```r
 modNlin3 <- boxcox(modNlin, lambda = 0.5)
+```
+
+![](_main_files/figure-html/unnamed-chunk-206-1.png)<!-- -->
+
+```r
 summary(modNlin3)
 ## 
-## Formula: bcFct1(Conc) ~ bcFct2(A * exp(-k * Time))
+## Estimated lambda: 0.5 
+## Confidence interval for lambda: [NA,NA]
+## 
+## Formula: newRes ~ eval(parse(text = newFormula), df)
 ## 
 ## Parameters:
 ##    Estimate Std. Error t value Pr(>|t|)    
@@ -5658,7 +6432,6 @@ gnlht(modNlin, func)
 The 'gnlht()' function provides standard errors based on the delta method, which we have already introduced in a previous chapter.
 
 
-
 --- 
 
 ## Further readings
@@ -5679,39 +6452,15 @@ The 'gnlht()' function provides standard errors based on the delta method, which
 
 # Exercises
 
-The following excercises are organised by section, each one corresponding to a book chapter. Use the exercises to verify your learning process, after studying each chapter and before proceeding to the next one. 
+This book was not intended to build a solid theoretical foundation in biometry, but it was mainly intended to give you the tools to organise experiments and analyse their results. Therefore, we propose a list of exercises and case studies, so that you can build some practical experience an this matter and evaluate how clear are the concepts exposed earlier in this book. The exercises are organised in sections and each section corresponds to one or more book chapters. In some cases you will need to enter small datasets in R, while, for the bigger datasets, we usually provide the related file in an external repository, so that you can load them in R, by using the appropriate function.
 
-## Introduction to biometry (ch. 1)
+## Designing experiments (ch. 1 to 2)
 
-### Question 1
+### Exercise 1
 
-What are the fundamental traits of a valid experiment?
+You have been requested to lay-out a breeding experiment, with 16 wheat genotypes, coded by using letters of the Roman alphabet. The aim is to determine which genotype is the best in a given environment.
 
-### Question 2
-
-What are the main steps of Galileo's scientific method?
-
-### Question 3
-
-What is the difference between systematic and random errors? Which of the two errors is most concerning?
-
-### Question 4
-
-What is the difference between true-replicates and pseudo-replicates?
-
-### Question 5
-
-What do we intend with the word 'confounding'? What is the role of 'confounding' in scientific experiments?
-
----
-
-## Designing experiments (ch. 2)
-
-### Excercise 1
-
-You have been requested to lay-out a breeding experiment, with 16 wheat genotypes, coded by using letters of the Roman alphabet. The aim is to determine which genotype behaves the best in a given environment.
-
-Write the experimental protocol, where you specify all the main elements of your project (subjects, variables, replicates, experimental design) and add the field map.
+Write the experimental protocol, where you specify all the main elements of your project (subjects, variables, replicates, experimental design) and draw the field map.
 
 ### Exercise 2
 
@@ -5720,7 +6469,6 @@ Describe the protocol of an experiment to determine the effect of sowing date (a
 ### Exercise 3
 
 Describe the protocol of an experiment to determine the effect of nitrogen dose on several wheat genotypes. Include all possible elements to assess whether the experiment is valid, describe the type of design and include the field map, showing all relevant information (including plot sizes and orientation in space). Motivate all your choices.
-
 
 
 ---
@@ -5733,7 +6481,7 @@ A chemical analysis was performed in triplicate, with the following results: 125
 
 ### Exercise 2
 
-Consider the Excel file 'rimsulfuron.csv' from [https://www.casaonofri.it/_datasets/rimsulfuron.csv](https://www.casaonofri.it/_datasets/rimsulfuron.csv) (you can either download it, or read it directly from the internet repository). This is a dataset relating to a field experiment to compare 14 herbicides and two untreated checks, with 4 replicates per treatment. The response variables are maize yield and weed coverage. Describe the dataset and show the results on a barplot, including some measure of variability. Check whether yield correlates to weed coverage and comment on the results.
+Consider the Excel file 'rimsulfuron.csv' from [https://www.casaonofri.it/_datasets/rimsulfuron.csv](https://www.casaonofri.it/_datasets/rimsulfuron.csv) (you can either download it, or read it directly from the web repository). This is a dataset relating to a field experiment to compare 14 herbicides and two untreated checks, with 4 replicates per treatment. The response variables are maize yield and weed coverage. Describe the dataset and show the results on a barplot, including some measure of variability. Check whether yield correlates to weed coverage and comment on the results.
 
 ### Exercise 3
 
@@ -5797,7 +6545,7 @@ Consider the relationship between crop yield and density, as shown in Exercise 2
 
 ---
 
-## Estimation of model parameters (ch. 5)
+## Interval estimation of model parameters (ch. 5)
 
 ### Exercise 1
 
@@ -5839,17 +6587,17 @@ A sample of 400 insects was sprayed with an insecticide and 136 individuals surv
 
 ### Exercise 1
 
-We have compared two herbicides for weed control in maize. With the first herbicide (A), we observed the following weed coverings: 9.3, 10.2, 9.7 %. With the second herbicide, we observedd: 12.6, 12.3 e 12.5 %. Are the means for the two herbicides significantly different (P < 0.05)?
+We have compared two herbicides for weed control in maize. With the first herbicide (A), we observed the following weed coverings: 9.3, 10.2, 9.7 %. With the second herbicide, we observed: 12.6, 12.3 and 12.5 %. Are the means for the two herbicides significantly different ($\alpha = 0.05$)?
 
 
 ### Exercise 2
 
-We have made an experiment to compare two fungicides A and B. The first fungicide was used to treat 200 fungi colonies and the number of surviving colonies was 180. B was used to treat 100 colonies and 50 of those survived. Is there a significant difference between the efficiacies of A and B (P < 0.05)?
+We have made an experiment to compare two fungicides A and B. The first fungicide was used to treat 200 fungi colonies and the number of surviving colonies was 180. B was used to treat 100 colonies and 50 of those survived. Is there a significant difference between the efficiacies of A and B ($\alpha = 0.05$)?
 
 
 ### Exercise 3
 
-A plant pathologist studied the crop performances with (A) and without (NT) a fungicide treatment. The results are as follows:
+A plant pathologist studied the crop performances with (A) and without (NT) a fungicide treatment. The results (yield in tons per hectar) are as follows:
 
     A    NT
   ----- ----
@@ -5857,11 +6605,11 @@ A plant pathologist studied the crop performances with (A) and without (NT) a fu
    71    51
    68    59
 
-Was the treatment effect significant (P < 0.05)?
+Was the treatment effect significant ($\alpha = 0.05$)?
 
 ### Exercise 4
 
-In this year, an assay showed that 600 olive drupes out of 750 were attacked by  *Daucus olee*. In a close field, under the same environmental conditions, the count of attacked drupes was 120 on 750. Is the the observed difference statistically significant (P < 0.05) or is it just due to random fluctuation?
+In this year, an assay showed that 600 olive drupes out of 750 were attacked by  *Daucus olee*. In a close field, under the same environmental conditions, the count of attacked drupes was 120 on 750. Is the the observed difference statistically significant ($\alpha = 0.05$) or is it just due to random fluctuation?
 
 ### Exercise 5
 
@@ -5878,7 +6626,7 @@ In a hospital, blood cholesterol level was measured for eight patients, before a
            7      161.5      112.4
            8      243.6      190.5
 
-Can we say that this terapy is effective, or not?
+Can we say that this terapy is effective, or  ($\alpha = 0.05$)?
 
 ### Exercise 6
 
@@ -5900,7 +6648,7 @@ A plant breeder organised an experiment to compare three wheat genotypes, i.e. G
 
 1. Describe the three samples, by using the appropriate statistics of central tendency and spread
 2. Infere the means of the pupulations from where the samples were drawn
-3. For each of the three possible couples (GUERCINO vs ARNOVA, GUERCINO vs BOLOGNA and ARNOVA vs BOLOGNA), test the hypothesis that the two means are significantly different.
+3. For each of the three possible couples (GUERCINO vs ARNOVA, GUERCINO vs BOLOGNA and ARNOVA vs BOLOGNA), test the hypothesis that the two means are significantly different ($\alpha = 0.05$).
 
 
 
@@ -5910,16 +6658,54 @@ A plant breeder organised an experiment to compare three wheat genotypes, i.e. G
 A botanist counted the number of germinated seeds for oilseed rape at two different temperatures (15 and 25°C). At 15°C, 358 germinations were counted out of 400 seeds. At 25°C, 286 germinations were counted out of 380 seeds.
 
 1. Describe the proportions of germination for the three samples
-2. Infere the proportion of germinated seeds in the two populations, from where the samples of seeds were extracted (remember that the variance for a proportion is calculated as $p \times (1- p)$.
+2. Infere the proportion of germinated seeds in the two populations, from where the samples of seeds were extracted (remember that the variance for a proportion is calculated as $p \times (1- p)$).
 3. Test the hypothesis that temperature had a significant effect on the germinability of oilseed rape seeds.
 
 
 
 ---
 
+## Fitting models to data from agriculture experiments
+
+In the following sections we include several case studies that imply a process of model fitting. In most of the cases, these datasets are taken from real experiments and your main aim should be to learn something from those datasets, by asking the right questions. Therefore, do not limit yourself to producing the right statistics and writing the correct R coding, but try to use the statistical tools you have built up to obtain the answers for your questions.
+
+Please, follow the  workplan outlined below.
+
+1. Load the data and make the necessary transformations.
+2. Describe the data, by calculating, at least, the means and standard deviations for the experimental groups. This is usually called 'Initial Data Analysis' (IDA) and it is meant to get an idea about the main traits of the data at hand.
+3. Specify the model, explain its components and fit the model into the data.
+4. Check the model for the basic assumptions and, if necessary, adopt the appropriate correcting measures and re-fit the model
+5. Test the significance of all effects, by using the appropriate variance partitioning.
+6. If it is appropriate, compare the means for the most relevant effects.
+7. Present the results and comment on them
+
+The datasets for the following cases studies are bigger than the ones you met so far and you may not like to enter all the data in R. Therefore, we put all the datasets at your disposal in an Excel file, which you can download from the following link [https://www.casaonofri.it/_datasets/BookExercises.xlsx](https://www.casaonofri.it/_datasets/BookExercises.xlsx). Each dataset is in a different sheet and the sheet names are given in each exercise, so that you can load them by using the 'readxl()' function.
+
+In order to ease you mind, we provide a summary table with the models described in this book and the R coding to fit them.
+
+
+Table: (\#tab:unnamed-chunk-218)Summary of main models to describe the results of experiments in agriculture
+
+|Model                    |Design                         |R.function  |Specification                                 |
+|:------------------------|:------------------------------|:-----------|:---------------------------------------------|
+|One-way ANOVA            |CRD                            |lm()        |Y ~ F1                                        |
+|One-way ANOVA            |CRBD                           |lm()        |Y ~ F1 + BL                                   |
+|Two-way ANOVA            |CRD                            |lm()        |Y ~ F1 * F2                                   |
+|Two-way ANOVA            |CRBD                           |lm()        |Y ~ F1 * F2 + BL                              |
+|Two-way ANOVA            |Split-plot CRD                 |lmer()      |Y ~ F1 * F2 + (1&#124;MAIN)                   |
+|Two-way ANOVA            |Split-plot CRBD                |lmer()      |Y ~ F1 * F2 + BL + (1&#124;MAIN)              |
+|Two-way ANOVA            |Strip-plot CRD                 |lmer()      |Y ~ F1 * F2 + (1&#124;ROW) + (1&#124;COL)     |
+|Two-way ANOVA            |Strip-plot CRBD                |lmer()      |Y ~ F1 * F2 + BL + (1&#124;ROW + (1&#124;COL) |
+|One-way ANOVA            |One-way CRD, two environments  |lm()/lmer() |Y ~ F1 * ENV                                  |
+|One-way ANOVA            |One-way CRBD, two environments |lm()/lmer() |Y ~ F1 * ENV + BL&#124;ENV                    |
+|Simple Linear Regression |CRD                            |lm()        |Y ~ X1                                        |
+|Simple Linear Regression |CRBD                           |lm()        |Y ~ X1 + BL                                   |
+
+In the table above, Y is the response variable, that is always continuous/discrete, F1 and F2 are the names of two experimental factors (nominal variables), while X1 is the name of a covariate (continuous variable). BL is the block variable (factor), ENV is the environment variable (factor) and MAIN, ROW, COL are, respectively, the variables (factors) that represent the main plots in a split-plot design and the rows/columns in a strip-plot design.
+
+
 ## One-way ANOVA models (ch. 7 to 9)
 
-The following exercises are based on slightly more complex datasets. You may not like to enter all the data in R and, therefore, we put all the dataset at your disposal in an Excel file, which you can download from the following link [https://www.casaonofri.it/_datasets/BookExercises.xlsx](https://www.casaonofri.it/_datasets/BookExercises.xlsx). Each dataset is in a different sheet and the sheet names are given in each exercise.
 
 ### Exercise 1
 
@@ -5935,13 +6721,8 @@ An experiment was conducted with a completely randomised design to compare the y
       E     | 21.7 |  24.5  | 23.4 |
 
 
-1. Write the linear model for this study and explain the model components
-2. Compute the ANOVA
-3. Check for the basic assumptions
-4. Compare the means
-5. Present the results and comment on them
+The example is taken from: Le Clerg *et al*. (1962).
 
-The example is taken from: Le Clerg *et al*. (1962)    
 [Sheet: 7.1]
 
 ### Exercise 2
@@ -5956,11 +6737,6 @@ Control | Glucose | Fructose | Sucrose |
 45 | 29 | 28 | 33 |
 42 | 33 | 27 | 34 |
 
-1. Write the linear model for this study and explain the model components
-2. Compute the ANOVA
-3. Check for the basic assumptions
-4. Compare the means
-5. Present the results and comment on them   
 [Sheet: 7.2]
 
 
@@ -5996,7 +6772,8 @@ The results are as follows:
      1708                688
      1708                729
 
-Please, note that these are the only possible values for temperature. Determine the best operating temperature, in order to delay failure.    
+Regard the temperature as a factor and determine the best operating temperature, in order to delay failure.
+
 [Sheet: 7.3]
 
 ### Exercise 4
@@ -6026,7 +6803,7 @@ Which is the most resistant genotype?
 
 ---
 
-## Multy-way ANOVA models (ch. 10)
+## Multi-way ANOVA models (ch. 10)
 
 ### Exercise 1
 
@@ -6042,16 +6819,11 @@ Data were collected about 5 types of irrigation on orange trees in Spain. The ex
 |           Submersion  | 403 |  380  | 336  | 101  | 293   |
 
 
-1. Write the linear model for this study and explain the model components
-2. Compute the ANOVA
-3. Check for the basic assumptions
-4. Compare the means
-5. Present the results and comment on them    
 [Sheet: 10.1]
 
 ### Exercise 2
 
-A fertilisation trial was conducted according to a RCBD with five replicates. One value is missing for the second treatment in the fifth block. The observed data are percentage contents in P~2~ O~5~ in leaf samples:
+A fertilisation trial was conducted according to a randomised complete block design with five replicates. One value is missing for the second treatment in the fifth block. The observed data are percentage contents in P~2~ O~5~ in leaf samples:
 
               Treatment       1      2     3      4      5
   ----------------------- ------ ------ ----- ------ ------
@@ -6061,11 +6833,8 @@ A fertilisation trial was conducted according to a RCBD with five replicates. On
      50 lb N + 75 lb P2O5   10.8   11.2   8.8   10.4   12.9
     100 lb N + 75 lb P205    9.6    9.3    12   10.6   11.6
 
-1. Calculate arithmetic means
-2. Calculate the ANOVA
-3. Check for the basic assumptions
-4. Calculate expected marginal means and compare to arithmetic means
-5. The addition of P~2~ O~5~ is a convenient practice, in terms of agronomic effect?    
+Is the addition of P~2~ O~5~ a convenient practice, in terms of agronomic effect?
+
 [Sheet: 10.2]
 
 ### Exercise 3
@@ -6091,18 +6860,33 @@ A latin square experiment was planned to assess effect of four different fertili
       C          4        4         160
       D          4        3         163
       
-1. Write the linear model for this study and explain the model components
-2. Compute the ANOVA
-3. Check for the basic assumptions
-4. Compare the means
-5. Present the results and comment on them: what is the best fertiliser?    
+What is the best fertiliser?
+
 [Sheet: 10.3]
 
 ---
 
 ## Multi-way ANOVA models with interactions (ch. 11 and 13)
 
-Some of the following datasets were obtained by experiments designed as split-plots or strip-plots. If you do not understand these designs, you have not yet studied Chapter 13; therefore, you can disregard the information about the design and simply analyse the data as if they were obtained by simple randomised blocks designs. Please, note that, in practise, diregarding the information about the experimental design during data analysis is not admissible!
+Some of the following datasets were obtained by experiments designed as split-plots or strip-plots (see Chapter 2); please, note that, in practice, disregarding the experimental design during data analysis is not admissible! If you have not yet read Chapter 13, you can still analyse these datasets by paying attention to the following issues.
+
+For split-plot and strip-plot designs, we need to use the 'lmer()' function and, thus, we need to install and load the 'lme4' and 'lmerTest' packages.
+
+Before fitting the models, we need to uniquely identify the main-plots (for split-plot designs) and the rows/columns (for strip-plot designs). The main plots can be uniquely identified by crossing the block and main plot factor variables, as in the example below, with the 'Tillage' and 'Block' variables, in the 'dataset' data frame.
+
+```
+dataset$mainPlot <- with(dataset, factor(Block:Tillage))
+```
+
+For strip-plot designs, the rows and columns can be uniquely identified by crossing the block and each factor variables, as in the example below, with the 'Crop/Herbicide' and 'Block' variables, in the 'dataset' data frame.
+
+```
+dataset$Rows <- factor(dataset$Crop:dataset$Block)
+dataset$Columns <- factor(dataset$Herbicide:dataset$Block)
+```
+
+The code for fitting the models is reported in the table 15.1. The 'plot()' method only returns the plot of 'residuals against expected values' and the 'which' argument does not work. Thus, do not perform the check for the normality of residuals.
+
 
 ### Exercise 1
 
@@ -6123,17 +6907,14 @@ A pot experiment was planned to evaluate the best timing for herbicide applicati
 |               | 35.24 | 14.17 | 21.81 | 39.55 | 1.42    | 34.11|
 |               | 13.32 | 23.93 | 60.72 | 48.37 | 6.83    | 32.21|
 
-1. Write the linear model for this study and explain the model components
-2. Compute the ANOVA
-3. Check for the basic assumptions
-4. Calculate marginal means and cell means
-5. Present the results and comment on them: what type of means should you report?    
+In which timing the herbicide is most effective?
+
 [Sheet: 11.1]
 
 
 ### Exercise 2
 
-Six faba bean genotypes were tested in two sowing times, according to a plit-plot design in 4 complete blocks. Sowing times were randomised to main-plots within blocks and genotypes were randomised to sub-plots within main-plots and blocks. Results are:
+Six faba bean genotypes were tested in two sowing times, according to a split-plot design in 4 complete blocks. Sowing times were randomised to main-plots within blocks and genotypes were randomised to sub-plots within main-plots and blocks. Results are:
 
 
 |Sowing  Time| Genotype    |    1  |    2  |    3  |    4  |
@@ -6151,12 +6932,8 @@ Six faba bean genotypes were tested in two sowing times, according to a plit-plo
 |            |    Sicania  | 3.24  | 3.60  | 3.16  | 3.08  |
 |            |    Vesuvio  | 2.34  | 2.44  | 1.71  | 2.00  |
 
+What is the best genotype for autumn sowing?
 
-1. Write the linear model for this study and explain the model components
-2. Compute the ANOVA
-3. Check for the basic assumptions
-4. Calculate marginal means and cell means
-5. Present the results and comment on them: what type of means should you report?    
 [Sheet: 11.2]
 
 ### Exercise 3
@@ -6181,13 +6958,9 @@ Four crops were sown in soil 20 days after the application of three herbicide tr
 |                  | 2   |     227  |  169  |      195  |       494 |
 |                  | 3   |     400  |  364  |      257  |       397 |
 |                  | 4   |     171  |  134  |      137  |       180 |
-  
 
-1. Write the linear model for this study and explain the model components
-2. Compute the ANOVA
-3. Check for the basic assumptions
-4. Calculate marginal means and cell means
-5. Present the results and comment on them: what type of means should you report?   
+What crops could be safely sown 20 days after the application of imazethapyr, primisulfuron and rimsulfuron?  
+
 [Sheet: 11.3]
 
 
@@ -6204,11 +6977,8 @@ A field experiment was conducted to evaluate the effect of fertilisation timing 
 |          |    2   |   47.9  |  46.8 |  54.0  |
 |          |    3   |   40.1  |  57.9 |  62.0  |
 
-1. Write the linear model for this study and explain the model components
-2. Compute the ANOVA
-3. Check for the basic assumptions
-4. Calculate marginal means and cell means
-5. Present the results and comment on them: what type of means should you report?    
+What is the best genotype? What is the best fertilisation timing? Do these two factors interact and how?
+ 
 [Sheet: 11.4]
 
 ### Exercise 5
@@ -6224,20 +6994,17 @@ A study was carried out to evaluate the effect of washing temperature on the red
   |    C    |     2.8     |     4.4    |     8.7     |   13.2    |
   |         |     3.2     |     4.8    |     8.4     |   13.0    |
   |    D    |     3.2     |     3.3    |     5.7     |   10.9    |
-  |         |     3.6     |     3.5    |     5.8     |   11.1    |    
+  |         |     3.6     |     3.5    |     5.8     |   11.1    |  
 
-Consider the temperature as a factor and:
+Consider the temperature as a factor and answer the following questions:
 
-1. Write the linear model for this study and explain the model components
-2. Compute the ANOVA
-3. Check for the basic assumptions
-4. Calculate marginal means and cell means
-5. Present the results and comment on them: what type of means should you report?    
+1. What is the best fabric, in terms of tolerance to high temperatures? What is the highest safe temperature, for each fabric?
+
 [Sheet: 11.5]
 
 ### Exercise 6
 
-A chemical process requires one alcohol and one base. A study is organised to evaluate the factorial combinations of three alcohols and two bases on the efficiency of the process, expressed as a percentage. The experiment is designd as completely randomised.
+A chemical process requires one alcohol and one base. A study is organised to evaluate the factorial combinations of three alcohols and two bases on the efficiency of the process, expressed as a percentage. The experiment is designed as completely randomised.
 
  | Base  | Alcohol 1 | Alcohol 2 | Alcohol 3 |
  |:-----:|:---------:|:---------:|:---------:|
@@ -6250,11 +7017,8 @@ A chemical process requires one alcohol and one base. A study is organised to ev
  |       |  91.5     |    88.3   |     90.6  |
  |       |  94.7     |    91.5   |     89.8  |
 
-1. Write the linear model for this study and explain the model components
-2. Compute the ANOVA
-3. Check for the basic assumptions
-4. Calculate marginal means and cell means
-5. Present the results and comment on them: what type of means should you report?     
+What is the combination that gives the highest efficiency?
+    
 [Sheet: 11.6]
 
 ---
@@ -6273,18 +7037,15 @@ A study was conducted to evaluate the effect of nitrogen fertilisation in lettuc
      150     157   150   140   163
      200     163   156   156   171
 
-1. Write the linear model for this study and explain the model components
-2. Estimate model parameters
-3. Check for the basic assumptions
-4. What yield might be obtained by using 120 kg N ha^-1^?
-5. Present the results and comment on them?
+What yield might be obtained by using 120 kg N ha^-1^?
+
 [Sheet: 12.1]
 
 ### Exercise 2
 
-A study was conducted to evaluate the effect of increasing densities of a weed (*Sinapis arvensis*) on sunflower yield. The experiment was completely randomised. Assuming that the yield response is linear, parameterise the model, check the goodness of fit and find the economical threshold level of weed density, considering that the yield worths 150 Euros per ton and the herbicide treatment costs 40 Euros per hectar. The observed results are:
+A study was conducted to evaluate the effect of increasing densities of a weed (*Sinapis arvensis*) on sunflower yield. The experiment was completely randomised and the observed results are:
 
-   density   Rep   yield
+   density   Rep     yield
   --------- ------- --------
       0        1     36.63
      14        1     29.73
@@ -6315,6 +7076,7 @@ A study was conducted to evaluate the effect of increasing densities of a weed (
      38        4     27.114
      54        4     24.664
 
+Assuming that the yield response is linear, parameterise the model, check the goodness of fit and find the economical threshold level of weed density, considering that the yield worths 150 Euros per ton and the herbicide treatment costs 40 Euros per hectar. 
 
 [Sheet: 12.2]     
 
@@ -6355,6 +7117,8 @@ A microbial population grows exponentially over time. Considering the following 
     50     39
     60     94
     70     201
+
+How long does it take before we reach 100 cells?
     
 [Sheet: 14.2]    
 
@@ -6673,9 +7437,14 @@ Very often, there are multiple arguments and we have to pay some attention on ho
 
 We can see the required list of arguments and their order by using the R help, that is invoked by a question mark followed by the function name, as shown in the example below.
 
+```
+# Getting help
+?log 
+```
+
+
 
 ```r
-?log #Getting help
 # The two arguments are the value and the base for logarithm
 log(100, 2) # Supplied in order
 ## [1] 6.643856
@@ -6799,7 +7568,7 @@ plot(y ~ x)
 curve(7.77 * exp(0.189 * x), add = T, col = "red")
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-213-1.png" width="90%" />
+<img src="_main_files/figure-html/unnamed-chunk-237-1.png" width="90%" />
 
 ---
 

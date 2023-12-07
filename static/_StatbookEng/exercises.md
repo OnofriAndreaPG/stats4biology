@@ -1,7 +1,7 @@
 ---
 title: "Experimental methods in agriculture"
 author: "Andrea Onofri and Dario Sacco"
-date: "Update: v. 1.001 (2022-10-08), compil. 2022-11-23"
+date: "Update: v. 1.001 (2022-10-08), compil. 2023-12-06"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -295,16 +295,29 @@ Placeholder
 Placeholder
 
 
-## Plots of different sizes
+## Split-plot or strip-plot experiments
 ### Example 1: a split-plot experiment
 #### Model definition
 #### Model fitting with R
 ### Example 2: a strip-plot design
 #### Model definition
 #### Model fitting with R
-## Subsampling designs
-## Repeated measures in perennial crops
+## Sub-sampling designs
+### Example 3: A RCBD with sub-sampling
+#### Model definition
+#### Model fitting with R
+#### A simpler alternative
 ## Repeated experiments
+### A model for pooling the results
+### Preliminary analyses
+### Fixed or random runs?
+### Example 4: a seed germination experiment in two runs
+#### Model fitting with R
+### Example 5: a multi-year winter wheat experiment
+#### Model fitting with R
+## Repeated measures in perennial crops
+### Example 5: genotype experiment with lucerne
+#### Model definition
 ## Further readings
 
 <!--chapter:end:13-Eng_SplitStrip.Rmd-->
@@ -334,39 +347,15 @@ Placeholder
 
 # Exercises
 
-The following excercises are organised by section, each one corresponding to a book chapter. Use the exercises to verify your learning process, after studying each chapter and before proceeding to the next one. 
+This book was not intended to build a solid theoretical foundation in biometry, but it was mainly intended to give you the tools to organise experiments and analyse their results. Therefore, we propose a list of exercises and case studies, so that you can build some practical experience an this matter and evaluate how clear are the concepts exposed earlier in this book. The exercises are organised in sections and each section corresponds to one or more book chapters. In some cases you will need to enter small datasets in R, while, for the bigger datasets, we usually provide the related file in an external repository, so that you can load them in R, by using the appropriate function.
 
-## Introduction to biometry (ch. 1)
+## Designing experiments (ch. 1 to 2)
 
-### Question 1
+### Exercise 1
 
-What are the fundamental traits of a valid experiment?
+You have been requested to lay-out a breeding experiment, with 16 wheat genotypes, coded by using letters of the Roman alphabet. The aim is to determine which genotype is the best in a given environment.
 
-### Question 2
-
-What are the main steps of Galileo's scientific method?
-
-### Question 3
-
-What is the difference between systematic and random errors? Which of the two errors is most concerning?
-
-### Question 4
-
-What is the difference between true-replicates and pseudo-replicates?
-
-### Question 5
-
-What do we intend with the word 'confounding'? What is the role of 'confounding' in scientific experiments?
-
----
-
-## Designing experiments (ch. 2)
-
-### Excercise 1
-
-You have been requested to lay-out a breeding experiment, with 16 wheat genotypes, coded by using letters of the Roman alphabet. The aim is to determine which genotype behaves the best in a given environment.
-
-Write the experimental protocol, where you specify all the main elements of your project (subjects, variables, replicates, experimental design) and add the field map.
+Write the experimental protocol, where you specify all the main elements of your project (subjects, variables, replicates, experimental design) and draw the field map.
 
 ### Exercise 2
 
@@ -375,7 +364,6 @@ Describe the protocol of an experiment to determine the effect of sowing date (a
 ### Exercise 3
 
 Describe the protocol of an experiment to determine the effect of nitrogen dose on several wheat genotypes. Include all possible elements to assess whether the experiment is valid, describe the type of design and include the field map, showing all relevant information (including plot sizes and orientation in space). Motivate all your choices.
-
 
 
 ---
@@ -388,7 +376,7 @@ A chemical analysis was performed in triplicate, with the following results: 125
 
 ### Exercise 2
 
-Consider the Excel file 'rimsulfuron.csv' from [https://www.casaonofri.it/_datasets/rimsulfuron.csv](https://www.casaonofri.it/_datasets/rimsulfuron.csv) (you can either download it, or read it directly from the internet repository). This is a dataset relating to a field experiment to compare 14 herbicides and two untreated checks, with 4 replicates per treatment. The response variables are maize yield and weed coverage. Describe the dataset and show the results on a barplot, including some measure of variability. Check whether yield correlates to weed coverage and comment on the results.
+Consider the Excel file 'rimsulfuron.csv' from [https://www.casaonofri.it/_datasets/rimsulfuron.csv](https://www.casaonofri.it/_datasets/rimsulfuron.csv) (you can either download it, or read it directly from the web repository). This is a dataset relating to a field experiment to compare 14 herbicides and two untreated checks, with 4 replicates per treatment. The response variables are maize yield and weed coverage. Describe the dataset and show the results on a barplot, including some measure of variability. Check whether yield correlates to weed coverage and comment on the results.
 
 ### Exercise 3
 
@@ -452,7 +440,7 @@ Consider the relationship between crop yield and density, as shown in Exercise 2
 
 ---
 
-## Estimation of model parameters (ch. 5)
+## Interval estimation of model parameters (ch. 5)
 
 ### Exercise 1
 
@@ -494,17 +482,17 @@ A sample of 400 insects was sprayed with an insecticide and 136 individuals surv
 
 ### Exercise 1
 
-We have compared two herbicides for weed control in maize. With the first herbicide (A), we observed the following weed coverings: 9.3, 10.2, 9.7 %. With the second herbicide, we observedd: 12.6, 12.3 e 12.5 %. Are the means for the two herbicides significantly different (P < 0.05)?
+We have compared two herbicides for weed control in maize. With the first herbicide (A), we observed the following weed coverings: 9.3, 10.2, 9.7 %. With the second herbicide, we observed: 12.6, 12.3 and 12.5 %. Are the means for the two herbicides significantly different ($\alpha = 0.05$)?
 
 
 ### Exercise 2
 
-We have made an experiment to compare two fungicides A and B. The first fungicide was used to treat 200 fungi colonies and the number of surviving colonies was 180. B was used to treat 100 colonies and 50 of those survived. Is there a significant difference between the efficiacies of A and B (P < 0.05)?
+We have made an experiment to compare two fungicides A and B. The first fungicide was used to treat 200 fungi colonies and the number of surviving colonies was 180. B was used to treat 100 colonies and 50 of those survived. Is there a significant difference between the efficiacies of A and B ($\alpha = 0.05$)?
 
 
 ### Exercise 3
 
-A plant pathologist studied the crop performances with (A) and without (NT) a fungicide treatment. The results are as follows:
+A plant pathologist studied the crop performances with (A) and without (NT) a fungicide treatment. The results (yield in tons per hectar) are as follows:
 
     A    NT
   ----- ----
@@ -512,11 +500,11 @@ A plant pathologist studied the crop performances with (A) and without (NT) a fu
    71    51
    68    59
 
-Was the treatment effect significant (P < 0.05)?
+Was the treatment effect significant ($\alpha = 0.05$)?
 
 ### Exercise 4
 
-In this year, an assay showed that 600 olive drupes out of 750 were attacked by  *Daucus olee*. In a close field, under the same environmental conditions, the count of attacked drupes was 120 on 750. Is the the observed difference statistically significant (P < 0.05) or is it just due to random fluctuation?
+In this year, an assay showed that 600 olive drupes out of 750 were attacked by  *Daucus olee*. In a close field, under the same environmental conditions, the count of attacked drupes was 120 on 750. Is the the observed difference statistically significant ($\alpha = 0.05$) or is it just due to random fluctuation?
 
 ### Exercise 5
 
@@ -533,7 +521,7 @@ In a hospital, blood cholesterol level was measured for eight patients, before a
            7      161.5      112.4
            8      243.6      190.5
 
-Can we say that this terapy is effective, or not?
+Can we say that this terapy is effective, or  ($\alpha = 0.05$)?
 
 ### Exercise 6
 
@@ -555,7 +543,7 @@ A plant breeder organised an experiment to compare three wheat genotypes, i.e. G
 
 1. Describe the three samples, by using the appropriate statistics of central tendency and spread
 2. Infere the means of the pupulations from where the samples were drawn
-3. For each of the three possible couples (GUERCINO vs ARNOVA, GUERCINO vs BOLOGNA and ARNOVA vs BOLOGNA), test the hypothesis that the two means are significantly different.
+3. For each of the three possible couples (GUERCINO vs ARNOVA, GUERCINO vs BOLOGNA and ARNOVA vs BOLOGNA), test the hypothesis that the two means are significantly different ($\alpha = 0.05$).
 
 
 
@@ -565,16 +553,54 @@ A plant breeder organised an experiment to compare three wheat genotypes, i.e. G
 A botanist counted the number of germinated seeds for oilseed rape at two different temperatures (15 and 25°C). At 15°C, 358 germinations were counted out of 400 seeds. At 25°C, 286 germinations were counted out of 380 seeds.
 
 1. Describe the proportions of germination for the three samples
-2. Infere the proportion of germinated seeds in the two populations, from where the samples of seeds were extracted (remember that the variance for a proportion is calculated as $p \times (1- p)$.
+2. Infere the proportion of germinated seeds in the two populations, from where the samples of seeds were extracted (remember that the variance for a proportion is calculated as $p \times (1- p)$).
 3. Test the hypothesis that temperature had a significant effect on the germinability of oilseed rape seeds.
 
 
 
 ---
 
+## Fitting models to data from agriculture experiments
+
+In the following sections we include several case studies that imply a process of model fitting. In most of the cases, these datasets are taken from real experiments and your main aim should be to learn something from those datasets, by asking the right questions. Therefore, do not limit yourself to producing the right statistics and writing the correct R coding, but try to use the statistical tools you have built up to obtain the answers for your questions.
+
+Please, follow the  workplan outlined below.
+
+1. Load the data and make the necessary transformations.
+2. Describe the data, by calculating, at least, the means and standard deviations for the experimental groups. This is usually called 'Initial Data Analysis' (IDA) and it is meant to get an idea about the main traits of the data at hand.
+3. Specify the model, explain its components and fit the model into the data.
+4. Check the model for the basic assumptions and, if necessary, adopt the appropriate correcting measures and re-fit the model
+5. Test the significance of all effects, by using the appropriate variance partitioning.
+6. If it is appropriate, compare the means for the most relevant effects.
+7. Present the results and comment on them
+
+The datasets for the following cases studies are bigger than the ones you met so far and you may not like to enter all the data in R. Therefore, we put all the datasets at your disposal in an Excel file, which you can download from the following link [https://www.casaonofri.it/_datasets/BookExercises.xlsx](https://www.casaonofri.it/_datasets/BookExercises.xlsx). Each dataset is in a different sheet and the sheet names are given in each exercise, so that you can load them by using the 'readxl()' function.
+
+In order to ease you mind, we provide a summary table with the models described in this book and the R coding to fit them.
+
+
+Table: (\#tab:unnamed-chunk-9)Summary of main models to describe the results of experiments in agriculture
+
+|Model                    |Design                         |R.function  |Specification                                 |
+|:------------------------|:------------------------------|:-----------|:---------------------------------------------|
+|One-way ANOVA            |CRD                            |lm()        |Y ~ F1                                        |
+|One-way ANOVA            |CRBD                           |lm()        |Y ~ F1 + BL                                   |
+|Two-way ANOVA            |CRD                            |lm()        |Y ~ F1 * F2                                   |
+|Two-way ANOVA            |CRBD                           |lm()        |Y ~ F1 * F2 + BL                              |
+|Two-way ANOVA            |Split-plot CRD                 |lmer()      |Y ~ F1 * F2 + (1&#124;MAIN)                   |
+|Two-way ANOVA            |Split-plot CRBD                |lmer()      |Y ~ F1 * F2 + BL + (1&#124;MAIN)              |
+|Two-way ANOVA            |Strip-plot CRD                 |lmer()      |Y ~ F1 * F2 + (1&#124;ROW) + (1&#124;COL)     |
+|Two-way ANOVA            |Strip-plot CRBD                |lmer()      |Y ~ F1 * F2 + BL + (1&#124;ROW + (1&#124;COL) |
+|One-way ANOVA            |One-way CRD, two environments  |lm()/lmer() |Y ~ F1 * ENV                                  |
+|One-way ANOVA            |One-way CRBD, two environments |lm()/lmer() |Y ~ F1 * ENV + BL&#124;ENV                    |
+|Simple Linear Regression |CRD                            |lm()        |Y ~ X1                                        |
+|Simple Linear Regression |CRBD                           |lm()        |Y ~ X1 + BL                                   |
+
+In the table above, Y is the response variable, that is always continuous/discrete, F1 and F2 are the names of two experimental factors (nominal variables), while X1 is the name of a covariate (continuous variable). BL is the block variable (factor), ENV is the environment variable (factor) and MAIN, ROW, COL are, respectively, the variables (factors) that represent the main plots in a split-plot design and the rows/columns in a strip-plot design.
+
+
 ## One-way ANOVA models (ch. 7 to 9)
 
-The following exercises are based on slightly more complex datasets. You may not like to enter all the data in R and, therefore, we put all the dataset at your disposal in an Excel file, which you can download from the following link [https://www.casaonofri.it/_datasets/BookExercises.xlsx](https://www.casaonofri.it/_datasets/BookExercises.xlsx). Each dataset is in a different sheet and the sheet names are given in each exercise.
 
 ### Exercise 1
 
@@ -590,13 +616,8 @@ An experiment was conducted with a completely randomised design to compare the y
       E     | 21.7 |  24.5  | 23.4 |
 
 
-1. Write the linear model for this study and explain the model components
-2. Compute the ANOVA
-3. Check for the basic assumptions
-4. Compare the means
-5. Present the results and comment on them
+The example is taken from: Le Clerg *et al*. (1962).
 
-The example is taken from: Le Clerg *et al*. (1962)    
 [Sheet: 7.1]
 
 ### Exercise 2
@@ -611,11 +632,6 @@ Control | Glucose | Fructose | Sucrose |
 45 | 29 | 28 | 33 |
 42 | 33 | 27 | 34 |
 
-1. Write the linear model for this study and explain the model components
-2. Compute the ANOVA
-3. Check for the basic assumptions
-4. Compare the means
-5. Present the results and comment on them   
 [Sheet: 7.2]
 
 
@@ -651,7 +667,8 @@ The results are as follows:
      1708                688
      1708                729
 
-Please, note that these are the only possible values for temperature. Determine the best operating temperature, in order to delay failure.    
+Regard the temperature as a factor and determine the best operating temperature, in order to delay failure.
+
 [Sheet: 7.3]
 
 ### Exercise 4
@@ -681,7 +698,7 @@ Which is the most resistant genotype?
 
 ---
 
-## Multy-way ANOVA models (ch. 10)
+## Multi-way ANOVA models (ch. 10)
 
 ### Exercise 1
 
@@ -697,16 +714,11 @@ Data were collected about 5 types of irrigation on orange trees in Spain. The ex
 |           Submersion  | 403 |  380  | 336  | 101  | 293   |
 
 
-1. Write the linear model for this study and explain the model components
-2. Compute the ANOVA
-3. Check for the basic assumptions
-4. Compare the means
-5. Present the results and comment on them    
 [Sheet: 10.1]
 
 ### Exercise 2
 
-A fertilisation trial was conducted according to a RCBD with five replicates. One value is missing for the second treatment in the fifth block. The observed data are percentage contents in P~2~ O~5~ in leaf samples:
+A fertilisation trial was conducted according to a randomised complete block design with five replicates. One value is missing for the second treatment in the fifth block. The observed data are percentage contents in P~2~ O~5~ in leaf samples:
 
               Treatment       1      2     3      4      5
   ----------------------- ------ ------ ----- ------ ------
@@ -716,11 +728,8 @@ A fertilisation trial was conducted according to a RCBD with five replicates. On
      50 lb N + 75 lb P2O5   10.8   11.2   8.8   10.4   12.9
     100 lb N + 75 lb P205    9.6    9.3    12   10.6   11.6
 
-1. Calculate arithmetic means
-2. Calculate the ANOVA
-3. Check for the basic assumptions
-4. Calculate expected marginal means and compare to arithmetic means
-5. The addition of P~2~ O~5~ is a convenient practice, in terms of agronomic effect?    
+Is the addition of P~2~ O~5~ a convenient practice, in terms of agronomic effect?
+
 [Sheet: 10.2]
 
 ### Exercise 3
@@ -746,18 +755,33 @@ A latin square experiment was planned to assess effect of four different fertili
       C          4        4         160
       D          4        3         163
       
-1. Write the linear model for this study and explain the model components
-2. Compute the ANOVA
-3. Check for the basic assumptions
-4. Compare the means
-5. Present the results and comment on them: what is the best fertiliser?    
+What is the best fertiliser?
+
 [Sheet: 10.3]
 
 ---
 
 ## Multi-way ANOVA models with interactions (ch. 11 and 13)
 
-Some of the following datasets were obtained by experiments designed as split-plots or strip-plots. If you do not understand these designs, you have not yet studied Chapter 13; therefore, you can disregard the information about the design and simply analyse the data as if they were obtained by simple randomised blocks designs. Please, note that, in practise, diregarding the information about the experimental design during data analysis is not admissible!
+Some of the following datasets were obtained by experiments designed as split-plots or strip-plots (see Chapter 2); please, note that, in practice, disregarding the experimental design during data analysis is not admissible! If you have not yet read Chapter 13, you can still analyse these datasets by paying attention to the following issues.
+
+For split-plot and strip-plot designs, we need to use the 'lmer()' function and, thus, we need to install and load the 'lme4' and 'lmerTest' packages.
+
+Before fitting the models, we need to uniquely identify the main-plots (for split-plot designs) and the rows/columns (for strip-plot designs). The main plots can be uniquely identified by crossing the block and main plot factor variables, as in the example below, with the 'Tillage' and 'Block' variables, in the 'dataset' data frame.
+
+```
+dataset$mainPlot <- with(dataset, factor(Block:Tillage))
+```
+
+For strip-plot designs, the rows and columns can be uniquely identified by crossing the block and each factor variables, as in the example below, with the 'Crop/Herbicide' and 'Block' variables, in the 'dataset' data frame.
+
+```
+dataset$Rows <- factor(dataset$Crop:dataset$Block)
+dataset$Columns <- factor(dataset$Herbicide:dataset$Block)
+```
+
+The code for fitting the models is reported in the table 15.1. The 'plot()' method only returns the plot of 'residuals against expected values' and the 'which' argument does not work. Thus, do not perform the check for the normality of residuals.
+
 
 ### Exercise 1
 
@@ -778,17 +802,14 @@ A pot experiment was planned to evaluate the best timing for herbicide applicati
 |               | 35.24 | 14.17 | 21.81 | 39.55 | 1.42    | 34.11|
 |               | 13.32 | 23.93 | 60.72 | 48.37 | 6.83    | 32.21|
 
-1. Write the linear model for this study and explain the model components
-2. Compute the ANOVA
-3. Check for the basic assumptions
-4. Calculate marginal means and cell means
-5. Present the results and comment on them: what type of means should you report?    
+In which timing the herbicide is most effective?
+
 [Sheet: 11.1]
 
 
 ### Exercise 2
 
-Six faba bean genotypes were tested in two sowing times, according to a plit-plot design in 4 complete blocks. Sowing times were randomised to main-plots within blocks and genotypes were randomised to sub-plots within main-plots and blocks. Results are:
+Six faba bean genotypes were tested in two sowing times, according to a split-plot design in 4 complete blocks. Sowing times were randomised to main-plots within blocks and genotypes were randomised to sub-plots within main-plots and blocks. Results are:
 
 
 |Sowing  Time| Genotype    |    1  |    2  |    3  |    4  |
@@ -806,12 +827,8 @@ Six faba bean genotypes were tested in two sowing times, according to a plit-plo
 |            |    Sicania  | 3.24  | 3.60  | 3.16  | 3.08  |
 |            |    Vesuvio  | 2.34  | 2.44  | 1.71  | 2.00  |
 
+What is the best genotype for autumn sowing?
 
-1. Write the linear model for this study and explain the model components
-2. Compute the ANOVA
-3. Check for the basic assumptions
-4. Calculate marginal means and cell means
-5. Present the results and comment on them: what type of means should you report?    
 [Sheet: 11.2]
 
 ### Exercise 3
@@ -836,13 +853,9 @@ Four crops were sown in soil 20 days after the application of three herbicide tr
 |                  | 2   |     227  |  169  |      195  |       494 |
 |                  | 3   |     400  |  364  |      257  |       397 |
 |                  | 4   |     171  |  134  |      137  |       180 |
-  
 
-1. Write the linear model for this study and explain the model components
-2. Compute the ANOVA
-3. Check for the basic assumptions
-4. Calculate marginal means and cell means
-5. Present the results and comment on them: what type of means should you report?   
+What crops could be safely sown 20 days after the application of imazethapyr, primisulfuron and rimsulfuron?  
+
 [Sheet: 11.3]
 
 
@@ -859,11 +872,8 @@ A field experiment was conducted to evaluate the effect of fertilisation timing 
 |          |    2   |   47.9  |  46.8 |  54.0  |
 |          |    3   |   40.1  |  57.9 |  62.0  |
 
-1. Write the linear model for this study and explain the model components
-2. Compute the ANOVA
-3. Check for the basic assumptions
-4. Calculate marginal means and cell means
-5. Present the results and comment on them: what type of means should you report?    
+What is the best genotype? What is the best fertilisation timing? Do these two factors interact and how?
+ 
 [Sheet: 11.4]
 
 ### Exercise 5
@@ -879,20 +889,17 @@ A study was carried out to evaluate the effect of washing temperature on the red
   |    C    |     2.8     |     4.4    |     8.7     |   13.2    |
   |         |     3.2     |     4.8    |     8.4     |   13.0    |
   |    D    |     3.2     |     3.3    |     5.7     |   10.9    |
-  |         |     3.6     |     3.5    |     5.8     |   11.1    |    
+  |         |     3.6     |     3.5    |     5.8     |   11.1    |  
 
-Consider the temperature as a factor and:
+Consider the temperature as a factor and answer the following questions:
 
-1. Write the linear model for this study and explain the model components
-2. Compute the ANOVA
-3. Check for the basic assumptions
-4. Calculate marginal means and cell means
-5. Present the results and comment on them: what type of means should you report?    
+1. What is the best fabric, in terms of tolerance to high temperatures? What is the highest safe temperature, for each fabric?
+
 [Sheet: 11.5]
 
 ### Exercise 6
 
-A chemical process requires one alcohol and one base. A study is organised to evaluate the factorial combinations of three alcohols and two bases on the efficiency of the process, expressed as a percentage. The experiment is designd as completely randomised.
+A chemical process requires one alcohol and one base. A study is organised to evaluate the factorial combinations of three alcohols and two bases on the efficiency of the process, expressed as a percentage. The experiment is designed as completely randomised.
 
  | Base  | Alcohol 1 | Alcohol 2 | Alcohol 3 |
  |:-----:|:---------:|:---------:|:---------:|
@@ -905,11 +912,8 @@ A chemical process requires one alcohol and one base. A study is organised to ev
  |       |  91.5     |    88.3   |     90.6  |
  |       |  94.7     |    91.5   |     89.8  |
 
-1. Write the linear model for this study and explain the model components
-2. Compute the ANOVA
-3. Check for the basic assumptions
-4. Calculate marginal means and cell means
-5. Present the results and comment on them: what type of means should you report?     
+What is the combination that gives the highest efficiency?
+    
 [Sheet: 11.6]
 
 ---
@@ -928,16 +932,13 @@ A study was conducted to evaluate the effect of nitrogen fertilisation in lettuc
      150     157   150   140   163
      200     163   156   156   171
 
-1. Write the linear model for this study and explain the model components
-2. Estimate model parameters
-3. Check for the basic assumptions
-4. What yield might be obtained by using 120 kg N ha^-1^?
-5. Present the results and comment on them?
+What yield might be obtained by using 120 kg N ha^-1^?
+
 [Sheet: 12.1]
 
 ### Exercise 2
 
-A study was conducted to evaluate the effect of increasing densities of a weed (*Sinapis arvensis*) on sunflower yield. The experiment was completely randomised. Assuming that the yield response is linear, parameterise the model, check the goodness of fit and find the economical threshold level of weed density, considering that the yield worths 150 Euros per ton and the herbicide treatment costs 40 Euros per hectar. The observed results are:
+A study was conducted to evaluate the effect of increasing densities of a weed (*Sinapis arvensis*) on sunflower yield. The experiment was completely randomised and the observed results are:
 
    density   Rep   yield
   --------- ------- --------
@@ -970,6 +971,7 @@ A study was conducted to evaluate the effect of increasing densities of a weed (
      38        4     27.114
      54        4     24.664
 
+Assuming that the yield response is linear, parameterise the model, check the goodness of fit and find the economical threshold level of weed density, considering that the yield worths 150 Euros per ton and the herbicide treatment costs 40 Euros per hectar. 
 
 [Sheet: 12.2]     
 
@@ -1010,6 +1012,8 @@ A microbial population grows exponentially over time. Considering the following 
     50     39
     60     94
     70     201
+
+How long does it take before we reach 100 cells?
     
 [Sheet: 14.2]    
 
