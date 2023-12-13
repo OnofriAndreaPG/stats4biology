@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 15 Exercises | Experimental methods in agriculture</title>
   <meta name="description" content="Chapter 15 Exercises | Experimental methods in agriculture: a tutorial book with R" />
-  <meta name="generator" content="bookdown 0.27 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.37 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 15 Exercises | Experimental methods in agriculture" />
   <meta property="og:type" content="book" />
@@ -127,6 +127,10 @@ code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
 
 </head>
 
@@ -952,7 +956,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td align="left">Simple Linear Regression</td>
 <td align="left">CRBD</td>
 <td align="left">lm()</td>
-<td align="left">Y ~ X1 + BL</td>
+<td align="left">Y ~ BL + X1</td>
 </tr>
 </tbody>
 </table>
@@ -2127,6 +2131,22 @@ dataset$Columns &lt;- factor(dataset$Herbicide:dataset$Block)</code></pre>
 </div>
 <div id="simple-linear-regression-ch.-12" class="section level2 hasAnchor" number="15.10">
 <h2><span class="header-section-number">15.10</span> Simple linear regression (ch. 12)<a href="exercises.html#simple-linear-regression-ch.-12" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>When the predictor is a quantitative variable, we may be interested to check for the existence of a possible functional relationship, in the form of some sort of dose-response curve. The simplest regression model is the ‘straight line’, with equation <span class="math inline">\(Y = b_0 + b_1 \, X\)</span>; fitting this model implies finding maximum likelihood values for <span class="math inline">\(b_0\)</span> and <span class="math inline">\(b_1\)</span>, so that the resulting line passes as close as possible to the observed values. When we fit a regression model, the workplan at Section 15.6 is changed at step 4 (model checking); indeed, apart from the usual check for the homoscedasticity and normality of residuals, we have to check for possible lack of fit (i.e., the model sistematically deviates from the observed responses). This is done by plotting the observed values against the predictor and adding the regression line. This may be done by using the following code:</p>
+<pre><code>model &lt;- lm(Y ~ X1, data = dataset) # fits the model
+summary(model) # get model parameters and use them below
+b0 &lt;- 10 # value obtained from the previous step
+b1 &lt;- 0.5 # value obtained from the previous step
+plot(Y ~ X1, data = dataset) # plot the observed values
+curve(B0 + B1 * x, add = T) # &#39;x&#39; must be used in small letter</code></pre>
+<p>Obviously, when we fit a regression model we do not need to do any multiple comparison testing: if we can prove that the response follows a certain continuous curve, every predictor value produces a more or less different response from any other predictor value.</p>
+<p>Regression models can be fitted also to unreplicated data or to the group means. However, when we have the replicates, we have two possible models to fit. The first possibility is to disregard the quantitative nature of the independent variable, regard it as a factor (qualitative variable) and fit an ANOVA model, as we have seen in the previous sections. This first model is the best fitting one, because we do not put any constraint on the ‘shape’ of the response, matching exactly the mean responses for all treatment groups. The second possibility is to recognise that the predictor is a quantity (e.g., a dose) and fit a simple linear regression model; in this case, we constrain the response to be linear and continuously increase/decrease as the predictor increases/decreases. This second model is worse than the first one, because it will never match the mean responses for all treatment group, unless these means are perfectly aligned, which is almost impossible. However, it is also simpler because, regardless of the number of levels for the predictor, we always fit two parameters: an intercept and a slope. We can test the hypothesis of no lack of fit, by comparing the regression model and the ANOVA model by using the following code:</p>
+<pre><code>anova(model1, model2)</code></pre>
+<p>The null hypothesis is that there is no lack of fit and, thus, the fit of the two models is more or less similar. This null can be accepted if the P-level is higher than 0.05 and, in such a case, we favour the regression model over the ANOVA model, for its higher simplicity (Occam’s razor principle).</p>
+<p>In the case of replicated experiments designed in blocks, we also have to add the block effect to the model, regarding the block variable as a factor (as usual). In this case the model is:</p>
+<pre><code>model &lt;- lm(Y ~ BL + X1, data = dataset) # fits the model
+summary(model)</code></pre>
+<p>and the ‘summary()’ method produces several intercepts (one per each block) and one slope value. In order to plot the model, we need to calculate the average intercept value, which can be done by using the ‘emmeans()’ function, as shown below:</p>
+<pre><code>emmeans(model, ~1, at = (X1 = 0))</code></pre>
 <div id="exercise-1-8" class="section level3 hasAnchor" number="15.10.1">
 <h3><span class="header-section-number">15.10.1</span> Exercise 1<a href="exercises.html#exercise-1-8" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>A study was conducted to evaluate the effect of nitrogen fertilisation in lettuce. The experiment is completely randomised with 4 replicates and the yield results are as follows:</p>
@@ -2840,7 +2860,7 @@ gitbook.start({
     var script = document.createElement("script");
     script.type = "text/javascript";
     var src = "true";
-    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:")
       if (/^https?:/.test(src))
         src = src.replace(/^https?:/, '');

@@ -1,7 +1,7 @@
 ---
 title: "Experimental methods in agriculture"
 author: "Andrea Onofri and Dario Sacco"
-date: "Update: v. 1.1 (2023-12-06), compil. 2023-12-07"
+date: "Update: v. 1.1 (2023-12-06), compil. 2023-12-13"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -1907,7 +1907,7 @@ res <- rbinom(100000, 40, 0.775)/40
 head(res)
 ## [1] 0.750 0.750 0.750 0.700 0.750 0.925
 mean(res)
-## [1] 0.7749263
+## [1] 0.7749262
 sd(res)
 ## [1] 0.06611151
 ```
@@ -3008,7 +3008,7 @@ B <- c(3.025, -0.82, 1.716, -0.089, -2.566, -1.394,
        0.59, -1.853, -2.069, 3.255, 0.205)
 mean(A); mean(B)
 ## [1] -9.090909e-05
-## [1] 1.006214e-17
+## [1] 6.308085e-17
 var(A); var(B)
 ## [1] 1.000051
 ## [1] 4.000271
@@ -6699,7 +6699,7 @@ Table: (\#tab:unnamed-chunk-218)Summary of main models to describe the results o
 |One-way ANOVA            |One-way CRD, two environments  |lm()/lmer() |Y ~ F1 * ENV                                  |
 |One-way ANOVA            |One-way CRBD, two environments |lm()/lmer() |Y ~ F1 * ENV + BL&#124;ENV                    |
 |Simple Linear Regression |CRD                            |lm()        |Y ~ X1                                        |
-|Simple Linear Regression |CRBD                           |lm()        |Y ~ X1 + BL                                   |
+|Simple Linear Regression |CRBD                           |lm()        |Y ~ BL + X1                                   |
 
 In the table above, Y is the response variable, that is always continuous/discrete, F1 and F2 are the names of two experimental factors (nominal variables), while X1 is the name of a covariate (continuous variable). BL is the block variable (factor), ENV is the environment variable (factor) and MAIN, ROW, COL are, respectively, the variables (factors) that represent the main plots in a split-plot design and the rows/columns in a strip-plot design.
 
@@ -7024,6 +7024,43 @@ What is the combination that gives the highest efficiency?
 ---
 
 ## Simple linear regression (ch. 12)
+
+When the predictor is a quantitative variable, we may be interested to check for the existence of a possible functional relationship, in the form of some sort of dose-response curve. The simplest regression model is the 'straight line', with equation $Y = b_0 + b_1 \, X$; fitting this model implies finding maximum likelihood values for $b_0$ and $b_1$, so that the resulting line passes as close as possible to the observed values. When we fit a regression model, the workplan at Section 15.6 is changed at step 4 (model checking); indeed, apart from the usual check for the homoscedasticity and normality of residuals, we have to check for possible lack of fit (i.e., the model sistematically deviates from the observed responses). This is done by plotting the observed values against the predictor and adding the regression line. This may be done by using the following code:
+
+```
+model <- lm(Y ~ X1, data = dataset) # fits the model
+summary(model) # get model parameters and use them below
+b0 <- 10 # value obtained from the previous step
+b1 <- 0.5 # value obtained from the previous step
+plot(Y ~ X1, data = dataset) # plot the observed values
+curve(B0 + B1 * x, add = T) # 'x' must be used in small letter
+```
+
+Obviously, when we fit a regression model we do not need to do any multiple comparison testing: if we can prove that the response follows a certain continuous curve, every predictor value produces a more or less different response from any other predictor value.
+
+Regression models can be fitted also to unreplicated data or to the group means. However, when we have the replicates, we have two possible models to fit. The first possibility is to disregard the quantitative nature of the independent variable, regard it as a factor (qualitative variable) and fit an ANOVA model, as we have seen in the previous sections. This first model is the best fitting one, because we do not put any constraint on the 'shape' of the response, matching exactly the mean responses for all treatment groups. The second possibility is to recognise that the predictor is a quantity (e.g., a dose) and fit a simple linear regression model; in this case, we constrain the response to be linear and continuously increase/decrease as the predictor increases/decreases. This second model is worse than the first one, because it will never match the mean responses for all treatment group, unless these means are perfectly aligned, which is almost impossible. However, it is also simpler because, regardless of the number of levels for the predictor, we always fit two parameters: an intercept and a slope. We can test the hypothesis of no lack of fit, by comparing the regression model and the ANOVA model by using the following code:
+
+```
+anova(model1, model2)
+```
+The null hypothesis is that there is no lack of fit and, thus, the fit of the two models is more or less similar. This null can be accepted if the P-level is higher than 0.05 and, in such a case, we favour the regression model over the ANOVA model, for its higher simplicity (Occam's razor principle).
+
+In the case of replicated experiments designed in blocks, we also have to add the block effect to the model, regarding the block variable as a factor (as usual). In this case the model is:
+
+```
+model <- lm(Y ~ BL + X1, data = dataset) # fits the model
+summary(model)
+```
+
+and the 'summary()' method produces several intercepts (one per each block) and one slope value. In order to plot the model, we need to calculate the average intercept value, which can be done by using the 'emmeans()' function, as shown below:
+
+
+
+
+```
+emmeans(model, ~1, at = (X1 = 0))
+```
+
 
 ### Exercise 1
 
@@ -7568,7 +7605,7 @@ plot(y ~ x)
 curve(7.77 * exp(0.189 * x), add = T, col = "red")
 ```
 
-<img src="_main_files/figure-html/unnamed-chunk-237-1.png" width="90%" />
+<img src="_main_files/figure-html/unnamed-chunk-238-1.png" width="90%" />
 
 ---
 
