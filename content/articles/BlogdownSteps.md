@@ -120,7 +120,11 @@ It took me awhile to figure out how to include a figure in a blog post. Lately I
 
 1. created an 'img' folder within the 'static' folder in my blogdown project directory.
 2. Put all the images I wanted to include in blog posts in that folder
-3. Use the markdown code: ![caption](/img/figFileName.png)
+3. Use the markdown code: 
+
+```
+![caption](/img/figFileName.png)
+```
 
 Be careful: the 'slash' character at the beginning of file path is fundamental, otherwise the code does not work. Of course, you can use html tags to center your figure:
 
@@ -129,3 +133,14 @@ Be careful: the 'slash' character at the beginning of file path is fundamental, 
 ![](/_Figures/Stat_drcte_3-method-data.png){width=90%}
 </p>
 ```
+# Step 13 - Changing the title of the home page (14/12/2023)
+
+It may seem stupid, but it took me awhile to figure out how I could possibly change the title for the homepage. Lately, in the cointent folder I discovered a file named '_index.Rmarkdown', containing only the YAML header with
+
+```
+---
+title: Homepage title
+---
+```
+
+This is where the homepage title is defined. As far as I could see, all other test in the body of this file is neglected.

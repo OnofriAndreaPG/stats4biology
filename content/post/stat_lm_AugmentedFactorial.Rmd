@@ -1,0 +1,94 @@
+---
+title: "Factorial designs with check in pesticide research"
+author: "Andrea Onofri"
+date: 2023-12-15
+slug: 'Linear_models'
+categories:
+  - R
+  - 'Linear_models'
+tags:
+  - R
+  - 'Linear_models'
+  - 'Case_study'
+archives:
+  - 2023
+---
+
+```{r setup, cache = F, echo = F}
+#Put at the beginning
+knitr::opts_chunk$set(echo = TRUE, message = F, warning = F)
+knitr::knit_hooks$set(document = function(x){ 
+  gsub("```\n*```r*\n*", "", x) 
+})
+```
+
+In pesticide research or, in general, agriculture research, we very commonly encouter experiments with two/three crossed factors and some other treatment that is not included in the factorial structure. For example, let's consider an experiment with two herbicides (rimsulfuron and dicamba) at two rates (40 and 60 g/ha for rimsulfuron and 0.6 and 1 kg/ha for dicamba) and with four adjuvant treatments (surfactant, frigate, mineral oil and no adjuvant). Apart from this fully crossed structure, we need to introduce, at least, an untreated control and a hand-weeded control. The design for such an experiment has been termed 'augmented factorial', because we are, indeed, including some extra treatment levels beyond the crossed factorial structure.
+
+The dataset relating to the above example is named 'adjuvants.csv', it is available in an online repository and it can be loaded by using the code below. We have three predictors (Herbicide, Adjuvant and Dose) and two quantitative response variables (WeedCoverage and Yield). We need to transform the variables 'Herbicide' and 'Adjuvant' into factors, while we recode the two dose levels as 'HIGH' and 'LOW', in order to make the two herbicides comparable (we could also work with the original dose variable and fit a regression model, but I have made this point in another post, [see here](https://www.statforbiology.com/2023/stat_lm_augmentedfactorial_regression/)).
+
+
+```{r}
+rm(list = ls())
+library(emmeans)
+library(multcomp)
+fileName <- "https://www.casaonofri.it/_datasets/adjuvants.csv"
+dataset <- read.csv(fileName)
+head(dataset)
+dataset$DoseF <- with(dataset, factor(ifelse(Dose==60 | Dose == 1, "HIGH",
+                               ifelse(Dose == 0, "NONE", 
+                                      "LOW"))))
+dataset[,c(1:3,5)] <- lapply(dataset[,c(1:3,5)], function(i) factor(i))
+```
+
+
+To my experience, such an augmented factorial design may give a few troubles at the data analysis stage. In particular, I have noted that many colleagues, in order to avoid problems, combine the three predictors into one and fit a simple one-way ANOVA model, as shown below, e.g., for the yield response
+
+```{r}
+Comb <- with(dataset, factor(Herbicide:Adjuvant:DoseF))
+model1 <- lm(Yield ~ Comb, data = dataset)
+anova(model1)
+```
+
+Such an analysis, to my opinion, is rather inefficient. Indeed, the aim of an experiment like this one is not only to compare the treatments with the control, but it is also to analyse the factorial structure, to assess the existence of possible interaction effects among the predictors. Therefore, it may be worth to take a minute to develop a more efficient model to describe our experimental data.
+
+With R, it will be convenient to create a new 'dummy' variable to part the controls and the factorial structure, as shown in the box below. In this case, we have two controls, but, in other case, this dummy variable will be binary.
+
+
+```{r}
+dataset$CvT <- with(dataset, factor(ifelse(Herbicide == "HandWeeded", "chk1",
+                      ifelse(Herbicide == "Unweeded", "chk2","trt"))))
+```
+
+Now, we code the model, by nesting the factorial structure within the newly created variable.
+
+```{r}
+model2 <- lm(Yield ~ CvT/(Herbicide*DoseF*Adjuvant), data = dataset)
+anova(model2)
+```
+
+The 'CvT' effects represents the contrast between the two controls and the treated plots and it has three levels (untreated, hand-weeded and treated). We see that this effect is significant, as well as the 'Herbicide:Adjuvant' interaction within treated plots. On the other hand, the 'Dose' effect within treated plots, is not significant. We can use the `emmeans()` function to extract the relevant marginal means and compare them.
+
+```{r message=FALSE, warning=FALSE}
+cld(emmeans(model2, ~CvT), Letters = LETTERS)
+cld(emmeans(model2, ~CvT:Herbicide:Adjuvant), Letters = LETTERS)
+```
+
+I suggest that this type of analysis is simple enough and makes better use of the information contained in our dataset.
+
+Thanks for reading and happy coding!
+
+Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences        
+University of Perugia (Italy)        
+[andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)  
+
+<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow @onofriandreapg</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+---
+
+# Reference
+
+1. Piepho, H.P., Edmondson, R.N., 2018. A tutorial on the statistical analysis of factorial experiments with qualitative and quantitative treatment factor levels. J Agronomy Crop Science 204, 429–455. https://doi.org/10.1111/jac.12267
+
+
+

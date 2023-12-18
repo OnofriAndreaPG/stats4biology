@@ -1,0 +1,83 @@
+---
+title: "Regression analyses with common checks in pesticide research"
+author: "Andrea Onofri"
+date: 2023-12-15
+slug: 'Linear_models'
+categories:
+  - R
+  - 'Linear_models'
+tags:
+  - R
+  - 'Linear_models'
+  - 'Case_study'
+archives:
+  - 2023
+---
+
+
+
+<p>In pesticide research or, in general, agriculture research, we very commonly encounter experiments with, e.g., several herbicides tested at different doses and in different conditions. For these experiments, the untreated control is always added and, of course, such control is common to all herbicides.</p>
+<p>For example, in another post (<a href="https://www.statforbiology.com/2023/stat_lm_augmentedfactorial/">see here</a>) we have considered an experiment with two herbicides (rimsulfuron and dicamba) at two rates (40 and 60 g/ha for rimsulfuron and 0.6 and 1 kg/ha for dicamba) and with four adjuvant treatments (surfactant, frigate, mineral oil and no adjuvant). The dataset is loaded in the box below: there are three predictors (Herbicide, Adjuvant and Dose) and two quantitative response variables (WeedCoverage and Yield).</p>
+<pre class="r"><code>rm(list = ls())
+library(emmeans)
+library(multcomp)
+fileName &lt;- &quot;https://www.casaonofri.it/_datasets/adjuvants.csv&quot;
+dataset &lt;- read.csv(fileName)
+head(dataset)
+##   Plot   Herbicide   Adjuvant Dose Block WeedCoverage Yield
+## 1    1  HandWeeded       None    0     1         0.00 14.55
+## 2    2     Dicamba    Frigate    1     1        27.70 11.10
+## 3    3     Dicamba Surfactant    1     1        22.60 13.16
+## 4    4     Dicamba MineralOil    1     1        16.35 14.22
+## 5    5     Dicamba       None    1     1        45.00 14.69
+## 6    6 Rimsulfuron MineralOil   60     1        16.65 12.01
+dataset[,c(1:3,5)] &lt;- lapply(dataset[,c(1:3,5)], 
+                             function(i) factor(i))</code></pre>
+<p>In the previous post we have taken the dose as a factor and fitted an augmented factorial model. More appropriately, in this post we would like to take the dose as a quantitative variable and fit a regression model. If we consider the common control (dose = 0), we have three available doses for each herbicide and, thus, we can fit a simple linear regression model. In particular, we should fit 8 regression lines, one per each adjuvant/herbicide combination and we should assume that these lines have a common intercept, as they share a common control. It will also be necessary to assume that the adjuvants have no effect on themselves, which may not be true in this case, but we are not attempting to draw any biological conclusions, we only want to give an example of the method.</p>
+<p>First of all, we remove the hand weeded control, that plays no role in regression analysis, because it has no explicit or implicit dose value.</p>
+<pre class="r"><code>dataset &lt;- subset(dataset, Herbicide != &quot;HandWeeded&quot;)
+dataset[,c(1:3,5)] &lt;- lapply(dataset[,c(1:3,5)], 
+                             function(i) factor(i))</code></pre>
+<p>In order to code for a set of models with a common intercept, we have to remove the main effects of herbicide and adjuvant from the model, because they would imply an adjuvant/herbicide-specific intercept, which is inappropriate. Next, we can fit eight different slopes by nesting the regression effect within the ‘herbicide by adjuvant’ combination, by using the nesting operator ‘%in%’. We could also use the ‘/’ operator, although in this case we would have the slopes expressed as differences with respect to one of the ‘herbicide by adjuvant’ combinations (i.e.: Rimsulfuron:Surfactant).</p>
+<pre class="r"><code>model &lt;- lm(Yield ~ Dose %in% (Herbicide:Adjuvant) - Herbicide
+            - Adjuvant, data = dataset)
+summary(model)$coef[,1:3]
+##                                                 Estimate  Std. Error   t value
+## (Intercept)                                  12.28612378 0.315604824 38.928821
+## Dose:HerbicideDicamba:AdjuvantFrigate         1.03544261 0.584247220  1.772268
+## Dose:HerbicideRimsulfuron:AdjuvantFrigate     0.04480531 0.009489724  4.721456
+## Dose:HerbicideDicamba:AdjuvantMineralOil      2.17845732 0.584247220  3.728657
+## Dose:HerbicideRimsulfuron:AdjuvantMineralOil  0.03691108 0.009489724  3.889584
+## Dose:HerbicideDicamba:AdjuvantNone            1.77478085 0.584247220  3.037722
+## Dose:HerbicideRimsulfuron:AdjuvantNone        0.01283416 0.009489724  1.352427
+## Dose:HerbicideDicamba:AdjuvantSurfactant      1.41081026 0.584247220  2.414749
+## Dose:HerbicideRimsulfuron:AdjuvantSurfactant  0.04518031 0.009489724  4.760972
+# Alternative
+# model &lt;- lm(Yield ~ Dose / (Herbicide:Adjuvant) - Herbicide
+#            - Adjuvant, data = dataset)</code></pre>
+<p>Obviously, the slope for the herbicide ‘Unweeded’ (the control), is not estimable. With some further effort, we can compare the regression coefficients, within each herbicides. For example, with rimsulfuron, we need to retrieve the slopes from the model fit, that are, respectively, the coefficients in 3rd, 6th, 9th, and 12nd position.</p>
+<pre class="r"><code>coefs &lt;- coef(model)[c(3,6,9,12)]</code></pre>
+<p>Second, we have to retrieve the variances-covariances for the selected parameters:</p>
+<pre class="r"><code>varCov &lt;- vcov(model)[c(3,6,9,12), c(3,6,9,12)]</code></pre>
+<p>Now, we can input these elements into the <code>pairComp()</code> function in the ‘aomisc’ package, considering that we have 63 degrees of freedom in the residuals (see above):</p>
+<pre class="r"><code>library(aomisc)
+pairComp(coefs, vcovMat = varCov, dfr = 63)$Letters
+##                                                    Mean          SE CLD
+## Dose:HerbicideRimsulfuron:AdjuvantNone       0.01283416 0.009489724   a
+## Dose:HerbicideRimsulfuron:AdjuvantMineralOil 0.03691108 0.009489724   b
+## Dose:HerbicideRimsulfuron:AdjuvantFrigate    0.04480531 0.009489724   b
+## Dose:HerbicideRimsulfuron:AdjuvantSurfactant 0.04518031 0.009489724   b</code></pre>
+<p>Thanks for reading and happy coding!</p>
+<p>Andrea Onofri<br />
+Department of Agricultural, Food and Environmental Sciences<br />
+University of Perugia (Italy)<br />
+<a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow <span class="citation">@onofriandreapg</span></a>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<hr />
+<div id="reference" class="section level1">
+<h1>Reference</h1>
+<ol style="list-style-type: decimal">
+<li>Piepho, H.P., Edmondson, R.N., 2018. A tutorial on the statistical analysis of factorial experiments with qualitative and quantitative treatment factor levels. J Agronomy Crop Science 204, 429–455. <a href="https://doi.org/10.1111/jac.12267" class="uri">https://doi.org/10.1111/jac.12267</a></li>
+</ol>
+</div>

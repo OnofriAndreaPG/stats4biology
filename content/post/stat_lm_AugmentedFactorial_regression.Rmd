@@ -1,0 +1,101 @@
+---
+title: "Regression analyses with common checks in pesticide research"
+author: "Andrea Onofri"
+date: 2023-12-15
+slug: 'Linear_models'
+categories:
+  - R
+  - 'Linear_models'
+tags:
+  - R
+  - 'Linear_models'
+  - 'Case_study'
+archives:
+  - 2023
+---
+
+```{r setup, cache = F, echo = F}
+#Put at the beginning
+knitr::opts_chunk$set(echo = TRUE, message = F, warning = F)
+knitr::knit_hooks$set(document = function(x){ 
+  gsub("```\n*```r*\n*", "", x) 
+})
+```
+
+In pesticide research or, in general, agriculture research, we very commonly encounter experiments with, e.g., several herbicides tested at different doses and in different conditions. For these experiments, the untreated control is always added and, of course, such control is common to all herbicides.
+
+For example, in another post ([see here](https://www.statforbiology.com/2023/stat_lm_augmentedfactorial/)) we have considered an experiment with two herbicides (rimsulfuron and dicamba) at two rates (40 and 60 g/ha for rimsulfuron and 0.6 and 1 kg/ha for dicamba) and with four adjuvant treatments (surfactant, frigate, mineral oil and no adjuvant). The dataset is loaded in the box below: there are three predictors (Herbicide, Adjuvant and Dose) and two quantitative response variables (WeedCoverage and Yield). 
+
+```{r}
+rm(list = ls())
+library(emmeans)
+library(multcomp)
+fileName <- "https://www.casaonofri.it/_datasets/adjuvants.csv"
+dataset <- read.csv(fileName)
+head(dataset)
+dataset[,c(1:3,5)] <- lapply(dataset[,c(1:3,5)], 
+                             function(i) factor(i))
+```
+
+
+In the previous post we have taken the dose as a factor and fitted an augmented factorial model. More appropriately, in this post we would like to take the dose as a quantitative variable and fit a regression model. If we consider the common control (dose = 0), we have three available doses for each herbicide and, thus, we can fit a simple linear regression model. In particular, we should fit 8 regression lines, one per each adjuvant/herbicide combination and we should assume that these lines have a common intercept, as they share a common control. It will also be necessary to assume that the adjuvants have no effect on themselves, which may not be true in this case, but we are not attempting to draw any biological conclusions, we only want to give an example of the method.
+
+First of all, we remove the hand weeded control, that plays no role in regression analysis, because it has no explicit or implicit dose value.
+
+```{r}
+dataset <- subset(dataset, Herbicide != "HandWeeded")
+dataset[,c(1:3,5)] <- lapply(dataset[,c(1:3,5)], 
+                             function(i) factor(i))
+```
+
+In order to code for a set of models with a common intercept, we have to remove the main effects of herbicide and adjuvant from the model, because they would imply an adjuvant/herbicide-specific intercept, which is inappropriate. Next, we can fit eight different slopes by nesting the regression effect within the 'herbicide by adjuvant' combination, by using the nesting operator '%in%'. We could also use the '/' operator, although in this case we would have the slopes expressed as differences with respect to one of the 'herbicide by adjuvant' combinations (i.e.: Rimsulfuron:Surfactant). 
+
+
+```{r}
+model <- lm(Yield ~ Dose %in% (Herbicide:Adjuvant) - Herbicide
+            - Adjuvant, data = dataset)
+summary(model)$coef[,1:3]
+
+# Alternative
+# model <- lm(Yield ~ Dose / (Herbicide:Adjuvant) - Herbicide
+#            - Adjuvant, data = dataset)
+```
+
+Obviously, the slope for the herbicide 'Unweeded' (the control), is not estimable. With some further effort, we can compare the regression coefficients, within each herbicides. For example, with rimsulfuron, we need to retrieve the slopes from the model fit, that are, respectively, the coefficients in 3rd, 6th, 9th, and 12nd position. 
+
+```{r}
+coefs <- coef(model)[c(3,6,9,12)]
+```
+
+Second, we have to retrieve the variances-covariances for the selected parameters:
+
+```{r}
+varCov <- vcov(model)[c(3,6,9,12), c(3,6,9,12)]
+```
+
+Now, we can input these elements into the `pairComp()` function in the 'aomisc' package, considering that we have 63 degrees of freedom in the residuals (see above):
+
+```{r}
+library(aomisc)
+pairComp(coefs, vcovMat = varCov, dfr = 63)$Letters
+```
+
+
+
+Thanks for reading and happy coding!
+
+Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences        
+University of Perugia (Italy)        
+[andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)  
+
+<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow @onofriandreapg</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+---
+
+# Reference
+
+1. Piepho, H.P., Edmondson, R.N., 2018. A tutorial on the statistical analysis of factorial experiments with qualitative and quantitative treatment factor levels. J Agronomy Crop Science 204, 429–455. https://doi.org/10.1111/jac.12267
+
+
+
