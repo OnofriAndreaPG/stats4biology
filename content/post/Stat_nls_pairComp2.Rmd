@@ -1,0 +1,150 @@
+---
+title: "Pairwise comparisons in nonlinear regression"
+author: "Andrea Onofri"
+date: 2024-02-23
+slug: 'nonlinear_regression'
+categories:
+  - R
+  - 'nonlinear_regression'
+tags:
+  - R
+  - 'nonlinear_regression'
+  - 'nls'
+  - 'aomisc'
+  - 'drm'
+archives:
+  - 2024
+---
+
+
+```{r setup, cache = F, echo = F}
+#Put at the beginning
+knitr::knit_hooks$set(document = function(x){ 
+  gsub("```\n*```r*\n*", "", x) 
+})
+```
+
+
+Pairwise comparisons are one of the most debated topic in agricultural research: they are very often used and, sometimes, abused, in literature. I have nothing against the appropriate use of this very useful technique and, for those who are interested, some colleagues and I have given a bunch of (hopefully) useful suggestions in a paper, a few years ago ([follow this link here](https://onlinelibrary.wiley.com/doi/10.1111/j.1365-3180.2009.00758.x)).
+
+According to the emails I often receive, there might be some interest in making pairwise comparisons in linear/nonlinear regression models. In particular, whenever we have grouped data and we have fitted the same model to each group, we might like to compare the groups, to state whether the regression lines/curves are significantly different from each other. To this aim, we could consider two approaches:
+
+1. comparing the parameters of the curves; for example, I have three groups and, consequently, three different straight lines. I could ask: are the three slopes significantly different from one another? Or, are the three intercepts significanly different from one another?
+2. Comparing the lines/curves as a whole unit; for example, with three different straight lines I could ask: are the three lines, overall, significantly different?
+
+I have already considered the #1 in a previous post ([follow this link here](https://www.statforbiology.com/2021/stat_nls_paircomp/)); basically, there are functions in the 'drc' (`compParm()`) and 'aomisc' (`compCoefs(),` `pairComp()` and `gnlht()`) packages that permit pairwise comparisons across model parameters.
+
+Relating to the #2 above, the situation is rather similar: we have fitted the same model to all groups, so that the set of maximum likelihood parameter estimates is different for each group. In maths:
+
+$$Y_{ij} = f(X, \theta_j) + \varepsilon_{ij}$$
+
+where $j$ is the group, $i$ is the individual in each group, Y is the response, X is the set of predictors and $\theta$ is the set of estimated parameters.
+
+If the j^th^ groups are not significantly different, the model above reduces to the following one:
+
+$$Y_{i} = f(X, \theta) + \varepsilon_{i}$$
+
+where the different curves have been pooled into one common curve for all treatment levels. These two models are nested in nature and could be compared by using a likelihood ratio test or, in the context of nonlinear regression, by an F test for the extra-sum-of-squares. This way, we can test the hypothesis that the curves are all the same, against the alternative that at least two of those curves are significantly different from each other. I have shown this technique in the context of time-to-event models in [this post](https://www.statforbiology.com/_seedtutorial/comparing-the-time-course-of-events-for-several-groups).
+
+However, a question remains open: which are the different pairs? Let's see a possible line of attack.
+
+# A case-study
+
+This is a real-life example, taken from a research published by Vischetti et al. in 1996  (we have used this example in other posts, before). That research considered three herbicides for weed control in sugar beet, i.e. metamitron (M), phenmedipham (P) and chloridazon (C). Four soil samples were contaminated, respectively with: (i) M alone, (ii) M + P (iii) M + C and (iv) M + P + C. The aim was to assess whether the degradation speed of metamitron in soil depended on the presence of co-applied herbicides. To reach this aim, the soil samples were incubated at 20°C and sub-samples were taken in different times after the beginning of the experiment. The concentration of metamitron in those sub-samples was measured by HPLC analyses, performed in triplicate. The resulting dataset is available within the 'aomisc' package.
+
+In the box below. we install the 'aomisc' package from gitHub (if necessary), load it and load the 'metamitron' dataset.
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+# library(devtools)
+# devtools::install_github("OnofriAndreaPG/aomisc")
+rm(list = ls())
+library(aomisc)
+data(metamitron)
+head(metamitron)
+#...
+#...
+tail(metamitron)
+```
+
+The first step we take is to fit a first-order degradation model, as follows:
+
+$$C_{t, h} = A_h \, \exp \left(-k_h  \, t \right)$$
+where $C$ is the concentration at time $t$ for metamitron in the $h^{th}$ combination (M alone, M + P, M + C and M + P + C), $A$ is the initial concentration for the metamitron in the $h^{th}$ combination, $k$ is the degradation rate for metamitron in the $h^{th}$ combination. This model is nonlinear and, therefore, we can use the `drm()` function in the 'drc' package for nonlinear least squares regression. The code is given below: please, note that the factor variable 'Herbicide' is passed as the 'curveid' argument, so that we can fit different parameters for each level of grouping factor.
+
+```{r}
+# Fit a grouped model
+mod <- drm(Conc ~ Time, fct = DRC.expoDecay(),
+               curveid = Herbicide, 
+               data=metamitron)
+summary(mod)
+```
+
+Now, we fit a common degradation curve for the four herbicides:
+
+```{r}
+# Fit a reduced model
+modRed <- drm(Conc ~ Time, fct = DRC.expoDecay(),
+                data=metamitron)
+summary(modRed)
+```
+
+Finally, we can compare these two nested models by using the 'extra-sum-of-squares' principle:
+
+$$F = \frac{\frac{RSS_r - RSSf}{DF_r-DF_f}}{\frac{RSS_f}{DF_f}},$$
+
+that is:
+
+```{r}
+RSSr <- sum(residuals(modRed)^2)
+RSSf <- sum(residuals(mod)^2)
+DFr <- modRed$df.residual
+DFf <- mod$df.residual
+Fval <- ((RSSr - RSSf)/(DFr - DFf))/(RSSf/DFf)
+pf(Fval, DFr-DFf, DFr, lower.tail = F)
+```
+
+where the value F has an approximate F distribution. More simply, we can reject the null by using the `anova()` function: 
+
+```{r}
+anova(mod, modRed, test = "F")
+```
+
+In conclusion, there is at least one pair of herbicides that degrade in a different manner. But, we have 4 herbicides and 6 possible pairs; which is different from which?
+
+Let's consider the pair composed by the herbicides M and MP; one possible line of attack is that we code a reduced model with three different curves, one for MC, one for MPC and one, in common, for M and MP. Thus we buid a new factor where the levels for M and MP have been collapsed into one.
+
+```{r}
+# New factor with three levels
+newFac <- metamitron$Herbicide
+levels(newFac)[1:2] <- "D1"
+newFac
+```
+
+We refit the reduce model with three curves and compare with the full one (4 curves):
+
+```{r}
+# Fit a reduced model (3 curves)
+modRed2 <- drm(Conc ~ Time, fct = DRC.expoDecay(),
+              curveid = newFac,
+              data=metamitron)
+summary(modRed2)
+anova(mod, modRed2)
+```
+
+We see that the null hypothesis (degradation M = degradation MP) can be rejected. In order to test the difference between the six pairs we can repeated this procees by six times. However, in order to make it quicker, we have added the `compCurves()` function to our 'aomisc' package. In order to correct for multiplicity, we can add the appropriate value to the 'adjusted' argument. 
+
+```{r}
+compCurves(mod, adjusted = "bonferroni")
+```
+
+
+Thanks for reading!
+
+
+Prof. Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences    
+University of Perugia (Italy)   
+email: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)
+Blog [www.statforbiology.com](www.statforbiology.com)
+
+

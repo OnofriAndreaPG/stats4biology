@@ -5,10 +5,208 @@
     <description>Recent content in R on The broken bridge between biologists and statisticians</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2023, @AndreaOnofri</copyright>
-    <lastBuildDate>Fri, 15 Dec 2023 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 23 Feb 2024 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://www.statforbiology.com/tags/r/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Pairwise comparisons in nonlinear regression</title>
+      <link>https://www.statforbiology.com/2024/stat_nls_paircomp2/</link>
+      <pubDate>Fri, 23 Feb 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.statforbiology.com/2024/stat_nls_paircomp2/</guid>
+      <description>
+
+
+&lt;p&gt;Pairwise comparisons are one of the most debated topic in agricultural research: they are very often used and, sometimes, abused, in literature. I have nothing against the appropriate use of this very useful technique and, for those who are interested, some colleagues and I have given a bunch of (hopefully) useful suggestions in a paper, a few years ago (&lt;a href=&#34;https://onlinelibrary.wiley.com/doi/10.1111/j.1365-3180.2009.00758.x&#34;&gt;follow this link here&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;According to the emails I often receive, there might be some interest in making pairwise comparisons in linear/nonlinear regression models. In particular, whenever we have grouped data and we have fitted the same model to each group, we might like to compare the groups, to state whether the regression lines/curves are significantly different from each other. To this aim, we could consider two approaches:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;comparing the parameters of the curves; for example, I have three groups and, consequently, three different straight lines. I could ask: are the three slopes significantly different from one another? Or, are the three intercepts significanly different from one another?&lt;/li&gt;
+&lt;li&gt;Comparing the lines/curves as a whole unit; for example, with three different straight lines I could ask: are the three lines, overall, significantly different?&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;I have already considered the #1 in a previous post (&lt;a href=&#34;https://www.statforbiology.com/2021/stat_nls_paircomp/&#34;&gt;follow this link here&lt;/a&gt;); basically, there are functions in the ‘drc’ (&lt;code&gt;compParm()&lt;/code&gt;) and ‘aomisc’ (&lt;code&gt;compCoefs(),&lt;/code&gt; &lt;code&gt;pairComp()&lt;/code&gt; and &lt;code&gt;gnlht()&lt;/code&gt;) packages that permit pairwise comparisons across model parameters.&lt;/p&gt;
+&lt;p&gt;Relating to the #2 above, the situation is rather similar: we have fitted the same model to all groups, so that the set of maximum likelihood parameter estimates is different for each group. In maths:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[Y_{ij} = f(X, \theta_j) + \varepsilon_{ij}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(j\)&lt;/span&gt; is the group, &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt; is the individual in each group, Y is the response, X is the set of predictors and &lt;span class=&#34;math inline&#34;&gt;\(\theta\)&lt;/span&gt; is the set of estimated parameters.&lt;/p&gt;
+&lt;p&gt;If the j&lt;sup&gt;th&lt;/sup&gt; groups are not significantly different, the model above reduces to the following one:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[Y_{i} = f(X, \theta) + \varepsilon_{i}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where the different curves have been pooled into one common curve for all treatment levels. These two models are nested in nature and could be compared by using a likelihood ratio test or, in the context of nonlinear regression, by an F test for the extra-sum-of-squares. This way, we can test the hypothesis that the curves are all the same, against the alternative that at least two of those curves are significantly different from each other. I have shown this technique in the context of time-to-event models in &lt;a href=&#34;https://www.statforbiology.com/_seedtutorial/comparing-the-time-course-of-events-for-several-groups&#34;&gt;this post&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;However, a question remains open: which are the different pairs? Let’s see a possible line of attack.&lt;/p&gt;
+&lt;div id=&#34;a-case-study&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;A case-study&lt;/h1&gt;
+&lt;p&gt;This is a real-life example, taken from a research published by Vischetti et al. in 1996 (we have used this example in other posts, before). That research considered three herbicides for weed control in sugar beet, i.e. metamitron (M), phenmedipham (P) and chloridazon (C). Four soil samples were contaminated, respectively with: (i) M alone, (ii) M + P (iii) M + C and (iv) M + P + C. The aim was to assess whether the degradation speed of metamitron in soil depended on the presence of co-applied herbicides. To reach this aim, the soil samples were incubated at 20°C and sub-samples were taken in different times after the beginning of the experiment. The concentration of metamitron in those sub-samples was measured by HPLC analyses, performed in triplicate. The resulting dataset is available within the ‘aomisc’ package.&lt;/p&gt;
+&lt;p&gt;In the box below. we install the ‘aomisc’ package from gitHub (if necessary), load it and load the ‘metamitron’ dataset.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# library(devtools)
+# devtools::install_github(&amp;quot;OnofriAndreaPG/aomisc&amp;quot;)
+rm(list = ls())
+library(aomisc)
+data(metamitron)
+head(metamitron)
+##   Time Herbicide   Conc
+## 1    0         M  92.00
+## 2    0         M 118.64
+## 3    0         M  89.58
+## 4    7         M  59.32
+## 5    7         M  62.95
+## 6    7         M  62.95
+#...
+#...
+tail(metamitron)
+##    Time Herbicide  Conc
+## 91   55       MPC 35.75
+## 92   55       MPC 37.83
+## 93   55       MPC 27.41
+## 94   67       MPC 23.38
+## 95   67       MPC 28.41
+## 96   67       MPC 18.92&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The first step we take is to fit a first-order degradation model, as follows:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[C_{t, h} = A_h \, \exp \left(-k_h  \, t \right)\]&lt;/span&gt;
+where &lt;span class=&#34;math inline&#34;&gt;\(C\)&lt;/span&gt; is the concentration at time &lt;span class=&#34;math inline&#34;&gt;\(t\)&lt;/span&gt; for metamitron in the &lt;span class=&#34;math inline&#34;&gt;\(h^{th}\)&lt;/span&gt; combination (M alone, M + P, M + C and M + P + C), &lt;span class=&#34;math inline&#34;&gt;\(A\)&lt;/span&gt; is the initial concentration for the metamitron in the &lt;span class=&#34;math inline&#34;&gt;\(h^{th}\)&lt;/span&gt; combination, &lt;span class=&#34;math inline&#34;&gt;\(k\)&lt;/span&gt; is the degradation rate for metamitron in the &lt;span class=&#34;math inline&#34;&gt;\(h^{th}\)&lt;/span&gt; combination. This model is nonlinear and, therefore, we can use the &lt;code&gt;drm()&lt;/code&gt; function in the ‘drc’ package for nonlinear least squares regression. The code is given below: please, note that the factor variable ‘Herbicide’ is passed as the ‘curveid’ argument, so that we can fit different parameters for each level of grouping factor.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Fit a grouped model
+mod &amp;lt;- drm(Conc ~ Time, fct = DRC.expoDecay(),
+               curveid = Herbicide, 
+               data=metamitron)
+summary(mod)
+## 
+## Model fitted: Exponential Decay Model (2 parms)
+## 
+## Parameter estimates:
+## 
+##          Estimate Std. Error t-value   p-value    
+## C0:M   9.4832e+01 4.8822e+00  19.424 &amp;lt; 2.2e-16 ***
+## C0:MP  9.9585e+01 4.4763e+00  22.247 &amp;lt; 2.2e-16 ***
+## C0:MC  1.0209e+02 4.3613e+00  23.407 &amp;lt; 2.2e-16 ***
+## C0:MPC 1.1162e+02 4.1297e+00  27.030 &amp;lt; 2.2e-16 ***
+## k:M    4.2600e-02 4.3306e-03   9.837 8.327e-16 ***
+## k:MP   3.0338e-02 2.7516e-03  11.025 &amp;lt; 2.2e-16 ***
+## k:MC   2.5735e-02 2.3393e-03  11.001 &amp;lt; 2.2e-16 ***
+## k:MPC  2.1859e-02 1.7677e-03  12.366 &amp;lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error:
+## 
+##  9.701411 (88 degrees of freedom)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now, we fit a common degradation curve for the four herbicides:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Fit a reduced model
+modRed &amp;lt;- drm(Conc ~ Time, fct = DRC.expoDecay(),
+                data=metamitron)
+summary(modRed)
+## 
+## Model fitted: Exponential Decay Model (2 parms)
+## 
+## Parameter estimates:
+## 
+##                  Estimate Std. Error t-value   p-value    
+## C0:(Intercept) 1.0119e+02 3.0656e+00  33.008 &amp;lt; 2.2e-16 ***
+## k:(Intercept)  2.8212e-02 1.7546e-03  16.079 &amp;lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error:
+## 
+##  13.48936 (94 degrees of freedom)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Finally, we can compare these two nested models by using the ‘extra-sum-of-squares’ principle:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[F = \frac{\frac{RSS_r - RSSf}{DF_r-DF_f}}{\frac{RSS_f}{DF_f}},\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;that is:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;RSSr &amp;lt;- sum(residuals(modRed)^2)
+RSSf &amp;lt;- sum(residuals(mod)^2)
+DFr &amp;lt;- modRed$df.residual
+DFf &amp;lt;- mod$df.residual
+Fval &amp;lt;- ((RSSr - RSSf)/(DFr - DFf))/(RSSf/DFf)
+pf(Fval, DFr-DFf, DFr, lower.tail = F)
+## [1] 2.32031e-12&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;where the value F has an approximate F distribution. More simply, we can reject the null by using the &lt;code&gt;anova()&lt;/code&gt; function:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;anova(mod, modRed, test = &amp;quot;F&amp;quot;)
+## 
+## 1st model
+##  fct:      DRC.expoDecay()
+##  pmodels: 1 (for all parameters)
+## 2nd model
+##  fct:      DRC.expoDecay()
+##  pmodels: Herbicide (for all parameters)
+## ANOVA table
+## 
+##           ModelDf     RSS Df F value p value
+## 2nd model      94 17104.5                   
+## 1st model      88  8282.3  6  15.623   0.000&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In conclusion, there is at least one pair of herbicides that degrade in a different manner. But, we have 4 herbicides and 6 possible pairs; which is different from which?&lt;/p&gt;
+&lt;p&gt;Let’s consider the pair composed by the herbicides M and MP; one possible line of attack is that we code a reduced model with three different curves, one for MC, one for MPC and one, in common, for M and MP. Thus we buid a new factor where the levels for M and MP have been collapsed into one.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# New factor with three levels
+newFac &amp;lt;- metamitron$Herbicide
+levels(newFac)[1:2] &amp;lt;- &amp;quot;D1&amp;quot;
+newFac
+##  [1] D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1 
+## [20] D1  D1  D1  D1  D1  MP  MP  MP  MP  MP  MP  MP  MP  MP  MP  MP  MP  MP  MP 
+## [39] MP  MP  MP  MP  MP  MP  MP  MP  MP  MP  D1  D1  D1  D1  D1  D1  D1  D1  D1 
+## [58] D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  MPC MPC MPC MPC
+## [77] MPC MPC MPC MPC MPC MPC MPC MPC MPC MPC MPC MPC MPC MPC MPC MPC MPC MPC MPC
+## [96] MPC
+## Levels: D1 MP MPC&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We refit the reduce model with three curves and compare with the full one (4 curves):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Fit a reduced model (3 curves)
+modRed2 &amp;lt;- drm(Conc ~ Time, fct = DRC.expoDecay(),
+              curveid = newFac,
+              data=metamitron)
+summary(modRed2)
+## 
+## Model fitted: Exponential Decay Model (2 parms)
+## 
+## Parameter estimates:
+## 
+##          Estimate Std. Error t-value   p-value    
+## C0:D1  9.7816e+01 3.7911e+00 25.8015 &amp;lt; 2.2e-16 ***
+## C0:MP  9.9585e+01 5.2295e+00 19.0429 &amp;lt; 2.2e-16 ***
+## C0:MPC 1.1162e+02 4.8246e+00 23.1366 &amp;lt; 2.2e-16 ***
+## k:D1   3.2290e-02 2.5371e-03 12.7271 &amp;lt; 2.2e-16 ***
+## k:MP   3.0338e-02 3.2146e-03  9.4376 4.222e-15 ***
+## k:MPC  2.1860e-02 2.0651e-03 10.5850 &amp;lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error:
+## 
+##  11.33378 (90 degrees of freedom)
+anova(mod, modRed2)
+## 
+## 1st model
+##  fct:      DRC.expoDecay()
+##  pmodels: newFac (for all parameters)
+## 2nd model
+##  fct:      DRC.expoDecay()
+##  pmodels: Herbicide (for all parameters)
+## ANOVA table
+## 
+##           ModelDf     RSS Df F value p value
+## 2nd model      90 11560.9                   
+## 1st model      88  8282.3  2  17.418   0.000&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We see that the null hypothesis (degradation M = degradation MP) can be rejected. In order to test the difference between the six pairs we can repeated this procees by six times. However, in order to make it quicker, we have added the &lt;code&gt;compCurves()&lt;/code&gt; function to our ‘aomisc’ package. In order to correct for multiplicity, we can add the appropriate value to the ‘adjusted’ argument.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;compCurves(mod, adjusted = &amp;quot;bonferroni&amp;quot;)
+## $Pairs
+##             RSS1     RSS2 DF Test.value      p.level
+## M-MC   11560.913 8282.329  2  17.417530 2.542176e-06
+## M-MP    9691.075 8282.329  2   7.483983 5.977160e-03
+## M-MPC  16698.655 8282.329  2  44.711862 2.391420e-13
+## MC-MP   8683.576 8282.329  2   2.131632 7.483781e-01
+## MC-MPC  9470.171 8282.329  2   6.310427 1.648606e-02
+## MP-MPC 11241.475 8282.329  2  15.720510 8.722373e-06
+## 
+## $Letters
+##     Curve Letters
+## M       M       a
+## MC     MC       b
+## MP     MP       b
+## MPC   MPC       c&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Thanks for reading!&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+email: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;
+Blog &lt;a href=&#34;www.statforbiology.com&#34;&gt;www.statforbiology.com&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Factorial designs with check in pesticide research</title>
@@ -20,7 +218,7 @@
 
 
 &lt;p&gt;In pesticide research or, in general, agriculture research, we very commonly encouter experiments with two/three crossed factors and some other treatment that is not included in the factorial structure. For example, let’s consider an experiment with two herbicides (rimsulfuron and dicamba) at two rates (40 and 60 g/ha for rimsulfuron and 0.6 and 1 kg/ha for dicamba) and with four adjuvant treatments (surfactant, frigate, mineral oil and no adjuvant). Apart from this fully crossed structure, we need to introduce, at least, an untreated control and a hand-weeded control. The design for such an experiment has been termed ‘augmented factorial’, because we are, indeed, including some extra treatment levels beyond the crossed factorial structure.&lt;/p&gt;
-&lt;p&gt;The dataset relating to the above example is named ‘adjuvants.csv’, it is available in an online repository and it can be loaded by using the code below. We have three predictors (Herbicide, Adjuvant and Dose) and two quantitative response variables (WeedCoverage and Yield). We need to transform the variables ‘Herbicide’ and ‘Adjuvant’ into factors, while we recode the two dose levels as ‘HIGH’ and ‘LOW’, in order to make the two herbicides comparable (we could also work with the original dose variable and fit a regression model, but I’ll make this point in a future post).&lt;/p&gt;
+&lt;p&gt;The dataset relating to the above example is named ‘adjuvants.csv’, it is available in an online repository and it can be loaded by using the code below. We have three predictors (Herbicide, Adjuvant and Dose) and two quantitative response variables (WeedCoverage and Yield). We need to transform the variables ‘Herbicide’ and ‘Adjuvant’ into factors, while we recode the two dose levels as ‘HIGH’ and ‘LOW’, in order to make the two herbicides comparable (we could also work with the original dose variable and fit a regression model, but I have made this point in another post, &lt;a href=&#34;https://www.statforbiology.com/2023/stat_lm_augmentedfactorial_regression/&#34;&gt;see here&lt;/a&gt;).&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rm(list = ls())
 library(emmeans)
 library(multcomp)
@@ -133,8 +331,8 @@ University of Perugia (Italy)&lt;br /&gt;
       <description>
 
 
-&lt;p&gt;In pesticide research or, in general, agriculture research, we very commonly encouter experiments with, e.g., several herbicides tested at different doses and in different conditions. For these experiments, the untreated control is always added and, of course, such control is common to all herbicides.&lt;/p&gt;
-&lt;p&gt;For example, in another post we have considered an experiment with two herbicides (rimsulfuron and dicamba) at two rates (40 and 60 g/ha for rimsulfuron and 0.6 and 1 kg/ha for dicamba) and with four adjuvant treatments (surfactant, frigate, mineral oil and no adjuvant). The dataset is loaded in the box below: there are three predictors (Herbicide, Adjuvant and Dose) and two quantitative response variables (WeedCoverage and Yield).&lt;/p&gt;
+&lt;p&gt;In pesticide research or, in general, agriculture research, we very commonly encounter experiments with, e.g., several herbicides tested at different doses and in different conditions. For these experiments, the untreated control is always added and, of course, such control is common to all herbicides.&lt;/p&gt;
+&lt;p&gt;For example, in another post (&lt;a href=&#34;https://www.statforbiology.com/2023/stat_lm_augmentedfactorial/&#34;&gt;see here&lt;/a&gt;) we have considered an experiment with two herbicides (rimsulfuron and dicamba) at two rates (40 and 60 g/ha for rimsulfuron and 0.6 and 1 kg/ha for dicamba) and with four adjuvant treatments (surfactant, frigate, mineral oil and no adjuvant). The dataset is loaded in the box below: there are three predictors (Herbicide, Adjuvant and Dose) and two quantitative response variables (WeedCoverage and Yield).&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rm(list = ls())
 library(emmeans)
 library(multcomp)
@@ -158,51 +356,17 @@ dataset[,c(1:3,5)] &amp;lt;- lapply(dataset[,c(1:3,5)],
 &lt;p&gt;In order to code for a set of models with a common intercept, we have to remove the main effects of herbicide and adjuvant from the model, because they would imply an adjuvant/herbicide-specific intercept, which is inappropriate. Next, we can fit eight different slopes by nesting the regression effect within the ‘herbicide by adjuvant’ combination, by using the nesting operator ‘%in%’. We could also use the ‘/’ operator, although in this case we would have the slopes expressed as differences with respect to one of the ‘herbicide by adjuvant’ combinations (i.e.: Rimsulfuron:Surfactant).&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model &amp;lt;- lm(Yield ~ Dose %in% (Herbicide:Adjuvant) - Herbicide
             - Adjuvant, data = dataset)
-summary(model)
-## 
-## Call:
-## lm(formula = Yield ~ Dose %in% (Herbicide:Adjuvant) - Herbicide - 
-##     Adjuvant, data = dataset)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -3.2661 -0.5379  0.1867  0.6387  2.1454 
-## 
-## Coefficients: (4 not defined because of singularities)
-##                                              Estimate Std. Error t value
-## (Intercept)                                  12.28612    0.31561  38.929
-## Dose:HerbicideDicamba:AdjuvantFrigate         1.03544    0.58425   1.772
-## Dose:HerbicideRimsulfuron:AdjuvantFrigate     0.04480    0.00949   4.721
-## Dose:HerbicideUnweeded:AdjuvantFrigate             NA         NA      NA
-## Dose:HerbicideDicamba:AdjuvantMineralOil      2.17846    0.58425   3.729
-## Dose:HerbicideRimsulfuron:AdjuvantMineralOil  0.03691    0.00949   3.890
-## Dose:HerbicideUnweeded:AdjuvantMineralOil          NA         NA      NA
-## Dose:HerbicideDicamba:AdjuvantNone            1.77478    0.58425   3.038
-## Dose:HerbicideRimsulfuron:AdjuvantNone        0.01283    0.00949   1.352
-## Dose:HerbicideUnweeded:AdjuvantNone                NA         NA      NA
-## Dose:HerbicideDicamba:AdjuvantSurfactant      1.41081    0.58425   2.415
-## Dose:HerbicideRimsulfuron:AdjuvantSurfactant  0.04518    0.00949   4.761
-## Dose:HerbicideUnweeded:AdjuvantSurfactant          NA         NA      NA
-##                                              Pr(&amp;gt;|t|)    
-## (Intercept)                                   &amp;lt; 2e-16 ***
-## Dose:HerbicideDicamba:AdjuvantFrigate        0.081185 .  
-## Dose:HerbicideRimsulfuron:AdjuvantFrigate    1.35e-05 ***
-## Dose:HerbicideUnweeded:AdjuvantFrigate             NA    
-## Dose:HerbicideDicamba:AdjuvantMineralOil     0.000415 ***
-## Dose:HerbicideRimsulfuron:AdjuvantMineralOil 0.000244 ***
-## Dose:HerbicideUnweeded:AdjuvantMineralOil          NA    
-## Dose:HerbicideDicamba:AdjuvantNone           0.003466 ** 
-## Dose:HerbicideRimsulfuron:AdjuvantNone       0.181073    
-## Dose:HerbicideUnweeded:AdjuvantNone                NA    
-## Dose:HerbicideDicamba:AdjuvantSurfactant     0.018661 *  
-## Dose:HerbicideRimsulfuron:AdjuvantSurfactant 1.17e-05 ***
-## Dose:HerbicideUnweeded:AdjuvantSurfactant          NA    
-## ---
-## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
-## 
-## Residual standard error: 1.052 on 63 degrees of freedom
-## Multiple R-squared:  0.3939, Adjusted R-squared:  0.3169 
-## F-statistic: 5.117 on 8 and 63 DF,  p-value: 6.255e-05
+summary(model)$coef[,1:3]
+##                                                 Estimate  Std. Error   t value
+## (Intercept)                                  12.28612378 0.315604824 38.928821
+## Dose:HerbicideDicamba:AdjuvantFrigate         1.03544261 0.584247220  1.772268
+## Dose:HerbicideRimsulfuron:AdjuvantFrigate     0.04480531 0.009489724  4.721456
+## Dose:HerbicideDicamba:AdjuvantMineralOil      2.17845732 0.584247220  3.728657
+## Dose:HerbicideRimsulfuron:AdjuvantMineralOil  0.03691108 0.009489724  3.889584
+## Dose:HerbicideDicamba:AdjuvantNone            1.77478085 0.584247220  3.037722
+## Dose:HerbicideRimsulfuron:AdjuvantNone        0.01283416 0.009489724  1.352427
+## Dose:HerbicideDicamba:AdjuvantSurfactant      1.41081026 0.584247220  2.414749
+## Dose:HerbicideRimsulfuron:AdjuvantSurfactant  0.04518031 0.009489724  4.760972
 # Alternative
 # model &amp;lt;- lm(Yield ~ Dose / (Herbicide:Adjuvant) - Herbicide
 #            - Adjuvant, data = dataset)&lt;/code&gt;&lt;/pre&gt;
@@ -210,7 +374,7 @@ summary(model)
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;coefs &amp;lt;- coef(model)[c(3,6,9,12)]&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Second, we have to retrieve the variances-covariances for the selected parameters:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;varCov &amp;lt;- vcov(model)[c(3,6,9,12), c(3,6,9,12)]&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Now, we can input these elements into the ‘pairComp()’ function in the ‘aomisc’ package, considering that we have 63 degrees of freedom in the residual (see above):&lt;/p&gt;
+&lt;p&gt;Now, we can input these elements into the &lt;code&gt;pairComp()&lt;/code&gt; function in the ‘aomisc’ package, considering that we have 63 degrees of freedom in the residuals (see above):&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(aomisc)
 pairComp(coefs, vcovMat = varCov, dfr = 63)$Letters
 ##                                                    Mean          SE CLD
@@ -218,7 +382,6 @@ pairComp(coefs, vcovMat = varCov, dfr = 63)$Letters
 ## Dose:HerbicideRimsulfuron:AdjuvantMineralOil 0.03691108 0.009489724   b
 ## Dose:HerbicideRimsulfuron:AdjuvantFrigate    0.04480531 0.009489724   b
 ## Dose:HerbicideRimsulfuron:AdjuvantSurfactant 0.04518031 0.009489724   b&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;I suggest that this type of analysis is simple enough and makes better use of the information contained in our dataset.&lt;/p&gt;
 &lt;p&gt;Thanks for reading and happy coding!&lt;/p&gt;
 &lt;p&gt;Andrea Onofri&lt;br /&gt;
 Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;

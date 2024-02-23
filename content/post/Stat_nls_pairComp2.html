@@ -1,0 +1,206 @@
+---
+title: "Pairwise comparisons in nonlinear regression"
+author: "Andrea Onofri"
+date: 2024-02-23
+slug: 'nonlinear_regression'
+categories:
+  - R
+  - 'nonlinear_regression'
+tags:
+  - R
+  - 'nonlinear_regression'
+  - 'nls'
+  - 'aomisc'
+  - 'drm'
+archives:
+  - 2024
+---
+
+
+
+<p>Pairwise comparisons are one of the most debated topic in agricultural research: they are very often used and, sometimes, abused, in literature. I have nothing against the appropriate use of this very useful technique and, for those who are interested, some colleagues and I have given a bunch of (hopefully) useful suggestions in a paper, a few years ago (<a href="https://onlinelibrary.wiley.com/doi/10.1111/j.1365-3180.2009.00758.x">follow this link here</a>).</p>
+<p>According to the emails I often receive, there might be some interest in making pairwise comparisons in linear/nonlinear regression models. In particular, whenever we have grouped data and we have fitted the same model to each group, we might like to compare the groups, to state whether the regression lines/curves are significantly different from each other. To this aim, we could consider two approaches:</p>
+<ol style="list-style-type: decimal">
+<li>comparing the parameters of the curves; for example, I have three groups and, consequently, three different straight lines. I could ask: are the three slopes significantly different from one another? Or, are the three intercepts significanly different from one another?</li>
+<li>Comparing the lines/curves as a whole unit; for example, with three different straight lines I could ask: are the three lines, overall, significantly different?</li>
+</ol>
+<p>I have already considered the #1 in a previous post (<a href="https://www.statforbiology.com/2021/stat_nls_paircomp/">follow this link here</a>); basically, there are functions in the ‘drc’ (<code>compParm()</code>) and ‘aomisc’ (<code>compCoefs(),</code> <code>pairComp()</code> and <code>gnlht()</code>) packages that permit pairwise comparisons across model parameters.</p>
+<p>Relating to the #2 above, the situation is rather similar: we have fitted the same model to all groups, so that the set of maximum likelihood parameter estimates is different for each group. In maths:</p>
+<p><span class="math display">\[Y_{ij} = f(X, \theta_j) + \varepsilon_{ij}\]</span></p>
+<p>where <span class="math inline">\(j\)</span> is the group, <span class="math inline">\(i\)</span> is the individual in each group, Y is the response, X is the set of predictors and <span class="math inline">\(\theta\)</span> is the set of estimated parameters.</p>
+<p>If the j<sup>th</sup> groups are not significantly different, the model above reduces to the following one:</p>
+<p><span class="math display">\[Y_{i} = f(X, \theta) + \varepsilon_{i}\]</span></p>
+<p>where the different curves have been pooled into one common curve for all treatment levels. These two models are nested in nature and could be compared by using a likelihood ratio test or, in the context of nonlinear regression, by an F test for the extra-sum-of-squares. This way, we can test the hypothesis that the curves are all the same, against the alternative that at least two of those curves are significantly different from each other. I have shown this technique in the context of time-to-event models in <a href="https://www.statforbiology.com/_seedtutorial/comparing-the-time-course-of-events-for-several-groups">this post</a>.</p>
+<p>However, a question remains open: which are the different pairs? Let’s see a possible line of attack.</p>
+<div id="a-case-study" class="section level1">
+<h1>A case-study</h1>
+<p>This is a real-life example, taken from a research published by Vischetti et al. in 1996 (we have used this example in other posts, before). That research considered three herbicides for weed control in sugar beet, i.e. metamitron (M), phenmedipham (P) and chloridazon (C). Four soil samples were contaminated, respectively with: (i) M alone, (ii) M + P (iii) M + C and (iv) M + P + C. The aim was to assess whether the degradation speed of metamitron in soil depended on the presence of co-applied herbicides. To reach this aim, the soil samples were incubated at 20°C and sub-samples were taken in different times after the beginning of the experiment. The concentration of metamitron in those sub-samples was measured by HPLC analyses, performed in triplicate. The resulting dataset is available within the ‘aomisc’ package.</p>
+<p>In the box below. we install the ‘aomisc’ package from gitHub (if necessary), load it and load the ‘metamitron’ dataset.</p>
+<pre class="r"><code># library(devtools)
+# devtools::install_github(&quot;OnofriAndreaPG/aomisc&quot;)
+rm(list = ls())
+library(aomisc)
+data(metamitron)
+head(metamitron)
+##   Time Herbicide   Conc
+## 1    0         M  92.00
+## 2    0         M 118.64
+## 3    0         M  89.58
+## 4    7         M  59.32
+## 5    7         M  62.95
+## 6    7         M  62.95
+#...
+#...
+tail(metamitron)
+##    Time Herbicide  Conc
+## 91   55       MPC 35.75
+## 92   55       MPC 37.83
+## 93   55       MPC 27.41
+## 94   67       MPC 23.38
+## 95   67       MPC 28.41
+## 96   67       MPC 18.92</code></pre>
+<p>The first step we take is to fit a first-order degradation model, as follows:</p>
+<p><span class="math display">\[C_{t, h} = A_h \, \exp \left(-k_h  \, t \right)\]</span>
+where <span class="math inline">\(C\)</span> is the concentration at time <span class="math inline">\(t\)</span> for metamitron in the <span class="math inline">\(h^{th}\)</span> combination (M alone, M + P, M + C and M + P + C), <span class="math inline">\(A\)</span> is the initial concentration for the metamitron in the <span class="math inline">\(h^{th}\)</span> combination, <span class="math inline">\(k\)</span> is the degradation rate for metamitron in the <span class="math inline">\(h^{th}\)</span> combination. This model is nonlinear and, therefore, we can use the <code>drm()</code> function in the ‘drc’ package for nonlinear least squares regression. The code is given below: please, note that the factor variable ‘Herbicide’ is passed as the ‘curveid’ argument, so that we can fit different parameters for each level of grouping factor.</p>
+<pre class="r"><code># Fit a grouped model
+mod &lt;- drm(Conc ~ Time, fct = DRC.expoDecay(),
+               curveid = Herbicide, 
+               data=metamitron)
+summary(mod)
+## 
+## Model fitted: Exponential Decay Model (2 parms)
+## 
+## Parameter estimates:
+## 
+##          Estimate Std. Error t-value   p-value    
+## C0:M   9.4832e+01 4.8822e+00  19.424 &lt; 2.2e-16 ***
+## C0:MP  9.9585e+01 4.4763e+00  22.247 &lt; 2.2e-16 ***
+## C0:MC  1.0209e+02 4.3613e+00  23.407 &lt; 2.2e-16 ***
+## C0:MPC 1.1162e+02 4.1297e+00  27.030 &lt; 2.2e-16 ***
+## k:M    4.2600e-02 4.3306e-03   9.837 8.327e-16 ***
+## k:MP   3.0338e-02 2.7516e-03  11.025 &lt; 2.2e-16 ***
+## k:MC   2.5735e-02 2.3393e-03  11.001 &lt; 2.2e-16 ***
+## k:MPC  2.1859e-02 1.7677e-03  12.366 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error:
+## 
+##  9.701411 (88 degrees of freedom)</code></pre>
+<p>Now, we fit a common degradation curve for the four herbicides:</p>
+<pre class="r"><code># Fit a reduced model
+modRed &lt;- drm(Conc ~ Time, fct = DRC.expoDecay(),
+                data=metamitron)
+summary(modRed)
+## 
+## Model fitted: Exponential Decay Model (2 parms)
+## 
+## Parameter estimates:
+## 
+##                  Estimate Std. Error t-value   p-value    
+## C0:(Intercept) 1.0119e+02 3.0656e+00  33.008 &lt; 2.2e-16 ***
+## k:(Intercept)  2.8212e-02 1.7546e-03  16.079 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error:
+## 
+##  13.48936 (94 degrees of freedom)</code></pre>
+<p>Finally, we can compare these two nested models by using the ‘extra-sum-of-squares’ principle:</p>
+<p><span class="math display">\[F = \frac{\frac{RSS_r - RSSf}{DF_r-DF_f}}{\frac{RSS_f}{DF_f}},\]</span></p>
+<p>that is:</p>
+<pre class="r"><code>RSSr &lt;- sum(residuals(modRed)^2)
+RSSf &lt;- sum(residuals(mod)^2)
+DFr &lt;- modRed$df.residual
+DFf &lt;- mod$df.residual
+Fval &lt;- ((RSSr - RSSf)/(DFr - DFf))/(RSSf/DFf)
+pf(Fval, DFr-DFf, DFr, lower.tail = F)
+## [1] 2.32031e-12</code></pre>
+<p>where the value F has an approximate F distribution. More simply, we can reject the null by using the <code>anova()</code> function:</p>
+<pre class="r"><code>anova(mod, modRed, test = &quot;F&quot;)
+## 
+## 1st model
+##  fct:      DRC.expoDecay()
+##  pmodels: 1 (for all parameters)
+## 2nd model
+##  fct:      DRC.expoDecay()
+##  pmodels: Herbicide (for all parameters)
+## ANOVA table
+## 
+##           ModelDf     RSS Df F value p value
+## 2nd model      94 17104.5                   
+## 1st model      88  8282.3  6  15.623   0.000</code></pre>
+<p>In conclusion, there is at least one pair of herbicides that degrade in a different manner. But, we have 4 herbicides and 6 possible pairs; which is different from which?</p>
+<p>Let’s consider the pair composed by the herbicides M and MP; one possible line of attack is that we code a reduced model with three different curves, one for MC, one for MPC and one, in common, for M and MP. Thus we buid a new factor where the levels for M and MP have been collapsed into one.</p>
+<pre class="r"><code># New factor with three levels
+newFac &lt;- metamitron$Herbicide
+levels(newFac)[1:2] &lt;- &quot;D1&quot;
+newFac
+##  [1] D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1 
+## [20] D1  D1  D1  D1  D1  MP  MP  MP  MP  MP  MP  MP  MP  MP  MP  MP  MP  MP  MP 
+## [39] MP  MP  MP  MP  MP  MP  MP  MP  MP  MP  D1  D1  D1  D1  D1  D1  D1  D1  D1 
+## [58] D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  D1  MPC MPC MPC MPC
+## [77] MPC MPC MPC MPC MPC MPC MPC MPC MPC MPC MPC MPC MPC MPC MPC MPC MPC MPC MPC
+## [96] MPC
+## Levels: D1 MP MPC</code></pre>
+<p>We refit the reduce model with three curves and compare with the full one (4 curves):</p>
+<pre class="r"><code># Fit a reduced model (3 curves)
+modRed2 &lt;- drm(Conc ~ Time, fct = DRC.expoDecay(),
+              curveid = newFac,
+              data=metamitron)
+summary(modRed2)
+## 
+## Model fitted: Exponential Decay Model (2 parms)
+## 
+## Parameter estimates:
+## 
+##          Estimate Std. Error t-value   p-value    
+## C0:D1  9.7816e+01 3.7911e+00 25.8015 &lt; 2.2e-16 ***
+## C0:MP  9.9585e+01 5.2295e+00 19.0429 &lt; 2.2e-16 ***
+## C0:MPC 1.1162e+02 4.8246e+00 23.1366 &lt; 2.2e-16 ***
+## k:D1   3.2290e-02 2.5371e-03 12.7271 &lt; 2.2e-16 ***
+## k:MP   3.0338e-02 3.2146e-03  9.4376 4.222e-15 ***
+## k:MPC  2.1860e-02 2.0651e-03 10.5850 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error:
+## 
+##  11.33378 (90 degrees of freedom)
+anova(mod, modRed2)
+## 
+## 1st model
+##  fct:      DRC.expoDecay()
+##  pmodels: newFac (for all parameters)
+## 2nd model
+##  fct:      DRC.expoDecay()
+##  pmodels: Herbicide (for all parameters)
+## ANOVA table
+## 
+##           ModelDf     RSS Df F value p value
+## 2nd model      90 11560.9                   
+## 1st model      88  8282.3  2  17.418   0.000</code></pre>
+<p>We see that the null hypothesis (degradation M = degradation MP) can be rejected. In order to test the difference between the six pairs we can repeated this procees by six times. However, in order to make it quicker, we have added the <code>compCurves()</code> function to our ‘aomisc’ package. In order to correct for multiplicity, we can add the appropriate value to the ‘adjusted’ argument.</p>
+<pre class="r"><code>compCurves(mod, adjusted = &quot;bonferroni&quot;)
+## $Pairs
+##             RSS1     RSS2 DF Test.value      p.level
+## M-MC   11560.913 8282.329  2  17.417530 2.542176e-06
+## M-MP    9691.075 8282.329  2   7.483983 5.977160e-03
+## M-MPC  16698.655 8282.329  2  44.711862 2.391420e-13
+## MC-MP   8683.576 8282.329  2   2.131632 7.483781e-01
+## MC-MPC  9470.171 8282.329  2   6.310427 1.648606e-02
+## MP-MPC 11241.475 8282.329  2  15.720510 8.722373e-06
+## 
+## $Letters
+##     Curve Letters
+## M       M       a
+## MC     MC       b
+## MP     MP       b
+## MPC   MPC       c</code></pre>
+<p>Thanks for reading!</p>
+<p>Prof. Andrea Onofri<br />
+Department of Agricultural, Food and Environmental Sciences<br />
+University of Perugia (Italy)<br />
+email: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a>
+Blog <a href="www.statforbiology.com">www.statforbiology.com</a></p>
+</div>
