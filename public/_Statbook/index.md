@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.23 (Anno Accademico 2022-2023), compil. 2023-05-23"
+date: "Update: v. 1.24 (Anno Accademico 2022-2023), compil. 2024-03-01"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -188,7 +188,7 @@ Controllare gli errori, o, analogamente, eseguire un esperimento controllato sig
 1.  adottare provvedimenti idonei ad evitare le fonti di errore, mantenendole al livello più basso possibile (alta precisione);
 2.  agire in modo da isolare l'effetto in studio (accuratezza), evitando che si confonda con effetti casuali e di altra natura. Ad esempio, se dobbiamo confrontare due fitofarmaci, dobbiamo fare in modo che i soggetti inclusi nell'esperimento differiscano tra di loro solo per il fitofarmaco impiegato e non per altro.
 
-Mettere in pratica questi principi fondamentali richiede una vita di esperienza! Tuttavia, vogliamo solo sottolineare alcuni aspetti, come il rigore metodologico. È evidente che, ad esempio, se vogliamo sapere la cinetica di degradazione di un erbicida a 20 °C dovremo realizzare una prova esattamente a quella temperatura, con un erbicida uniformemente distribuito nel terreno, dentro una camera climatica capace di un controllo perfetto della temperatura. Gli strumenti dovranno essere ben tarati e sarà necessario attenersi scrupolosamente a metodi validati e largamente condivisi. Tuttavia, a proposito di rigore, non bisogna scordare quanto diceva C.F. Gauss a proposito della precisione nei calcoli, e che può essere anche riferito al rigore nella ricerca : "*Manca di mentalità matematica tanto chi non sa riconoscere rapidamente ciò che è evidente, quanto chi si attarda nei calcoli con una precisione superiore alla necessità*"
+Mettere in pratica questi principi fondamentali richiede una vita di esperienza! Tuttavia, vogliamo solo sottolineare alcuni aspetti, come il rigore metodologico. È evidente che, ad esempio, se vogliamo sapere la cinetica di degradazione di un erbicida a 20 °C dovremo realizzare una prova esattamente a quella temperatura, con un erbicida uniformemente distribuito nel terreno, dentro una camera climatica capace di un controllo perfetto della temperatura. Gli strumenti dovranno essere ben tarati e sarà necessario attenersi scrupolosamente a metodi validati e largamente condivisi. Tuttavia, a proposito di rigore, non bisogna scordare il famoso aforisma, attribuito a C.F. Gauss e riferito alla della precisione nei calcoli, che può essere anche riferito al rigore nella ricerca : "*Manca di mentalità matematica tanto chi non sa riconoscere rapidamente ciò che è evidente, quanto chi si attarda nei calcoli con una precisione superiore alla necessità*". In altre parole, il rigore metodologico è fondamentale, ma deve essere sempre compatibile con gli scopi della ricerca ed i livelli di precisione richiesti, per evitare un'eccessivo consumo di tempo e risorse finanziare.
 
 Oltre al rigore metodologico, è bene anche ricordare come un esperimento ben fatto passi sempre attraverso la giusta selezione dei soggetti sperimentali, che debbono essere omogenei, ma rappresentativi della popolazione alla quale intendiamo riferire i risultati ottenuti. Ad esempio, se si vuole ottenere un risultato riferito alla collina umbra, bisognerà scegliere parcelle di terreno omogenee, ma che rappresentano bene la variabilità pedo-climatica di quell'ambiente, né di più, né di meno.
 
@@ -764,19 +764,34 @@ In primo luogo, calcoliamo le due medie, che sono, rispettivamente, 46.44 e 46.2
 
 
 
+```
+##    A  B   scarti.a    scarti.b prod.scarti scarti.a2    scarti.b2
+## 1 45 44 -1.4444444  -2.2222222   3.2098765  2.086420   4.93827160
+## 2 47 44  0.5555556  -2.2222222  -1.2345679  0.308642   4.93827160
+## 3 49 49  2.5555556   2.7777778   7.0987654  6.530864   7.71604938
+## 4 51 53  4.5555556   6.7777778  30.8765432 20.753086  45.93827160
+## 5 44 48 -2.4444444   1.7777778  -4.3456790  5.975309   3.16049383
+## 6 37 34 -9.4444444 -12.2222222 115.4320988 89.197531 149.38271605
+## 7 48 47  1.5555556   0.7777778   1.2098765  2.419753   0.60493827
+## 8 44 46 -2.4444444  -0.2222222   0.5432099  5.975309   0.04938272
+## 9 53 51  6.5555556   4.7777778  31.3209877 42.975309  22.82716049
+```
+
+
+
 Table: (\#tab:tabName3)Calcolo manuale del coefficiente di correlazione
 
-|  A|  B|  $z_A$|   $z_B$| $z_A^2$| $z_B^2$| $z_A \times z_B$|
-|--:|--:|------:|-------:|-------:|-------:|----------------:|
-| 45| 44| -1.444|  -2.222|   3.210|   2.086|            4.938|
-| 47| 44|  0.556|  -2.222|  -1.235|   0.309|            4.938|
-| 49| 49|  2.556|   2.778|   7.099|   6.531|            7.716|
-| 51| 53|  4.556|   6.778|  30.877|  20.753|           45.938|
-| 44| 48| -2.444|   1.778|  -4.346|   5.975|            3.160|
-| 37| 34| -9.444| -12.222| 115.432|  89.198|          149.383|
-| 48| 47|  1.556|   0.778|   1.210|   2.420|            0.605|
-| 44| 46| -2.444|  -0.222|   0.543|   5.975|            0.049|
-| 53| 51|  6.556|   4.778|  31.321|  42.975|           22.827|
+|  A|  B|  $z_A$|   $z_B$| $z_A \times z_B$| $z_A^2$| $z_B^2$|
+|--:|--:|------:|-------:|----------------:|-------:|-------:|
+| 45| 44| -1.444|  -2.222|            3.210|   2.086|   4.938|
+| 47| 44|  0.556|  -2.222|           -1.235|   0.309|   4.938|
+| 49| 49|  2.556|   2.778|            7.099|   6.531|   7.716|
+| 51| 53|  4.556|   6.778|           30.877|  20.753|  45.938|
+| 44| 48| -2.444|   1.778|           -4.346|   5.975|   3.160|
+| 37| 34| -9.444| -12.222|          115.432|  89.198| 149.383|
+| 48| 47|  1.556|   0.778|            1.210|   2.420|   0.605|
+| 44| 46| -2.444|  -0.222|            0.543|   5.975|   0.049|
+| 53| 51|  6.556|   4.778|           31.321|  42.975|  22.827|
 
 La somma dei quadrati dei residui ci permette di calcolare le devianze di $A$ e $B$ (rispettivamente 176.22 e 239.56), mentre la somme dei prodotti degli residui ci permette di calcolare la codevianza (pari a 184.11).
 
@@ -5749,9 +5764,10 @@ Pur essendo entrambi gli approcci corretti, il secondo è certamente più elegan
 
 # Esercizi
 
-Le domande e gli esercizi che seguono sono organizzati per capitolo, in modo che possiate verificare, di volta in volta, se avete acquisito le competenze necessarie per passare al capitolo successivo.
+Questo libro non è finalizzato alla costruzione di una solida formazione teorica in biometria, ma è finalizzato a fornisre gli strumenti necessari per organizzare esperimenti validi ed analizzarne i dati in modo attendibile.
+Per questo motivo, vi proponiamo una lista di esercizi e di casi-studio, coi quali mettere in pratica e verificare la chiarezza dei concetti proposti. Gli esercizi sono orgnizzati in sezioni ed ognuna di esse corrisponde ad uno o più capitoli del libro; per alcuni di essi è necessario caricare dei *datasets*, che si trovano su *repository* esterne, che verranno via via indicate.
 
-## Introduzione alla biometria (Cap. 1)
+## Il disegno degli esperimenti (Cap. 1 e 2)
 
 ### Domanda 1
 
@@ -5773,8 +5789,34 @@ Qual è la differenza tra repliche vere e pseudo-repliche?
 
 Cosa è il confounding e come può rendere distorti i risultati di un esperimento scientifico?
 
+### Domanda 6
 
-## Disegno sperimentale (Cap. 2)
+Quali sono gli elementi comuni a tutti gli esperimenti scientifici?
+
+### Domanda 7
+
+Quali tipi di variabili conoscete e quali sono le loro caratteristiche?
+
+### Domanda 8
+
+Qual è la differenza tra un esperimento fattoriale innestato ed uno incrociato
+
+### Domanda 9
+
+Quali sono le caratteristiche principali degli esperimenti a randomizzazione completa, blocchi randomizzati e quadrato latino?
+
+### Domanda 10
+
+Come è fatto e quando si utilizza uno schema sperimentale a split-plot?
+
+### Domanda 12
+
+Cosa è l'effetto di bordo e come si può controllare?
+
+### Domanda 13
+
+Illustrare e discutere le caratteristiche fondamentali delle 'parcelle' (forma, dimensioni, numero ...)
+
 
 ### Esercizio 1
 
@@ -5807,13 +5849,30 @@ Descrivete lo schema sperimentale che utilizzereste per organizzare una prova su
 
 ## Statistica descrittiva (Cap. 3)
 
+### Domanda 1
+
+Illustrare e discutere i principali indici di tendenza centrale per le variabili quantitative
+
+### Domanda 2
+
+Illustrare e discutere i principali indici di variabilità per le variabili quantitative
+
+### Domanda 3
+
+Illustrare e discutere il coefficiente di correlazione di Pearson
+
+### Domanda 4
+
+Quali statistiche descrittive possono essere utilizzate con le variabili categoriche e ordinali? Illustrare brevemente e discutere
+
+
 ### Esercizio 1
 
-Un'analisi chimica è stata eseguita i triplicato e i risultati sono stati i seguenti: 125, 169 and 142 ng/g. Calcolate a mano la media e tutti gli indicatori di variabilità che conoscete. In che modo può essere espressa l'incertezza della misura?
+Un'analisi chimica è stata eseguita in triplicato e i risultati sono stati i seguenti: 125, 169 and 142 ng/g. Calcolate la media e tutti gli indicatori di variabilità che conoscete. In che modo può essere espressa l'incertezza assoluta della misura?
 
 ### Esercizio 2
 
-Un ricercatore ha confrontato il rapporto tra maschi e femmine in una popolazione di insetti sottoposta a due trattamenti sperimentali diversi e si chiede se maschi e femmine manifestino una diversa sensibilità al trattamento in studio. Considerando la tabella sottostante, valutare il grado di dipendenza tra i due caratteri (sesso e sensibilità), in rapporto al valore minimo e massimo possibile per l'indicatore prescelto. Eseguire i calcoli manualmente.
+Un ricercatore ha confrontato il rapporto tra maschi e femmine in una popolazione di insetti sottoposta a due trattamenti sperimentali diversi e si chiede se maschi e femmine manifestino una diversa sensibilità al trattamento in studio. Considerando la tabella sottostante, valutare il grado di dipendenza tra i due caratteri (sesso e sensibilità), in rapporto al valore minimo e massimo possibile per l'indicatore prescelto.
 
 
 |   | Male| Female|
@@ -5831,7 +5890,7 @@ Altezza <- c(2.3, 2.7, 3.1, 3.5)
 Diametro <- c(0.46, 0.51, 0.59, 0.64)
 ```
 
-Calcolare (a mano) il coefficiente di correlazione di Pearson e valutare la ampiezza della correlazione in base ai valori massimi e minimi ammissibili per questa statistica.
+Calcolare il coefficiente di correlazione di Pearson e valutare l'entità della correlazione in base ai valori massimi e minimi ammissibili per questa statistica.
 
 ### Esercizio 4
 
@@ -5839,7 +5898,10 @@ Considerate il file EXCEL 'rimsulfuron.csv', che potete trovare in questo percor
 
 ### Esercizio 5
 
-Caricare il datasets 'students' disponibile al link: 'https://www.casaonofri.it/_datasets/students.csv'. In questo file potete trovare una database relativo alla valutazione degli studenti in alcune materie del primo anno di Agraria. Ogni record rappresenta un esame, con il relativo voto, la materia e la scuola di provenienza dello studente. Con un uso appropriato delle tabelle di contingenza e del chi quadro, valutare se il voto dipende dalla materia e dalla scuola di provenienza dello studente.
+Caricare il datasets 'students' disponibile al link: 'https://www.casaonofri.it/_datasets/students.csv'. In questo file potete trovare una database relativo alla valutazione degli studenti in alcune materie del primo anno di Agraria. Ogni record rappresenta un esame, con il relativo voto, la materia e la scuola di provenienza dello studente.
+
+1. Determinare la frequenza assoluta e relativa dei diversi voti (da 18 a 30). È possibile calcolare le frequenze cumulate?
+2. Con un uso appropriato delle tabelle di contingenza e del chi quadro, valutare se il voto dipende dalla materia e dalla scuola di provenienza dello studente.
 
 ---
 
@@ -5847,21 +5909,34 @@ Caricare il datasets 'students' disponibile al link: 'https://www.casaonofri.it/
 
 ### Esercizio 1
 
-E' data una distribuzione normale con $\mu$ = 23 e $\sigma$ = 1. Calcolare la probabilità di estrarre individui:
+Un ricercatore sta studiando una popolazione di insetti ed ha valutato che la loro lunghezza è distribuita normalmente, con $\mu = 23 \, \textrm{mm}$ e $\sigma = 1.6$. Calcolare la probabilità di estrarre individui con lunghezza:
 
-1.  maggiori di 25
-2.  minori di 21
-3.  compresi tra 21 e 25
+1.  maggiore di 25
+2.  minore di 21
+3.  compresa tra 21 e 25
 
 ### Esercizio 2
 
-E' data una distribuzione normale con $\mu$ = 156 e $\sigma$ = 13. Calcolare la probabilità di estrarre individui:
+Una macchina confezionatrice riempe automaticamente delle confezioni di seme. Il peso dichiarato sulla confezione è 12.5 kg, ma la precisione della macchina è $\pm $ 1 kg. Calcolare la probabilità che una confezione contenga:
 
-1.  maggiori di 170
-2.  minori di 140
-3.  compresi tra 140 e 170
+1. meno del peso dichiarato
+2. meno di 12 kg
+3. più di 13 Kg
+
+In questa condizione, si vuole regolare la macchina in modo che non più del 5% dei sacchi contenga un peso inferiore a quello dichiarato. Su quale peso dovrebbe essere regolata la macchina di riempimento? (SUGGERIMENTO: se io regolo la macchina a 12.5 kg, la quantità effettivamente erogata è normalmente distribuita, con media 12.5 e deviazione standard 1. In questo caso, c'è un 5% di probabilità di erogare meno di _____ kg; di conseguenza, devo alzare la media di ____ kg per far si che la quantità erogata non sia inferiore a 12.5 kg, se non nel 5% dei casi)
+
+
+
 
 ### Esercizio 3
+
+Uno strumento di analisi ha un coefficiente di variabilità pari al 10\%. Ammettendo di utilizzare quello strumento su una matrice la cui concentrazione è 10 ng/g, calcolare la probabilità di ottenere una misura:
+1. inferiore a 9 ng/g
+2. superiore a 11 ng/g
+3. compresa tra 9 e 11 ng/g
+
+
+### Esercizio 4
 
 Un erbicida si degrada nel terreno seguendo una cinetica del primo ordine:
 
@@ -5871,7 +5946,7 @@ dove Y è la concentrazione al tempo t. Dopo aver spruzzato questo erbicida, che
 
 
 
-### Esercizio 4
+### Esercizio 5
 
 Una sostanza xenobiotica si degrada nell'acqua a 20°C seguendo una cinetica del primo ordine:
 
@@ -5882,7 +5957,7 @@ dove Y è la concentrazione al tempo t. Simulare i risultati di un esperimento i
 
 
 
-### Esercizio 5
+### Esercizio 6
 
 Una coltura produce in funzione della sua fittezza, secondo la seguente relazione:
 
@@ -5894,7 +5969,7 @@ Stabilire la fittezza necessaria per ottenere il massimo produttivo (graficament
 
 
 
-### Esercizio 6
+### Esercizio 7
 
 La tossicità di un insetticida varia con la dose, secondo la legge log-logistica:
 
@@ -5904,18 +5979,18 @@ dove Y è la proporzione di animali morti e X è la dose. Se trattiamo 150 inset
 
 
 
-### Esercizio 7
+### Esercizio 8
 
 Simulare i risultati di un esperimento varietale, con sette varietà di frumento e quattro repliche. Considerare che il modello deterministico è un modello ANOVA, nel quale vengono definite le medie delle sette varietà (valori attesi). Decidere autonomamente sui parametri da impiegare per la simulazione (da $\mu_1$ a $\mu_7$ e $\sigma$)
 
-### Esercizio 8
+### Esercizio 9
 
 Considerando il testo dell'esercizio 5, simulare un esperimento in cui la coltura viene seminata a fittezze di 2, 4, 6, 8 piante per metro quadrato, con quattro repliche.
 
 
-### Esercizio 9
+### Esercizio 10
 
-Considerando il testo dell'esercizio 6, simulare un esperimento in cui l'insetticida viene utilizzato a cinque dosi crescenti (a vostra scelta), con quattro repliche.
+Considerando il testo dell'esercizio 7, simulare un esperimento in cui l'insetticida viene utilizzato a cinque dosi crescenti (a vostra scelta), con quattro repliche.
 
 
 ---
@@ -6276,7 +6351,7 @@ Eseguire l'ANOVA, considerando il dato mancante. Calcolare SEM e SED. Qual è il
 |          D |  4  |   3    |  163  |
 
 Analizzate i dati e commentate i risultati ottenuti
-[Sheet: 10.2]
+[Sheet: 10.3]
 
 ---
 

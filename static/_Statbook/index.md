@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.23 (Anno Accademico 2022-2023), compil. 2024-02-28"
+date: "Update: v. 1.24 (Anno Accademico 2022-2023), compil. 2024-03-01"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -2651,8 +2651,9 @@ Se assumiamo che l'ipotesi nulla è vera, allora i dati dovrebbero essere campio
 ```r
 Ysim <- rnorm(16, 14.48375, 3.9177)
 Ysim
-##  [1] 11.25108 15.84385 10.87910 13.35805 12.32459 17.80849 19.59052 12.41272
-##  [9] 17.47276 21.49765 16.50393 16.48161 17.92167 13.28823 10.57145 17.53845
+##  [1] 11.25108 15.84385 10.87910 13.35805 12.32459 17.80849 19.59052
+##  [8] 12.41272 17.47276 21.49765 16.50393 16.48161 17.92167 13.28823
+## [15] 10.57145 17.53845
 ```
 
 Se sottoponiamo questo dataset alla scomposizione della varianza, possiamo calcolare il relativo valore F. Se ripetiamo questo processo, ad esempio, 100'000 volte, otteniamo 100'000 valori F compatibili con l'ipotesi nulla, in quanto generati assumendola come vera. Otteniamo quindi una *sampling distribution* empirica per F e possiamo valutare qual è la probabilità di ottenere valori superiori a 23.66. In questo caso, il test è ad una sola coda, perché la statistica F è un rapporto do varianze, che sono, per definizione, positive.
@@ -3536,7 +3537,8 @@ In tutte le condizioni analoghe a quelle più sopra accennate si pone il problem
 ```r
 alphaC <- as.data.frame(con)[,6]
 1 - (1 - alphaC)^6
-## [1] 6.722991e-01 9.683462e-02 2.190543e-04 6.923077e-03 2.869757e-05 2.255183e-02
+## [1] 6.722991e-01 9.683462e-02 2.190543e-04 6.923077e-03 2.869757e-05
+## [6] 2.255183e-02
 ```
 \normalsize
 
@@ -3572,7 +3574,8 @@ Quest'ultima è un po' più conservativa della precedente, nel senso che fornisc
 
 ```r
 alphaC * 6
-## [1] 1.018071e+00 1.009900e-01 2.190743e-04 6.943132e-03 2.869792e-05 2.276671e-02
+## [1] 1.018071e+00 1.009900e-01 2.190743e-04 6.943132e-03 2.869792e-05
+## [6] 2.276671e-02
 ```
 
 Oppure possiamo utilizzare la funzione `contrast()`:
@@ -5865,11 +5868,11 @@ Quali statistiche descrittive possono essere utilizzate con le variabili categor
 
 ### Esercizio 1
 
-Un'analisi chimica è stata eseguita in triplicato e i risultati sono stati i seguenti: 125, 169 and 142 ng/g. Calcolate a mano la media e tutti gli indicatori di variabilità che conoscete. In che modo può essere espressa l'incertezza della misura?
+Un'analisi chimica è stata eseguita in triplicato e i risultati sono stati i seguenti: 125, 169 and 142 ng/g. Calcolate la media e tutti gli indicatori di variabilità che conoscete. In che modo può essere espressa l'incertezza assoluta della misura?
 
 ### Esercizio 2
 
-Un ricercatore ha confrontato il rapporto tra maschi e femmine in una popolazione di insetti sottoposta a due trattamenti sperimentali diversi e si chiede se maschi e femmine manifestino una diversa sensibilità al trattamento in studio. Considerando la tabella sottostante, valutare il grado di dipendenza tra i due caratteri (sesso e sensibilità), in rapporto al valore minimo e massimo possibile per l'indicatore prescelto. Eseguire i calcoli manualmente.
+Un ricercatore ha confrontato il rapporto tra maschi e femmine in una popolazione di insetti sottoposta a due trattamenti sperimentali diversi e si chiede se maschi e femmine manifestino una diversa sensibilità al trattamento in studio. Considerando la tabella sottostante, valutare il grado di dipendenza tra i due caratteri (sesso e sensibilità), in rapporto al valore minimo e massimo possibile per l'indicatore prescelto.
 
 
 |   | Male| Female|
@@ -5887,7 +5890,7 @@ Altezza <- c(2.3, 2.7, 3.1, 3.5)
 Diametro <- c(0.46, 0.51, 0.59, 0.64)
 ```
 
-Calcolare (a mano) il coefficiente di correlazione di Pearson e valutare la ampiezza della correlazione in base ai valori massimi e minimi ammissibili per questa statistica.
+Calcolare il coefficiente di correlazione di Pearson e valutare l'entità della correlazione in base ai valori massimi e minimi ammissibili per questa statistica.
 
 ### Esercizio 4
 
@@ -5906,21 +5909,34 @@ Caricare il datasets 'students' disponibile al link: 'https://www.casaonofri.it/
 
 ### Esercizio 1
 
-E' data una distribuzione normale con $\mu$ = 23 e $\sigma$ = 1. Calcolare la probabilità di estrarre individui:
+Un ricercatore sta studiando una popolazione di insetti ed ha valutato che la loro lunghezza è distribuita normalmente, con $\mu = 23 \, \textrm{mm}$ e $\sigma = 1.6$. Calcolare la probabilità di estrarre individui con lunghezza:
 
-1.  maggiori di 25
-2.  minori di 21
-3.  compresi tra 21 e 25
+1.  maggiore di 25
+2.  minore di 21
+3.  compresa tra 21 e 25
 
 ### Esercizio 2
 
-E' data una distribuzione normale con $\mu$ = 156 e $\sigma$ = 13. Calcolare la probabilità di estrarre individui:
+Una macchina confezionatrice riempe automaticamente delle confezioni di seme. Il peso dichiarato sulla confezione è 12.5 kg, ma la precisione della macchina è $\pm $ 1 kg. Calcolare la probabilità che una confezione contenga:
 
-1.  maggiori di 170
-2.  minori di 140
-3.  compresi tra 140 e 170
+1. meno del peso dichiarato
+2. meno di 12 kg
+3. più di 13 Kg
+
+In questa condizione, si vuole regolare la macchina in modo che non più del 5% dei sacchi contenga un peso inferiore a quello dichiarato. Su quale peso dovrebbe essere regolata la macchina di riempimento? (SUGGERIMENTO: se io regolo la macchina a 12.5 kg, la quantità effettivamente erogata è normalmente distribuita, con media 12.5 e deviazione standard 1. In questo caso, c'è un 5% di probabilità di erogare meno di _____ kg; di conseguenza, devo alzare la media di ____ kg per far si che la quantità erogata non sia inferiore a 12.5 kg, se non nel 5% dei casi)
+
+
+
 
 ### Esercizio 3
+
+Uno strumento di analisi ha un coefficiente di variabilità pari al 10\%. Ammettendo di utilizzare quello strumento su una matrice la cui concentrazione è 10 ng/g, calcolare la probabilità di ottenere una misura:
+1. inferiore a 9 ng/g
+2. superiore a 11 ng/g
+3. compresa tra 9 e 11 ng/g
+
+
+### Esercizio 4
 
 Un erbicida si degrada nel terreno seguendo una cinetica del primo ordine:
 
@@ -5930,7 +5946,7 @@ dove Y è la concentrazione al tempo t. Dopo aver spruzzato questo erbicida, che
 
 
 
-### Esercizio 4
+### Esercizio 5
 
 Una sostanza xenobiotica si degrada nell'acqua a 20°C seguendo una cinetica del primo ordine:
 
@@ -5941,7 +5957,7 @@ dove Y è la concentrazione al tempo t. Simulare i risultati di un esperimento i
 
 
 
-### Esercizio 5
+### Esercizio 6
 
 Una coltura produce in funzione della sua fittezza, secondo la seguente relazione:
 
@@ -5953,7 +5969,7 @@ Stabilire la fittezza necessaria per ottenere il massimo produttivo (graficament
 
 
 
-### Esercizio 6
+### Esercizio 7
 
 La tossicità di un insetticida varia con la dose, secondo la legge log-logistica:
 
@@ -5963,18 +5979,18 @@ dove Y è la proporzione di animali morti e X è la dose. Se trattiamo 150 inset
 
 
 
-### Esercizio 7
+### Esercizio 8
 
 Simulare i risultati di un esperimento varietale, con sette varietà di frumento e quattro repliche. Considerare che il modello deterministico è un modello ANOVA, nel quale vengono definite le medie delle sette varietà (valori attesi). Decidere autonomamente sui parametri da impiegare per la simulazione (da $\mu_1$ a $\mu_7$ e $\sigma$)
 
-### Esercizio 8
+### Esercizio 9
 
 Considerando il testo dell'esercizio 5, simulare un esperimento in cui la coltura viene seminata a fittezze di 2, 4, 6, 8 piante per metro quadrato, con quattro repliche.
 
 
-### Esercizio 9
+### Esercizio 10
 
-Considerando il testo dell'esercizio 6, simulare un esperimento in cui l'insetticida viene utilizzato a cinque dosi crescenti (a vostra scelta), con quattro repliche.
+Considerando il testo dell'esercizio 7, simulare un esperimento in cui l'insetticida viene utilizzato a cinque dosi crescenti (a vostra scelta), con quattro repliche.
 
 
 ---

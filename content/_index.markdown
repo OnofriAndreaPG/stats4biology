@@ -1,3 +1,3 @@
 ---
-title: The broken bridge between biologists and statisticians
+title: Fixing the bridge between biologists and statisticians
 ---
