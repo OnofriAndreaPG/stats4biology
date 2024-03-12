@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.24 (Anno Accademico 2022-2023), compil. 2024-03-01"
+date: "Update: v. 1.24 (Anno Accademico 2022-2023), compil. 2024-03-12"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -741,7 +741,7 @@ Se su ogni soggetto abbiamo rilevato due caratteri quantitativi (ad esempio il p
 Per questo fine, si utilizza il *coefficiente di correlazione di Pearson* costituito dal rapporto tra la codevianza (o somma dei prodotti) delle due variabili e la radice quadrata del prodotto delle loro devianze. Vedremo tra poco il metodo di calcolo, ma vogliamo anticipare che il coefficiente di correlazione varia tra $-1$ e $+1$; se è pari ad 1, abbiamo una situazione ideale di concordanza perfetta (quando aumenta una variabile, aumenta anche l’altra in modo esattamente proporzionale), mentre quando è pari a $-1$, abbiamo una situazione ideale di discordanza perfetta (quando aumenta una variabile, diminuisce l’altra in modo inversamente proporzionale). Un valore pari a $0$ è altrettanto ideal ed indica assenza di qualunque grado di variazione congiunta (assenza di correlazione). Nell'intervallo tra $-1$ ed $1$, il coefficiente indica una correlazione imperfetta, ma tanto migliore quanto più ci allontaniamo dallo zero e ci avviciniamo a $-1$ o $1$. Due esempi di ottima correlazione sono mostrati in Figura \@ref(fig:figName311); si evidenzia un elevato grado di correlazione, che, tuttavia, non è perfetta, in quanto i punti non sono esattamente allineati. 
 
 <div class="figure" style="text-align: center">
-<img src="_images/CorrelationExample.png" alt="Esempio di correlazione positiva (destra) e negativa (sinistra)" width="75%" />
+<img src="_images/CorrelationExample.png" alt="Esempio di correlazione positiva (destra) e negativa (sinistra)" width="85%" />
 <p class="caption">(\#fig:figName311)Esempio di correlazione positiva (destra) e negativa (sinistra)</p>
 </div>
 
@@ -761,21 +761,6 @@ Per valutare la entità della correlazione tra i risultati dei due metodi di ana
 3. calcolare devianze e codevianze
 
 In primo luogo, calcoliamo le due medie, che sono, rispettivamente, 46.44 e 46.22. Successivamente, possiamo calcolare i residui, come differenze tra ogni dato e la sua media, i loro quadrati ed i loro prodotti, come indicato in Tabella \@ref(tab:tabName3).
-
-
-
-```
-##    A  B   scarti.a    scarti.b prod.scarti scarti.a2    scarti.b2
-## 1 45 44 -1.4444444  -2.2222222   3.2098765  2.086420   4.93827160
-## 2 47 44  0.5555556  -2.2222222  -1.2345679  0.308642   4.93827160
-## 3 49 49  2.5555556   2.7777778   7.0987654  6.530864   7.71604938
-## 4 51 53  4.5555556   6.7777778  30.8765432 20.753086  45.93827160
-## 5 44 48 -2.4444444   1.7777778  -4.3456790  5.975309   3.16049383
-## 6 37 34 -9.4444444 -12.2222222 115.4320988 89.197531 149.38271605
-## 7 48 47  1.5555556   0.7777778   1.2098765  2.419753   0.60493827
-## 8 44 46 -2.4444444  -0.2222222   0.5432099  5.975309   0.04938272
-## 9 53 51  6.5555556   4.7777778  31.3209877 42.975309  22.82716049
-```
 
 
 
@@ -2651,9 +2636,8 @@ Se assumiamo che l'ipotesi nulla è vera, allora i dati dovrebbero essere campio
 ```r
 Ysim <- rnorm(16, 14.48375, 3.9177)
 Ysim
-##  [1] 11.25108 15.84385 10.87910 13.35805 12.32459 17.80849 19.59052
-##  [8] 12.41272 17.47276 21.49765 16.50393 16.48161 17.92167 13.28823
-## [15] 10.57145 17.53845
+##  [1] 11.25108 15.84385 10.87910 13.35805 12.32459 17.80849 19.59052 12.41272
+##  [9] 17.47276 21.49765 16.50393 16.48161 17.92167 13.28823 10.57145 17.53845
 ```
 
 Se sottoponiamo questo dataset alla scomposizione della varianza, possiamo calcolare il relativo valore F. Se ripetiamo questo processo, ad esempio, 100'000 volte, otteniamo 100'000 valori F compatibili con l'ipotesi nulla, in quanto generati assumendola come vera. Otteniamo quindi una *sampling distribution* empirica per F e possiamo valutare qual è la probabilità di ottenere valori superiori a 23.66. In questo caso, il test è ad una sola coda, perché la statistica F è un rapporto do varianze, che sono, per definizione, positive.
@@ -6703,52 +6687,60 @@ Parametrizzare questo modello e verificarne la bontà d'adattamento.
 
 <!--chapter:end:15-Esercizi.Rmd-->
 
-# Appendice 1: breve introduzione ad R
+# Appendice: breve introduzione ad R
 
 
-## Cosa è R? {-}
+## Cosa è R?
 
-R è un software cugino di S-PLUS, con il quale condivide la gran parte delle procedure ed una perfetta compatibilità. Rispetto al cugino più famoso, è completamente freeware (sotto la licenza GNU General Public Licence della Free Software Foundation) ed è nato proprio per mettere a disposizione degli utenti un software gratuito, potente, mantenendo comunque la capacità di lavorare in proprio senza usare software di frodo.
+R è un software cugino di S-PLUS, con il quale condivide la gran parte delle procedure ed una perfetta compatibilità. Rispetto al cugino più famoso, è completamente freeware (sotto la licenza GNU General Public Licence della Free Software Foundation) ed è nato proprio per mettere a disposizione degli utenti uno strumento gratuito, potente, che permette di lavorare in modo estremamente professionale, senza usare software di frodo. Inoltre, si tratta di un programma *Open Source*, cioè ognuno può avere accesso al suo codice interno ed, eventualmente, proporne modifiche o ampliarne le funzionalità programmando apposite librerie aggiuntive.
 
-E'uno strumento molto potente, anche da un punto di vista grafico, ma necessita di una certa pratica, in quanto manca di una vera e propria interfaccia grafica (Graphical User Interface: GUI) e, di conseguenza, è spesso necessario scrivere codice.
+A fronte di questi vantaggi, bisogna tuttavia considerare il fatto che R, almeno all'inizio, presenta alcune difficoltà legate al fatto che manca una vera e propria interfaccia grafica (Graphical User Interface: GUI) e, di conseguenza, ogni operazione deve essere eseguita digitando il codice necessario. Parte di queste difficoltà possono essere alleviate utilizzando R dall'interno di RStudio, un'interfaccia che garantisce una più facile digitazione del codice. Per questo motivo, dopo aver installato R [da questo link](https://cran.r-project.org), è opportuno installare anche RStudio, da [quest'altro link](https://posit.co). 
 
-Inoltre, si tratta di un programma *Open Source*, cioè ognuno può avere accesso al suo codice interno ed, eventualmente, proporne modifiche. Altro vantaggio è che, oltre che un programma, R è anche un linguaggio *object oriented*, che può essere utilizzato dall'utente per creare funzioni personalizzate.
+## Prima di iniziare
 
-**Per evitare noiosi errori che possono essere molto comuni per chi è abituato a lavorare in ambiente WINDOWS, è bene precisare subito che R, come tutti i linguaggi di derivazione UNIX, è *case sensitive*, cioè distingue tra lettere maiuscole e lettere minuscole.**
+Ci sono alcune nozioni che è bene conoscere prima di mettersi al lavoro con R. Riassumiamole:
 
-## Oggetti e assegnazioni {-}
+1. *Case sensitivity*. Per evitare noiosi errori che possono essere molto comuni per chi è abituato a lavorare in ambiente WINDOWS, è bene precisare subito che R, come tutti i linguaggi di derivazione UNIX, è *case sensitive*, cioè distingue tra lettere maiuscole e lettere minuscole.
+2. Spazi. Gli spazi possono essere aggiunti ovunque nel codice per renderlo più leggibile. Tuttavia, non si possono aggiungere spazi all'interno dei nomi delle funzioni, dei nomi degli oggetti e degli operatori composti da più di un carattere.
+3. Pannelli. In RStudio, ci sono quattro pannelli e noi ne utilizzeremo prevalentemente due, denominati, rispettivamente SOURCE e CONSOLE. Il codice si scrive nel pannello SOURCE, che è un semplice editor di testi, salvabili con l'estensione '.R'. Il codice composto nel pannello SOURCE *DEVE* essere inviato alla console, dove viene eseguito, utilizzando i tasti 'ctrl-r' (Windows) oppure 'ctrl-invio' (Windows) o 'cmd-invio' (Mac). **Se il codice non è inviato alla console non viene eseguito: è come scrivere un messaggio in Whattsapp**, senza inviarlo al destinatario!
+4. Operatori. In informatica e programmazione, un operatore è un simbolo che specifica quale operazione applicare ad uno o più operandi, per generare un risultato. Si distinguono in (1) aritmetici (+, -, * e /); (2) di assegnazione (<- oppure =); (3) logici (TRUE, FALSE, & e |); (4) Condizionali (if); (5) di relazione (<, <=, ==, >= e >)
+5. Tipi di dati. In R, abbamo dati (1) numerici a doppia precisione; (2) 'integer'; (3) carattere (con virgolette, ad es. "Germinato", "Non germinato") e (4) logici (TRUE o FALSE, T o F).
 
-### Costanti e vettori {-}
+## Oggetti e assegnazioni
 
-R lavora con valori, stringhe di caratteri, vettori e matrici, che vengono assegnati alle variabili con opportuni comandi. Ad esempio, il comando:
+In R, si lavora creando ed assegnando loro un nome, che identifica la porzione di memoria in cui questo oggetto viene collocato. Nel principio, questo è molto simile a quello che facciamo in un foglio elettronico, dove assegniamo un oggetto (lo memorizziamo) in una determinata cella. Ad esempio, il comando:
 
 
 ```r
 y  <-  3
-y
-## [1] 3
 ```
 
-assegna il valore 3 alla variabile *y*. Invece il comando:
+assegna al valore numerico 3 il nome *y*. Invece il comando:
 
 
 ```r
-x  <-  c(1, 2, 3)
-x
-## [1] 1 2 3
+x  <-  "Biondo"
 ```
 
-crea un vettore *x* contenente i numeri 1,2 e 3. Bisogna precisare che il 'vettore', in R, non ha alcun legame con la fisica o l'algebra, ed è semplicemente una collezione di numeri (o strighe) consecutivi.
+assegna al testo "Biondo" il nome *x*.
 
-Gli elementi dei vettori possono essere richiamati con il relativo indice tra parentesi quadre. Ad esempio, il secondo elemento di 'x' può essere richiamato come:
+Gli oggetti che possiamo creare sono di diverso tipo, principalmente:
+
+1. costanti,
+2. vettori,
+3. matrici,
+4. dataframes.
+
+### Costanti e vettori
+
+Le costanti sono, ad esempio, quelle indicate in precedenza, ma, solitamente, in R si creano oggetti più organizzati, come i 'vettori', cioè degli elenchi di dati dello stesso tipo. Ad esempio, il codice segente crea un vettore di nome x, contenente i numeri 1, 2 e 3. Bisogna precisare che il 'vettore', in R, non ha alcun legame con la fisica o l'algebra, ed è semplicemente una collezione di elementi affini.
 
 
 ```r
-x[2]
-## [1] 2
+x <- c(1, 2, 3)
 ```
 
-I vettori possono essere numerici, oppure a stringa, cioè possono contenere caratteri alfanumerici. Ad esempio, nel codice sottostante abbiamo creato un vettore contenente nomi di persona.
+Oltre che numerici, i vettori possono contenere testi alfanumerici. Ad esempio, nel codice sottostante abbiamo creato un vettore contenente nomi di persona.
 
 
 ```r
@@ -6768,19 +6760,33 @@ classe
 ```
 
 
-### Matrici {-}
+### Matrici
 
 Oltre ai vettori, in R possiamo definire le matrici. Ad esempio il comando:
 
 
 ```r
-z  <-  matrix(c(1, 2, 3, 4, 5, 6, 7, 8), 2, 4, 
-              byrow=TRUE)
+z  <-  matrix(c(1, 2, 3, 4, 5, 6, 7, 8), nrow = 2, ncol = 4, 
+              byrow = TRUE)
 ```
 
 crea una matrice *z* a 2 righe e 4 colonne, contenente i numeri da 1 a 8. La matrice viene riempita per riga.
 
-Come già mostrato, per visualizzare il contenuto di una variabile basta digitare il nome della variabile. Ad esempio:
+### Dataframe
+
+Oltre a vettori e matrici, in R esiste un altro importante oggetto, cioè il *dataframe*, costituito da una tabella di dati con una o più colonne di variabili e una o più righe di dati. A differenza della matrice, il dataframe può essere utilizzato per memorizzare variabili di diverso tipo (numeri e caratteri). Un dataframe può essere creato unendo più vettori, come nell'esempio seguente; fare attenzione a non confondere il nome assegnato alla colonna, con il nome del vettore il cui contenuto viene immesso nella colonna stessa (nel codice sottostante, "Parc" = parcelle significa che la prima colonna della tabella si chiama "Parc" e contiene i dati del vettore 'parcelle').
+
+
+```r
+parcelle  <-  c(1, 2, 3, 4, 5, 6)
+tesi  <-  factor(c("A", "A", "B", "B", "C", "C"))
+dati  <-  c(12, 15, 16, 13, 11, 19)
+tabella  <-  data.frame("Parc" = parcelle, "Tesi" = tesi,
+                        "Produzioni" = dati)
+```
+
+Per visualizzare un oggetto basta invocare il suo nome:
+
 
 
 ```r
@@ -6790,25 +6796,10 @@ z
 ## [2,]    5    6    7    8
 ```
 
-Gli elementi di una matrice possono essere richiamati con gli indici e, dato che vi sono due dimensioni (righe e colonne), abbiamo bisogno di due indici, separati da virgole:
+oppure:
 
 
 ```r
-z[1,3]
-## [1] 3
-```
-
-
-### Dataframe {-}
-
-Oltre a vettori e matrici, in R esiste un altro importante oggetto, cioè il *dataframe*, costituito da una tabella di dati con una o più colonne di variabili e una o più righe di dati. A differenza della matrice, il dataframe può essere utilizzato per memorizzare variabili di diverso tipo (numeri e caratteri). Un dataframe può essere creato unendo più vettori, come nell'esempio seguente.
-
-
-```r
-parcelle  <-  c(1, 2, 3, 4, 5, 6)
-tesi  <-  factor(c("A", "A", "B", "B", "C", "C"))
-dati  <-  c(12, 15, 16, 13, 11, 19)
-tabella  <-  data.frame("Parc"=parcelle,"Tesi"=tesi,"Produzioni"=dati)
 tabella
 ##   Parc Tesi Produzioni
 ## 1    1    A         12
@@ -6819,15 +6810,17 @@ tabella
 ## 6    6    C         19
 ```
 
-Per utilizzare i dati in un dataframe, bisognerà accedere ai singoli vettori colonna che lo costituiscono. Per far questo possiamo utilizzare l'estrattore *$*:
+### Indicizzazione
+
+Vettori, matrici e dataframe sono oggetti organizzati caratterizzati da una o due dimensioni. Gli elementi che sono in essi contenuti possono essere identificati per mezzo di 'indici', un po' come avviene nella battaglia navale. Gli indici sono inclusi tra parentesi quadre. Ad esempio, il secondo elemento del vettore 'x' creato in precedenza può essere richiamato in questo modo:
 
 
 ```r
-tabella$Parc
-## [1] 1 2 3 4 5 6
+x[2]
+## [1] 2
 ```
 
-oppure possiamo utilizzare gli indici, che come nel caso delle matrici, sono due, uno per le righe e uno per le colonne, separati da virgole:
+Nel caso delle matrici e dei dataframes, che sono oggetti bidimensionali, gli indici sono due, uno per le righe e uno per le colonne, separati da virgole:
 
 
 ```r
@@ -6835,9 +6828,148 @@ tabella[2,1]
 ## [1] 2
 ```
 
-### Quale oggetto sto utilizzando? {-}
+Per questi oggetti bidimensionali, è possibile anche accedere agli elementi di un'intera riga o di un'intera colonna, lasciando vuoto l'indice relativo ad una delle due dimensioni. Ad esempio:
 
-Per avere informazioni sulla natura di un oggetto creato in R, posso usare la funzione `str()`, come nell'esempio seguente:
+
+```r
+tabella[,1]
+## [1] 1 2 3 4 5 6
+```
+
+oppure:
+
+
+```r
+tabella[1,]
+##   Parc Tesi Produzioni
+## 1    1    A         12
+```
+
+Per un dataframe, si può accedere alle singole colonne utilizzando l'estrattore *$* seguito dal nome della colonna, ad esempio:
+
+
+```r
+tabella$Parc
+## [1] 1 2 3 4 5 6
+```
+
+
+## Espressioni e funzioni
+
+Gli oggetti numerici possono essere creati e manipolati anche con opportune operazioni algebriche (espressioni), utilizzando gli operatori indicati in precedenza. Ad esempio:
+
+
+```r
+f  <-  2 * y
+f
+## [1] 6
+```
+
+Le operazioni più complesse ed usuali sono implementate in apposite funzioni, che hanno un nome ed uno o più argomenti. Ad esempio, la funzione:
+
+
+```r
+abs(-5)
+## [1] 5
+```
+
+restituisce il valore assoluto e richiede un solo argomento, cioè il numero di cui calcolare il valore assoluto. Al contrario, la funzione:
+
+
+```r
+log(100, 2)
+## [1] 6.643856
+```
+
+Calcola il logaritmo in base 2 di 100 e richiede due argomenti, cioè il numero di cui calcolare il logaritmo e la base del logaritmo. A volte, gli argomenti hanno valori di default, per cui, se digitiamo:
+
+
+```r
+log(5)
+## [1] 1.609438
+```
+
+otteniamo il logaritmo naturale di 5, in quanto il secondo argomento (la base) ha, per default, il valore $e$ (operatore di Nepero).
+
+Quando sono necessari due o più argomenti essi debbono essere messi nell'ordine esatto in cui R se li aspetta (in questo caso prima il numero, poi la base), oppure possono essere specificati per nome. Ad esempio, i due comandi:
+
+
+```r
+log(x=100, base=2)
+## [1] 6.643856
+log(base=2, x=100)
+## [1] 6.643856
+```
+
+restituiscono lo stesso risultato, al contrario dei due comandi seguenti:
+
+
+```r
+log(100, 2)
+## [1] 6.643856
+log(2, 100)
+## [1] 0.150515
+```
+
+perchè il primo restituisce il logaritmo di 100 in base 2, mentre il secondo restituisce il logaritmo di 2 in base 100. Per conoscere gli argomenti di una funzione ed il loro ordine, si può digitare il nome della funzione preceduto dal punto interrogativo:
+
+```
+?log
+```
+
+A volte le funzioni restituiscono diversi risultati, che vengono messi in appositi 'slots'. Ad esempio, se vogliamo calcolare autovettori ed autovalori di una matrice, utilizziamo la funzione 'eigen()'. Questa funzione restituisce una lista che, al suo interno, contiene i due oggetti, denominati, rispettivamente, 'values' (autovalori) e 'vectors' (autovettori). Per recuperare l'uno o l'altro dei due oggetti (autovettori o autovalori) si usa l'estrattore '$', come abbiamo visto prima per le colonne dei dataframes:
+
+
+```r
+matrice  <-  matrix(c(2,1,3,4),2,2)
+ev  <-  eigen(matrice)
+ev$values
+## [1] 5 1
+ev$vectors
+##            [,1]       [,2]
+## [1,] -0.7071068 -0.9486833
+## [2,] -0.7071068  0.3162278
+```
+
+
+## Funzioni di uso comune
+
+Nella pratica operativa, ci troviamo spesso nelle condizioni di creare una serie di numeri progressivi, utilizzando il comando `seq(n, m, by=step)`, che genera una sequenza da $n$ a $m$ con passo pari a $step$. Il codice sottostante crea una serie da 1 a 12.
+
+
+```r
+options(width = 55)
+parcelle  <-  seq(1, 12, 1)
+parcelle
+##  [1]  1  2  3  4  5  6  7  8  9 10 11 12
+```
+
+Altre volte, abbiamo la necessità di creare vettori, ripetendo più volte alcune categorie. Ad esempio, potremmo avere quattro osservazioni che appartengono alla varietà BAIO, quattro osservazioni che appartengono alla varietà DUILIO e quattro osservazioni che appartengono alla varietà PLINIO. Per creare velocemente questo vettore, possiamo utilizzare la funzione `rep() `, in questo modo:
+
+
+
+```r
+tesi  <-  factor(c("BAIO", "DUILIO", "PLINIO"))
+tesi
+## [1] BAIO   DUILIO PLINIO
+## Levels: BAIO DUILIO PLINIO
+rep(tesi, each=4)
+##  [1] BAIO   BAIO   BAIO   BAIO   DUILIO DUILIO DUILIO
+##  [8] DUILIO PLINIO PLINIO PLINIO PLINIO
+## Levels: BAIO DUILIO PLINIO
+```
+
+Notare l'uso della funzione `factor() ` per creare un vettore di dati qualitativi (fattore sperimentale). Notare anche che il codice sottostante restituisce lo stesso risultato, ma ordinato in modo diverso, in quanto viene ripetuto l'intero vettore, non i singoli elementi che lo costituiscono:
+
+
+```r
+rep(tesi, times = 4)
+##  [1] BAIO   DUILIO PLINIO BAIO   DUILIO PLINIO BAIO  
+##  [8] DUILIO PLINIO BAIO   DUILIO PLINIO
+## Levels: BAIO DUILIO PLINIO
+```
+
+Un'altra funzione molto usata è 'str()' che permette di avere informazioni sulla struttura di un oggetto creato in R:
 
 
 ```r
@@ -6848,9 +6980,9 @@ str(tabella)
 ##  $ Produzioni: num  12 15 16 13 11 19
 ```
 
-Vediamo infatti che R ci informa che l'oggetto 'tabella' è in realtà un dataframe composto da tre colonne, di cui la prima e la terza sono numeriche, mentre la seconda è una variabile qualitativa (fattore).
+R ci informa che l'oggetto 'tabella' è in realtà un dataframe composto da tre colonne, di cui la prima e la terza sono numeriche, mentre la seconda è una variabile qualitativa (fattore).
 
-Inoltre, esiste un'altra funzione molto comune in R, che permette di ottenere informazione riassuntive su un oggetto. Si tratta della funzione 'summary()', che fornisce un output diverso a seconda dell'oggetto che le viene passato come argomento:
+Altre informazioni riassuntive su un oggetto possono essere ottenute con la funzione  'summary()', che fornisce un output diverso a seconda dell'oggetto che le viene passato come argomento:
 
 
 ```r
@@ -6870,189 +7002,7 @@ summary(tabella)
 ##  Max.   :6.00         Max.   :19.00
 ```
 
-
-## Operazioni ed operatori {-}
-
-Gli oggetti numerici possono essere manipolati anche con opportune operazioni algebriche, che si eseguono utilizzando i normali operatori (+, -, *, /). Ad esempio:
-
-
-```r
-f  <-  2 * y
-f
-## [1] 6
-```
-
-
-## Funzioni ed argomenti {-}
-
-Per eseguire operazioni particolari si utilizzano, in genere, le funzioni. Una funzione è richiamata con un nome ed uno o più argomenti. Ad esempio, il comando:
-
-
-```r
-log(5)
-## [1] 1.609438
-```
-
-Calcola il logaritmo naturale di 5 e richiede un solo argomento, cioè il numero di cui calcolare il logaritmo. Al contrario, il comando:
-
-
-```r
-log(100, 2)
-## [1] 6.643856
-```
-
-Calcola il logaritmo in base 2 di 100 e richiede due argomenti, cioè il numero di cui calcolare il logaritmo e la base del logaritmo. Quando sono necessari due o più argomenti essi debbono essere messi nell'ordine esatto (in questo caso prima il numero poi la base) oppure debbono essere utilizzati i riferimenti corretti. Ad esempio, i due comandi:
-
-
-```r
-log(100, base=2)
-## [1] 6.643856
-log(base=2, 100)
-## [1] 6.643856
-```
-
-restituiscono lo stesso risultato, al contrario dei due comandi seguenti:
-
-
-```r
-log(100, 2)
-## [1] 6.643856
-log(2, 100)
-## [1] 0.150515
-```
-
-
-## Consigli per l'immissione di dati sperimentali {-}
-
-I dati delle prove sperimentali si possono o importare in R da altri software (ad esempio Excel) oppue si possono digitare direttamente in R. In quest'ultimo caso, in genere, si crea  un vettore per ogni colonna di dati e, successivamente, si riuniscono i vettori in un dataframe, che viene poi salvato nel workspace, come vedremo immediatamente. 
-
-
-### Immissione di numeri progressivi {-}
-
-In genere le osservazioni debbono essere identificate univocamente e, per questo, immetteremo una serie di codici numerici progressivi da uno al numero di dati da immettere. Per creare velocemente una serie progressiva, si può utilizzare il comando `seq(n, m, by=step)` che genera una sequenza da $n$ a $m$ con passo pari a $step$. Il codice sottostante crea una serie da 1 a 12.
-
-
-```r
-options(width = 55)
-parcelle  <-  seq(1, 12, 1)
-parcelle
-##  [1]  1  2  3  4  5  6  7  8  9 10 11 12
-```
-
-### Immissione dei codici delle tesi e dei blocchi {-}
-
-A volte i codici delle tesi sono sequenze ripetute di stringhe. Ad esempio, i primi quattro dati potrebbero essere riferiti alla varietà BAIO, i secondi quattro alla varietà DUILIO, i successivi quattro alla varietà PLINIO. Per creare velocemente questo vettore, possiamo utilizzare la funzione `rep() `, in questo modo.
-
-
-
-```r
-options(width = 55)
-tesi  <-  factor(c("BAIO", "DUILIO", "PLINIO"))
-tesi
-## [1] BAIO   DUILIO PLINIO
-## Levels: BAIO DUILIO PLINIO
-tesi  <-  rep(tesi,each=4)
-tesi
-##  [1] BAIO   BAIO   BAIO   BAIO   DUILIO DUILIO DUILIO
-##  [8] DUILIO PLINIO PLINIO PLINIO PLINIO
-## Levels: BAIO DUILIO PLINIO
-```
-
-Notare l'uso della funzione `factor() ` per creare un vettore di dati qualitativi (fattore). Allo stesso modo, per immettere i codici dei blocchi possiamo utilizzare la stessa funzione in un modo diverso. Ammettiamo infatti che i quattro valori di ogni tesi appartengano rispettivamente ai quattro blocchi; si opera quindi in questo modo.
-
-
-```r
-blocchi  <-  (c (1, 2, 3, 4))
-blocchi <- rep(blocchi, times=3)
-blocchi
-##  [1] 1 2 3 4 1 2 3 4 1 2 3 4
-```
-
-### Immissione dei valori e creazione del datframe {-}
-
-A questo punto possiamo immettere i dati, creando un vettore con 12 valori.
-
-
-```r
-yield <- c(12, 15, 17, 13, 19, 21, 22, 17, 12, 14, 16, 12)
-```
-
-A questo punto creiamo una tabella di dati, con la funzione `data.frame()`
-
-
-```r
-tab <- data.frame(parcelle, tesi, blocchi, yield)
-tab
-##    parcelle   tesi blocchi yield
-## 1         1   BAIO       1    12
-## 2         2   BAIO       2    15
-## 3         3   BAIO       3    17
-## 4         4   BAIO       4    13
-## 5         5 DUILIO       1    19
-## 6         6 DUILIO       2    21
-## 7         7 DUILIO       3    22
-## 8         8 DUILIO       4    17
-## 9         9 PLINIO       1    12
-## 10       10 PLINIO       2    14
-## 11       11 PLINIO       3    16
-## 12       12 PLINIO       4    12
-```
-
-È importante notare come i dati siano sistemati in modo ordinato, vale a dire:
-
-1. Vi è una sola riga per soggetto sperimentale
-2. ogni colonna contiene le diverse informazioni per ogni soggetto
-3. i nomi delle colonne sono immessi come 'header', cioè come etichette di colonna, ma non fanno parte fisicamente del dataset
-4. i nomi delle colonne sono semplici e non contengono spazi e altri caratteri invalidi.
-
-### Leggere e salvare dati esterni {-}
-
-Oltre che immessi da tastiera, i dati possono essere importati in R da files esterni, ed, inoltre, gli oggetti di R creati nel corso di una sessione possono essere memorizzati su files esterni. Partiamo dal presupposto di aver creato (come frequentemente avviene) il nostro database con EXCEL e di volerlo importare in R nel DATAFRAME *dati*. Per far questo avremo bisogno di una libreria addizionale, che dovremo installare e poi caricare in memoria, utilizzando il codice sottostante:
-
-
-```r
-#install.packages("readxl")
-library(readxl)
-```
-
-A questo punto, in R, possiamo digitare il seguente comando, che permette di selezionare un file, tramite una form di selezione e di leggere il foglio di lavoro con il nome indicato.
-
-```
-dati <- read_xlsx(file.choose(), sheet = "Foglio1")
-dati
-```
-
-
-I dati contenuti in un dataframe o in qualunque altro oggetto possono essere salvati in un file esterno (in formato R binario):
-
-```
-save(file="dati1.rda", dati)
-```
-
-ed eventualmente ricaricati:
-
-```
-load("dati1.rda")
-```
-
-Per scrivere in un file di testo (in questo caso *comma delineated*, ma il separatore di elenco può essere modificato secondo le nostre esigenze con l'argomento `sep`) si utilizza il seguente comando:
-
-```
-write.table(dati, "residui.csv", row.names=FALSE, 
-              col.names=TRUE, sep=",")
-```
-
-## Alcune operazioni comuni sul dataset {-}
-
-### Selezionare un subset di dati {-}
-
-E' possibile estrarre da un dataframe un subset di dati utilizzando la funzione:
-
-```
-subset(dataframe, condizione)
-```
-
-Ad esempio, se consideriamo il dataframe tabella creato in precedenza, è possibile selezionare tutte le righe relative alle Tesi A e C come segue:
+Tra le funzioni di uso comune, citiamo quelle che si impiegano per fare alcune semplici operazioni su un dataframe, come l'ordinamento o la selezione di records. Ad esempio, è possibile estrarre da un dataframe un subset di dati utilizzando la funzione 'subset()':
 
 
 ```r
@@ -7079,10 +7029,7 @@ tabella3
 ```
 
 
-
-### Ordinare un vettore o un dataframe {-}
-
-Un vettore (numerico o carattere) può essere ordinato con il comando `sort`:
+Un vettore (numerico o carattere) può essere ordinato con la funzione 'sort()':
 
 
 ```r
@@ -7094,16 +7041,58 @@ sort(z, decreasing = TRUE)
 ## [1] "M" "L" "F" "E" "D" "C" "B" "A"
 ```
 
-Un dataframe può essere invece ordinato con il comando `order()`, facendo attenzione al segno meno utilizzabile per l'ordinamento decrescente.
+Un dataframe può essere invece ordinato con la funzione `order()`, facendo attenzione al segno meno utilizzabile per l'ordinamento decrescente.
 
 ```
 dataset[order(dataset$z, dataset$y), ]
 dataset[order(dataset$z, -dataset$y), ]
 ```
 
-## Workspace {-}
+## Creazione di funzioni personalizzate
 
-Gli oggetti creati durante una sessione di lavoro vengono memorizzati nel cosiddetto workspace. Per il salvataggio del workspace nella directory corrente si usa il menu (File/Save Workspace) oppure il comando:
+Anche se R contiene tantissime funzioni, a volte ci troviamo nella necessità di creare una funzione personale, se questa non fosse già disponibile. Immaginiamo, ad esempio, di voler scrivere una funzione che, dato il valore della produzione rilevata in una parcella di orzo di 20 $ m^2 $ (in kg) e la sua umidità percentuale, calcoli automaticamente il valore della produzione secca in kg/ha. La funzione che dobbiamo implementare è:
+
+$$ PS = PU \cdot \frac{100 - U}{100} \cdot \frac{10000}{20}$$
+
+dove PS è la produzione secca in kg/ha e PU è la produzione in kg per 20 $ m^2 $ con l'umidità percentuale U. Il codice è: 
+
+
+
+```r
+PS  <-  function(PU, U) {
+  PU*((100-U)/100)*(10000/20)
+}
+```
+
+Notare l'uso delle parentesi graffe. Una volta creata ed inviata alla console, la funzione può essere utilizzata come ogni altre funzione di R:
+
+
+
+```r
+PS(PU = 20, U = 85)
+## [1] 1500
+```
+
+## Uso di librerie aggiuntive
+
+Le funzionalità di R possono essere anche estese installando librerie aggiuntive. Il comando è:
+
+```
+install.packages("NomeLibreria")
+```
+
+
+Un libreria si installa 'una tantum', ma va caricata ogni volta che la si vuole usare:
+
+```
+library("NomeLibreria")
+```
+
+
+## Workspace
+
+
+Gli oggetti creati durante una sessione di lavoro vengono memorizzati nel cosiddetto workspace (ambiente di lavoro). Per il salvataggio del workspace nella directory corrente si usa il menu (File/Save Workspace) oppure il comando:
 
 ```
 save.image('nomefile.RData')
@@ -7155,137 +7144,57 @@ rm(list=ls()[ls()!="oggetto1" & ls()!="oggetto2"])
 
 che elimina tutto meno "oggetto1" e "oggetto2".
 
-## Script o programmi {-}
 
-Come è possibile memorizzare dati e workspace, è anche possibile creare uno script (procedura, funzione...) da memorizzare e richiamare in seguito. Nel caso più semplice è possibile scrivere comandi in un semplice editor di testo e salvarli in un file con estensione '.r'. I comandi possono poi essere riutilizzati per semplice copia ed incolla sulla console, opppure, nel caso in cui si utilizzi Rstudio (FILE -$>$ APRI SCRIPT o NUOVO SCRIPT) selezionando il comando (o i comandi) da inviare alla console e premendo la combinazione CTRL + INVIO.
+## Importare dati esterni
 
-Lavorare con scripts è molto comodo e consigliabile perchè non si deve partire da zero ad ogni sessione, ma è sufficiente correggere i comandi digitati in sessioni precedenti.
+Oltre che immessi da tastiera, i dati possono essere importati in R da files esterni, ad esempio in formato EXCEL. Per essere importata, una tabella deve essere in formato 'ordinato' (tidy data), vale a dire:
 
-Oltre agli script, è possibile creare funzioni personalizzate fino ad arrivare a veri e propri programmi (packages). Immaginiamo ad esempio di voler scrivere una funzione che, dato il valore della produzione rilevata in una parcella di orzo di 20 $ m^2 $ (in kg) e la sua umidità percentuale, calcoli automaticamente il valore della
-produzione secca in kg/ha. La funzione che dobbiamo implementare è:
+1. la prima riga dovrebbe contenere i nomi delle colonne
+2. ci dovrebbe essere una riga per ogni soggetto
+3. ci dovrebbe essere una colonna per ogni attributo dei soggetti
 
-$$
-PS = PU \cdot \frac{100 - U}{100} \cdot \frac{10000}{20}
-$$
-
-ove PS è la produzione secca in kg/ha e PU è la produzione all'umidità U in kg per 20 $ m^2 $.
-
-Scriveremo un file di testo (ad esempio con il *Block notes* o con l'editor interno ad R):
-
-```
-PS  <-  function(PU, U) {
-  PU*((100-U)/100)*(10000/20)
-}
-```
-
-Notare l'uso delle parentesi graffe. Salveremo il file di testo con il nome (ad esempio) "prova.r".
-
-Aprendo una nuova sessione in R, possiamo ricaricare in memoria il file di programma (FILE - SORGENTE CODICE R, oppure da console, con il comando:
-
-```
-source('prova.r')
-```
-
-A differenza di quanto avviene con uno script, i comandi memorizzati nella funzione non vengono eseguiti, ma la funzione 'PS' diviene disponibile nel workspace e può essere utilizzata nel modo seguente:
-
-```
-PS(20,85)
-```
-
-## Interrogazione di oggetti {-}
-
-A differenza di altri linguaggi statistici come SAS o SPSS, R immagazzina i risultati delle analisi negli oggetti, mostrando un output video piuttosto minimale. Per ottenere informazioni è necessario interrogare opportunamente gli oggetti che al loro interno possono contenere altri oggetti da cui recuperare le informazioni interessanti. Gli oggetti che contengono altri oggetti sono detti
-**liste**.
-
-Ad esempio, se vogliamo calcolare autovettori ed autovalori di una
-matrice, utilizziamo la funzione 'eigen'. Questa funzione restituisce una lista di oggetti, che al suo interno contiene i due oggetti values (autovalori) e vectors (autovettori). Per recuperare l'uno o l'altro dei due risultati (autovettori o autovalori) si usa l'operatore di concatenamento (detto anche estrattore) \$.
+Detto ciò, avremo bisogno di una libreria addizionale, che dovremo installare ('una tantum') e poi caricare in memoria, utilizzando il codice sottostante:
 
 
 ```r
-matrice  <-  matrix(c(2,1,3,4),2,2)
-matrice
-##      [,1] [,2]
-## [1,]    2    3
-## [2,]    1    4
-ev  <-  eigen(matrice)
-ev
-## eigen() decomposition
-## $values
-## [1] 5 1
-## 
-## $vectors
-##            [,1]       [,2]
-## [1,] -0.7071068 -0.9486833
-## [2,] -0.7071068  0.3162278
-ev$values
-## [1] 5 1
-ev$vectors
-##            [,1]       [,2]
-## [1,] -0.7071068 -0.9486833
-## [2,] -0.7071068  0.3162278
+# install.packages("readxl") # solo la prima volta
+library(readxl)
 ```
 
-## Altre funzioni matriciali {-}
+A questo punto, in R, possiamo digitare il seguente comando, che permette di selezionare un file, tramite una 'form' di selezione e, da questo, importare il foglio di lavoro con il nome 'Foglio1'.
 
-Oltre che autovettori ed autovalori di una matrice, R ci permette di gestire altre funzioni di matrice. Se ad esempio abbiamo
-le matrici:
-
-$$
-Z = \left( {\begin{array}{*{20}c}
-   1 & 2  
-   2 & 3  
-\end{array}} \right)\,\,\,\,\,\,\,Y = \left( {\begin{array}{*{20}c}
-   3 & 2  
-\end{array}} \right)
-$$
-
-
-queste possono essere caricate in R con i seguenti comandi:
-
-
-```r
-Z  <-  matrix(c(1,2,2,3),2,2)
-Y  <-  matrix(c(3,2),1,2)
+```
+dati <- read_xlsx(file.choose(), sheet = "Foglio1")
+dati
 ```
 
-Possiamo poi ottenere la trasposta di Z con il comando:
+Per importare un file di testo (ad esempio in formato *comma delineated*, cioè *.csv*) si utilizza il seguente comando:
 
-
-```r
-t(Z)
-##      [,1] [,2]
-## [1,]    1    2
-## [2,]    2    3
+```
+dataset <- read.csv("NomeFile.csv", sep = ";", dec = ",")
 ```
 
-Possiamo moltiplicare Y e Z utilizzando l'operatore \%*\%:
+dove gli argomenti 'sep' e 'dec' permettono di specificare, rispettivamente, il separatore di elenco e il separatore decimale. E' possibile anche esportare un dataframe in un file di testo, con il codice seguente:
 
-
-```r
-Y%*%Z
-##      [,1] [,2]
-## [1,]    7   12
+```
+write.table(nomeDataframe, file = "residui.csv", 
+             row.names=FALSE, 
+             sep=";", dec = ",")
 ```
 
-Possiamo calcolare l'inversa di Z con:
 
-```r
-solve(Z)
-##      [,1] [,2]
-## [1,]   -3    2
-## [2,]    2   -1
-```
 
-## Cenni sulle funzionalità grafiche in R {-}
+## Cenni sulle funzionalità grafiche in R
 
 R è un linguaggio abbastanza potente e permette di creare grafici interessanti. Ovviamente un trattazione esauriente esula dagli scopi di questo testo, anche se è opportuno dare alcune indicazioni che potrebbero essere utili in seguito.
+
 La funzione più utilizzata per produrre grafici è:
 
 ```
-plot(x,y, type, xlab, ylab, col, lwd, lty...)
+plot(x, y, type, xlab, ylab, col)
 ```
 
-ovex ed y sono i vettori con le coordinate dei punti da disegnare. ` Type ` rappresenta il tipo di grafico (''p'' produce un grafico a punti, ''l'' un grafico a linee, ''b'' disegna punti uniti da linee, ''h'' disegna istogrammi), 'Title disegna il titolo del grafico, sub il sottotitolo,xlab e ylab le etichette degli assi,  col è il colore dell'oggetto,  lwd il suo spessore, lty il tipo di linea e così via.
+dove x ed y sono i vettori con le coordinate dei punti da disegnare, 'type' rappresenta il tipo di grafico (''p'' produce un grafico a punti, ''l'' un grafico a linee, ''b'' disegna punti uniti da linee, ''h'' disegna istogrammi), 'xlab' e 'ylab' le etichette degli assi, 'col' è il colore dei punti/linee.
 
 Per una descrizione più dettagliata si consiglia di consultare la documentazione on line. A titolo di esempio, i comandi mostrati qui sotto producono l'output in Figura \@ref(fig:figName231).
 
@@ -7293,7 +7202,7 @@ Per una descrizione più dettagliata si consiglia di consultare la documentazion
 ```r
 x  <-  c(1, 2, 3, 4)
 y  <-  c(10, 11, 13, 17)
-plot(x, y, type = "p", col="red", lwd=5, xlab="Ascissa", ylab="Ordinata")
+plot(x, y, type = "p", col="red", xlab="Ascissa", ylab="Ordinata")
 ```
 
 <div class="figure" style="text-align: center">
@@ -7306,8 +7215,8 @@ Per sovrapporre una seconda serie di dati alla prima possiamo utilizzare la funz
 
 ```r
 y2  <-  c(17,13,11,10)
-plot(x, y, type = "p", col="red", lwd=5, xlab="Ascissa", ylab="Ordinata")
-points(x, y2, col="blue", lwd=5)
+plot(x, y, type = "p", col="red", xlab="Ascissa", ylab="Ordinata")
+points(x, y2, col="blue")
 ```
 
 <div class="figure" style="text-align: center">
@@ -7315,13 +7224,13 @@ points(x, y2, col="blue", lwd=5)
 <p class="caption">(\#fig:figName232)Esempio di grafico con due serie di dati</p>
 </div>
 
-Se avessimo voluto sovrapporre una grafico a linee avremmo utilizzato la funzione 'lines()' al posto della funzione 'points()', ottenendo l'output in Figura \@ref(fig:figName233).
+Se avessimo voluto sovrapporre un grafico a linee avremmo potuto utilizzare la funzione 'lines()' al posto della funzione 'points()', ottenendo l'output in Figura \@ref(fig:figName233).
 
 
 ```r
-plot(x, y, "p", col="red", lwd=5,xlab="Ascissa", ylab="Ordinata")
-points(x, y2, col="blue", lwd=5)
-lines(x, y2, col="blue", lwd=2)
+plot(x, y, "p", col="red", xlab="Ascissa", ylab="Ordinata")
+points(x, y2, col="blue")
+lines(x, y2, col="blue")
 ```
 
 <div class="figure" style="text-align: center">
@@ -7329,46 +7238,33 @@ lines(x, y2, col="blue", lwd=2)
 <p class="caption">(\#fig:figName233)Esempio di grafico con due serie di dati, con linee e punti</p>
 </div>
 
-Per disegnare una curva si può utilizzare la funzione:
-
-```
-curve(funzione, Xiniziale, Xfinale, add=FALSE/TRUE)
-```
-
-dove l'argomento 'add' serve per specificare se la funzione deve essere aggiunta ad un grafico preesistente.
-
-Per aggiungere un titolo ad un grafico possiamo utilizzare la funzione:
-
-```
-title(main="Titolo")
-```
-
-mentre per aggiungere una legenda utilizziamo la funzione:
-
-```
-legend(Xcoord, YCoord , legend=c("Punti","X+10"), pch=c(19,-1),
-      col=c("Red","Blue"),
-      lwd=c(3,3), lty=c(0,3))
-```
-
-
-ove i vettori indicano, per ogni elemento della legenda, il testo che deve essere riportato (legend), il tipo di simbolo (pch, con -1 che indica nessun simbolo), il colore (col), la larghezza (lwd) e il tipo di linea (lty, con 0 che indica nessuna linea).
-
-Ad esempio, il codice riportato più sotto produce l'output in Figura \@ref(fig:figName234).
+Per disegnare una curva si può utilizzare la funzione 'curve()' ottenendo, ad esempio, l'output in Figura \@ref(fig:figName233b).
 
 
 ```r
-plot(x, y, "p", col="red", lwd=5, xlab="Ascissa", 
-       ylab = "Ordinata")
-curve(10+x, add=TRUE, lty=1, lwd=2, col="blue")
-title(main="Grafico di prova")
-legend(1,17, legend=c("Punti", "X+10"), pch=c(19,-1), 
-  col=c("Red", "Blue"), lwd=c(3,3), lty=c(0,1))
+curve(5 + 4 * x + 2 * x^2, from = -15, to = 15, ylab = "y")
 ```
 
 <div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName234-1.png" alt="Esempio di grafico con titolo e legenda" width="90%" />
-<p class="caption">(\#fig:figName234)Esempio di grafico con titolo e legenda</p>
+<img src="_main_files/figure-html/figName233b-1.png" alt="Esempio di una parabola" width="90%" />
+<p class="caption">(\#fig:figName233b)Esempio di una parabola</p>
+</div>
+
+
+Un grafico a barre può essere ottenuto con il codice indicato più sotto, che produce il grafico in Figura \@ref(fig:figName234) e che è di facile interpretazione.
+
+
+```r
+Produzioni <- c(10, 12, 13, 15, 17)
+Genotipo <- c("A", "B", "C", "D", "E")
+barplot(Produzioni, names.arg = Genotipo,
+        ylab = "Produzioni (t/ha)",
+        main = "Produzioni di diversi genotipi di mais")
+```
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName234-1.png" alt="Esempio di grafico a barre" width="90%" />
+<p class="caption">(\#fig:figName234)Esempio di grafico a barre</p>
 </div>
 
 
@@ -7382,7 +7278,7 @@ Ad esempio il comando sottostante, produce l'output in Figura \@ref(fig:figName2
 
 
 ```r
-pie(c(20,30,50),label=c("B", "C"),
+pie(c(20,35,45),label=c("A", "B", "C"),
         col=c("blue", "green", "red"))
 ```
 
@@ -7393,7 +7289,7 @@ pie(c(20,30,50),label=c("B", "C"),
 
 ---
 
-## Altre letture {-}
+## Altre letture
 
 
 1. Maindonald J. Using R for Data Analysis and Graphics - Introduction, Examples and Commentary. (PDF, data sets and scripts are available at [JM's homepage](https://cran.r-project.org/doc/contrib/usingR.pdff).
