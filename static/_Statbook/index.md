@@ -2636,8 +2636,9 @@ Se assumiamo che l'ipotesi nulla è vera, allora i dati dovrebbero essere campio
 ```r
 Ysim <- rnorm(16, 14.48375, 3.9177)
 Ysim
-##  [1] 11.25108 15.84385 10.87910 13.35805 12.32459 17.80849 19.59052 12.41272
-##  [9] 17.47276 21.49765 16.50393 16.48161 17.92167 13.28823 10.57145 17.53845
+##  [1] 11.25108 15.84385 10.87910 13.35805 12.32459 17.80849 19.59052
+##  [8] 12.41272 17.47276 21.49765 16.50393 16.48161 17.92167 13.28823
+## [15] 10.57145 17.53845
 ```
 
 Se sottoponiamo questo dataset alla scomposizione della varianza, possiamo calcolare il relativo valore F. Se ripetiamo questo processo, ad esempio, 100'000 volte, otteniamo 100'000 valori F compatibili con l'ipotesi nulla, in quanto generati assumendola come vera. Otteniamo quindi una *sampling distribution* empirica per F e possiamo valutare qual è la probabilità di ottenere valori superiori a 23.66. In questo caso, il test è ad una sola coda, perché la statistica F è un rapporto do varianze, che sono, per definizione, positive.
@@ -5878,7 +5879,7 @@ Calcolare il coefficiente di correlazione di Pearson e valutare l'entità della 
 
 ### Esercizio 4
 
-Considerate il file EXCEL 'rimsulfuron.csv', che potete trovare in questo percorso: 'https://www.casaonofri.it/_datasets/students.csv'. In questo file sono riportati i risultati di un esperimento con 16 trattamenti e 4 repliche, nel quale sono stati posti a confronti diversi erbicidi e/o dosi per il diserbo nel mais. Calcolare le medie produttive ottenute con le diverse tesi sperimentali e riportarle su un grafico, includendo anche un'indicazione di variabilità. Verificare se la produzione è correlata con il ricoprimento (WeedCover) delle piante infestanti.
+Considerate il file EXCEL 'rimsulfuron.csv', che potete trovare in questo percorso: [https://www.casaonofri.it/_datasets/rimsulfuron.csv](https://www.casaonofri.it/_datasets/rimsulfuron.csv). In questo file sono riportati i risultati di un esperimento con 16 trattamenti e 4 repliche, nel quale sono stati posti a confronti diversi erbicidi e/o dosi per il diserbo nel mais. Calcolare le medie produttive ottenute con le diverse tesi sperimentali e riportarle su un grafico, includendo anche un'indicazione di variabilità. Verificare se la produzione è correlata con il ricoprimento (WeedCover) delle piante infestanti.
 
 ### Esercizio 5
 
@@ -5901,7 +5902,7 @@ Un ricercatore sta studiando una popolazione di insetti ed ha valutato che la lo
 
 ### Esercizio 2
 
-Una macchina confezionatrice riempe automaticamente delle confezioni di seme. Il peso dichiarato sulla confezione è 12.5 kg, ma la precisione della macchina è $\pm $ 1 kg. Calcolare la probabilità che una confezione contenga:
+Una macchina confezionatrice riempe automaticamente delle confezioni di seme. Il peso dichiarato sulla confezione è 12.5 kg, ma la precisione della macchina è $\pm$ 1 kg. Calcolare la probabilità che una confezione contenga:
 
 1. meno del peso dichiarato
 2. meno di 12 kg
