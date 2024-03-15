@@ -5,10 +5,89 @@
     <description>Recent content in R on Fixing the bridge between biologists and statisticians</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2023, @AndreaOnofri</copyright>
-    <lastBuildDate>Fri, 23 Feb 2024 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 15 Mar 2024 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://www.statforbiology.com/tags/r/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Here is why I don&#39;t care about the Levene&#39;s test</title>
+      <link>https://www.statforbiology.com/2024/stat_lm_checkassumptions/</link>
+      <pubDate>Fri, 15 Mar 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.statforbiology.com/2024/stat_lm_checkassumptions/</guid>
+      <description>
+
+
+&lt;p&gt;During my stat courses, I never give my students any information about the Levene’s test (Levene and Howard, 1960), or other similar tests for homoscedasticity, unless I am specifically prompted to do so. It is not that I intend to underrate the tremendous importance of checking for the basic assumptions of linear model! On the contrary, I always show my students several methods for the graphical inspection of model residuals, but I do not share the same aching desire for a P-value, that most of my colleagues seem to possess.&lt;/p&gt;
+&lt;p&gt;I understand that the Levene’s test could have played an important role at the time when it was devised; at that time, biologists/agronomists used to only have ANOVA and regression at their disposal and the Levene’s or other formal tests were strictly necessary to assess whether those powerful techniques (ANOVA/regression) could be reliably used, in place of other less powerful non-parametric methods of data analyses. At that time, the only sensible question they could ask the data was: ‘are the variances homogeneous across the experimental groups?’. And the P-level from a Levene’s test provided the perfect answer.&lt;/p&gt;
+&lt;p&gt;Today, things have vastly changed: we have very powerful computers and we have the freeware statistical environment R, where an awful lot of advanced models are put at our disposal. There is nothing that prevents us from asking our body of data several interesting questions, such as:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;do the treatments affect the variances of the experimental groups?&lt;/li&gt;
+&lt;li&gt;Are the variances, somehow, related to the expected responses?&lt;/li&gt;
+&lt;li&gt;Is a heteroscedastic model more reasonable than a homoscedastic model?&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Nowadays, we can answer all these (and other) questions by an appropriate comparison of alternative models: for example, let’s consider a genotype experiment with kamut, resulting in the dataset ‘HetGenotypes.csv’, which is available in an external repository. It is a simple fully randomised experiment with three replicates, aimed at comparing the yield of 15 kamut genotypes.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(dplyr)
+fileName &amp;lt;- &amp;quot;https://www.casaonofri.it/_datasets/HetGenotypes.csv&amp;quot;
+dataset &amp;lt;- read.csv(fileName)
+dataset &amp;lt;- dataset |&amp;gt;
+  transform(Genotype, factor(Genotype))
+head(dataset)
+##   Genotype Yield
+## 1        A 8.129
+## 2        A 8.616
+## 3        A 7.932
+## 4        B 6.188
+## 5        B 6.767
+## 6        B 6.635&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It would be rather common to start the analyses by fitting a simple ‘ANOVA’ model, where the yield measurements (&lt;span class=&#34;math inline&#34;&gt;\(y_i\)&lt;/span&gt;) are regarded as functions of the ovarell mean (&lt;span class=&#34;math inline&#34;&gt;\(\mu\)&lt;/span&gt;) plus the genotype effects (&lt;span class=&#34;math inline&#34;&gt;\(\alpha_j\)&lt;/span&gt;), while errors (&lt;span class=&#34;math inline&#34;&gt;\(\varepsilon_i\)&lt;/span&gt;) are regarded as gaussian, independent and homoscedastic (a simple ANOVA model, indeed):&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[y_i = \mu + \alpha_j + \varepsilon_i; \quad \quad  \textrm{with:} \quad \quad\varepsilon_i  \sim N(0, \sigma)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;For reasons that will be clearer later on, we fit this model by using the &lt;code&gt;gls()&lt;/code&gt; function in the &lt;code&gt;nlme&lt;/code&gt; package (same syntax as with the usual &lt;code&gt;lm()&lt;/code&gt; function). Immediately afterwards, we plot the residuals, which reveals that there are strong differences of variability across groups, but residuals are not clearly related to yield level.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(nlme)
+library(ggplot2)
+mod.aov &amp;lt;- gls(Yield ~ Genotype, data = dataset)
+
+g1 &amp;lt;- ggplot(dataset) +
+  geom_boxplot(mapping = aes(y = residuals(mod.aov), x = Genotype)) +
+  theme_bw()
+g2 &amp;lt;- ggplot() +
+  geom_point(mapping = aes(y = residuals(mod.aov), x = fitted(mod.aov))) +
+  theme_bw()
+library(gridExtra)
+gridExtra::grid.arrange(g1, g2, nrow = 1) &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_lm_checkAssumptions_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;My question at this stage: is it sensible to ask whether the variances are the same across groups? Using Tukey’s word (Tukey, 1991), such a question appears to be ‘rather foolish’, as the answer is already clear from the previous figure. However, it is sensible to ask whether a more complex model, allowing for heteroscedastic of within group errors, is warranted. Such a model would be expressed as:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[y_i = \mu + \alpha_j + \varepsilon_i; \quad \quad  \textrm{with:} \quad \quad\varepsilon_i  \sim N(0, \sigma_j)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(\sigma_i\)&lt;/span&gt; is allowed to assume a different value for each genotype; nowadays, fitting such a model is widely feasible, by using the same &lt;code&gt;gls()&lt;/code&gt; function as we have used before:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod.het &amp;lt;- gls(Yield ~ Genotype, data = dataset,
+               weights = varIdent(form = ~1|Genotype))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;You see it: no fitting difficulties of any kind. This second model, with respect to the first one, may be more respectful of what we observed in our experiment, but it has the cost of requiring 14 extra parameters, to estimate 15 variances, instead of just one. Is this extra-cost justified by the data at hand?&lt;/p&gt;
+&lt;p&gt;We can directly compare the two models by using the AIC (Akaike’s information criterion):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;anova(mod.aov, mod.het)
+##         Model df       AIC      BIC    logLik   Test  L.Ratio p-value
+## mod.aov     1 16 106.18435 128.6035 -37.09218                        
+## mod.het     2 30  97.44571 139.4816 -18.72285 1 vs 2 36.73865   8e-04&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We see that the AIC is lower for the heteroscedastic model and we also see that the Likelihood Ratio Test confirms that the more complex model is much more likely, in spite of the cost induced by the need for extra parameters. Thus I keep the most complex model and go ahead with that.&lt;/p&gt;
+&lt;p&gt;In conclusion, this is why I do not care about the Levene’s test: it provides a good answer to the wrong question (BTW: the Levene’s test in this circumstance turns out to be non-significant…)!&lt;/p&gt;
+&lt;p&gt;Thanks for reading and happy coding!&lt;/p&gt;
+&lt;p&gt;Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+&lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;hr /&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Akaike, H., 1974. A new look at the statistical model identification. IEEE Transactions on Automatic Control 19, 716–723. &lt;a href=&#34;https://doi.org/doi:10.1109/TAC.1974.1100705&#34; class=&#34;uri&#34;&gt;https://doi.org/doi:10.1109/TAC.1974.1100705&lt;/a&gt;, MR 0423716&lt;/li&gt;
+&lt;li&gt;Levene and Howard, 1960. Robust tests for equality of variances, In Ingram Olkin; Harold Hotelling; et al. (eds.), Contributions to Probability and Statistics: Essays in Honor of Harold Hotelling, Stanford University Press.&lt;/li&gt;
+&lt;li&gt;Tukey, J.W., 1991. The phylosophy of multiple comparisons. Statistical Science 6, 100–116.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Pairwise comparisons in nonlinear regression</title>

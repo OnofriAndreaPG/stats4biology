@@ -1,5 +1,5 @@
 ---
-title: "Fitting 'complex' mixed models with 'nlme': Example #4"
+title: "Testing for interactions in nonlinear regression"
 author: "Andrea Onofri"
 date: 2019-09-13
 slug: 'Mixed models'
@@ -22,7 +22,7 @@ knitr::knit_hooks$set(document = function(x){
 })
 ```
 
-# Testing for interactions in nonlinear regression
+# Fitting 'complex' mixed models with 'nlme': Example #4
 
 Factorial experiments are very common in agriculture and they are usually laid down to test for the significance of interactions between experimental factors. For example, genotype assessments may be performed at two different nitrogen fertilisation levels (e.g. high and low) to understand whether the ranking of genotypes depends on nutrient availability. For those of you who are not very much into agriculture, I will only say that such an assessment is relevant, because we need to know whether we can recommend the same genotypes, e.g., both in conventional agriculture (high nitrogen availability) and in organic agriculture (relatively lower nitrogen availability).
 
@@ -35,7 +35,7 @@ rm(list=ls())
 library(lattice)
 library(nlme)
 library(aomisc)
-dataset <- read.csv("https://raw.githubusercontent.com/OnofriAndreaPG/agroBioData/master/growthNGEN.csv",
+dataset <- read.csv("https://www.casaonofri.it/_datasets/growthNGEN.csv",
   header=T)
 dataset$Block <- factor(dataset$Block)
 dataset$N <- factor(dataset$N)
@@ -120,7 +120,8 @@ The transformation of both sides of the equation is made explicitely.
 
 ```{r message=FALSE, warning=FALSE, paged.print=FALSE}
 library(aomisc)
-modnlme1 <- nlme(sqrt(Yield) ~ sqrt(NLS.L3(DAS, b, d, e)), data = dataset,
+modnlme1 <- nlme(sqrt(Yield) ~ sqrt(NLS.L3(DAS, b, d, e)), 
+                 data = dataset,
                     random = d + e ~ 1|Block/Plot,
                     fixed = list(b ~ 1, d ~ N*GEN, e ~ N*GEN),
                     start = coef(modNaive1), 
@@ -184,22 +185,28 @@ Now, let's go back to our initial aim: testing the significance of the 'genotype
 
 
 ```{r message=FALSE, warning=FALSE, paged.print=FALSE}
-modNaive2 <- drm(Yield ~ DAS, fct = L.3(), data = dataset,
-            curveid = N:GEN,
-            pmodels = c( ~ 1,  ~ N + GEN,  ~ N * GEN), bcVal = 0.5)
+modNaive2 <- drm(Yield ~ DAS, fct = L.3(), 
+                 data = dataset,
+                 curveid = N:GEN,
+                 pmodels = c( ~ 1,  ~ N + GEN,  ~ N * GEN), 
+                 bcVal = 0.5)
 
-modnlme2 <- nlme(sqrt(Yield) ~ sqrt(NLS.L3(DAS, b, d, e)), data = dataset,
-                    random = d + e ~ 1|Block/Plot,
-                    fixed = list(b ~ 1, d ~ N + GEN, e ~ N*GEN),
-                    start = coef(modNaive2), control = list(msMaxIter = 200))
+modnlme2 <- nlme(sqrt(Yield) ~ sqrt(NLS.L3(DAS, b, d, e)), 
+                 data = dataset,
+                 random = d + e ~ 1|Block/Plot,
+                 fixed = list(b ~ 1, d ~ N + GEN, e ~ N*GEN),
+                 start = coef(modNaive2), 
+                 control = list(msMaxIter = 200))
+
 modNaive3 <- drm(Yield ~ DAS, fct = L.3(), data = dataset,
             curveid = N:GEN,
             pmodels = c( ~ 1,  ~ N*GEN,  ~ N + GEN), bcVal = 0.5)
 
-modnlme3 <- nlme(sqrt(Yield) ~ sqrt(NLS.L3(DAS, b, d, e)), data = dataset,
-                    random = d + e ~ 1|Block/Plot,
-                    fixed = list(b ~ 1, d ~ N*GEN, e ~ N + GEN),
-                    start = coef(modNaive3), control = list(msMaxIter = 200))
+modnlme3 <- nlme(sqrt(Yield) ~ sqrt(NLS.L3(DAS, b, d, e)),
+                 data = dataset,
+                 random = d + e ~ 1|Block/Plot,
+                 fixed = list(b ~ 1, d ~ N*GEN, e ~ N + GEN),
+                 start = coef(modNaive3), control = list(msMaxIter = 200))
 
 ```
 
