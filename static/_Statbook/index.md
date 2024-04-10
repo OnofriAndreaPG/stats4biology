@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.24 (Anno Accademico 2022-2023), compil. 2024-04-09"
+date: "Update: v. 1.24 (Anno Accademico 2022-2023), compil. 2024-04-10"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -1768,7 +1768,7 @@ Questo intervallo di confidenza empirico funziona piuttosto bene ed ha campi di 
 
 # Decisioni ed incertezza
 
-Dovrebbero ormai essere chiari i motivi per cui i risultati di un esperimento non corrispondono alla verità vera e si presentano in modo diverso ogni volta che lo ripetiamo. Nel capitolo precedente abbiamo visto come è possibile (e necessario) esplicitare la nostra incertezza in relazione alla verità vera, aggiungendo alle nostre stime campionarie il cosiddetto **intervallo di confidenza**, basato sulla *sampling distribution* della stima, che mostra come quest'ultima varia quando ripetiamo l'esperimento. Un approccio affine può essere utilizzato per prendere decisioni in presenza di incertezza, con un procedimento che si chiama **test d'ipotesi**. Anche per questo argomento, vediamo alcuni semplici, ma realistici esempi.
+Dovrebbero ormai essere chiari i motivi per cui i risultati di un esperimento non corrispondono alla verità vera e si presentano in modo diverso ogni volta che lo ripetiamo. Nel capitolo precedente abbiamo visto come è possibile (e necessario) esplicitare la nostra incertezza in relazione alla verità vera, aggiungendo alle nostre stime campionarie il cosiddetto **intervallo di confidenza**, basato sulla *sampling distribution* della stima, che mostra come quest'ultima vari quando ripetiamo l'esperimento. Un approccio affine può essere utilizzato per prendere decisioni in presenza di incertezza, con un procedimento che si chiama **test d'ipotesi**. Anche per questo argomento, vediamo alcuni semplici, ma realistici, esempi.
 
 ## Il test t di Student
 
@@ -1800,13 +1800,13 @@ m2; s2; n2
 ## [1] 5
 ```
 
-Il passo precedente è importante e ci consente di comprendere alcune caratteristiche dei due campioni, ma non dobbiamo mai dimenticare il fatto che noi siamo interessati a trarre conclusioni generali, relative a tutte le infinite parcelle che avremmo potuto coltivare e che non abbiamo potuto coltivare, per la limitatezza delle risorse a nostra disposizione. Il passo successivo è quello di fare un'ipotesi ragionevole sul meccanismo causa-effetto che ha generato le nostre osservazioni sperimentali, da esplicitare con un modello statistico a due componenti (deterministica e stocastica), come abbiamo visto nel Capitolo 4. Il modello dovrà essere un po' più complesso rispetto a quello introdotto nel capitolo precedente, in quanto dovrà considerare l'effetto varietale, che potremmo immaginare come additivo, così come indicato di seguito:
+Il passo precedente è importante e ci consente di comprendere alcune caratteristiche dei due campioni, ma non dobbiamo mai dimenticare il fatto che noi siamo interessati a trarre conclusioni generali, relative a tutte le infinite parcelle che avremmo potuto coltivare e che non abbiamo coltivato, per la limitatezza delle risorse a nostra disposizione. Il passo successivo è quello di fare un'ipotesi ragionevole sul meccanismo causa-effetto che ha generato le nostre osservazioni sperimentali, da esplicitare con un modello statistico a due componenti (deterministica e stocastica), come abbiamo visto nel Capitolo 4. Il modello dovrà essere un po' più complesso rispetto a quello introdotto nel Capitolo 5, in quanto dovrà considerare l'effetto varietale, che potremmo immaginare come additivo, così come indicato di seguito:
 
 $$
 Y_i = \mu_1 + \delta_j + \varepsilon_{i} 
 $$
 
-dove $Y_i$ è la produzione della i-esima parcella ($i$ va da 1 a 10), $\mu_1$ è la produzione attesa della prima varietà (A, in ordine alfabetico), mentre $\delta_j$ è l'effetto della varietà, che è fisso ed uguale a 0 per la prima varietà ($\delta_1 = 0$) mentre è uguale alla differenza tra le due medie per la seconda varietà ($\delta_2 = \mu_1 - \mu_2$), cosicché la produzione attesa della seconda varietà è $\mu_2 = \mu_1 + \delta_2$. I termini $\varepsilon_i$ rappresentano gli effetti di confusione, casuali e diversi per ogni i-esima osservazione e che assumiamo gaussiani, con media 0 e deviazione standard $\sigma$. La scelta di utilizzare $\mu_1$ come parametro esplicito nel modello è puramente arbitraria, nel senso che avremmo potuto benissimo utilizzare $\mu_2$, rovesciando il segno della differenza $\delta_2$.
+dove $Y_i$ è la produzione della i-esima parcella ($i$ va da 1 a 10), $\mu_1$ è la produzione attesa della prima varietà (A, in ordine alfabetico), mentre $\delta_j$ è l'effetto della varietà, che è fisso ed uguale a 0 per la prima varietà ($\delta_1 = 0$) mentre è uguale alla differenza tra le due medie per la seconda varietà ($\delta_2 = \mu_2 - \mu_1$), cosicché la produzione attesa della seconda varietà è $\mu_2 = \mu_1 + \delta_2$. I termini $\varepsilon_i$ rappresentano gli effetti di confusione, casuali e diversi per ogni i-esima osservazione e che assumiamo gaussiani, con media 0 e deviazione standard $\sigma$. La scelta di utilizzare $\mu_1$ come parametro esplicito nel modello è puramente arbitraria, nel senso che avremmo potuto benissimo utilizzare $\mu_2$, rovesciando il segno della differenza $\delta_2$.
 
 
 
@@ -1872,16 +1872,16 @@ Un primo approccio intuitivo per il test d'ipotesi potrebbe essere basato sull'i
 
 
 ```r
-delta <- mean(A) - mean(P)
+delta <- mean(P) - mean(A)
 delta + qt(0.975, 8) * sed
-## [1] -7.448258
+## [1] 22.95174
 delta - qt(0.975, 8) * sed
-## [1] -22.95174
+## [1] 7.448258
 ```
 
 
 
-La differenza è negativa e l'intervallo di confidenza non contiene lo zero, il che supporta, in qualche modo, l'idea che esista effettivamente una differenza significativa tra le due varietà. 
+La differenza è positiva e l'intervallo di confidenza non contiene lo zero, il che supporta, in qualche modo, l'idea che esista effettivamente una differenza significativa tra le due varietà. 
 
 
 
@@ -1900,7 +1900,7 @@ $$T = \frac{d_2}{SED}$$
 
 Il valore osservato è:
 
-$$T = \frac{-15.2}{3.361547} = -4.5217$$
+$$T = \frac{15.2}{3.361547} = 4.5217$$
 
 ### Simulazione Monte Carlo
 
@@ -1950,7 +1950,7 @@ length(result[result > - T_obs]) /100000
 ## [1] 0.00082
 ```
 
-Come risultato (vettore 'result') otteniamo una lista di 100'000 valori di T, tutti compatibili con l'ipotesi nulla vera ($\delta_2 = 0$); in altre parole, otteniamo una *sampling distribution* per T, in quanto le variazioni tra un valore e l'altro sono solo dovute al campionamento, visto che l'ipotesi nulla è vera. In mezzo a questi 100'000 valori ne troviamo alcuni piuttosto alti ($> 9$) o piuttosto bassi ($< - 9$). Negli anni 20 del 1900, Fischer propose di utilizzare come **'forza dell'evidenza scientifica'** proprio la probabilità di ottenere un risultato uguale o più estremo di quello osservato, supponendo vera l'ipotesi nulla. Per applicare questo criterio, dobbiamo partire dalla nostra osservazione ($T = -4.521727$) e considerare che il valore è negativo, ma solo perché abbiamo scritto la differenza come $m_1 - m_2$ invece che come $m_2 - m_1$. Quindi dobbiamo andarci a cercare nel vettore 'result' i valori che risultano minori di -4.5217 e maggiori di 4.5217, che sono più discrepanti di quello da noi osservato. Dobbiamo quindi tener conto di entrambe le 'code' della *sampling distribution* e, per questo, si parla di **test a due code**.
+Come risultato (vettore 'result') otteniamo una lista di 100'000 valori di T, tutti compatibili con l'ipotesi nulla vera ($\delta_2 = 0$); in altre parole, otteniamo una *sampling distribution* per T, in quanto le variazioni tra un valore e l'altro sono solo dovute al campionamento, visto che l'ipotesi nulla è vera. In mezzo a questi 100'000 valori ne troviamo alcuni piuttosto alti ($> 9$) o piuttosto bassi ($< - 9$). Negli anni 20 del 1900, Fischer propose di utilizzare come **'forza dell'evidenza scientifica'** proprio la probabilità di ottenere un risultato uguale o più estremo di quello osservato, supponendo vera l'ipotesi nulla. Per applicare questo criterio, dobbiamo partire dalla nostra osservazione ($T = 4.521727$) e considerare che il valore è positivo, ma solo perché abbiamo scritto la differenza come $m_2 - m_1$ invece che come $m_1 - m_2$. Quindi dobbiamo andarci a cercare nel vettore 'result' i valori che risultano maggiori di 4.5217 e minori di -4.5217, che sono più discrepanti di quello da noi osservato. Dobbiamo quindi tener conto di entrambe le 'code' della *sampling distribution* e, per questo, si parla di **test a due code**.
 
 Vediamo che, dei 100'000 valori di T simulati assumendo vera l'ipotesi nulla, poco meno dell'uno per mille sono inferiori a -4.5217 e altrettanti sono superiori al suo reciproco (4.5217). In totale, la probabilità di osservare un valore di T uguale o più estremo di quello da noi osservato è molto bassa a pari allo 0.18% circa. Questo valore di probabilità è detto **P-level** (o **P-value**) e viene utilizzato come criterio decisionale: se esso è inferiore a 0.05 (5% di probabilità), come in questo caso, rifiutiamo l'ipotesi nulla ed abbracciamo l'alternativa, concludendo che i due trattamenti sono significativamente diversi tra loro (in termini di risposta prodotta nei soggetti trattati, ovviamente).
 
@@ -1978,7 +1978,7 @@ curve(dt(x, 8), add=TRUE, col="red")
 <p class="caption">(\#fig:figName71)Sampling distribution empirica a confronto con una distribuzione normale (in rosso) e una distribuzione t di Student con otto gradi di libertà</p>
 </div>
 
-Vediamo che l'istogramma non è rappresentabile fedelmente con una curva gaussiana (curva blu in Figura \@ref(fig:figName71)), in quanto le code sono leggermente più alte. Oltre alla funzione di densità gaussiana esiste un'altra funzione simile, detta 't di Student', di cui abbiamo parlato nel Capitolo 5 e che, rispetto alla gaussiana, è caratterizzata da una più elevata densità nelle code, soprattutto quando il numero di gradi di libertà è basso (in questo caso ne abbiamo 8, come abbiamo precisato più sopra). Possiamo vedere che la distribuzione t di Student con 8 gradi di libertà si adatta perfettamente alla *sampling distribution* empirica (curva rossa in Figura \@ref(fig:figName71)). 
+Vediamo che l'istogramma non è rappresentabile fedelmente con una curva gaussiana (curva blu in Figura \@ref(fig:figName71)), in quanto le code sono leggermente più alte. Al contrario, si può utilizzare la distribuzione di densità di 't di Student', di cui abbiamo già parlato nel Capitolo 5 e che, rispetto alla gaussiana, è caratterizzata da una più elevata densità nelle code, soprattutto quando il numero di gradi di libertà è basso (in questo caso ne abbiamo 8, come abbiamo precisato più sopra). Possiamo vedere che la distribuzione t di Student con 8 gradi di libertà si adatta perfettamente alla *sampling distribution* empirica (curva rossa in Figura \@ref(fig:figName71)). 
 
 L'impiego della curva 't di Student' ci permette di calcolare il P-level molto velocemente, senza dover ricorrere ad una simulazione Monte Carlo. Chiaramente, dato che l'ipotesi alternativa è quella semplice dobbiamo considerare entrambe le code, utilizzando il codice sottostante: 
 
@@ -1988,7 +1988,7 @@ L'impiego della curva 't di Student' ci permette di calcolare il P-level molto v
 ## [1] 0.001945471
 ```
 
-Abbiamo moltiplicato per 2 il risultato, in quanto la funzione `dt()` fornisce la probabilità di trovare individui superiori al valore assoluto di -4.5217 ('abs(T_obs)' e 'lower.tail = F'), ma, essendo la curva t di Student simmetrica, la probabilità di trovare soggetti nell'altra coda è esattamente la stessa.
+Abbiamo moltiplicato per 2 il risultato, in quanto la funzione `dt()` fornisce la probabilità di trovare individui superiori al valore assoluto di 4.5217 ('abs(T_obs)' e 'lower.tail = F'), ma, essendo la curva t di Student simmetrica, la probabilità di trovare soggetti nell'altra coda è esattamente la stessa. L'impiego della funzione valore assoluto è irrilevante nel nostro caso, ma è utile quando la differenza osservata è negativa.
 
 Vediamo che il P-level ottenuto formalmente è simile a quello ottenuto empiricamente, ma, rispetto a quest'ultimo, è più preciso, in quanto con la simulazione di Monte Carlo non abbiamo potuto considerare, come avremmo dovuto, un numero infinito di repliche dell'esperimento. Tuttavia bisogna precisare che **l'impiego di una sampling distribution formale richiede che siano vere alcune condizioni di base, come, ad esempio, l'omogeneità delle varianze e la normalità dei residui** $\varepsilon_i$, altrimenti il test è invalido. Questo aspetto non va assolutamente dimenticato e, per questo, daremo alcuni indicazioni in seguito.
 
@@ -2019,13 +2019,13 @@ T_obs <- 12/1.5
 
 Quando il P-level è inferiore a 0.05, rigettiamo l'ipotesi nulla e concludiamo che il valore del parametro nella popolazione è significativamente diverso da zero.
 
-Oltre a questo, esistono anche altri campi d'applicazione del test di t di Student, alcuni dei quali sono anche da considerare più 'tradizionali' di quello da noi indicato. Vediamoli con altri esempi.
+Oltre a questo, esistono anche altri campi d'applicazione del test di t di Student, alcuni dei quali sono anche da considerarsi più 'tradizionali' di quello da noi indicato. Vediamoli con altri esempi.
 
 ### Confronto tra due medie campionarie
 
-Tradizionalmente, il test t di Student è utilizzato per saggiare la differenza tra due medie campionarie, anche senza costruire un modello statistico come il nostro. In particolare, il processo è analogo a quello sopra indicato, salvo il fatto che, all'inizio, calcoliamo le medie dei due campioni, la loro differenza e l'errore standard di questa differenza. Successivamente, diviidiamo la differenza per il suo errore standard e procediamo come sopra.
+Tradizionalmente, il test t di Student è utilizzato per saggiare la differenza tra due medie campionarie, anche senza costruire un modello statistico come il nostro. In particolare, il processo è analogo a quello sopra indicato, salvo il fatto che, all'inizio, calcoliamo le medie dei due campioni, la loro differenza e l'errore standard di questa differenza. Successivamente, dividiamo la differenza per il suo errore standard e procediamo come sopra.
 
-In R, questo processo è agevolato dalla funzione `t.test()`, che, nel caso del nostro esempio iniziale, riceve in input i due campioni, assieme alla specifica 'var.equal = T', che permette di eseguire un test omoscedastco, con risultati assolutamente uguali a quelli riportati più sopra.
+In R, questo processo è agevolato dalla funzione `t.test()`, che, nel caso del nostro esempio iniziale, riceve in input i due campioni, assieme alla specifica 'var.equal = T', che permette di eseguire un test omoscedastico, con risultati assolutamente uguali a quelli riportati più sopra.
 
 
 ```r
@@ -2042,7 +2042,6 @@ t.test(A, P, var.equal = T)
 ## mean of x mean of y 
 ##      70.2      85.4
 ```
-
 
 
 ### Varianze non omogenee
@@ -2079,10 +2078,11 @@ In questo esempio:
 
 
 ```r
+sed <- sqrt( var(D1)/5 + var(D2)/5 )
 dfS <- (var(D1) + var(D2))^2 / 
   ((var(D1)^2)/4 + (var(D2)^2)/4)
-dfS
-## [1] 4.126621
+2 * pt(abs(mean(D1) - mean(D2))/sed, dfS, lower.tail = F)
+## [1] 2.325897e-06
 ```
 
 Con R, il test di Welch si esegue utilizzando l'argomento 'var.equal = F', che è l'opzione di default; è leggermente meno potente di quello omoscedastico (P-level più basso), ma permette di rilasciare l'assunzione di omogeneità delle varianze e fornisce risultati validi anche quando i due campioni hanno una variabilità molto diversa.
@@ -2166,11 +2166,9 @@ t.test(A, P, var.equal = T, alternative = "less") # più semplice
 
 Ricordiamo come l'ipotesi alternativa complessa possa essere adottata solo nei casi in cui essa risulti ragionevole già prima di effettuare l'esperimento e non dopo averne visti i risultati.
 
-## Altri test d'ipotesi
+## Altri test d'ipotesi: il test $\chi^2$
 
-## Il test $\chi^2$
-
-Il test di t, con tutte le sue varianti, è fondamentalmente basato sul rapporto tra una stima ed il suo errore standard, la cui *sampling distribution* è approssimativamente gaussian o, più precisamente, segue la distribuzione di 't di Student'. Tuttavia, io posso testare ipotesi di ogni tipo, mi basta avere una qualunque statistica che descriva l'andamento dell'esperimento e conoscere la sua *sampling distribution*, assumendo che l'ipotesi nulla sia vera. Questa *sampling distribution* può essere empirica (cioè ottenuta per simulazione Monte Carlo) o meglio teorica, scelta in base a considerazioni di natura statistico-matematica; su di essa, vado a cercare la probabilità di trovare valori per la statistica in studio che siano tanto estremi o più estremi di quello da noi riscontrato.
+Il test di t, con tutte le sue varianti, è fondamentalmente basato sul rapporto tra una stima ed il suo errore standard, la cui *sampling distribution* è approssimativamente gaussiana o, più precisamente, segue la distribuzione di 't di Student'. Tuttavia, io posso testare ipotesi di ogni tipo, mi basta avere una qualunque statistica che descriva l'andamento dell'esperimento e conoscere la sua *sampling distribution*, assumendo che l'ipotesi nulla sia vera. Questa *sampling distribution* può essere empirica (cioè ottenuta per simulazione Monte Carlo) o meglio teorica, scelta in base a considerazioni di natura statistico-matematica; su di essa, vado a cercare la probabilità di trovare valori per la statistica in studio che siano tanto estremi o più estremi di quello da noi riscontrato.
 
 Ad esempio, immaginiamo che io abbia una stima pari a 22 ed immaginiamo che la *sampling distribution* per questa stima, assumendo vera l'ipotesi nulla, segua la distribuzione di $\chi^2$ con 10 gradi di libertà (per menzionare una qualunque distribuzione che non conosciamo ancora). Allora io posso ottenere un P-level per l'ipotesi nulla andandomi a guardare la probabilità di osservare un valore altrettanto estremo o più estremo di 22 (test ad una coda), come indicato nel box sottostante.
 
@@ -5924,16 +5922,17 @@ Utilizzando una simulazione Monte Carlo opportunamente pianificata, mostrare che
 
 ### Esercizio 1
 
-Uno sperimentatore ha impostato un esperimento per verificare l'effetto di un fungicida (A) in confronto al testimone non trattato (B), in base al numero di colonie fungine sopravvissute. Il numero delle colonie trattate è di 200, mentre il numero di quelle non trattate è di 100. Le risposte (frequenze) sono come segue:
+La nostra miglior stima puntuale del parametro di un modello statistico è $\gamma = -7.2$, con un errore standard pari a 2.8, con 16 gradi di libertà. E'possibile che, in realtà, sia $\gamma = 0$? Qual è il P-level per l'ipotesi nulla? Devo accettarla o posso rifiutarla?
 
-|     | Morte | Sopravvissute |
-|-----|:-----:|:-------------:|
-| A   |  180  |      20       |
-| B   |  50   |      50       |
 
-Stabilire se i risultati possono essere considerati significativamente diversi, per un livello di probabilità del 5%.
 
 ### Esercizio 2
+
+La nostra miglior stima puntuale del parametro di un modello statistico è $\delta = 13.5$, con un errore standard pari a 8.4, ma non è disponibile, per questo errore standard, una stima accurata dei gradi di libertà. E'possibile che, in realtà, sia $\delta = 0$? Qual è il P-level per l'ipotesi nulla? Devo accettarla o posso rifiutarla?
+
+
+
+### Esercizio 3
 
 Uno sperimentatore ha impostato un esperimento per confrontare due tesi sperimentali (A, B). I risultati sono i seguenti (in q/ha):
 
@@ -5943,25 +5942,32 @@ Uno sperimentatore ha impostato un esperimento per confrontare due tesi sperimen
 | 10.2 | 12.3 |
 | 9.7  | 12.5 |
 
-Stabilire se i risultati per le due tesi sperimentali possono essere considerati significativamente diversi, per un livello di probabilità del 5%.
+Stabilire se i risultati per le due tesi sperimentali possono essere considerati significativamente diversi, per un livello di probabilità di errore di I specie del 5%.
 
-### Esercizio 3
+
+
+### Esercizio 4
 
 Uno sperimentatore ha impostato un esperimento per confrontare se l'effetto di un fungicida è significativo, in un disegno sperimentale con tre ripetizioni. Con ognuna delle due opzioni di trattamento i risultati produttivi sono i seguenti (in t/ha):
 
 |  A  | NT  |
 |:---:|:---:|
-| 65  | 54  |
-| 71  | 51  |
-| 68  | 59  |
+| 6.5  | 54  |
+| 7.1  | 48  |
+| 6.8  | 63  |
 
-E'significativo l'effetto del trattamento fungicida sulla produzione, per un livello di probabilità del 5%?
+E'significativo l'effetto del trattamento fungicida sulla produzione, per un livello di probabilità del 5%?. SUGGERIMENTO: prestare attenzione all'omogeneità delle varianze.
 
-### Esercizio 4
 
-Immaginate di aver riscontrato che, in determinate condizioni ambientali, 60 olive su 75 sono attaccate da *Daucus olee* (mosca dell'olivo). Nelle stesse condizioni ambientali, diffondendo in campo un insetto predatore siamo riusciti a ridurre il numero di olive attaccate a 12 su 75. Si tratta di una oscillazione casuale del livello di attacco o possiamo concludere che l'insetto predatore è stato un mezzo efficace di lotta biologica alla mosca dell'olivo?
 
 ### Esercizio 5
+
+Con un esperimento in laboratorio, abbiamo stimato che il tasso di degradazione di una sostanza xenobiotica in acqua è $\kappa_1 = -0.071 \pm 0.012$ (7 gradi di libertà). Per una sostanza affine il tasso di degradazione è pari a $\kappa_2 = -0.153 \pm 0.024$ (anocora 7 gradi di lbertà); possiamo concludere che il tasso di degradazione delle due sostanze, in realtà, non è significativamente diverso?
+
+
+
+
+### Esercizio 6
 
 In un ospedale, è stata misurata la concentrazione di colesterolo nel sangue di otto pazienti, prima e dopo un trattamento medico. Per ogni paziente, sono stati analizzati due campioni, ottenendo le seguenti concentrazioni:
 
@@ -5978,7 +5984,38 @@ In un ospedale, è stata misurata la concentrazione di colesterolo nel sangue di
 
 Si può concludere che il trattamento medico è stato efficace?
 
-### Esercizio 6
+
+
+
+### Esercizio 7
+
+Un veterinario ha organizzato un esperimento per valutare l'effetto di una dieta innovativa, sulla pressione arteriosa sistolica di cavalli da corsa. Le informazioni preliminari mostrano con chiarezza che questa dieta innovativa non può avere effetti negativi, ma, eventualmente, solo positivi. Il ricercatore ha selezionato a caso 16 animali, ne ha misurato la pressione arteriosa a riposo ed ha ripetuto la stessa misurazione dopo sei mesi di questa dieta. I risultati ottenuti sono i seguenti:
+
+
+
+
+Stabilire se la dieta è efficace, con una probabilità di errore P < 0.05. SUGGERIMENTO: ricordare che la l'effetto atteso della dieta, per le informazioni preliminari disponibili, può, eventualmente, essere solo quello di abbassare la pressione, mai quello di alzarla.
+
+
+
+
+### Esercizio 8
+
+Uno sperimentatore ha impostato un esperimento per verificare l'effetto di un fungicida (A) in confronto al testimone non trattato (B), in base al numero di colonie fungine sopravvissute. Il numero delle colonie trattate è di 200, mentre il numero di quelle non trattate è di 100. Le risposte (frequenze) sono come segue:
+
+|     | Morte | Sopravvissute |
+|-----|:-----:|:-------------:|
+| A   |  180  |      20       |
+| B   |  50   |      50       |
+
+Stabilire se i risultati possono essere considerati significativamente diversi, per un livello di probabilità del 5%.
+
+### Esercizio 9
+
+Immaginate di aver riscontrato che, in determinate condizioni ambientali, 60 olive su 75 sono attaccate da *Daucus olee* (mosca dell'olivo). Nelle stesse condizioni ambientali, diffondendo in campo un insetto predatore siamo riusciti a ridurre il numero di olive attaccate a 12 su 75. Si tratta di una oscillazione casuale del livello di attacco o possiamo concludere che l'insetto predatore è stato un mezzo efficace di lotta biologica alla mosca dell'olivo?
+
+
+### Esercizio 10
 
 I Q.I. di 16 studenti provenienti da un quartiere di una certa città sono risultati pari a:
 
@@ -5999,7 +6036,7 @@ QI2 <- c(90.66, 101.41, 104.61,  91.77, 107.06,  89.51,  87.91,
 
 Esiste una differenza significativa tra i Q.I. nei due quartieri della città?
 
-### Esercizio 7
+### Esercizio 11
 
 Viene estratto un campione di rondelle da una macchina in perfette condizioni di funzionamento. Lo spessore delle rondelle misurate è:
 
@@ -6020,7 +6057,19 @@ S2 <- c(0.0502, 0.0528, 0.0492, 0.0556, 0.0501, 0.0500, 0.0498,
 
 Verificare se la macchina sia ancora ben tarata, oppure necessiti di revisione.
 
-### Esercizio 8
+### Esercizio 12
+
+Le varianze di due campioni composti da 30 unità sono risultate pari, rispettivamente a 115.3 e 356.4; stabilire se il secondo campione ha una varianza significativamente più alta del primo. SUGGERIMENTO: considerare che il rapporto tra due varianze di campioni estratti dalla stessa popolazione gaussiana segue la distribuzione F di Fisher. Considerare anche che, in R, la funzione 'pf(x, n1, n2)' restituisce la probabilità di ottenere valori pari o superiori ad x, da una distribuzione F di Fisher con n1 ed n2 gradi di libertà. Considerare anche che il rapporto di due varianze può solo essere positivo.
+
+
+```r
+pf(356.4/115.3, 29, 29, lower.tail = F)
+## [1] 0.001648857
+```
+
+
+
+### Esercizio 13
 
 Sono stati osservati 153 calciatori registrando la dominanza della mano e quella del piede, ottenendo la tabella riportata qui di seguito.
 
@@ -6033,7 +6082,7 @@ Sono stati osservati 153 calciatori registrando la dominanza della mano e quella
 
 Esiste dipendenza tra la dominanza della mano e del piede?
 
-### Esercizio 9
+### Esercizio 14
 
 Un agronomo ha organizzato un esperimento varietale, per confrontare tre varietà di frumento, cioè GUERCINO, ARNOVA e BOLOGNA. Per far questo ha individuato, in un campo uniforme dell'areale umbro, trenta parcelle da 18 m^2^ e ne ha selezionate dieci a caso, da coltivare con GUERCINO, altre dieci a caso sono state coltivate con ARNOVA e le ultime dieci sono state coltivate con BOLOGNA.
 
@@ -6059,7 +6108,7 @@ Al termine dell'esperimento, le produttività osservate erano le seguenti:
 
 
 
-### Esercizio 10
+### Esercizio 15
 
 Un botanico ha valutato il numero di semi germinati per colza sottoposto a due diversi regimi termici dopo l'imbibizione (15 e 25°C). Per la temperatura più bassa, su 400 semi posti in prova, ne sono germinati 358. Alla temperatura più alta, su 380 semi in prova, ne sono germinati 286.
 
@@ -6069,13 +6118,6 @@ Un botanico ha valutato il numero di semi germinati per colza sottoposto a due d
 
 
 
-### Esercizio 11
-
-Un veterinario ha organizzato un esperimento per valutare l'effetto di una dieta innovativa, sulla pressione arteriosa sistolica di cavalli da corsa. Ha selezionato a caso 16 animali, ne ha misurato la pressione arteriosa a riposo ed ha ripetuto la stessa misurazione dopo sei mesi di questa dieta. I risultati ottenuti sono i seguenti:
-
-
-
-Stabilire se la dieta è efficace, con una probabilità di errore P < 0.05.
 
 ---
 
