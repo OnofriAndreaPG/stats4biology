@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.24 (Anno Accademico 2022-2023), compil. 2024-04-10"
+date: "Update: v. 1.24 (Anno Accademico 2022-2023), compil. 2024-04-17"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -1772,7 +1772,7 @@ Dovrebbero ormai essere chiari i motivi per cui i risultati di un esperimento no
 
 ## Il test t di Student
 
-Immaginiamo che un ricercatore abbia testato la produzione di due genotipi (A e P) in un disegno sperimentale a randomizzazione completa, con cinque repliche (dieci parcelle in totale). I risultati ottenuti sono i seguenti:
+Immaginiamo che un ricercatore abbia testato la produzione di due genotipi (A e P) in un disegno sperimentale a randomizzazione completa, con cinque repliche (dieci parcelle in totale). I risultati ottenuti (q/ha) sono i seguenti:
 
 
 ```r
@@ -1814,7 +1814,7 @@ Una volta definito il modello generale, possiamo utilizzare i dati osservati per
 
 Nell'ipotesi di omoscedasticità, la miglior stima di $\sigma$ può essere ottenuta da una sorta di media delle varianze campionarie, pesata sui relativi gradi di libertà:
 
-$$\sigma = \sqrt{ \frac{s_1^2 \, (n_1 - 1) + s_2^2 \, (n_2 - 1)}{n_1 + n_2 - 2} }$$
+$$\sigma = s_{pool} = \sqrt{ \frac{s_1^2 \, (n_1 - 1) + s_2^2 \, (n_2 - 1)}{n_1 + n_2 - 2} }$$
 
 dove $s_1$ ed $s_2$ sono le deviazioni standard dei due campioni e $n_1$ ed $n_2$ sono le due numerosità (entrambe uguali a cinque):
 
@@ -1831,7 +1831,7 @@ La deviazione standard 'comune' ha $n_1 + n_2 - 2 = 8$ gradi di libertà, pari a
 
 Dopo la stima puntuale dei parametri, dobbiamo procedere alla determinazione degli errori standard, che sono l'ingrediente fondamentale dell'inferenza statistica. L'errore standard della media $\mu_1$ è $5.315/\sqrt{5} = 2.377$ mentre l'errore standard della differenza $\delta_2$ (abbreviato come SED), in base alla legge di propagazione degli errori e per campioni estratti in modo indipendente, può essere ottenuta come la radice quadrata della somma pesata delle varianze campionarie, comuni ai due campioni:
 
-$$SED = \sqrt {\frac{s^2}{ n_1}  + \frac{s^2}{n_2} }$$
+$$SED = \sqrt {\frac{s_{pool}^2}{ n_1}  + \frac{s_{pool}^2}{n_2} }$$
 
 Considerando che in questo caso anche il numero delle osservazioni è costante, l'errore standard della differenza si riduce a:
 
@@ -1846,7 +1846,7 @@ sed
 
 Dopo aver completato l'inferenza statistica, ci chiediamo se, a livello di popolazione, sia possibile concludere che il genotipo P è più produttivo del genotipo A, coerentemente con i risultati osservati nei due campioni. Non dimentichiamoci che i due campioni sono totalmente irrilevanti, perché vogliamo trarre conclusioni generali e non specifiche per il nostro esperimento. Dobbiamo quindi **trovare un metodo per decidere se il genotipo P, in generale, è più produttivo del genotipo A**, pur in presenza dell'incertezza legata all'errore sperimentale.
 
-Innanzitutto, ricordiamo la logica Popperiana illustrata nel primo capitolo, secondo la quale nessun esperimento può dimostrare che un'ipotesi scientifica è vera, mentre è possibile dimostrare che essa è falsa. E'quindi conveniente porre l'ipotesi scientifica di nostro interesse ($H_0$) in modo che essa possa essere falsificata, cieè, ad esempio:
+Innanzitutto, ricordiamo la logica Popperiana illustrata nel primo capitolo, secondo la quale nessun esperimento può dimostrare che un'ipotesi scientifica è vera, mentre è possibile dimostrare che essa è falsa. E'quindi conveniente porre l'ipotesi scientifica di nostro interesse ($H_0$) in modo che essa possa essere falsificata, cioè, ad esempio:
 
 $$H_0: \delta_2 = 0$$
 
@@ -2019,7 +2019,6 @@ T_obs <- 12/1.5
 
 Quando il P-level è inferiore a 0.05, rigettiamo l'ipotesi nulla e concludiamo che il valore del parametro nella popolazione è significativamente diverso da zero.
 
-Oltre a questo, esistono anche altri campi d'applicazione del test di t di Student, alcuni dei quali sono anche da considerarsi più 'tradizionali' di quello da noi indicato. Vediamoli con altri esempi.
 
 ### Confronto tra due medie campionarie
 
@@ -2436,18 +2435,18 @@ Table: (\#tab:tabResidui)Tabella dei dati osservati, dei valori attesi, dei resi
 |Metribuzin__348 |   4.38| 14.484| -5.309|  9.175|  -4.795|
 |Metribuzin__348 |  10.32| 14.484| -5.309|  9.175|   1.145|
 |Metribuzin__348 |   6.80| 14.484| -5.309|  9.175|  -2.375|
-|Mixture_378     |   6.14| 14.484| -9.356|  5.127|   1.012|
+|Mixture_378     |   6.14| 14.484| -9.356|  5.127|   1.013|
 |Mixture_378     |   1.95| 14.484| -9.356|  5.128|  -3.178|
-|Mixture_378     |   7.27| 14.484| -9.356|  5.128|   2.142|
-|Mixture_378     |   5.15| 14.484| -9.356|  5.128|   0.022|
+|Mixture_378     |   7.27| 14.484| -9.356|  5.127|   2.142|
+|Mixture_378     |   5.15| 14.484| -9.356|  5.128|   0.023|
 |Rimsulfuron_30  |  10.50| 14.484|  2.376| 16.860|  -6.360|
 |Rimsulfuron_30  |  20.70| 14.484|  2.376| 16.860|   3.840|
 |Rimsulfuron_30  |  20.74| 14.484|  2.376| 16.860|   3.880|
 |Rimsulfuron_30  |  15.50| 14.484|  2.376| 16.860|  -1.360|
-|Unweeded        |  24.62| 14.484| 12.289| 26.773|  -2.152|
-|Unweeded        |  30.94| 14.484| 12.289| 26.773|   4.168|
+|Unweeded        |  24.62| 14.484| 12.289| 26.773|  -2.153|
+|Unweeded        |  30.94| 14.484| 12.289| 26.773|   4.167|
 |Unweeded        |  24.02| 14.484| 12.289| 26.773|  -2.753|
-|Unweeded        |  27.51| 14.484| 12.289| 26.773|   0.738|
+|Unweeded        |  27.51| 14.484| 12.289| 26.773|   0.737|
 
 ### Stima di $\sigma$
 
@@ -3591,7 +3590,7 @@ rimsulfuron$Block <- factor(rimsulfuron$Block)
 
 ```
 ##                                                 1       2       3       4  Medie
-## Alachlor + terbuthylazine                  12.060  49.580  41.340  16.370 29.838
+## Alachlor + terbuthylazine                  12.060  49.580  41.340  16.370 29.837
 ## Hand-Weeded                                77.580  92.080  86.590  99.630 88.970
 ## Metolachlor + terbuthylazine (pre)         51.770  52.100  49.460  34.670 47.000
 ## Pendimethalin (post) + rimsuulfuron (post) 94.820  87.720 102.050 101.940 96.632
@@ -5621,7 +5620,7 @@ summary(modComp)
 ## Residual standard error: 1.866 on 41 degrees of freedom
 ## 
 ## Number of iterations to convergence: 3 
-## Achieved convergence tolerance: 9.819e-06
+## Achieved convergence tolerance: 9.817e-06
 ```
 
 Vediamo che, in questo caso, la produzione nel testimone non infestato non è più fissata al valor medio osservato, ma è stimata utilizzando tutti i dati sperimentali ed è, pertanto, più precisa.
@@ -5992,6 +5991,12 @@ Si può concludere che il trattamento medico è stato efficace?
 Un veterinario ha organizzato un esperimento per valutare l'effetto di una dieta innovativa, sulla pressione arteriosa sistolica di cavalli da corsa. Le informazioni preliminari mostrano con chiarezza che questa dieta innovativa non può avere effetti negativi, ma, eventualmente, solo positivi. Il ricercatore ha selezionato a caso 16 animali, ne ha misurato la pressione arteriosa a riposo ed ha ripetuto la stessa misurazione dopo sei mesi di questa dieta. I risultati ottenuti sono i seguenti:
 
 
+```r
+prima <- c(113.5, 116.5, 118.1, 111.3, 116.8, 117.0, 114.8, 114.9, 
+           114.8, 114.2, 115.0, 114.0, 114.4, 116.1, 117.9, 115.7)
+dopo <- c(110.9, 110.1, 110.3, 116.8, 112.2, 111.0, 111.1, 112.9, 
+          110.6, 109.1, 113.1, 109.9, 111.9, 110.1, 114.2, 111.0)
+```
 
 
 Stabilire se la dieta è efficace, con una probabilità di errore P < 0.05. SUGGERIMENTO: ricordare che la l'effetto atteso della dieta, per le informazioni preliminari disponibili, può, eventualmente, essere solo quello di abbassare la pressione, mai quello di alzarla.
@@ -6121,9 +6126,45 @@ Un botanico ha valutato il numero di semi germinati per colza sottoposto a due d
 
 ---
 
+## Fitting di modelli nella sperimentazione agraria
+
+Nelle sezioni seguenti riporteremo diversi datasets ottenuti da esperimenti nelle scienze agraria e che si prestano per il fitting di modelli statistici descrittivi di vario tipo. La stima dei parametri di questi modelli e il test d'ipotesi permettono di rispondere a semplici domande sui processi biologici coinvolti. Indipendentemente dal dataset, il processo di lavoro dovrà essere il seguente.
+
+1. Caricare i dati ed eseguire le eventuali trasformazioni che si rendano necessarie (ad es. le trasformazioni delle variabili numeriche in 'factors' oppure le trasformazioni stabilizzanti).
+2. Descrive i dati, calcolando almeno un indicatore di tendenza centrale (media) e un indicatore di variabilità (deviazione standard) come indicato nel Capitolo 3.
+3. Specificare il modello descrittivo più opportuno a stimarne i parametri con R.
+4. Controllare il fitting per il rispetto delle assunzioni di base. Se necessario, trasformare i dati e ripetere il fitting
+5. Testare la significanza di tutti gli effetti inclusi nel modello, attraverso l'ANOVA.
+6. Se necessario, confrontare le medie con un test di confronto multiplo
+7. Presentare i risultati e commentarli.
+
+I dataset degli esempi che seguono sono riportati in un file Excel, che potete scaricare dal seguente link:  [https://www.casaonofri.it/_datasets/BookExercises.xlsx](https://www.casaonofri.it/_datasets/BookExercises.xlsx). Ogni dataset è su un diverso foglio di lavoro all'interno dello stesso file; il nome del foglio di lavoro è riportato in fondo ad ogni esercizio. Utilizzare la funzione 'readxl()' function, per la lettura del dataset.
+
+Per facilitarvi la vita, alleghiamo una tabella che riassume i modelli descritti in questo libro ed utilizzabili per gli esercizi che seguono.
+
+
+Table: (\#tab:unnamed-chunk-213)Sommario dei principali modelli per descrivere i principali esperimenti nelle scienze agrarie
+
+|Modello                      |Disegno.sperimentale                  |Funzione.R  |Specifiche                                    |
+|:----------------------------|:-------------------------------------|:-----------|:---------------------------------------------|
+|ANOVA ad una via             |CRD                                   |lm()        |Y ~ F1                                        |
+|ANOVA ad una via             |CRBD                                  |lm()        |Y ~ F1 + BL                                   |
+|ANOVA a due vie              |CRD                                   |lm()        |Y ~ F1 * F2                                   |
+|ANOVA a due vie              |CRBD                                  |lm()        |Y ~ F1 * F2 + BL                              |
+|ANOVA a due vie              |Split-plot CRD                        |lmer()      |Y ~ F1 * F2 + (1&#124;MAIN)                   |
+|ANOVA a due vie              |Split-plot CRBD                       |lmer()      |Y ~ F1 * F2 + BL + (1&#124;MAIN)              |
+|ANOVA a due vie              |Strip-plot CRD                        |lmer()      |Y ~ F1 * F2 + (1&#124;ROW) + (1&#124;COL)     |
+|ANOVA a due vie              |Strip-plot CRBD                       |lmer()      |Y ~ F1 * F2 + BL + (1&#124;ROW + (1&#124;COL) |
+|ANOVA ad una via             |ANOVA ad una via (CRD), due ambienti  |lm()/lmer() |Y ~ F1 * ENV                                  |
+|ANOVA ad una via             |ANOVA ad una via (CRBD), due ambienti |lm()/lmer() |Y ~ F1 * ENV + BL&#124;ENV                    |
+|Regressione Lineare semplice |CRD                                   |lm()        |Y ~ X1                                        |
+|Simple Linear Regression     |CRBD                                  |lm()        |Y ~ BL + X1                                   |
+
+Nella tabella precedente, Y è la risposta, sempre rappresentata da una variabile continua, F1 ed F2  sono due fattori sperimentali (variabili nominali), X1 è una covariata (variabile continua), BL è la variabile che identifica i blocchi (variabile nominale), ENVè la variabile che identifica gli ambienti (variabile nominale) e MAIN, ROW, COL sono le variabili che identificano le main-plots nello split-plot e le righe/colonne nello strip-plot (variabili nominali).
+
+
 ## Modelli ANOVA ad una via (Cap. da 7 a 9)
 
-Gli esercizi che seguono sono basati su una serie di dataset, disponibili in un file Excel, che può essere scaricato da [questo link](https://www.casaonofri.it/_datasets/EserciziTesto.xlsx). Ogni dataset è in un foglio a parte, il cui nome viene fornito nel testo di ciascun esercizio.
 
 ### Esercizio 1 
 
@@ -6278,6 +6319,45 @@ Analizzate i dati e commentate i risultati ottenuti
 
 ## Regressione (Cap. 11)
 
+Quando la variabile indipendente è continua, potremmo essere interessati a valutare l'esistenza di una possibile relazione funzionale tra la X e la Y (curva dose-risposta). La relazione più semplice è la 'retta' $Y = b_0 + b_1 \, X$; il fitting di questo modello implica la stima di $b_0$ (intercetta) e $b_1$ (pendenza), in modo che la retta stimata sia quella che passa 'più vicina' possibile ai dati osservati. Quando facciamo il fitting di un modello come questo, lo schema di lavoro presentato all'inizio di questo capitolo cambia, nel senso che, oltre agli usuali controlli sull'omogeneità delle varianze e sulla normalità dei residui, dobbiamo anche controllare la bontà di adattamento. Ciò può essere fatto attraverso un grafico nel quale vengano contemporaneamente mostrati i valori osservati e quelli predetti dal modello, con il codice seguente:
+
+
+```
+model <- lm(Y ~ X1, data = dataset) # fitting del modello
+summary(model) # stima dei parametri
+b0 <- 10 # valore dell'intercetta, ottenuto più sopra
+b1 <- 0.5 # valore della pendenza ottenuto più sopra
+plot(Y ~ X1, data = dataset) # grafico dei dati osservati
+curve(B0 + B1 * x, add = T) # retta stimata; 'x' deve essere scritto così come è, in lettera piccola
+```
+
+Ovviamente, nel caso della regressione lineare non dobbiamo eseguire il test di confronto multiplo: se la risposta giace su una retta ogni valore del predittore X produce una risposta diversa dall'altro. 
+
+I modelli di regressione possono essere adattati anche a dati da prove non replicate. Se però abbiamo le repliche, allora ci sono due possibili modelli: un modello ANOVA, nel quale la variabile X viene trasformata in una variabile nominale ed un modello di regressione, nel quale la variabile X resta numerica. Il primo modello è certamente più vicino ai dati (più basso residuo) perché non pone alcun vincolo sulla forma della risposta, mentre il secondo modello è più semplice (meno parametri da stimare), ma meno preciso, perché impone che le risposte siano allineate a carattterizzate da una crescita/decrescita monotona. Possiamo confrontare i due modelli per valutare se il fitting è altrettanto buono con il codice che segue.
+
+```
+anova(model1, model2)
+```
+
+Se il P-level è maggiore di 0.05 posso accettare la nulla, concludere che i due modelli sono ugualmente buoni e, di conseguenza, scegliere quello più semplice, seguendo il principio del rasio di Occam. Ciò equivale a dire che il modello di regressione non ha alcuna mancanza di adattamento ai dati osservati.
+
+Quando gli esperimenti sono replicati abbiamo però una difficoltà aggiuntiva, nel senso che il codice sottostante:
+
+```
+model <- lm(Y ~ BL + X1, data = dataset) # fits the model
+summary(model)
+```
+
+produce una sola pendenza e tante intercette quanti sono i blocchi. Per trovare l'intercetta media posso utilizzare la usuale funzione 'emmeans()', come indicato più sotto (X1 è da sostituire col nome della variabile indipendente).
+
+
+
+
+```
+emmeans(model, ~1, at = list(X1 = 0))
+```
+
+
 ### Esercizio 1
 
 È stato condotto uno studio per verificare l'effetto della concimazione azotata (in kg/ha) sulla produzione (in quintali per ettaro) della lattuga, utilizzando uno schema a blocchi randomizzati. I risultati sono i seguenti:
@@ -6334,6 +6414,23 @@ Eseguire l'ANOVA e verificare il rispetto delle assunzioni di base. E'corretto e
 ---
 
 ## ANOVA a due vie con interazione (Cap. 12 e 13)
+
+Alcuni dei dataset che seguono sono stati ottenuti da esperimenti a split-plot. Se non avete letto il Capitolo 13, potete anlizzare questi dataset facendo attenzione a quanto segue.
+
+Per i disegni a split-plot e a strip-plot, invece delione 'lm()', dobbiamo utilizzare la funzione 'lmer()' che necessita dell'istallazione dei packages 'lme4' e 'lmerTest'. Prima del fitting, dobbiamo identificare in modo univoco le main-plots (per i disegni a split-plot) e le righe/colonne (per i disegni a strip-plot). Le main-plots possono essere identificate incrociando la variabile del fattore principale con i blocchi, come indicato più sotto per la variabile 'Tillage' nel dataframe 'dataset':
+
+```
+dataset$mainPlot <- with(dataset, factor(Block:Tillage))
+```
+
+Analogamente per un disgno a strip-plot, possiamo operare come segue:
+
+```
+dataset$Rows <- factor(dataset$Crop:dataset$Block)
+dataset$Columns <- factor(dataset$Herbicide:dataset$Block)
+```
+
+Il codice per il fitting è riportato nella tabella sovrastante. L'uso del metodo plot() applicato al risultato del fitting restituisce solo il grafico dei residui verso i valori attesi e quindi il controllo dell'assunzione di normalità può essere evitato, per semplicità. L'esigenza di eventuali trasformazioni stabilizzanti potrà essere valutata facendo un fitting preliminare di un modello lineare nel quale vengano trascurati i fattori di blocco (main-plot, righe e colonne).
 
 ### Esercizio 1
 
