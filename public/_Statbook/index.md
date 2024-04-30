@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.24 (Anno Accademico 2022-2023), compil. 2024-03-12"
+date: "Update: v. 1.24 (Anno Accademico 2023-2024), compil. 2024-04-30"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -1449,7 +1449,7 @@ Le diverse tecniche di analisi dei dati che descriveremo nei capitoli successivi
 
 ## Modelli stocastici non-normali
 
-In questo capitolo abbiamo utilizzato un solo modello stocastico, cioè la funzione di densità gaussiana. Oltre a questa, che è largamente la più importante, esistono molti altri modelli stocastici, sia per eventi continui che discreti. Chi volesse approfondire queste distribuzioni trova informazioni in letteratura e, in particolare, nel primo dei riferimenti bibliografici forniti più sotto.
+In questo capitolo abbiamo utilizzato un solo modello stocastico, cioè la funzione di densità gaussiana. Oltre a questa, che è largamente la più importante, esistono molti altri modelli stocastici, sia per eventi continui che discreti. La trattazione dei modelli stocastici non-normali esula dagli obiettivi di questo testo; chi fosse interessato, può trovare abbondanti informazioni in letteratura e, in particolare, nel primo dei riferimenti bibliografici forniti più sotto.
 
 ---
 
@@ -1469,17 +1469,13 @@ In questo capitolo abbiamo utilizzato un solo modello stocastico, cioè la funzi
 
 
 
+Nel capitolo precedente, abbiamo visto che: 
 
-Nel capitolo precedente abbiamo visto che: 
-
-1.  I fenomeni biologici seguono una legge di natura (verità 'vera'), che ne costituisce il meccanismo deterministico fondamentale. Questa legge di natura produce un risultato atteso $Y_E$.
+1.  i fenomeni biologici seguono una legge di natura (verità 'vera'), che ne costituisce il meccanismo deterministico fondamentale. Questa legge di natura produce un risultato atteso $Y_E$.
 2.  Quando si organizza un esperimento, i soggetti sperimentali obbediscono a questo meccanismo di fondo, al quale tuttavia si sovrappongono molto altri elementi di 'confusione', altamente incontrollabili, che vanno sotto il nome di errore sperimentale.
 3.  L'osservazione sperimentale è quindi un'immagine confusa della verità vera ($Y_O \neq Y_E$) e, soprattutto, essa tende ad essere sempre diversa, anche quando ripetiamo lo stesso esperimento nelle stesse condizioni.
-4.  Compito del ricercatore è comprendere come sia la verità 'vera', separata dal 'rumore di fondo' generato dall'errore sperimentale.
 
-
-Questo dualismo tra verità 'vera' (inconoscibile) e verità sperimentale (esplorabile tramite un esperimento opportunamente pianificato) è l'aspetto centrale di tutta la biometria ed è schematizzato nella figura \@ref(fig:figName61).
-
+Come facciamo, quindi, a gestire questa fondamentale 'irriproducibilità' dei risultati? Usualmente ci serviamo di un processo che prende il nome di **inferenza statistica**, attraverso il quale utilizziamo il campione per ottenere informazioni relative alla popolazione che lo ha generato, come in Figura \@ref(fig:figName61). Questo processo, nella sua forma classica, è basato sulle teorie di Karl Pearson (1857-1936), di suo figlio Egon Pearson (1895-1980), di Jarzy Neyman (1894-1981), in aggiunta al contributo di Ronald Fisher, del quale abbiamo già detto in precedenza.
 
 <div class="figure" style="text-align: center">
 <img src="_images/InferenceProcess.jpeg" alt="Osservazioni sperimentali e meccanismi perturbativi" width="75%" />
@@ -1489,7 +1485,7 @@ Questo dualismo tra verità 'vera' (inconoscibile) e verità sperimentale (esplo
 
 ## Esempio: una soluzione erbicida
 
-Nel capitolo precedente, abbiamo introdotto un esempio relativo ad un pozzo inquinato da un erbicida a concentrazione pari a 120 $mg/L$, che viene misurata tramite un gascromatografo. Questo strumento di misura, unitamente a tutte le altre fonti ignote di errore, produce un coefficiente di variabilità del 10% (corrispondente ad una deviazione standard di 12 $mg/L$). Abbiamo anche visto che, se immaginiamo di fare le analisi in triplicato, come usuale per questo tipo di lavori, i risultati di questo esperimento possono essere simulati ricorrendo ad un generatore di numeri casuali:
+Riprendiamo l'esempio relativo ad un pozzo inquinato da un erbicida a concentrazione pari a 120 $mg/L$ (Capitolo 4), misurata tramite un gascromatografo che, unitamente a tutte le altre fonti ignote di errore, produce un coefficiente di variabilità del 10% (corrispondente ad una deviazione standard di 12 $mg/L$). Immaginando di fare le analisi in triplicato, come usuale per questo tipo di lavori, i risultati di questo esperimento possono essere simulati ricorrendo ad un generatore di numeri casuali, come nel box sottostante (ricordiamo che l'impiego della funzione `set.seed()` rende riproducibili i calcoli che seguono)
 
 
 ```r
@@ -1499,19 +1495,10 @@ Y
 ## [1] 105.5152 123.3292 133.0133
 ```
 
-Ricordiamo che i numeri casuali, in quanto tali, dovrebbero essere diversi ogni volta che li estraiamo, anche se, utilizzando la funzione `set.seed()`, è possibile indurre l'algoritmo a produrre sempre gli stessi valori, in modo che i calcoli di questo capitolo siano riproducibili.
 
 ### Analisi dei dati: stima dei parametri
 
-A questo punto mettiamoci in una situazione reale e, di conseguenza, dimentichiamo di conoscere che la concentrazione ignota è pari a 120 $mg/L$ e che $\sigma = 12$. Ipotizziamo quindi che le nostre osservazioni sperimentali siano generate da un modello del tipo:
-
-$$Y_i = \mu + \varepsilon_i$$
-
-con:
-
-$$\varepsilon_i \sim N(0, \sigma)$$
-
-Nelle due equazioni sovrastanti, gli elementi incogniti sono $\mu$ e $\sigma$. Guardando il campione, le nostre migliori stime per queste due quantità, che chiameremo rispettivamente $m$ ed $s$, sono pari rispettivamente alla media e alla deviazione standard del campione.
+A questo punto mettiamoci in una situazione reale: non sappiamo quale sia la concentrazione nel pozzo e, per determinarla, abbiamo a disposizione i risultati dell'esperimento appena citato. Per prima cosa, come abbiamo visto nel Capitolo 3, calcoliamo le statistiche descrittive di tendenza centrale e dispersione, cioè media e deviazione standard, che chiameremo, rispettivamente $m$ ed $s$.
 
 
 ```r
@@ -1522,14 +1509,24 @@ m; s
 ## [1] 13.9479
 ```
 
-Questo processo con il quale assegniamo alla popolazione le caratteristiche del campione prende il nome di **stima puntuale** dei parametri. Vediamo ancora una volta che l'osservazione sperimentale non coincide con la verità 'vera' ($m \neq \mu$ e $s \neq \sigma)$, ma non siamo molto distanti, considerando il 10% di variabilità dello strumento di analisi. Tuttavia, visto che dobbiamo trarre conclusioni che riguardano l'intero meccanismo causa-effetto e non il campione, è giustificato da parte nostra un atteggiamento prudenziale: prima di dire che la concentrazione erbicida nella soluzione è pari 120.6192187, dobbiamo chiederci: che cosa succederebbe se ripetessimo l'esperimento molte altre volte?
+Il passo avanti è relativo al fatto che non siamo semplicemente interessati alle tre osservazioni che abbiamo fatto, ma siamo interessati a trarre conclusioni generali, relative all'intero pozzo e quindi a tutti i numerosi campioni che avremmo potute estrarre, ma che non abbiamo estratto. Facciamo quindi un'ipotesi sul meccanismo causa-effetto che genera le osservazioni sperimentali, che potrebbe essere del tipo:
+
+$$Y_i = \mu + \varepsilon_i$$
+
+con:
+
+$$\varepsilon_i \sim N(0, \sigma)$$
+
+Nelle due equazioni sovrastanti, gli elementi incogniti sono $\mu$ e $\sigma$, ai quali, in assenza di altre informazioni, assegniamo, rispettivamente, i valori $m$ ed $s$. Questo processo con il quale assegniamo alla popolazione le caratteristiche del campione prende il nome di **stima puntuale** dei parametri.
+
+Si conferma che l'osservazione sperimentale non coincide con la verità 'vera' ($m \neq \mu$ e $s \neq \sigma)$, anche se, in questo caso, non siamo molto distanti, considerando il 10% di variabilità dello strumento di analisi. Tuttavia, visto che dobbiamo trarre conclusioni che riguardano l'intero meccanismo causa-effetto e non il campione, è giustificato da parte nostra un atteggiamento prudenziale: prima di dire che la concentrazione erbicida nella soluzione è pari 120.6192187, dobbiamo chiederci: che cosa succederebbe se ripetessimo l'esperimento molte altre volte?
 
 
-### La 'sampling distribution'
+### La 'sampling distribution' empirica
 
-In questo caso l'esperimento è solo 'elettronico' e possiamo quindi ripeterlo un numero anche molto elevato di volte, seguendo questa procedura:
+Il nostro esperimento è solo simulato e possiamo quindi ripeterlo un numero anche molto elevato di volte, seguendo questa procedura:
 
-1.  Ripetiamo l'estrazione precedente per 100'000 volte (ripetiamo l'analisi chimica per 100'000 volte, sempre con tre repliche)
+1.  Ripetiamo l'estrazione precedente per 100'000 volte (in altre parole: immaginiamo di ripetere l'analisi chimica per 100'000 volte, sempre con tre repliche)
 2. Otteniamo 100'000 medie
 3. Calcoliamo la media delle medie e la deviazione standard delle medie
 
@@ -1548,14 +1545,14 @@ sd(result)
 ## [1] 6.939063
 ```
 
-In sostanza, la simulazione Monte Carlo ci consente di fare quello che dovremmo sempre fare, cioè ripetere l'esperimento un numero di volte molto elevato, anche se finito (un numero infinito è chiaramente impossibile!). A questo punto abbiamo in mano una popolazione di medie, che viene detta **sampling distribution**, un 'oggetto' abbastanza 'teorico', ma fondamentale per la statistica frequentista, perché caratterizza la variabilità dei risultati di un esperimento, e quindi la sua riproducibilità.
+Alla fine del processo ci troviamo con una popolazione di medie, che viene detta **sampling distribution**; si tratta di un 'oggetto' abbastanza 'teorico', ma fondamentale per la statistica frequentista, perché caratterizza la variabilità dei risultati di un esperimento, e quindi la sua riproducibilità.
 
 Notiamo che:
 
 1.  La media delle medie è praticamente coincidente con $\mu$, la verità 'vera'. Ciò conferma che $m$ è uno stimatore non distorto di $\mu$, perché tende a convergere su $\mu$ quando il numero di repliche tende a diventare molto elevato;
-2.  La deviazione standard delle medie è pari a 6.939063. Questo valore prende il nome di **errore standard** della media (SEM) e, in qualche modo, caratterizza la replicabilità di un esperimento, ovvero la sua precisione.
+2.  La deviazione standard delle medie è pari a 6.939063. Questo valore è più basso della deviazione standard della popolazione di partenza, prende il nome di **errore standard** della media (SEM) e, in qualche modo, caratterizza la replicabilità di un esperimento, ovvero la sua precisione.
 
-Esploriamo meglio la *sampling distribution*. Con R possiamo provare a discretizzarla e a riportarla su di un grafico a barre (figura \@ref(fig:figName62) ).
+Con R possiamo visualizzare la *sampling distribution*, discretizzando la variabile concentrazione e riportando le frequenze di ogni intervallo su un grafico a barre (Fig. \@ref(fig:figName62) ). Vediamo con chiarezza che essa somiglia molto ad una distribuzione normale, con media pari a 120 e deviazione standard pari a 6.94. 
 
 <div class="figure" style="text-align: center">
 <img src="_main_files/figure-html/figName62-1.png" alt="Sampling distribution empirica e teorica" width="90%" />
@@ -1563,131 +1560,112 @@ Esploriamo meglio la *sampling distribution*. Con R possiamo provare a discretiz
 </div>
 
 
-### L'errore standard
+### La 'sampling distribution' teorica
 
-La *sampling distribution* che abbiamo ottenuto con la simulazione Monte Carlo è puramente empirica. Sarebbe interessante capire con più esattezza se esista una funzione di densità che permetta di ottenere una sampling distribution, senza ricorrere ad una simulazione Monte Carlo. In effetti, il grafico precedente mostra che la *sampling distribution* assomiglia molto ad una distribuzione normale, con media pari a 120 e deviazione standard pari all'errore standard.
+La *sampling distribution* definita più sopra è puramente empirica e potrebbe essere comunque utilizzata per gli sviluppi che seguono, anche se sarebbe molto utile poterla descrivere con una funzione di densità formale. Quanto osservato in Figura \@ref(fig:figName62) sulla somiglianza tra la *sampling distribution* empirica e la curva di Gauss può essere generalizzato grazie al teorema centrale del limite (o teorema del limite centrale), col quale si dimostra che, qualunque sia la popolazione di partenza, le medie di campioni casuali, indipendenti e di numerosità sufficientemente elevata tendono ad essere distribuite in modo normale. Insomma, la *sampling distribution* è effettivamente gaussiana, con media uguale alla media della popolazione di partenza, mentre, tenendo conto della legge di propagazione degli errori, si può dimostrare che l'errore standard è uguale a:
 
-Questa osservazione empirica sulla 'normalità' della sampling distribution è dimostrabile attraverso la legge di propagazione degli errori, che permette tre importanti conclusioni:
-
-1. se ho due variabili normalmente distribuite e le sommo tra di loro, la variabile risultante è ancora normale. Se ho una variabile normalmente distribuita e la moltiplico per una costante, la variabile risultante è ancora normale.
-2. Per variabili indipendenti, la varianza della somma è uguale alla somma delle varianze.
-3. La varianza del prodotto di una variabile per una costante $k$ è pari alla varianza della variabile originale moltiplicata per $k^2$. 
-
-Consideriamo che, quando preleviamo alcuni individui da una popolazione, ognuno di essi porta con sé una sua componente di incertezza, che egli 'eredita' dalla popolazione di cui fa parte. In questo caso, la popolazione ha una varianza pari a $12^2 = 144$ e quindi ognuno dei tre soggetti campionati eredita tale varianza. Quando calcolo la media di tre osservazioni, in prima battuta io le sommo. A questo punto, dato che si tratta di osservazioni indipendenti, la propagazione degli errori (punto 2) ci dice che la varianza della somma è uguale a $144 \times 3 = 432$.
-
-Dopo aver sommato, il calcolo della media richiede che il risultato venga diviso per 3. La legge di propagazione degli errori (punto 3) ci dice quindi che la varianza viene divisa per $3^2 = 9$. Insomma la popolazione delle medie è normale (punto 1), ha media pari a 120 e varianza pari a $432/9  = 48$ e, di conseguenza, deviazione standard pari a $\sqrt{48} = 6.928$, cioè $12/\sqrt{3}$. In generale, l'errore standard di una media è:
 
 $$\sigma_m  = \frac{\sigma }{\sqrt n }$$
 
-dove *n* è la dimensione del campione.
+dove *n* è la dimensione del campione. Il valore ottenuto per questa espressione è pari a $12/\sqrt{3} = 6.928$ ed è molto simile a quello riscontrato con la simulazione Monte Carlo.
+
+A questo punto possiamo trarre le nostra prima importante conclusione: **se ripetiamo un esperimento un numero molto elevato di volte, la variabilità delle medie campionarie e quindi la riproducibilità dei risultati possono essere caratterizzate utilizzando una *sampling distribution* gaussiana, con media pari alla media della popolazione di partenza e deviazione standard pari alla deviazione standard della popolazione di partenza, divisa per la radice quadrata del numero delle repliche**
+
+E'importante ricordare che questa conclusione, oltre che alla media, può essere estesa ad altri stimatori campionari, anche se il calcolo dell'errore standard viene effettuato in modo diverso.
 
 
 ## Stima per intervallo
 
-Che cosa ci insegna questo esperimento? Ci insegna che, se prendiamo una distribuzione normale con media $\mu$ e deviazione standard $\sigma$ e cominciamo ad estrarre campioni, le medie dei campioni sono variabili, secondo una distribuzione normale con media $\mu$ e deviazione standard $\sigma / \sqrt{n}$. Questo concetto è interessante e può essere utilizzato per caratterizzare l'incertezza dei risultati di un esperimento. Riassumiamo:
+Sapendo che la *sampling distribution* è gaussiana, siamo in grado di individuare due valori simmetrici rispetto alla media, che contengono il 95% delle medie campionarie possibili e lasciano al loro esterno solo il 5% delle medie campionarie più 'rare'. 
 
-1.  Abbiamo fatto un esperimento con tre repliche campionando da una distribuzione normale incognita.
-2.  Abbiamo ottenuto i tre valori 105.5152, 123.3292 e 133.0133.
-3.  In base alle osservazioni in nostro possesso, m = 120.6192 $mg/L$, e, considerando che la cosa più probabile è che la media del campione sia uguale a quella della popolazione, concludiamo che $\mu = m$.
-4.  Dobbiamo adottare un atteggiamento prudenziale in relazione alla media, dato che non sappiamo il valore vero di $\mu$. Sappiamo che le medie campionarie producono una sampling distribution caratterizzata da una deviazione standard pari a $\sigma / \sqrt{n}$. Non conoscendo $\sigma$, utilizziamo la sua miglior stima $s$ e concludiamo che $ES = 13.95/\sqrt{3} = 8.05$.
-5. Concludiamo quindi che $\mu$ è pari a 120.6192 $\pm$ 8.053.
+<div class="figure" style="text-align: center">
+<img src="_images/ConfidenceInterval.png" alt="Costruzione di un intervallo di confidenza (P = 0.95): se campioniamo da una popolazione gaussiana con media uguale a 120 e deviazione standard uguale a 12, il 95% delle medie campionarie ricadono nell'intervallo evidenziato" width="75%" />
+<p class="caption">(\#fig:figName62b)Costruzione di un intervallo di confidenza (P = 0.95): se campioniamo da una popolazione gaussiana con media uguale a 120 e deviazione standard uguale a 12, il 95% delle medie campionarie ricadono nell'intervallo evidenziato</p>
+</div>
 
-Abbiamo caratterizzato l'incertezza del risultato attraverso un intervallo di valori (**stima per intervallo**).
+L'espressione algebrica è la seguente:
 
-## L'intervallo di confidenza
+$$P \left[ \mu - k \times \frac{\sigma}{\sqrt{n} } \leq m \leq \mu + k \times \frac{\sigma}{\sqrt{n} } \right] = 0.95 \, ,$$
 
-La stima per intervallo fu uno degli interessi di ricerca del matematico polacco Jerzy Neyman (1894-1981), che definì la teoria degli intervalli di confidenza, ancora molto seguita anche ai giorni nostri. Partendo dal presupposto che le medie campionarie sono distribuite normalmente con media $\mu$ e deviazione standard $\sigma/\sqrt{n}$, è possibile calcolare la probabilità $\alpha$ di trovare un campione la cui media era contenuta in un certo intervallo. Prendiamo, ad esempio, la nostra popolazione iniziale, con $\mu$ = 120 e $\sigma$ = 12. È facile vedere che c'è il 68% circa di probabilità di ottenere un campione con media inclusa nell'intervallo $120 \pm 12a/\sqrt{3}$:
-
-
-```r
-pnorm(120 + 12/sqrt(3), 120, 12/sqrt(3)) - 
-  pnorm(120 - 12/sqrt(3), 120, 12/sqrt(3))
-## [1] 0.6826895
-```
-
-Aumentando l'ampiezza dell'intervallo, è possibile aumentare la probabilità di campionare al suo interno. Ad esempio, se moltiplichiamo l'errore standard per due, la probabilità di ottenere un campione con una media inclusa nell'intervallo $120 \pm 2 \times 12/\sqrt{3}$ supera (di poco) il 95%:
+dove vediamo che gli estremi dell'intervallo sono definiti aggiungendo e togliendo dalla media della popolazione $\mu$ un multiplo dell'errore standard, con moltiplicatore $k$.
 
 
-```r
-mult <- 2
-pnorm(120 + mult * 12/sqrt(3), 120, 12/sqrt(3)) - 
-  pnorm(120 - mult * 12/sqrt(3), 120, 12/sqrt(3))
-## [1] 0.9544997
-```
 
-È possibile ottenere esattamente una probabilità del 95% utilizzando come moltiplicatore dell'errore standard il 97.5-esimo quantile della distribuzione normale standardizzata ^[Tra tutte le distribuzioni normali, ce n'è una particolare, che ha media 0 e deviazione standard 1. Questa si chiama **distribuzione normale standardizzata**]:
+
+Con semplici passaggi algebrici, possiamo ricavare l'espressione seguente:
+
+$$P \left[ m - k \times \frac{\sigma}{\sqrt{n} } \leq \mu \leq m + k \times \frac{\sigma}{\sqrt{n} } \right] = 0.95$$
+che è di estrema importanza, in quanto esprime il concetto che, **se facciamo un esperimento ed otteniamo una media pari ad $m$ e scegliamo accuratamente $k$, possiamo costruire un intervallo di confidenza intorno alla nostra stima, pari a $k$ volte l'errore standard e tale da contenere la media vera $\mu$ con una probabilità del 95%**. Questa espressione fornisce l'euristica più utilizzata per costruire il cosiddetto **intervallo di confidenza**.
+
+Dato che non conosciamo $\sigma$ lo sostituiamo con la sua stima puntuale $s$; per il nostro esempio, otteniamo quindi il seguente errore standard:
+
+$$s_m = \frac{13.95}{\sqrt{3}} = 8.053$$
+
+A questo punto dobbiamo individuare il valore più opportuno per $k$; in prima istanza, potremmo considerare $k = 1$ e calcolare l'intervallo di confidenza $120.6192 \pm 8.053$, che permette di definire gli estremi $112.5662$ e $128.6722$. Questo intervallo è molto utilizzato in pratica come indicazione della precisione della stima e della riproducibilità dei risultati, risultando tanto più ampio quanto più il fenomeno in studio è variabile (alto valore di $\sigma$), oppure quanto meno numerose sono le repliche ($n$ piccolo).
+
+Tuttavia, dobbiamo anche sapere che questo intervallo non è in grado di ottenere un 'coverage' del 95%, cioè non è in grado di 'catturare' la media della popolazione nel 95% dei casi. Nel codice sottostante, abbiamo ripetuto 100'000 volte l'esperimento iniziale, calcolando 100'000 intervalli di confidenza. Per ognuno di questi intervalli, abbiamo verificato se esso 'contenesse' il valore della media vera, cioè 120, oppure no (funzione `ifelse()`); nel primo caso abbiamo assegnato al vettore 'result' il valore 1, altrimenti gli abbiamo assegnato il valore 0. Alla fine del ciclo iterativo il numero dei successi (media vera catturata) sul totale degli intervalli di confidenza calcolati costituisce una misura del già citato 'coverage'.
 
 
 ```r
-mult <- qnorm(0.975, mean = 0, sd = 1)
-pnorm(120 + mult * 12/sqrt(3), 120, 12/sqrt(3)) - 
-  pnorm(120 - mult * 12/sqrt(3), 120, 12/sqrt(3))
-## [1] 0.95
+# Simulazione MONTE CARLO
+# Coverage intervallo di confidenza
+set.seed(1234)
+result <- rep(0, 100000)
+for (i in 1:100000){
+  sample <- rnorm(3, 120, 12)
+  media <- mean(sample)
+  ES <- sd(sample)/sqrt(3)
+  limSup <- media + ES
+  limInf <- media - ES
+  result[i] <- ifelse(limSup > 120 & limInf < 120, 1, 0)
+}
+sum(result)/100000
+## [1] 0.57749
 ```
 
-
-Se approssimiamo il 97.5-esimo quantile della distribuzione normale standardizzata alla seconda cifra decimale (per semplicità), possiamo scrivere:
-
-$$ P \left[ \mu - 1.96 \times \frac{\sigma}{\sqrt{n} } \leq m \leq \mu + 1.96 \times \frac{\sigma}{\sqrt{n} } \right] = 0.95 $$
-
-Per il nostro esempio possiamo concludere che la probabilità di estrarre un campione di acqua dal nostro pozzo inquinato, analizzarlo in triplicato ed ottenere una concentrazione media all'interno dell'intervallo $\mu \pm 1.96 \times\sigma/\sqrt{n}$ è del 95%.
-
-Con semplici passaggi algebrici, possiamo ottenere l'intervallo di confidenza:
-
-$$ P \left[ m - 1.96 \times \frac{\sigma}{\sqrt{n} } \leq \mu \leq m + 1.96 \times \frac{\sigma}{\sqrt{n} } \right] = 0.95 $$
-
-Proviamo a leggere l'espressione sovrastante: se prendiamo la stima $m$ e il suo errore standard $\sigma_m$ e calcoliamo un intervallo di confidenza come 1.96 volte $\sigma_m$, **esiste una probabilità pari a 0.95 che questo intervallo contenga $\mu$, cioè la media vera e ignota della popolazione**. In pratica, l'intervallo di confidenza potrebbe essere approssimato con il doppio dell'errore standard.
-
-Il problema è che, nella pratica sperimentale, $\sigma$ non è noto. Neyman propose di utilizzare $s$ al posto di $\sigma$, cioè la deviazione standard del campione, invece che quella della popolazione. Quindi, nel nostro caso, i limiti dell'intervallo di confidenza sono pari a:
+Vediamo che esso è pari al 58% circa, quindi piuttosto basso. Se la *sampling distribution* fosse veramente gaussiana, si potrebbe utilizzare un valore $k$ pari al 97.5-esimo percentile di una distribuzione normale standardizzata, cioè 1.96, approssimabile a 2, per semplicità. Purtroppo però, la *sampling distribution* non è effettivamente gaussiana, per il fatto che, nel calcolo dell'errore standard, abbiamo dovuto sostituire $\sigma$ (che è costante, ma ignoto) con la sua miglior stima $s$, che cambia ad ogni estrazione. In effetti, il teorema centrale del limite dice che la *sampling distribution* dovrebbe comunque essere approssimativamente gaussiana, ma solo quando il campione è molto numeroso (più di 15-20 unità, almeno). Nel nostro caso, la numerosità è bassa (n = 3) è l'impiego di $k = 2$ porta ad un 'coverage' dell'82%, che è ancora insufficiente, rispetto alle nostre esigenze.
 
 
 ```r
-m - qnorm(0.975) * s/sqrt(3)
-## [1] 104.836
-m + qnorm(0.975) * s/sqrt(3)
-## [1] 136.4025
+# Simulazione MONTE CARLO
+# Coverage intervallo di confidenza - 2
+set.seed(1234)
+result <- rep(0, 100000)
+for (i in 1:100000){
+  sample <- rnorm(3, 120, 12)
+  media <- mean(sample)
+  ES <- sd(sample)/sqrt(3)
+  limSup <- media + 2 * ES
+  limInf <- media - 2 * ES
+  result[i] <- ifelse(limSup > 120 & limInf < 120, 1, 0)
+}
+sum(result)/100000
+## [1] 0.81708
 ```
 
-più semplicemente:
+Più in generale, si può dimostrare che è possibile ottenere il coverage desiderato (95%) utilizzando $k$ uguale al 97.5-esimo percentile della distribuzione 't di Student' con $n - 1$ gradi di libertà. Questa distribuzione di densità, simila alla normale, ma più variabile, è stata definita da William Sealy Gosset (1876 - 1937), uno statistico impiegato presso la fabbrica londinese della famosa birra Guinness, dove elaborava i dati relativi all'andamento del processo di maltazione. Egli, avendo definito questa nuova funzione di densità, per aggirare il divieto di pubblicazione impostogli dal suo datore di lavoro, pubblicò i suoi risultati sotto lo pseudonimo 'Student', da cui deriva il nome della distribuzione. 
+
+La simulazione sottostante conferma che questa tecnica di calcolo degli intervalli di confidenza fornisce effettivamente un 'coverage' del 95%.
 
 
 ```r
-m - 2 * s/sqrt(3)
-## [1] 104.5136
-m + 2 * s/sqrt(3)
-## [1] 136.7249
+# Simulazione MONTE CARLO
+# Coverage intervallo di confidenza - 2
+set.seed(1234)
+result <- rep(0, 100000)
+for (i in 1:100000){
+  sample <- rnorm(3, 120, 12)
+  media <- mean(sample)
+  ES <- sd(sample)/sqrt(3)
+  limSup <- media + qt(0.975, 2) * ES
+  limInf <- media - qt(0.975, 2) * ES
+  result[i] <- ifelse(limSup > 120 & limInf < 120, 1, 0)
+}
+sum(result)/100000
+## [1] 0.94936
 ```
 
-Questo che abbiamo calcolato è l'intervallo di confidenza per una probabilità del 95%. Aumentando opportunamente il moltiplicatore possiamo calcolare gli intervalli di confidenza per una probabilità del 99%, del 99.9% e così via. Di fatto, l'intervallo di confidenza del 95% è il più utilizzato in pratica.
-
-
-## Qual è il senso dell'intervallo di confidenza?
-
-E' utile ricordare il nostro punto di partenza e il nostro punto di arrivo:
-
-1.  PUNTO DI PARTENZA: una distribuzione normale con $\mu$ = 120 e $\sigma$ = 12. Nella realtà assumiamo che la distribuzione di partenza sia normale, mentre i suoi parametri sono totalmente ignoti.
-2.  PUNTO DI ARRIVO: una stima di $\mu$ ed un intervallo di confidenza.
-
-Che cosa significa questo intervallo? Esso fornisce:
-
-1.  una misura di precisione: più piccolo è l'intervallo, maggiore è la precisione della stima;
-2.  un'espressione di confidenza nel fatto che, se ripetessimo molte volte l'esperimento, nel 95% dei casi l'intervallo calcolato conterrebbe $\mu$.
-
-Insomma, l'intervallo di confidenza serve ad esplicitare la nostra incertezza sulla media vera della popolazione in studio.
-
-## Come presentare i risultati degli esperimenti
-
-Dopo aver letto questo capitolo e quelli precedenti, dovrebbe essere chiaro che la presenza dell'errore sperimentale crea incertezza in relazione alle caratteristiche della popolazione da cui abbiamo estratto il campione. Pertanto, è sempre obbligatorio associare alle nostre stime un indicatore di incertezza, la cui assenza non è, in linea di principio, accettabile. Possiamo considerare le seguenti possibilità:
-
-1.  riportare la media associata alla deviazione standard, per descrivere la variabilità originale del fenomeno in studio;
-2.  riportare la media associata all'errore standard, per descrivere l'incertezza associata alla stima della media;
-3. riportare l'intervallo di confidenza ottenuto sottraendo/aggiungendo alla media il doppio dell'errore standard, per descrivere l'incertezza associata alla stima della media;
-
-## Alcune precisazioni
-
-### Campioni numerosi e non
-
-Calcolare l'intervallo di confidenza utilizzando il doppio dell'errore standard costituisce un'approssimazione che è valida solo quando abbiamo esperimenti con un numero elevato di soggetti (maggiore di 15-20 circa). Per gli esperimenti piccoli, è necessario incrementare opportunamente il moltiplicatore. A questo fine viene utilizzato il valore corrispondente al 97.5-esimo percentile della distribuzione t di Student (non alla normale standardizzata, come abbiamo fatto finora), con un numero di gradi di libertà pari a quelli del campione studiato. Con tre soggetti il moltiplicatore sarebbe:
+Considerando che, nel nostro caso (3 soggetti per campione e quindi 2 gradi di libertà), il 97.5-esimo percentile del t di Student è pari a:
 
 
 ```r
@@ -1695,31 +1673,32 @@ qt(0.975, 2)
 ## [1] 4.302653
 ```
 
-Il moltiplicatore diminuisce all'aumentare della numerosità e, con 20 soggetti, diviene molto vicino a 2.
+la miglior stima per intervallo della concentrazione nel pozzo è pari a $120.6192 \pm 4.302 \times 8.053$.
 
+Questo intervallo di confidenza (detto anche intervallo di confidenza classico o frequentista) non è solo una misura di precisione e riproducibilità dei risultati, ma esprime anche la nostra fiducia nel fatto che, se ripetessimo l'esperimento un numero molto elevato di volte, il nostro intervallo di confidenza conterrebbe la media vera della popolazione nel 95% dei casi, limitando i nostri errori entro un margine accettabile. Ovviamente, questa fiducia non si può riferire al singolo sforzo di campionamento in quanto non sapremo mai se uno specifico intervallo di confidenza (nel nostro caso, da 86.0 a 155.3) contenga o no $\mu$ e con quale probabilità (nel nostro caso lo contiene, ma possiamo dirlo solo perché conoscevamo la popolazione di partenza che, nella realtà, sarebbe totalmente ignota). Più propriamente, l'uso dell'intervallo di confidenza classico garantisce solo che, nel lungo periodo, un ricercatore dovrebbe riuscire a contenere la sua probabilità d'errore di stima al disotto del 5%. Ed è proprio per questo che abbiamo fiducia nella scienza, in quanto il metodo adottato consente di evitare errori frequenti e gravi.
 
-```r
-qt(0.975, 20)
-## [1] 2.085963
-```
+## Inferenza statistica: conclusioni
 
-Nel nostro esempio, con tre soggetti, l'intervallo di confidenza sarebbe:
+Considerando quanto finora detto, possiamo riassumere la logica dell'inferenza classica nel modo seguente:
 
+1. un esperimento è solo un campione di un numero infinito di esperimenti simili che avremmo potuto/dovuto eseguire, ma che non abbiamo eseguito, per mancanza di risorse;
+2. utilizziamo il campione per stimare i parametri del modello deterministico/stocastico che presumiamo abbia generato le nostre osservazioni sperimentali;
+3. definiamo, per ogni stima, la sua *sampling distribution* in modo da caratterizzare i risultati delle infinite repliche del nostro esperimento, che avremmo dovuto fare, ma che non abbiamo fatto. Per costruire la *sampling distribution*, assumiamo che questa sia gaussiana (in coerenza con il teorema centrale del limite) e che l'errore standard sia definibile con l'impiego di una formula affidabile. Ad esempio, per l'inferenze sulla media, utilizziamo la deviazione standard del campione divisa per la radice quadrata del numero di repliche;
+4. definiamo gli intervalli di confidenza, aggiungendo e togliendo dalla stima un multiplo del relativo errore standard.
 
-```r
-m - qt(0.975, 2) * s/sqrt(3)
-## [1] 85.97071
-m + qt(0.975, 2) * s/sqrt(3)
-## [1] 155.2677
-```
+Per quanto riguarda la scelta del moltiplicatore $k$, è frequente trovare nelle pubblicazioni scientifiche l'intervallo composto dalla media più o meno l'errore standard ($k = 1$); si tratta di una tecnica accettabile per esprimere l'incertezza di stima della media o di altre statistiche campionarie, ma bisogna che il lettore sia informato di come abbiamo calcolato questo intervallo, per evitare che gli attribuisca un 'coverage' che, in realtà, esso non ha. Altrimenti, più in generale, si utilizza la distribuzione t di Student, a meno che la numerosità non sia molto elevata, nel qual caso si può semplificare, utilizzando $k = 2$. 
 
-Quindi, ben più alto di quello approssimato calcolato in precedenza. Chi ne volesse sapere di più, trova ulteriori informazioni in appendice.
+Concludiamo con una precisazione: nel capitolo sulla statistica descrittiva abbiamo visto che l'incertezza assoluta di un gruppo di misure può essere espressa utilizzando un intervallo ottenuto sommando e sottraendo alla media del campione la sua deviazione standard. Questo intervallo non ha nulla a che vedere con l'intervallo di confidenza e non ha alcun ruolo inferenziale; è semplicemente un intervallo descrittivo che caratterizza la variabilità del campione, insieme alla sua tendenza centrale, senza alcun riferimento alla popolazione che ha generato il campione.
+
+In ultimo, ribadiamo che questo processo classico di inferenza può essere applicato anche ad altri importanti stimatori campionari, perché ci sia un metodo affidabile per il calcolo dell'errore standard.
+
+## Per chi avesse voglia di approfondire un po'...
 
 ### Popolazioni gaussiane e non 
 
-In questo esempio siamo partiti da una popolazione con distribuzione gaussiana. In altri casi potrebbe non essere così. Ad esempio, immaginiamo di avere una popolazione di insetti, nella quale il rapporto tra maschi e femmine è ignoto. Campioniamo 40 insetti e contiamo 15 femmine. Qual è la proporzione di femmine nella popolazione originaria?
+In questo esempio siamo partiti da una popolazione con distribuzione gaussiana. In altri casi potrebbe non essere così. Ad esempio, immaginiamo di avere una popolazione di insetti, nella quale il rapporto tra maschi e femmine è ignoto. Campioniamo 40 insetti e contiamo 14 femmine. Qual è la proporzione di femmine nella popolazione originaria?
 
-In questo caso stiamo studiando una grandezza che, almeno nel principio, non può essere gaussiana, ma è binomiale (vedi il capitolo precedente). Nonostante questo, possiamo utilizzare la stessa tecnica per la stima dell'intervallo di confidenza: sappiamo che la media di una distribuzione binomiale è $p = 14/40 = 0.375$, mentre la deviazione standard è $\sigma = \sqrt{0.375 \times (1 - 0.375)} = 0.484$.  Di conseguenza, l'errore standard è $0.484 / \sqrt{40} = 0.077$. L'intervallo di confidenza  sarà dato quindi da:
+Stiamo studiando una grandezza che, almeno nel principio, non può essere gaussiana, ma, nonostante questo, grazie al teorema centrale del limite, possiamo utilizzare la stessa tecnica per la stima dell'intervallo di confidenza; basta sapere che la proporzione osservata è $p = 14/40 = 0.375$, mentre la deviazione standard di una proporzione (che non abbiamo finora incontrato) è pari a $\sigma = \sqrt{0.375 \times (1 - 0.375)} = 0.484$ (Snedecor e Cochran, 1989).  L'errore standard è $0.484 / \sqrt{40} = 0.077$ e l'intervallo di confidenza, considerando che il campione è molto numeroso, potrà essere approssimato come:
 
 
 ```r
@@ -1729,261 +1708,71 @@ In questo caso stiamo studiando una grandezza che, almeno nel principio, non pu�
 ## [1] 0.529
 ```
 
-Chi fosse interessato ad approfondire questi aspetti può proseguire nella lettura, dopo gli esercizi. Gli altri potranno fermarsi agli esercizi sottostanti.
 
-## Analisi statistica dei dati: riassunto del percorso logico
+### Cosa fare se il teorema centrale del limite non funziona?
 
-Considerando quanto finora detto, possiamo riassumere la logica dell'inferenza tradizionale nel modo seguente:
+Nel caso precedente, avevamo a che fare con una distribuzione non gaussiana, ma avevamo comunque un campione numeroso, oltre ad una formula per il calcolo dell'errore standard. In altri casi, non abbiamo nessuno di questi elementi e quindi non possiamo calcolare l'intervallo di confidenza classico, come suggerito da Neyman. L'esempio tipico è la varianza, per la quale non sappiamo come calcolare un errore standard attendibile (anche se sono disponibili in letteratura alcune formule di uso comune).
 
-1.  Un esperimento è solo un campione di un numero infinito di esperimenti simili che avremmo potuto/dovuto eseguire, ma che non abbiamo eseguito, per mancanza di risorse;
-2.  Assumiamo che i dati del nostro esperimento sono generati da un modello matematico probabilistico, che prende una certa forma algebrica e ne stimiamo i parametri utilizzando i dati osservati;
-3.  Costruiamo la sampling distribution per i parametri stimati o per altre statistiche rilevanti, in modo da caratterizzare i risultati delle infinite repliche del nostro esperimento, che avremmo dovuto fare, ma che non abbiamo fatto.
-4.  Utilizziamo la sampling distribution per l'inferenza statistica.
-
-## Da ricordare
-
-1.  La natura genera i dati
-2.  Noi scegliamo un modello deterministico che simula il meccanismo di generazione dei dati attuato dalla natura.
-3.  Stimiamo i parametri.
-4.  Confrontiamo le previsioni con i dati osservati. Determiniamo $\epsilon$ e la sua deviazione standard ($\sigma$)
-5.  Assumiamo un modello stocastico ragionevole per spiegare $\epsilon$, quasi sempre di tipo gaussiano, con media 0 e deviazione standard pari a $\sigma$, indipendente dalla X (omoscedasticità)
-6.  Qualunque stima sperimentale deve essere associata ad un indicatore di variabilità (errore standard o intervallo di confidenza).
-
-
----
-
-## Per approfondire un po'...
-
-## *Coverage* degli intervalli di confidenza
-
-Abbiamo visto che un metodo semplice per costruire un intervallo di confidenza è utilizzare il doppio dell'errore standard. Questo intervallo, se viene utilizzato come misura di precisione/incertezza, è sempre accettabile. Tuttavia, da un punto di vista strettamente probabilistico, è lecito chiedersi: ma è proprio vero che se io ripeto l'esperimento molte volte e calcolo sempre l'intervallo di confidenza, riesco a centrare la media $\mu$ nel 95% dei casi? È bene sapere che, con termine inglese, l'effettiva percentuale di campioni per i quali l'intervallo di confidenza, calcolato per un certo P nominale (es. P = 0.95), contiene effettivamente la media $\mu$ della popolazione, viene detta  *coverage*. Quindi la nostra domanda è: qual è il *coverage* dell'intervallo di confidenza calcolato con il doppio dell'errore standard?
-
-Proviamo a rispondere a questa domanda con una simulazione Monte Carlo. Prendiamo la solita popolazione normalmente distribuita con $\mu = 120$ e $\sigma = 12$ ed estraiamo centomila campioni. Per ogni campione, calcoliamo l'intervallo di confidenza della media (P = 0.95) considerando il doppio dell'errore standard. Verifichiamo poi se questo intervallo contiene il valore 120: se si, assegniamo al campionamento il valore 1 (successo), altrimenti assegniamo il valore 0. 
+Ad esempio, immaginiamo di avere un campione di 30 soggetti, la cui media è pari a 7.0 e la cui varianza è 0.5. Possiamo dire che la media della popolazione che ha generato il campione è presumibilmente compresa tra:
 
 
 ```r
+7 - qt(0.975, 29) * sqrt(0.5)/sqrt(30)
+## [1] 6.735962
+```
+
+e
+
+
+```r
+7 + qt(0.975, 29) * sqrt(0.5)/sqrt(30)
+## [1] 7.264038
+```
+
+Invece, in relazione alla varianza della popolazione, possiamo solo dire che la stima puntuale è pari a 0.5, ma non abbiamo una formula attendibile per stimare l'errore standard e quindi per calcolare l'intervallo di confidenza. In questo caso, possiamo determinare una *sampling distribution* empirica, con una simulazione di Monte Carlo, come indicato nel codice sottostante:
+
+
+```r
+# Simulazione Monte Carlo - Varianza
+set.seed(1234)
 result <- rep(0, 100000)
-set.seed(1234)
 for (i in 1:100000){
-  sample <- rnorm(3, 120, 12)
-  limInf<- mean(sample) - sd(sample)/sqrt(3) * 2 
-  limSup<- mean(sample) + sd(sample)/sqrt(3) * 2
-  if (limInf<= 120 & limSup>= 120) result[i] = 1
+  sample <- rnorm(30, 7, sqrt(0.5))
+  result[i] <- var(sample)
 }
-sum(result)/100000
-## [1] 0.81708
+mean(result)
+## [1] 0.5004283
+sd(result)
+## [1] 0.1313021
 ```
 
-La simulazione mostra che la risposta alla domanda precedente è no: il nostro intervallo di confidenza non è riuscito a centrare la media nel 95% dei casi; ciò è avvenuto in poco più dell'80% dei casi (*coverage* dell 81.7%, circa). In realtà, possiamo facilmente verificare, con altre simulazioni di Monte Carlo, che il *coverage* si avvicina al 95% solo se abbiamo campioni di numerosità superiore a 15-20 circa.
-
+Vediamo che la *sampling distribution* empirica ha media pari a 0.5 circa (questo non ci sorprende) e che l'errore standard è pari a 0.131. Possiamo anche calcolare il 2.5-esimo e il 97.5-esimo percentile ed utilizzarli come margini dell'intervallo di confidenza, che comprende al suo interno il 95% dei valori:
 
 
 ```r
-result <- rep(0, 100000)
-set.seed(1234)
-for (i in 1:100000){
-  n <- 15
-  sample <- rnorm(n, 120, 12)
-  limInf<- mean(sample) - sd(sample)/sqrt(n) * 2 
-  limSup<- mean(sample) + sd(sample)/sqrt(n) * 2
-  if (limInf<= 120 & limSup>= 120) result[i] = 1
-}
-sum(result)/100000
-## [1] 0.93594
+quantile(result, probs = c(0.025, 0.975))
+##      2.5%     97.5% 
+## 0.2770264 0.7871032
 ```
 
-Insomma, quando gli esperimenti sono piccoli, con poche repliche, dovremmo trovare un metodo di calcolo degli intervalli di confidenza un po' più affidabile, se veramente volessimo ottenere un *coverage* pari a quello nominale (P = 0.95).
-
-Il problema, già accennato, nasce dal fatto che $\sigma_m$ viene sostituito con $s_m$, cioè il valore di errore standard stimato nel campione. Come tutte le stime, anche $s_m$ è soggetto ad incertezza, il che aggiunge un elemento ulteriore di imprecisione nella sampling distribution di $T$. Insomma ci chiediamo, la *sampling distribution* di T, calcolata con $s$ invece che $\sigma$ è ancora normale? Verifichiamo questo aspetto empiricamente, con una nuova simulazione Monte Carlo. Questa volta facciamo la seguente operazione:
-
-1. campioniamo tre individui
-2. Calcoliamo il valore di $T$ con la statistica precedente, utilizzando la deviazione standard del campione e lo salviamo
-3. Con un po' di pazienza, ripetiamo il tutto 100'000 volte.
-
-
-```r
-#SIMULAZIONE MONTE CARLO - t di Student
-set.seed(435)
-result <- c()
-for (i in 1:100000){
-  sample3 <- rnorm(3, 120, 12)
-  Ti <- (mean(sample3) - 120) / (sd(sample3)/sqrt(3))
-  result[i] <- Ti
-  }
-```
-
-Se riportiamo i valori ottenuti su una distribuzione di frequenze otteniamo il grafico in Figura \@ref(fig:figName2531).
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName2531-1.png" alt="Sampling distribution empirica per le medie campionarie, insieme ad una distribuzione gaussiana (blue) e t di Student con 2 gradi di libertà (rossa)" width="90%" />
-<p class="caption">(\#fig:figName2531)Sampling distribution empirica per le medie campionarie, insieme ad una distribuzione gaussiana (blue) e t di Student con 2 gradi di libertà (rossa)</p>
-</div>
-
-Vediamo che la *sampling distribution* di $T$, determinata utilizzando $s$ invece che $\sigma$ è solo approssimativamente normale. E' facile vedere che questa approssimazione è sufficientemente buona solo se la numerosità del campione diviene abbastanza grande (es. $n > 30)$, ma non certamente quando $n$ = 3. In questo caso, la *sampling distribution* che osserviamo è più 'dispersa' di quella normale, con un maggior numero di valori sulle code.
-
-Neyman scoprì che la sampling distribution di T poteva essere perfettamente descritta utilizzando la distribuzione t di Student, con un numero di gradi di libertà pari a quelli del campione (in questo caso 2), come vediamo nella figura \@ref(fig:figName2531). In realtà questa conclusione era stata già raggiunta da William Sealy Gosset (1876 - 1937), uno statistico impiegato presso la fabbrica londinese della famosa birra Guinness, dove elaborava i dati relativi all'andamento del processo di maltazione. Egli, avendo definito questa nuova funzione di densità, per aggirare il divieto di pubblicazione imposto dal suo datore di lavoro, pubblicò i risultati sotto lo pseudonimo Student, da cui deriva il nome della distribuzione di densità. 
-
-Quindi, quando i campioni sono piccoli, il modo giusto di calcolare l'intervallo di confidenza è quello di utilizzare l'espressione seguente:
-
-$$P \left[ m - \textrm{qt}(0.975,n - 1) \cdot s_m \le \mu  \le m + \textrm{qt}(0.975,n - 1) \cdot s_m \right] = 0.95$$
-
-dove $\textrm{qt}(0.975,n - 1)$ è il 97.5-esimo percentile della distribuzione t di Student, con n-1 gradi di libertà.
-
-E' facile osservare che, se l'intervallo di confidenza è calcolato in questo modo, il suo *coverage* effettivo e pari al 95%. 
-
-
-```r
-result <- rep(0, 100000)
-set.seed(1234)
-for (i in 1:100000){
-  sample <- rnorm(3, 120, 12)
-  limInf<- mean(sample) - sd(sample)/sqrt(3) * qt(0.975, 2) 
-  limSup<- mean(sample) + sd(sample)/sqrt(3) * qt(0.975, 2) 
-  if (limInf<= 120 & limSup>= 120) result[i] = 1
-}
-sum(result)/100000
-## [1] 0.94936
-```
-
-
-Tuttavia, la formula di Neyman, anche se assicura un *coverage* pari a quello nominale, si presta a cattive letture, che sono insensate da un punto di vista probabilistico, ma tuttavia molto frequenti nella pratica operativa. Ad esempio, immaginiamo di aver effettuato un campionamento dalla nostra popolazione con $\mu = 120$ e $\sigma = 12$. Il risultato è:
-
-
-```r
-set.seed(1234)
-x <- rnorm(3, 120, 12)
-m <- mean(x)
-s <- sd(x)
-m; s
-## [1] 120.6192
-## [1] 13.9479
-```
-
-Di conseguenza, l'intervallo di confidenza va da 85.9707117 a 155.2677256
-
-1.  **NON E' VERA** l'affermazione che: *c'è il 95% di probabilità che la media 'vera' sia tra 85.0 e 155.3*. La media vera della popolazione è sempre fissa e pari a 120 e non cambia seguendo una distribuzione di probabilità. L'affermazione probabilistica deve essere riferita alla possibilità che l'intervallo di confidenza la centri, non al valore della media.
-3. **E' DUBBIA** l'affermazione che: *c'è il 95% di probabilità che l'intervallo di confidenza contenga $\mu$*. In questa affermazione, la probabilità è legata all'intervallo di confidenza, ma l'affermazione è ugualmente sbagliata se si riferisce al singolo campionamento. Infatti, il singolo e specifico intervallo di confidenza (86.0 - 155.3) può contenere o no $\mu$, ma non abbiamo alcun elemento per sapere se effittavamento lo contiene, neanche in termini di probabilità. Invece l'affermazione è corretta se si riferisce al futuro, cioè alle ipotetiche repliche dell'esperimento.
-3.  **NON E' VERA:** l'affermazione che *ripetendo infinite volte l'esperimento, il 95% delle stime che otteniamo cadono nell'intervallo 86.0 e 155.3*. Una semplice simulazione mostra che tutte le medie campionate cadono in quell'intervallo
-
-
-```r
-result <- rep(0, 100000)
-set.seed(1234)
-for (i in 1:100000){
-  sample <- rnorm(3, 120, 12)
-  if (mean(sample) <= 155.0 & mean(sample) >= 85.3) result[i] = 1
-}
-sum(result)/100000
-## [1] 1
-```
-
-Insomma, l'intervallo di confidenza vale per la sampling distribution e non vale per ogni singolo campionamento (esperimento). L'unica cosa che possiamo lecitamente affermare è che, se ripetessimo l'esperimento un numero molto elevato di volte e calcolassimo l'intervallo di confidenza sempre con la formula di Neyman, nel 95% dei casi saremmo in grado di 'catturare' la media vera della popolazione all'interno del nostro intervallo di confidenza, che diviene in questo modo una sorta di polizza assicurativa, per contenere la nostra probabilità d'errore, nel lungo periodo, al disotto del 5%.
-
-
-### Intervalli di confidenza per fenomeni non-normali
-
-Nel sottocapitolo precedente abbiamo presentato un esempio in cui avevamo campionato da una distribuzione normale, riscontrando una *sampling distribution* per la media campionaria anch'essa normale (almeno approssimativamente). Ma che succede se la distribuzione di partenza è non-normale? La *sampling distribution* di uno stimatore è ancora normale? Vediamo un nuovo esempio.
-
-Immaginiamo di avere 4'000'000 di semi ben mischiati (in modo che non ci siano raggruppamenti non casuali di qualche tipo), che costituiscono la nostra popolazione di partenza. Vogliamo appurare la frequenza relativa (p) dei semi dormienti. Questa informazione, nella realtà, esiste ($\pi$ = 0.25), ma non è nota.
-
-Dato l'elevato numero di 'soggetti', non possiamo testare la germinabilità di tutti i semi, ma dobbiamo necessariamente prelevare un campione casuale di 40 soggetti; ogni seme viene saggiato e, dato che la popolazione è molto numerosa, l'estrazione di un seme non modifica sensibilmente la proporzione di quelli dormienti nella popolazione (esperimenti indipendenti).
-
-Dopo aver descritto la popolazione e l'esperimento, ci chiediamo quale sia il modello matematico che genera i nostri dati (numero di successi su 40 semi estratti). Il disegno sperimentale ci assicura che ogni estrazione è totalmente indipendente dalla precedente e dalla successiva ed ha due soli risultati possibili, cioè successo (seme dormiente), o insuccesso (seme germinabile). Di conseguenza, ogni singola estrazione si configura come un esperimento Bernoulliano, con probabilità di successo pari a $\pi$, il cui valore 'vero' esiste, è fisso, pre-determinato (esiste ancor prima di organizzare l'esperimento), anche se incognito e inconoscibile, a meno di non voler/poter esaminare tutti i semi disponibili. L'insieme delle 40 estrazioni (40 esperimenti Bernoulliani) può produrre un ventaglio di risultati possibili, da 40 successi a 40 insuccessi, per un totale di 41 possibili 'outcomes'.
-
-E' evidente che i 41 possibili risultati non sono ugualmente probabili e si può dimostrare che la probabilità di ottenere *k* successi (con *k* che va da 0 ad *n*; *n* è al numero delle estrazioni) dipende da $\pi$ ed è descrivibile matematicamente con la distribuzione binomiale $\phi$:
-
-$$\phi(k, n, p) = \frac{n!}{(n-k)!k!} p^k (1 - p)^{(n-k)}$$
-
-Abbiamo quindi definito il modello matematico che descrive la probabilità di tutti i possibili risultati del nostro esperimento e quindi può in qualche modo essere considerato il 'meccanismo' che 'genera' i dati sperimentali osservati. Si tratta di un meccanismo puramente 'stocastico' nel quale è solo il caso che, attraverso il campionamento, determina il risultato dell'esperimento.
-
-Con queste informazioni, possiamo simulare un esperimento con R, ottenendo i seguenti risultati:
-
-
-```r
-set.seed(236)
-rbinom(1, 40, 0.25)
-## [1] 9
-```
-
-Abbiamo ottenuto 9 successi su 40, cioè 9 semi dormienti su 40 saggiati.La proporzione osservata è *p* = 9/40 = 0.225. Concludiamo (stima puntuale) che $\pi$ = 0.225. Anche in questo caso vi è chiara discrasia tra la verità 'vera' e l'osservazione sperimentale (tra $\pi$ e $p$).
-
-Cosa succede se ripetiamo l'esperimento? Come abbiamo imparato a fare, possiamo cercare una risposta attraverso la simulazione Monte Carlo, ricorrendo ad un generatore di numeri casuali da una distribuzione binomiale con n = 40 e $\pi$ = 0.25 (in R si usa la funzione 'rbinom(numeroDatiCasuali, n, p)'). Il codice è più semplice, in quanto non è necessario impostare un ciclo iterativo:
-
-
-
-```r
-set.seed(1234)
-result <- rbinom(10000000, 40, 0.25)
-```
-
-Esploriamo i risultati ottenuti:
-
-
-```r
-result_p <- result/40
-mean(result_p)
-## [1] 0.2499795
-sd(result_p)
-## [1] 0.06849423
-```
-
-Osserviamo subito che, anche se i singoli esperimenti portano a stime diverse da $\pi$ vero, la media di $p$ tende ad essere uguale a $\pi$. L'errore standard (deviazione standard della *sampling distribution*) è 0.0685. Fino a qui, non vi è nulla di diverso dall'esempio precedente, se teniamo presente che la deviazione standard della popolazione originale (che è binomiale) è pari a $\sqrt{p \times (1 - p)}$, quindi l'errore standard è $\sqrt{0.25 \times 0.75 / 40} = 0.0685$.
-
-Rimane da stabilire se la *sampling distribution* di $p$ è normale. Possiamo utilizzare i 10'000'000 di valori ottenuti per costruire una distribuzione empirica di frequenze, come nel codice sottostante.
-
-
-
-```r
-breaks <- seq(0, 0.7, by=0.025)
-freqAss <- as.numeric( table(cut(result_p, breaks) ) ) 
-freqRel <- freqAss/length(result_p)
-density <- freqRel/0.025
-p_oss <- breaks[2:length(breaks)]
-```
-
-La distribuzione empirica della proporzione campionaria è visibile in Figura \@rif(fig:figName2541).
-
-
-```r
-plot(density ~ p_oss, type = "h",
-     xlab = expression(paste(bar(p))),
-     ylab="Density", 
-    xlim=c(0,0.6) )
-b <- seq(0, 1, by=0.1)
-curve(dnorm(x, 0.25, 0.0685), add=TRUE, col="red")
-```
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName2541-1.png" alt="Sampling distribution per le proporzioni campionarie" width="90%" />
-<p class="caption">(\#fig:figName2541)Sampling distribution per le proporzioni campionarie</p>
-</div>
-
-Vediamo che *sampling distribution* è approssimativamente normale con media pari a 0.25 e deviazione standard pari a 0.0685. Lo percepiamo chiaramente dal grafico soprastante, ma c'è una spiegazione scientifica per questo, basata sul **TEOREMA DEL LIMITE CENTRALE**:
-
-1.  La sampling distribution di una statistica ottenuta da campioni casuali e indipendenti è approssimativamente normale, indipendentemente dalla distribuzione della popolazione da cui i campioni sono stati estratti.
-2.  La media della sampling distribution è uguale al valore della statistica calcolata sulla popolazione originale, la deviazione standard della sampling distribution (errore standard) è pari alla deviazione standard della popolazione originale divisa per la radice quadrata della numerosità di un campione.
-
----
+Questo intervallo di confidenza empirico funziona piuttosto bene ed ha campi di impiego abbastanza vasti, anche quando il teorema centrale del limite non vale; tuttavia, l'intervallo di confidenza così ottenuto può non essere simmetrico rispetto alla media, il che non dovrebbe stupire, dato che la *sampling distribution* non è gaussiana e può essere più o meno asimmetrica.
 
 ## Altre letture
 
 1. Hastie, T., Tibshirani, R., Friedman, J., 2009. The elements of statistical learning, Springer Series in Statistics. Springer Science + Business Media, California, USA.
-
+2. Morey, RD, R Hoekstra, JN Rouder, MD Lee, E-J Wagenmakers, 2016. The fallacy of placing confidence in confidence intervals. Psychonomic Bulletin & Review 23, 103–123
+3. Snedecor G.W. and Cochran W.G., 1989. Statistical Methods. Ames: Iowa State University Press (1989).
 
 
 <!--chapter:end:05-InferenzaStatistica.Rmd-->
 
 # Decisioni ed incertezza
 
+Dovrebbero ormai essere chiari i motivi per cui i risultati di un esperimento non corrispondono alla verità vera e si presentano in modo diverso ogni volta che lo ripetiamo. Nel capitolo precedente abbiamo visto come è possibile (e necessario) esplicitare la nostra incertezza in relazione alla verità vera, aggiungendo alle nostre stime campionarie il cosiddetto **intervallo di confidenza**, basato sulla *sampling distribution* della stima, che mostra come quest'ultima vari quando ripetiamo l'esperimento. Un approccio affine può essere utilizzato per prendere decisioni in presenza di incertezza, con un procedimento che si chiama **test d'ipotesi**. Anche per questo argomento, vediamo alcuni semplici, ma realistici, esempi.
 
-Nel capitolo precedente abbiamo visto come è possibile esprimere l'incertezza che il campionamento e, in genere, l'errore sperimentale producono sulle nostre stime. In particolare, abbiamo visto che, per una certa statistica rilevata su un campione, è possibile costruire una *sampling distribution* (o *sample space* o *distribuzione campionaria*), che descrive la variabilità della statistica stessa tra un campionamento e l'altro. La *sampling distribution* è, almeno approssimativamente, gaussiana e la sua deviazione standard (detta **errore standard**) può essere utilizzata per definire una 'banda' di incertezza per la nostra stima, con un procedimento che prende il nome di inferenza statistica (stima per intervallo). Analogamente, la *sampling distribution* può essere utilizzata per prendere decisioni in presenza di incertezza, con un procedimento che si chiama **test d'ipotesi**. Anche in questo capitolo, vediamo alcuni semplici, ma realistici esempi.
+## Il test t di Student
 
-
-## Confronto tra due medie: il test t di Student
-
-Un ricercatore ha testato due genotipi (A e P) in un disegno sperimentale a randomizzazione completa, con cinque repliche (dieci parcelle in totale). Alla fine dell'esperimento ha determinato la produzione parcellare, ottenendo quindi dieci valori, che debbono essere considerati come un campione di tutti quelli possibili; per ogni genotipo, i valori sono diversi, a seguito degli effetti stocastici di varia natura, agronomica ed ambientale, che costituiscono il meccanismo perturbativo di fondo.
-
-I risultati sono i seguenti:
+Immaginiamo che un ricercatore abbia testato la produzione di due genotipi (A e P) in un disegno sperimentale a randomizzazione completa, con cinque repliche (dieci parcelle in totale). I risultati ottenuti (q/ha) sono i seguenti:
 
 
 ```r
@@ -1991,93 +1780,133 @@ A <- c(65, 68, 69, 71, 78)
 P <- c(80, 81, 84, 88, 94)
 ```
 
-
-Nel campione A la media è pari a 70.2, mentre la deviazione standard è pari a 4.87. L'errore standard è pari a 2.18 e quindi l'intervallo di confidenza della media è 70.2 $\pm$ 6.04. Invece, nel campione P, la media è 85.4, mentre la deviazione standard è pari a 5.72. L'errore standard è pari a 2.56, mentre l'intervallo di confidenza per la media è 85.4 $\pm$ 7.11.
-
-Dopo aver completato questo esperimento, ci chiediamo se sia possibile concludere che il genotipo P è più produttivo del genotipo A, coerentemente con i risultati osservati. Nel rispondere a questa domanda bisogna tener presente che i due campioni ottenuti sono totalmente irrilevanti, dato che il nostro interesse è rivolto alle popolazioni che hanno generato i campioni; vogliamo infatti che le nostre conclusioni abbiano carattere di universalità e non siano specifiche per il nostro esperimento. Dobbiamo quindi **trovare un metodo per decidere se il genotipo P, in generale, è più produttivo del genotipo A**, pur in presenza dell'incertezza legata all'errore sperimentale.
-
-Un primo approccio intuitivo potrebbe essere basato sugli intervalli di confidenza delle due medie. Possiamo notare che il limite di confidenza superiore per A (70.2 + 6.04 = 76.24) è inferiore al limite di confidenza inferiore per P (85.4 - 7.11 = 78.29), in modo che gli intervalli di confidenza non si sovrappongono (Figura \@ref(fig:figName70)). In base a questo criterio, quindi, potremmo concludere che le popolazioni da cui provengono i due campioni sono diverse e, di conseguenza, P è un genotipo più produttivo.
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName70-1.png" alt="Medie ed intervalli di confidenza calcolati sue due campioni. Si può notare che gli intervalli di confidenza non si sovrappongono." width="50%" />
-<p class="caption">(\#fig:figName70)Medie ed intervalli di confidenza calcolati sue due campioni. Si può notare che gli intervalli di confidenza non si sovrappongono.</p>
-</div>
+Come al solito, l'analisi dei dati inizia con il calcolo delle più importanti statistiche descrittive per ogni campione, come abbiamo visto nel Capitolo 3. Trattandosi di una serie di misure quantitative, calcoliamo quindi media e deviazione standard, come indicato nel box sottostante.
 
 
-Anche se questo criterio è, in qualche modo, accettabile, in pratica si preferisce utilizzare un altro criterio più rigoroso, che illustreremo di seguito.
+```r
+m1 <- mean(A)
+m2 <- mean(P)
+s1 <- sd(A)
+s2 <- sd(P)
+n1 <- length(A)
+n2 <- length(P)
+m1; s1; n1
+## [1] 70.2
+## [1] 4.868265
+## [1] 5
+m2; s2; n2
+## [1] 85.4
+## [1] 5.727128
+## [1] 5
+```
 
-### L'ipotesi nulla e alternativa
+Il passo precedente è importante e ci consente di comprendere alcune caratteristiche dei due campioni, ma non dobbiamo mai dimenticare il fatto che noi siamo interessati a trarre conclusioni generali, relative a tutte le infinite parcelle che avremmo potuto coltivare e che non abbiamo coltivato, per la limitatezza delle risorse a nostra disposizione. Il passo successivo è quello di fare un'ipotesi ragionevole sul meccanismo causa-effetto che ha generato le nostre osservazioni sperimentali, da esplicitare con un modello statistico a due componenti (deterministica e stocastica), come abbiamo visto nel Capitolo 4. Il modello dovrà essere un po' più complesso rispetto a quello introdotto nel Capitolo 5, in quanto dovrà considerare l'effetto varietale, che potremmo immaginare come additivo, così come indicato di seguito:
 
-Innanzitutto, ricordiamo la logica Popperiana illustrata nel primo capitolo, secondo la quale nessun esperimento può dimostrare che un'ipotesi scientifica è vera, mentre è possibile dimostrare che essa è falsa. E'quindi conveniente porre la nostra ipotesi scientifica in modo che essa possa essere falsificata; dovendo dimostrare che la produzione di A è diversa da quella di P, possiamo formulare l'ipotesi scientifica ($H_0$) in questo modo:
+$$
+Y_i = \mu_1 + \delta_j + \varepsilon_{i} 
+$$
 
-$$H_0: \mu_A = \mu_P = \mu$$
+dove $Y_i$ è la produzione della i-esima parcella ($i$ va da 1 a 10), $\mu_1$ è la produzione attesa della prima varietà (A, in ordine alfabetico), mentre $\delta_j$ è l'effetto della varietà, che è fisso ed uguale a 0 per la prima varietà ($\delta_1 = 0$) mentre è uguale alla differenza tra le due medie per la seconda varietà ($\delta_2 = \mu_2 - \mu_1$), cosicché la produzione attesa della seconda varietà è $\mu_2 = \mu_1 + \delta_2$. I termini $\varepsilon_i$ rappresentano gli effetti di confusione, casuali e diversi per ogni i-esima osservazione e che assumiamo gaussiani, con media 0 e deviazione standard $\sigma$. La scelta di utilizzare $\mu_1$ come parametro esplicito nel modello è puramente arbitraria, nel senso che avremmo potuto benissimo utilizzare $\mu_2$, rovesciando il segno della differenza $\delta_2$.
 
-In altre parole, la nostra ipotesi di lavoro è che i due campioni siano in realtà estratti da due distribuzioni normali con la stessa media e la stessa deviazione standard, il che equivale a dire che essi provengono da un'unica distribuzione normale con media $\mu$ e deviazione standard $\sigma$. Questa ipotesi si chiama **ipotesi nulla** e, se riuscissimo a falsificarla, avremmo conseguito il nostro obiettivo, in totale coerenza con la logica Popperiana. Vi chiediamo di fare nuovamente attenzione al fatto che l'ipotesi nulla riguarda le medie delle popolazioni che hanno generato i campioni, non i campioni stessi, per i quali già sappiamo che le medie sono diverse.
 
-Oltre all'ipotesi nulla possiamo anche definire l'ipotesi alternativa, che abbracceremmo se dovessimo riuscire a falsificare quella nulla. L'ipotesi alternativa semplice è:
 
-$$H_1 :\mu_A  \ne \mu_P$$
+Una volta definito il modello generale, possiamo utilizzare i dati osservati per stimarne i parametri ignoti. Le stime puntuali sono: $\mu_1 = m_1 = 70.2$, $\delta_2 = d_2 = 15.2$ (dove $d_2$ è la differenza campionaria osservata) e, di conseguenza, $\mu_2 = 70.2 + 15.2 = 85.4$. Per quanto riguarda $\sigma$ (la deviazione standard dei residui $\varepsilon_i$), la formulazione del modello prevede che essa sia costante e comune per tutte le osservazioni, indipendentemente dalla varietà a cui 'appartengono'. Questa condizione è detta di **omoscedasticità** (od **omoschedasticità**) ed è ragionevole, in quanto si può ipotizzare che l'effetto varietà agisca solo sulla produzione media, ma non solo sulla deviazione standard. Vedremo in seguito che questa semplificazione non è strettamente necessaria.
 
-Se avessimo elementi sufficienti già prima di effettuare l'esperimento (e non dopo aver visto i risultati), potremmo anche adottare ipotesi alternative complesse, del tipo
+Nell'ipotesi di omoscedasticità, la miglior stima di $\sigma$ può essere ottenuta da una sorta di media delle varianze campionarie, pesata sui relativi gradi di libertà:
 
-$$H_1 :\mu_A  > \mu_P$$
+$$s_{pool} = \sqrt{ \frac{s_1^2 \, (n_1 - 1) + s_2^2 \, (n_2 - 1)}{n_1 + n_2 - 2} }$$
+
+dove $s_1$ ed $s_2$ sono le deviazioni standard dei due campioni e $n_1$ ed $n_2$ sono le due numerosità (entrambe uguali a cinque):
+
+
+```r
+s_pool <- sqrt( (sd(A)^2 * (n1 - 1) + sd(P)^2 * (n2 - 1))/(n1 + n2 - 2) )
+s_pool
+## [1] 5.315073
+```
+
+
+
+La deviazione standard 'comune' ha $n_1 + n_2 - 2 = 8$ gradi di libertà, pari allo somma dei gradi di libertà di ogni campione.
+
+Dopo la stima puntuale dei parametri, dobbiamo procedere alla determinazione degli errori standard, che sono l'ingrediente fondamentale dell'inferenza statistica. L'errore standard della media $\mu_1$ è $5.315/\sqrt{5} = 2.377$ mentre l'errore standard della differenza $\delta_2$ (abbreviato come SED), in base alla legge di propagazione degli errori e per campioni estratti in modo indipendente, può essere ottenuta come la radice quadrata della somma pesata delle varianze campionarie, comuni ai due campioni:
+
+$$SED = \sqrt {\frac{s_{pool}^2}{ n_1}  + \frac{s_{pool}^2}{n_2} }$$
+
+Considerando che in questo caso anche il numero delle osservazioni è costante, l'errore standard della differenza si riduce a:
+
+
+```r
+sed <- s_pool * sqrt(2/5)
+sed
+## [1] 3.361547
+```
+
+### L'ipotesi 'nulla' e l'ipotesi 'alternativa'
+
+Dopo aver completato l'inferenza statistica, ci chiediamo se, a livello di popolazione, sia possibile concludere che il genotipo P è più produttivo del genotipo A, coerentemente con i risultati osservati nei due campioni. Non dimentichiamoci che i due campioni sono totalmente irrilevanti, perché vogliamo trarre conclusioni generali e non specifiche per il nostro esperimento. Dobbiamo quindi **trovare un metodo per decidere se il genotipo P, in generale, è più produttivo del genotipo A**, pur in presenza dell'incertezza legata all'errore sperimentale.
+
+Innanzitutto, ricordiamo la logica Popperiana illustrata nel primo capitolo, secondo la quale nessun esperimento può dimostrare che un'ipotesi scientifica è vera, mentre è possibile dimostrare che essa è falsa. E'quindi conveniente porre l'ipotesi scientifica di nostro interesse ($H_0$) in modo che essa possa essere falsificata, cioè, ad esempio:
+
+$$H_0: \delta_2 = 0$$
+
+In altre parole, stiamo cercando di dimostrare che uno dei parametri stimati nel modello sia, in realtà, uguale a 0; questa ipotesi si chiama **ipotesi nulla** e, se riuscissimo a falsificarla, avremmo conseguito il nostro obiettivo, in totale coerenza con la logica Popperiana. Dobbiamo però avere un'ipotesi alternativa ($H_1$) da abbracciare nel caso in cui quella nulla risultasse falsa, ad esempio:
+
+$$H_1: \delta_2 \neq 0$$
+
+In questa ipotesi alternativa non viene considerata la direzione della differenza (positiva o negativa) ma solo la sua esistenza (**ipotesi alternativa semplice**), il che è coerente con la scelta puramente arbitraria di inserire $\mu_1$ come parametro esplicito nel modello; se avessimo infatti scelto di inserire $\mu_2$, il segno di $\delta_2$ sarebbe stato opposto.
+
+In altri casi potrebbe essere opportuno adottare **ipotesi alternative complesse**, del tipo
+
+$$H_1 :\delta_2  > 0$$
 
 oppure:
 
-$$H_1 :\mu_A  < \mu_P$$
+$$H_1 :\delta_2  < 0$$
 
-Abbiamo già anticipato che le ipotesi (nulla ed alternativa) debbono essere stabilite prima di effettuare l'esperimento. Che cosa è possibile attendersi prima di un esperimento, in relazione alla produttività di due genotipi? In mancanza di informazioni preliminari attendibili, dovremmo essere indotti ad abbracciare l'ipotesi alternativa semplice $\mu_A  \neq \mu_P$, mentre una delle due ipotesi alternative complesse può essere adottata soli in quei casi in cui l'altra può essere esclusa 'a priori', già prima di aver visto i risultati dell'esperimento.
+Vedremo tra breve che l'adozione di ipotesi alternative complesse è conveniente in termini di potenza del test, ma richiede informazioni preliminari di supporto (pensate che sia possibile fare una scommessa dopo aver visto accadere un evento?). Ciò può realizzarsi, ad esempio, quando andiamo a sperimentare un concime di cui sia nota l'assenza di effetti collaterali negativi e per il quale sia quindi lecito attendersi che, rispetto al testimone non concimato, vi possa essere solo un incremento produttivo più o meno alto, non un decremento. Nel nostro caso, trattandosi di due varietà, non vi è nessuna informazione preliminare attendibile che possa portarci ad escludere *a priori* che P \> A o che P \< A e quindi la nostra ipotesi alternativa dovrà essere per forza semplice.
 
 ### La statistica T
 
-Ma torniamo a lavorare sull'ipotesi nulla. Possiamo intuire che l'idea che $\mu_A = \mu_P$ non è impossibile; infatti, se avessimo una sola popolazione gaussiana con media $\mu$, potremmo comunque campionare cinque parcelle sulla coda sinistra (e quindi con bassa produzione) e cinque parcelle sulla coda destra (con elevata produzione), in modo che $m_A \neq m_P$. Il problema è capire quanto questo sia probabile.
+Un primo approccio intuitivo per il test d'ipotesi potrebbe essere basato sull'intervallo di confidenza di $\delta_2$, che, tenendo conto che l'errore standard di questa stima ha 8 gradi di libertà, può essere calcolato come:
 
-Cerchiamo di definire una statistica che, posto $\mu_A = \mu_P$, ci permetta di capire che possibilità ho di trovare $m_A \neq m_P$. Due sono i valori di cui tenere conto:
 
-1. l'entità della differenza tra le medie dei campioni: più la differenza tra le due medie è alta e più è improbabile che essa si produca quando $\mu_A = \mu_P$;
-2. l'entità dell'errore standard. Maggiore l'incertezza di stima delle due medie, maggiore la probabilità di trovare ampie differenze tra $m_A$ ed $m_P$ anche quando $\mu_A = \mu_P$.
+```r
+delta <- mean(P) - mean(A)
+delta + qt(0.975, 8) * sed
+## [1] 22.95174
+delta - qt(0.975, 8) * sed
+## [1] 7.448258
+```
 
-Una buona statistica è quella indicata di seguito:
 
-$$T = \frac{m_A - m_P}{SED}$$
 
-Si può osservare che T, in realtà, non è altro che il rapporto tra le quantità indicate in precedenza ai punti 1 e 2: infatti la quantità al numeratore è la differenza tra le medie dei due campioni, mentre la quantità al denominatore è il cosiddetto errore standard della differenza tra due medie (SED). Quest'ultima quantità si può ottenere pensando che i due campioni sono estratti in modo indipendente e, pertanto, la varianza della somma (algebrica) è uguale alla somma delle varianze. La varianza di ogni media è data dal quadrato dell'errore standard (SEM) e, pertanto, possiamo scrivere:
+La differenza è positiva e l'intervallo di confidenza non contiene lo zero, il che supporta, in qualche modo, l'idea che esista effettivamente una differenza significativa tra le due varietà. 
 
-$$SED^2 = SEM_1^2 + SEM_2^2$$
 
-Sappiamo anche che il SEM si ottiene dividendo la deviazione standard di ogni campione per la radice quadrata del numero dei dati, quindi:
 
-$$SED^2 = \frac{s_1^2}{n_1} +  \frac{s_2^2}{n_2}$$
+Anche se questo criterio basato sull'intervallo di confidenza è, in qualche modo, accettabile, in pratica si preferisce utilizzare un altro criterio più rigoroso, basato sul calcolo di probabilità.
 
-cioè:
+La domanda è: come è possibile falsificare l'ipotesi nulla? Ad esempio, potremmo chiederci: "ma se l'ipotesi nulla è vera, perché io ho osservato due compioni con medie così diverse?". In effetti esiste una spiegazione: anche se ho campionato due volte dalla stessa popolazione, potrei aver campionato cinque parcelle dalla coda sinistra (e quindi con bassa produzione) e cinque parcelle dalla coda destra (con elevata produzione), in modo che $m_1 \neq m_2$ e quindi $d_2 \neq 0$. Di conseguenza, la differenza osservata sarebbe solo casuale, legata ad un campionamento 'sfortunato'. Sarebbe un po' come osservare, per esempio, cinque teste consecutive in altrettanti lanci di una moneta: un 'outcome' possibile, ma abbastanza improbabile. La domanda è quindi: "Quanto è improbabile il nostro risultato, quando l'ipotesi nulla è vera?".
 
-$$SED = \sqrt{ \frac{s_1^2}{n_1} +  \frac{s_2^2}{n_2} }$$
+Nello stabilire la probabilità di trovare $d_2 \neq 0$, dobbiamo tener conto di due aspetti:
 
-Possiamo anche scrivere:
+1.  l'entità della differenza stessa: più la differenza è alta e più è improbabile che essa si sia prodotta per caso;
+2.  l'entità dell'errore standard: maggiore l'incertezza di stima, maggiore la probabilità di trovare differenze casuali anche ampie.
 
-$$SED = \sqrt{ \frac{s_1^2 \, n_2 + s_2^2 \, n_1}{n_1 \, n_2} }$$
+Una statistica che considera entrambi gli aspetti è quella indicata di seguito:
 
-e, se le varianze sono uguali ($s_1^2 = s_2^2 = s^2$), segue che: 
+$$T = \frac{d_2}{SED}$$
 
-$$SED = \sqrt {s^2 \frac{n_1  + n_2}{n_1 \, n_2 } }$$
+Il valore osservato è:
 
-Se fosse anche $n_1 = n_2 =n$, potremmo scrivere:
-
-$$SED = \sqrt{2 \, \frac{s^2}{n} } = \sqrt{2} \times SEM$$
-
-Il valore da noi osservato per T è:
-
-$$T = \frac{70.2 - 85.4}{3.361547} = -4.5217$$
-
-dove il denominatore è ottenuto come:
-
-$$SED = \sqrt{ 2.18^2 +  2.56^2 } = 3.361547$$
+$$T = \frac{15.2}{3.361547} = 4.5217$$
 
 ### Simulazione Monte Carlo
 
-Ipotizzando che l'ipotesi nulla sia vera ($\mu_A = \mu_P$), che valori può assumere la statistica T? E'facile intuire che il valore più probabile sia 0, ma, dato che la media di un campione non necessariamente coincide con la media della popolazione da cui proviene, possiamo anche aspettarci che T sia diverso da zero. Tuttavia, trovare valori di T molto alti o molto bassi dovrebbe essere via via meno probabile.
+Ipotizzando che l'ipotesi nulla sia vera ($\delta = 0$), che valori può assumere la statistica T? E'facile intuire che il valore più probabile sia 0, ma possiamo anche aspettarci che T sia diverso da zero. Tuttavia, trovare valori di T molto alti o molto bassi dovrebbe essere via via meno probabile.
 
-Nel nostro esperimento, il valore di T che abbiamo ottenuto è abbastanza diverso da zero, il che indica un certo grado di discrepanza tra l'osservazione è l'ipotesi nulla. **Possiamo affermare che ciò sia imputabile solo alla variabilità di campionamento e che quindi il nostro esperimento confermi l’ipotesi nulla**?
+Nel nostro esperimento, il valore di T che abbiamo ottenuto è ben diverso da zero, il che indica un certo grado di discrepanza tra l'osservazione è l'ipotesi nulla. **Possiamo affermare che ciò sia imputabile solo alla variabilità di campionamento e che quindi il nostro esperimento confermi l'ipotesi nulla**?
 
 Per rispondere a questa domanda, supponiamo che l'ipotesi nulla sia vera. In questo caso, immaginiamo che le nostre dieci parcelle siano tutte estratte da una sola popolazione di parcelle con media e deviazione standard stimate (stima puntuale) come segue:
 
@@ -2091,9 +1920,7 @@ devSt
 ## [1] 9.44928
 ```
 
-Prendiamo quindi questa popolazione normale, con $\mu = 77.8$ e $\sigma = 9.45$, ed utilizziamo un generatore di numeri casuali gaussiani per estrarre numerose (100’000) coppie di campioni, calcolando, per ogni coppia, il valore T, come abbiamo fatto con la nostra coppia iniziale.
-
-Il codice da utilizzare in R per le simulazioni è il seguente:
+Prendiamo quindi questa popolazione normale, con $\mu = 77.8$ e $\sigma = 9.45$, ed utilizziamo un generatore di numeri casuali gaussiani per estrarre numerose (100'000) coppie di campioni, calcolando, per ogni coppia, il valore T, come abbiamo fatto con la nostra coppia iniziale. Il codice da utilizzare in R per le simulazioni è il seguente:
 
 
 ```r
@@ -2103,9 +1930,10 @@ result <- rep(0, 100000)
 for (i in 1:100000){
   sample1 <- rnorm(5, media, devSt)
   sample2 <- rnorm(5, media, devSt)
-  SED <- sqrt( (sd(sample1)/sqrt(5))^2 +
-                 (sd(sample2)/sqrt(5))^2 )
-  result[i] <- (mean(sample1) - mean(sample2)) / SED
+  d <- (mean(sample1) - mean(sample2))
+  s_pool <- sqrt( (sd(sample1)^2 * 4 + sd(sample2)^2 * 4)/8 )
+  sed <- s_pool * sqrt(2/5)
+  result[i] <-  d / sed
 }
 
 # Valutazione dei valori di T
@@ -2122,14 +1950,14 @@ length(result[result > - T_obs]) /100000
 ## [1] 0.00082
 ```
 
-Come risultato (vettore 'result') otteniamo una lista di 100'000 valori di T, tutti compatibili con l'ipotesi nulla vera ($\mu_A = \mu_P$); in altre parole, otteniamo una *sampling distribution* per T, in quanto le variazioni tra un valore e l'altro sono solo dovute al campionamento, visto che l'ipotesi nulla è vera. In mezzo a questi 100'000 valori ne troviamo alcuni piuttosto alti ($> 9$) e piuttosto bassi ($< - 9$). Negli anni 20 del 1900, Fischer propose di utilizzare come **‘forza dell’evidenza scientifica’** proprio la probabilità di ottenere un risultato uguale o più estremo di quello osservato, supponendo vera l’ipotesi nulla. Per applicare questo criterio, dobbiamo partire dalla nostra osservazione (T = -4.521727) e considerare che il valore è negativo, ma solo perché abbiamo scritto la differenza come $m_A - m_P$ invece che come $m_P - m_A$. Quindi dobbiamo andarci a cercare nel vettore 'result' i valori che risultano minori di -4.5217 e maggiori di 4.5217, che sono più discrepanti di quello da noi osservato.
+Come risultato (vettore 'result') otteniamo una lista di 100'000 valori di T, tutti compatibili con l'ipotesi nulla vera ($\delta_2 = 0$); in altre parole, otteniamo una *sampling distribution* per T, in quanto le variazioni tra un valore e l'altro sono solo dovute al campionamento, visto che l'ipotesi nulla è vera. In mezzo a questi 100'000 valori ne troviamo alcuni piuttosto alti ($> 9$) o piuttosto bassi ($< - 9$). Negli anni 20 del 1900, Fischer propose di utilizzare come **'forza dell'evidenza scientifica'** proprio la probabilità di ottenere un risultato uguale o più estremo di quello osservato, supponendo vera l'ipotesi nulla. Per applicare questo criterio, dobbiamo partire dalla nostra osservazione ($T = 4.521727$) e considerare che il valore è positivo, ma solo perché abbiamo scritto la differenza come $m_2 - m_1$ invece che come $m_1 - m_2$. Quindi dobbiamo andarci a cercare nel vettore 'result' i valori che risultano maggiori di 4.5217 e minori di -4.5217, che sono più discrepanti di quello da noi osservato. Dobbiamo quindi tener conto di entrambe le 'code' della *sampling distribution* e, per questo, si parla di **test a due code**.
 
 Vediamo che, dei 100'000 valori di T simulati assumendo vera l'ipotesi nulla, poco meno dell'uno per mille sono inferiori a -4.5217 e altrettanti sono superiori al suo reciproco (4.5217). In totale, la probabilità di osservare un valore di T uguale o più estremo di quello da noi osservato è molto bassa a pari allo 0.18% circa. Questo valore di probabilità è detto **P-level** (o **P-value**) e viene utilizzato come criterio decisionale: se esso è inferiore a 0.05 (5% di probabilità), come in questo caso, rifiutiamo l'ipotesi nulla ed abbracciamo l'alternativa, concludendo che i due trattamenti sono significativamente diversi tra loro (in termini di risposta prodotta nei soggetti trattati, ovviamente).
 
 
 ### Soluzione formale
 
-Eseguire una simulazione di Monte Carlo per costruire una *sampling distribution* per T non è sempre agevole e, pertanto, ci dobbiamo chiedere se esista una funzione di densità per rappresentare questa *sampling distribution*. Nel grafico sottostante abbiamo trasformato il vettore 'result' in una distribuzione di frequenze relative, considerando intervalli di ampiezza pari a 2.5, in modo da poter rappresentare la *sampling distribution* di T con un istogramma.
+Eseguire una simulazione di Monte Carlo per costruire una *sampling distribution* empirica per T non è sempre agevole e, pertanto, ci dobbiamo chiedere se esista una funzione di densità formale da utilizzare come *sampling distribution* teorica. Nel grafico sottostante abbiamo reppresentato il vettore 'result', è quindi la *sampling distribution* empirica, come una distribuzione discreta di frequenze, considerando intervalli di ampiezza pari a 2.5.
 
 
 ```r
@@ -2150,22 +1978,53 @@ curve(dt(x, 8), add=TRUE, col="red")
 <p class="caption">(\#fig:figName71)Sampling distribution empirica a confronto con una distribuzione normale (in rosso) e una distribuzione t di Student con otto gradi di libertà</p>
 </div>
 
-Vediamo che l'istogramma non è rappresentabile fedelmente con una curva gaussiana (curva blu in Figura \@ref(fig:figName71)), in quanto le code sono leggermente più alte. Oltre alla funzione di densità gaussian esiste un'altra funzione simile, detta 't di Student', che, rispetto alla gaussiana, è caratterizzata da una più elevata densità nelle code e quindi è in grado di fornire una descrizione più precisa del nostro istogramma (curva rossa in Figura \@ref(fig:figName71)). La forma della funzione t di Student dipende dal numero di gradi di libertà; in questo caso ne abbiamo otto, in quanto abbiamo due campioni con cinque individui e, quindi, quattro gradi di libertà ciascuno.
+Vediamo che l'istogramma non è rappresentabile fedelmente con una curva gaussiana (curva blu in Figura \@ref(fig:figName71)), in quanto le code sono leggermente più alte. Al contrario, si può utilizzare la distribuzione di densità di 't di Student', di cui abbiamo già parlato nel Capitolo 5 e che, rispetto alla gaussiana, è caratterizzata da una più elevata densità nelle code, soprattutto quando il numero di gradi di libertà è basso (in questo caso ne abbiamo 8, come abbiamo precisato più sopra). Possiamo vedere che la distribuzione t di Student con 8 gradi di libertà si adatta perfettamente alla *sampling distribution* empirica (curva rossa in Figura \@ref(fig:figName71)). 
 
-La curva di densità di 't di Student' ci permette di calcolare il P-level molto velocemente, senza dover ricorrere ad una simulazione Monte Carlo. Chiaramente, dato che l'ipotesi alternativa è quella semplice dobbiamo prendere entrambe le code (test a due code), utilizzando il codice sottostante. 
-
+L'impiego della curva 't di Student' ci permette di calcolare il P-level molto velocemente, senza dover ricorrere ad una simulazione Monte Carlo. Chiaramente, dato che l'ipotesi alternativa è quella semplice dobbiamo considerare entrambe le code, utilizzando il codice sottostante: 
 
 
 ```r
-2 * pt(-4.5217, 8, lower.tail=T) 
-## [1] 0.00194554
+2 * pt(abs(T_obs), 8, lower.tail = F) 
+## [1] 0.001945471
 ```
 
-Abbiamo moltiplicato per 2 il risultato, in quanto la funzione `dt()` fornisce la probabilità di trovare individui inferiori a -4.5217 ('lower.tail = T'), ma, essendo la funzione simmetrica, la probabilità di trovare soggetti superiori a 4.5217 è esattamente la stessa.
+Abbiamo moltiplicato per 2 il risultato, in quanto la funzione `dt()` fornisce la probabilità di trovare individui superiori al valore assoluto di 4.5217 ('abs(T_obs)' e 'lower.tail = F'), ma, essendo la curva t di Student simmetrica, la probabilità di trovare soggetti nell'altra coda è esattamente la stessa. L'impiego della funzione valore assoluto è irrilevante nel nostro caso, ma è utile quando la differenza osservata è negativa.
 
-Vediamo che il P-level ottenuto formalmente è simile a quello ottenuto empiricamente, ma, rispetto a quest'ultimo, è più preciso, in quanto con la simulazione di Monte Carlo non abbiamo potuto considerare, come avremmo dovuto, un numero infinito di repliche dell'esperimento.
+Vediamo che il P-level ottenuto formalmente è simile a quello ottenuto empiricamente, ma, rispetto a quest'ultimo, è più preciso, in quanto con la simulazione di Monte Carlo non abbiamo potuto considerare, come avremmo dovuto, un numero infinito di repliche dell'esperimento. Tuttavia bisogna precisare che **l'impiego di una sampling distribution formale richiede che siano vere alcune condizioni di base, come, ad esempio, l'omogeneità delle varianze e la normalità dei residui** $\varepsilon_i$, altrimenti il test è invalido. Questo aspetto non va assolutamente dimenticato e, per questo, daremo alcuni indicazioni in seguito.
 
-Allo stesso valore, più semplicemente, si perviene utilizzando la funzione `t.test()`:
+
+### Interpretazione del P-level
+
+Abbiamo detto che quando il P-level è inferiore a 0.05, concludiamo che vi sono prove scientifiche sufficientemente forti per rifiutare la nostra ipotesi di partenza.
+
+Bisogna sottolineare come il P-level nella statistica tradizionale sia stato inizialmente proposto da Fisher come criterio di comportamento e non come un vero e proprio criterio inferenziale-probabilistico. Successivamente, Jarzy Neyman ed Egon Pearson, intorno al 1930, proposero di utilizzare il P-level come probabilità di errore di I specie, cioè come probabilità di rifiutare erroneamente l'ipotesi nulla. Tuttavia, trattandosi di una probabilità calcolata a partire da una *sampling distribution*, cioè da un'ipotetica infinita ripetizione dell'esperimento, essa non ha alcun valore in relazione al singolo esperimento effettivamente eseguito, come i due autori menzionati in precedenza hanno esplicitamente chiarito.
+
+Di conseguenza, nel caso in esempio, affermare che abbiamo una probabilità di errore pari a 0.0019 nel rifiutare l'ipotesi nulla, rappresenterebbe un abuso: le nostre conclusioni potrebbero essere false o vere, ma non abbiamo alcun elemento per scegliere tra le due opzioni. Possiamo solo affermare che, se ripetessimo infinite volte l'esperimento e se l'ipotesi nulla fosse vera, otterremmo un risultato estremo come il nostro o più estremo solo in 2 casi (circa) su 1000. In altre parole, basando sempre le nostre conclusioni sul criterio anzidetto (rifiuto l'ipotesi nulla se il P-value è inferiore a 0.05), possiamo contenere la nostra probabilità di errore (falso-positivo) sotto il 5% nel lungo periodo, non in relazione ad ogni singolo sforzo sperimentale di campionamento.
+
+## Altri esempi dell'uso del test di t di Student
+
+In questo capitolo abbiamo utilizzato il test t di Student per valutare la significatività della stima di un parametro, sotto l'ipotesi nulla che il valore del parametro nella popolazione sia uguale a 0. Questo approccio è sempre possibile ed è generalizzabile in questo modo:
+
+1. poniamo di avere un parametro $\beta$ da stimare ed otteniamo lo stimatore campionario $b$ = 12);
+2. determiniamo il suo errore standard (ad esempio 1.5, con 7 gradi di libertà) con un metodo adeguato;
+3. calcoliamo il rapporto tra la stima e il suo errore standard (ad esempio T = 12/1.5 = 8 con 7 gradi di libertà);
+4. Utilizziamo la distribuzione t di Student per calcolare il P-level per l'ipotesi nulla $H_0: \beta = 0$, come mostrato nel box sottostante.
+
+
+```r
+T_obs <- 12/1.5
+2 * pt(abs(T_obs), 7, lower.tail = F)
+## [1] 9.114921e-05
+```
+
+Quando il P-level è inferiore a 0.05, rigettiamo l'ipotesi nulla e concludiamo che il valore del parametro nella popolazione è significativamente diverso da zero.
+
+
+### Confronto tra due medie campionarie
+
+Tradizionalmente, il test t di Student è utilizzato per saggiare la differenza tra due medie campionarie, anche senza costruire un modello statistico come il nostro. In particolare, il processo è analogo a quello sopra indicato, salvo il fatto che, all'inizio, calcoliamo le medie dei due campioni, la loro differenza e l'errore standard di questa differenza. Successivamente, dividiamo la differenza per il suo errore standard e procediamo come sopra.
+
+In R, questo processo è agevolato dalla funzione `t.test()`, che, nel caso del nostro esempio iniziale, riceve in input i due campioni, assieme alla specifica 'var.equal = T', che permette di eseguire un test omoscedastico, con risultati assolutamente uguali a quelli riportati più sopra.
 
 
 ```r
@@ -2183,28 +2042,10 @@ t.test(A, P, var.equal = T)
 ##      70.2      85.4
 ```
 
-Gli argomenti di questa funzione sono i due vettori, oltre all'argomento 'var.equal', che in questo caso è stato impostato su 'TRUE', considerando i due campioni estratti da distribuzioni gaussiane con la stessa varianza. Torneremo su questo aspetto tra poco.
 
-### Interpretazione del P-level
+### Varianze non omogenee
 
-Abbiamo detto che quando il P-level è inferiore a 0.05, concludiamo che vi sono prove scientifiche sufficientemente forti per rifiutare la nostra ipotesi di partenza.
-
-Bisogna sottolineare come il P-level nella statistica tradizionale sia stato inizialmente proposto da Fisher come criterio di comportamento e non come un vero e proprio criterio inferenziale-probabilistico. Successivamente, Jarzy Neyman ed Egon Pearson, intorno al 1930, proposero di utilizzare il P-level come probabilità di errore di I specie, cioè come probabilità di rifiutare erroneamente l’ipotesi nulla. Tuttavia, trattandosi di una probabilità calcolata a partire da una *sampling distribution*, cioè da un’ipotetica infinita ripetizione dell’esperimento, essa non ha alcun valore in relazione al singolo esperimento effettivamente eseguito, come i due autori menzionati in precedenza hanno esplicitamente chiarito.
-
-Di conseguenza, nel caso in esempio, affermare che abbiamo una probabilità di errore pari a 0.0019 nel rifiutare l’ipotesi nulla, rappresenterebbe un abuso: le nostre conclusioni potrebbero essere false o vere, ma non abbiamo alcun elemento per scegliere tra le due opzioni. Possiamo solo affermare che, se ripetessimo infinite volte l’esperimento e se l’ipotesi nulla fosse vera, otterremmo un risultato estremo come il nostro o più estremo solo in 2 casi (circa) su 1000. In altre parole, basando sempre le nostre conclusioni sul criterio anzidetto (rifiuto l'ipotesi nulla se il P-value è inferiore a 0.05) commettiamo un errore in non più del 5% dei casi, cosicché  il P-level può essere guardato come la probabilità di ‘falso-positivo’ nel lungo periodo, non in relazione ad ogni singolo sforzo sperimentale di campionamento. 
-
-
-### Tipologie alternative di test t di Student
-
-Chiunque abbia utilizzato un computer per eseguire un test di t, si sarà accorto che è necessario scegliere tra tre procedure alternative. Infatti, abbiamo:
-
-1. t-test appaiato. In questo caso le misure sono prese a coppia sullo stesso soggetto e non sono quindi indipendenti.
-2. t-test omoscedastico. Le misure sono prese su soggetti diversi (indipendenti) e possiamo supporre che i due campioni provengano da due popolazioni con la stessa varianza.
-3. t-test eteroscedastico. Le misure sono prese su soggetti diversi, ma le varianze non sono omogenee.
-
-Quello che abbiamo appena utilizzato con la funzione `t.test()` è un test omoscedastico, che suppone che le varianze dei campioni siano simili tra loro, almeno dello stesso ordine di grandezza (omogeneità delle varianze od omoscedasticità).
-
-Se consideriamo invece la coppia di campioni riportata di seguito, possiamo notare che le varianza sono molto diverse e l'ipotesi di omoscedasticità non è difendibile. 
+Se le varianze dei due campioni di cui vogliamo confrontare le medie non sono uguali, possiamo utilizzare il test di t eteroscedastico, meglio noto con il nome di test di Welch. Consideriamo, per esempio, i due campioni riportati di seguito e caratterizzati da varianze molto diverse, per cui l'ipotesi di omoscedasticità non è difendibile.
 
 
 
@@ -2224,7 +2065,7 @@ var(D2)
 ## [1] 1.767402
 ```
 
-Pertanto, dobbiamo utilizzare un t-test eteroscedastico (test di Welch), nel quale il numero di gradi di libertà non è ottenuto per semplice somma dei gradi di libertà di ogni campione, ma è approssimato con la formula di Satterthwaite:
+Il test di Welch è analogo al test di t, ma l'errore standard della differenza viene calcolato utilizzando le deviazioni standard dei due campioni, senza calcolare una deviazione standard comune. Inoltre, il numero di gradi di libertà non è ottenuto per semplice somma dei gradi di libertà di ogni campione, ma è approssimato con la formula di Satterthwaite:
 
 $$DF_s \simeq \frac{ \left( s^2_1 + s^2_2 \right)^2 }{ \frac{(s^2_1)^2}{DF_1} + \frac{(s^2_2)^2}{DF_2} }$$
 
@@ -2232,17 +2073,18 @@ Vediamo che se le varianze e i gradi di libertà sono uguali, la formula precede
 
 $$DF_s = 2 \times DF$$
 
-Nel nostro caso:
+In questo esempio:
 
 
 ```r
+sed <- sqrt( var(D1)/5 + var(D2)/5 )
 dfS <- (var(D1) + var(D2))^2 / 
   ((var(D1)^2)/4 + (var(D2)^2)/4)
-dfS
-## [1] 4.126621
+2 * pt(abs(mean(D1) - mean(D2))/sed, dfS, lower.tail = F)
+## [1] 2.325897e-06
 ```
 
-Con R, il test di Welch si esegue utilizzando l'argomento 'var.equal = F':
+Con R, il test di Welch si esegue utilizzando l'argomento 'var.equal = F', che è l'opzione di default; è leggermente meno potente di quello omoscedastico (P-level più basso), ma permette di rilasciare l'assunzione di omogeneità delle varianze e fornisce risultati validi anche quando i due campioni hanno una variabilità molto diversa.
 
 
 ```r
@@ -2260,11 +2102,32 @@ t.test(D1, D2, var.equal = F)
 ##  12.00078  34.14769
 ```
 
-Il t-test appaiato è invece quello in cui le misure sono state prese negli stessi soggetti, prima e dopo un certo trattamento sperimentale. Ad esempio, se le misure D1 e D2 fossero state rilevate sugli stessi soggetti (due misure per soggetto, in posizioni corrispondenti dei vettori D1 e D2), allora avremmo cinque soggetti invece che dieci e, di conseguenza, avremmo solo solo 4 gradi di libertà invece che 8:
+Dato che le varianze di due campioni non sono mai esattamente uguali, ci si può chiedere quando sia opportuno utilizzare il test di t di Student e quando sia invece preferibile il test di Welch. Non c'è una risposta esatta: in genere il test t di Student è preferibile per la sua semplicità e potenza quando le varianze sono poco diverse, nello stesso ordine di grandezza e con un rapporto pari ad 1/2 o 1/3 massimo. Secondo alcuni, invece, il test di Welch è sempre preferibile, per la maggior protezione che garantisce, come dimostra il fatto che esso costituisca l'opzione di default in R.
+
+### Differenze generalizzate tra parametri
+
+Il test di Welch può essere generalizzato a qualunque situazione in cui abbiamo due stime indipendenti e vogliamo valutare se la loro differenza è significativa. Ad esempio, immaginiamo di avere la stima di $\gamma_1 = 22$ con errore standard pari a 1.3 e la stima di $\gamma_2 = 31$, con errore standard pari a 2.9. L'errore standard della differenza sarà pari a:
+
+$$\textrm{SED} = \sqrt{\textrm{SEM}_1^2 + \textrm{SEM}_2^2} = 3.178$$
+
+Avendo anche i gradi di libertà dei due SEM, potrei approssimare i gradi di libertà del SED utilizzando la formula di Satterthwaite. Altrimenti, nell'ipotesi che il numero di gradi di libertà sia sufficientemente alto (maggiore di 15-20, all'incirca), potrei utilizzare una approssimazione gaussiana, come indicato nel box sottostante.
 
 
 ```r
-t.test(D1, D2, var.equal=F, paired=T)
+T_obs <- (22 - 31)/3.178
+2 * pnorm(abs(T_obs), lower.tail = F)
+## [1] 0.004626222
+```
+
+Anche in questo caso il P-level è abbondantemente inferiore allo 0.05, per cui rigettiamo l'ipotesi nulla.
+
+### Misure appaiate
+
+Il t-test appaiato è quello in cui le misure sono state prese negli stessi soggetti, prima e dopo un certo trattamento sperimentale. Ad esempio, se le misure D1 e D2 fossero state rilevate sugli stessi soggetti (due misure per soggetto, in posizioni corrispondenti dei vettori D1 e D2), allora avremmo cinque soggetti invece che dieci e, di conseguenza, avremmo solo solo 4 gradi di libertà invece che 8:
+
+
+```r
+t.test(D1, D2, var.equal = F, paired=T)
 ## 
 ## 	Paired t-test
 ## 
@@ -2278,14 +2141,47 @@ t.test(D1, D2, var.equal=F, paired=T)
 ##       -22.14691
 ```
 
+### Test ad una coda 
 
-## Confronto tra due proporzioni: il test $\chi^2$
+Se fosse ragionevole adottare un ipotesi alternativa complessa del tipo $H_1: \delta_2 < 0$, allora potremmo effettuare un **test ad una coda**. Tornando all'esempio precedente, avendo osservato un valore di T uguale a -4.5217, potremmo limitarci a valutare la probabilità di ottenere, con l'ipotesi nulla vera, valori pari o inferiori a quello da noi osservati, trascurando invece l'altra coda della distribuzione di riferimento (valori pari o superiori a 4.5217). In questo modo il test produrrebbe un P-level inferiore e risulterebbe quindi più potente (sarebbe più facile rigettare l'ipotesi nulla). Un esempio è dato nel box sottostante
 
-Il test di t è molto utile, ma soltanto nel caso in cui si abbia a che fare con caratteri quantitativi, cioè con variabili misurate su una scala continua, per le quali sia possibile calcolare statistiche descrittive, come appunto la media. Talvolta, i ricercatori sono interessati a rilevare caratteristiche qualitative, come ad esempio lo stato di una pianta in seguito ad un trattamento (morta o viva), il colore dei semi (si ricordino i piselli verdi e gialli di Mendel) ed altre caratteristiche che non sono misurabili su una scala continua.
 
-Avendo a che fare con variabili qualitative, l'unica statistica rilevabile è il numero di soggetti che presentano le diverse modalità. Ad esempio, immaginiamo un esperimento per verificare se un coadiuvante aumenta l'efficacia di un insetticida. In questo esperimento, utilizziamo l'insetticida da solo e miscelato con il coadiuvante su due gruppi di insetti diversi. Nel primo gruppo (trattato con insetticida) contiamo 56 morti su 75 insetti trattate, mentre nel secondo gruppo (trattato con insetticida e coadiuvante) otteniamo 48 morti su 50 insetti trattati.
+```r
+pt(-4.5217, 8, lower.tail = T)
+## [1] 0.0009727699
+t.test(A, P, var.equal = T, alternative = "less") # più semplice
+## 
+## 	Two Sample t-test
+## 
+## data:  A and P
+## t = -4.5217, df = 8, p-value = 0.0009727
+## alternative hypothesis: true difference in means is less than 0
+## 95 percent confidence interval:
+##       -Inf -8.949041
+## sample estimates:
+## mean of x mean of y 
+##      70.2      85.4
+```
 
-Nel capitolo 3 abbiamo visto che i risultati di questo esperimento si riducono ad una tabella di contingenze, per la quale sappiamo già calcolare una statistica che misuri la connessione tra variabili (trattamento e mortalità), detta $\chi^2$:
+Ricordiamo come l'ipotesi alternativa complessa possa essere adottata solo nei casi in cui essa risulti ragionevole già prima di effettuare l'esperimento e non dopo averne visti i risultati.
+
+## Altri test d'ipotesi: il test $\chi^2$
+
+Il test di t, con tutte le sue varianti, è fondamentalmente basato sul rapporto tra una stima ed il suo errore standard, la cui *sampling distribution* è approssimativamente gaussiana o, più precisamente, segue la distribuzione di 't di Student'. Tuttavia, io posso testare ipotesi di ogni tipo, mi basta avere una qualunque statistica che descriva l'andamento dell'esperimento e conoscere la sua *sampling distribution*, assumendo che l'ipotesi nulla sia vera. Questa *sampling distribution* può essere empirica (cioè ottenuta per simulazione Monte Carlo) o meglio teorica, scelta in base a considerazioni di natura statistico-matematica; su di essa, vado a cercare la probabilità di trovare valori per la statistica in studio che siano tanto estremi o più estremi di quello da noi riscontrato.
+
+Ad esempio, immaginiamo che io abbia una stima pari a 22 ed immaginiamo che la *sampling distribution* per questa stima, assumendo vera l'ipotesi nulla, segua la distribuzione di $\chi^2$ con 10 gradi di libertà (per menzionare una qualunque distribuzione che non conosciamo ancora). Allora io posso ottenere un P-level per l'ipotesi nulla andandomi a guardare la probabilità di osservare un valore altrettanto estremo o più estremo di 22 (test ad una coda), come indicato nel box sottostante.
+
+
+```r
+pchisq(22, 10, lower.tail = F)
+## [1] 0.0151046
+```
+
+Il test di $\chi^2$ funziona esattamente in questo modo ed è utilizzato per valutare la significatività della connessione tra due caratteri qualitativi, per i quali sia stata costruita una tabella delle contingenze (ricordate il Capitolo 3?). 
+
+Ad esempio, immaginiamo un esperimento per verificare se un coadiuvante aumenta l'efficacia di un insetticida. In questo esperimento, utilizziamo l'insetticida da solo e miscelato con il coadiuvante su due gruppi di insetti diversi. Nel primo gruppo (trattato con insetticida) contiamo 56 morti su 75 insetti trattate, mentre nel secondo gruppo (trattato con insetticida e coadiuvante) otteniamo 48 morti su 50 insetti trattati.
+
+Nel capitolo 3 abbiamo visto come costruire una tabella di contingenze e come calcolare il $\chi^2$ per misurare l'entità della connessione:
 
 
 ```r
@@ -2304,43 +2200,19 @@ summary( as.table(tab) )
 ## 	Chisq = 9.768, df = 1, p-value = 0.001776
 ```
 
-
-La connessione è la statistica giusta per rispondere alla nostra domanda di ricerca; infatti ci stiamo chiedendo se la proporzione dei morti è indipendente dal tipo di trattamento oppure no. Il valore di $\chi^2$ osservato è pari a 9.768, il che indica un certo grado di connessione. Infatti, ricordiamo che, in caso di indipendenza tra le variabili, $\chi^2$ dovrebbe essere zero (Capitolo 3).
-
-Tuttavia, noi non siamo interessati ai due campioni, in quanto i 125 soggetti osservati sono tratti da due popolazioni più ampie. Considerando queste due popolazioni, poniamo l'ipotesi nulla in questi termini:
+Il valore di $\chi^2$ osservato è pari a 9.768, il che indica un certo grado di connessione, in quanto è diverso dal valore atteso in assenza di connessione che sarebbe zero (Capitolo 3). Tuttavia, noi non siamo interessati solo ai 125 insetti osservati, ma siamo interessati a trarre conclusioni generali e valide per l'intera popolazione che ha generato il nostro campione. A questo fine abbiamo bisogno di un test d'ipotesi formale; se non esiste connessione, la proporzione di insetti controllati dal trattamento dovrebbe la stessa, indipendentemente dalla presenza del coadiuvante. Cioè:
 
 $$H_o :\pi_1  = \pi_2  = \pi$$
 
-Vediamo che, come negli altri esempio, l'ipotesi nulla riguarda i parametri delle popolazioni ($\pi_1$ e $\pi_2$), non quelli dei campioni  ($p_1$ e $p_2$). Ci chiediamo: se l'ipotesi nulla fosse vera ($\pi_1  = \pi_2$), quale sarebbe la *sampling distribution* per $\chi^2$? E soprattutto, quanto sarebbe probabile ottenere un valore alto come il nostro o più alto?
-
-Vediamo che l'output della funzione `summary()` ci da già il P-level, che, essendo inferiore a 0.05, ci consente di rigettare l'ipotesi nulla, affermando che esiste una differenza significativa tra l'effetto dell'insetticida quando è utilizzato da solo e quando è utilizzando in abbinamento con un coadiuvante.
-
-### Simulazione Monte Carlo
-
- Per chi fosse interessato, proviamo a vedere come si costruisce la *sampling distribution* per $\chi^2$ con una simulazione Monte Carlo. Possiamo utilizzare la funzione `r2dtable()`, che, partendo da una situazione in cui l'ipotesi nulla è vera (cioè $\pi_1  = \pi_2$) e quindi i due caratteri sono indipendenti, produce tante tabelle di contingenza (nel nostro caso 10'000), rispettando i totali marginali della nostra tabella di partenza. Le tabelle prodotte  sono restituite come lista, quindi possiamo utilizzare la funzione `lapply()` per applicare ad ogni elemento della lista la funzione che restituisce il $\chi^2$ ('chiSim'). 
-
+Vediamo che, come negli altri esempio, l'ipotesi nulla riguarda i parametri delle popolazioni ($\pi_1$ e $\pi_2$), non quelli dei campioni ($p_1$ e $p_2$). Ci chiediamo: se l'ipotesi nulla fosse vera ($\pi_1 = \pi_2$), quale sarebbe la *sampling distribution* per $\chi^2$? E soprattutto, quanto sarebbe probabile ottenere un valore alto come il nostro o più alto? Karl Pearson ha dimostrato che il valore di $\chi^2$, quando l'ipotesi nulla è vera, segue la distribuzione di $\chi^2$, con un numero di gradi di libertà pari a quelli della tabelle delle contingenze (bisogna prendere il minimo valore tra il numero di righe meno una e il numero di colonne meno una; vedi il Capitolo 3). Il box sottostante mostra come utilizzare la funzione 'pchi()' per il calcolo del P-level (in questo caso il test è ad una coda, perché la connessione implica valori di $\chi^2$ alti e non bassi).
 
 
 ```r
-chiSim <- function(x) summary(as.table(x))$stat
-set.seed(1234)
-tabs <- r2dtable(10000, apply(tab, 1, sum), apply(tab, 2, sum))
-chiVals <- as.numeric( lapply( tabs, chiSim) )
-length(chiVals[chiVals > 9.768])
-## [1] 19
+pchisq(9.768, df = 1, lower.tail = F)
+## [1] 0.001775755
 ```
 
-Vediamo che vi sono 19 valori più alti di quello da noi osservato, quindi il P-value è 0.0019.
-
-### Soluzione formale
-
-In modo formale, si può dimostrare che, se $n$ è sufficientemente grande (n > 30), il valore osservato di $\chi^2$ segue appunto la distribuzione di probabilità $\chi^2$, con un numero di gradi di libertà $\nu$ pari al numero dei dati indipendenti, che, in questo caso, è pari ad 1. Infatti, una volta fissata una frequenza, le altre sono automaticamente definite, dovendo restituire i totali marginali. In R, possiamo utilizzare la funzione `pchisq()` per calcolare la probabilità di ottenere valori pari o superiori a 9.768:
-
-
-```r
-pchisq(9.76801, 1, lower.tail=F)
-## [1] 0.001775746
-```
+Vediamo che questo P-level era già disponibile nell'output della funzione `summary()`; essendo inferiore a 0.05, ci consente di rigettare l'ipotesi nulla, affermando che esiste una differenza significativa tra l'effetto dell'insetticida quando è utilizzato da solo e quando è utilizzando in abbinamento con un coadiuvante.
 
 Allo stesso risultato, ma in modo più semplice, è possibile pervenire utilizzando la funzione `chisq.test()`, applicata alla tabella di contingenza:
 
@@ -2354,7 +2226,27 @@ chisq.test(tab, correct = F)
 ## X-squared = 9.768, df = 1, p-value = 0.001776
 ```
 
-Come nel caso del 't' di Student, abbiamo diversi tipi di test di chi quadro. In particolare, possiamo applicare o no la correzione per la continuità, che è necessaria quando il numero dei soggetti è piccolo (minore di 30, grosso modo). Nel nostro caso, non lo abbiamo ritenuto necessario ed abbiamo quindi aggiunto l'argomento 'correct = F'.
+L'opzione 'correct = F' permette di evitare la correzione per la continuità (correzione di Yates), che è invece necessaria quando il numero dei soggetti è piccolo (minore di 30, grosso modo).
+
+
+## Test d'ipotesi con simulazione di Monte Carlo
+
+Vi sono situazioni nelle quali non vi è una chiara indicazione su quale sia la distribuzione di probabilità/densità più opportuna per descrivere la *sampling distribution* di una statistica sotto l'ipotesi nulla. Ciò è vero anche per il test di $\chi^2$ appena esposto, per il quale la distribuzione di $\chi^2$ è cosniderata solo una buona approssimazione.
+
+In queste situazioni è possibile costruire una *sampling distribution* empirica analogamente a quanto abbiamo fatto in precedenza per il test di t di Student. Nel caso del test di $\chi^2$, possiamo utilizzare la funzione `r2dtable()`, che, partendo da una situazione in cui l'ipotesi nulla è vera (cioè $\pi_1 = \pi_2$) e quindi i due caratteri sono indipendenti, produce tante tabelle di contingenza (nel nostro caso 10'000), rispettando i totali marginali della nostra tabella di partenza. Le tabelle prodotte sono restituite come lista, quindi possiamo utilizzare la funzione `lapply()` per applicare ad ogni elemento della lista la funzione che restituisce il $\chi^2$ ('chiSim').
+
+
+```r
+chiSim <- function(x) summary(as.table(x))$stat
+set.seed(1234)
+tabs <- r2dtable(10000, apply(tab, 1, sum), apply(tab, 2, sum))
+chiVals <- as.numeric( lapply( tabs, chiSim) )
+length(chiVals[chiVals > 9.768])
+## [1] 19
+```
+
+Vediamo che vi sono 19 valori so 10'000 più alti di quello da noi osservato, quindi il P-value è 0.0019, molto simile a quello osservato con il test formale.
+
 
 ## Conclusioni e riepilogo
 
@@ -2362,18 +2254,17 @@ Abbiamo visto il P-level è lo strumento giusto per tirare conclusioni in presen
 
 Concludiamo proprio ricordando questo metodo di lavoro:
 
-1. si formula l'ipotesi nulla.
-2. Si individua una statistica che descriva l'andamento dell'esperimento, in relazione all'ipotesi nulla.
-3. Si individua la *sampling distribution* per questa statistica, assumendo vera l'ipotesi nulla; la sampling distribution può essere empirica (ottenuta per simulazione Monte Carlo) o meglio teorica, scelta in base a considerazioni probabilistiche.
-4. Si calcola la probabilità che, essendo vera l'ipotesi nulla, si possa osservare una valore altrettanto estremo o più estremo di quello calcolato, per la statistica di riferimento.
-5. Se il livello di probabilità è inferiore ad una certa soglia $\alpha$ prefissata (generalmente 0.05), si rifiuta l'ipotesi nulla e si accetta l'ipotesi alternativa.
+1.  si formula l'ipotesi nulla.
+2.  Si individua una statistica che descriva l'andamento dell'esperimento, in relazione all'ipotesi nulla.
+3.  Si individua la *sampling distribution* per questa statistica, assumendo vera l'ipotesi nulla; la sampling distribution può essere empirica (ottenuta per simulazione Monte Carlo) o meglio teorica, scelta in base a considerazioni probabilistiche.
+4.  Si calcola la probabilità che, essendo vera l'ipotesi nulla, si possa osservare una valore altrettanto estremo o più estremo di quello calcolato, per la statistica di riferimento.
+5.  Se il livello di probabilità è inferiore ad una certa soglia $\alpha$ prefissata (generalmente 0.05), si rifiuta l'ipotesi nulla e si accetta l'ipotesi alternativa.
 
 ---
 
 ## Altre letture
 
-1. Hastie, T., Tibshirani, R., Friedman, J., 2009. The elements of statistical learning, Springer Series in Statistics. Springer Science + Business Media, California, USA.
-
+1.  Hastie, T., Tibshirani, R., Friedman, J., 2009. The elements of statistical learning, Springer Series in Statistics. Springer Science + Business Media, California, USA.
 
 <!--chapter:end:06-TestIpotesi.Rmd-->
 
@@ -3181,52 +3072,13 @@ plot(mod, which = 2)
 <p class="caption">(\#fig:figName112)Analisi grafica dei residui per il dataset 'insects.csv', previa trasformazione logaritmica</p>
 </div>
 
-Vediamo che i dati trasformati non mostrano più alcun sintomo di eteroscedasticità e, di conseguenza, l'ANOVA su questa metrica è totalmente affidabile. Ovviamente, avendo lavorato con il logaritmo dei dati, commentare i risultati potrebbe essere più complicato, in quanto dovremmo calcolare le medie marginali attese su scala logaritmica, come indicato nel codice sottostante.
+Vediamo che i dati trasformati non mostrano più alcun sintomo di eteroscedasticità e, di conseguenza, il P-level calcolato su questa metrica è totalmente affidabile.
 
+## Altri approcci avanzati
 
-```r
-library(emmeans)
-medie <- emmeans(mod, ~Insecticide)
-medie
-##  Insecticide emmean    SE df lower.CL upper.CL
-##  T1            6.34 0.178 12     5.96     6.73
-##  T2            5.81 0.178 12     5.43     6.20
-##  T3            3.95 0.178 12     3.56     4.34
-## 
-## Results are given on the log (not the response) scale. 
-## Confidence level used: 0.95
-```
+L'uso di trasformazioni stabilizzanti è stato molto di moda fino agli anni '80 del '900, quando la potenza di calcolo era estremamente bassa e rendeva possibile solo l'impiego di procedure semplici, come quelle indicate in questo libro. Oggigiorno, la diffusione di computer potenti a costo relativamente basso ha permesso la diffusione di modelli in grado di gestire anche errori non-normali e dati eteroscedastici. Questi modelli appartengono alle classi dei cosiddetti Modelli Lineari Generalizzati (GLM) o dei modelli con fitting basato sui Minimi Quadrati Generalizzati (GLS); sono molto flessibili, ma sono anche abbastanza complessi e non possono essere trattati su un testo introduttivo.
 
-È evidente che presentare le medie su scala logaritmica potrebbe non essere di immediata o facile lettura. Per questo, potremmo pensare di retro-trasformare le medie, utilizzando la trasformazione inversa di quella logaritmica, cioè l'antilogaritmo. Ad esempio, per la prima media:
-
-
-$$e^{6.34} = 566.7963$$
-
-In questo modo la nostra unità di misura ridiventa quella originale, anche se il valore ottenuto non coincide con la media dei dati originali; in effetti la trasformazione è non lineare e la media dei logaritmi non può coincidere con il logaritmo della media. Possiamo osservare che la media del trattamento A, sulla scala originale, è:
-
-
-```r
-mean(dataset[dataset$Insecticide == "A","Count"])
-## [1] NaN
-```
-
-e risulta più alta della media retro-trasformata. In realtà, se è vero che i logaritmi sono normalmente distribuiti, la media dei logaritmi (6.34) dovrebbe essere uguale alla mediana (ricordiamo che in una distribuzione normale media e mediana coincidono). La mediana è il valore centrale; dato che la retro-trasformazione è monotona, il valore centrale resta centrale, anche se io retro-trasformo. Quindi la media retro-trasformata è uno stimatore della mediana della popolazione originale, non della sua media. Questo non è uno svantaggio: infatti il QQ-plot suggerisce un'asimmetria positiva (confronta la Figura \@ref(fig:figName111) con la Figura \@ref(fig:figName106) ) cosa che è confermata dal fatto che la mediana è minore della media. Se la distribuzione dei dati è asimmetrica, la mediana è un indicatore di tendenza centrale migliore della media, perché meno sensibile ai valori estremi, che sono più frequenti in caso di asimmetria.
-
-Il problema è che, se vogliamo utilizzare la media retro-trasformata, dobbiamo trovare un valore di errore standard per questo stima, con il quale esprimere la sua incertezza. In realtà, anche l'errore standard può essere retro-trasformato, con una tecnica detta metodo 'delta', che costituisce un estensione della legge di propagazione degli errori per le trasformazioni non-lineari. È inutile andare nel dettaglio; diciamo solo che la funzione `emmeans()` rende semplicissima l'implementazione del metodo delta, con il comando seguente:
-
-
-```r
-retroMedie <- emmeans(mod, ~Insecticide, regrid = "response")
-retroMedie
-##  Insecticide response     SE df lower.CL upper.CL
-##  T1             568.6 101.01 12    348.5      789
-##  T2             335.1  59.54 12    205.4      465
-##  T3              51.9   9.22 12     31.8       72
-## 
-## Confidence level used: 0.95
-```
-
-Con questo abbiamo tutto quello che ci serve: stime ed errori standard, che, ovviamente, sono diversi per le diverse medie retro-trasformate, coerentemente con la mancanza di omoscedasticità.
+Inoltre, per completezza di informazione, mensioneremo il fatto che esistono anche metodi di analisi dei dati che non fanno assunzioni parametriche o che ne fanno molto poche e sono, pertanto, noti come metodi non-parametrici. Non parleremo neanche di questi, rinviando chi fosse interessato alla lettura di testi specifici. 
 
 ---
 
@@ -3237,7 +3089,11 @@ Con questo abbiamo tutto quello che ci serve: stime ed errori standard, che, ovv
 2. Anscombe, F. J. and J. W. Tukey. 1963, The examination and analysis of residuals. Technometrics 5: 141-160.
 3. Box, G. E. P. and D. R. Cox. 1964, An analysis of transformations. Journal of the Royal Statistical Society, B-26, 211-243, discussion 244-252.
 4. D’Elia, A. 2001, Un metodo grafico per la trasformazione di Box-Cox: aspetti esplorativi ed inferenziali. STATISTICA LXI: 630-648.
-5. Saskia, R. M. 1992, The Box-Cox transformation technique: a review. Statistician 41: 169-178.
+5. Pinheiro, J.C., Bates, D.M., 2000. Mixed-Effects Models in S and S-Plus, Springer-Verlag Inc. ed. Springer-Verlag Inc., New York.
+6. Saskia, R. M. 1992, The Box-Cox transformation technique: a review. Statistician 41: 169-178.
+7. Siegel, S e Castellan N.J. (1992) Statistica non-parametrica. McGraw-Hill, Milano.
+
+
 6. Weisberg, S., 2005. Applied linear regression, 3rd ed. John Wiley & Sons Inc. (per il metodo 'delta')
 
 
@@ -3250,7 +3106,7 @@ La scomposizione della varianza (ANOVA fisheriana) rappresenta frequentemente il
 
 Questa parte del lavoro viene usualmente eseguita utilizzando i **contrasti lineari**, che introdurremo utilizzando lo stesso dataset che abbiamo già iniziato ad analizzare nei due capitoli precedenti ('mixture.csv').
 
-## Esempio
+## Esempio 1
 
 Torniamo al nostro esperimento in cui abbiamo confrontato due erbicidi e la loro miscela con il testimone non trattato, in un disegno sperimentale completamente randomizzato con quattro repliche. Ricarichiamo il dataset ed eseguiamo l'ANOVA, come abbiamo visto nel Capitolo 7. Ricordiamo anche che, nel Capitolo 8, l'analisi grafica dei residui ha confermato che, per questo dataset, non vi sono problemi con le assunzioni di base per i modelli lineari.
 
@@ -3340,7 +3196,7 @@ Se l'ipotesi nulla è vera, che probabilità abbiamo di osservare T = -7.244? Ab
 
 ```r
 Tval <- -16.385 / 2.261866
-2 * pt(Tval, 12, lower.tail = T)
+2 * pt(abs(Tval), 12, lower.tail = F)
 ## [1] 1.023001e-05
 ```
 
@@ -3605,7 +3461,7 @@ contrast(medie, method="pairwise")
 
 Possiamo notare che i P-levels sono leggermente più bassi di quelli ottenuti con Bonferroni, che conferma quindi di essere una procedura molto conservativa, mentre l'impiego del t multivariato consente di rispettare esattamente il tasso di errore 'per esperimento'.
 
-Ovviamente la correzione per la molteplicità ed il conseguente innalzamento del P-level sono fortemente dipendenti dal numero di contrasti effttuati; se utilizziamo un set di confronti tipo 'dunnett' invece che tipo 'pairwise', avremo meno confronti e quindi una correzione più 'leggera'.
+Ovviamente la correzione per la molteplicità ed il conseguente innalzamento del P-level sono fortemente dipendenti dal numero di contrasti effettuati; se utilizziamo un set di confronti tipo 'dunnett' invece che tipo 'pairwise', avremo meno confronti e quindi una correzione più 'leggera'.
 
 
 ```r
@@ -3619,7 +3475,115 @@ contrast(medie, method="dunnett")
 ## P value adjustment: dunnettx method for 3 tests
 ```
 
+## Esempio 2: confronti multipli con dati trasformati
 
+Un altro aspetto di cui tener conto è relativo al fatto che, nel caso in cui si fosse reso necessario qualche tipo di trasformazione stabilizzante, il test di confronto multiplo deve opportunamente adeguato. Per capire questo aspetto, possiamo riprendere in mano il dataset 'insects.csv' già esplorato nel capitolo precedente e relativo alle quindici piante trattate con tre insetticidi (cinque piante per insetticida), su ciascuna delle quali, alcune settimane dopo il trattamento, sono stati contati gli insetti presenti e vitali. Ricarichiamo il dataset e, tenendo conto dell'esigenza emerse nel capitolo precedente, analizziamo i dati previa trasformazione logaritmica. Quest'ultima viene eseguita direttamente nel corso del 'model fitting' e non nel dataset, per un motivo che sarà chiaro in seguito.
+
+
+```r
+fileName <- "https://www.casaonofri.it/_datasets/insects.csv"
+dataset <- read.csv(fileName, header = T)
+dataset$Insecticide <- factor(dataset$Insecticide)
+mod <- lm(log(Count) ~ Insecticide, data = dataset)
+```
+
+A questo punto, possiamo calcolare le medie marginali attese, che, tuttavia, sono su scala logaritmica, come indicato nel codice sottostante.
+
+
+```r
+medie <- emmeans(mod, ~Insecticide)
+medie
+##  Insecticide emmean    SE df lower.CL upper.CL
+##  T1            6.34 0.178 12     5.96     6.73
+##  T2            5.81 0.178 12     5.43     6.20
+##  T3            3.95 0.178 12     3.56     4.34
+## 
+## Results are given on the log (not the response) scale. 
+## Confidence level used: 0.95
+```
+
+Presentare le medie su scala logaritmica, in molti casi, potrebbe non essere di immediata o facile lettura. Per questo, potremmo pensare di retro-trasformare le medie, utilizzando la trasformazione inversa di quella logaritmica, cioè l'antilogaritmo. Ad esempio, per la prima media:
+
+$$e^{6.34} = 566.7963$$
+
+In questo modo la nostra unità di misura ridiventa quella originale, anche se il valore ottenuto non coincide con la media dei dati originali; in effetti la trasformazione è non lineare e la media dei logaritmi non può coincidere con il logaritmo della media. Possiamo osservare che la media del trattamento A, sulla scala originale, è:
+
+
+```r
+mean(dataset[dataset$Insecticide == "T1","Count"])
+## [1] 589.8
+```
+
+e risulta più alta della media retro-trasformata. In realtà, se è vero che i logaritmi sono normalmente distribuiti, la media dei logaritmi (6.34) dovrebbe essere uguale alla mediana (ricordiamo che in una distribuzione normale media e mediana coincidono). La mediana è il valore centrale; dato che la retro-trasformazione è monotona, il valore centrale resta centrale, anche se io retro-trasformo. Quindi la media retro-trasformata è uno stimatore della mediana della popolazione originale, non della sua media. Questo non è uno svantaggio: infatti il QQ-plot suggerisce un'asimmetria positiva (vedi capitolo precedente) cosa che è confermata dal fatto che la mediana è minore della media. Se la distribuzione dei dati è asimmetrica, la mediana è un indicatore di tendenza centrale migliore della media, perché meno sensibile ai valori estremi, che sono più frequenti in caso di asimmetria.
+
+Il problema è che, se vogliamo utilizzare la media retro-trasformata, dobbiamo trovare un valore di errore standard per questo stima, con il quale esprimere la sua incertezza. In realtà, anche l'errore standard può essere retro-trasformato, con una tecnica detta metodo 'delta', che costituisce un estensione della legge di propagazione degli errori per le trasformazioni non-lineari. È inutile andare nel dettaglio; diciamo solo che la funzione `emmeans()` rende semplicissima l'implementazione del metodo delta, con il comando seguente:
+
+
+```r
+retroMedie <- emmeans(mod, ~Insecticide, type = "response")
+retroMedie
+##  Insecticide response     SE df lower.CL upper.CL
+##  T1             568.6 101.01 12    386.1    837.3
+##  T2             335.1  59.54 12    227.6    493.5
+##  T3              51.9   9.22 12     35.2     76.4
+## 
+## Confidence level used: 0.95 
+## Intervals are back-transformed from the log scale
+```
+
+Con questo abbiamo tutto quello che ci serve: stime ed errori standard, che, ovviamente, sono diversi per le diverse medie retro-trasformate, coerentemente con la mancanza di omoscedasticità. Il test di confronto multiplo è, pertanto:
+
+
+```r
+library(multcomp)
+cld(retroMedie, Letters = LETTERS)
+##  Insecticide response     SE df lower.CL upper.CL .group
+##  T3              51.9   9.22 12     35.2     76.4  A    
+##  T2             335.1  59.54 12    227.6    493.5   B   
+##  T1             568.6 101.01 12    386.1    837.3   B   
+## 
+## Confidence level used: 0.95 
+## Intervals are back-transformed from the log scale 
+## P value adjustment: tukey method for comparing a family of 3 estimates 
+## Tests are performed on the log scale 
+## significance level used: alpha = 0.05 
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.
+```
+
+La retrotrasformazione è immediata in quanto la funzione `emmeans()` è stata in grado di riconoscere la trasformazione stabilizzante applicata all'interno del 'model fitting'. La situazione è più complessa se la trasformazione è applicata prima del 'model fitting' oppure se non viene automaticamente riconosciuta. Ad esempio, una trasformazione inversa non viene automaticamente riconosciuta e, di conseguenza, la retrotrasformazione non è effettuata.
+
+
+```r
+mod2 <- lm(1/Count ~ Insecticide, data = dataset)
+emmeans(mod2, ~Insecticide, type = "response")
+##  Insecticide  emmean      SE df lower.CL upper.CL
+##  T1          0.00182 0.00279 12 -0.00426  0.00789
+##  T2          0.00317 0.00279 12 -0.00291  0.00924
+##  T3          0.02120 0.00279 12  0.01513  0.02727
+## 
+## Confidence level used: 0.95
+```
+
+In questo caso la trasformazione viene eseguita prima del 'model fitting', per poi cambiare la griglia di riferimento per il modello (`update(ref_grid(mod2), ....)`) specificando la trasformazione effettuata (`tran = "inverse"`). La griglia così modificata viene passata al posto del modello alla funzione `emmeans()`, come indicato di seguito.
+
+
+```r
+dataset$InvCount <- 1/dataset$Count
+mod3 <- lm(InvCount ~ Insecticide, data = dataset)
+updGrid <- update(ref_grid(mod3), tran = "inverse")
+emmeans(updGrid, ~Insecticide, type = "response")
+##  Insecticide response    SE df lower.CL upper.CL
+##  T1             550.9 845.9 12    126.8      Inf
+##  T2             315.8 278.0 12    108.2      Inf
+##  T3              47.2   6.2 12     36.7       66
+## 
+## Confidence level used: 0.95 
+## Intervals are back-transformed from the inverse scale
+```
+
+Questo metodo si può utilizzare con numerose funzioni, come, ad esempio "identity", "1/mu^2", "inverse", "reciprocal", "log10", "log2", "asin.sqrt" e "asinh.sqrt".
 
 ## E le classiche procedure di confronto multiplo?
 
@@ -5749,7 +5713,7 @@ Pur essendo entrambi gli approcci corretti, il secondo è certamente più elegan
 
 # Esercizi
 
-Questo libro non è finalizzato alla costruzione di una solida formazione teorica in biometria, ma è finalizzato a fornisre gli strumenti necessari per organizzare esperimenti validi ed analizzarne i dati in modo attendibile.
+Questo libro non è finalizzato alla costruzione di una solida formazione teorica in biometria, ma è finalizzato a fornire gli strumenti necessari per organizzare esperimenti validi ed analizzarne i dati in modo attendibile.
 Per questo motivo, vi proponiamo una lista di esercizi e di casi-studio, coi quali mettere in pratica e verificare la chiarezza dei concetti proposti. Gli esercizi sono orgnizzati in sezioni ed ognuna di esse corrisponde ad uno o più capitoli del libro; per alcuni di essi è necessario caricare dei *datasets*, che si trovano su *repository* esterne, che verranno via via indicate.
 
 ## Il disegno degli esperimenti (Cap. 1 e 2)
@@ -5970,7 +5934,7 @@ Simulare i risultati di un esperimento varietale, con sette varietà di frumento
 
 ### Esercizio 9
 
-Considerando il testo dell'esercizio 5, simulare un esperimento in cui la coltura viene seminata a fittezze di 2, 4, 6, 8 piante per metro quadrato, con quattro repliche.
+Considerando il testo dell'esercizio 6, simulare un esperimento in cui la coltura viene seminata a fittezze di 2, 4, 6, 8 piante per metro quadrato, con quattro repliche.
 
 
 ### Esercizio 10
@@ -6026,20 +5990,21 @@ Utilizzando una simulazione Monte Carlo opportunamente pianificata, mostrare che
 
 ---
 
-## Inferenza (Cap. 6)
+## Test d'ipotesi (Cap. 6)
 
 ### Esercizio 1
 
-Uno sperimentatore ha impostato un esperimento per verificare l'effetto di un fungicida (A) in confronto al testimone non trattato (B), in base al numero di colonie fungine sopravvissute. Il numero delle colonie trattate è di 200, mentre il numero di quelle non trattate è di 100. Le risposte (frequenze) sono come segue:
+La nostra miglior stima puntuale del parametro $\gamma$ di un modello statistico è $g = -7.2$, con un errore standard pari a 2.8, con 16 gradi di libertà. E'possibile che, in realtà, sia $\gamma = 0$? Qual è il P-level per l'ipotesi nulla? Devo accettarla o posso rifiutarla?
 
-|     | Morte | Sopravvissute |
-|-----|:-----:|:-------------:|
-| A   |  180  |      20       |
-| B   |  50   |      50       |
 
-Stabilire se i risultati possono essere considerati significativamente diversi, per un livello di probabilità del 5%.
 
 ### Esercizio 2
+
+La nostra miglior stima puntuale del parametro $\delta$ di un modello statistico è $d = 13.5$, con un errore standard pari a 8.4, ma non è disponibile, per questo errore standard, una stima accurata dei gradi di libertà. E'possibile che, in realtà, sia $\delta = 0$? Qual è il P-level per l'ipotesi nulla? Devo accettarla o posso rifiutarla?
+
+
+
+### Esercizio 3
 
 Uno sperimentatore ha impostato un esperimento per confrontare due tesi sperimentali (A, B). I risultati sono i seguenti (in q/ha):
 
@@ -6049,25 +6014,32 @@ Uno sperimentatore ha impostato un esperimento per confrontare due tesi sperimen
 | 10.2 | 12.3 |
 | 9.7  | 12.5 |
 
-Stabilire se i risultati per le due tesi sperimentali possono essere considerati significativamente diversi, per un livello di probabilità del 5%.
+Stabilire se i risultati per le due tesi sperimentali possono essere considerati significativamente diversi, per un livello di probabilità di errore di I specie del 5%.
 
-### Esercizio 3
+
+
+### Esercizio 4
 
 Uno sperimentatore ha impostato un esperimento per confrontare se l'effetto di un fungicida è significativo, in un disegno sperimentale con tre ripetizioni. Con ognuna delle due opzioni di trattamento i risultati produttivi sono i seguenti (in t/ha):
 
 |  A  | NT  |
 |:---:|:---:|
-| 65  | 54  |
-| 71  | 51  |
-| 68  | 59  |
+| 6.5  | 54  |
+| 7.1  | 48  |
+| 6.8  | 63  |
 
-E'significativo l'effetto del trattamento fungicida sulla produzione, per un livello di probabilità del 5%?
+E'significativo l'effetto del trattamento fungicida sulla produzione, per un livello di probabilità del 5%?. SUGGERIMENTO: prestare attenzione all'omogeneità delle varianze.
 
-### Esercizio 4
 
-Immaginate di aver riscontrato che, in determinate condizioni ambientali, 60 olive su 75 sono attaccate da *Daucus olee* (mosca dell'olivo). Nelle stesse condizioni ambientali, diffondendo in campo un insetto predatore siamo riusciti a ridurre il numero di olive attaccate a 12 su 75. Si tratta di una oscillazione casuale del livello di attacco o possiamo concludere che l'insetto predatore è stato un mezzo efficace di lotta biologica alla mosca dell'olivo?
 
 ### Esercizio 5
+
+Con un esperimento in laboratorio, abbiamo stimato che il tasso di degradazione di una sostanza xenobiotica in acqua è $k_1 = -0.071 \pm 0.012$ (7 gradi di libertà). Per una sostanza affine il tasso di degradazione è pari a $k_2 = -0.153 \pm 0.024$ (7 gradi di lbertà); possiamo concludere che il tasso di degradazione delle due sostanze, in realtà, non è significativamente diverso?
+
+
+
+
+### Esercizio 6
 
 In un ospedale, è stata misurata la concentrazione di colesterolo nel sangue di otto pazienti, prima e dopo un trattamento medico. Per ogni paziente, sono stati analizzati due campioni, ottenendo le seguenti concentrazioni:
 
@@ -6084,7 +6056,44 @@ In un ospedale, è stata misurata la concentrazione di colesterolo nel sangue di
 
 Si può concludere che il trattamento medico è stato efficace?
 
-### Esercizio 6
+
+
+
+### Esercizio 7
+
+Un veterinario ha organizzato un esperimento per valutare l'effetto di una dieta innovativa, sulla pressione arteriosa sistolica di cavalli da corsa. Le informazioni preliminari mostrano con chiarezza che questa dieta innovativa non può avere effetti negativi, ma, eventualmente, solo positivi. Il ricercatore ha selezionato a caso 16 animali, ne ha misurato la pressione arteriosa a riposo ed ha ripetuto la stessa misurazione dopo sei mesi di questa dieta. I risultati ottenuti sono i seguenti:
+
+
+```r
+prima <- c(113.5, 116.5, 118.1, 111.3, 116.8, 117.0, 114.8, 114.9, 
+           114.8, 114.2, 115.0, 114.0, 114.4, 116.1, 117.9, 115.7)
+dopo <- c(110.9, 110.1, 110.3, 116.8, 112.2, 111.0, 111.1, 112.9, 
+          110.6, 109.1, 113.1, 109.9, 111.9, 110.1, 114.2, 111.0)
+```
+
+
+Stabilire se la dieta è efficace, con una probabilità di errore P < 0.05. SUGGERIMENTO: ricordare che la l'effetto atteso della dieta, per le informazioni preliminari disponibili, può, eventualmente, essere solo quello di abbassare la pressione, mai quello di alzarla.
+
+
+
+
+### Esercizio 8
+
+Uno sperimentatore ha impostato un esperimento per verificare l'effetto di un fungicida (A) in confronto al testimone non trattato (B), in base al numero di colonie fungine sopravvissute. Il numero delle colonie trattate è di 200, mentre il numero di quelle non trattate è di 100. Le risposte (frequenze) sono come segue:
+
+|     | Morte | Sopravvissute |
+|-----|:-----:|:-------------:|
+| A   |  180  |      20       |
+| B   |  50   |      50       |
+
+Stabilire se i risultati possono essere considerati significativamente diversi, per un livello di probabilità del 5%.
+
+### Esercizio 9
+
+Immaginate di aver riscontrato che, in determinate condizioni ambientali, 60 olive su 75 sono attaccate da *Daucus olee* (mosca dell'olivo). Nelle stesse condizioni ambientali, diffondendo in campo un insetto predatore siamo riusciti a ridurre il numero di olive attaccate a 12 su 75. Si tratta di una oscillazione casuale del livello di attacco o possiamo concludere che l'insetto predatore è stato un mezzo efficace di lotta biologica alla mosca dell'olivo?
+
+
+### Esercizio 10
 
 I Q.I. di 16 studenti provenienti da un quartiere di una certa città sono risultati pari a:
 
@@ -6105,7 +6114,7 @@ QI2 <- c(90.66, 101.41, 104.61,  91.77, 107.06,  89.51,  87.91,
 
 Esiste una differenza significativa tra i Q.I. nei due quartieri della città?
 
-### Esercizio 7
+### Esercizio 11
 
 Viene estratto un campione di rondelle da una macchina in perfette condizioni di funzionamento. Lo spessore delle rondelle misurate è:
 
@@ -6126,7 +6135,15 @@ S2 <- c(0.0502, 0.0528, 0.0492, 0.0556, 0.0501, 0.0500, 0.0498,
 
 Verificare se la macchina sia ancora ben tarata, oppure necessiti di revisione.
 
-### Esercizio 8
+### Esercizio 12
+
+Le varianze di due campioni composti da 30 unità sono risultate pari, rispettivamente a 115.3 e 356.4; stabilire se il secondo campione ha una varianza significativamente più alta del primo. SUGGERIMENTO: considerare che il rapporto tra due varianze di campioni estratti dalla stessa popolazione gaussiana segue la distribuzione F di Fisher. Considerare anche che, in R, la funzione `pf(x, n1, n2, lower.tail = F)` restituisce la probabilità di ottenere valori pari o superiori ad $x$, da una distribuzione $F$ di Fisher con $n1$ ed $n2$ gradi di libertà. Considerare anche che il rapporto di due varianze può solo essere positivo.
+
+
+
+
+
+### Esercizio 13
 
 Sono stati osservati 153 calciatori registrando la dominanza della mano e quella del piede, ottenendo la tabella riportata qui di seguito.
 
@@ -6139,7 +6156,7 @@ Sono stati osservati 153 calciatori registrando la dominanza della mano e quella
 
 Esiste dipendenza tra la dominanza della mano e del piede?
 
-### Esercizio 9
+### Esercizio 14
 
 Un agronomo ha organizzato un esperimento varietale, per confrontare tre varietà di frumento, cioè GUERCINO, ARNOVA e BOLOGNA. Per far questo ha individuato, in un campo uniforme dell'areale umbro, trenta parcelle da 18 m^2^ e ne ha selezionate dieci a caso, da coltivare con GUERCINO, altre dieci a caso sono state coltivate con ARNOVA e le ultime dieci sono state coltivate con BOLOGNA.
 
@@ -6165,7 +6182,7 @@ Al termine dell'esperimento, le produttività osservate erano le seguenti:
 
 
 
-### Esercizio 10
+### Esercizio 15
 
 Un botanico ha valutato il numero di semi germinati per colza sottoposto a due diversi regimi termici dopo l'imbibizione (15 e 25°C). Per la temperatura più bassa, su 400 semi posti in prova, ne sono germinati 358. Alla temperatura più alta, su 380 semi in prova, ne sono germinati 286.
 
@@ -6175,19 +6192,48 @@ Un botanico ha valutato il numero di semi germinati per colza sottoposto a due d
 
 
 
-### Esercizio 11
-
-Un veterinario ha organizzato un esperimento per valutare l'effetto di una dieta innovativa, sulla pressione arteriosa sistolica di cavalli da corsa. Ha selezionato a caso 16 animali, ne ha misurato la pressione arteriosa a riposo ed ha ripetuto la stessa misurazione dopo sei mesi di questa dieta. I risultati ottenuti sono i seguenti:
-
-
-
-Stabilire se la dieta è efficace, con una probabilità di errore P < 0.05.
 
 ---
 
+## Fitting di modelli nella sperimentazione agraria
+
+Nelle sezioni seguenti riporteremo diversi datasets ottenuti da esperimenti nelle scienze agraria e che si prestano per il fitting di modelli statistici descrittivi di vario tipo. La stima dei parametri di questi modelli e il test d'ipotesi permettono di rispondere a semplici domande sui processi biologici coinvolti. Indipendentemente dal dataset, il processo di lavoro dovrà essere il seguente.
+
+1. Caricare i dati ed eseguire le eventuali trasformazioni che si rendano necessarie (ad es. le trasformazioni delle variabili numeriche in 'factors' oppure le trasformazioni stabilizzanti).
+2. Descrivere i dati, calcolando almeno un indicatore di tendenza centrale (media) e un indicatore di variabilità (deviazione standard) come indicato nel Capitolo 3.
+3. Specificare il modello descrittivo più opportuno a stimarne i parametri con R.
+4. Controllare il fitting per il rispetto delle assunzioni di base. Se necessario, trasformare i dati e ripetere il fitting
+5. Testare la significanza di tutti gli effetti inclusi nel modello, attraverso l'ANOVA.
+6. Se necessario, confrontare le medie con un test di confronto multiplo
+7. Presentare i risultati e commentarli.
+
+I dataset degli esempi che seguono sono riportati in un file Excel, che potete scaricare dal seguente link:  [https://www.casaonofri.it/_datasets/BookExercises.xlsx](https://www.casaonofri.it/_datasets/BookExercises.xlsx). Ogni dataset è su un diverso foglio di lavoro all'interno dello stesso file; il nome del foglio di lavoro è riportato in fondo ad ogni esercizio. Utilizzare la funzione 'readxl()' function, per la lettura del dataset.
+
+Per facilitarvi la vita, alleghiamo una tabella che riassume i modelli descritti in questo libro ed utilizzabili per gli esercizi che seguono.
+
+
+Table: (\#tab:unnamed-chunk-217)Sommario dei principali modelli per descrivere i principali esperimenti nelle scienze agrarie
+
+|Modello                      |Disegno.sperimentale                  |Funzione.R  |Specifiche                                    |
+|:----------------------------|:-------------------------------------|:-----------|:---------------------------------------------|
+|ANOVA ad una via             |CRD                                   |lm()        |Y ~ F1                                        |
+|ANOVA ad una via             |CRBD                                  |lm()        |Y ~ F1 + BL                                   |
+|ANOVA a due vie              |CRD                                   |lm()        |Y ~ F1 * F2                                   |
+|ANOVA a due vie              |CRBD                                  |lm()        |Y ~ F1 * F2 + BL                              |
+|ANOVA a due vie              |Split-plot CRD                        |lmer()      |Y ~ F1 * F2 + (1&#124;MAIN)                   |
+|ANOVA a due vie              |Split-plot CRBD                       |lmer()      |Y ~ F1 * F2 + BL + (1&#124;MAIN)              |
+|ANOVA a due vie              |Strip-plot CRD                        |lmer()      |Y ~ F1 * F2 + (1&#124;ROW) + (1&#124;COL)     |
+|ANOVA a due vie              |Strip-plot CRBD                       |lmer()      |Y ~ F1 * F2 + BL + (1&#124;ROW + (1&#124;COL) |
+|ANOVA ad una via             |ANOVA ad una via (CRD), due ambienti  |lm()/lmer() |Y ~ F1 * ENV                                  |
+|ANOVA ad una via             |ANOVA ad una via (CRBD), due ambienti |lm()/lmer() |Y ~ F1 * ENV + BL&#124;ENV                    |
+|Regressione Lineare semplice |CRD                                   |lm()        |Y ~ X1                                        |
+|Simple Linear Regression     |CRBD                                  |lm()        |Y ~ BL + X1                                   |
+
+Nella tabella precedente, Y è la risposta, sempre rappresentata da una variabile continua, F1 ed F2  sono due fattori sperimentali (variabili nominali), X1 è una covariata (variabile continua), BL è la variabile che identifica i blocchi (variabile nominale), ENVè la variabile che identifica gli ambienti (variabile nominale) e MAIN, ROW, COL sono le variabili che identificano le main-plots nello split-plot e le righe/colonne nello strip-plot (variabili nominali).
+
+
 ## Modelli ANOVA ad una via (Cap. da 7 a 9)
 
-Gli esercizi che seguono sono basati su una serie di dataset, disponibili in un file Excel, che può essere scaricato da [questo link](https://www.casaonofri.it/_datasets/EserciziTesto.xlsx). Ogni dataset è in un foglio a parte, il cui nome viene fornito nel testo di ciascun esercizio.
 
 ### Esercizio 1 
 
@@ -6342,6 +6388,45 @@ Analizzate i dati e commentate i risultati ottenuti
 
 ## Regressione (Cap. 11)
 
+Quando la variabile indipendente è continua, potremmo essere interessati a valutare l'esistenza di una possibile relazione funzionale tra la X e la Y (curva dose-risposta). La relazione più semplice è la 'retta' $Y = b_0 + b_1 \, X$; il fitting di questo modello implica la stima di $b_0$ (intercetta) e $b_1$ (pendenza), in modo che la retta stimata sia quella che passa 'più vicina' possibile ai dati osservati. Quando facciamo il fitting di un modello come questo, lo schema di lavoro presentato all'inizio di questo capitolo cambia, nel senso che, oltre agli usuali controlli sull'omogeneità delle varianze e sulla normalità dei residui, dobbiamo anche controllare la bontà di adattamento. Ciò può essere fatto attraverso un grafico nel quale vengano contemporaneamente mostrati i valori osservati e quelli predetti dal modello, con il codice seguente:
+
+
+```
+model <- lm(Y ~ X1, data = dataset) # fitting del modello
+summary(model) # stima dei parametri
+b0 <- 10 # valore dell'intercetta, ottenuto più sopra
+b1 <- 0.5 # valore della pendenza ottenuto più sopra
+plot(Y ~ X1, data = dataset) # grafico dei dati osservati
+curve(B0 + B1 * x, add = T) # retta stimata; 'x' deve essere scritto così come è, in lettera piccola
+```
+
+Ovviamente, nel caso della regressione lineare non dobbiamo eseguire il test di confronto multiplo: se la risposta giace su una retta ogni valore del predittore X produce una risposta diversa dall'altro. 
+
+I modelli di regressione possono essere adattati anche a dati da prove non replicate. Se però abbiamo le repliche, allora ci sono due possibili modelli: un modello ANOVA, nel quale la variabile X viene trasformata in una variabile nominale ed un modello di regressione, nel quale la variabile X resta numerica. Il primo modello è certamente più vicino ai dati (più basso residuo) perché non pone alcun vincolo sulla forma della risposta, mentre il secondo modello è più semplice (meno parametri da stimare), ma meno preciso, perché impone che le risposte siano allineate a carattterizzate da una crescita/decrescita monotona. Possiamo confrontare i due modelli per valutare se il fitting è altrettanto buono con il codice che segue.
+
+```
+anova(model1, model2)
+```
+
+Se il P-level è maggiore di 0.05 posso accettare la nulla, concludere che i due modelli sono ugualmente buoni e, di conseguenza, scegliere quello più semplice, seguendo il principio del rasio di Occam. Ciò equivale a dire che il modello di regressione non ha alcuna mancanza di adattamento ai dati osservati.
+
+Quando gli esperimenti sono replicati abbiamo però una difficoltà aggiuntiva, nel senso che il codice sottostante:
+
+```
+model <- lm(Y ~ BL + X1, data = dataset) # fits the model
+summary(model)
+```
+
+produce una sola pendenza e tante intercette quanti sono i blocchi. Per trovare l'intercetta media posso utilizzare la usuale funzione 'emmeans()', come indicato più sotto (X1 è da sostituire col nome della variabile indipendente).
+
+
+
+
+```
+emmeans(model, ~1, at = list(X1 = 0))
+```
+
+
 ### Esercizio 1
 
 È stato condotto uno studio per verificare l'effetto della concimazione azotata (in kg/ha) sulla produzione (in quintali per ettaro) della lattuga, utilizzando uno schema a blocchi randomizzati. I risultati sono i seguenti:
@@ -6398,6 +6483,23 @@ Eseguire l'ANOVA e verificare il rispetto delle assunzioni di base. E'corretto e
 ---
 
 ## ANOVA a due vie con interazione (Cap. 12 e 13)
+
+Alcuni dei dataset che seguono sono stati ottenuti da esperimenti a split-plot. Se non avete letto il Capitolo 13, potete anlizzare questi dataset facendo attenzione a quanto segue.
+
+Per i disegni a split-plot e a strip-plot, invece delione 'lm()', dobbiamo utilizzare la funzione 'lmer()' che necessita dell'istallazione dei packages 'lme4' e 'lmerTest'. Prima del fitting, dobbiamo identificare in modo univoco le main-plots (per i disegni a split-plot) e le righe/colonne (per i disegni a strip-plot). Le main-plots possono essere identificate incrociando la variabile del fattore principale con i blocchi, come indicato più sotto per la variabile 'Tillage' nel dataframe 'dataset':
+
+```
+dataset$mainPlot <- with(dataset, factor(Block:Tillage))
+```
+
+Analogamente per un disgno a strip-plot, possiamo operare come segue:
+
+```
+dataset$Rows <- factor(dataset$Crop:dataset$Block)
+dataset$Columns <- factor(dataset$Herbicide:dataset$Block)
+```
+
+Il codice per il fitting è riportato nella tabella sovrastante. L'uso del metodo plot() applicato al risultato del fitting restituisce solo il grafico dei residui verso i valori attesi e quindi il controllo dell'assunzione di normalità può essere evitato, per semplicità. L'esigenza di eventuali trasformazioni stabilizzanti potrà essere valutata facendo un fitting preliminare di un modello lineare nel quale vengano trascurati i fattori di blocco (main-plot, righe e colonne).
 
 ### Esercizio 1
 
