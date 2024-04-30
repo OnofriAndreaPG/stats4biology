@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.24 (Anno Accademico 2022-2023), compil. 2024-04-17"
+date: "Update: v. 1.24 (Anno Accademico 2023-2024), compil. 2024-04-30"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -1814,7 +1814,7 @@ Una volta definito il modello generale, possiamo utilizzare i dati osservati per
 
 Nell'ipotesi di omoscedasticità, la miglior stima di $\sigma$ può essere ottenuta da una sorta di media delle varianze campionarie, pesata sui relativi gradi di libertà:
 
-$$\sigma = s_{pool} = \sqrt{ \frac{s_1^2 \, (n_1 - 1) + s_2^2 \, (n_2 - 1)}{n_1 + n_2 - 2} }$$
+$$s_{pool} = \sqrt{ \frac{s_1^2 \, (n_1 - 1) + s_2^2 \, (n_2 - 1)}{n_1 + n_2 - 2} }$$
 
 dove $s_1$ ed $s_2$ sono le deviazioni standard dei due campioni e $n_1$ ed $n_2$ sono le due numerosità (entrambe uguali a cinque):
 
@@ -2005,7 +2005,7 @@ Di conseguenza, nel caso in esempio, affermare che abbiamo una probabilità di e
 
 In questo capitolo abbiamo utilizzato il test t di Student per valutare la significatività della stima di un parametro, sotto l'ipotesi nulla che il valore del parametro nella popolazione sia uguale a 0. Questo approccio è sempre possibile ed è generalizzabile in questo modo:
 
-1. procediamo alla stima puntuale del parametro (ad esempio $\beta$ = 12);
+1. poniamo di avere un parametro $\beta$ da stimare ed otteniamo lo stimatore campionario $b$ = 12);
 2. determiniamo il suo errore standard (ad esempio 1.5, con 7 gradi di libertà) con un metodo adeguato;
 3. calcoliamo il rapporto tra la stima e il suo errore standard (ad esempio T = 12/1.5 = 8 con 7 gradi di libertà);
 4. Utilizziamo la distribuzione t di Student per calcolare il P-level per l'ipotesi nulla $H_0: \beta = 0$, come mostrato nel box sottostante.
@@ -2435,18 +2435,18 @@ Table: (\#tab:tabResidui)Tabella dei dati osservati, dei valori attesi, dei resi
 |Metribuzin__348 |   4.38| 14.484| -5.309|  9.175|  -4.795|
 |Metribuzin__348 |  10.32| 14.484| -5.309|  9.175|   1.145|
 |Metribuzin__348 |   6.80| 14.484| -5.309|  9.175|  -2.375|
-|Mixture_378     |   6.14| 14.484| -9.356|  5.127|   1.013|
+|Mixture_378     |   6.14| 14.484| -9.356|  5.127|   1.012|
 |Mixture_378     |   1.95| 14.484| -9.356|  5.128|  -3.178|
-|Mixture_378     |   7.27| 14.484| -9.356|  5.127|   2.142|
-|Mixture_378     |   5.15| 14.484| -9.356|  5.128|   0.023|
+|Mixture_378     |   7.27| 14.484| -9.356|  5.128|   2.142|
+|Mixture_378     |   5.15| 14.484| -9.356|  5.128|   0.022|
 |Rimsulfuron_30  |  10.50| 14.484|  2.376| 16.860|  -6.360|
 |Rimsulfuron_30  |  20.70| 14.484|  2.376| 16.860|   3.840|
 |Rimsulfuron_30  |  20.74| 14.484|  2.376| 16.860|   3.880|
 |Rimsulfuron_30  |  15.50| 14.484|  2.376| 16.860|  -1.360|
-|Unweeded        |  24.62| 14.484| 12.289| 26.773|  -2.153|
-|Unweeded        |  30.94| 14.484| 12.289| 26.773|   4.167|
+|Unweeded        |  24.62| 14.484| 12.289| 26.773|  -2.152|
+|Unweeded        |  30.94| 14.484| 12.289| 26.773|   4.168|
 |Unweeded        |  24.02| 14.484| 12.289| 26.773|  -2.753|
-|Unweeded        |  27.51| 14.484| 12.289| 26.773|   0.737|
+|Unweeded        |  27.51| 14.484| 12.289| 26.773|   0.738|
 
 ### Stima di $\sigma$
 
@@ -3072,52 +3072,13 @@ plot(mod, which = 2)
 <p class="caption">(\#fig:figName112)Analisi grafica dei residui per il dataset 'insects.csv', previa trasformazione logaritmica</p>
 </div>
 
-Vediamo che i dati trasformati non mostrano più alcun sintomo di eteroscedasticità e, di conseguenza, l'ANOVA su questa metrica è totalmente affidabile. Ovviamente, avendo lavorato con il logaritmo dei dati, commentare i risultati potrebbe essere più complicato, in quanto dovremmo calcolare le medie marginali attese su scala logaritmica, come indicato nel codice sottostante.
+Vediamo che i dati trasformati non mostrano più alcun sintomo di eteroscedasticità e, di conseguenza, il P-level calcolato su questa metrica è totalmente affidabile.
 
+## Altri approcci avanzati
 
-```r
-library(emmeans)
-medie <- emmeans(mod, ~Insecticide)
-medie
-##  Insecticide emmean    SE df lower.CL upper.CL
-##  T1            6.34 0.178 12     5.96     6.73
-##  T2            5.81 0.178 12     5.43     6.20
-##  T3            3.95 0.178 12     3.56     4.34
-## 
-## Results are given on the log (not the response) scale. 
-## Confidence level used: 0.95
-```
+L'uso di trasformazioni stabilizzanti è stato molto di moda fino agli anni '80 del '900, quando la potenza di calcolo era estremamente bassa e rendeva possibile solo l'impiego di procedure semplici, come quelle indicate in questo libro. Oggigiorno, la diffusione di computer potenti a costo relativamente basso ha permesso la diffusione di modelli in grado di gestire anche errori non-normali e dati eteroscedastici. Questi modelli appartengono alle classi dei cosiddetti Modelli Lineari Generalizzati (GLM) o dei modelli con fitting basato sui Minimi Quadrati Generalizzati (GLS); sono molto flessibili, ma sono anche abbastanza complessi e non possono essere trattati su un testo introduttivo.
 
-È evidente che presentare le medie su scala logaritmica potrebbe non essere di immediata o facile lettura. Per questo, potremmo pensare di retro-trasformare le medie, utilizzando la trasformazione inversa di quella logaritmica, cioè l'antilogaritmo. Ad esempio, per la prima media:
-
-
-$$e^{6.34} = 566.7963$$
-
-In questo modo la nostra unità di misura ridiventa quella originale, anche se il valore ottenuto non coincide con la media dei dati originali; in effetti la trasformazione è non lineare e la media dei logaritmi non può coincidere con il logaritmo della media. Possiamo osservare che la media del trattamento A, sulla scala originale, è:
-
-
-```r
-mean(dataset[dataset$Insecticide == "A","Count"])
-## [1] NaN
-```
-
-e risulta più alta della media retro-trasformata. In realtà, se è vero che i logaritmi sono normalmente distribuiti, la media dei logaritmi (6.34) dovrebbe essere uguale alla mediana (ricordiamo che in una distribuzione normale media e mediana coincidono). La mediana è il valore centrale; dato che la retro-trasformazione è monotona, il valore centrale resta centrale, anche se io retro-trasformo. Quindi la media retro-trasformata è uno stimatore della mediana della popolazione originale, non della sua media. Questo non è uno svantaggio: infatti il QQ-plot suggerisce un'asimmetria positiva (confronta la Figura \@ref(fig:figName111) con la Figura \@ref(fig:figName106) ) cosa che è confermata dal fatto che la mediana è minore della media. Se la distribuzione dei dati è asimmetrica, la mediana è un indicatore di tendenza centrale migliore della media, perché meno sensibile ai valori estremi, che sono più frequenti in caso di asimmetria.
-
-Il problema è che, se vogliamo utilizzare la media retro-trasformata, dobbiamo trovare un valore di errore standard per questo stima, con il quale esprimere la sua incertezza. In realtà, anche l'errore standard può essere retro-trasformato, con una tecnica detta metodo 'delta', che costituisce un estensione della legge di propagazione degli errori per le trasformazioni non-lineari. È inutile andare nel dettaglio; diciamo solo che la funzione `emmeans()` rende semplicissima l'implementazione del metodo delta, con il comando seguente:
-
-
-```r
-retroMedie <- emmeans(mod, ~Insecticide, regrid = "response")
-retroMedie
-##  Insecticide response     SE df lower.CL upper.CL
-##  T1             568.6 101.01 12    348.5      789
-##  T2             335.1  59.54 12    205.4      465
-##  T3              51.9   9.22 12     31.8       72
-## 
-## Confidence level used: 0.95
-```
-
-Con questo abbiamo tutto quello che ci serve: stime ed errori standard, che, ovviamente, sono diversi per le diverse medie retro-trasformate, coerentemente con la mancanza di omoscedasticità.
+Inoltre, per completezza di informazione, mensioneremo il fatto che esistono anche metodi di analisi dei dati che non fanno assunzioni parametriche o che ne fanno molto poche e sono, pertanto, noti come metodi non-parametrici. Non parleremo neanche di questi, rinviando chi fosse interessato alla lettura di testi specifici. 
 
 ---
 
@@ -3128,7 +3089,11 @@ Con questo abbiamo tutto quello che ci serve: stime ed errori standard, che, ovv
 2. Anscombe, F. J. and J. W. Tukey. 1963, The examination and analysis of residuals. Technometrics 5: 141-160.
 3. Box, G. E. P. and D. R. Cox. 1964, An analysis of transformations. Journal of the Royal Statistical Society, B-26, 211-243, discussion 244-252.
 4. D’Elia, A. 2001, Un metodo grafico per la trasformazione di Box-Cox: aspetti esplorativi ed inferenziali. STATISTICA LXI: 630-648.
-5. Saskia, R. M. 1992, The Box-Cox transformation technique: a review. Statistician 41: 169-178.
+5. Pinheiro, J.C., Bates, D.M., 2000. Mixed-Effects Models in S and S-Plus, Springer-Verlag Inc. ed. Springer-Verlag Inc., New York.
+6. Saskia, R. M. 1992, The Box-Cox transformation technique: a review. Statistician 41: 169-178.
+7. Siegel, S e Castellan N.J. (1992) Statistica non-parametrica. McGraw-Hill, Milano.
+
+
 6. Weisberg, S., 2005. Applied linear regression, 3rd ed. John Wiley & Sons Inc. (per il metodo 'delta')
 
 
@@ -3141,7 +3106,7 @@ La scomposizione della varianza (ANOVA fisheriana) rappresenta frequentemente il
 
 Questa parte del lavoro viene usualmente eseguita utilizzando i **contrasti lineari**, che introdurremo utilizzando lo stesso dataset che abbiamo già iniziato ad analizzare nei due capitoli precedenti ('mixture.csv').
 
-## Esempio
+## Esempio 1
 
 Torniamo al nostro esperimento in cui abbiamo confrontato due erbicidi e la loro miscela con il testimone non trattato, in un disegno sperimentale completamente randomizzato con quattro repliche. Ricarichiamo il dataset ed eseguiamo l'ANOVA, come abbiamo visto nel Capitolo 7. Ricordiamo anche che, nel Capitolo 8, l'analisi grafica dei residui ha confermato che, per questo dataset, non vi sono problemi con le assunzioni di base per i modelli lineari.
 
@@ -3231,7 +3196,7 @@ Se l'ipotesi nulla è vera, che probabilità abbiamo di osservare T = -7.244? Ab
 
 ```r
 Tval <- -16.385 / 2.261866
-2 * pt(Tval, 12, lower.tail = T)
+2 * pt(abs(Tval), 12, lower.tail = F)
 ## [1] 1.023001e-05
 ```
 
@@ -3496,7 +3461,7 @@ contrast(medie, method="pairwise")
 
 Possiamo notare che i P-levels sono leggermente più bassi di quelli ottenuti con Bonferroni, che conferma quindi di essere una procedura molto conservativa, mentre l'impiego del t multivariato consente di rispettare esattamente il tasso di errore 'per esperimento'.
 
-Ovviamente la correzione per la molteplicità ed il conseguente innalzamento del P-level sono fortemente dipendenti dal numero di contrasti effttuati; se utilizziamo un set di confronti tipo 'dunnett' invece che tipo 'pairwise', avremo meno confronti e quindi una correzione più 'leggera'.
+Ovviamente la correzione per la molteplicità ed il conseguente innalzamento del P-level sono fortemente dipendenti dal numero di contrasti effettuati; se utilizziamo un set di confronti tipo 'dunnett' invece che tipo 'pairwise', avremo meno confronti e quindi una correzione più 'leggera'.
 
 
 ```r
@@ -3510,7 +3475,115 @@ contrast(medie, method="dunnett")
 ## P value adjustment: dunnettx method for 3 tests
 ```
 
+## Esempio 2: confronti multipli con dati trasformati
 
+Un altro aspetto di cui tener conto è relativo al fatto che, nel caso in cui si fosse reso necessario qualche tipo di trasformazione stabilizzante, il test di confronto multiplo deve opportunamente adeguato. Per capire questo aspetto, possiamo riprendere in mano il dataset 'insects.csv' già esplorato nel capitolo precedente e relativo alle quindici piante trattate con tre insetticidi (cinque piante per insetticida), su ciascuna delle quali, alcune settimane dopo il trattamento, sono stati contati gli insetti presenti e vitali. Ricarichiamo il dataset e, tenendo conto dell'esigenza emerse nel capitolo precedente, analizziamo i dati previa trasformazione logaritmica. Quest'ultima viene eseguita direttamente nel corso del 'model fitting' e non nel dataset, per un motivo che sarà chiaro in seguito.
+
+
+```r
+fileName <- "https://www.casaonofri.it/_datasets/insects.csv"
+dataset <- read.csv(fileName, header = T)
+dataset$Insecticide <- factor(dataset$Insecticide)
+mod <- lm(log(Count) ~ Insecticide, data = dataset)
+```
+
+A questo punto, possiamo calcolare le medie marginali attese, che, tuttavia, sono su scala logaritmica, come indicato nel codice sottostante.
+
+
+```r
+medie <- emmeans(mod, ~Insecticide)
+medie
+##  Insecticide emmean    SE df lower.CL upper.CL
+##  T1            6.34 0.178 12     5.96     6.73
+##  T2            5.81 0.178 12     5.43     6.20
+##  T3            3.95 0.178 12     3.56     4.34
+## 
+## Results are given on the log (not the response) scale. 
+## Confidence level used: 0.95
+```
+
+Presentare le medie su scala logaritmica, in molti casi, potrebbe non essere di immediata o facile lettura. Per questo, potremmo pensare di retro-trasformare le medie, utilizzando la trasformazione inversa di quella logaritmica, cioè l'antilogaritmo. Ad esempio, per la prima media:
+
+$$e^{6.34} = 566.7963$$
+
+In questo modo la nostra unità di misura ridiventa quella originale, anche se il valore ottenuto non coincide con la media dei dati originali; in effetti la trasformazione è non lineare e la media dei logaritmi non può coincidere con il logaritmo della media. Possiamo osservare che la media del trattamento A, sulla scala originale, è:
+
+
+```r
+mean(dataset[dataset$Insecticide == "T1","Count"])
+## [1] 589.8
+```
+
+e risulta più alta della media retro-trasformata. In realtà, se è vero che i logaritmi sono normalmente distribuiti, la media dei logaritmi (6.34) dovrebbe essere uguale alla mediana (ricordiamo che in una distribuzione normale media e mediana coincidono). La mediana è il valore centrale; dato che la retro-trasformazione è monotona, il valore centrale resta centrale, anche se io retro-trasformo. Quindi la media retro-trasformata è uno stimatore della mediana della popolazione originale, non della sua media. Questo non è uno svantaggio: infatti il QQ-plot suggerisce un'asimmetria positiva (vedi capitolo precedente) cosa che è confermata dal fatto che la mediana è minore della media. Se la distribuzione dei dati è asimmetrica, la mediana è un indicatore di tendenza centrale migliore della media, perché meno sensibile ai valori estremi, che sono più frequenti in caso di asimmetria.
+
+Il problema è che, se vogliamo utilizzare la media retro-trasformata, dobbiamo trovare un valore di errore standard per questo stima, con il quale esprimere la sua incertezza. In realtà, anche l'errore standard può essere retro-trasformato, con una tecnica detta metodo 'delta', che costituisce un estensione della legge di propagazione degli errori per le trasformazioni non-lineari. È inutile andare nel dettaglio; diciamo solo che la funzione `emmeans()` rende semplicissima l'implementazione del metodo delta, con il comando seguente:
+
+
+```r
+retroMedie <- emmeans(mod, ~Insecticide, type = "response")
+retroMedie
+##  Insecticide response     SE df lower.CL upper.CL
+##  T1             568.6 101.01 12    386.1    837.3
+##  T2             335.1  59.54 12    227.6    493.5
+##  T3              51.9   9.22 12     35.2     76.4
+## 
+## Confidence level used: 0.95 
+## Intervals are back-transformed from the log scale
+```
+
+Con questo abbiamo tutto quello che ci serve: stime ed errori standard, che, ovviamente, sono diversi per le diverse medie retro-trasformate, coerentemente con la mancanza di omoscedasticità. Il test di confronto multiplo è, pertanto:
+
+
+```r
+library(multcomp)
+cld(retroMedie, Letters = LETTERS)
+##  Insecticide response     SE df lower.CL upper.CL .group
+##  T3              51.9   9.22 12     35.2     76.4  A    
+##  T2             335.1  59.54 12    227.6    493.5   B   
+##  T1             568.6 101.01 12    386.1    837.3   B   
+## 
+## Confidence level used: 0.95 
+## Intervals are back-transformed from the log scale 
+## P value adjustment: tukey method for comparing a family of 3 estimates 
+## Tests are performed on the log scale 
+## significance level used: alpha = 0.05 
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.
+```
+
+La retrotrasformazione è immediata in quanto la funzione `emmeans()` è stata in grado di riconoscere la trasformazione stabilizzante applicata all'interno del 'model fitting'. La situazione è più complessa se la trasformazione è applicata prima del 'model fitting' oppure se non viene automaticamente riconosciuta. Ad esempio, una trasformazione inversa non viene automaticamente riconosciuta e, di conseguenza, la retrotrasformazione non è effettuata.
+
+
+```r
+mod2 <- lm(1/Count ~ Insecticide, data = dataset)
+emmeans(mod2, ~Insecticide, type = "response")
+##  Insecticide  emmean      SE df lower.CL upper.CL
+##  T1          0.00182 0.00279 12 -0.00426  0.00789
+##  T2          0.00317 0.00279 12 -0.00291  0.00924
+##  T3          0.02120 0.00279 12  0.01513  0.02727
+## 
+## Confidence level used: 0.95
+```
+
+In questo caso la trasformazione viene eseguita prima del 'model fitting', per poi cambiare la griglia di riferimento per il modello (`update(ref_grid(mod2), ....)`) specificando la trasformazione effettuata (`tran = "inverse"`). La griglia così modificata viene passata al posto del modello alla funzione `emmeans()`, come indicato di seguito.
+
+
+```r
+dataset$InvCount <- 1/dataset$Count
+mod3 <- lm(InvCount ~ Insecticide, data = dataset)
+updGrid <- update(ref_grid(mod3), tran = "inverse")
+emmeans(updGrid, ~Insecticide, type = "response")
+##  Insecticide response    SE df lower.CL upper.CL
+##  T1             550.9 845.9 12    126.8      Inf
+##  T2             315.8 278.0 12    108.2      Inf
+##  T3              47.2   6.2 12     36.7       66
+## 
+## Confidence level used: 0.95 
+## Intervals are back-transformed from the inverse scale
+```
+
+Questo metodo si può utilizzare con numerose funzioni, come, ad esempio "identity", "1/mu^2", "inverse", "reciprocal", "log10", "log2", "asin.sqrt" e "asinh.sqrt".
 
 ## E le classiche procedure di confronto multiplo?
 
@@ -3590,7 +3663,7 @@ rimsulfuron$Block <- factor(rimsulfuron$Block)
 
 ```
 ##                                                 1       2       3       4  Medie
-## Alachlor + terbuthylazine                  12.060  49.580  41.340  16.370 29.837
+## Alachlor + terbuthylazine                  12.060  49.580  41.340  16.370 29.838
 ## Hand-Weeded                                77.580  92.080  86.590  99.630 88.970
 ## Metolachlor + terbuthylazine (pre)         51.770  52.100  49.460  34.670 47.000
 ## Pendimethalin (post) + rimsuulfuron (post) 94.820  87.720 102.050 101.940 96.632
@@ -5620,7 +5693,7 @@ summary(modComp)
 ## Residual standard error: 1.866 on 41 degrees of freedom
 ## 
 ## Number of iterations to convergence: 3 
-## Achieved convergence tolerance: 9.817e-06
+## Achieved convergence tolerance: 9.819e-06
 ```
 
 Vediamo che, in questo caso, la produzione nel testimone non infestato non è più fissata al valor medio osservato, ma è stimata utilizzando tutti i dati sperimentali ed è, pertanto, più precisa.
@@ -5640,7 +5713,7 @@ Pur essendo entrambi gli approcci corretti, il secondo è certamente più elegan
 
 # Esercizi
 
-Questo libro non è finalizzato alla costruzione di una solida formazione teorica in biometria, ma è finalizzato a fornisre gli strumenti necessari per organizzare esperimenti validi ed analizzarne i dati in modo attendibile.
+Questo libro non è finalizzato alla costruzione di una solida formazione teorica in biometria, ma è finalizzato a fornire gli strumenti necessari per organizzare esperimenti validi ed analizzarne i dati in modo attendibile.
 Per questo motivo, vi proponiamo una lista di esercizi e di casi-studio, coi quali mettere in pratica e verificare la chiarezza dei concetti proposti. Gli esercizi sono orgnizzati in sezioni ed ognuna di esse corrisponde ad uno o più capitoli del libro; per alcuni di essi è necessario caricare dei *datasets*, che si trovano su *repository* esterne, che verranno via via indicate.
 
 ## Il disegno degli esperimenti (Cap. 1 e 2)
@@ -5921,13 +5994,13 @@ Utilizzando una simulazione Monte Carlo opportunamente pianificata, mostrare che
 
 ### Esercizio 1
 
-La nostra miglior stima puntuale del parametro di un modello statistico è $\gamma = -7.2$, con un errore standard pari a 2.8, con 16 gradi di libertà. E'possibile che, in realtà, sia $\gamma = 0$? Qual è il P-level per l'ipotesi nulla? Devo accettarla o posso rifiutarla?
+La nostra miglior stima puntuale del parametro $\gamma$ di un modello statistico è $g = -7.2$, con un errore standard pari a 2.8, con 16 gradi di libertà. E'possibile che, in realtà, sia $\gamma = 0$? Qual è il P-level per l'ipotesi nulla? Devo accettarla o posso rifiutarla?
 
 
 
 ### Esercizio 2
 
-La nostra miglior stima puntuale del parametro di un modello statistico è $\delta = 13.5$, con un errore standard pari a 8.4, ma non è disponibile, per questo errore standard, una stima accurata dei gradi di libertà. E'possibile che, in realtà, sia $\delta = 0$? Qual è il P-level per l'ipotesi nulla? Devo accettarla o posso rifiutarla?
+La nostra miglior stima puntuale del parametro $\delta$ di un modello statistico è $d = 13.5$, con un errore standard pari a 8.4, ma non è disponibile, per questo errore standard, una stima accurata dei gradi di libertà. E'possibile che, in realtà, sia $\delta = 0$? Qual è il P-level per l'ipotesi nulla? Devo accettarla o posso rifiutarla?
 
 
 
@@ -5961,7 +6034,7 @@ E'significativo l'effetto del trattamento fungicida sulla produzione, per un liv
 
 ### Esercizio 5
 
-Con un esperimento in laboratorio, abbiamo stimato che il tasso di degradazione di una sostanza xenobiotica in acqua è $\kappa_1 = -0.071 \pm 0.012$ (7 gradi di libertà). Per una sostanza affine il tasso di degradazione è pari a $\kappa_2 = -0.153 \pm 0.024$ (anocora 7 gradi di lbertà); possiamo concludere che il tasso di degradazione delle due sostanze, in realtà, non è significativamente diverso?
+Con un esperimento in laboratorio, abbiamo stimato che il tasso di degradazione di una sostanza xenobiotica in acqua è $k_1 = -0.071 \pm 0.012$ (7 gradi di libertà). Per una sostanza affine il tasso di degradazione è pari a $k_2 = -0.153 \pm 0.024$ (7 gradi di lbertà); possiamo concludere che il tasso di degradazione delle due sostanze, in realtà, non è significativamente diverso?
 
 
 
@@ -6064,13 +6137,9 @@ Verificare se la macchina sia ancora ben tarata, oppure necessiti di revisione.
 
 ### Esercizio 12
 
-Le varianze di due campioni composti da 30 unità sono risultate pari, rispettivamente a 115.3 e 356.4; stabilire se il secondo campione ha una varianza significativamente più alta del primo. SUGGERIMENTO: considerare che il rapporto tra due varianze di campioni estratti dalla stessa popolazione gaussiana segue la distribuzione F di Fisher. Considerare anche che, in R, la funzione 'pf(x, n1, n2)' restituisce la probabilità di ottenere valori pari o superiori ad x, da una distribuzione F di Fisher con n1 ed n2 gradi di libertà. Considerare anche che il rapporto di due varianze può solo essere positivo.
+Le varianze di due campioni composti da 30 unità sono risultate pari, rispettivamente a 115.3 e 356.4; stabilire se il secondo campione ha una varianza significativamente più alta del primo. SUGGERIMENTO: considerare che il rapporto tra due varianze di campioni estratti dalla stessa popolazione gaussiana segue la distribuzione F di Fisher. Considerare anche che, in R, la funzione `pf(x, n1, n2, lower.tail = F)` restituisce la probabilità di ottenere valori pari o superiori ad $x$, da una distribuzione $F$ di Fisher con $n1$ ed $n2$ gradi di libertà. Considerare anche che il rapporto di due varianze può solo essere positivo.
 
 
-```r
-pf(356.4/115.3, 29, 29, lower.tail = F)
-## [1] 0.001648857
-```
 
 
 
@@ -6131,7 +6200,7 @@ Un botanico ha valutato il numero di semi germinati per colza sottoposto a due d
 Nelle sezioni seguenti riporteremo diversi datasets ottenuti da esperimenti nelle scienze agraria e che si prestano per il fitting di modelli statistici descrittivi di vario tipo. La stima dei parametri di questi modelli e il test d'ipotesi permettono di rispondere a semplici domande sui processi biologici coinvolti. Indipendentemente dal dataset, il processo di lavoro dovrà essere il seguente.
 
 1. Caricare i dati ed eseguire le eventuali trasformazioni che si rendano necessarie (ad es. le trasformazioni delle variabili numeriche in 'factors' oppure le trasformazioni stabilizzanti).
-2. Descrive i dati, calcolando almeno un indicatore di tendenza centrale (media) e un indicatore di variabilità (deviazione standard) come indicato nel Capitolo 3.
+2. Descrivere i dati, calcolando almeno un indicatore di tendenza centrale (media) e un indicatore di variabilità (deviazione standard) come indicato nel Capitolo 3.
 3. Specificare il modello descrittivo più opportuno a stimarne i parametri con R.
 4. Controllare il fitting per il rispetto delle assunzioni di base. Se necessario, trasformare i dati e ripetere il fitting
 5. Testare la significanza di tutti gli effetti inclusi nel modello, attraverso l'ANOVA.
@@ -6143,7 +6212,7 @@ I dataset degli esempi che seguono sono riportati in un file Excel, che potete s
 Per facilitarvi la vita, alleghiamo una tabella che riassume i modelli descritti in questo libro ed utilizzabili per gli esercizi che seguono.
 
 
-Table: (\#tab:unnamed-chunk-213)Sommario dei principali modelli per descrivere i principali esperimenti nelle scienze agrarie
+Table: (\#tab:unnamed-chunk-217)Sommario dei principali modelli per descrivere i principali esperimenti nelle scienze agrarie
 
 |Modello                      |Disegno.sperimentale                  |Funzione.R  |Specifiche                                    |
 |:----------------------------|:-------------------------------------|:-----------|:---------------------------------------------|
