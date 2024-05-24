@@ -1,0 +1,160 @@
+---
+title: "Plotting weather data with ggplot()"
+author: "Andrea Onofri"
+date: 2024-05-24
+slug: 'ggplot'
+categories:
+  - R
+  - 'ggplot'
+tags:
+  - R
+  - 'ggplot'
+  - 'plot'
+  - 'climate_data'
+archives:
+  - 2024
+---
+
+```{r setup, cache = F, echo = F}
+knitr::opts_chunk$set(echo = TRUE)
+#Put at the beginning
+knitr::knit_hooks$set(document = function(x){ 
+  gsub("```\n*```r*\n*", "", x) 
+})
+```
+
+Very often, we agronomists have to deal with weather data, e.g., to evaluate and explain the behaviour of genotypes in different environments. We are very much used to representing temperature and rainfall data in one single graph with two y-axis, which gives a good immediate insight on the weather pattern at a certain location. Unfortunately, I had to discover that doing such graphs with `ggplot()` is not a straightforward task.
+
+Indeed, while searching for possible solutions, I came to discover that graphs with dual-scaled axes are not regarded as a good tool for visualisation; Hadley Wikham, the author of 'ggplot2' and several other important R packages, gave some good reasons (e.g., at this link: [https://stackoverflow.com/questions/3099219/ggplot-with-2-y-axes-on-each-side-and-different-scales](https://stackoverflow.com/questions/3099219/ggplot-with-2-y-axes-on-each-side-and-different-scales)); I do not intend to question those general reasons, but, nonetheless, the idea that I am not able to do with `ggplot()` what I could do with Excel gets on my nerves. After all, those graphs may be rather useful in some specific circumstances, such as with weather data.
+
+Therefore, I started my search for a reasonable solution and I finally found my way, which I would like to share in this post. Let's consider the dataset 'DailyMeteoData.csv' reporting the daily average temperature and rainfall level in two years, in a location of my region (Umbria, central Italy). Let's open the dataset and use 'dplyr' to make a few useful transformations, such as:
+
+1. transforming the date character into a date object;
+2. adding fields for Year, Month and the Day Of the Year (DOY);
+
+
+```{r message=FALSE, warning=FALSE}
+library(dplyr)
+fileName <- "https://www.casaonofri.it/_datasets/DailyMeteoData.csv"
+dataMeteo <- read.csv(fileName) |>
+  mutate(Date = as.Date(Date, format = "%d/%m/%Y"),
+         Year = as.numeric(as.character(Date, format="%Y")),
+         Month = as.numeric(as.character(Date, format="%m")),
+         DOY = as.numeric(as.character(Date, format="%j")))
+head(dataMeteo)
+```
+
+Temperature is a continuous variable and it is easily represented by using a line graph, while rainfall consists of discrete events, which needs to be accumulated, e.g., over months or decades. Thus, we use 'dplyr' once more to get a new rainfall dataset, with the accumulated monthly rainfall, that is more useful to our purposes; for the sake of simplicity, we assume that the year is divided into 12 months of the same length (i.e. 30.4 days, roughly) and we create the DOY for the central day of each month, to be used as the center for the respective plot bar. 
+
+```{r message=FALSE, warning=FALSE}
+dataMeteo2 <- dataMeteo |>
+  group_by(Year, Month) |>
+  summarise(Rain = sum(Rain)) |>
+  mutate(DOY = seq(15, 365, by = 365/12))
+head(dataMeteo2)
+```
+
+Now we produce our first graph with both rainfall and temperature level; in the box below I have played a little bit with the x-axes ticks and labels and I have left the y-axis label empty, for the moment.
+
+```{r}
+library(ggplot2)
+ggplot() +
+  geom_bar(dataMeteo2, mapping = aes(x = DOY, y = Rain), fill = "grey",
+           stat = "identity", width = 28) +
+  geom_line(dataMeteo, mapping = aes(x = DOY, y = Tavg), col = "blue") +
+  scale_x_continuous(breaks = c(365/12, 365/12*4, 365/12*8, 365) - 15, 
+                     labels = c("Jan", "Apr", "Aug", "Dec"),
+                     name = "") +
+  scale_y_continuous(name = "") +
+  facet_wrap(~Year) +
+  theme_bw()
+```
+
+This graph does not work: the temperature line is hardly visible, as its measurement unit is rather small compared to the rainfall unit; therefore, we need some sort of 'scaling' for the temperature variable, so that it ranges approximately between 150 and 250, in such a way that the blue line is clearly visible and does not get in the way of the rainfall bars. The minimum and maximum temperature values are equal, respectively, to -4.2°C and 28.9°C; we would like to match these original values with the new transformed values of 150 and 250, as shown in the Figure below.
+
+```{r echo=FALSE}
+# min(dataMeteo$Tavg)
+# max(dataMeteo$Tavg)
+# (250-150)/(28.9 + 4.2) # Slope
+# 250 - 3.021148*28.9 # Intercept
+dfr <- data.frame(x = c(-4.2, 28.9),
+                  y = c(150, 250))
+
+plot(y ~ x, data = dfr, xlim = c(-10, 40), ylim = c(100, 300),
+     xlab = "Temperature", ylab = "Transformed temperature")
+abline(162.69, 3.021148)
+segments(-4.2, 100, -4.2, 150, col = "red")
+arrows(-4.2, 150, -10, 150, col = "red")
+segments(28.9, 100, 28.9, 250, col = "red")
+arrows(28.9, 250, -10, 250, col = "red")
+```
+
+The previous figure tells us that we could transform the original temperature scale by using the equation of the straight line passing through the two points (-4.2, 150) and (28.9, 250). Thanks to some reminiscences from geometry courses, we can calculate the slope of such a straight line as:
+
+$$m = \frac{250 - 150}{28.9 + 4.2} = 3.02$$
+
+while the intercept is:
+
+$$q = 250 - 3.02 \times 28.9 = 162.69$$
+
+Thus, the scaling equation is:
+
+$$Y_N = 162.69 + 3.02 \,\, Y_O$$
+
+where $Y_N$ is the new temperature scale, while $Y_O$ is the original one. The reverse transformation is:
+
+$$Y_O = \frac{Y_N - 162.69}{3.02}$$
+
+Now, we are ready to plot the graph. We transform the temperature to its new unit and plot it:
+
+```{r}
+dataMeteo <- dataMeteo %>% 
+  mutate(newTavg = 162.69 + 3.02 * Tavg)
+
+ggplot() +
+  geom_bar(dataMeteo2, mapping = aes(x = DOY, y = Rain), fill = "grey",
+           stat = "identity", width = 28) +
+  geom_line(dataMeteo, mapping = aes(x = DOY, y = newTavg), col = "blue") +
+  scale_x_continuous(breaks = c(365/12, 365/12*4, 365/12*8, 365) - 15, 
+                     labels = c("Jan", "Apr", "Aug", "Dec"),
+                     name = "") +
+  scale_y_continuous(name = "") +
+  facet_wrap(~Year) +
+  theme_bw()
+```
+
+Now, we include the second axis, by using the `sec.axis` argument and the `sec_axis()` function, wherein we specify the back-transforming function the original scale:
+
+```{r}
+dataMeteo <- dataMeteo %>% 
+  mutate(newTavg = 162.69 + 3.02 * Tavg)
+
+ggplot() +
+  geom_bar(dataMeteo2, mapping = aes(x = DOY, y = Rain), fill = "grey",
+           stat = "identity", width = 28) +
+  geom_line(dataMeteo, mapping = aes(x = DOY, y = newTavg), col = "blue") +
+  scale_x_continuous(breaks = c(365/12, 365/12*4, 365/12*8, 365) - 15, 
+                     labels = c("Jan", "Apr", "Aug", "Dec"),
+                     name = "") +
+  scale_y_continuous(name = "Rain (mm)", 
+                     sec.axis = sec_axis(~ (. - 162.69)/3.02, 
+                                         name = "Daily Temperature (°C)",
+                                         breaks = c(-10, 0, 10, 20, 30))) +
+  facet_wrap(~Year) +
+  theme_bw()
+```
+
+And we are done! I am sure you have comments to improve this: please, drop me a not at the adress below.
+
+Thanks for reading and happy coding!
+
+
+
+Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences        
+University of Perugia (Italy)        
+[andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)  
+
+<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow @onofriandreapg</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+

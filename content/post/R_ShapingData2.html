@@ -32,7 +32,7 @@ library(dplyr)
 library(tidyr)
 students &lt;- read_csv(&quot;https://www.casaonofri.it/_datasets/students.csv&quot;)
 students
-## # A tibble: 232 x 6
+## # A tibble: 232 × 6
 ##       Id Subject  Date        Mark  Year HighSchool 
 ##    &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;      
 ##  1     1 AGRONOMY 10/06/2002    30  2001 HUMANITIES 
@@ -45,13 +45,13 @@ students
 ##  8     8 AGRONOMY 09/09/2002    26  2001 SCIENTIFIC 
 ##  9     9 AGRONOMY 09/09/2002    23  2001 ACCOUNTING 
 ## 10    10 AGRONOMY 08/07/2002    27  2001 HUMANITIES 
-## # … with 222 more rows</code></pre>
+## # ℹ 222 more rows</code></pre>
 <p>With respect to the usual <code>read.csv</code> function I saved some typing, as I did not need to specify the ‘header = T’ argument. Furthermore, printing the tibble only shows the first ten rows, which makes the ‘head()’ function no longer needed.</p>
 <p>Let’s go ahead and try to subset this tibble: we want to extract the good students, with marks higher than 28. In my previous post, I used the ‘subset()’ function. Now, I will use the ‘filter()’ function in the ‘dplyr’ package:</p>
 <pre class="r"><code># subData &lt;- subset(students, Mark &gt;= 28)
 subData &lt;- filter(students, Mark &gt;= 28)
 subData
-## # A tibble: 87 x 6
+## # A tibble: 87 × 6
 ##       Id Subject  Date        Mark  Year HighSchool  
 ##    &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;       
 ##  1     1 AGRONOMY 10/06/2002    30  2001 HUMANITIES  
@@ -64,7 +64,7 @@ subData
 ##  8    19 AGRONOMY 09/09/2002    30  2001 AGRICULTURE 
 ##  9    20 AGRONOMY 09/09/2002    30  2001 OTHER SCHOOL
 ## 10    22 AGRONOMY 23/01/2003    30  2001 ACCOUNTING  
-## # … with 77 more rows</code></pre>
+## # ℹ 77 more rows</code></pre>
 <p>I have noted that all other subsetting examples in my previous post can be solved by simply replacing ‘subset()’ with ‘filter()’, with no other changes. However, differences appear when I try to select the columns. Indeed, ‘dplyr’ has a specific function ‘select()’, which should be used for this purpose. Therefore, in the case that I want to select the students with marks ranging from 26 to 28 in Maths or Chemistry and, at the same time, I want to report only the three columns ‘Subject’, ‘Mark’ and ‘Date’, I need to split the process in two steps (filter and, then, select):</p>
 <pre class="r"><code># subData &lt;- subset(students, Mark &lt;= 28 &amp; Mark &gt;=26 &amp; 
 #                     Subject == &quot;MATHS&quot; | 
@@ -81,7 +81,7 @@ subData &lt;- select(subData1, c(Subject, Mark, HighSchool))</code></pre>
                     Subject == &quot;CHEMISTRY&quot;) %&gt;%
   select(c(Subject, Mark, HighSchool))
 subData
-## # A tibble: 50 x 3
+## # A tibble: 50 × 3
 ##    Subject    Mark HighSchool  
 ##    &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;       
 ##  1 CHEMISTRY    20 AGRICULTURE 
@@ -94,7 +94,7 @@ subData
 ##  8 CHEMISTRY    27 AGRICULTURE 
 ##  9 CHEMISTRY    27 SCIENTIFIC  
 ## 10 CHEMISTRY    23 ACCOUNTING  
-## # … with 40 more rows</code></pre>
+## # ℹ 40 more rows</code></pre>
 <p>In the end: there is not much difference between ‘subset()’ and ‘filter()’. However, I must admit I am seduced by the ‘pipe’ operator… my younger collegues may be right: it should be possible to chain several useful data management steps, producing highly readable code. But… how about debugging?</p>
 </div>
 <div id="sorting-the-data" class="section level1">
@@ -104,7 +104,7 @@ subData
 # head(sortedData)
 sortedData &lt;- arrange(students, desc(Mark), Subject)
 sortedData
-## # A tibble: 232 x 6
+## # A tibble: 232 × 6
 ##       Id Subject  Date        Mark  Year HighSchool  
 ##    &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;       
 ##  1     1 AGRONOMY 10/06/2002    30  2001 HUMANITIES  
@@ -117,12 +117,12 @@ sortedData
 ##  8    22 AGRONOMY 23/01/2003    30  2001 ACCOUNTING  
 ##  9    38 BIOLOGY  28/02/2002    30  2001 AGRICULTURE 
 ## 10    42 BIOLOGY  28/02/2002    30  2001 ACCOUNTING  
-## # … with 222 more rows
+## # ℹ 222 more rows
 # sortedData &lt;- students[order(-students$Mark, -xtfrm(students$Subject)), ]
 # head(sortedData)
 sortedData &lt;- arrange(students, desc(Mark), desc(Subject))
 sortedData
-## # A tibble: 232 x 6
+## # A tibble: 232 × 6
 ##       Id Subject Date        Mark  Year HighSchool  
 ##    &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;       
 ##  1   116 MATHS   01/07/2002    30  2001 OTHER SCHOOL
@@ -135,26 +135,23 @@ sortedData
 ##  8   134 MATHS   26/02/2002    30  2001 AGRICULTURE 
 ##  9   135 MATHS   11/02/2002    30  2001 AGRICULTURE 
 ## 10   143 MATHS   04/02/2002    30  2001 ACCOUNTING  
-## # … with 222 more rows</code></pre>
+## # ℹ 222 more rows</code></pre>
 <p>As for sorting, there is no competition! The ‘arrange()’ function, together with the ‘desc()’ function for descending order, represents a much clearer way to sort the data, with respect to the traditional ‘order()’ function.</p>
 </div>
 <div id="casting-the-data" class="section level1">
 <h1>Casting the data</h1>
 <p>When we have a dataset in the LONG format, we might be interested in reshaping it into the WIDE format. This is the same as what the ‘pivot table’ function in Excel does. For example, take the ‘rimsulfuron.csv’ dataset in my repository. This contains the results of a randomised block experiment, where we have 16 herbicides in four blocks. The dataset is in the LONG format, with one row per plot.</p>
 <pre class="r"><code>rimsulfuron &lt;- read_csv(&quot;https://www.casaonofri.it/_datasets/rimsulfuron.csv&quot;)
-## 
+## Rows: 64 Columns: 7
 ## ── Column specification ────────────────────────────────────────────────────────
-## cols(
-##   Herbicide = col_character(),
-##   Plot = col_double(),
-##   Code = col_double(),
-##   Block = col_double(),
-##   Box = col_double(),
-##   WeedCover = col_double(),
-##   Yield = col_double()
-## )
+## Delimiter: &quot;,&quot;
+## chr (1): Herbicide
+## dbl (6): Plot, Code, Block, Box, WeedCover, Yield
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 rimsulfuron
-## # A tibble: 64 x 7
+## # A tibble: 64 × 7
 ##    Herbicide                              Plot  Code Block   Box WeedCover Yield
 ##    &lt;chr&gt;                                 &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;
 ##  1 Rimsulfuron (40)                          1     1     1     1      27.8  85.9
@@ -167,7 +164,7 @@ rimsulfuron
 ##  8 Pendimethalin (pre) + rimsulfuron (p…     8     8     1     2      10.2  65.5
 ##  9 Pendimethalin (post) + rimsuulfuron …     9     9     1     1       5.4  94.8
 ## 10 Rimsulfuron + Atred                      10    10     1     1      40.3  94.1
-## # … with 54 more rows</code></pre>
+## # ℹ 54 more rows</code></pre>
 <p>Let’s put this data frame in the WIDE format, with one row per herbicide and one column per block. In my previous post, I used to the ‘cast()’ function in the ‘reshape’ package. Now I can use the ‘pivot_wider()’ function in the ‘tidyr’ package: the herbicide goes in the first column, the blocks (B1, B2, B3, B4) should go in the next four columns, and each unique level of yield should go in each cell, at the crossing of the correct herbicide row and block column. The ‘Height’ variable is not needed and it should be removed. Again, a two steps process, that is made easier by using the pipe:</p>
 <pre class="r"><code># library(reshape)
 # castData &lt;- cast(Herbicide ~ Block, data = rimsulfuron,
@@ -178,7 +175,7 @@ castData &lt;- rimsulfuron %&gt;%
   select(-Plot, - Code, -Box, - WeedCover) %&gt;%
   pivot_wider(names_from = Block, values_from = Yield)
 castData
-## # A tibble: 16 x 5
+## # A tibble: 16 × 5
 ##    Herbicide                                    `1`   `2`   `3`   `4`
 ##    &lt;chr&gt;                                      &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
 ##  1 Rimsulfuron (40)                            85.9  91.1 111.   93.2
@@ -213,7 +210,7 @@ castData
 # 
 pivot_longer(castData, names_to = &quot;Block&quot;, values_to = &quot;Yield&quot;,
              cols = c(2:5))
-## # A tibble: 64 x 3
+## # A tibble: 64 × 3
 ##    Herbicide        Block Yield
 ##    &lt;chr&gt;            &lt;chr&gt; &lt;dbl&gt;
 ##  1 Rimsulfuron (40) 1      85.9
@@ -226,7 +223,7 @@ pivot_longer(castData, names_to = &quot;Block&quot;, values_to = &quot;Yield&quo
 ##  8 Rimsulfuron (45) 4      79.0
 ##  9 Rimsulfuron (50) 1      86.9
 ## 10 Rimsulfuron (50) 2     106. 
-## # … with 54 more rows</code></pre>
+## # ℹ 54 more rows</code></pre>
 <p>As before with casting, neither ‘melt()’, nor ‘pivot_longer()’ let me completely satisfied.</p>
 </div>
 <div id="tidyverse-or-not-tidyverse" class="section level1">
@@ -269,7 +266,7 @@ students %&gt;%
   summarise(Mark = mean(Mark)) %&gt;%
   pivot_wider(names_from = Year, values_from = Mark) %&gt;%
   mutate(Mean = (`2001` + `2002`)/2)
-## # A tibble: 6 x 4
+## # A tibble: 6 × 4
 ## # Groups:   Subject [6]
 ##   Subject     `2001` `2002`  Mean
 ##   &lt;chr&gt;        &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;

@@ -2308,17 +2308,16 @@ Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.o
     </item>
     
     <item>
-      <title>Fitting &#39;complex&#39; mixed models with &#39;nlme&#39;: Example #4</title>
+      <title>Testing for interactions in nonlinear regression</title>
       <link>https://www.statforbiology.com/2019/stat_nlmm_interaction/</link>
       <pubDate>Fri, 13 Sep 2019 00:00:00 +0000</pubDate>
       
       <guid>https://www.statforbiology.com/2019/stat_nlmm_interaction/</guid>
       <description>
-&lt;script src=&#34;https://www.statforbiology.com/rmarkdown-libs/header-attrs/header-attrs.js&#34;&gt;&lt;/script&gt;
 
 
-&lt;div id=&#34;testing-for-interactions-in-nonlinear-regression&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;Testing for interactions in nonlinear regression&lt;/h1&gt;
+&lt;div id=&#34;fitting-complex-mixed-models-with-nlme-example-4&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Fitting ‘complex’ mixed models with ‘nlme’: Example #4&lt;/h1&gt;
 &lt;p&gt;Factorial experiments are very common in agriculture and they are usually laid down to test for the significance of interactions between experimental factors. For example, genotype assessments may be performed at two different nitrogen fertilisation levels (e.g. high and low) to understand whether the ranking of genotypes depends on nutrient availability. For those of you who are not very much into agriculture, I will only say that such an assessment is relevant, because we need to know whether we can recommend the same genotypes, e.g., both in conventional agriculture (high nitrogen availability) and in organic agriculture (relatively lower nitrogen availability).&lt;/p&gt;
 &lt;p&gt;Let’s consider an experiment where we have tested three genotypes (let’s call them A, B and C, for brevity), at two nitrogen rates (‘high’ an ‘low’) in a complete block factorial design, with four replicates. Biomass subsamples were taken from each of the 24 plots in eight different times (Days After Sowing: DAS), to evaluate the growth of biomass over time.&lt;/p&gt;
 &lt;p&gt;The dataset is available on gitHub and the following code loads it and transforms the ‘Block’ variable into a factor. For this post, we will use several packages, including ‘aomisc’, the accompanying package for this blog. Please refer to &lt;a href=&#34;https://www.statforbiology.com/rpackages/&#34;&gt;this page for downloading and installing&lt;/a&gt;.&lt;/p&gt;
@@ -2326,7 +2325,7 @@ Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.o
 library(lattice)
 library(nlme)
 library(aomisc)
-dataset &amp;lt;- read.csv(&amp;quot;https://raw.githubusercontent.com/OnofriAndreaPG/agroBioData/master/growthNGEN.csv&amp;quot;,
+dataset &amp;lt;- read.csv(&amp;quot;https://www.casaonofri.it/_datasets/growthNGEN.csv&amp;quot;,
   header=T)
 dataset$Block &amp;lt;- factor(dataset$Block)
 dataset$N &amp;lt;- factor(dataset$N)
@@ -2389,7 +2388,8 @@ e_{ijkl} = \mu_e + q_{ei} + N_{ej} + gN_{eij} + \theta_{ek} + \zeta_{el}
 &lt;/ol&gt;
 &lt;p&gt;The transformation of both sides of the equation is made explicitely.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(aomisc)
-modnlme1 &amp;lt;- nlme(sqrt(Yield) ~ sqrt(NLS.L3(DAS, b, d, e)), data = dataset,
+modnlme1 &amp;lt;- nlme(sqrt(Yield) ~ sqrt(NLS.L3(DAS, b, d, e)), 
+                 data = dataset,
                     random = d + e ~ 1|Block/Plot,
                     fixed = list(b ~ 1, d ~ N*GEN, e ~ N*GEN),
                     start = coef(modNaive1), 
@@ -2437,22 +2437,28 @@ VarCorr(modnlme1)
 ## e.(Intercept) 1.023108e-09                 3.198605e-05 0     
 ## Residual      1.750623e-01                 4.184044e-01&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Now, let’s go back to our initial aim: testing the significance of the ‘genotype x nitrogen’ interaction. Indeed, we have two available tests: on for the parameter &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; and one for the parameter &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt;. First of all, we code two ‘reduced’ models, where the genotype and nitrogen effects are purely addictive. To do so, we change the specification of the fixed effects from ’~ N*GEN’ to ‘~ N + GEN’. Also in this case, we use a ‘naive’ nonlinear regression fit to get starting values for model parameters, to be used in the following NLME model fitting.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;modNaive2 &amp;lt;- drm(Yield ~ DAS, fct = L.3(), data = dataset,
-            curveid = N:GEN,
-            pmodels = c( ~ 1,  ~ N + GEN,  ~ N * GEN), bcVal = 0.5)
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;modNaive2 &amp;lt;- drm(Yield ~ DAS, fct = L.3(), 
+                 data = dataset,
+                 curveid = N:GEN,
+                 pmodels = c( ~ 1,  ~ N + GEN,  ~ N * GEN), 
+                 bcVal = 0.5)
 
-modnlme2 &amp;lt;- nlme(sqrt(Yield) ~ sqrt(NLS.L3(DAS, b, d, e)), data = dataset,
-                    random = d + e ~ 1|Block/Plot,
-                    fixed = list(b ~ 1, d ~ N + GEN, e ~ N*GEN),
-                    start = coef(modNaive2), control = list(msMaxIter = 200))
+modnlme2 &amp;lt;- nlme(sqrt(Yield) ~ sqrt(NLS.L3(DAS, b, d, e)), 
+                 data = dataset,
+                 random = d + e ~ 1|Block/Plot,
+                 fixed = list(b ~ 1, d ~ N + GEN, e ~ N*GEN),
+                 start = coef(modNaive2), 
+                 control = list(msMaxIter = 200))
+
 modNaive3 &amp;lt;- drm(Yield ~ DAS, fct = L.3(), data = dataset,
             curveid = N:GEN,
             pmodels = c( ~ 1,  ~ N*GEN,  ~ N + GEN), bcVal = 0.5)
 
-modnlme3 &amp;lt;- nlme(sqrt(Yield) ~ sqrt(NLS.L3(DAS, b, d, e)), data = dataset,
-                    random = d + e ~ 1|Block/Plot,
-                    fixed = list(b ~ 1, d ~ N*GEN, e ~ N + GEN),
-                    start = coef(modNaive3), control = list(msMaxIter = 200))&lt;/code&gt;&lt;/pre&gt;
+modnlme3 &amp;lt;- nlme(sqrt(Yield) ~ sqrt(NLS.L3(DAS, b, d, e)),
+                 data = dataset,
+                 random = d + e ~ 1|Block/Plot,
+                 fixed = list(b ~ 1, d ~ N*GEN, e ~ N + GEN),
+                 start = coef(modNaive3), control = list(msMaxIter = 200))&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Let’s consider the first reduced model ‘modnlme2’. In this model, the ‘genotype x nitrogen’ interaction has been removed for the &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; parameter. We can compare this reduced model with the full model ‘modnlme1’, by using a Likelihood Ratio Test:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;anova(modnlme1, modnlme2)
 ##          Model df      AIC      BIC    logLik   Test L.Ratio p-value

@@ -5,10 +5,124 @@
     <description>Recent content in R on Fixing the bridge between biologists and statisticians</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2023, @AndreaOnofri</copyright>
-    <lastBuildDate>Fri, 15 Mar 2024 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 24 May 2024 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://www.statforbiology.com/tags/r/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Plotting weather data with ggplot()</title>
+      <link>https://www.statforbiology.com/2024/r_ggplot_dualscaledaxes/</link>
+      <pubDate>Fri, 24 May 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.statforbiology.com/2024/r_ggplot_dualscaledaxes/</guid>
+      <description>
+
+
+&lt;p&gt;Very often, we agronomists have to deal with weather data, e.g., to evaluate and explain the behaviour of genotypes in different environments. We are very much used to representing temperature and rainfall data in one single graph with two y-axis, which gives a good immediate insight on the weather pattern at a certain location. Unfortunately, I had to discover that doing such graphs with &lt;code&gt;ggplot()&lt;/code&gt; is not a straightforward task.&lt;/p&gt;
+&lt;p&gt;Indeed, while searching for possible solutions, I came to discover that graphs with dual-scaled axes are not regarded as a good tool for visualisation; Hadley Wikham, the author of ‘ggplot2’ and several other important R packages, gave some good reasons (e.g., at this link: &lt;a href=&#34;https://stackoverflow.com/questions/3099219/ggplot-with-2-y-axes-on-each-side-and-different-scales&#34;&gt;https://stackoverflow.com/questions/3099219/ggplot-with-2-y-axes-on-each-side-and-different-scales&lt;/a&gt;); I do not intend to question those general reasons, but, nonetheless, the idea that I am not able to do with &lt;code&gt;ggplot()&lt;/code&gt; what I could do with Excel gets on my nerves. After all, those graphs may be rather useful in some specific circumstances, such as with weather data.&lt;/p&gt;
+&lt;p&gt;Therefore, I started my search for a reasonable solution and I finally found my way, which I would like to share in this post. Let’s consider the dataset ‘DailyMeteoData.csv’ reporting the daily average temperature and rainfall level in two years, in a location of my region (Umbria, central Italy). Let’s open the dataset and use ‘dplyr’ to make a few useful transformations, such as:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;transforming the date character into a date object;&lt;/li&gt;
+&lt;li&gt;adding fields for Year, Month and the Day Of the Year (DOY);&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(dplyr)
+fileName &amp;lt;- &amp;quot;https://www.casaonofri.it/_datasets/DailyMeteoData.csv&amp;quot;
+dataMeteo &amp;lt;- read.csv(fileName) |&amp;gt;
+  mutate(Date = as.Date(Date, format = &amp;quot;%d/%m/%Y&amp;quot;),
+         Year = as.numeric(as.character(Date, format=&amp;quot;%Y&amp;quot;)),
+         Month = as.numeric(as.character(Date, format=&amp;quot;%m&amp;quot;)),
+         DOY = as.numeric(as.character(Date, format=&amp;quot;%j&amp;quot;)))
+head(dataMeteo)
+##         Date Tavg Rain Year Month DOY
+## 1 2011-01-01  5.9  0.0 2011     1   1
+## 2 2011-01-02  6.2  0.6 2011     1   2
+## 3 2011-01-03  4.5  0.0 2011     1   3
+## 4 2011-01-04 -0.3  0.0 2011     1   4
+## 5 2011-01-05  2.3  0.2 2011     1   5
+## 6 2011-01-06  6.9  0.0 2011     1   6&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Temperature is a continuous variable and it is easily represented by using a line graph, while rainfall consists of discrete events, which needs to be accumulated, e.g., over months or decades. Thus, we use ‘dplyr’ once more to get a new rainfall dataset, with the accumulated monthly rainfall, that is more useful to our purposes; for the sake of simplicity, we assume that the year is divided into 12 months of the same length (i.e. 30.4 days, roughly) and we create the DOY for the central day of each month, to be used as the center for the respective plot bar.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dataMeteo2 &amp;lt;- dataMeteo |&amp;gt;
+  group_by(Year, Month) |&amp;gt;
+  summarise(Rain = sum(Rain)) |&amp;gt;
+  mutate(DOY = seq(15, 365, by = 365/12))
+head(dataMeteo2)
+## # A tibble: 6 × 4
+## # Groups:   Year [1]
+##    Year Month  Rain   DOY
+##   &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt;
+## 1  2011     1  40.4  15  
+## 2  2011     2  32.8  45.4
+## 3  2011     3 113.   75.8
+## 4  2011     4  16.6 106. 
+## 5  2011     5  27.4 137. 
+## 6  2011     6  61.2 167.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now we produce our first graph with both rainfall and temperature level; in the box below I have played a little bit with the x-axes ticks and labels and I have left the y-axis label empty, for the moment.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(ggplot2)
+ggplot() +
+  geom_bar(dataMeteo2, mapping = aes(x = DOY, y = Rain), fill = &amp;quot;grey&amp;quot;,
+           stat = &amp;quot;identity&amp;quot;, width = 28) +
+  geom_line(dataMeteo, mapping = aes(x = DOY, y = Tavg), col = &amp;quot;blue&amp;quot;) +
+  scale_x_continuous(breaks = c(365/12, 365/12*4, 365/12*8, 365) - 15, 
+                     labels = c(&amp;quot;Jan&amp;quot;, &amp;quot;Apr&amp;quot;, &amp;quot;Aug&amp;quot;, &amp;quot;Dec&amp;quot;),
+                     name = &amp;quot;&amp;quot;) +
+  scale_y_continuous(name = &amp;quot;&amp;quot;) +
+  facet_wrap(~Year) +
+  theme_bw()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/R_ggplot_dualScaledAxes_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;This graph does not work: the temperature line is hardly visible, as its measurement unit is rather small compared to the rainfall unit; therefore, we need some sort of ‘scaling’ for the temperature variable, so that it ranges approximately between 150 and 250, in such a way that the blue line is clearly visible and does not get in the way of the rainfall bars. The minimum and maximum temperature values are equal, respectively, to -4.2°C and 28.9°C; we would like to match these original values with the new transformed values of 150 and 250, as shown in the Figure below.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/R_ggplot_dualScaledAxes_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;The previous figure tells us that we could transform the original temperature scale by using the equation of the straight line passing through the two points (-4.2, 150) and (28.9, 250). Thanks to some reminiscences from geometry courses, we can calculate the slope of such a straight line as:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[m = \frac{250 - 150}{28.9 + 4.2} = 3.02\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;while the intercept is:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[q = 250 - 3.02 \times 28.9 = 162.69\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Thus, the scaling equation is:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[Y_N = 162.69 + 3.02 \,\, Y_O\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(Y_N\)&lt;/span&gt; is the new temperature scale, while &lt;span class=&#34;math inline&#34;&gt;\(Y_O\)&lt;/span&gt; is the original one. The reverse transformation is:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[Y_O = \frac{Y_N - 162.69}{3.02}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Now, we are ready to plot the graph. We transform the temperature to its new unit and plot it:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dataMeteo &amp;lt;- dataMeteo %&amp;gt;% 
+  mutate(newTavg = 162.69 + 3.02 * Tavg)
+
+ggplot() +
+  geom_bar(dataMeteo2, mapping = aes(x = DOY, y = Rain), fill = &amp;quot;grey&amp;quot;,
+           stat = &amp;quot;identity&amp;quot;, width = 28) +
+  geom_line(dataMeteo, mapping = aes(x = DOY, y = newTavg), col = &amp;quot;blue&amp;quot;) +
+  scale_x_continuous(breaks = c(365/12, 365/12*4, 365/12*8, 365) - 15, 
+                     labels = c(&amp;quot;Jan&amp;quot;, &amp;quot;Apr&amp;quot;, &amp;quot;Aug&amp;quot;, &amp;quot;Dec&amp;quot;),
+                     name = &amp;quot;&amp;quot;) +
+  scale_y_continuous(name = &amp;quot;&amp;quot;) +
+  facet_wrap(~Year) +
+  theme_bw()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/R_ggplot_dualScaledAxes_files/figure-html/unnamed-chunk-5-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Now, we include the second axis, by using the &lt;code&gt;sec.axis&lt;/code&gt; argument and the &lt;code&gt;sec_axis()&lt;/code&gt; function, wherein we specify the back-transforming function the original scale:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dataMeteo &amp;lt;- dataMeteo %&amp;gt;% 
+  mutate(newTavg = 162.69 + 3.02 * Tavg)
+
+ggplot() +
+  geom_bar(dataMeteo2, mapping = aes(x = DOY, y = Rain), fill = &amp;quot;grey&amp;quot;,
+           stat = &amp;quot;identity&amp;quot;, width = 28) +
+  geom_line(dataMeteo, mapping = aes(x = DOY, y = newTavg), col = &amp;quot;blue&amp;quot;) +
+  scale_x_continuous(breaks = c(365/12, 365/12*4, 365/12*8, 365) - 15, 
+                     labels = c(&amp;quot;Jan&amp;quot;, &amp;quot;Apr&amp;quot;, &amp;quot;Aug&amp;quot;, &amp;quot;Dec&amp;quot;),
+                     name = &amp;quot;&amp;quot;) +
+  scale_y_continuous(name = &amp;quot;Rain (mm)&amp;quot;, 
+                     sec.axis = sec_axis(~ (. - 162.69)/3.02, 
+                                         name = &amp;quot;Daily Temperature (°C)&amp;quot;,
+                                         breaks = c(-10, 0, 10, 20, 30))) +
+  facet_wrap(~Year) +
+  theme_bw()&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/R_ggplot_dualScaledAxes_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;And we are done! I am sure you have comments to improve this: please, drop me a not at the adress below.&lt;/p&gt;
+&lt;p&gt;Thanks for reading and happy coding!&lt;/p&gt;
+&lt;p&gt;Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+&lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+</description>
+    </item>
     
     <item>
       <title>Here is why I don&#39;t care about the Levene&#39;s test</title>
@@ -8132,10 +8246,10 @@ summary(mod.aov)
     
     <item>
       <title>From &#39;&#39;for()&#39;&#39; loops to the &#39;&#39;split-apply-combine&#39;&#39; paradigm for column-wise tasks: the transition for a dinosaur</title>
-      <link>https://www.statforbiology.com/2020/stat_r_tidyverse_columnwise/</link>
+      <link>https://www.statforbiology.com/2020/r_tidyverse_columnwise/</link>
       <pubDate>Fri, 11 Dec 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://www.statforbiology.com/2020/stat_r_tidyverse_columnwise/</guid>
+      <guid>https://www.statforbiology.com/2020/r_tidyverse_columnwise/</guid>
       <description>
 
 
@@ -8144,7 +8258,7 @@ summary(mod.aov)
 &lt;div id=&#34;the-example&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;The example&lt;/h1&gt;
 &lt;p&gt;A few days ago, I met a colleague from the plant pathology group, who asked my co-operation for an experiment where he studied the content in 62 mycotoxins in wheat caryopses, as recorded in 70 samples coming from different Italian regions. The dataset was structured as 70 x 64 table, as shown in the scheme below: there is one row for each wheat sample, while the first column represents the sample id, the second column represents the region from where that sample was collected and the other columns represent the concentrations of the 62 toxins (one column per toxin).&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/_Figures/Stat_general_tidyverse.png&#34; width=&#34;75%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;../../../../../../../../../../../_Figures/Stat_general_tidyverse.png&#34; width=&#34;75%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;That colleague wanted me to calculate, for each toxin and for each region, the following stats:&lt;/p&gt;
 &lt;ol style=&#34;list-style-type: decimal&#34;&gt;
 &lt;li&gt;number of collected samples&lt;/li&gt;
@@ -8165,7 +8279,7 @@ summary(mod.aov)
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rm(list = ls())
 dataset &amp;lt;- read.csv(&amp;quot;https://casaonofri.it/_datasets/Mycotoxins.csv&amp;quot;, header = T)
 # str(dataset)
-# &amp;#39;data.frame&amp;#39;: 70 obs. of  64 variables:
+# &amp;#39;data.frame&amp;#39;:	70 obs. of  64 variables:
 #  $ Sample : int  1 2 3 4 5 6 7 8 9 10 ...
 #  $ Region : chr  &amp;quot;Lombardy&amp;quot; &amp;quot;Lombardy&amp;quot; &amp;quot;Lombardy&amp;quot; &amp;quot;Lombardy&amp;quot; ...
 #  $ DON    : num  8.62 16.2 18.19 27.08 10.97 ...
@@ -10822,10 +10936,10 @@ I-06121 - PERUGIA&lt;/p&gt;
     
     <item>
       <title>Some everyday data tasks: a few hints with R (revisited)</title>
-      <link>https://www.statforbiology.com/2020/stat_r_shapingdata2/</link>
+      <link>https://www.statforbiology.com/2020/r_shapingdata2/</link>
       <pubDate>Tue, 28 Jan 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://www.statforbiology.com/2020/stat_r_shapingdata2/</guid>
+      <guid>https://www.statforbiology.com/2020/r_shapingdata2/</guid>
       <description>
 
 
@@ -10846,7 +10960,7 @@ library(dplyr)
 library(tidyr)
 students &amp;lt;- read_csv(&amp;quot;https://www.casaonofri.it/_datasets/students.csv&amp;quot;)
 students
-## # A tibble: 232 x 6
+## # A tibble: 232 × 6
 ##       Id Subject  Date        Mark  Year HighSchool 
 ##    &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt;    &amp;lt;chr&amp;gt;      &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt;      
 ##  1     1 AGRONOMY 10/06/2002    30  2001 HUMANITIES 
@@ -10859,13 +10973,13 @@ students
 ##  8     8 AGRONOMY 09/09/2002    26  2001 SCIENTIFIC 
 ##  9     9 AGRONOMY 09/09/2002    23  2001 ACCOUNTING 
 ## 10    10 AGRONOMY 08/07/2002    27  2001 HUMANITIES 
-## # … with 222 more rows&lt;/code&gt;&lt;/pre&gt;
+## # ℹ 222 more rows&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;With respect to the usual &lt;code&gt;read.csv&lt;/code&gt; function I saved some typing, as I did not need to specify the ‘header = T’ argument. Furthermore, printing the tibble only shows the first ten rows, which makes the ‘head()’ function no longer needed.&lt;/p&gt;
 &lt;p&gt;Let’s go ahead and try to subset this tibble: we want to extract the good students, with marks higher than 28. In my previous post, I used the ‘subset()’ function. Now, I will use the ‘filter()’ function in the ‘dplyr’ package:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# subData &amp;lt;- subset(students, Mark &amp;gt;= 28)
 subData &amp;lt;- filter(students, Mark &amp;gt;= 28)
 subData
-## # A tibble: 87 x 6
+## # A tibble: 87 × 6
 ##       Id Subject  Date        Mark  Year HighSchool  
 ##    &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt;    &amp;lt;chr&amp;gt;      &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt;       
 ##  1     1 AGRONOMY 10/06/2002    30  2001 HUMANITIES  
@@ -10878,7 +10992,7 @@ subData
 ##  8    19 AGRONOMY 09/09/2002    30  2001 AGRICULTURE 
 ##  9    20 AGRONOMY 09/09/2002    30  2001 OTHER SCHOOL
 ## 10    22 AGRONOMY 23/01/2003    30  2001 ACCOUNTING  
-## # … with 77 more rows&lt;/code&gt;&lt;/pre&gt;
+## # ℹ 77 more rows&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;I have noted that all other subsetting examples in my previous post can be solved by simply replacing ‘subset()’ with ‘filter()’, with no other changes. However, differences appear when I try to select the columns. Indeed, ‘dplyr’ has a specific function ‘select()’, which should be used for this purpose. Therefore, in the case that I want to select the students with marks ranging from 26 to 28 in Maths or Chemistry and, at the same time, I want to report only the three columns ‘Subject’, ‘Mark’ and ‘Date’, I need to split the process in two steps (filter and, then, select):&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# subData &amp;lt;- subset(students, Mark &amp;lt;= 28 &amp;amp; Mark &amp;gt;=26 &amp;amp; 
 #                     Subject == &amp;quot;MATHS&amp;quot; | 
@@ -10895,7 +11009,7 @@ subData &amp;lt;- select(subData1, c(Subject, Mark, HighSchool))&lt;/code&gt;&lt
                     Subject == &amp;quot;CHEMISTRY&amp;quot;) %&amp;gt;%
   select(c(Subject, Mark, HighSchool))
 subData
-## # A tibble: 50 x 3
+## # A tibble: 50 × 3
 ##    Subject    Mark HighSchool  
 ##    &amp;lt;chr&amp;gt;     &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt;       
 ##  1 CHEMISTRY    20 AGRICULTURE 
@@ -10908,7 +11022,7 @@ subData
 ##  8 CHEMISTRY    27 AGRICULTURE 
 ##  9 CHEMISTRY    27 SCIENTIFIC  
 ## 10 CHEMISTRY    23 ACCOUNTING  
-## # … with 40 more rows&lt;/code&gt;&lt;/pre&gt;
+## # ℹ 40 more rows&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;In the end: there is not much difference between ‘subset()’ and ‘filter()’. However, I must admit I am seduced by the ‘pipe’ operator… my younger collegues may be right: it should be possible to chain several useful data management steps, producing highly readable code. But… how about debugging?&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;sorting-the-data&#34; class=&#34;section level1&#34;&gt;
@@ -10918,7 +11032,7 @@ subData
 # head(sortedData)
 sortedData &amp;lt;- arrange(students, desc(Mark), Subject)
 sortedData
-## # A tibble: 232 x 6
+## # A tibble: 232 × 6
 ##       Id Subject  Date        Mark  Year HighSchool  
 ##    &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt;    &amp;lt;chr&amp;gt;      &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt;       
 ##  1     1 AGRONOMY 10/06/2002    30  2001 HUMANITIES  
@@ -10931,12 +11045,12 @@ sortedData
 ##  8    22 AGRONOMY 23/01/2003    30  2001 ACCOUNTING  
 ##  9    38 BIOLOGY  28/02/2002    30  2001 AGRICULTURE 
 ## 10    42 BIOLOGY  28/02/2002    30  2001 ACCOUNTING  
-## # … with 222 more rows
+## # ℹ 222 more rows
 # sortedData &amp;lt;- students[order(-students$Mark, -xtfrm(students$Subject)), ]
 # head(sortedData)
 sortedData &amp;lt;- arrange(students, desc(Mark), desc(Subject))
 sortedData
-## # A tibble: 232 x 6
+## # A tibble: 232 × 6
 ##       Id Subject Date        Mark  Year HighSchool  
 ##    &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt;   &amp;lt;chr&amp;gt;      &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt;       
 ##  1   116 MATHS   01/07/2002    30  2001 OTHER SCHOOL
@@ -10949,26 +11063,23 @@ sortedData
 ##  8   134 MATHS   26/02/2002    30  2001 AGRICULTURE 
 ##  9   135 MATHS   11/02/2002    30  2001 AGRICULTURE 
 ## 10   143 MATHS   04/02/2002    30  2001 ACCOUNTING  
-## # … with 222 more rows&lt;/code&gt;&lt;/pre&gt;
+## # ℹ 222 more rows&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;As for sorting, there is no competition! The ‘arrange()’ function, together with the ‘desc()’ function for descending order, represents a much clearer way to sort the data, with respect to the traditional ‘order()’ function.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;casting-the-data&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Casting the data&lt;/h1&gt;
 &lt;p&gt;When we have a dataset in the LONG format, we might be interested in reshaping it into the WIDE format. This is the same as what the ‘pivot table’ function in Excel does. For example, take the ‘rimsulfuron.csv’ dataset in my repository. This contains the results of a randomised block experiment, where we have 16 herbicides in four blocks. The dataset is in the LONG format, with one row per plot.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rimsulfuron &amp;lt;- read_csv(&amp;quot;https://www.casaonofri.it/_datasets/rimsulfuron.csv&amp;quot;)
-## 
+## Rows: 64 Columns: 7
 ## ── Column specification ────────────────────────────────────────────────────────
-## cols(
-##   Herbicide = col_character(),
-##   Plot = col_double(),
-##   Code = col_double(),
-##   Block = col_double(),
-##   Box = col_double(),
-##   WeedCover = col_double(),
-##   Yield = col_double()
-## )
+## Delimiter: &amp;quot;,&amp;quot;
+## chr (1): Herbicide
+## dbl (6): Plot, Code, Block, Box, WeedCover, Yield
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 rimsulfuron
-## # A tibble: 64 x 7
+## # A tibble: 64 × 7
 ##    Herbicide                              Plot  Code Block   Box WeedCover Yield
 ##    &amp;lt;chr&amp;gt;                                 &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt;     &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt;
 ##  1 Rimsulfuron (40)                          1     1     1     1      27.8  85.9
@@ -10981,7 +11092,7 @@ rimsulfuron
 ##  8 Pendimethalin (pre) + rimsulfuron (p…     8     8     1     2      10.2  65.5
 ##  9 Pendimethalin (post) + rimsuulfuron …     9     9     1     1       5.4  94.8
 ## 10 Rimsulfuron + Atred                      10    10     1     1      40.3  94.1
-## # … with 54 more rows&lt;/code&gt;&lt;/pre&gt;
+## # ℹ 54 more rows&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Let’s put this data frame in the WIDE format, with one row per herbicide and one column per block. In my previous post, I used to the ‘cast()’ function in the ‘reshape’ package. Now I can use the ‘pivot_wider()’ function in the ‘tidyr’ package: the herbicide goes in the first column, the blocks (B1, B2, B3, B4) should go in the next four columns, and each unique level of yield should go in each cell, at the crossing of the correct herbicide row and block column. The ‘Height’ variable is not needed and it should be removed. Again, a two steps process, that is made easier by using the pipe:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# library(reshape)
 # castData &amp;lt;- cast(Herbicide ~ Block, data = rimsulfuron,
@@ -10992,7 +11103,7 @@ castData &amp;lt;- rimsulfuron %&amp;gt;%
   select(-Plot, - Code, -Box, - WeedCover) %&amp;gt;%
   pivot_wider(names_from = Block, values_from = Yield)
 castData
-## # A tibble: 16 x 5
+## # A tibble: 16 × 5
 ##    Herbicide                                    `1`   `2`   `3`   `4`
 ##    &amp;lt;chr&amp;gt;                                      &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt;
 ##  1 Rimsulfuron (40)                            85.9  91.1 111.   93.2
@@ -11027,7 +11138,7 @@ castData
 # 
 pivot_longer(castData, names_to = &amp;quot;Block&amp;quot;, values_to = &amp;quot;Yield&amp;quot;,
              cols = c(2:5))
-## # A tibble: 64 x 3
+## # A tibble: 64 × 3
 ##    Herbicide        Block Yield
 ##    &amp;lt;chr&amp;gt;            &amp;lt;chr&amp;gt; &amp;lt;dbl&amp;gt;
 ##  1 Rimsulfuron (40) 1      85.9
@@ -11040,7 +11151,7 @@ pivot_longer(castData, names_to = &amp;quot;Block&amp;quot;, values_to = &amp;qu
 ##  8 Rimsulfuron (45) 4      79.0
 ##  9 Rimsulfuron (50) 1      86.9
 ## 10 Rimsulfuron (50) 2     106. 
-## # … with 54 more rows&lt;/code&gt;&lt;/pre&gt;
+## # ℹ 54 more rows&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;As before with casting, neither ‘melt()’, nor ‘pivot_longer()’ let me completely satisfied.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;tidyverse-or-not-tidyverse&#34; class=&#34;section level1&#34;&gt;
@@ -11083,7 +11194,7 @@ students %&amp;gt;%
   summarise(Mark = mean(Mark)) %&amp;gt;%
   pivot_wider(names_from = Year, values_from = Mark) %&amp;gt;%
   mutate(Mean = (`2001` + `2002`)/2)
-## # A tibble: 6 x 4
+## # A tibble: 6 × 4
 ## # Groups:   Subject [6]
 ##   Subject     `2001` `2002`  Mean
 ##   &amp;lt;chr&amp;gt;        &amp;lt;dbl&amp;gt;  &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt;
@@ -11448,17 +11559,16 @@ Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.o
     </item>
     
     <item>
-      <title>Fitting &#39;complex&#39; mixed models with &#39;nlme&#39;: Example #4</title>
+      <title>Testing for interactions in nonlinear regression</title>
       <link>https://www.statforbiology.com/2019/stat_nlmm_interaction/</link>
       <pubDate>Fri, 13 Sep 2019 00:00:00 +0000</pubDate>
       
       <guid>https://www.statforbiology.com/2019/stat_nlmm_interaction/</guid>
       <description>
-&lt;script src=&#34;https://www.statforbiology.com/rmarkdown-libs/header-attrs/header-attrs.js&#34;&gt;&lt;/script&gt;
 
 
-&lt;div id=&#34;testing-for-interactions-in-nonlinear-regression&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;Testing for interactions in nonlinear regression&lt;/h1&gt;
+&lt;div id=&#34;fitting-complex-mixed-models-with-nlme-example-4&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Fitting ‘complex’ mixed models with ‘nlme’: Example #4&lt;/h1&gt;
 &lt;p&gt;Factorial experiments are very common in agriculture and they are usually laid down to test for the significance of interactions between experimental factors. For example, genotype assessments may be performed at two different nitrogen fertilisation levels (e.g. high and low) to understand whether the ranking of genotypes depends on nutrient availability. For those of you who are not very much into agriculture, I will only say that such an assessment is relevant, because we need to know whether we can recommend the same genotypes, e.g., both in conventional agriculture (high nitrogen availability) and in organic agriculture (relatively lower nitrogen availability).&lt;/p&gt;
 &lt;p&gt;Let’s consider an experiment where we have tested three genotypes (let’s call them A, B and C, for brevity), at two nitrogen rates (‘high’ an ‘low’) in a complete block factorial design, with four replicates. Biomass subsamples were taken from each of the 24 plots in eight different times (Days After Sowing: DAS), to evaluate the growth of biomass over time.&lt;/p&gt;
 &lt;p&gt;The dataset is available on gitHub and the following code loads it and transforms the ‘Block’ variable into a factor. For this post, we will use several packages, including ‘aomisc’, the accompanying package for this blog. Please refer to &lt;a href=&#34;https://www.statforbiology.com/rpackages/&#34;&gt;this page for downloading and installing&lt;/a&gt;.&lt;/p&gt;
@@ -11466,7 +11576,7 @@ Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.o
 library(lattice)
 library(nlme)
 library(aomisc)
-dataset &amp;lt;- read.csv(&amp;quot;https://raw.githubusercontent.com/OnofriAndreaPG/agroBioData/master/growthNGEN.csv&amp;quot;,
+dataset &amp;lt;- read.csv(&amp;quot;https://www.casaonofri.it/_datasets/growthNGEN.csv&amp;quot;,
   header=T)
 dataset$Block &amp;lt;- factor(dataset$Block)
 dataset$N &amp;lt;- factor(dataset$N)
@@ -11529,7 +11639,8 @@ e_{ijkl} = \mu_e + q_{ei} + N_{ej} + gN_{eij} + \theta_{ek} + \zeta_{el}
 &lt;/ol&gt;
 &lt;p&gt;The transformation of both sides of the equation is made explicitely.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(aomisc)
-modnlme1 &amp;lt;- nlme(sqrt(Yield) ~ sqrt(NLS.L3(DAS, b, d, e)), data = dataset,
+modnlme1 &amp;lt;- nlme(sqrt(Yield) ~ sqrt(NLS.L3(DAS, b, d, e)), 
+                 data = dataset,
                     random = d + e ~ 1|Block/Plot,
                     fixed = list(b ~ 1, d ~ N*GEN, e ~ N*GEN),
                     start = coef(modNaive1), 
@@ -11577,22 +11688,28 @@ VarCorr(modnlme1)
 ## e.(Intercept) 1.023108e-09                 3.198605e-05 0     
 ## Residual      1.750623e-01                 4.184044e-01&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Now, let’s go back to our initial aim: testing the significance of the ‘genotype x nitrogen’ interaction. Indeed, we have two available tests: on for the parameter &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; and one for the parameter &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt;. First of all, we code two ‘reduced’ models, where the genotype and nitrogen effects are purely addictive. To do so, we change the specification of the fixed effects from ’~ N*GEN’ to ‘~ N + GEN’. Also in this case, we use a ‘naive’ nonlinear regression fit to get starting values for model parameters, to be used in the following NLME model fitting.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;modNaive2 &amp;lt;- drm(Yield ~ DAS, fct = L.3(), data = dataset,
-            curveid = N:GEN,
-            pmodels = c( ~ 1,  ~ N + GEN,  ~ N * GEN), bcVal = 0.5)
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;modNaive2 &amp;lt;- drm(Yield ~ DAS, fct = L.3(), 
+                 data = dataset,
+                 curveid = N:GEN,
+                 pmodels = c( ~ 1,  ~ N + GEN,  ~ N * GEN), 
+                 bcVal = 0.5)
 
-modnlme2 &amp;lt;- nlme(sqrt(Yield) ~ sqrt(NLS.L3(DAS, b, d, e)), data = dataset,
-                    random = d + e ~ 1|Block/Plot,
-                    fixed = list(b ~ 1, d ~ N + GEN, e ~ N*GEN),
-                    start = coef(modNaive2), control = list(msMaxIter = 200))
+modnlme2 &amp;lt;- nlme(sqrt(Yield) ~ sqrt(NLS.L3(DAS, b, d, e)), 
+                 data = dataset,
+                 random = d + e ~ 1|Block/Plot,
+                 fixed = list(b ~ 1, d ~ N + GEN, e ~ N*GEN),
+                 start = coef(modNaive2), 
+                 control = list(msMaxIter = 200))
+
 modNaive3 &amp;lt;- drm(Yield ~ DAS, fct = L.3(), data = dataset,
             curveid = N:GEN,
             pmodels = c( ~ 1,  ~ N*GEN,  ~ N + GEN), bcVal = 0.5)
 
-modnlme3 &amp;lt;- nlme(sqrt(Yield) ~ sqrt(NLS.L3(DAS, b, d, e)), data = dataset,
-                    random = d + e ~ 1|Block/Plot,
-                    fixed = list(b ~ 1, d ~ N*GEN, e ~ N + GEN),
-                    start = coef(modNaive3), control = list(msMaxIter = 200))&lt;/code&gt;&lt;/pre&gt;
+modnlme3 &amp;lt;- nlme(sqrt(Yield) ~ sqrt(NLS.L3(DAS, b, d, e)),
+                 data = dataset,
+                 random = d + e ~ 1|Block/Plot,
+                 fixed = list(b ~ 1, d ~ N*GEN, e ~ N + GEN),
+                 start = coef(modNaive3), control = list(msMaxIter = 200))&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Let’s consider the first reduced model ‘modnlme2’. In this model, the ‘genotype x nitrogen’ interaction has been removed for the &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; parameter. We can compare this reduced model with the full model ‘modnlme1’, by using a Likelihood Ratio Test:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;anova(modnlme1, modnlme2)
 ##          Model df      AIC      BIC    logLik   Test L.Ratio p-value
