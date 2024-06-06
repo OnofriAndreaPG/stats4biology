@@ -1,7 +1,7 @@
 ---
 title: "Plotting weather data with ggplot()"
 author: "Andrea Onofri"
-date: 2024-05-24
+date: 2024-06-06
 slug: 'ggplot'
 categories:
   - R
@@ -11,6 +11,7 @@ tags:
   - 'ggplot'
   - 'plot'
   - 'climate_data'
+  - 'ggh4x'
 archives:
   - 2024
 ---
@@ -28,9 +29,9 @@ archives:
 fileName &lt;- &quot;https://www.casaonofri.it/_datasets/DailyMeteoData.csv&quot;
 dataMeteo &lt;- read.csv(fileName) |&gt;
   mutate(Date = as.Date(Date, format = &quot;%d/%m/%Y&quot;),
-         Year = as.numeric(as.character(Date, format=&quot;%Y&quot;)),
-         Month = as.numeric(as.character(Date, format=&quot;%m&quot;)),
-         DOY = as.numeric(as.character(Date, format=&quot;%j&quot;)))
+         Year = as.numeric(format(Date, format=&quot;%Y&quot;)),
+         Month = as.numeric(format(Date, format=&quot;%m&quot;)),
+         DOY = as.numeric(format(Date, format=&quot;%j&quot;)))
 head(dataMeteo)
 ##         Date Tavg Rain Year Month DOY
 ## 1 2011-01-01  5.9  0.0 2011     1   1
@@ -111,7 +112,7 @@ ggplot() +
   facet_wrap(~Year) +
   theme_bw()</code></pre>
 <p><img src="/post/R_ggplot_dualScaledAxes_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
-<p>And we are done! I am sure you have comments to improve this: please, drop me a not at the adress below.</p>
+<p>And we are done! I am sure you have comments to improve this: please, drop me a not at the address below.</p>
 <p>Thanks for reading and happy coding!</p>
 <p>Andrea Onofri<br />
 Department of Agricultural, Food and Environmental Sciences<br />
@@ -119,3 +120,59 @@ University of Perugia (Italy)<br />
 <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
 <a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow <span class="citation">@onofriandreapg</span></a>
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<hr />
+<div id="update-662024" class="section level1">
+<h1>UPDATE (6/6/2024)</h1>
+<p>Ross Gilmoure from Galileo Consulting (Kuala Lumpur) sent me an interesting comment, proposing the use of the ‘lubridate’ package for the management of dates and of the ‘ggh4x’ package, to exploit the nested axis capabilities of this latter. Basically, his graph does not have facets, but the two years are put one after the other. Furthermore, he made use of minor ticks, which might be a good idea. Ross’ code is following: I’d like to thank him very much!</p>
+<pre class="r"><code>library(lubridate)
+library(ggh4x)
+dataMeteo1 &lt;- dataMeteo |&gt;
+  mutate(
+    Date = as.Date(Date, format = &quot;%d/%m/%Y&quot;),
+    Year = lubridate::year(Date),
+    Month = lubridate::month(Date))
+
+dataMeteo2 &lt;- dataMeteo1 |&gt;
+  group_by(Year, Month) |&gt;
+  summarise(
+    Rain = sum(Rain),
+    Temp = mean(Tavg, rm.na = TRUE)) |&gt;
+  mutate(Mth = factor(month.abb[Month], 
+                      levels = c(&quot;Jan&quot;, &quot;Feb&quot;, &quot;Mar&quot;, &quot;Apr&quot;,
+                                 &quot;May&quot;, &quot;Jun&quot;, &quot;Jul&quot;, &quot;Aug&quot;,
+                                 &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot;)))
+dataMeteo3 &lt;- dataMeteo2 |&gt;
+  mutate(newTemp = 162.69 + 3.02 * Temp)
+
+ggplot(dataMeteo3, mapping = aes(x = interaction(Mth, Year),
+                                 group = 1)) +
+  geom_col(aes(y = Rain), fill = &quot;grey&quot;) +
+  geom_point(aes(y = newTemp), size = 2, col = &quot;blue&quot;) +
+  geom_smooth(
+    method = &quot;gam&quot;, formula = y ~ s(x, bs = &quot;cc&quot;),
+    aes(x = as.numeric(interaction(Mth, Year)), y = newTemp),
+    col = &quot;blue&quot;) +
+  geom_point(aes(y = newTemp), size = 3, col = &quot;blue&quot;, 
+             fill = &quot;white&quot;, shape = 21, stroke = 1) +
+  scale_y_continuous(
+    minor_breaks = scales::breaks_width(20),
+    name = &quot;Mean Monthly Total Rainfall (mm)&quot;,
+    sec.axis = sec_axis(~ (. - 162.69) / 3.02,
+      name = &quot;Mean Monthly Daily Temperature (°C)&quot;,
+      breaks = c(-10, 0, 10, 20, 30))) +
+  guides(x = &quot;axis_nested&quot;,
+        y = guide_axis(minor.ticks=TRUE),
+        y.sec = guide_axis(minor.ticks=TRUE)) +
+  theme_bw(base_size = 18) +
+  theme(
+     panel.grid.minor = element_blank(),
+     axis.title.x = element_blank(),
+     axis.text.x = element_text(face = &quot;bold&quot;),
+     axis.ticks = element_line(colour = &quot;red&quot;),
+     ggh4x.axis.nestline.x = element_line(linewidth = 2),
+     ggh4x.axis.nesttext.x = element_text(colour = &quot;blue&quot;, 
+                                          face = &quot;bold&quot;, 
+                                          size = rel(1.2))
+  )</code></pre>
+<p><img src="/post/R_ggplot_dualScaledAxes_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+</div>

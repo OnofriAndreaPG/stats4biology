@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.23 (Anno Accademico 2022-2023), compil. 2023-05-15"
+date: "Update: v. 1.30 (Anno Accademico 2023-2024; giugno), compil. 2024-05-30"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -139,20 +139,13 @@ Placeholder
 
 ## Esempio: una soluzione erbicida
 ### Analisi dei dati: stima dei parametri
-### La 'sampling distribution'
-### L'errore standard
+### La 'sampling distribution' empirica
+### La 'sampling distribution' teorica
 ## Stima per intervallo
-## L'intervallo di confidenza
-## Qual è il senso dell'intervallo di confidenza?
-## Come presentare i risultati degli esperimenti
-## Alcune precisazioni
-### Campioni numerosi e non
+## Inferenza statistica: conclusioni
+## Per chi avesse voglia di approfondire un po'...
 ### Popolazioni gaussiane e non 
-## Analisi statistica dei dati: riassunto del percorso logico
-## Da ricordare
-## Per approfondire un po'...
-## *Coverage* degli intervalli di confidenza
-### Intervalli di confidenza per fenomeni non-normali
+### Cosa fare se il teorema centrale del limite non funziona?
 ## Altre letture
 
 <!--chapter:end:05-InferenzaStatistica.Rmd-->
@@ -163,16 +156,20 @@ Placeholder
 Placeholder
 
 
-## Confronto tra due medie: il test t di Student
-### L'ipotesi nulla e alternativa
+## Il test t di Student
+### L'ipotesi 'nulla' e l'ipotesi 'alternativa'
 ### La statistica T
 ### Simulazione Monte Carlo
 ### Soluzione formale
 ### Interpretazione del P-level
-### Tipologie alternative di test t di Student
-## Confronto tra due proporzioni: il test $\chi^2$
-### Simulazione Monte Carlo
-### Soluzione formale
+## Altri esempi dell'uso del test di t di Student
+### Confronto tra due medie campionarie
+### Varianze non omogenee
+### Differenze generalizzate tra parametri
+### Misure appaiate
+### Test ad una coda 
+## Altri test d'ipotesi: il test $\chi^2$
+## Test d'ipotesi con simulazione di Monte Carlo
 ## Conclusioni e riepilogo
 ## Altre letture
 
@@ -220,10 +217,10 @@ Placeholder
 ### Correzione/Rimozione degli outliers
 ### Correzione del modello
 ### Trasformazione della variabile indipendente
-### Impiego di metodiche statistiche avanzate
 ### Trasformazioni stabilizzanti
 ## Esempio 1
 ## Esempio 2
+## Altri approcci 'avanzati'
 ## Altre letture
 
 <!--chapter:end:08-AssunzioniBase.Rmd-->
@@ -234,13 +231,14 @@ Placeholder
 Placeholder
 
 
-## Esempio
+## Esempio 1
 ## I contrasti
 ## I contrasti con R
 ## I confronti multipli a coppie (pairwise comparisons)
 ## Display a lettere
 ## Tassi di errore per confronto e per esperimento
 ## Aggiustamento per la molteplicità
+## Esempio 2: confronti multipli con dati trasformati
 ## E le classiche procedure di confronto multiplo?
 ## Consigli pratici
 ## Altre letture
@@ -358,9 +356,10 @@ Placeholder
 
 # Esercizi
 
-Le domande e gli esercizi che seguono sono organizzati per capitolo, in modo che possiate verificare, di volta in volta, se avete acquisito le competenze necessarie per passare al capitolo successivo.
+Questo libro non è finalizzato alla costruzione di una solida formazione teorica in biometria, ma è finalizzato a fornire gli strumenti necessari per organizzare esperimenti validi ed analizzarne i dati in modo attendibile.
+Per questo motivo, vi proponiamo una lista di esercizi e di casi-studio, coi quali mettere in pratica e verificare la chiarezza dei concetti proposti. Gli esercizi sono orgnizzati in sezioni ed ognuna di esse corrisponde ad uno o più capitoli del libro; per alcuni di essi è necessario caricare dei *datasets*, che si trovano su *repository* esterne, che verranno via via indicate.
 
-## Introduzione alla biometria (Cap. 1)
+## Il disegno degli esperimenti (Cap. 1 e 2)
 
 ### Domanda 1
 
@@ -382,8 +381,34 @@ Qual è la differenza tra repliche vere e pseudo-repliche?
 
 Cosa è il confounding e come può rendere distorti i risultati di un esperimento scientifico?
 
+### Domanda 6
 
-## Disegno sperimentale (Cap. 2)
+Quali sono gli elementi comuni a tutti gli esperimenti scientifici?
+
+### Domanda 7
+
+Quali tipi di variabili conoscete e quali sono le loro caratteristiche?
+
+### Domanda 8
+
+Qual è la differenza tra un esperimento fattoriale innestato ed uno incrociato
+
+### Domanda 9
+
+Quali sono le caratteristiche principali degli esperimenti a randomizzazione completa, blocchi randomizzati e quadrato latino?
+
+### Domanda 10
+
+Come è fatto e quando si utilizza uno schema sperimentale a split-plot?
+
+### Domanda 12
+
+Cosa è l'effetto di bordo e come si può controllare?
+
+### Domanda 13
+
+Illustrare e discutere le caratteristiche fondamentali delle 'parcelle' (forma, dimensioni, numero ...)
+
 
 ### Esercizio 1
 
@@ -416,13 +441,30 @@ Descrivete lo schema sperimentale che utilizzereste per organizzare una prova su
 
 ## Statistica descrittiva (Cap. 3)
 
+### Domanda 1
+
+Illustrare e discutere i principali indici di tendenza centrale per le variabili quantitative
+
+### Domanda 2
+
+Illustrare e discutere i principali indici di variabilità per le variabili quantitative
+
+### Domanda 3
+
+Illustrare e discutere il coefficiente di correlazione di Pearson
+
+### Domanda 4
+
+Quali statistiche descrittive possono essere utilizzate con le variabili categoriche e ordinali? Illustrare brevemente e discutere
+
+
 ### Esercizio 1
 
-Un'analisi chimica è stata eseguita i triplicato e i risultati sono stati i seguenti: 125, 169 and 142 ng/g. Calcolate a mano la media e tutti gli indicatori di variabilità che conoscete. In che modo può essere espressa l'incertezza della misura?
+Un'analisi chimica è stata eseguita in triplicato e i risultati sono stati i seguenti: 125, 169 and 142 ng/g. Calcolate la media e tutti gli indicatori di variabilità che conoscete. In che modo può essere espressa l'incertezza assoluta della misura?
 
 ### Esercizio 2
 
-Un ricercatore ha confrontato il rapporto tra maschi e femmine in una popolazione di insetti sottoposta a due trattamenti sperimentali diversi e si chiede se maschi e femmine manifestino una diversa sensibilità al trattamento in studio. Considerando la tabella sottostante, valutare il grado di dipendenza tra i due caratteri (sesso e sensibilità), in rapporto al valore minimo e massimo possibile per l'indicatore prescelto. Eseguire i calcoli manualmente.
+Un ricercatore ha confrontato il rapporto tra maschi e femmine in una popolazione di insetti sottoposta a due trattamenti sperimentali diversi e si chiede se maschi e femmine manifestino una diversa sensibilità al trattamento in studio. Considerando la tabella sottostante, valutare il grado di dipendenza tra i due caratteri (sesso e sensibilità), in rapporto al valore minimo e massimo possibile per l'indicatore prescelto.
 
 
 |   | Male| Female|
@@ -440,15 +482,18 @@ Altezza <- c(2.3, 2.7, 3.1, 3.5)
 Diametro <- c(0.46, 0.51, 0.59, 0.64)
 ```
 
-Calcolare (a mano) il coefficiente di correlazione di Pearson e valutare la ampiezza della correlazione in base ai valori massimi e minimi ammissibili per questa statistica.
+Calcolare il coefficiente di correlazione di Pearson e valutare l'entità della correlazione in base ai valori massimi e minimi ammissibili per questa statistica.
 
 ### Esercizio 4
 
-Considerate il file EXCEL 'rimsulfuron.csv', che potete trovare in questo percorso: 'https://www.casaonofri.it/_datasets/students.csv'. In questo file sono riportati i risultati di un esperimento con 16 trattamenti e 4 repliche, nel quale sono stati posti a confronti diversi erbicidi e/o dosi per il diserbo nel mais. Calcolare le medie produttive ottenute con le diverse tesi sperimentali e riportarle su un grafico, includendo anche un'indicazione di variabilità. Verificare se la produzione è correlata con il ricoprimento (WeedCover) delle piante infestanti.
+Considerate il file EXCEL 'rimsulfuron.csv', che potete trovare in questo percorso: [https://www.casaonofri.it/_datasets/rimsulfuron.csv](https://www.casaonofri.it/_datasets/rimsulfuron.csv). In questo file sono riportati i risultati di un esperimento con 16 trattamenti e 4 repliche, nel quale sono stati posti a confronti diversi erbicidi e/o dosi per il diserbo nel mais. Calcolare le medie produttive ottenute con le diverse tesi sperimentali e riportarle su un grafico, includendo anche un'indicazione di variabilità. Verificare se la produzione è correlata con il ricoprimento (WeedCover) delle piante infestanti.
 
 ### Esercizio 5
 
-Caricare il datasets 'students' disponibile al link: 'https://www.casaonofri.it/_datasets/students.csv'. In questo file potete trovare una database relativo alla valutazione degli studenti in alcune materie del primo anno di Agraria. Ogni record rappresenta un esame, con il relativo voto, la materia e la scuola di provenienza dello studente. Con un uso appropriato delle tabelle di contingenza e del chi quadro, valutare se il voto dipende dalla materia e dalla scuola di provenienza dello studente.
+Caricare il datasets 'students' disponibile al link: 'https://www.casaonofri.it/_datasets/students.csv'. In questo file potete trovare una database relativo alla valutazione degli studenti in alcune materie del primo anno di Agraria. Ogni record rappresenta un esame, con il relativo voto, la materia e la scuola di provenienza dello studente.
+
+1. Determinare la frequenza assoluta e relativa dei diversi voti (da 18 a 30). È possibile calcolare le frequenze cumulate?
+2. Con un uso appropriato delle tabelle di contingenza e del chi quadro, valutare se il voto dipende dalla materia e dalla scuola di provenienza dello studente.
 
 ---
 
@@ -456,21 +501,34 @@ Caricare il datasets 'students' disponibile al link: 'https://www.casaonofri.it/
 
 ### Esercizio 1
 
-E' data una distribuzione normale con $\mu$ = 23 e $\sigma$ = 1. Calcolare la probabilità di estrarre individui:
+Un ricercatore sta studiando una popolazione di insetti ed ha valutato che la loro lunghezza è distribuita normalmente, con $\mu = 23 \, \textrm{mm}$ e $\sigma = 1.6$. Calcolare la probabilità di estrarre individui con lunghezza:
 
-1.  maggiori di 25
-2.  minori di 21
-3.  compresi tra 21 e 25
+1.  maggiore di 25
+2.  minore di 21
+3.  compresa tra 21 e 25
 
 ### Esercizio 2
 
-E' data una distribuzione normale con $\mu$ = 156 e $\sigma$ = 13. Calcolare la probabilità di estrarre individui:
+Una macchina confezionatrice riempe automaticamente delle confezioni di seme. Il peso dichiarato sulla confezione è 12.5 kg, ma la precisione della macchina è $\pm$ 1 kg. Calcolare la probabilità che una confezione contenga:
 
-1.  maggiori di 170
-2.  minori di 140
-3.  compresi tra 140 e 170
+1. meno del peso dichiarato
+2. meno di 12 kg
+3. più di 13 Kg
+
+In questa condizione, si vuole regolare la macchina in modo che non più del 5% dei sacchi contenga un peso inferiore a quello dichiarato. Su quale peso dovrebbe essere regolata la macchina di riempimento? (SUGGERIMENTO: se io regolo la macchina a 12.5 kg, la quantità effettivamente erogata è normalmente distribuita, con media 12.5 e deviazione standard 1. In questo caso, c'è un 5% di probabilità di erogare meno di _____ kg; di conseguenza, devo alzare la media di ____ kg per far si che la quantità erogata non sia inferiore a 12.5 kg, se non nel 5% dei casi)
+
+
+
 
 ### Esercizio 3
+
+Uno strumento di analisi ha un coefficiente di variabilità pari al 10\%. Ammettendo di utilizzare quello strumento su una matrice la cui concentrazione è 10 ng/g, calcolare la probabilità di ottenere una misura:
+1. inferiore a 9 ng/g
+2. superiore a 11 ng/g
+3. compresa tra 9 e 11 ng/g
+
+
+### Esercizio 4
 
 Un erbicida si degrada nel terreno seguendo una cinetica del primo ordine:
 
@@ -480,7 +538,7 @@ dove Y è la concentrazione al tempo t. Dopo aver spruzzato questo erbicida, che
 
 
 
-### Esercizio 4
+### Esercizio 5
 
 Una sostanza xenobiotica si degrada nell'acqua a 20°C seguendo una cinetica del primo ordine:
 
@@ -491,7 +549,7 @@ dove Y è la concentrazione al tempo t. Simulare i risultati di un esperimento i
 
 
 
-### Esercizio 5
+### Esercizio 6
 
 Una coltura produce in funzione della sua fittezza, secondo la seguente relazione:
 
@@ -503,7 +561,7 @@ Stabilire la fittezza necessaria per ottenere il massimo produttivo (graficament
 
 
 
-### Esercizio 6
+### Esercizio 7
 
 La tossicità di un insetticida varia con la dose, secondo la legge log-logistica:
 
@@ -513,18 +571,19 @@ dove Y è la proporzione di animali morti e X è la dose. Se trattiamo 150 inset
 
 
 
-### Esercizio 7
+### Esercizio 8
 
 Simulare i risultati di un esperimento varietale, con sette varietà di frumento e quattro repliche. Considerare che il modello deterministico è un modello ANOVA, nel quale vengono definite le medie delle sette varietà (valori attesi). Decidere autonomamente sui parametri da impiegare per la simulazione (da $\mu_1$ a $\mu_7$ e $\sigma$)
 
-### Esercizio 8
-
-Considerando il testo dell'esercizio 5, simulare un esperimento in cui la coltura viene seminata a fittezze di 2, 4, 6, 8 piante per metro quadrato, con quattro repliche.
-
-
 ### Esercizio 9
 
-Considerando il testo dell'esercizio 6, simulare un esperimento in cui l'insetticida viene utilizzato a cinque dosi crescenti (a vostra scelta), con quattro repliche.
+Considerando il testo dell'esercizio 6, simulare un esperimento in cui la coltura viene seminata a fittezze di 2, 4, 6, 8 piante per metro quadrato, con quattro repliche.
+
+
+### Esercizio 10
+
+Considerando il testo dell'esercizio 7, simulare un esperimento in cui l'insetticida viene utilizzato a cinque dosi crescenti (a vostra scelta), con quattro repliche.
+
 
 ---
 
@@ -568,22 +627,27 @@ Un campione di 400 insetti a cui è stato somministrato un certo insetticida mos
 
 Assumendo che la relazione sia lineare (retta), stimare la pendenza e l'intercetta della popolazione di riferimento, dalla quale è stato estratto il campione in studio. Utilizzare la funzione `lm(Yield ~ Dose)` ed estrarre gli errori standard con il metodo `summary()`.
 
+### Esercizio 6
+
+Utilizzando una simulazione Monte Carlo opportunamente pianificata, mostrare che la varianza del campione (uguale alla devianza divisa per il numero di individui meno uno) fornisce una stima più accurata della varianza della popolazione, rispetto allo scarto quadratico medio (devianza divisa per il numero di soggetti) che è invece uno stimatore distorto. Suggerimento: ricordare che uno stimatore accurato ha una distribuzione campionaria (*sampling distribution*) il cui valore atteso coincide con il valore da stimare.
+
 ---
 
-## Inferenza (Cap. 6)
+## Test d'ipotesi (Cap. 6)
 
 ### Esercizio 1
 
-Uno sperimentatore ha impostato un esperimento per verificare l'effetto di un fungicida (A) in confronto al testimone non trattato (B), in base al numero di colonie fungine sopravvissute. Il numero delle colonie trattate è di 200, mentre il numero di quelle non trattate è di 100. Le risposte (frequenze) sono come segue:
+La nostra miglior stima puntuale del parametro $\gamma$ di un modello statistico è $g = -7.2$, con un errore standard pari a 2.8, con 16 gradi di libertà. E'possibile che, in realtà, sia $\gamma = 0$? Qual è il P-level per l'ipotesi nulla? Devo accettarla o posso rifiutarla?
 
-|     | Morte | Sopravvissute |
-|-----|:-----:|:-------------:|
-| A   |  180  |      20       |
-| B   |  50   |      50       |
 
-Stabilire se i risultati possono essere considerati significativamente diversi, per un livello di probabilità del 5%.
 
 ### Esercizio 2
+
+La nostra miglior stima puntuale del parametro $\delta$ di un modello statistico è $d = 13.5$, con un errore standard pari a 8.4, ma non è disponibile, per questo errore standard, una stima accurata dei gradi di libertà. E'possibile che, in realtà, sia $\delta = 0$? Qual è il P-level per l'ipotesi nulla? Devo accettarla o posso rifiutarla?
+
+
+
+### Esercizio 3
 
 Uno sperimentatore ha impostato un esperimento per confrontare due tesi sperimentali (A, B). I risultati sono i seguenti (in q/ha):
 
@@ -593,25 +657,32 @@ Uno sperimentatore ha impostato un esperimento per confrontare due tesi sperimen
 | 10.2 | 12.3 |
 | 9.7  | 12.5 |
 
-Stabilire se i risultati per le due tesi sperimentali possono essere considerati significativamente diversi, per un livello di probabilità del 5%.
+Stabilire se i risultati per le due tesi sperimentali possono essere considerati significativamente diversi, per un livello di probabilità di errore di I specie del 5%.
 
-### Esercizio 3
+
+
+### Esercizio 4
 
 Uno sperimentatore ha impostato un esperimento per confrontare se l'effetto di un fungicida è significativo, in un disegno sperimentale con tre ripetizioni. Con ognuna delle due opzioni di trattamento i risultati produttivi sono i seguenti (in t/ha):
 
 |  A  | NT  |
 |:---:|:---:|
-| 65  | 54  |
-| 71  | 51  |
-| 68  | 59  |
+| 6.5  | 54  |
+| 7.1  | 48  |
+| 6.8  | 63  |
 
-E'significativo l'effetto del trattamento fungicida sulla produzione, per un livello di probabilità del 5%?
+E'significativo l'effetto del trattamento fungicida sulla produzione, per un livello di probabilità del 5%?. SUGGERIMENTO: prestare attenzione all'omogeneità delle varianze.
 
-### Esercizio 4
 
-Immaginate di aver riscontrato che, in determinate condizioni ambientali, 60 olive su 75 sono attaccate da *Daucus olee* (mosca dell'olivo). Nelle stesse condizioni ambientali, diffondendo in campo un insetto predatore siamo riusciti a ridurre il numero di olive attaccate a 12 su 75. Si tratta di una oscillazione casuale del livello di attacco o possiamo concludere che l'insetto predatore è stato un mezzo efficace di lotta biologica alla mosca dell'olivo?
 
 ### Esercizio 5
+
+Con un esperimento in laboratorio, abbiamo stimato che il tasso di degradazione di una sostanza xenobiotica in acqua è $k_1 = -0.071 \pm 0.012$ (7 gradi di libertà). Per una sostanza affine il tasso di degradazione è pari a $k_2 = -0.153 \pm 0.024$ (7 gradi di lbertà); possiamo concludere che il tasso di degradazione delle due sostanze, in realtà, non è significativamente diverso?
+
+
+
+
+### Esercizio 6
 
 In un ospedale, è stata misurata la concentrazione di colesterolo nel sangue di otto pazienti, prima e dopo un trattamento medico. Per ogni paziente, sono stati analizzati due campioni, ottenendo le seguenti concentrazioni:
 
@@ -628,7 +699,44 @@ In un ospedale, è stata misurata la concentrazione di colesterolo nel sangue di
 
 Si può concludere che il trattamento medico è stato efficace?
 
-### Esercizio 6
+
+
+
+### Esercizio 7
+
+Un veterinario ha organizzato un esperimento per valutare l'effetto di una dieta innovativa, sulla pressione arteriosa sistolica di cavalli da corsa. Le informazioni preliminari mostrano con chiarezza che questa dieta innovativa non può avere effetti negativi, ma, eventualmente, solo positivi. Il ricercatore ha selezionato a caso 16 animali, ne ha misurato la pressione arteriosa a riposo ed ha ripetuto la stessa misurazione dopo sei mesi di questa dieta. I risultati ottenuti sono i seguenti:
+
+
+```r
+prima <- c(113.5, 116.5, 118.1, 111.3, 116.8, 117.0, 114.8, 114.9, 
+           114.8, 114.2, 115.0, 114.0, 114.4, 116.1, 117.9, 115.7)
+dopo <- c(110.9, 110.1, 110.3, 116.8, 112.2, 111.0, 111.1, 112.9, 
+          110.6, 109.1, 113.1, 109.9, 111.9, 110.1, 114.2, 111.0)
+```
+
+
+Stabilire se la dieta è efficace, con una probabilità di errore P < 0.05. SUGGERIMENTO: ricordare che la l'effetto atteso della dieta, per le informazioni preliminari disponibili, può, eventualmente, essere solo quello di abbassare la pressione, mai quello di alzarla.
+
+
+
+
+### Esercizio 8
+
+Uno sperimentatore ha impostato un esperimento per verificare l'effetto di un fungicida (A) in confronto al testimone non trattato (B), in base al numero di colonie fungine sopravvissute. Il numero delle colonie trattate è di 200, mentre il numero di quelle non trattate è di 100. Le risposte (frequenze) sono come segue:
+
+|     | Morte | Sopravvissute |
+|-----|:-----:|:-------------:|
+| A   |  180  |      20       |
+| B   |  50   |      50       |
+
+Stabilire se i risultati possono essere considerati significativamente diversi, per un livello di probabilità del 5%.
+
+### Esercizio 9
+
+Immaginate di aver riscontrato che, in determinate condizioni ambientali, 60 olive su 75 sono attaccate da *Daucus olee* (mosca dell'olivo). Nelle stesse condizioni ambientali, diffondendo in campo un insetto predatore siamo riusciti a ridurre il numero di olive attaccate a 12 su 75. Si tratta di una oscillazione casuale del livello di attacco o possiamo concludere che l'insetto predatore è stato un mezzo efficace di lotta biologica alla mosca dell'olivo?
+
+
+### Esercizio 10
 
 I Q.I. di 16 studenti provenienti da un quartiere di una certa città sono risultati pari a:
 
@@ -649,7 +757,7 @@ QI2 <- c(90.66, 101.41, 104.61,  91.77, 107.06,  89.51,  87.91,
 
 Esiste una differenza significativa tra i Q.I. nei due quartieri della città?
 
-### Esercizio 7
+### Esercizio 11
 
 Viene estratto un campione di rondelle da una macchina in perfette condizioni di funzionamento. Lo spessore delle rondelle misurate è:
 
@@ -670,7 +778,15 @@ S2 <- c(0.0502, 0.0528, 0.0492, 0.0556, 0.0501, 0.0500, 0.0498,
 
 Verificare se la macchina sia ancora ben tarata, oppure necessiti di revisione.
 
-### Esercizio 8
+### Esercizio 12
+
+Le varianze di due campioni composti da 30 unità sono risultate pari, rispettivamente a 115.3 e 356.4; stabilire se il secondo campione ha una varianza significativamente più alta del primo. SUGGERIMENTO: considerare che il rapporto tra due varianze di campioni estratti dalla stessa popolazione gaussiana segue la distribuzione F di Fisher. Considerare anche che, in R, la funzione `pf(x, n1, n2, lower.tail = F)` restituisce la probabilità di ottenere valori pari o superiori ad $x$, da una distribuzione $F$ di Fisher con $n1$ ed $n2$ gradi di libertà. Considerare anche che il rapporto di due varianze può solo essere positivo.
+
+
+
+
+
+### Esercizio 13
 
 Sono stati osservati 153 calciatori registrando la dominanza della mano e quella del piede, ottenendo la tabella riportata qui di seguito.
 
@@ -683,7 +799,7 @@ Sono stati osservati 153 calciatori registrando la dominanza della mano e quella
 
 Esiste dipendenza tra la dominanza della mano e del piede?
 
-### Esercizio 9
+### Esercizio 14
 
 Un agronomo ha organizzato un esperimento varietale, per confrontare tre varietà di frumento, cioè GUERCINO, ARNOVA e BOLOGNA. Per far questo ha individuato, in un campo uniforme dell'areale umbro, trenta parcelle da 18 m^2^ e ne ha selezionate dieci a caso, da coltivare con GUERCINO, altre dieci a caso sono state coltivate con ARNOVA e le ultime dieci sono state coltivate con BOLOGNA.
 
@@ -709,7 +825,7 @@ Al termine dell'esperimento, le produttività osservate erano le seguenti:
 
 
 
-### Esercizio 10
+### Esercizio 15
 
 Un botanico ha valutato il numero di semi germinati per colza sottoposto a due diversi regimi termici dopo l'imbibizione (15 e 25°C). Per la temperatura più bassa, su 400 semi posti in prova, ne sono germinati 358. Alla temperatura più alta, su 380 semi in prova, ne sono germinati 286.
 
@@ -719,19 +835,48 @@ Un botanico ha valutato il numero di semi germinati per colza sottoposto a due d
 
 
 
-### Esercizio 11
-
-Un veterinario ha organizzato un esperimento per valutare l'effetto di una dieta innovativa, sulla pressione arteriosa sistolica di cavalli da corsa. Ha selezionato a caso 16 animali, ne ha misurato la pressione arteriosa a riposo ed ha ripetuto la stessa misurazione dopo sei mesi di questa dieta. I risultati ottenuti sono i seguenti:
-
-
-
-Stabilire se la dieta è efficace, con una probabilità di errore P < 0.05.
 
 ---
 
+## Fitting di modelli nella sperimentazione agraria
+
+Nelle sezioni seguenti riporteremo diversi datasets ottenuti da esperimenti nelle scienze agraria e che si prestano per il fitting di modelli statistici descrittivi di vario tipo. La stima dei parametri di questi modelli e il test d'ipotesi permettono di rispondere a semplici domande sui processi biologici coinvolti. Indipendentemente dal dataset, il processo di lavoro dovrà essere il seguente.
+
+1. Caricare i dati ed eseguire le eventuali trasformazioni che si rendano necessarie (ad es. le trasformazioni delle variabili numeriche in 'factors' oppure le trasformazioni stabilizzanti).
+2. Descrivere i dati, calcolando almeno un indicatore di tendenza centrale (media) e un indicatore di variabilità (deviazione standard) come indicato nel Capitolo 3.
+3. Specificare il modello descrittivo più opportuno a stimarne i parametri con R.
+4. Controllare il fitting per il rispetto delle assunzioni di base. Se necessario, trasformare i dati e ripetere il fitting
+5. Testare la significanza di tutti gli effetti inclusi nel modello, attraverso l'ANOVA.
+6. Se necessario, confrontare le medie con un test di confronto multiplo
+7. Presentare i risultati e commentarli.
+
+I dataset degli esempi che seguono sono riportati in un file Excel, che potete scaricare dal seguente link:  [https://www.casaonofri.it/_datasets/BookExercises.xlsx](https://www.casaonofri.it/_datasets/BookExercises.xlsx). Ogni dataset è su un diverso foglio di lavoro all'interno dello stesso file; il nome del foglio di lavoro è riportato in fondo ad ogni esercizio. Utilizzare la funzione 'readxl()' function, per la lettura del dataset.
+
+Per facilitarvi la vita, alleghiamo una tabella che riassume i modelli descritti in questo libro ed utilizzabili per gli esercizi che seguono.
+
+
+Table: (\#tab:unnamed-chunk-25)Sommario dei principali modelli per descrivere i principali esperimenti nelle scienze agrarie
+
+|Modello                      |Disegno.sperimentale                  |Funzione.R  |Specifiche                                    |
+|:----------------------------|:-------------------------------------|:-----------|:---------------------------------------------|
+|ANOVA ad una via             |CRD                                   |lm()        |Y ~ F1                                        |
+|ANOVA ad una via             |CRBD                                  |lm()        |Y ~ F1 + BL                                   |
+|ANOVA a due vie              |CRD                                   |lm()        |Y ~ F1 * F2                                   |
+|ANOVA a due vie              |CRBD                                  |lm()        |Y ~ F1 * F2 + BL                              |
+|ANOVA a due vie              |Split-plot CRD                        |lmer()      |Y ~ F1 * F2 + (1&#124;MAIN)                   |
+|ANOVA a due vie              |Split-plot CRBD                       |lmer()      |Y ~ F1 * F2 + BL + (1&#124;MAIN)              |
+|ANOVA a due vie              |Strip-plot CRD                        |lmer()      |Y ~ F1 * F2 + (1&#124;ROW) + (1&#124;COL)     |
+|ANOVA a due vie              |Strip-plot CRBD                       |lmer()      |Y ~ F1 * F2 + BL + (1&#124;ROW + (1&#124;COL) |
+|ANOVA ad una via             |ANOVA ad una via (CRD), due ambienti  |lm()/lmer() |Y ~ F1 * ENV                                  |
+|ANOVA ad una via             |ANOVA ad una via (CRBD), due ambienti |lm()/lmer() |Y ~ F1 * ENV + BL&#124;ENV                    |
+|Regressione Lineare semplice |CRD                                   |lm()        |Y ~ X1                                        |
+|Simple Linear Regression     |CRBD                                  |lm()        |Y ~ BL + X1                                   |
+
+Nella tabella precedente, Y è la risposta, sempre rappresentata da una variabile continua, F1 ed F2  sono due fattori sperimentali (variabili nominali), X1 è una covariata (variabile continua), BL è la variabile che identifica i blocchi (variabile nominale), ENVè la variabile che identifica gli ambienti (variabile nominale) e MAIN, ROW, COL sono le variabili che identificano le main-plots nello split-plot e le righe/colonne nello strip-plot (variabili nominali).
+
+
 ## Modelli ANOVA ad una via (Cap. da 7 a 9)
 
-Gli esercizi che seguono sono basati su una serie di dataset, disponibili in un file Excel, che può essere scaricato da [questo link](https://www.casaonofri.it/_datasets/EserciziTesto.xlsx). Ogni dataset è in un foglio a parte, il cui nome viene fornito nel testo di ciascun esercizio.
 
 ### Esercizio 1 
 
@@ -795,7 +940,7 @@ E'stato impostato un test di durata su un impianto di riscaldamento, per verific
 |  1708 |              729 |
 
 Valutare se la temperatura di esercizio infleunza significativamente la durata del riscaldatore. Quale/i temperatura/e consentono la maggior durata?
-[Sheet: 7.3]
+[Sheet: 7.3] *SUGGERIMENTO: in questo esercizio è necessaria una trasformazione stabilizzante che non è automaticamente riconosciuta da 'emmeans()'. Pertanto, per la retrotrasformazione, sarà necessario utilizzare la procedura descritta alla fine del paragrafo 9.8.*
 
 ### Esercizio 4
 
@@ -819,7 +964,7 @@ Un entomologo ha contato il numero di uova deposte da un lepidottero sulle fogli
 |     14 |     0 |         0 |  566 |
 |     15 |   153 |       218 |  734 |
 
-Eseguite l'ANOVA. Quali sono le assunzioni necessarie per l'ANOVA? Sono rispettate? Vi sono outliers? Calcolate SEM e SED in modo attendibile.
+Eseguite l'ANOVA. Quali sono le assunzioni necessarie per l'ANOVA? Sono rispettate? Vi sono outliers? Calcolate SEM e SED in modo attendibile. *SUGGERIMENTO: in questo esercizio è necessaria una trasformazione stabilizzante che non è automaticamente riconosciuta da 'emmeans()'. Pertanto, per la retrotrasformazione, sarà necessario utilizzare la procedura descritta alla fine del paragrafo 9.8.*
 [Sheet: 7.4]
 
 ---
@@ -854,7 +999,7 @@ E' stato impostato un esperimento di fertilizzazione secondo uno schema a blocch
 | 100 lb N + 75 lb P205 |  9.6 |  9.3 |  12 | 10.6 | 11.6 |
 
 Eseguire l'ANOVA, considerando il dato mancante. Calcolare SEM e SED. Qual è il trattamento migliore? Aumentare il dosaggio di N senza P~2~ O~5~ è conveniente? E in presenza di P~2~ O~5~?
-[Sheet: 10.2]
+[Sheet: 10.2] *SUGGERIMENTO: in questo dataset vi è un dato mancante, contrassegnato con NA (Not Available). Al contrario della funzione 'read.csv()', la funzione 'read_xlsx()' non è in grado di riconoscere autometicamente questo dato mancante e, pertanto, sarà necessario utilizzare largomento `na = "NA"`, all'interno del comando di lettura file.*
 
 ### Esercizio 3
 
@@ -880,11 +1025,50 @@ Eseguire l'ANOVA, considerando il dato mancante. Calcolare SEM e SED. Qual è il
 |          D |  4  |   3    |  163  |
 
 Analizzate i dati e commentate i risultati ottenuti
-[Sheet: 10.2]
+[Sheet: 10.3] *SUGGERIMENTO: l'esperimento è a quadrato latino e, di conseguenza, vi sono tre fonti di variazione additive: il fertilizzante, la riga e la colonna (riguardare il display dei disegni a quadrato latino al capitolo 2, se necessario).*
 
 ---
 
 ## Regressione (Cap. 11)
+
+Quando la variabile indipendente è continua, potremmo essere interessati a valutare l'esistenza di una possibile relazione funzionale tra la X e la Y (curva dose-risposta). La relazione più semplice è la 'retta' $Y = b_0 + b_1 \, X$; il fitting di questo modello implica la stima di $b_0$ (intercetta) e $b_1$ (pendenza), in modo che la retta stimata sia quella che passa 'più vicina' possibile ai dati osservati. Quando facciamo il fitting di un modello come questo, lo schema di lavoro presentato all'inizio di questo capitolo cambia, nel senso che, oltre agli usuali controlli sull'omogeneità delle varianze e sulla normalità dei residui, dobbiamo anche controllare la bontà di adattamento. Ciò può essere fatto attraverso un grafico nel quale vengano contemporaneamente mostrati i valori osservati e quelli predetti dal modello, con il codice seguente:
+
+
+```
+model <- lm(Y ~ X1, data = dataset) # fitting del modello
+summary(model) # stima dei parametri
+b0 <- 10 # valore dell'intercetta, ottenuto più sopra
+b1 <- 0.5 # valore della pendenza ottenuto più sopra
+plot(Y ~ X1, data = dataset) # grafico dei dati osservati
+curve(B0 + B1 * x, add = T) # retta stimata; 'x' deve essere scritto così come è, in lettera piccola
+```
+
+Ovviamente, nel caso della regressione lineare non dobbiamo eseguire il test di confronto multiplo: se la risposta giace su una retta ogni valore del predittore X produce una risposta diversa dall'altro. 
+
+I modelli di regressione possono essere adattati anche a dati da prove non replicate. Se però abbiamo le repliche, allora ci sono due possibili modelli: un modello ANOVA, nel quale la variabile X viene trasformata in una variabile nominale ed un modello di regressione, nel quale la variabile X resta numerica. Il primo modello è certamente più vicino ai dati (più basso residuo) perché non pone alcun vincolo sulla forma della risposta, mentre il secondo modello è più semplice (meno parametri da stimare), ma meno preciso, perché impone che le risposte siano allineate a carattterizzate da una crescita/decrescita monotona. Possiamo confrontare i due modelli per valutare se il fitting è altrettanto buono con il codice che segue.
+
+```
+anova(model1, model2)
+```
+
+Se il P-level è maggiore di 0.05 posso accettare la nulla, concludere che i due modelli sono ugualmente buoni e, di conseguenza, scegliere quello più semplice, seguendo il principio del rasio di Occam. Ciò equivale a dire che il modello di regressione non ha alcuna mancanza di adattamento ai dati osservati.
+
+Quando gli esperimenti sono replicati abbiamo però una difficoltà aggiuntiva, nel senso che il codice sottostante:
+
+```
+model <- lm(Y ~ BL + X1, data = dataset) # fits the model
+summary(model)
+```
+
+produce una sola pendenza e tante intercette quanti sono i blocchi. Per trovare l'intercetta media posso utilizzare la usuale funzione 'emmeans()', come indicato più sotto (X1 è da sostituire col nome della variabile indipendente).
+
+
+
+
+```
+emmeans(model, ~1, at = list(X1 = 0))
+```
+
 
 ### Esercizio 1
 
@@ -942,6 +1126,23 @@ Eseguire l'ANOVA e verificare il rispetto delle assunzioni di base. E'corretto e
 ---
 
 ## ANOVA a due vie con interazione (Cap. 12 e 13)
+
+Alcuni dei dataset che seguono sono stati ottenuti da esperimenti a split-plot. Se non avete letto il Capitolo 13, potete anlizzare questi dataset facendo attenzione a quanto segue.
+
+Per i disegni a split-plot e a strip-plot, invece delione 'lm()', dobbiamo utilizzare la funzione 'lmer()' che necessita dell'istallazione dei packages 'lme4' e 'lmerTest'. Prima del fitting, dobbiamo identificare in modo univoco le main-plots (per i disegni a split-plot) e le righe/colonne (per i disegni a strip-plot). Le main-plots possono essere identificate incrociando la variabile del fattore principale con i blocchi, come indicato più sotto per la variabile 'Tillage' nel dataframe 'dataset':
+
+```
+dataset$mainPlot <- with(dataset, factor(Block:Tillage))
+```
+
+Analogamente per un disgno a strip-plot, possiamo operare come segue:
+
+```
+dataset$Rows <- factor(dataset$Crop:dataset$Block)
+dataset$Columns <- factor(dataset$Herbicide:dataset$Block)
+```
+
+Il codice per il fitting è riportato nella tabella sovrastante. L'uso del metodo plot() applicato al risultato del fitting restituisce solo il grafico dei residui verso i valori attesi e quindi il controllo dell'assunzione di normalità può essere evitato, per semplicità. L'esigenza di eventuali trasformazioni stabilizzanti potrà essere valutata facendo un fitting preliminare di un modello lineare nel quale vengano trascurati i fattori di blocco (main-plot, righe e colonne).
 
 ### Esercizio 1
 
@@ -1010,7 +1211,7 @@ Gli erbicidi mostrano sempre un certo grado di persistenza nel terreno. Di conse
 |               |   3   |   400   | 364  |   257    |    397    |
 |               |   4   |   171   | 134  |   137    |    180    |
 
-Eseguite l'ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente.
+Eseguite l'ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente. *SUGGERIMENTO: in questo esercizio è necessaria una trasformazione stabilizzante, che dovrà essere valutata preventivamente, utilizzando un modello che trascura il disegno sperimentale, considerandolo un semplice fattoriale a blocchi randomizzati, in modo da poter procedere con la funzione 'lm()' e, successivamente, la funzione 'boxcox()'.*
 [Sheet: 12-13.3]
 
 ### Esercizio 4
@@ -1233,33 +1434,26 @@ Parametrizzare questo modello e verificarne la bontà d'adattamento.
 <!--chapter:end:15-Esercizi.Rmd-->
 
 
-# Appendice 1: breve introduzione ad R
+# Appendice: breve introduzione ad R
 
 Placeholder
 
 
-## Cosa è R? {-}
-## Oggetti e assegnazioni {-}
-### Costanti e vettori {-}
-### Matrici {-}
-### Dataframe {-}
-### Quale oggetto sto utilizzando? {-}
-## Operazioni ed operatori {-}
-## Funzioni ed argomenti {-}
-## Consigli per l'immissione di dati sperimentali {-}
-### Immissione di numeri progressivi {-}
-### Immissione dei codici delle tesi e dei blocchi {-}
-### Immissione dei valori e creazione del datframe {-}
-### Leggere e salvare dati esterni {-}
-## Alcune operazioni comuni sul dataset {-}
-### Selezionare un subset di dati {-}
-### Ordinare un vettore o un dataframe {-}
-## Workspace {-}
-## Script o programmi {-}
-## Interrogazione di oggetti {-}
-## Altre funzioni matriciali {-}
-## Cenni sulle funzionalità grafiche in R {-}
-## Altre letture {-}
+## Cosa è R?
+## Prima di iniziare
+## Oggetti e assegnazioni
+### Costanti e vettori
+### Matrici
+### Dataframe
+### Indicizzazione
+## Espressioni e funzioni
+## Funzioni di uso comune
+## Creazione di funzioni personalizzate
+## Uso di librerie aggiuntive
+## Workspace
+## Importare dati esterni
+## Cenni sulle funzionalità grafiche in R
+## Altre letture
 
 <!--chapter:end:17-IntroduzioneR.Rmd-->
 

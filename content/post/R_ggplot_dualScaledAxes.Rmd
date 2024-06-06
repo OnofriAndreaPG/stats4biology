@@ -1,7 +1,7 @@
 ---
 title: "Plotting weather data with ggplot()"
 author: "Andrea Onofri"
-date: 2024-05-24
+date: 2024-06-06
 slug: 'ggplot'
 categories:
   - R
@@ -11,6 +11,7 @@ tags:
   - 'ggplot'
   - 'plot'
   - 'climate_data'
+  - 'ggh4x'
 archives:
   - 2024
 ---
@@ -38,9 +39,9 @@ library(dplyr)
 fileName <- "https://www.casaonofri.it/_datasets/DailyMeteoData.csv"
 dataMeteo <- read.csv(fileName) |>
   mutate(Date = as.Date(Date, format = "%d/%m/%Y"),
-         Year = as.numeric(as.character(Date, format="%Y")),
-         Month = as.numeric(as.character(Date, format="%m")),
-         DOY = as.numeric(as.character(Date, format="%j")))
+         Year = as.numeric(format(Date, format="%Y")),
+         Month = as.numeric(format(Date, format="%m")),
+         DOY = as.numeric(format(Date, format="%j")))
 head(dataMeteo)
 ```
 
@@ -144,11 +145,9 @@ ggplot() +
   theme_bw()
 ```
 
-And we are done! I am sure you have comments to improve this: please, drop me a not at the adress below.
+And we are done! I am sure you have comments to improve this: please, drop me a not at the address below.
 
 Thanks for reading and happy coding!
-
-
 
 Andrea Onofri   
 Department of Agricultural, Food and Environmental Sciences        
@@ -156,5 +155,66 @@ University of Perugia (Italy)
 [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)  
 
 <a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow @onofriandreapg</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+---
+
+# UPDATE (6/6/2024)
+
+Ross Gilmoure from Galileo Consulting (Kuala Lumpur) sent me an interesting comment, proposing the use of the 'lubridate' package for the management of dates and of the 'ggh4x' package, to exploit the nested axis capabilities of this latter. Basically, his graph does not have facets, but the two years are put one after the other. Furthermore, he made use of minor ticks, which might be a good idea. Ross' code is following: I'd like to thank him very much!
+
+```{r message=FALSE, warning=FALSE}
+library(lubridate)
+library(ggh4x)
+dataMeteo1 <- dataMeteo |>
+  mutate(
+    Date = as.Date(Date, format = "%d/%m/%Y"),
+    Year = lubridate::year(Date),
+    Month = lubridate::month(Date))
+
+dataMeteo2 <- dataMeteo1 |>
+  group_by(Year, Month) |>
+  summarise(
+    Rain = sum(Rain),
+    Temp = mean(Tavg, rm.na = TRUE)) |>
+  mutate(Mth = factor(month.abb[Month], 
+                      levels = c("Jan", "Feb", "Mar", "Apr",
+                                 "May", "Jun", "Jul", "Aug",
+                                 "Sep", "Oct", "Nov", "Dec")))
+dataMeteo3 <- dataMeteo2 |>
+  mutate(newTemp = 162.69 + 3.02 * Temp)
+
+ggplot(dataMeteo3, mapping = aes(x = interaction(Mth, Year),
+                                 group = 1)) +
+  geom_col(aes(y = Rain), fill = "grey") +
+  geom_point(aes(y = newTemp), size = 2, col = "blue") +
+  geom_smooth(
+    method = "gam", formula = y ~ s(x, bs = "cc"),
+    aes(x = as.numeric(interaction(Mth, Year)), y = newTemp),
+    col = "blue") +
+  geom_point(aes(y = newTemp), size = 3, col = "blue", 
+             fill = "white", shape = 21, stroke = 1) +
+  scale_y_continuous(
+    minor_breaks = scales::breaks_width(20),
+    name = "Mean Monthly Total Rainfall (mm)",
+    sec.axis = sec_axis(~ (. - 162.69) / 3.02,
+      name = "Mean Monthly Daily Temperature (°C)",
+      breaks = c(-10, 0, 10, 20, 30))) +
+  guides(x = "axis_nested",
+        y = guide_axis(minor.ticks=TRUE),
+        y.sec = guide_axis(minor.ticks=TRUE)) +
+  theme_bw(base_size = 18) +
+  theme(
+     panel.grid.minor = element_blank(),
+     axis.title.x = element_blank(),
+     axis.text.x = element_text(face = "bold"),
+     axis.ticks = element_line(colour = "red"),
+     ggh4x.axis.nestline.x = element_line(linewidth = 2),
+     ggh4x.axis.nesttext.x = element_text(colour = "blue", 
+                                          face = "bold", 
+                                          size = rel(1.2))
+  )
+
+```
+
 
 

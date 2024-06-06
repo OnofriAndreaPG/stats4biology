@@ -1,7 +1,7 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.24 (Anno Accademico 2023-2024), compil. 2024-04-30"
+date: "Update: v. 1.30 (Anno Accademico 2023-2024; giugno), compil. 2024-05-30"
 #site: bookdown::bookdown_site
 documentclass: book
 citation_package: natbib
@@ -2933,7 +2933,7 @@ Se le procedure diagnostiche hanno evidenziato deviazioni rispetto agli assunti 
 
 In presenza di outliers, la 'terapia' più opportuna è, banalmente, quella di rimuoverli, ottenendo così un dataset 'sbilanciato' (diverso numero di repliche per trattamento). Oggigiorno, trattare un dataset sbilanciato non costituisce un problema, ovviamente se si utilizzano le metodiche di analisi opportune. Qualche anno fa, al contrario, si cercava di evitare lo sbilanciamento a tutti i costi, utilizzando tecniche di *imputing* per l'immissione di valori ’ragionevoli’ in sostituzione di quelli mancanti/aberranti. Con le dovute eccezioni, le tecniche di *imputing* sembrano oggi abbastanza obsolete, almeno in questo contesto.
 
-Vorrei porre l'attenzione sul fatto che i dati aberranti sono dati molto 'influenziali', nel senso che possono influenzare in modo molto marcato il risultato dell’analisi. Pertanto, se è sbagliato correggerli arbitrariamente, senza aver prima accertato che siano effettivamente frutto di errore, può essere altrettanto sbagliato lasciarli nel dataset. Ovviamente, la rimozione non può che riguardare una larga minoranza dei dati sperimentali raccolti, altrimenti si dovrà necessariamente pensare di ripetere l’esperimento.
+Vorremmo porre l'attenzione sul fatto che i dati aberranti possono influenzare in modo molto marcato il risultato dell’analisi (sono dati 'influenziali'); pertanto, se è sbagliato correggerli arbitrariamente, senza aver prima accertato che siano effettivamente frutto di errore, può essere altrettanto sbagliato lasciarli nel dataset. Ovviamente, la rimozione non può che riguardare una larga minoranza dei dati sperimentali raccolti, altrimenti si dovrà necessariamente pensare di ripetere l’esperimento.
 
 
 ### Correzione del modello
@@ -2944,26 +2944,22 @@ Abbiamo visto che il modello impiegato potrebbe non essere adatto a descrivere i
 
 A volte la variabile dipendente non è qualitativa, bensì quantitativa. Vedremo meglio questo aspetto nei prossimi capitoli, quando parleremo di regressione. Tuttavia, anticipiamo che, quando la variabile indipendente è quantitativa, essa può essere sottoposta ad opportuna trasformazione. Ad esempio, se i dati mostrano un andamento esponenziale, la trasformazione della variabile indipendente in logaritmo può portare al sensibile miglioramento del fitting con un'equazione lineare.
 
-### Impiego di metodiche statistiche avanzate
-
-In presenza di deviazioni sistematiche rispetto agli assunti di base, la cosa più logica sarebbe quella di chiedersi perché il dataset è non-normale e/o eteroscedastico ed incorporare queste informazioni nel modello. Ad esempio, un conteggio potrebbe seguire la distribuzione di Poisson, oppure una serie di proporzioni potrebbero seguire la distribuzione binomiale. In questi casi sarebbe opportuno utilizzare modelli lineari generalizzati (GLiM), basati non sulla distribuzione normale, ma su altre distribuzioni, più adatte per il fenomeno in studio. Allo stesso modo, l'eterogeneità delle varianze può essere incorporata nel modello, utilizzando tecniche dei minimi quadrati generalizzati (GLS). In altri casi, quando non si riescono a rispettare le assunzioni di base dei modelli, si può ricorrere a metodiche statistiche che ne fanno di meno e che, pertanto, sono dette metodiche 'non-parametriche'.
-
-In questo libro, non tratteremo né i GLiM, né i GLS, né le metodiche non parametriche, ritenendole più adatte ad un corso di livello più avanzato.
 
 ### Trasformazioni stabilizzanti
 
-Una strategia empirica, ma molto seguita in pratica e caratterizzata da un'efficacia non disprezzabile, è quella di ricorrere alle trasformazioni correttive. Con questa tecnica, si va a cercare una metrica sulla quale le assunzioni di base dell’ANOVA siano rispettate e si esegue l’elaborazione dei dati trasformati invece che di quelli non trasformati.
+Una strategia empirica, ma molto semplice, diffusa ed efficace, è quella di ricorrere alle trasformazioni correttive. Con questa tecnica, si trasformano i dati in modo da portarli su una metrica che soddisfi le assunzioni di base dei modelli lineari; successivamente si ripete l’elaborazione sui dati trasformati.
 
-Per i conteggi e per l’eterogeneità delle varianze di variabili continue, si consiglia la trasformazione in radice quadrata o in logaritmo, scegliendo in base a quella che consente la miglior distribuzione dei residui. Per evitare di scegliere la trasformazione 'al buio', si può impiegare la procedura suggerita da Box e Cox (1964), basata su una 'famiglia di trasformazioni', definita come segue:
+Le trasformazioni possibili sono molte: ad esempio, per i conteggi oppure per variabili continue caratterizzate da medie proporzionali alle varianze, vengono usualmente consigliate la trasformazione nella radice quadrata o quella nel logaritmo, oppure per i dati percentuali viene consigliata la trasformazione angolare (arcoseno della radice quadrata). Per evitare di scegliere la trasformazione 'al buio', si può impiegare la procedura suggerita da Box e Cox (1964), basata su una 'famiglia di trasformazioni', così definita:
 
 $$ W = \left\{ \begin{array}{ll}
 \frac{Y^\lambda - 1}{\lambda} & \quad \textrm{if} \,\,\, \lambda \neq 0 \\
 \log(Y) & \quad \textrm{if} \,\,\, \lambda = 0
 \end{array} \right.$$
 
-dove $W$ è la variabile trasformata, $Y$ è la variabile originale e $\lambda$ è il parametro che definisce la trasformazione. In particolare, osserviamo che se $\lambda$ è pari ad 1 i dati non sono, di fatto, trasformati, se è pari a 0.5 abbiamo una trasformazione equivalente alla radice quadrata, se è pari a 0 abbiamo la trasformazione logaritmica, se è pari a -1 abbiamo una trasformazione equivalente al reciproco.
+dove $W$ è la variabile trasformata, $Y$ è la variabile originale e $\lambda$ è il parametro che definisce la trasformazione ^[Nota: Considerate che il limite dell'espressione $(Y^\lambda -1)/\lambda$ per $\lambda \rightarrow 0$ è proprio $\log(Y)$]
 
-La scelta del valore $\lambda$ può essere effettuata in modo empirico, confrontando la verosimiglianza di modelli basati su trasformazioni diverse. In R, questa procedura è automatizzata nella funzione `boxcox()`, disponibile nel package MASS è verrà illustrata in un esempio successivo.
+Questa famiglia è molto flessibile, nel senso che cambiando il valore di $\lambda$ possiamo rimediare alla gran parte delle deviazioni rispetto alle assunzioni di base. Per scegliere il valore ottimale per questo parametro, possiamo procedere in modo empirico, confrontando la verosimiglianza di modelli basati su trasformazioni diverse. In R, questa procedura è automatizzata nella funzione `boxcox()`, disponibile nel package MASS è verrà illustrata negli esempi che seguono. Bisogna tener presente che, qualora il valore ottimale risultasse $\lambda = 1$, la trasformazione sarebbe completamente fittizia, in quanto, da ogni dato, verrebbe semplicemente sottratta un'unità, senza quindi alterare minimamente i risultati dell'analisi. **Di conseguenza, trovare che $\lambda$ ottimale è uguale ad 1 viene considerato come evidenza del fatto che la trasformazione non è necessaria.**
+
 
 ## Esempio 1
 
@@ -3002,7 +2998,19 @@ e il risultato è mostrato nella figura \@ref(fig:figName110a).
 <p class="caption">(\#fig:figName110a)Analisi grafica dei residui per un modello ANOVA ad una via adattato al dataset 'mixture.csv'</p>
 </div>
 
-Nessuno dei grafici suggerisce l'esistenza di particolari problematiche e, considerando anche che che non si tratta di un conteggio o una proporzione e che le differenze tra le medie sono piuttosto piccole (meno di un ordine di grandezza), possiamo concludere che non vi sono motivi per dubitare del rispetto delle assunzioni di base.
+Nessuno dei grafici suggerisce l'esistenza di particolari problematiche e, considerando anche che che non si tratta di un conteggio o una proporzione e che le differenze tra le medie sono piuttosto piccole (meno di un ordine di grandezza), possiamo concludere che non vi sono motivi per dubitare del rispetto delle assunzioni di base. Questa conclusione può essere confermata utilizzando la funzione `boxcox()` nel package MASS, per individuare il valore di $\lambda$ più adatto per i nostri dati. Il comando è:
+
+```
+library(MASS)
+boxcox(mod)
+```
+
+e fornisce l'output in figura \@ref(fig:figName111a); il valore ottimale sarebbe $\lambda = 0.83$, ma vediamo che anche $\lambda = 1$ rientra nell'intervallo di confidenza di $\lambda$ ottimale e, di conseguenza, si conferma che non è necessaria alcuna trasformazione stabilizzante.
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName111a-1.png" alt="Scelta del valore ottimale di 'lambda' per la trasformazione di Box e Cox: caso in cui la trasformazione non è necessaria" width="85%" />
+<p class="caption">(\#fig:figName111a)Scelta del valore ottimale di 'lambda' per la trasformazione di Box e Cox: caso in cui la trasformazione non è necessaria</p>
+</div>
 
 
 ## Esempio 2
@@ -3041,18 +3049,11 @@ shapiro.test(residuals(mod) )
 ## W = 0.87689, p-value = 0.04265
 ```
 
-I test di Levene e Shapiro-Wilks confermano che la mancanza di normalità è significativa e, pertanto, scegliamo di impiegare una trasformazione correttiva. Utilizziamo quindi la funzione `boxcox()` per individuare la trasformazione più adatta a correggere la patologia riscontrata. Il comando è:
-
-```
-library(MASS)
-boxcox(mod)
-```
-
-e fornisce l'output in figura \@ref(fig:figName111).
+I test di Levene e Shapiro-Wilks confermano che la mancanza di normalità è significativa e, pertanto, scegliamo di impiegare una trasformazione correttiva. Utilizziamo quindi la funzione `boxcox(mod)` per individuare la trasformazione più adatta a correggere la patologia riscontrata, ottenendo l'output in figura \@ref(fig:figName111b).
 
 <div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName111-1.png" alt="Scelta del valore ottimale di lambda per la trasformazione di Box e Cox" width="85%" />
-<p class="caption">(\#fig:figName111)Scelta del valore ottimale di lambda per la trasformazione di Box e Cox</p>
+<img src="_main_files/figure-html/figName111b-1.png" alt="Scelta del valore ottimale di 'lambda' per la trasformazione di Box e Cox: caso in cui è consigliabile una trasformazione logaritmica" width="85%" />
+<p class="caption">(\#fig:figName111b)Scelta del valore ottimale di 'lambda' per la trasformazione di Box e Cox: caso in cui è consigliabile una trasformazione logaritmica</p>
 </div>
 
 Vediamo che la verosimiglianza del modello raggiunge il massimo valore quando $\lambda$ è pari a 0.14. I limiti dell'intervallo di confidenza (linee verticali tratteggiate) vanno da poco sotto lo 0 a 0.5 circa. Rimanendo nell'ambito dell'intervallo di confidenza, scegliamo il valore $\lambda = 0$, che corrisponde alla trasformazione logaritmica. Questa scelta è motivata dal fatto che si tratta di una trasformazione molto nota e facilmente comprensibile.
@@ -3072,13 +3073,71 @@ plot(mod, which = 2)
 <p class="caption">(\#fig:figName112)Analisi grafica dei residui per il dataset 'insects.csv', previa trasformazione logaritmica</p>
 </div>
 
-Vediamo che i dati trasformati non mostrano più alcun sintomo di eteroscedasticità e, di conseguenza, il P-level calcolato su questa metrica è totalmente affidabile.
+Vediamo che i dati trasformati non mostrano più alcun sintomo di eteroscedasticità e, di conseguenza, il P-level calcolato su questa metrica è totalmente affidabile. Procediamo quindi con l'analisi e richiediamo la tabella ANOVA, da cui si deduce che le differenze tra insetticidi sono significative (P = 1.493e-06).
 
-## Altri approcci avanzati
+
+```r
+anova(mod)
+## Analysis of Variance Table
+## 
+## Response: log(Count)
+##             Df  Sum Sq Mean Sq F value    Pr(>F)    
+## Insecticide  2 15.8200  7.9100  50.122 1.493e-06 ***
+## Residuals   12  1.8938  0.1578                      
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+Se confrontiamo la tabella sovrastante con quella che si ottiene dai dati non trasformati, riportata di seguito, vediamo che vi sono lievi differenze nel P-value, ma, comunque, in entrambi i casi si può procedere al rigetto dell'ipotesi nulla.
+
+
+```r
+anova(lm(Count ~ Insecticide, data = dataset))
+## Analysis of Variance Table
+## 
+## Response: Count
+##             Df Sum Sq Mean Sq F value    Pr(>F)    
+## Insecticide  2 714654  357327  18.161 0.0002345 ***
+## Residuals   12 236105   19675                      
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+Tuttavia, l'analisi sui dati non trasformati è comunque sbagliata ed il P-value è invalido, il che può fare una grossa differenza nel caso in cui ci trovassimo vicini al valore critico di 0.05. La scelta della trasformazione è quindi un aspetto da non trascurare in fase di analisi dei dati delle prove sperimentali.
+
+Concludiamo con un'osservazione pratica: nel caso in cui risultasse che il valore di $\lambda$ ottimale è diverso sia da 1 che da 0, la trasformazione $W = (Y^\lambda - 1)/\lambda$ potrebbe essere semplificata in $W = Y^\lambda$, in modo da ottenere una metrica più facile da interpretare. Infatti, con $\lambda = 0.5$ avremmo una semplice trasformazione nella radice quadrata, mentre con $\lambda = -1$ avremmo l'altrettanto semplice trasformazione nel reciproco. Il box seguente mostra un esempio dell'equivalenza della trasformazione di Box e Cox nella forma originale e in quella semplificata: possiamo infatti notare che il rapporto F e il P-level sono esattamente uguali.
+
+
+```r
+mod.1 <- lm(sqrt(Count) ~ Insecticide, data = dataset)
+mod.2 <- lm((Count^0.5 - 1)/0.5 ~ Insecticide, data = dataset)
+anova(mod.1)
+## Analysis of Variance Table
+## 
+## Response: sqrt(Count)
+##             Df Sum Sq Mean Sq F value    Pr(>F)    
+## Insecticide  2 724.22  362.11  35.022 9.791e-06 ***
+## Residuals   12 124.08   10.34                      
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+anova(mod.2)
+## Analysis of Variance Table
+## 
+## Response: (Count^0.5 - 1)/0.5
+##             Df Sum Sq Mean Sq F value    Pr(>F)    
+## Insecticide  2 2896.9 1448.44  35.022 9.791e-06 ***
+## Residuals   12  496.3   41.36                      
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+
+## Altri approcci 'avanzati'
 
 L'uso di trasformazioni stabilizzanti è stato molto di moda fino agli anni '80 del '900, quando la potenza di calcolo era estremamente bassa e rendeva possibile solo l'impiego di procedure semplici, come quelle indicate in questo libro. Oggigiorno, la diffusione di computer potenti a costo relativamente basso ha permesso la diffusione di modelli in grado di gestire anche errori non-normali e dati eteroscedastici. Questi modelli appartengono alle classi dei cosiddetti Modelli Lineari Generalizzati (GLM) o dei modelli con fitting basato sui Minimi Quadrati Generalizzati (GLS); sono molto flessibili, ma sono anche abbastanza complessi e non possono essere trattati su un testo introduttivo.
 
 Inoltre, per completezza di informazione, mensioneremo il fatto che esistono anche metodi di analisi dei dati che non fanno assunzioni parametriche o che ne fanno molto poche e sono, pertanto, noti come metodi non-parametrici. Non parleremo neanche di questi, rinviando chi fosse interessato alla lettura di testi specifici. 
+
 
 ---
 
@@ -3092,9 +3151,6 @@ Inoltre, per completezza di informazione, mensioneremo il fatto che esistono anc
 5. Pinheiro, J.C., Bates, D.M., 2000. Mixed-Effects Models in S and S-Plus, Springer-Verlag Inc. ed. Springer-Verlag Inc., New York.
 6. Saskia, R. M. 1992, The Box-Cox transformation technique: a review. Statistician 41: 169-178.
 7. Siegel, S e Castellan N.J. (1992) Statistica non-parametrica. McGraw-Hill, Milano.
-
-
-6. Weisberg, S., 2005. Applied linear regression, 3rd ed. John Wiley & Sons Inc. (per il metodo 'delta')
 
 
 <!--chapter:end:08-AssunzioniBase.Rmd-->
@@ -3552,7 +3608,7 @@ cld(retroMedie, Letters = LETTERS)
 ##       But we also did not show them to be the same.
 ```
 
-La retrotrasformazione è immediata in quanto la funzione `emmeans()` è stata in grado di riconoscere la trasformazione stabilizzante applicata all'interno del 'model fitting'. La situazione è più complessa se la trasformazione è applicata prima del 'model fitting' oppure se non viene automaticamente riconosciuta. Ad esempio, una trasformazione inversa non viene automaticamente riconosciuta e, di conseguenza, la retrotrasformazione non è effettuata.
+La retrotrasformazione è immediata in quanto la funzione `emmeans()` è stata in grado di riconoscere la trasformazione stabilizzante applicata all'interno del 'model fitting'. La situazione diviene più complessa se la trasformazione è applicata prima del 'model fitting' oppure se non viene automaticamente riconosciuta. Ad esempio, una trasformazione inversa non viene automaticamente riconosciuta e, di conseguenza, la retrotrasformazione non viene effettuata.
 
 
 ```r
@@ -3566,7 +3622,7 @@ emmeans(mod2, ~Insecticide, type = "response")
 ## Confidence level used: 0.95
 ```
 
-In questo caso la trasformazione viene eseguita prima del 'model fitting', per poi cambiare la griglia di riferimento per il modello (`update(ref_grid(mod2), ....)`) specificando la trasformazione effettuata (`tran = "inverse"`). La griglia così modificata viene passata al posto del modello alla funzione `emmeans()`, come indicato di seguito.
+In questo caso, dobbiamo eseguire la trasformazione prima del 'model fitting' e poi cambiare la griglia di riferimento per il modello (`update(ref_grid(mod2), ....)`) specificando la trasformazione effettuata (`tran = "inverse"`). La griglia così modificata viene passata al posto del modello alla funzione `emmeans()`, come indicato di seguito.
 
 
 ```r
@@ -3584,6 +3640,24 @@ emmeans(updGrid, ~Insecticide, type = "response")
 ```
 
 Questo metodo si può utilizzare con numerose funzioni, come, ad esempio "identity", "1/mu^2", "inverse", "reciprocal", "log10", "log2", "asin.sqrt" e "asinh.sqrt".
+
+Un approccio analogo può essere utilizzato se vogliamo effettuare la trasformazione di Box-Cox nella sua forma semplificata ($W = Y^{\lambda}$), utilizzando un valore $\lambda$ diverso da quelli 'semplici' (cioè diverso da 1, 0, 0.5 o -1). Ad esempio, se vogliamo utilizzare $\lambda = 0.25$, dobbiamo operare in modo simile a quello descritto in precedenza, utilizzando la funzione `make.tran()`, come evidenziato nel box seguente. 
+
+
+```r
+dataset$lCount <- dataset$Count^0.25
+mod4 <- lm(lCount ~ Insecticide, data = dataset)
+updGrid <- update(ref_grid(mod4), tran = make.tran("power", 0.25))
+emmeans(updGrid, ~Insecticide, type = "response")
+##  Insecticide response   SE df lower.CL upper.CL
+##  T1             573.5 78.7 12    420.3    765.3
+##  T2             340.5 53.2 12    238.5    472.1
+##  T3              53.1 13.2 12     29.6     88.3
+## 
+## Confidence level used: 0.95 
+## Intervals are back-transformed from the mu^0.25 scale
+```
+
 
 ## E le classiche procedure di confronto multiplo?
 
@@ -3628,6 +3702,7 @@ La cosa fondamentale è muoversi in coerenza con le finalità dell'esperimento. 
 10. O'Neill, R. and G. B. Wetherill. 1971, The present state of multiple comparison methods. Journ. Roy. Stat. Soc. , 2, 218-249.
 11. Petersen, R. G. 1977, Use and misuse of multiple comparison procedurs. Agronomy Journal, 69, 205-208.
 12. Scott, A. J. and M. Knott. 1974, A cluster analysis method for grouping means in the analysis of variance. Biometrics, 30, 507-512.
+6. Weisberg, S., 2005. Applied linear regression, 3rd ed. John Wiley & Sons Inc. (per il metodo 'delta')
 13. Willavize, S. A., S. G. Carmer, and W. M. Walker. 1980, Evaluation of cluster analysis for comparing treatment means. Agronomy journal, 72,317-320.
 
 <!--chapter:end:09-ConfrontoMultiplo.Rmd-->
@@ -6212,7 +6287,7 @@ I dataset degli esempi che seguono sono riportati in un file Excel, che potete s
 Per facilitarvi la vita, alleghiamo una tabella che riassume i modelli descritti in questo libro ed utilizzabili per gli esercizi che seguono.
 
 
-Table: (\#tab:unnamed-chunk-217)Sommario dei principali modelli per descrivere i principali esperimenti nelle scienze agrarie
+Table: (\#tab:unnamed-chunk-221)Sommario dei principali modelli per descrivere i principali esperimenti nelle scienze agrarie
 
 |Modello                      |Disegno.sperimentale                  |Funzione.R  |Specifiche                                    |
 |:----------------------------|:-------------------------------------|:-----------|:---------------------------------------------|
@@ -6297,7 +6372,7 @@ E'stato impostato un test di durata su un impianto di riscaldamento, per verific
 |  1708 |              729 |
 
 Valutare se la temperatura di esercizio infleunza significativamente la durata del riscaldatore. Quale/i temperatura/e consentono la maggior durata?
-[Sheet: 7.3]
+[Sheet: 7.3] *SUGGERIMENTO: in questo esercizio è necessaria una trasformazione stabilizzante che non è automaticamente riconosciuta da 'emmeans()'. Pertanto, per la retrotrasformazione, sarà necessario utilizzare la procedura descritta alla fine del paragrafo 9.8.*
 
 ### Esercizio 4
 
@@ -6321,7 +6396,7 @@ Un entomologo ha contato il numero di uova deposte da un lepidottero sulle fogli
 |     14 |     0 |         0 |  566 |
 |     15 |   153 |       218 |  734 |
 
-Eseguite l'ANOVA. Quali sono le assunzioni necessarie per l'ANOVA? Sono rispettate? Vi sono outliers? Calcolate SEM e SED in modo attendibile.
+Eseguite l'ANOVA. Quali sono le assunzioni necessarie per l'ANOVA? Sono rispettate? Vi sono outliers? Calcolate SEM e SED in modo attendibile. *SUGGERIMENTO: in questo esercizio è necessaria una trasformazione stabilizzante che non è automaticamente riconosciuta da 'emmeans()'. Pertanto, per la retrotrasformazione, sarà necessario utilizzare la procedura descritta alla fine del paragrafo 9.8.*
 [Sheet: 7.4]
 
 ---
@@ -6356,7 +6431,7 @@ E' stato impostato un esperimento di fertilizzazione secondo uno schema a blocch
 | 100 lb N + 75 lb P205 |  9.6 |  9.3 |  12 | 10.6 | 11.6 |
 
 Eseguire l'ANOVA, considerando il dato mancante. Calcolare SEM e SED. Qual è il trattamento migliore? Aumentare il dosaggio di N senza P~2~ O~5~ è conveniente? E in presenza di P~2~ O~5~?
-[Sheet: 10.2]
+[Sheet: 10.2] *SUGGERIMENTO: in questo dataset vi è un dato mancante, contrassegnato con NA (Not Available). Al contrario della funzione 'read.csv()', la funzione 'read_xlsx()' non è in grado di riconoscere autometicamente questo dato mancante e, pertanto, sarà necessario utilizzare largomento `na = "NA"`, all'interno del comando di lettura file.*
 
 ### Esercizio 3
 
@@ -6382,7 +6457,7 @@ Eseguire l'ANOVA, considerando il dato mancante. Calcolare SEM e SED. Qual è il
 |          D |  4  |   3    |  163  |
 
 Analizzate i dati e commentate i risultati ottenuti
-[Sheet: 10.3]
+[Sheet: 10.3] *SUGGERIMENTO: l'esperimento è a quadrato latino e, di conseguenza, vi sono tre fonti di variazione additive: il fertilizzante, la riga e la colonna (riguardare il display dei disegni a quadrato latino al capitolo 2, se necessario).*
 
 ---
 
@@ -6568,7 +6643,7 @@ Gli erbicidi mostrano sempre un certo grado di persistenza nel terreno. Di conse
 |               |   3   |   400   | 364  |   257    |    397    |
 |               |   4   |   171   | 134  |   137    |    180    |
 
-Eseguite l'ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente.
+Eseguite l'ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente. *SUGGERIMENTO: in questo esercizio è necessaria una trasformazione stabilizzante, che dovrà essere valutata preventivamente. Siccome la funzione 'boxcox()' non supporta i modelli misti, sarà necessario trascurare inizialmente i fattori di raggruppamento e considerare il disegno come se fosse un semplice fattoriale a blocchi randomizzati. In questo modo si potrà procedere al 'fitting' con la funzione 'lm()' e, successivamente, si potrà individuare la trasformazione migliore con l'usuale funzione 'boxcox()'. Una volta individuato il valore di $\lambda$ più opportuno, si potrà procedere al fitting con 'lmer()', utilizzando la trasformazione individuata in precedenza ed inserendo i fattori di raggruppamento necessari per un disegno a strip-plot.*
 [Sheet: 12-13.3]
 
 ### Esercizio 4
