@@ -5,7 +5,7 @@
     <description>Recent content in R on Fixing the bridge between biologists and statisticians</description>
     <generator>Hugo -- gohugo.io</generator>
     <copyright>Copyright © 2023, @AndreaOnofri</copyright>
-    <lastBuildDate>Fri, 24 May 2024 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 06 Jun 2024 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://www.statforbiology.com/tags/r/index.xml" rel="self" type="application/rss+xml" />
     
@@ -13,7 +13,7 @@
     <item>
       <title>Plotting weather data with ggplot()</title>
       <link>https://www.statforbiology.com/2024/r_ggplot_dualscaledaxes/</link>
-      <pubDate>Fri, 24 May 2024 00:00:00 +0000</pubDate>
+      <pubDate>Thu, 06 Jun 2024 00:00:00 +0000</pubDate>
       
       <guid>https://www.statforbiology.com/2024/r_ggplot_dualscaledaxes/</guid>
       <description>
@@ -30,9 +30,9 @@
 fileName &amp;lt;- &amp;quot;https://www.casaonofri.it/_datasets/DailyMeteoData.csv&amp;quot;
 dataMeteo &amp;lt;- read.csv(fileName) |&amp;gt;
   mutate(Date = as.Date(Date, format = &amp;quot;%d/%m/%Y&amp;quot;),
-         Year = as.numeric(as.character(Date, format=&amp;quot;%Y&amp;quot;)),
-         Month = as.numeric(as.character(Date, format=&amp;quot;%m&amp;quot;)),
-         DOY = as.numeric(as.character(Date, format=&amp;quot;%j&amp;quot;)))
+         Year = as.numeric(format(Date, format=&amp;quot;%Y&amp;quot;)),
+         Month = as.numeric(format(Date, format=&amp;quot;%m&amp;quot;)),
+         DOY = as.numeric(format(Date, format=&amp;quot;%j&amp;quot;)))
 head(dataMeteo)
 ##         Date Tavg Rain Year Month DOY
 ## 1 2011-01-01  5.9  0.0 2011     1   1
@@ -113,7 +113,7 @@ ggplot() +
   facet_wrap(~Year) +
   theme_bw()&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/R_ggplot_dualScaledAxes_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;And we are done! I am sure you have comments to improve this: please, drop me a not at the adress below.&lt;/p&gt;
+&lt;p&gt;And we are done! I am sure you have comments to improve this: please, drop me a not at the address below.&lt;/p&gt;
 &lt;p&gt;Thanks for reading and happy coding!&lt;/p&gt;
 &lt;p&gt;Andrea Onofri&lt;br /&gt;
 Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
@@ -121,6 +121,62 @@ University of Perugia (Italy)&lt;br /&gt;
 &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
 &lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
 &lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;hr /&gt;
+&lt;div id=&#34;update-662024&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;UPDATE (6/6/2024)&lt;/h1&gt;
+&lt;p&gt;Ross Gilmoure from Galileo Consulting (Kuala Lumpur) sent me an interesting comment, proposing the use of the ‘lubridate’ package for the management of dates and of the ‘ggh4x’ package, to exploit the nested axis capabilities of this latter. Basically, his graph does not have facets, but the two years are put one after the other. Furthermore, he calculated the montly means for temperature and fitted a cubic spline using ‘geom_smooth()’ and ‘method=“gam”’; he also made use of minor ticks, which might be a good idea. Ross’code is following: I’d like to thank him very much!&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(lubridate)
+library(ggh4x)
+dataMeteo1 &amp;lt;- dataMeteo |&amp;gt;
+  mutate(
+    Date = as.Date(Date, format = &amp;quot;%d/%m/%Y&amp;quot;),
+    Year = lubridate::year(Date),
+    Month = lubridate::month(Date))
+
+dataMeteo2 &amp;lt;- dataMeteo1 |&amp;gt;
+  group_by(Year, Month) |&amp;gt;
+  summarise(
+    Rain = sum(Rain),
+    Temp = mean(Tavg, rm.na = TRUE)) |&amp;gt;
+  mutate(Mth = factor(month.abb[Month], 
+                      levels = c(&amp;quot;Jan&amp;quot;, &amp;quot;Feb&amp;quot;, &amp;quot;Mar&amp;quot;, &amp;quot;Apr&amp;quot;,
+                                 &amp;quot;May&amp;quot;, &amp;quot;Jun&amp;quot;, &amp;quot;Jul&amp;quot;, &amp;quot;Aug&amp;quot;,
+                                 &amp;quot;Sep&amp;quot;, &amp;quot;Oct&amp;quot;, &amp;quot;Nov&amp;quot;, &amp;quot;Dec&amp;quot;)))
+dataMeteo3 &amp;lt;- dataMeteo2 |&amp;gt;
+  mutate(newTemp = 162.69 + 3.02 * Temp)
+
+ggplot(dataMeteo3, mapping = aes(x = interaction(Mth, Year),
+                                 group = 1)) +
+  geom_col(aes(y = Rain), fill = &amp;quot;grey&amp;quot;) +
+  geom_point(aes(y = newTemp), size = 2, col = &amp;quot;blue&amp;quot;) +
+  geom_smooth(
+    method = &amp;quot;gam&amp;quot;, formula = y ~ s(x, bs = &amp;quot;cc&amp;quot;),
+    aes(x = as.numeric(interaction(Mth, Year)), y = newTemp),
+    col = &amp;quot;blue&amp;quot;) +
+  geom_point(aes(y = newTemp), size = 3, col = &amp;quot;blue&amp;quot;, 
+             fill = &amp;quot;white&amp;quot;, shape = 21, stroke = 1) +
+  scale_y_continuous(
+    minor_breaks = scales::breaks_width(20),
+    name = &amp;quot;Mean Monthly Total Rainfall (mm)&amp;quot;,
+    sec.axis = sec_axis(~ (. - 162.69) / 3.02,
+      name = &amp;quot;Mean Monthly Daily Temperature (°C)&amp;quot;,
+      breaks = c(-10, 0, 10, 20, 30))) +
+  guides(x = &amp;quot;axis_nested&amp;quot;,
+        y = guide_axis(minor.ticks=TRUE),
+        y.sec = guide_axis(minor.ticks=TRUE)) +
+  theme_bw(base_size = 18) +
+  theme(
+     panel.grid.minor = element_blank(),
+     axis.title.x = element_blank(),
+     axis.text.x = element_text(face = &amp;quot;bold&amp;quot;, size = rel(0.5)),
+     axis.ticks = element_line(colour = &amp;quot;red&amp;quot;),
+     ggh4x.axis.nestline.x = element_line(linewidth = 0.6),
+     ggh4x.axis.nesttext.x = element_text(colour = &amp;quot;blue&amp;quot;, 
+                                          face = &amp;quot;bold&amp;quot;, 
+                                          size = rel(1.2))
+  )&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/R_ggplot_dualScaledAxes_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
 </description>
     </item>
     
