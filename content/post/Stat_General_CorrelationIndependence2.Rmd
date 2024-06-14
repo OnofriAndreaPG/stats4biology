@@ -27,8 +27,8 @@ I will use the same example as presented [in my previous post](https://www.statf
 library(reshape2)
 library(plyr)
 library(nlme)
-library(asreml)
-dataset <- read.csv("https://raw.githubusercontent.com/OnofriAndreaPG/aomisc/master/data/WheatQuality.csv", header=T)
+# library(asreml)
+dataset <- read.csv("https://www.casaonofri.it/_datasets/WheatQuality.csv", header=T)
 dataset$Block <- factor(dataset$Block)
 head(dataset)
 ```
@@ -56,24 +56,24 @@ To the best of my knowledge, there is no way to fit such a complex model with th
 2. The random model, that is composed by the interactions 'genotype x trait' and 'block x trait'. For both, I specified a general unstructured variance covariance matrix, so that the traits are heteroscedastic and correlated. Therefore, the random model is ~ Genotype:us(trait) + Block:us(trait).
 3. The residual structure, where the observations in the same plot (the term 'units' is used in 'asreml' to represent the observational units, i.e. the plots) are heteroscedastic and correlated.
 
-The model call is:
+The model call is (sorry, I have not renewed my license):
 
 ```{r message=FALSE, warning=FALSE, paged.print=FALSE}
-mod.asreml <- asreml(cbind(Yield, TKW) ~ trait - 1,
-        random = ~ Genotype:us(trait, init = c(3.7, -0.25, 1.7)) + 
-          Block:us(trait, init = c(77, 38, 53)),
-        residual = ~ units:us(trait, init = c(6, 0.16, 4.5)), 
-        data=dataset)
-summary(mod.asreml)$varcomp[,1:3]
+# mod.asreml <- asreml(cbind(Yield, TKW) ~ trait - 1,
+#        random = ~ Genotype:us(trait, init = c(3.7, -0.25, 1.7)) + 
+#          Block:us(trait, init = c(77, 38, 53)),
+#        residual = ~ units:us(trait, init = c(6, 0.16, 4.5)), 
+#        data=dataset)
+# summary(mod.asreml)$varcomp[,1:3]
 ```
 
 The box above shows the results about the variance-covariance parameters. In order to get the correlations, I specified the necessary combinations of variance-covariance parameters. It is necessary to remember that estimates, in 'asreml', are named as V1, V2, ... Vn, according to their ordering in model output.
 
 ```{r}
-parms <- mod.asreml$vparameters
-vpredict(mod.asreml, rb ~ V2 / (sqrt(V1)*sqrt(V3) ) )
-vpredict(mod.asreml, rt ~ V5 / (sqrt(V4)*sqrt(V6) ) )
-vpredict(mod.asreml, re ~ V9 / (sqrt(V8)*sqrt(V10) ) )
+# parms <- mod.asreml$vparameters
+# vpredict(mod.asreml, rb ~ V2 / (sqrt(V1)*sqrt(V3) ) )
+# vpredict(mod.asreml, rt ~ V5 / (sqrt(V4)*sqrt(V6) ) )
+# vpredict(mod.asreml, re ~ V9 / (sqrt(V8)*sqrt(V10) ) )
 ```
 
 We see that the estimates are very close to those obtained by using the Pearson's correlation coefficients (see my previous post). The advantage of this mixed model solution is that we can also test hypotheses in a relatively reliable way. For example, I tested the hypothesis that residuals are not correlated by:
@@ -84,27 +84,27 @@ We see that the estimates are very close to those obtained by using the Pearson'
 Removing the correlation of residuals is easily done, by changing the correlation structure from 'us' (unstructured variance-covariance matrix) to 'idh' (diagonal variance-covariance matrix).
 
 ```{r message=FALSE, warning=FALSE}
-mod.asreml2 <- asreml(cbind(Yield, TKW) ~ trait - 1,
-        random = ~ Genotype:us(trait) + Block:us(trait),
-        residual = ~ units:idh(trait), 
-        data=dataset)
-lrt.asreml(mod.asreml, mod.asreml2)
+# mod.asreml2 <- asreml(cbind(Yield, TKW) ~ trait - 1,
+#         random = ~ Genotype:us(trait) + Block:us(trait),
+#         residual = ~ units:idh(trait), 
+#         data=dataset)
+# lrt.asreml(mod.asreml, mod.asreml2)
 ```
 
 Likewise, I tried to further reduce the model to test the significance of the correlation between block means and genotype means.
 
 ```{r message=FALSE, warning=FALSE}
-mod.asreml3 <- asreml(cbind(Yield, TKW) ~ trait - 1,
-        random = ~ Genotype:us(trait) + Block:idh(trait),
-        residual = ~ units:idh(trait), 
-        data=dataset)
-lrt.asreml(mod.asreml, mod.asreml3)
+# mod.asreml3 <- asreml(cbind(Yield, TKW) ~ trait - 1,
+#         random = ~ Genotype:us(trait) + Block:idh(trait),
+#         residual = ~ units:idh(trait), 
+#         data=dataset)
+# lrt.asreml(mod.asreml, mod.asreml3)
 
-mod.asreml4 <- asreml(cbind(Yield, TKW) ~ trait - 1,
-        random = ~ Genotype:idh(trait) + Block:idh(trait),
-        residual = ~ units:idh(trait), 
-        data=dataset)
-lrt.asreml(mod.asreml, mod.asreml4)
+# mod.asreml4 <- asreml(cbind(Yield, TKW) ~ trait - 1,
+#         random = ~ Genotype:idh(trait) + Block:idh(trait),
+#         residual = ~ units:idh(trait), 
+#         data=dataset)
+# lrt.asreml(mod.asreml, mod.asreml4)
 ```
 
 We see that only the genotype means are significantly correlated.
@@ -112,41 +112,41 @@ We see that only the genotype means are significantly correlated.
 An alternative (and more useful) way to code the same model is by using the 'corgh' structure, instead of 'us'. These two structures are totally similar, apart from the fact that the first one uses the correlations, instead of the covariances. Another difference, which we should consider when giving starting values, is that correlations come before variances.
 
 ```{r message=FALSE, warning=FALSE, paged.print=FALSE}
-mod.asreml.r <- asreml(cbind(Yield, TKW) ~ trait - 1,
-        random = ~ Genotype:corgh(trait, init=c(-0.1, 3.8, 1.8))
-        + Block:corgh(trait, init = c(0.6, 77, 53)),
-        residual = ~ units:corgh(trait, init = c(0.03, 6, 4.5)), 
-        data=dataset)
-summary(mod.asreml.r)$varcomp[,1:2]
+# mod.asreml.r <- asreml(cbind(Yield, TKW) ~ trait - 1,
+#         random = ~ Genotype:corgh(trait, init=c(-0.1, 3.8, 1.8))
+#         + Block:corgh(trait, init = c(0.6, 77, 53)),
+#         residual = ~ units:corgh(trait, init = c(0.03, 6, 4.5)), 
+#         data=dataset)
+# summary(mod.asreml.r)$varcomp[,1:2]
 ```
 
 The advantage of this parameterisation is that we can test our hypotheses by easily setting up contraints on correlations. One way to do this is to run the model with the argument 'start.values = T'. In this way I could derive a data frame ('mod.init$parameters'), with the starting values for REML maximisation. 
 
 ```{r}
 # Getting the starting values
-mod.init <- asreml(cbind(Yield, TKW) ~ trait - 1,
-        random = ~ Genotype:corgh(trait, init=c(-0.1, 3.8, 1.8))
-        + Block:corgh(trait, init = c(0.6, 77, 53)),
-        residual = ~ units:corgh(trait, init = c(0.03, 6, 4.5)), 
-        data=dataset, start.values = T)
-init <- mod.init$vparameters
-init
+# mod.init <- asreml(cbind(Yield, TKW) ~ trait - 1,
+#         random = ~ Genotype:corgh(trait, init=c(-0.1, 3.8, 1.8))
+#         + Block:corgh(trait, init = c(0.6, 77, 53)),
+#         residual = ~ units:corgh(trait, init = c(0.03, 6, 4.5)), 
+#         data=dataset, start.values = T)
+# init <- mod.init$vparameters
+# init
 ```
 
 We see that the 'init' data frame has three columns: (i) names of parameters, (ii) initial values and (iii) type of constraint (U: unconstrained, P = positive, F = fixed). Now, if we take the seventh row (correlation of residuals), set the initial value to 0 and set the third column to 'F' (meaning: keep the initial value fixed), we are ready to fit a model without correlation of residuals (same as the ‘model.asreml2’ above). What I had to do was just to pass this data frame as the starting value matrix for a new model fit (see the argument ‘R.param’, below).
 
 ```{r}
-init2 <- init
-init2[8, 2] <- 0
-init2[8, 3] <- "F"
+# init2 <- init
+# init2[8, 2] <- 0
+# init2[8, 3] <- "F"
 
-mod.asreml.r2 <- asreml(cbind(Yield, TKW) ~ trait - 1,
-        random = ~ Genotype:corgh(trait)
-        + Block:corgh(trait),
-        residual = ~ units:corgh(trait), 
-        data=dataset, R.param = init2)
-summary(mod.asreml.r2)$varcomp[,1:2]
-lrt.asreml(mod.asreml.r2, mod.asreml.r)
+# mod.asreml.r2 <- asreml(cbind(Yield, TKW) ~ trait - 1,
+#         random = ~ Genotype:corgh(trait)
+#         + Block:corgh(trait),
+#         residual = ~ units:corgh(trait), 
+#         data=dataset, R.param = init2)
+# summary(mod.asreml.r2)$varcomp[,1:2]
+# lrt.asreml(mod.asreml.r2, mod.asreml.r)
 ```
 
 What is even more interesting is that 'asreml' permits to force the parameters to be linear combinations of one another. For instance, we can code a model where the residual correlation is contrained to be equal to the treatment correlation. To do so, we have to set up a two-column matrix (M), with row names matching the component names in the 'asreml' parameter vector. The matrix M should contain:
@@ -157,23 +157,23 @@ What is even more interesting is that 'asreml' permits to force the parameters t
 In this case, we would set the matrix M as follows:
 
 ```{r}
-firstCol <- c(1, 2, 3, 4, 5, 6, 7, 1, 8, 9)
-secCol <- c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
-M <- cbind(firstCol, secCol)
-dimnames(M)[[1]] <- mod.init$vparameters$Component
-M
+# firstCol <- c(1, 2, 3, 4, 5, 6, 7, 1, 8, 9)
+# secCol <- c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+# M <- cbind(firstCol, secCol)
+# dimnames(M)[[1]] <- mod.init$vparameters$Component
+# M
 ```
 
 Please note that in 'firstCol', the 1st and 8th element are both equal to 1, which contraints them to assume the same value. We can now pass the matrix M as the value of the 'vcc' argument in the model call.
 
 ```{r}
-mod.asreml.r3 <- asreml(cbind(Yield, TKW) ~ trait - 1,
-        random = ~ Genotype:corgh(trait)
-        + Block:corgh(trait),
-        residual = ~ units:corgh(trait), 
-        data=dataset, R.param = init, vcc = M)
-summary(mod.asreml.r3)$varcomp[,1:3]
-lrt.asreml(mod.asreml.r3, mod.asreml.r)
+# mod.asreml.r3 <- asreml(cbind(Yield, TKW) ~ trait - 1,
+#         random = ~ Genotype:corgh(trait)
+#         + Block:corgh(trait),
+#         residual = ~ units:corgh(trait), 
+#         data=dataset, R.param = init, vcc = M)
+# summary(mod.asreml.r3)$varcomp[,1:3]
+# lrt.asreml(mod.asreml.r3, mod.asreml.r)
 ```
 
 From the output, we see that the residual and treatment correlations are equal in this latter model. We also see that this reduced model fits significantly worse than the complete model ‘mod.asreml.r’.

@@ -1,0 +1,325 @@
+---
+title: 'Some everyday data tasks: a few hints with R'
+author: "Andrea Onofri"
+date: 2019-03-27
+tags: 
+  - R
+  - 'Data_management'
+categories:
+  - R
+  - 'Data_management'
+archives: ["2019"]
+---
+
+
+
+
+We all work with data frames and it is important that we know how we can reshape them, as necessary to meet our needs. I think that there are, at least, four routine tasks that we need to be able to accomplish:
+
+1. subsetting
+2. sorting
+3. casting
+4. melting
+
+Obviously, there is a wide array of possibilities; I'll just mention a few, which I regularly use.
+
+# Subsetting the data
+
+Subsetting means selecting the records (rows) or the variables (columns) which satisfy certain criteria. Let's take the 'students.csv' dataset, which is available on one of my repositories. It is a database of student's marks in a series of exams for different subjects.
+
+
+``` r
+students <- read.csv("https://www.casaonofri.it/_datasets/students.csv", header=T)
+head(students)
+##   Id  Subject       Date Mark Year  HighSchool
+## 1  1 AGRONOMY 10/06/2002   30 2001  HUMANITIES
+## 2  2 AGRONOMY 08/07/2002   24 2001 AGRICULTURE
+## 3  3 AGRONOMY 24/06/2002   30 2001 AGRICULTURE
+## 4  4 AGRONOMY 24/06/2002   26 2001  HUMANITIES
+## 5  5 AGRONOMY 23/01/2003   30 2001  HUMANITIES
+## 6  6 AGRONOMY 09/09/2002   28 2001 AGRICULTURE
+```
+
+Let's say that we want a new dataset, which contains only the students with marks higher than 28.
+
+
+``` r
+subData <- subset(students, Mark >= 28)
+head(subData)
+##    Id  Subject       Date Mark Year  HighSchool
+## 1   1 AGRONOMY 10/06/2002   30 2001  HUMANITIES
+## 3   3 AGRONOMY 24/06/2002   30 2001 AGRICULTURE
+## 5   5 AGRONOMY 23/01/2003   30 2001  HUMANITIES
+## 6   6 AGRONOMY 09/09/2002   28 2001 AGRICULTURE
+## 11 11 AGRONOMY 09/09/2002   28 2001  SCIENTIFIC
+## 17 17 AGRONOMY 10/06/2002   30 2001  HUMANITIES
+```
+
+Let's make it more difficult and extract the records were mark is ranging from 26 to 28 (margins included. Look at the AND clause):
+
+
+``` r
+subData <- subset(students, Mark <= 28 & Mark >=26)
+head(subData)
+##    Id  Subject       Date Mark Year  HighSchool
+## 4   4 AGRONOMY 24/06/2002   26 2001  HUMANITIES
+## 6   6 AGRONOMY 09/09/2002   28 2001 AGRICULTURE
+## 7   7 AGRONOMY 24/02/2003   26 2001  HUMANITIES
+## 8   8 AGRONOMY 09/09/2002   26 2001  SCIENTIFIC
+## 10 10 AGRONOMY 08/07/2002   27 2001  HUMANITIES
+## 11 11 AGRONOMY 09/09/2002   28 2001  SCIENTIFIC
+```
+
+Now we are interested in those students who got a mark ranging from 26 to 28 in MATHS (please note the equality relationship written as '=='):
+
+
+``` r
+subData <- subset(students, Mark <= 28 & Mark >=26 & 
+                    Subject == "MATHS")
+head(subData)
+##      Id Subject       Date Mark Year  HighSchool
+## 115 115   MATHS 15/07/2002   26 2001 AGRICULTURE
+## 124 124   MATHS 16/09/2002   26 2001  SCIENTIFIC
+## 138 138   MATHS 04/02/2002   27 2001  HUMANITIES
+## 144 144   MATHS 10/02/2003   27 2001  HUMANITIES
+## 145 145   MATHS 04/07/2003   27 2002  HUMANITIES
+## 146 146   MATHS 28/02/2002   28 2001 AGRICULTURE
+```
+
+Lets' look for good students either in MATHS or in CHEMISTRY (OR clause; note the '|' operator):
+
+
+``` r
+subData <- subset(students, Mark <= 28 & Mark >=26 & 
+                    Subject == "MATHS" | 
+                    Subject == "CHEMISTRY")
+head(subData)
+##    Id   Subject       Date Mark Year   HighSchool
+## 64 64 CHEMISTRY 18/06/2003   20 2002  AGRICULTURE
+## 65 65 CHEMISTRY 06/06/2002   21 2001   HUMANITIES
+## 66 66 CHEMISTRY 20/02/2003   21 2002   HUMANITIES
+## 67 67 CHEMISTRY 20/02/2003   18 2002  AGRICULTURE
+## 68 68 CHEMISTRY 04/06/2002   28 2001 OTHER SCHOOL
+## 69 69 CHEMISTRY 26/06/2002   23 2001   ACCOUNTING
+```
+
+We can also select columns; for example we may want to display only the 'Subject', 'Mark' and 'HighSchool' columns:
+
+
+``` r
+subData <- subset(students, Mark <= 28 & Mark >=26 & 
+                    Subject == "MATHS" | 
+                    Subject == "CHEMISTRY",
+                  select = c(Subject, Mark, HighSchool))
+head(subData)
+##      Subject Mark   HighSchool
+## 64 CHEMISTRY   20  AGRICULTURE
+## 65 CHEMISTRY   21   HUMANITIES
+## 66 CHEMISTRY   21   HUMANITIES
+## 67 CHEMISTRY   18  AGRICULTURE
+## 68 CHEMISTRY   28 OTHER SCHOOL
+## 69 CHEMISTRY   23   ACCOUNTING
+```
+
+We can as well drop the unwanted columns:
+
+
+
+``` r
+subData <- subset(students, Mark <= 28 & Mark >=26 & 
+                    Subject == "MATHS" | 
+                    Subject == "CHEMISTRY",
+                  select = c(-Id, 
+                             -Date,
+                             -Year))
+head(subData)
+##      Subject Mark   HighSchool
+## 64 CHEMISTRY   20  AGRICULTURE
+## 65 CHEMISTRY   21   HUMANITIES
+## 66 CHEMISTRY   21   HUMANITIES
+## 67 CHEMISTRY   18  AGRICULTURE
+## 68 CHEMISTRY   28 OTHER SCHOOL
+## 69 CHEMISTRY   23   ACCOUNTING
+```
+
+
+Using the function 'subset()' is very easy. However, we might have higher flexibility if we subset by using indices. We already know that the notation 'dataframe[i,j]' returns the element in the i-th row and j-th column in a data frame. We can of course replace i and j with some subsetting rules. For example, taking the exams where the mark is comprised between 25 and 29 is done as follows:
+
+
+``` r
+subData <- students[(students$Mark <= 29 & students$Mark >=25),]
+head(subData)
+##    Id  Subject       Date Mark Year  HighSchool
+## 4   4 AGRONOMY 24/06/2002   26 2001  HUMANITIES
+## 6   6 AGRONOMY 09/09/2002   28 2001 AGRICULTURE
+## 7   7 AGRONOMY 24/02/2003   26 2001  HUMANITIES
+## 8   8 AGRONOMY 09/09/2002   26 2001  SCIENTIFIC
+## 10 10 AGRONOMY 08/07/2002   27 2001  HUMANITIES
+## 11 11 AGRONOMY 09/09/2002   28 2001  SCIENTIFIC
+```
+
+This is useful to quickly edit the data. For example, if we want to replace all marks from 25 to 29 with NAs (Not Available), we can simply do:
+
+
+``` r
+subData <- students
+subData[(subData$Mark <= 29 & subData$Mark >=25), "Mark"] <- NA
+head(subData)
+##   Id  Subject       Date Mark Year  HighSchool
+## 1  1 AGRONOMY 10/06/2002   30 2001  HUMANITIES
+## 2  2 AGRONOMY 08/07/2002   24 2001 AGRICULTURE
+## 3  3 AGRONOMY 24/06/2002   30 2001 AGRICULTURE
+## 4  4 AGRONOMY 24/06/2002   NA 2001  HUMANITIES
+## 5  5 AGRONOMY 23/01/2003   30 2001  HUMANITIES
+## 6  6 AGRONOMY 09/09/2002   NA 2001 AGRICULTURE
+```
+
+Please note that I created a new dataset to make the replacement, in order not to modify the original dataset. Of course, I can use the 'is.na()' function to find the missing data and edit them.
+
+
+``` r
+subData[is.na(subData$Mark) == T, "Mark"] <- 0 
+head(subData)
+##   Id  Subject       Date Mark Year  HighSchool
+## 1  1 AGRONOMY 10/06/2002   30 2001  HUMANITIES
+## 2  2 AGRONOMY 08/07/2002   24 2001 AGRICULTURE
+## 3  3 AGRONOMY 24/06/2002   30 2001 AGRICULTURE
+## 4  4 AGRONOMY 24/06/2002    0 2001  HUMANITIES
+## 5  5 AGRONOMY 23/01/2003   30 2001  HUMANITIES
+## 6  6 AGRONOMY 09/09/2002    0 2001 AGRICULTURE
+```
+
+# Sorting the data
+
+Sorting is very much like subsetting by indexing. I just need to use the 'order' function. For example, let's sort the students dataset by mark:
+
+
+``` r
+sortedData <- students[order(students$Mark), ]
+head(sortedData)
+##    Id   Subject       Date Mark Year   HighSchool
+## 51 51   BIOLOGY 01/03/2002   18 2001   HUMANITIES
+## 67 67 CHEMISTRY 20/02/2003   18 2002  AGRICULTURE
+## 76 76 CHEMISTRY 24/02/2003   18 2002 OTHER SCHOOL
+## 79 79 CHEMISTRY 18/06/2003   18 2002  AGRICULTURE
+## 82 82 CHEMISTRY 18/07/2002   18 2001  AGRICULTURE
+## 83 83 CHEMISTRY 23/01/2003   18 2001   SCIENTIFIC
+```
+
+We can also sort by decreasing order:
+
+
+``` r
+sortedData <- students[order(-students$Mark), ]
+head(sortedData)
+##    Id  Subject       Date Mark Year  HighSchool
+## 1   1 AGRONOMY 10/06/2002   30 2001  HUMANITIES
+## 3   3 AGRONOMY 24/06/2002   30 2001 AGRICULTURE
+## 5   5 AGRONOMY 23/01/2003   30 2001  HUMANITIES
+## 17 17 AGRONOMY 10/06/2002   30 2001  HUMANITIES
+## 18 18 AGRONOMY 10/06/2002   30 2001 AGRICULTURE
+## 19 19 AGRONOMY 09/09/2002   30 2001 AGRICULTURE
+```
+
+We can obviously use multiple keys. For example, let's sort by subject within marks:
+
+
+``` r
+sortedData <- students[order(-students$Mark, students$Subject), ]
+head(sortedData)
+##    Id  Subject       Date Mark Year  HighSchool
+## 1   1 AGRONOMY 10/06/2002   30 2001  HUMANITIES
+## 3   3 AGRONOMY 24/06/2002   30 2001 AGRICULTURE
+## 5   5 AGRONOMY 23/01/2003   30 2001  HUMANITIES
+## 17 17 AGRONOMY 10/06/2002   30 2001  HUMANITIES
+## 18 18 AGRONOMY 10/06/2002   30 2001 AGRICULTURE
+## 19 19 AGRONOMY 09/09/2002   30 2001 AGRICULTURE
+```
+
+If I want to sort in decreasing order on a character variable (such as Subject), I need to use the helper function 'xtfrm()':
+
+
+``` r
+sortedData <- students[order(-students$Mark, -xtfrm(students$Subject)), ]
+head(sortedData)
+##      Id Subject       Date Mark Year   HighSchool
+## 116 116   MATHS 01/07/2002   30 2001 OTHER SCHOOL
+## 117 117   MATHS 18/06/2002   30 2001   ACCOUNTING
+## 118 118   MATHS 09/07/2002   30 2001  AGRICULTURE
+## 121 121   MATHS 18/06/2002   30 2001   ACCOUNTING
+## 123 123   MATHS 09/07/2002   30 2001   HUMANITIES
+## 130 130   MATHS 07/02/2002   30 2001   SCIENTIFIC
+```
+
+
+# Casting the data
+
+When we have a dataset in the LONG format, we might be interested in reshaping it in the WIDE format. This is the same as what the 'pivot table' function in Excel does. For example, take the 'rimsulfuron.csv' dataset in my repository. This contains the results of a randomised block experiment, where we have 16 herbicides in four blocks. The dataset is in the LONG format, with one row per plot.
+
+
+``` r
+rimsulfuron <- read.csv("https://www.casaonofri.it/_datasets/rimsulfuron.csv", header=T)
+head(rimsulfuron)
+##                      Herbicide Plot Code Block Box WeedCover Yield
+## 1             Rimsulfuron (40)    1    1     1   1      27.8 85.91
+## 2             Rimsulfuron (45)    2    2     1   1      27.8 93.03
+## 3             Rimsulfuron (50)    3    3     1   1      23.0 86.93
+## 4             Rimsulfuron (60)    4    4     1   1      42.8 52.99
+## 5    Rimsulfuron (50+30 split)    5    5     1   2      15.1 71.36
+## 6 Rimsulfuron + thyfensulfuron    6    6     1   2      22.9 75.28
+```
+
+Lets'put this data frame in the WIDE format, with one row per herbicide and one column per block. To do so, I usually use the 'cast()' function in the 'reshape' package.
+
+
+``` r
+library(reshape)
+castData <- cast(Herbicide ~ Block, data = rimsulfuron,
+     value = "Yield")
+head(castData)
+##                                    Herbicide     1     2      3      4
+## 1                  Alachlor + terbuthylazine 12.06 49.58  41.34  16.37
+## 2                                Hand-Weeded 77.58 92.08  86.59  99.63
+## 3         Metolachlor + terbuthylazine (pre) 51.77 52.10  49.46  34.67
+## 4 Pendimethalin (post) + rimsuulfuron (post) 94.82 87.72 102.05 101.94
+## 5   Pendimethalin (pre) + rimsulfuron (post) 65.51 88.72  95.52  82.39
+## 6                           Rimsulfuron (40) 85.91 91.09 111.42  93.15
+```
+
+Other similar functions are available within the 'reshape2' and 'tidyr' packages.
+
+# Melting the data
+
+In this case we do the reverse: we transform the dataset from WIDE to LONG format. For this task, I like the 'melt()' function in the 'reshape2' package, which requires a data frame as input. I would like to use the 'castData' object which we have just created by using the 'cast()' function above. Unfortunately, this object has a 'cast_df' class. Therefore, in order to avoid weird results, I need to change 'castData' into a data frame, by using the 'as.data.frame()' function. 
+
+
+``` r
+library(reshape2)
+castData <- as.data.frame(castData)
+mdati <- melt(castData,
+              variable.name = "Block",
+              value.name = "Yield",
+              id=c("Herbicide"))
+
+head(mdati)
+##                                    Herbicide Block Yield
+## 1                  Alachlor + terbuthylazine     1 12.06
+## 2                                Hand-Weeded     1 77.58
+## 3         Metolachlor + terbuthylazine (pre)     1 51.77
+## 4 Pendimethalin (post) + rimsuulfuron (post)     1 94.82
+## 5   Pendimethalin (pre) + rimsulfuron (post)     1 65.51
+## 6                           Rimsulfuron (40)     1 85.91
+```
+
+
+Have a nice work with these functions!
+
+---
+
+Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences   
+University of Perugia (Italy)   
+Borgo XX Giugno 74   
+I-06121 - PERUGIA   
+
+
