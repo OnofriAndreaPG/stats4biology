@@ -15,7 +15,6 @@ archives:
   - 2021
 ---
 
-<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
 <p>In this post I am revisiting the concept of Principal Component Analysis (PCA). You might say that there is no need for that, as the Internet is full with posts relating to such a rather old technique. However, I feel that, in those posts, the theoretical aspects are either too deeply rooted in maths or they are skipped altogether, so that the main emphasis is on interpreting the output of an R function. I think that both approaches may not be suitable for biologists: the first one may be too difficult to understand, while skipping altogether the theoretical aspects promotes the use of R as a black-box, which is dangerouse for teaching purposes. That’s why I wrote this post… I wanted to make my attempt to create a useful lesson. You will tell me whether I suceeded or not.</p>
@@ -70,6 +69,7 @@ eig
 ##           [,1]       [,2]
 ## [1,] 0.7071068 -0.7071068
 ## [2,] 0.7071068  0.7071068
+ r
 V &lt;- eig$vectors</code></pre>
 <p>We see that the eigenvectors of this decomposition correspond to the aforementioned rotation matrix. We can now use <span class="math inline">\(V\)</span> to rotate the original matrix <span class="math inline">\(Z\)</span> and calculate the coordinates of the original observations in the new, rotated space. We store the subject scores in the matrix <span class="math inline">\(U\)</span>:</p>
 <pre class="r"><code>U &lt;- Z %*% V
@@ -170,12 +170,13 @@ row.names(V) &lt;- colnames(WeedPop[,2:7])
 colnames(V) &lt;- paste(&quot;PC&quot;, 1:6, sep=&quot;&quot;)
 print(V, digits=3)
 ##          PC1    PC2      PC3     PC4    PC5     PC6
-## POLLA  0.460  0.221 -0.24985  0.1658  0.641 -0.4884
-## CHEPO -0.294 -0.473 -0.82077 -0.0553  0.106  0.0492
-## ECHCG  0.429 -0.318  0.04360 -0.7830 -0.178 -0.2617
-## AMARE  0.340  0.599 -0.50839 -0.0570 -0.460  0.2285
-## XANST  0.482 -0.252  0.05955  0.0369  0.338  0.7651
-## POLAV  0.413 -0.452 -0.00164  0.5931 -0.470 -0.2300
+## POLLA  0.460  0.221 -0.24985  0.1658  0.641  0.4884
+## CHEPO -0.294 -0.473 -0.82077 -0.0553  0.106 -0.0492
+## ECHCG  0.429 -0.318  0.04360 -0.7830 -0.178  0.2617
+## AMARE  0.340  0.599 -0.50839 -0.0570 -0.460 -0.2285
+## XANST  0.482 -0.252  0.05955  0.0369  0.338 -0.7651
+## POLAV  0.413 -0.452 -0.00164  0.5931 -0.470  0.2300
+ r
 print(d)
 ## [1] 3.85798046 0.93663779 0.67502915 0.30394443 0.19203762 0.03437055</code></pre>
 <p>Now, we can use the rotation matrix V to get the coordinates of our subjects in the new rotated space (<span class="math inline">\(U\)</span>):</p>
@@ -184,15 +185,15 @@ row.names(U) &lt;- LETTERS[1:9]
 colnames(U) &lt;- paste(&quot;PC&quot;, 1:6, sep=&quot;&quot;)
 print(U, digits=3)
 ##      PC1     PC2     PC3     PC4     PC5     PC6
-## A -3.149 -0.6934 -1.2399  0.0492  0.0360 -0.0871
-## B -2.546  0.9861  1.2551  0.7437 -0.1589 -0.0553
-## C -1.111  0.0642 -0.5837 -0.1334  0.4072  0.1219
-## D  2.131  1.9161 -0.9096  0.0616 -0.2061  0.0262
-## E -0.387  0.1079  0.6533 -0.6903  0.1889  0.3369
-## F  0.776  0.0767 -0.0814 -0.3752 -0.0397 -0.2627
-## G  1.463 -1.2798 -0.1703  0.5564 -0.7200  0.1704
-## H  2.362 -0.6767  0.3413  0.5668  0.8051 -0.0711
-## I  0.462 -0.5010  0.7353 -0.7787 -0.3124 -0.1793</code></pre>
+## A -3.149 -0.6934 -1.2399  0.0492  0.0360  0.0871
+## B -2.546  0.9861  1.2551  0.7437 -0.1589  0.0553
+## C -1.111  0.0642 -0.5837 -0.1334  0.4072 -0.1219
+## D  2.131  1.9161 -0.9096  0.0616 -0.2061 -0.0262
+## E -0.387  0.1079  0.6533 -0.6903  0.1889 -0.3369
+## F  0.776  0.0767 -0.0814 -0.3752 -0.0397  0.2627
+## G  1.463 -1.2798 -0.1703  0.5564 -0.7200 -0.1704
+## H  2.362 -0.6767  0.3413  0.5668  0.8051  0.0711
+## I  0.462 -0.5010  0.7353 -0.7787 -0.3124  0.1793</code></pre>
 <p>We now have the three ingredients of a PCA, i.e.:</p>
 <ol style="list-style-type: decimal">
 <li>the original standardised matrix (<span class="math inline">\(Z\)</span>)</li>
@@ -205,27 +206,30 @@ print(U, digits=3)
 <p>We have said that subject-scores in <span class="math inline">\(U\)</span> represent our subjects in the new, rotated space. We have six original variables and six PCs (indeeed, the number of PCs is equal to the lowest between the number of rows and the number of columns in the original matrix X). Let’s see some characteristics of subject scores:</p>
 <pre class="r"><code>apply(U, 2, mean)
 ##           PC1           PC2           PC3           PC4           PC5 
-##  1.233852e-16 -9.227765e-18  1.849769e-17 -2.467765e-17  2.930056e-17 
+##  8.018277e-17  1.233581e-16  2.467162e-17 -6.167906e-17 -5.551115e-17 
 ##           PC6 
-##  1.225826e-16
+##  1.326100e-16
+ r
 apply(U, 2, var)
 ##        PC1        PC2        PC3        PC4        PC5        PC6 
 ## 3.85798046 0.93663779 0.67502915 0.30394443 0.19203762 0.03437055
+ r
 cor(U)
 ##               PC1           PC2           PC3           PC4           PC5
-## PC1  1.000000e+00 -5.773238e-16 -2.028552e-16  1.397684e-16 -5.313598e-16
-## PC2 -5.773238e-16  1.000000e+00 -1.295690e-15 -1.214638e-16  3.326095e-16
-## PC3 -2.028552e-16 -1.295690e-15  1.000000e+00  1.851002e-16  3.505827e-16
-## PC4  1.397684e-16 -1.214638e-16  1.851002e-16  1.000000e+00  7.572507e-16
-## PC5 -5.313598e-16  3.326095e-16  3.505827e-16  7.572507e-16  1.000000e+00
-## PC6  5.636542e-16  4.023873e-16  3.853043e-16  1.540250e-15 -4.896632e-16
+## PC1  1.000000e+00 -2.901961e-16  7.481664e-16 -1.730123e-16 -7.174755e-16
+## PC2 -2.901961e-16  1.000000e+00  6.806718e-16 -3.121178e-16  6.708032e-16
+## PC3  7.481664e-16  6.806718e-16  1.000000e+00 -6.127621e-16 -1.127435e-15
+## PC4 -1.730123e-16 -3.121178e-16 -6.127621e-16  1.000000e+00  1.809425e-15
+## PC5 -7.174755e-16  6.708032e-16 -1.127435e-15  1.809425e-15  1.000000e+00
+## PC6  1.943646e-15  1.537263e-15  4.555497e-17 -6.788908e-16 -4.110310e-15
 ##               PC6
-## PC1  5.636542e-16
-## PC2  4.023873e-16
-## PC3  3.853043e-16
-## PC4  1.540250e-15
-## PC5 -4.896632e-16
+## PC1  1.943646e-15
+## PC2  1.537263e-15
+## PC3  4.555497e-17
+## PC4 -6.788908e-16
+## PC5 -4.110310e-15
 ## PC6  1.000000e+00
+ r
 #Distances
 dist(U)
 ##          A        B        C        D        E        F        G        H
@@ -237,6 +241,7 @@ dist(U)
 ## G 4.863326 4.862117 3.217457 3.425880 2.903991 1.959146                  
 ## H 5.808357 5.353306 3.762687 3.102872 3.224662 2.213925 1.954319         
 ## I 4.218553 3.727084 2.358123 3.477388 1.274494 1.158964 2.120882 2.620524
+ r
 dist(Z)
 ##          A        B        C        D        E        F        G        H
 ## B 3.151284                                                               
@@ -263,12 +268,12 @@ dist(Z)
 <p>When we look at <span class="math inline">\(U\)</span> we do not have any hints on how the components relate to the original matrix <span class="math inline">\(Z\)</span>. For example, we see that the subject ‘A’ has a score on PC1 equal to <span class="math inline">\(-3.15\)</span>; what does this mean in terms of weed infestation? There were a lot of weeds or a few weeds? One way to ascertain this is to look at the correlation between the principal components in <span class="math inline">\(U\)</span> and the original variables in <span class="math inline">\(X\)</span>:</p>
 <pre class="r"><code>print( cor(X, U), digits = 3)
 ##          PC1    PC2      PC3     PC4     PC5      PC6
-## POLLA  0.904  0.214 -0.20528  0.0914  0.2809 -0.09055
-## CHEPO -0.577 -0.457 -0.67435 -0.0305  0.0464  0.00913
-## ECHCG  0.842 -0.307  0.03582 -0.4317 -0.0780 -0.04852
-## AMARE  0.668  0.580 -0.41769 -0.0314 -0.2016  0.04236
-## XANST  0.946 -0.244  0.04892  0.0203  0.1480  0.14185
-## POLAV  0.811 -0.438 -0.00135  0.3270 -0.2058 -0.04265</code></pre>
+## POLLA  0.904  0.214 -0.20528  0.0914  0.2809  0.09055
+## CHEPO -0.577 -0.457 -0.67435 -0.0305  0.0464 -0.00913
+## ECHCG  0.842 -0.307  0.03582 -0.4317 -0.0780  0.04852
+## AMARE  0.668  0.580 -0.41769 -0.0314 -0.2016 -0.04236
+## XANST  0.946 -0.244  0.04892  0.0203  0.1480 -0.14185
+## POLAV  0.811 -0.438 -0.00135  0.3270 -0.2058  0.04265</code></pre>
 <p>We see that PC1 in <span class="math inline">\(U\)</span> is highly correlated with POLLA, XANST and ECHCG; therefore, the subjects ‘A’, with a very low score in PC1, is expected to have a low ground covering for the aforementioned weed species. The above correlations are known as <em>loadings</em>.</p>
 <p>If we look at the rotation matrix <span class="math inline">\(V\)</span>, we note that trait-scores are proportional to the correlations between subject scores and the original variables (see below).</p>
 <pre class="r"><code>cors &lt;- cor(X, U)
@@ -292,11 +297,11 @@ print( cors/V, digits = 3)
 <p>Indeed, we have decomposed our original matrix <span class="math inline">\(Z\)</span> into the product of two matrices: <span class="math inline">\(U\)</span> and <span class="math inline">\(V\)</span>. This multiplication can be seen as the ‘inner-products’ of row-vectors in <span class="math inline">\(U\)</span> (subject-scores) by the row-vectors in <span class="math inline">\(V\)</span> (trait-scores), which return the original values in <span class="math inline">\(X\)</span>. For example, the PC scores for the herbicide ‘A’ are:</p>
 <pre class="r"><code>U[1,]
 ##         PC1         PC2         PC3         PC4         PC5         PC6 
-## -3.14916165 -0.69341377 -1.23990604  0.04915220  0.03599628 -0.08713997</code></pre>
+## -3.14916165 -0.69341377 -1.23990604  0.04915220  0.03599628  0.08713997</code></pre>
 <p>The scores for POLLA (see first row of V) are:</p>
 <pre class="r"><code>V[1,]
 ##        PC1        PC2        PC3        PC4        PC5        PC6 
-##  0.4600611  0.2211836 -0.2498484  0.1657640  0.6410762 -0.4884065</code></pre>
+##  0.4600611  0.2211836 -0.2498484  0.1657640  0.6410762  0.4884065</code></pre>
 <p>The inner product for these two vectors is:</p>
 <pre class="r"><code>-3.14916165 * 0.4600611 + 
 -0.69341377 * 0.2211836 +
@@ -406,23 +411,25 @@ colnames(V) &lt;- paste(&quot;PC&quot;, 1:6, sep=&quot;&quot;)
 U &lt;- C %*% V
 print(U, digits = 3)
 ##      PC1      PC2    PC3    PC4      PC5    PC6
-## A -26.97 -12.2860  3.129 -0.271 -0.00398 -0.581
-## B -20.81  17.3167 -2.935  3.081 -1.29287 -0.475
-## C  -9.95  -3.6671  3.035 -0.819  2.38378  0.801
-## D  12.69   7.3364 11.756 -3.732 -1.45392  0.180
-## E   1.13   2.2854 -5.436 -3.412  1.86926  2.247
-## F   8.05  -1.6470 -0.455 -2.895  0.22101 -1.607
-## G   9.46  -7.3174 -1.213  5.072 -4.98975  0.976
-## H  16.34  -0.0632  0.799  7.213  4.07606 -0.509
-## I  10.07  -1.9578 -8.680 -4.237 -0.80960 -1.032
+## A -26.97 -12.2860  3.129 -0.271  0.00398  0.581
+## B -20.81  17.3167 -2.935  3.081  1.29287  0.475
+## C  -9.95  -3.6671  3.035 -0.819 -2.38378 -0.801
+## D  12.69   7.3364 11.756 -3.732  1.45392 -0.180
+## E   1.13   2.2854 -5.436 -3.412 -1.86926 -2.247
+## F   8.05  -1.6470 -0.455 -2.895 -0.22101  1.607
+## G   9.46  -7.3174 -1.213  5.072  4.98975 -0.976
+## H  16.34  -0.0632  0.799  7.213 -4.07606  0.509
+## I  10.07  -1.9578 -8.680 -4.237  0.80960  1.032
+ r
 print(V, digits = 3)
 ##          PC1     PC2     PC3     PC4     PC5     PC6
-## POLLA  0.349  0.0493  0.5614  0.1677  0.5574 -0.4710
-## CHEPO -0.390 -0.8693  0.2981  0.0013  0.0480  0.0327
-## ECHCG  0.688 -0.4384 -0.3600 -0.4322 -0.0113 -0.1324
-## AMARE  0.213  0.1200  0.6808 -0.4155 -0.4893  0.2547
-## XANST  0.372 -0.1050  0.0499  0.4107  0.2631  0.7813
-## POLAV  0.263 -0.1555  0.0184  0.6662 -0.6150 -0.2903
+## POLLA  0.349  0.0493  0.5614  0.1677 -0.5574  0.4710
+## CHEPO -0.390 -0.8693  0.2981  0.0013 -0.0480 -0.0327
+## ECHCG  0.688 -0.4384 -0.3600 -0.4322  0.0113  0.1324
+## AMARE  0.213  0.1200  0.6808 -0.4155  0.4893 -0.2547
+## XANST  0.372 -0.1050  0.0499  0.4107 -0.2631 -0.7813
+## POLAV  0.263 -0.1555  0.0184  0.6662  0.6150  0.2903
+ r
 print(d, digits = 3)
 ## [1] 243.01  72.93  34.13  17.49   6.90   1.39</code></pre>
 <p>One important difference is that the variance of components in the subject-score matrix has a sum equal to the sum of variances on the original matrix X:</p>
@@ -431,6 +438,7 @@ print(d, digits = 3)
 <p>Another important difference is that the inner products return the values in the centered matrix, i.e. the weed coverings of the different species as differences with respect to column-means. The goodness of representation and biplot are very similar to the previous ones. However, we may note that the weeds with higher variances (CHEPO and ECHCG) tend to have higher weight on the ordination, as shown by longer vectors.</p>
 <pre class="r"><code>cumsum(d)/sum(d) * 100
 ## [1]  64.65801  84.06118  93.14164  97.79412  99.62927 100.00000
+ r
 apply(X, 2, var)
 ##     POLLA     CHEPO     ECHCG     AMARE     XANST     POLAV 
 ##  43.45750  95.11111 136.86111  32.61111  38.73528  29.06500</code></pre>

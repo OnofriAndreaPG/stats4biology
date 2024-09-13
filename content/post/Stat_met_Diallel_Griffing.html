@@ -15,7 +15,6 @@ archives:
   - 2021
 ---
 
-<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
 <p>Diallel mating designs are often used by plant breeders to compare the possible crosses between a set of genotypes. In spite of such widespread usage, the process of data analysis in R is not yet strightforward and it is not clear which tool should be routinely used. We recently gave a small contribution by publishing a paper in Plant Breeding (<a href="https://link.springer.com/article/10.1007/s00122-020-03716-8">Onofri et al., 2020</a> ), where we advocated the idea that models for diallel crosses are just a class of general linear models, that should be fit by Ordinary Least Squares (OLS) or REstricted Maximum Likelihood methods (REML).</p>
@@ -51,22 +50,19 @@ dMod2 &lt;- lm.diallel(Ftime ~ Par1 + Par2, Block = Block,
                     data = hayman54, fct = &quot;GRIFFING1&quot;)
 # summary(dMod2)
 anova(dMod2)
-## Analysis of Variance Table
-## 
-## Response: Ftime
 ##             Df Sum Sq Mean Sq F value    Pr(&gt;F)    
 ## Block        1    142     142  0.3416   0.56100    
 ## GCA          7 277717   39674 95.1805 &lt; 2.2e-16 ***
 ## tSCA        28 102238    3651  8.7599 6.656e-13 ***
 ## Reciprocals 28  19112     683  1.6375   0.05369 .  
-## Residuals   63  26260                              
+## Residuals   63  26260     417                      
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>In order to obtain the full list of genetical parameters, we can use the <code>glht()</code> function in the <code>multcomp</code> package, together with the <code>diallel.eff()</code> function in the ‘lmDiallel’ package. An excerpt of the results is shown below.</p>
 <pre class="r"><code>library(multcomp)
 gh &lt;- glht(linfct = diallel.eff(dMod2))
 # summary(gh, test = adjusted(type = &quot;none&quot;))
-#    Simultaneous Tests for General Linear Hypotheses
+# 	 Simultaneous Tests for General Linear Hypotheses
 # 
 # Linear Hypotheses:
 #                  Estimate Std. Error t value Pr(&gt;|t|)    
@@ -96,20 +92,15 @@ dMod2 &lt;- lm.diallel(Yield ~ Par1 + Par2,
 <p>In this case the dataset has no replicates and, for the inferences, we need to provide an estimate of the residual mean square and degrees of freedom (see box below). If we have fitted the model by using the <code>lm()</code> function, the resulting ‘lm’ object can be explored by using the <code>summary.diallel()</code> and <code>anova.diallel()</code> functions. Otherwise, if we have fitted the model with the <code>lm.diallel()</code> function, the resulting ‘diallel’ object can be explored by using the <code>summary()</code> and <code>anova()</code> methods. See the box below for an example: the results are, obviously, the same.</p>
 <pre class="r"><code># summary.diallel(dMod, MSE = 7.1, dfr = 60)
 anova.diallel(dMod, MSE = 7.1, dfr = 60)
-## Analysis of Variance Table
-## 
-## Response: Yield
 ##                  Df Sum Sq Mean Sq F value    Pr(&gt;F)    
 ## GCA(Par1, Par2)   5 234.23  46.846  6.5980 5.923e-05 ***
 ## tSCA(Par1, Par2) 15 238.94  15.929  2.2436   0.01411 *  
 ## Residuals        60          7.100                      
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+ r
 # summary(dMod2, MSE = 7.1, dfr = 60)
 anova(dMod2, MSE = 7.1, dfr = 60)
-## Analysis of Variance Table
-## 
-## Response: Yield
 ##           Df Sum Sq Mean Sq F value    Pr(&gt;F)    
 ## GCA        5 234.23  46.846  6.5980 5.923e-05 ***
 ## tSCA      15 238.94  15.929  2.2436   0.01411 *  
@@ -134,17 +125,15 @@ dMod &lt;- lm(Ftime ~ Block + GCA(Par1, Par2) +
 dMod2 &lt;- lm.diallel(Ftime ~ Par1 + Par2, Block = Block,
                     data = hayman54b, fct = &quot;GRIFFING3&quot;)
 anova(dMod2)
-## Analysis of Variance Table
-## 
-## Response: Ftime
 ##             Df Sum Sq Mean Sq F value    Pr(&gt;F)    
 ## Block        1    329   329.1  0.8367   0.36432    
 ## GCA          7 168923 24131.9 61.3479 &lt; 2.2e-16 ***
-## tSCA        20  37289  1864.4  4.7398 2.318e-06 ***
+## SCA         20  37289  1864.4  4.7398 2.318e-06 ***
 ## Reciprocals 28  19112   682.6  1.7352   0.04052 *  
-## Residuals   55  21635                              
+## Residuals   55  21635   393.4                      
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+ r
 gh &lt;- glht(linfct = diallel.eff(dMod2))
 # summary(gh, test = adjusted(type = &quot;none&quot;))</code></pre>
 </div>
@@ -156,27 +145,23 @@ gh &lt;- glht(linfct = diallel.eff(dMod2))
 dMod &lt;- lm(Yield ~ GCA(Par1, Par2) + SCA.G3(Par1, Par2), 
            data = griffing56)
 anova.diallel(dMod, MSE = 21.05, dfr = 2558)
-## Analysis of Variance Table
-## 
-## Response: Yield
 ##                      Df  Sum Sq Mean Sq F value    Pr(&gt;F)    
 ## GCA(Par1, Par2)       8 18606.0 2325.75 110.487 &lt; 2.2e-16 ***
 ## SCA.G3(Par1, Par2)   27  9164.9  339.44  16.125 &lt; 2.2e-16 ***
 ## Residuals          2558           21.05                      
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+ r
 dMod2 &lt;- lm.diallel(Yield ~ Par1 + Par2,
                     data = griffing56, fct = &quot;GRIFFING4&quot;)
 anova(dMod2, MSE = 21.05, dfr = 2558)
-## Analysis of Variance Table
-## 
-## Response: Yield
 ##             Df  Sum Sq Mean Sq F value    Pr(&gt;F)    
 ## GCA          8 18606.0 2325.75 110.487 &lt; 2.2e-16 ***
-## tSCA        27  9164.9  339.44  16.125 &lt; 2.2e-16 ***
+## SCA         27  9164.9  339.44  16.125 &lt; 2.2e-16 ***
 ## Residuals 2558           21.05                      
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+ r
 # summary(dMod2, MSE = 21.05, dfr = 2558)
 
 gh &lt;- glht(linfct = diallel.eff(dMod2, MSE = 21.05, dfr = 2558))

@@ -90,20 +90,18 @@ Gtimes
 count &lt;- table( cut(Gtimes, breaks = c(0, obsT)) )
 count
 ## 
-##   (0,1]   (1,2]   (2,3]   (3,4]   (4,5]   (5,6]   (6,7]   (7,8]   (8,9] 
-##       3      11      10       8      13       2       1      12       4 
-##  (9,10] (10,11] (11,12] (12,13] (13,14] (14,15] (15,16] (16,17] (17,18] 
-##       5       2       3       2       2       0       1       0       0 
-## (18,19] (19,20] (20,21] (21,22] (22,23] (23,24] (24,25] (25,26] (26,27] 
-##       0       1       0       1       1       0       0       0       0 
-## (27,28] (28,29] (29,30] (30,31] (31,32] (32,33] (33,34] (34,35] (35,36] 
-##       1       0       0       1       1       1       0       0       0 
-## (36,37] (37,38] (38,39] (39,40] 
-##       0       0       0       0</code></pre>
+##   (0,1]   (1,2]   (2,3]   (3,4]   (4,5]   (5,6]   (6,7]   (7,8]   (8,9]  (9,10] 
+##       3      11      10       8      13       2       1      12       4       5 
+## (10,11] (11,12] (12,13] (13,14] (14,15] (15,16] (16,17] (17,18] (18,19] (19,20] 
+##       2       3       2       2       0       1       0       0       0       1 
+## (20,21] (21,22] (22,23] (23,24] (24,25] (25,26] (26,27] (27,28] (28,29] (29,30] 
+##       0       1       1       0       0       0       0       1       0       0 
+## (30,31] (31,32] (32,33] (33,34] (34,35] (35,36] (36,37] (37,38] (38,39] (39,40] 
+##       1       1       1       0       0       0       0       0       0       0</code></pre>
 <p>We can see that, e.g., 11 germinated seeds were counted at day 2; therefore they germinated between day 1 and day 2 and their real germination time is unknown, but included in the range between 1 and 2 (left-open and right-closed). This is a typical example of interval-censoring (see above).</p>
 <p>We can also see that, in total, we counted 86 germinated seeds and, therefore, 14 seeds were still ungerminated at the end of the assay. For this simulation exercise, we know that 11 seeds were non-germinable and three seeds were germinable, but were not allowed enough time to germinate (look at the table above: there are 3 seeds with germination times higher than 40). In real life, this is another source of uncertainty: we might be able to ascertain whether these 14 seeds are viable or not (e.g. by using a tetrazolium test), but, if they are viable, we would never be able to tell whether they are dormant or their germination time is simply longer than the duration of the assay. In real life, we can only reach an uncertain conclusion: the germination time of the 14 ungerminated seeds is comprised between 40 days to infinity; this is an example of right-censoring.</p>
 <p>The above uncertainty affects our capability of describing the germination time-course from the observed data. We can try to picture the situation in the graph below.</p>
-<p><img src="/post/Stat_Survival_Germination_files/figure-html/unnamed-chunk-4-1.png" width="576" /></p>
+<p><img src="/post/Stat_SeedGermination_Germination_files/figure-html/unnamed-chunk-4-1.png" width="576" /></p>
 <p>What is the real germination time-course? The red one? The blue one? Something in between? We cannot really say this from our dataset, we are uncertain. The grey areas represent the uncertainty due to censoring. Do you think that we can reasonably neglect it?</p>
 <hr />
 </div>
@@ -168,7 +166,7 @@ mod &lt;- drm(propCum ~ time, data = df,
 plot(mod, log = &quot;&quot;,
       xlab = &quot;Time (days)&quot;,
       ylab = &quot;Proportion of germinated seeds&quot;)</code></pre>
-<p><img src="/post/Stat_Survival_Germination_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p><img src="/post/Stat_SeedGermination_Germination_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <pre class="r"><code>summary(mod)
 ## 
 ## Model fitted: Log-logistic (ED50 as parameter) with lower limit at 0 (3 parms)
@@ -310,7 +308,7 @@ result &lt;- result[result$d2 &gt; 0,]</code></pre>
 <table>
 <thead>
 <tr class="header">
-<th></th>
+<th align="left"></th>
 <th align="left">b</th>
 <th align="left"><span class="math inline">\(d\)</span></th>
 <th align="left"><span class="math inline">\(e\)</span></th>
@@ -318,19 +316,19 @@ result &lt;- result[result$d2 &gt; 0,]</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Nonlinear regression</td>
+<td align="left">Nonlinear regression</td>
 <td align="left">1.63 (0.051)</td>
 <td align="left">0.85 (0.006)</td>
 <td align="left">4.55 (0.086)</td>
 </tr>
 <tr class="even">
-<td>Time-to-event method</td>
+<td align="left">Time-to-event method</td>
 <td align="left">1.62 (0.187)</td>
 <td align="left">0.85 (0.041)</td>
 <td align="left">4.55 (0.579)</td>
 </tr>
 <tr class="odd">
-<td>Real values</td>
+<td align="left">Real values</td>
 <td align="left">1.60 (0.188)</td>
 <td align="left">0.85 (0.041)</td>
 <td align="left">4.55 (0.593)</td>

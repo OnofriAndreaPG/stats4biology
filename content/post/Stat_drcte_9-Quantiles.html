@@ -16,7 +16,6 @@ archives:
   - 2022
 ---
 
-<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
 <p>This is a follow-up post. If you are interested in other posts of this series, please go to: <a href="https://www.statforbiology.com/tags/drcte/">https://www.statforbiology.com/tags/drcte/</a>. All these posts expand on a manuscript that we have recently published in the Journal ‘Weed Science’; please follow <a href="https://doi.org/10.1017/wsc.2022.8">this link</a> to the paper. In order to work throughout this post, you need to install the ‘drcte’ and ‘drcSeedGerm’ packages, by using the code provided <a href="https://www.statforbiology.com/2021/stat_drcte_1-intro/">in this page</a>.</p>
@@ -64,13 +63,13 @@ summary(mod1, units = Dish)
 ## 
 ##               Estimate Std. Error  t value  Pr(&gt;|t|)    
 ## b:arcturus   -9.930005   1.111135  -8.9368 4.286e-16 ***
-## b:blattaria  -7.198025   0.578038 -12.4525 &lt; 2.2e-16 ***
+## b:blattaria  -7.198025   0.575290 -12.5120 &lt; 2.2e-16 ***
 ## b:creticum  -11.033749   0.943374 -11.6961 &lt; 2.2e-16 ***
 ## d:arcturus    0.356648   0.047915   7.4433 3.715e-12 ***
 ## d:blattaria   0.840064   0.025593  32.8242 &lt; 2.2e-16 ***
 ## d:creticum    0.969990   0.017290  56.1015 &lt; 2.2e-16 ***
 ## e:arcturus   12.059189   0.486010  24.8126 &lt; 2.2e-16 ***
-## e:blattaria   4.031763   0.199741  20.1850 &lt; 2.2e-16 ***
+## e:blattaria   4.031763   0.199590  20.2002 &lt; 2.2e-16 ***
 ## e:creticum    3.200655   0.103161  31.0259 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
@@ -79,13 +78,13 @@ summary(mod1, units = Dish)
 ## 
 ## Estimated quantiles
 ## 
-##               Estimate Std. Error
-## arcturus:30%   14.2634   0.992685
-## arcturus:50%       NaN        NaN
-## blattaria:30%   3.7156   0.106630
-## blattaria:50%   4.2536   0.118066
-## creticum:30%    2.9759   0.058279
-## creticum:50%    3.2187   0.059480</code></pre>
+##               Estimate       SE
+## arcturus:30%   14.2634 0.992685
+## arcturus:50%       NaN      NaN
+## blattaria:30%   3.7156 0.106048
+## blattaria:50%   4.2536 0.118515
+## creticum:30%    2.9759 0.058279
+## creticum:50%    3.2187 0.059480</code></pre>
 <p>We may note that the T50 is not estimable with <em>Verbascum arcturus</em>, as the maximum germinated proportion (<em>d</em> parameter for the time-to-event model above) is 0.36. Standard errors are obtained by using the delta method and they are invalid whenever the experimental units (seeds) are clustered within containers, such as the Petri dishes.</p>
 <p>For all these cases, we should prefer cluster-robust standard errors (Zeileis et al. 2020), which can be obtained by setting the extra argument ‘robust = TRUE’ and providing a clustering variable as the <code>units</code> argument. By setting ‘interval = TRUE’ we can also obtain confidence intervals for the desired probability level (0.95, by default).</p>
 <pre class="r"><code>quantile(mod1, probs = c(0.3, 0.5), robust = T,
@@ -94,13 +93,13 @@ summary(mod1, units = Dish)
 ## 
 ## Estimated quantiles
 ## 
-##               Estimate Std. Error   Lower   Upper
-## arcturus:30%   14.2634   0.755294 12.7830 15.7437
-## arcturus:50%       NaN        NaN     NaN     NaN
-## blattaria:30%   3.7156   0.188941  3.3452  4.0859
-## blattaria:50%   4.2536   0.209027  3.8439  4.6632
-## creticum:30%    2.9759   0.085151  2.8090  3.1428
-## creticum:50%    3.2187   0.104743  3.0134  3.4240</code></pre>
+##               Estimate       SE   Lower   Upper
+## arcturus:30%   14.2634 0.755294 12.7830 15.7437
+## arcturus:50%       NaN      NaN     NaN     NaN
+## blattaria:30%   3.7156 0.187503  3.3481  4.0831
+## blattaria:50%   4.2536 0.209853  3.8423  4.6649
+## creticum:30%    2.9759 0.085151  2.8090  3.1428
+## creticum:50%    3.2187 0.104743  3.0134  3.4240</code></pre>
 <p>We may note that cluster robust standard errors are higher than naive standard errors: the seed in the same Petri dish are correlated and, thus, they do not contribute full information.</p>
 <p>If we are interested in the germination rates G30 and G50, we can set the argument ‘rate = T’, as shown in the box below.</p>
 <pre class="r"><code>quantile(mod1, probs = c(0.3, 0.5), robust = T,
@@ -112,8 +111,8 @@ summary(mod1, units = Dish)
 ##               Estimate        SE    Lower    Upper
 ## arcturus:30%   0.07011 0.0037126 0.062833 0.077386
 ## arcturus:50%   0.00000 0.0000000 0.000000 0.000000
-## blattaria:30%  0.26914 0.0136861 0.242315 0.295963
-## blattaria:50%  0.23510 0.0115531 0.212454 0.257741
+## blattaria:30%  0.26914 0.0135819 0.242519 0.295759
+## blattaria:50%  0.23510 0.0115987 0.212364 0.257830
 ## creticum:30%   0.33604 0.0096153 0.317191 0.354882
 ## creticum:50%   0.31069 0.0101106 0.290872 0.330505</code></pre>
 </div>
@@ -132,10 +131,10 @@ quantile(modTE, Psi = 0,
 ## Estimated quantiles
 ## 
 ##       Estimate      SE  Lower  Upper
-## 1:5%    1.6630 0.29134 1.0919 2.2340
-## 1:10%   1.6581 0.28523 1.0990 2.2171
-## 1:15%   1.6546 0.28115 1.1036 2.2056
-## 1:21%   1.6513 0.27745 1.1075 2.1951</code></pre>
+## 1:5%    1.5861 0.22621 1.1428 2.0295
+## 1:10%   1.5562 0.21060 1.1435 1.9690
+## 1:15%   1.5331 0.20063 1.1399 1.9263
+## 1:21%   1.5090 0.19183 1.1330 1.8850</code></pre>
 <p>The environmental covariate only accepts a single value; in order to vectorise, we need to use the <code>lapply()</code> function, as shown below.</p>
 <pre class="r"><code># This is to vectorise on Psi
 psiList &lt;- seq(-1, 0, 0.25)
@@ -148,39 +147,39 @@ lapply(psiList,
                             units = rape$Dish, 
                             display = F))
 ## $`-1`
-##        Estimate        SE       Lower     Upper
-## 1:5%  0.1854204 0.1316218 -0.07255364 0.4433945
-## 1:10% 0.1805588 0.1246436 -0.06373812 0.4248557
-## 1:15% 0.1770742 0.1199609 -0.05804492 0.4121932
-## 1:21% 0.1737531 0.1157066 -0.05302779 0.4005339
+##         Estimate         SE         Lower      Upper
+## 1:5%  0.10860038 0.05566723 -0.0005053802 0.21770614
+## 1:10% 0.07869462 0.03741665  0.0053593301 0.15202992
+## 1:15% 0.05555279 0.02674484  0.0031338792 0.10797171
+## 1:21% 0.03145638 0.01993609 -0.0076176245 0.07053039
 ## 
 ## $`-0.75`
-##        Estimate        SE     Lower     Upper
-## 1:5%  0.5548033 0.1603098 0.2406019 0.8690047
-## 1:10% 0.5499417 0.1532949 0.2494893 0.8503941
-## 1:15% 0.5464571 0.1485831 0.2552394 0.8376747
-## 1:21% 0.5431360 0.1442990 0.2603152 0.8259567
+##        Estimate         SE     Lower     Upper
+## 1:5%  0.4779833 0.08302599 0.3152553 0.6407112
+## 1:10% 0.4480775 0.06331213 0.3239880 0.5721670
+## 1:15% 0.4249357 0.05037871 0.3261952 0.5236762
+## 1:21% 0.4008393 0.03876416 0.3248629 0.4768157
 ## 
 ## $`-0.5`
-##        Estimate        SE     Lower    Upper
-## 1:5%  0.9241862 0.1932594 0.5454048 1.302968
-## 1:10% 0.9193246 0.1863806 0.5540254 1.284624
-## 1:15% 0.9158400 0.1817648 0.5595875 1.272092
-## 1:21% 0.9125189 0.1775713 0.5644855 1.260552
+##        Estimate         SE     Lower     Upper
+## 1:5%  0.8473662 0.11816778 0.6157616 1.0789708
+## 1:10% 0.8174604 0.09946283 0.6225169 1.0124040
+## 1:15% 0.7943186 0.08738918 0.6230390 0.9655982
+## 1:21% 0.7702222 0.07670819 0.6198769 0.9205675
 ## 
 ## $`-0.25`
 ##       Estimate        SE     Lower    Upper
-## 1:5%  1.293569 0.2286380 0.8454469 1.741691
-## 1:10% 1.288708 0.2219286 0.8537354 1.723680
-## 1:15% 1.285223 0.2174308 0.8590664 1.711379
-## 1:21% 1.281902 0.2133475 0.8637483 1.700055
+## 1:5%  1.216749 0.1559175 0.9111565 1.522342
+## 1:10% 1.186843 0.1380349 0.9162999 1.457387
+## 1:15% 1.163702 0.1265389 0.9156899 1.411713
+## 1:21% 1.139605 0.1163701 0.9115239 1.367686
 ## 
 ## $`0`
 ##       Estimate        SE    Lower    Upper
-## 1:5%  1.662952 0.2654765 1.142628 2.183276
-## 1:10% 1.658090 0.2589271 1.150603 2.165578
-## 1:15% 1.654606 0.2545391 1.155718 2.153493
-## 1:21% 1.651285 0.2505575 1.160201 2.142368</code></pre>
+## 1:5%  1.586132 0.1947646 1.204400 1.967864
+## 1:10% 1.556226 0.1774564 1.208418 1.904034
+## 1:15% 1.533084 0.1663240 1.207095 1.859073
+## 1:21% 1.508988 0.1564488 1.202354 1.815622</code></pre>
 </div>
 <div id="non-parametric-npmle-models" class="section level2">
 <h2>Non-parametric (NPMLE) models</h2>
@@ -196,13 +195,13 @@ quantile(mod2, probs = c(0.3, 0.5), robust = T, units = Dish,
 ## Estimated quantiles
 ## (cluster robust bootstrap-based inference)
 ## 
-##                 n       Mean   Median        SE   Lower   Upper
-## arcturus.30%  999 0.04146680 0.067397 0.0367206 0.00000 0.08547
-## arcturus.50%  999 0.00062217 0.000000 0.0065345 0.00000 0.00000
-## blattaria.30% 999 0.26951972 0.268293 0.0175655 0.24096 0.30726
-## blattaria.50% 999 0.23306179 0.230769 0.0127207 0.21393 0.26443
-## creticum.30%  999 0.34503418 0.343750 0.0205478 0.31176 0.38462
-## creticum.50%  999 0.30386151 0.302469 0.0131902 0.28255 0.33333</code></pre>
+##                 n       Mean   Median       SE   Lower    Upper
+## arcturus.30%  999 0.04077881 0.067249 0.036702 0.00000 0.085427
+## arcturus.50%  999 0.00084775 0.000000 0.007707 0.00000 0.000000
+## blattaria.30% 999 0.26904954 0.268577 0.017421 0.23997 0.305811
+## blattaria.50% 999 0.23259344 0.230483 0.012722 0.21347 0.261990
+## creticum.30%  999 0.34398510 0.341515 0.019330 0.31219 0.382813
+## creticum.50%  999 0.30315953 0.301887 0.012045 0.28241 0.331126</code></pre>
 <p>For KDE models, quantiles are calculated from the time-to-event curve by using a bisection method. However, we are still unsure about the most reliable way to obtain standard errors and, for this reason, inferences are not provided with this type of non-parametric models.</p>
 </div>
 </div>

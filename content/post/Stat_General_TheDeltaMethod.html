@@ -1,23 +1,22 @@
 ---
 title: "How do we combine errors, in biology? The delta method"
 author: "Andrea Onofri"
-date: '2019-05-25'
+date: "2019-05-25"
 categories:
 - R
 - delta_method
-slug: Non-linear models
+slug: "Non-linear models"
 tags:
 - R
 - delta_method
 - Error_propagation
-archives: 
-- 2019
+archives: 2019
 ---
 
 
 
 <p>In a recent post I have shown that we can build linear combinations of model parameters (<a href="https://www.statforbiology.com/2019/stat_general_errorpropagation/">see here</a> ). For example, if we have two parameter estimates, say Q and W, with standard errors respectively equal to <span class="math inline">\(\sigma_Q\)</span> and <span class="math inline">\(\sigma_W\)</span>, we can build a linear combination as follows:</p>
-<p><span class="math display">\[Z = AQ + BW + C\]</span></p>
+<p><span class="math display">\[ Z = AQ + BW + C\]</span></p>
 <p>where A, B and C are three coefficients. The standard error for this combination can be obtained as:</p>
 <p><span class="math display">\[ \sigma_Z = \sqrt{ A^2 \sigma^2_Q + B^2 \sigma^2_W + 2AB \sigma_{QW} }\]</span></p>
 <p>In biology, nonlinear transformations are much more frequent than linear transformations. Nonlinear transformations are, e.g., <span class="math inline">\(Z = exp(Q + W)\)</span>, or, <span class="math inline">\(Z = 1/(Q + W)\)</span>. What is the standard error for these nonlinear transformations? This is not a complex problem, but the solution may be beyond biologists with an average level of statistical proficiency. It is named the ‘delta method’ and it provides the so called ‘delta standard errors’. I thought it might be useful to talk about it, by using a very simple language and a few examples.</p>
@@ -25,7 +24,7 @@ archives:
 <h1>Example 1: getting the half-life of a herbicide</h1>
 <p>A herbicide has proven to follow a first order degradation kinetic in soil, with constant degradation rate <span class="math inline">\(k = -0.035\)</span> and standard error equal to <span class="math inline">\(0.00195\)</span>. What is the half-life (<span class="math inline">\(T_{1/2}\)</span>) of this herbicide and its standard error?</p>
 <p>Every pesticide chemist knows that the half-life (<span class="math inline">\(T_{1/2}\)</span>) is derived by the degradation rate, according to the following equation:</p>
-<p><span class="math display">\[T_{1/2} = \frac{\log(0.5)}{k}\]</span></p>
+<p><span class="math display">\[ T_{1/2} = \frac{\log(0.5)}{k}\]</span></p>
 <p>Therefore, the half-life for our herbicide is:</p>
 <pre class="r"><code>Thalf &lt;- log(0.5)/-0.035
 Thalf</code></pre>
@@ -33,7 +32,7 @@ Thalf</code></pre>
 <p>But … what is the standard error of this half-life? There is some uncertainty around the estimate of <span class="math inline">\(k\)</span> and it is clear that such an uncertainty should propagate to the estimate of <span class="math inline">\(T_{1/2}\)</span>; unfortunately, the transformation is nonlinear and we cannot use the expression given above for linear transformations.</p>
 <div id="the-basic-idea" class="section level2">
 <h2>The basic idea</h2>
-<p>The basic idea behind the delta method is that most of the simple nonlinear functions, which we use in biology, can be locally approximated by the tangent line through a point of interest. For example, our nonlinear half-life function is <span class="math inline">\(Y = \log(0.5)/X\)</span> and, obviously, we are interested in the point where <span class="math inline">\(X = k = -0.035\)</span>. In the graph below, we have represented our nonlinear function (in black) and its tangent line (in red) through the above point: we can see that the approximation is fairly good in the close vicinity of <span class="math inline">\(X = -0.035\)</span>.</p>
+<p>The basic idea behind the delta method is that most of the simple nonlinear functions, which we use in biology, can be locally approximated by the tangent line through a point of interest. For example, our nonlinear half-life function is <span class="math inline">\(Y  = \log(0.5)/X\)</span> and, obviously, we are interested in the point where <span class="math inline">\(X = k = -0.035\)</span>. In the graph below, we have represented our nonlinear function (in black) and its tangent line (in red) through the above point: we can see that the approximation is fairly good in the close vicinity of <span class="math inline">\(X = -0.035\)</span>.</p>
 <p><img src="/post/Stat_General_TheDeltaMethod_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 <p>What is the equation of the tangent line? In general, if the nonlinear function is <span class="math inline">\(G(X)\)</span>, you may remember from high school that the slope <span class="math inline">\(m\)</span> of the tangent line is equal to the first derivative of <span class="math inline">\(G(X)\)</span>, that is <span class="math inline">\(G&#39;(X)\)</span>. You may also remember that the equation of a line with slope <span class="math inline">\(m\)</span> through the point <span class="math inline">\(P(X_1, Y_1)\)</span> is <span class="math inline">\(Y - Y_1 = m(X - X_1)\)</span>. As <span class="math inline">\(Y_1 = G(X_1)\)</span>, the tangent line has equation:</p>
 <p><span class="math display">\[Y = G(X_1) + G&#39;(X_1)(X - X_1)\]</span></p>
@@ -73,10 +72,7 @@ m</code></pre>
 <h2>In general…</h2>
 <p>If we have a nonlinear transformation <span class="math inline">\(G(X)\)</span>, the standard error for this transformation is approximated by knowing the first derivative <span class="math inline">\(G&#39;(X)\)</span> and the standard error of <span class="math inline">\(X\)</span>:</p>
 <p><span class="math display">\[\sigma_{G(X)}  \simeq \sqrt{ [G&#39;(X)]^2 \, \sigma^2_X }\]</span></p>
-</div>
-</div>
-<div id="example-2-a-back-transformed-count" class="section level1">
-<h1>Example 2: a back-transformed count</h1>
+<p>#Example 2: a back-transformed count</p>
 <p>A paper reports that the mean number of microorganisms in a substrate, on a logarithmic scale, was <span class="math inline">\(X_1 = 5\)</span> with standard error <span class="math inline">\(\sigma = 0.84\)</span>. It is easy to derive that the actual number of micro-organisms was <span class="math inline">\(\exp{5} = 148.4132\)</span>; what is the standard error of the back-transformed mean?</p>
 <p>The first derivative of our nonlinear function is:</p>
 <pre class="r"><code>D(expression(exp(X)), &quot;X&quot;)</code></pre>
@@ -90,6 +86,7 @@ m</code></pre>
 <pre class="r"><code>sigma &lt;- 0.84
 sqrt( m^2 * sigma^2 )</code></pre>
 <pre><code>## [1] 124.6671</code></pre>
+</div>
 </div>
 <div id="example-3-selenium-concentration-in-olive-drupes" class="section level1">
 <h1>Example 3: Selenium concentration in olive drupes</h1>
@@ -111,9 +108,7 @@ sigma &lt;- matrix(c(sigmaX^2, sigmaXW, sigmaXW, sigmaW^2), 2, 2, byrow = T)
 sqrt( der %*% sigma %*% t(der) )</code></pre>
 <pre><code>##          [,1]
 ## [1,] 4.462726</code></pre>
-</div>
-<div id="the-delta-method-with-r" class="section level1">
-<h1>The delta method with R</h1>
+<p>#The delta method with R</p>
 <p>In R there is a shortcut function to calculate delta standard errors, that is available in the ‘car’ package. In order to use it, we need to have:</p>
 <ol style="list-style-type: decimal">
 <li>a named vector for the variables that we have to combine</li>
@@ -127,20 +122,20 @@ sigma &lt;- matrix(c(0.00195^2), 1, 1)
 library(car)</code></pre>
 <pre><code>## Loading required package: carData</code></pre>
 <pre class="r"><code>deltaMethod(object = obj, g=&quot;log(0.5)/k&quot;, vcov = sigma)</code></pre>
-<pre><code>##            Estimate       SE    2.5 %   97.5 %
-## log(0.5)/k 19.80421 1.103377 17.64163 21.96678</code></pre>
+<pre><code>##            Estimate      SE   2.5 % 97.5 %
+## log(0.5)/k  19.8042  1.1034 17.6416 21.967</code></pre>
 <p>For the second example:</p>
 <pre class="r"><code>obj &lt;- c(&quot;X1&quot; = 5)
 sigma &lt;- matrix(c(0.84^2), 1, 1)
 deltaMethod(object = obj, g=&quot;exp(X1)&quot;, vcov = sigma)</code></pre>
-<pre><code>##         Estimate       SE     2.5 %   97.5 %
-## exp(X1) 148.4132 124.6671 -95.92978 392.7561</code></pre>
+<pre><code>##         Estimate     SE  2.5 % 97.5 %
+## exp(X1)   148.41 124.67 -95.93 392.76</code></pre>
 <p>For the third example:</p>
 <pre class="r"><code>obj &lt;- c(&quot;X&quot; = 3.1, &quot;W&quot; = 3.4)
 sigma &lt;- matrix(c(0.8^2, 0.55, 0.55, 0.31^2), 2, 2, byrow = T)
 deltaMethod(object = obj, g=&quot;X * W&quot;, vcov = sigma)</code></pre>
-<pre><code>##       Estimate       SE    2.5 %   97.5 %
-## X * W    10.54 4.462726 1.793218 19.28678</code></pre>
+<pre><code>##       Estimate      SE   2.5 % 97.5 %
+## X * W  10.5400  4.4627  1.7932 19.287</code></pre>
 <p>The function ‘deltaMethod()’ is very handy to be used in connection with model objects, as we do not need to provide anything, but the transformation function. But this is something that requires another post!</p>
 <p>However, two final notes relating to the delta method need to be pointed out here:</p>
 <ol style="list-style-type: decimal">

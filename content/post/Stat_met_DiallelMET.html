@@ -15,7 +15,6 @@ tags:
 archives: 2021
 ---
 
-<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
 <p>In recent times, a few colleagues at my Department and I have devoted some research effort to data management for diallel mating experiments, which we have summarised in a paper (<a href="https://link.springer.com/article/10.1007/s00122-020-03716-8">Onofri et al., 2020</a>) and a series of five blog posts (<a href="https://www.statforbiology.com/tags/diallel_models/">see here</a>). A final topic that remains to be covered relates to the frequent possibility that these diallel experiments are repeated across years and/or locations. How should the resulting dataset be analysed?</p>
@@ -49,17 +48,14 @@ dMod2 &lt;- lm.diallel(Yield ~ Par1 + Par2,
                     data = dataset, fct = &quot;GRIFFING1&quot;,
                     Env = Env, Block = Block)
 anova(dMod2)
-## Analysis of Variance Table
-## 
-## Response: Yield
 ##                  Df Sum Sq Mean Sq  F value Pr(&gt;F)    
-## Environment       9   10.6    1.17   0.1550 0.9978    
-## Env:Block        30 3195.1  106.50  14.0554 &lt;2e-16 ***
+## Env               9   10.6    1.17   0.1550 0.9978    
+## Env/Block        30 3195.1  106.50  14.0554 &lt;2e-16 ***
 ## GCA               4 8673.7 2168.42 286.1657 &lt;2e-16 ***
-## GCA:Env          36  187.7    5.21   0.6882 0.9175    
 ## tSCA             10 3021.3  302.13  39.8725 &lt;2e-16 ***
-## tSCA:Env         90  108.8    1.21   0.1596 1.0000    
 ## Reciprocals      10 4379.7  437.97  57.7989 &lt;2e-16 ***
+## GCA:Env          36  187.7    5.21   0.6882 0.9175    
+## tSCA:Env         90  108.8    1.21   0.1596 1.0000    
 ## Reciprocals:Env  90  352.6    3.92   0.5170 0.9999    
 ## Residuals       720 5455.8    7.58                    
 ## ---
@@ -84,7 +80,7 @@ gh &lt;- glht(linfct = diallel.eff(dMod2))
 <p>The ANOVA table above shows that genetical effects did not significantly interact with the environment and, therefore, we might be interested in getting estimates of average genetical effects, which can be done by using the <code>glht()</code> function and passing the <code>type = "means"</code> argument in the <code>diallel.eff()</code> call. An excerpt of the result is given in the box below.</p>
 <pre class="r"><code>gh &lt;- glht(linfct = diallel.eff(dMod2, type = &quot;means&quot;))
 # summary(gh, test = adjusted(type = &quot;none&quot;))
-#    Simultaneous Tests for General Linear Hypotheses
+# 	 Simultaneous Tests for General Linear Hypotheses
 # 
 # Linear Hypotheses:
 #               Estimate Std. Error t value Pr(&gt;|t|)    
@@ -138,6 +134,7 @@ dMod3$beta #fixed effects
 ## 23     Y   REC(Par1, Par2)r_3:4  4.424875 0.2869127  15.4223768
 ## 24     Y   REC(Par1, Par2)r_3:5 -0.038625 0.2869127  -0.1346229
 ## 25     Y   REC(Par1, Par2)r_4:5 -2.149875 0.2869127  -7.4931342
+ r
 dMod3$varcomp #variance components
 ##               VarComp  VarCompSE
 ## Env        0.00000000 0.42671998
@@ -156,6 +153,7 @@ dMod3$varcomp #variance components
 dMod4$beta #fixed effects
 ##   Trait      Effect Estimate Std.Error  t.value
 ## 1     Y (Intercept) 16.45538  1.920185 8.569682
+ r
 dMod4$varcomp #variance components
 ##               VarComp  VarCompSE
 ## Env        0.00000000 0.42621427

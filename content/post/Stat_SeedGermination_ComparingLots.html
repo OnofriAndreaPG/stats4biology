@@ -64,6 +64,7 @@ head(datasetR, 16)
 ## 1.13     Low  Fix    1      13     14     0   14    0.56
 ## 1.14     Low  Fix    1      14     15     3   17    0.68
 ## 1.15     Low  Fix    1      15    Inf     8   NA      NA
+ r
 datasetR &lt;- datasetR %&gt;% 
   mutate(across(c(Storage, Temp, Dish), .fns = factor))</code></pre>
 <p>The snippet above shows the first dish. Roughly speaking, we have gone from a WIDE format to a LONG format. The column ‘timeAf’ contains the time when the inspection was made and the column ‘count’ contains the number of germinated seeds (e.g. 9 seeds were counted at day 9). These seeds did not germinate exactly at day 9; they germinated within the interval between two inspections, that is between day 8 and day 9. The beginning of the interval is given in the variable ‘timeBef’. Apart from these columns, we have additional columns, which we are not going to use for our analyses. The cumulative counts of germinated seeds are in the column ‘nCum’; these cumulative counts have been converted into cumulative proportions by dividing by 25 (i.e., the total number of seeds in a dish; see the column ‘propCum’).</p>
@@ -74,7 +75,7 @@ datasetR &lt;- datasetR %&gt;%
 plot(modPre, log = &quot;&quot;, xlab = &quot;Time&quot;, 
      ylab = &quot;Proportion of germinated seeds&quot;,
      xlim = c(0, 15))</code></pre>
-<p><img src="/post/Stat_Survival_ComparingLots_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p><img src="/post/Stat_SeedGermination_ComparingLots_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 <p>Please, note the following:</p>
 <ol style="list-style-type: decimal">
 <li>we are using the counts (‘count’) as the dependent variable</li>
@@ -86,12 +87,18 @@ plot(modPre, log = &quot;&quot;, xlab = &quot;Time&quot;,
 <pre class="r"><code>mod1 &lt;- drm(count ~ timeBef + timeAf, fct = LL.3(),
             data = datasetR, type = &quot;event&quot;, 
             curveid = Temp:Storage)
+## Warning in matrix(c(predVec, resVec), length(dose), 2): data length differs
+## from size of matrix: [480 != 60 x 2]
+ r
 plot(mod1, log = &quot;&quot;, legendPos = c(2, 1))</code></pre>
-<p><img src="/post/Stat_Survival_ComparingLots_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p><img src="/post/Stat_SeedGermination_ComparingLots_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <p>It appears that there are visible differences between the curves (the legend considers the curves in alphabetical order, i.e. 1: Fix-Low, 2: Fix-High, 3: Alt-Low and 4: Alt-High). We can test that the curves are similar by coding a reduced model, where we have only one pooled curve for all treatment levels. It is enough to remove the ‘curveid’ argument.</p>
 <pre class="r"><code>modNull &lt;- drm(count ~ timeBef + timeAf, fct = LL.3(),
                data = datasetR, 
                type = &quot;event&quot;)
+## Warning in matrix(c(predVec, resVec), length(dose), 2): data length differs
+## from size of matrix: [480 != 15 x 2]
+ r
 anova(mod1, modNull, test = &quot;Chisq&quot;)
 ## 
 ## 1st model
@@ -103,12 +110,15 @@ anova(mod1, modNull, test = &quot;Chisq&quot;)
 ## ANOVA-like table
 ## 
 ##           ModelDf  Loglik Df LR value p value
-## 1st model     244 -753.54                    
-## 2nd model     253 -854.93  9   202.77       0</code></pre>
+## 1st model     244 -753.53                    
+## 2nd model     253 -854.93  9    202.8       0</code></pre>
 <p>Now, we can compare the full model (four curves) with the reduced model (one common curve) by using a Likelihood Ratio Test, which is approximately distributed as a Chi-square. The test is highly significant. Of course, we can also test some other hypotheses. For example, we can code a model with different curves for storage times, assuming that the effect of temperature is irrelevant:</p>
 <pre class="r"><code>mod2 &lt;- drm(count ~ timeBef + timeAf, fct = LL.3(), 
             data = datasetR, type = &quot;event&quot;, 
             curveid = Storage)
+## Warning in matrix(c(predVec, resVec), length(dose), 2): data length differs
+## from size of matrix: [480 != 30 x 2]
+ r
 anova(mod1, mod2, test = &quot;Chisq&quot;)
 ## 
 ## 1st model
@@ -120,12 +130,15 @@ anova(mod1, mod2, test = &quot;Chisq&quot;)
 ## ANOVA-like table
 ## 
 ##           ModelDf  Loglik Df LR value p value
-## 1st model     244 -753.54                    
-## 2nd model     250 -797.26  6   87.436       0</code></pre>
+## 1st model     244 -753.53                    
+## 2nd model     250 -797.26  6   87.453       0</code></pre>
 <p>We see that such an assumption (temperature effect is irrelevant) is not supported by the data: the temperature effect cannot be removed without causing a significant decrease in the likelihood of the model. Similarly, we can test the effect of storage:</p>
 <pre class="r"><code>mod3 &lt;- drm(count ~ timeBef + timeAf, fct = LL.3(), 
             data = datasetR, type = &quot;event&quot;, 
             curveid = Temp)
+## Warning in matrix(c(predVec, resVec), length(dose), 2): data length differs
+## from size of matrix: [480 != 30 x 2]
+ r
 anova(mod1, mod3, test = &quot;Chisq&quot;)
 ## 
 ## 1st model
@@ -137,14 +150,14 @@ anova(mod1, mod3, test = &quot;Chisq&quot;)
 ## ANOVA-like table
 ## 
 ##           ModelDf  Loglik Df LR value p value
-## 1st model     244 -753.54                    
-## 2nd model     250 -849.48  6   191.87       0</code></pre>
+## 1st model     244 -753.53                    
+## 2nd model     250 -849.48  6    191.9       0</code></pre>
 <p>Again, we get significant results. So, we need to conclude that temperature and storage time caused a significant influence on the germination behavior for the species under study.</p>
 <p>Before concluding, it is necessary to mention that, in general, the above LR tests should be taken with care: the results are only approximate and the observed data are not totally independent, as multiple observations are taken in each experimental unit (Petri dish). In order to restore independence, we would need to add to the model a random effect for the Petri dish, which is not an easy task in a time-to-event framework (Onofri et al., 2019). However, we got very low p-levels, which leave us rather confident about the significance of effects. It may be a good suggestion, in general, to avoid formal hypothesis testing and compare the models by using the Akaike Information Criterion (AIC: the lowest is the best), which confirms that the complete model with four curves is, indeed, the best one.</p>
 <pre class="r"><code>AIC(mod1, mod2, mod3, modNull)
 ##          df      AIC
-## mod1    244 1995.088
-## mod2    250 2094.524
+## mod1    244 1995.066
+## mod2    250 2094.519
 ## mod3    250 2198.961
 ## modNull 253 2215.862</code></pre>
 <p>For those who are familiar with linear model parameterisation, it is possible to reach even a higher degree of flexibility by using the ‘pmodels’ argument, within the ‘drm()’ function. However, this will require another post. Thanks for reading!</p>

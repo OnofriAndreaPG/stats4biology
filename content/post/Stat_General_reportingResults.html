@@ -60,6 +60,7 @@ print(anova(model), digits=6)
 ## Residuals   12  1.89376 0.15781                       
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+ r
 summary(model)
 ## 
 ## Call:
@@ -78,7 +79,7 @@ summary(model)
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Residual standard error: 0.3973 on 12 degrees of freedom
-## Multiple R-squared:  0.8931, Adjusted R-squared:  0.8753 
+## Multiple R-squared:  0.8931,	Adjusted R-squared:  0.8753 
 ## F-statistic: 50.12 on 2 and 12 DF,  p-value: 1.493e-06</code></pre>
 <p>In this example, the standard error for each mean (SEM) corresponds to <span class="math inline">\(\sqrt{0.158/5}\)</span>. In the end, we might show the following table of means for transformed data:</p>
 <!-- table -->
@@ -121,13 +122,14 @@ summary(model)
 </ol>
 <p>This may be simply done by hand, with e.g <span class="math inline">\(exp(6.343) \times 0.178 = 101.19\)</span> (for insecticide A). This ‘manual’ solution is always available, regardless of the statistical software at hand. With R, we can use the ‘emmeans’ package (Lenth, 2016):</p>
 <pre class="r"><code>library(emmeans)
-countM &lt;- emmeans(model, ~Insecticide, transform = &quot;response&quot;)</code></pre>
-<p>It is enough to set the argument ‘transform’ to ’response, although the transformation must be embedded in the model. It means: it is ok if we coded the model as:</p>
+countM &lt;- emmeans(model, ~Insecticide, regrid = &quot;response&quot;)</code></pre>
+<p>It is enough to set the argument ‘regrid’ to ’response, although the transformation must be embedded in the model. It means: it is ok if we coded the model as:</p>
 <pre><code>log(Count) ~ Insecticide</code></pre>
 <p>On the contrary, it fails if we coded the model as:</p>
 <pre><code>logCount ~ Insecticide</code></pre>
-<p>where the transformation was performed prior to fitting.</p>
-<p>Obviously, the back-transformed standard error is different for each mean (there is no homogeneity of variances on the original scale, but we knew this already). Back-transformed data might be presented as follows:</p>
+<p>where the transformation was performed prior to fitting (there are methods to circumvent this, but I’ll explain in another post).</p>
+<p>Obviously, the back-transformed standard error is different for each mean (there is no homogeneity of variances on the original scale, but we knew this already).
+Back-transformed data might be presented as follows:</p>
 <table>
 <thead>
 <tr class="header">
@@ -159,9 +161,7 @@ countM &lt;- emmeans(model, ~Insecticide, transform = &quot;response&quot;)</cod
 <p>Thanks for reading!</p>
 <p>Andrea Onofri<br />
 University of Perugia (Italy)</p>
-</div>
-<div id="references" class="section level1">
-<h1>References</h1>
+<p>#References</p>
 <ol style="list-style-type: decimal">
 <li>Lenth, R.V., 2016. Least-Squares Means: The R Package lsmeans. Journal of Statistical Software 69. <a href="https://doi.org/10.18637/jss.v069.i01" class="uri">https://doi.org/10.18637/jss.v069.i01</a></li>
 <li>Onofri, A., Carbonell, E.A., Piepho, H.-P., Mortimer, A.M., Cousens, R.D., 2010. Current statistical issues in Weed Research. Weed Research 50, 5–24.</li>

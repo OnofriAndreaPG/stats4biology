@@ -76,14 +76,15 @@ dfr
 
 ```{r eval=FALSE, include=FALSE}
 # Can we use it with nlme?
+library(nlme)
 metamitron$Block <- rep(1:3, 32)
 metamitron2 <- groupedData(Conc ~ Time|Block, data = metamitron)
-library(nlme)
 modNlime <- nlme(Conc ~ A * exp(-k * Time),
   start = c(A = rep(100, 4), k = rep(0.06, 4)),
   fixed = A + k ~ Herbicide - 1,
   random = k ~ Block,
   data = metamitron2)
+print(modNlime)
 tab <- summary(modNlime)$tTable
 dRates <- tab[5:8,1]
 SEs <- tab[5:8,2]
@@ -97,8 +98,9 @@ dfr
 Now we have one vector of estimates to be compared and one vector of standard errors. In this situation, we can make pairwise comparisons by using the `pairComp()` function in the 'aomisc' package. We just have to pass the vector of model parameters, the vector of standard errors, and, optionally, the names of parameters (we do not need this, as 'dRates' is a named vector), the number of residual degrees of freedom (defaults to 'Inf') and the multiplicity adjustment method, as in the 'multcomp' package (defaults to "single-step").
 
 ```{r}
-cp <- pairComp(dRates, SEs, dfr = dfr, adjust = "holm")
-cp$pairs
+vcovMat <- vcov(modNlin)[5:8,5:8]
+cp <- pairComp(dRates, vcovMat, dfr = dfr, adjust = "holm")
+cp$Pairs
 ```
 
 We can also obtain a letter display, by taking the 'Letters' slot in the 'cp' object. In this case, we might like to change the yardstick protection level, by passing the 'level' argument in 'pairComp()', that defaults to 0.05.

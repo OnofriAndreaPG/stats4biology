@@ -79,7 +79,7 @@ summary(modNlin)
 ## Residual standard error: 9.701 on 88 degrees of freedom
 ## 
 ## Number of iterations to convergence: 5 
-## Achieved convergence tolerance: 7.136e-06</code></pre>
+## Achieved convergence tolerance: 7.149e-06</code></pre>
 <p>For the sake of simplicity, I will neglige an accurate model check, although I need to point out that this is highly wrong. I’ll come back to this issue in another post.</p>
 </div>
 <div id="working-with-model-parameters" class="section level1">
@@ -99,80 +99,81 @@ summary(modNlin)
 <p>Therefore, I wrote a wrapper for the ‘deltaMethod()’ function, which I named ‘gnlht()’, as it might play for nonlinear combinations the same role as ‘glht()’ for linear combinations. To use this function, apart from loading the ‘aomisc’ package, we need to prepare a list of formulas. Care needs to be taken to make sure that the element in the formulas correspond to the names of the estimated parameters in the model object, as returned by the ‘coef()’ method. In the box below, I show how we can calculate the differences between the degradation rates.</p>
 <pre class="r"><code>funList &lt;- list(~k1 - k2, ~k1 - k3, ~k1 - k4)
 gnlht(modNlin, funList)
-##      form   Estimate          SE  t-value      p-value
-## 1 k1 - k2 0.01686533 0.004718465 3.574325 5.727311e-04
+##      Form   Estimate          SE  t-value      p-value
+## 1 k1 - k2 0.01686533 0.004718465 3.574325 5.727310e-04
 ## 2 k1 - k3 0.01226241 0.004951372 2.476568 1.517801e-02
 ## 3 k1 - k4 0.02074109 0.004512710 4.596150 1.430392e-05</code></pre>
 <p>The very same code can be used for nonlinear combinations of model parameters. In order to calculate the half-lives, we can use the following code:</p>
 <pre class="r"><code>funList &lt;- list(~ -log(0.5)/k1, ~ -log(0.5)/k2,
                 ~ -log(0.5)/k3, ~ -log(0.5)/k4)
 gnlht(modNlin, funList)
-##           form Estimate       SE  t-value      p-value
-## 1 -log(0.5)/k1 16.27089 1.576827 10.31876 7.987827e-17
-## 2 -log(0.5)/k2 26.93390 2.391121 11.26413 9.552915e-19
+##           Form Estimate       SE  t-value      p-value
+## 1 -log(0.5)/k1 16.27089 1.576827 10.31876 7.987828e-17
+## 2 -log(0.5)/k2 26.93390 2.391121 11.26413 9.552912e-19
 ## 3 -log(0.5)/k3 22.84747 2.058588 11.09861 2.064093e-18
-## 4 -log(0.5)/k4 31.70942 2.643329 11.99601 3.257067e-20</code></pre>
+## 4 -log(0.5)/k4 31.70942 2.643330 11.99601 3.257068e-20</code></pre>
 <p>Instead of writing ‘0.5’, we can introduce a new model term, e.g. ‘prop’, as a ‘constant’, in the sense that it is not an estimated parameter. We can pass a value for this constant in a data frame, by using the ‘const’ argument:</p>
 <pre class="r"><code>funList &lt;- list(~ -log(prop)/k1, ~ -log(prop)/k2,
                 ~ -log(prop)/k3, ~ -log(prop)/k4)
 gnlht(modNlin, funList, const = data.frame(prop = 0.5))
-##            form prop Estimate       SE  t-value      p-value
-## 1 -log(prop)/k1  0.5 16.27089 1.576827 10.31876 7.987827e-17
-## 2 -log(prop)/k2  0.5 26.93390 2.391121 11.26413 9.552915e-19
+##            Form prop Estimate       SE  t-value      p-value
+## 1 -log(prop)/k1  0.5 16.27089 1.576827 10.31876 7.987828e-17
+## 2 -log(prop)/k2  0.5 26.93390 2.391121 11.26413 9.552912e-19
 ## 3 -log(prop)/k3  0.5 22.84747 2.058588 11.09861 2.064093e-18
-## 4 -log(prop)/k4  0.5 31.70942 2.643329 11.99601 3.257067e-20</code></pre>
+## 4 -log(prop)/k4  0.5 31.70942 2.643330 11.99601 3.257068e-20</code></pre>
 <p>This is very flexible, because it lets us to calculate, altogether, the half-life and the times required for the concentration to drop to 70 and 30% of the initial value:</p>
 <pre class="r"><code>funList &lt;- list(~ -log(prop)/k1, ~ -log(prop)/k2,
                 ~ -log(prop)/k3, ~ -log(prop)/k4)
 gnlht(modNlin, funList, const = data.frame(prop = c(0.7, 0.5, 0.3)))
-##             form prop  Estimate        SE  t-value      p-value
-## 1  -log(prop)/k1  0.7  8.372564 0.8113927 10.31876 7.987827e-17
-## 2  -log(prop)/k1  0.5 16.270892 1.5768267 10.31876 7.987827e-17
-## 3  -log(prop)/k1  0.3 28.261979 2.7388937 10.31876 7.987827e-17
-## 4  -log(prop)/k2  0.7 13.859465 1.2304069 11.26413 9.552915e-19
-## 5  -log(prop)/k2  0.5 26.933905 2.3911214 11.26413 9.552915e-19
-## 6  -log(prop)/k2  0.3 46.783265 4.1532956 11.26413 9.552915e-19
-## 7  -log(prop)/k3  0.7 11.756694 1.0592942 11.09861 2.064093e-18
-## 8  -log(prop)/k3  0.5 22.847468 2.0585881 11.09861 2.064093e-18
-## 9  -log(prop)/k3  0.3 39.685266 3.5756966 11.09861 2.064093e-18
-## 10 -log(prop)/k4  0.7 16.316814 1.3601864 11.99601 3.257067e-20
-## 11 -log(prop)/k4  0.5 31.709415 2.6433295 11.99601 3.257067e-20
-## 12 -log(prop)/k4  0.3 55.078163 4.5913724 11.99601 3.257067e-20</code></pre>
+##             Form prop  Estimate        SE  t-value      p-value
+## 1  -log(prop)/k1  0.7  8.372564 0.8113927 10.31876 7.987828e-17
+## 2  -log(prop)/k2  0.7 13.859465 1.2304069 11.26413 9.552912e-19
+## 3  -log(prop)/k3  0.7 11.756694 1.0592942 11.09861 2.064093e-18
+## 4  -log(prop)/k4  0.7 16.316815 1.3601865 11.99601 3.257068e-20
+## 5  -log(prop)/k1  0.5 16.270892 1.5768267 10.31876 7.987828e-17
+## 6  -log(prop)/k2  0.5 26.933905 2.3911214 11.26413 9.552912e-19
+## 7  -log(prop)/k3  0.5 22.847468 2.0585881 11.09861 2.064093e-18
+## 8  -log(prop)/k4  0.5 31.709416 2.6433295 11.99601 3.257068e-20
+## 9  -log(prop)/k1  0.3 28.261979 2.7388938 10.31876 7.987828e-17
+## 10 -log(prop)/k2  0.3 46.783265 4.1532955 11.26413 9.552912e-19
+## 11 -log(prop)/k3  0.3 39.685266 3.5756966 11.09861 2.064093e-18
+## 12 -log(prop)/k4  0.3 55.078164 4.5913725 11.99601 3.257068e-20</code></pre>
 <p>The differences between the half-lives (and other degradation times) can be calculated as well:</p>
 <pre class="r"><code>funList &lt;- list(~ (k2 - k1)/(k1 * k2) * log(prop),
                 ~ (k3 - k1)/(k1 * k3) * log(prop), 
                 ~ (k4 - k1)/(k1 * k4) * log(prop))
 gnlht(modNlin, funList, const = data.frame(prop = c(0.7, 0.5, 0.3)))
-##                              form prop  Estimate       SE  t-value      p-value
+##                              Form prop  Estimate       SE  t-value      p-value
 ## 1 (k2 - k1)/(k1 * k2) * log(prop)  0.7  5.486900 1.473859 3.722813 3.468973e-04
-## 2 (k2 - k1)/(k1 * k2) * log(prop)  0.5 10.663013 2.864235 3.722813 3.468973e-04
-## 3 (k2 - k1)/(k1 * k2) * log(prop)  0.3 18.521287 4.975078 3.722813 3.468973e-04
-## 4 (k3 - k1)/(k1 * k3) * log(prop)  0.7  3.384130 1.334340 2.536183 1.297111e-02
+## 2 (k3 - k1)/(k1 * k3) * log(prop)  0.7  3.384130 1.334340 2.536183 1.297111e-02
+## 3 (k4 - k1)/(k1 * k4) * log(prop)  0.7  7.944250 1.583814 5.015900 2.718444e-06
+## 4 (k2 - k1)/(k1 * k2) * log(prop)  0.5 10.663013 2.864235 3.722813 3.468973e-04
 ## 5 (k3 - k1)/(k1 * k3) * log(prop)  0.5  6.576577 2.593100 2.536183 1.297111e-02
-## 6 (k3 - k1)/(k1 * k3) * log(prop)  0.3 11.423287 4.504125 2.536183 1.297111e-02
-## 7 (k4 - k1)/(k1 * k4) * log(prop)  0.7  7.944250 1.583814 5.015900 2.718445e-06
-## 8 (k4 - k1)/(k1 * k4) * log(prop)  0.5 15.438524 3.077917 5.015900 2.718445e-06
-## 9 (k4 - k1)/(k1 * k4) * log(prop)  0.3 26.816185 5.346236 5.015900 2.718445e-06</code></pre>
+## 6 (k4 - k1)/(k1 * k4) * log(prop)  0.5 15.438524 3.077917 5.015900 2.718444e-06
+## 7 (k2 - k1)/(k1 * k2) * log(prop)  0.3 18.521287 4.975078 3.722813 3.468973e-04
+## 8 (k3 - k1)/(k1 * k3) * log(prop)  0.3 11.423287 4.504125 2.536183 1.297111e-02
+## 9 (k4 - k1)/(k1 * k4) * log(prop)  0.3 26.816185 5.346236 5.015900 2.718444e-06</code></pre>
 <p>The possibility of passing constants in a data.frame adds flexibility with respect to the ‘deltaMethod()’ function in the ‘car’ package. For example, we can use this method to make predictions:</p>
 <pre class="r"><code>funList &lt;- list(~ A1 * exp (- k1 * Time), ~ A2 * exp (- k2 * Time), 
                 ~ A3 * exp (- k3 * Time), ~ A4 * exp (- k4 * Time))
 pred &lt;- gnlht(modNlin, funList, const = data.frame(Time = seq(0, 67, 1)))
 head(pred)
-##                   form Time Estimate       SE  t-value      p-value
-## 1 A1 * exp(-k1 * Time)    0 94.83198 4.795948 19.77336 3.931107e-34
-## 2 A1 * exp(-k1 * Time)    1 90.87694 4.381511 20.74101 1.223613e-35
-## 3 A1 * exp(-k1 * Time)    2 87.08684 4.015039 21.69016 4.511113e-37
-## 4 A1 * exp(-k1 * Time)    3 83.45482 3.695325 22.58389 2.205772e-38
-## 5 A1 * exp(-k1 * Time)    4 79.97427 3.421034 23.37722 1.623774e-39
-## 6 A1 * exp(-k1 * Time)    5 76.63888 3.190531 24.02072 2.050113e-40
+##                   Form Time  Estimate       SE  t-value      p-value
+## 1 A1 * exp(-k1 * Time)    0  94.83198 4.795948 19.77336 3.931106e-34
+## 2 A2 * exp(-k2 * Time)    0 102.08592 4.316122 23.65223 6.671764e-40
+## 3 A3 * exp(-k3 * Time)    0  99.58530 4.463418 22.31144 5.485452e-38
+## 4 A4 * exp(-k4 * Time)    0 111.62446 4.183588 26.68151 5.980930e-44
+## 5 A1 * exp(-k1 * Time)    1  90.87694 4.381511 20.74101 1.223613e-35
+## 6 A2 * exp(-k2 * Time)    1  99.49225 4.062186 24.49229 4.617181e-41
+ r
 tail(pred)
-##                     form Time Estimate       SE  t-value      p-value
-## 267 A4 * exp(-k4 * Time)   62 28.78518 2.657182 10.83297 7.138133e-18
-## 268 A4 * exp(-k4 * Time)   63 28.16278 2.648687 10.63273 1.824651e-17
-## 269 A4 * exp(-k4 * Time)   64 27.55384 2.639403 10.43942 4.525865e-17
-## 270 A4 * exp(-k4 * Time)   65 26.95807 2.629361 10.25270 1.090502e-16
-## 271 A4 * exp(-k4 * Time)   66 26.37517 2.618594 10.07227 2.555132e-16
-## 272 A4 * exp(-k4 * Time)   67 25.80489 2.607131  9.89781 5.827812e-16</code></pre>
+##                     Form Time  Estimate       SE   t-value      p-value
+## 267 A3 * exp(-k3 * Time)   66 13.446308 2.095933  6.415427 6.838561e-09
+## 268 A4 * exp(-k4 * Time)   66 26.375174 2.618594 10.072266 2.555133e-16
+## 269 A1 * exp(-k1 * Time)   67  5.462339 1.363509  4.006090 1.287737e-04
+## 270 A2 * exp(-k2 * Time)   67 18.202556 2.358965  7.716331 1.752360e-11
+## 271 A3 * exp(-k3 * Time)   67 13.044500 2.068082  6.307534 1.106297e-08
+## 272 A4 * exp(-k4 * Time)   67 25.804886 2.607131  9.897810 5.827813e-16</code></pre>
 <p>Although this is not very fast, in contrast to the ‘predict()’ method for ‘nls’ objects, it has the advantage of reporting standard errors.</p>
 <p>Hope this is useful. Happy coding!</p>
 <hr />

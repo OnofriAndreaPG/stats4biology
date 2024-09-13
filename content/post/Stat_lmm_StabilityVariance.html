@@ -35,21 +35,25 @@ library(aomisc)
 ## The following objects are masked from &#39;package:stats&#39;:
 ## 
 ##     gaussian, getInitial
+## Registered S3 method overwritten by &#39;aomisc&#39;:
+##   method   from
+##   plot.nls nlme
+ r
 data(WinterWheat)
 WinterWheat$Year &lt;- factor(WinterWheat$Year)
 WinterWheat$Block &lt;- factor(WinterWheat$Block)
 head(WinterWheat, 10)
-##    Plot Block Genotype Yield Year
-## 1     2     1 COLOSSEO  6.73 1996
-## 2     1     1    CRESO  6.02 1996
-## 3    50     1   DUILIO  6.06 1996
-## 4    49     1   GRAZIA  6.24 1996
-## 5    63     1    IRIDE  6.23 1996
-## 6    32     1 SANCARLO  5.45 1996
-## 7    35     1   SIMETO  4.99 1996
-## 8    33     1    SOLEX  6.08 1996
-## 9   110     2 COLOSSEO  6.96 1996
-## 10  137     2    CRESO  5.34 1996</code></pre>
+##    Year Plot Block Genotype Yield
+## 1  1996    2     1 COLOSSEO  6.73
+## 2  1996    1     1    CRESO  6.02
+## 3  1996   50     1   DUILIO  6.06
+## 4  1996   49     1   GRAZIA  6.24
+## 5  1996   63     1    IRIDE  6.23
+## 6  1996   32     1 SANCARLO  5.45
+## 7  1996   35     1   SIMETO  4.99
+## 8  1996   33     1    SOLEX  6.08
+## 9  1996  110     2 COLOSSEO  6.96
+## 10 1996  137     2    CRESO  5.34</code></pre>
 <p>Please, note that this is a multienvironment experiment as it is repeated in several years: each year is an ‘environment’ in itself. Furthermore, please note that the year effect (i.e. the environment effect) is of random nature: we select the years, but we cannot control the weather conditions.</p>
 <div id="defining-a-linear-mixed-model" class="section level1">
 <h1>Defining a linear mixed model</h1>
@@ -98,10 +102,10 @@ VarCorr(model.mix2)
 ## Block1           0.01641744 0.1281305
 ## Block2           0.01641744 0.1281305
 ## Block3           0.01641744 0.1281305
-## GenotypeCOLOSSEO 0.10427267 0.3229128
+## GenotypeCOLOSSEO 0.10427266 0.3229128
 ## GenotypeCRESO    0.09588553 0.3096539
 ## GenotypeDUILIO   0.47612340 0.6900170
-## GenotypeGRAZIA   0.15286445 0.3909788
+## GenotypeGRAZIA   0.15286446 0.3909788
 ## GenotypeIRIDE    0.11860160 0.3443858
 ## GenotypeSANCARLO 0.02575029 0.1604690
 ## GenotypeSIMETO   0.42998504 0.6557324
@@ -127,26 +131,24 @@ names(sdRatios)[1] &lt;- &quot;COLOSSEO&quot;
 scalePar &lt;- model.mixM$sigma
 sigma2i &lt;- (scalePar * sdRatios)^2
 sigma2i
-##   COLOSSEO      CRESO     DUILIO     GRAZIA      IRIDE   SANCARLO 
-## 0.15387857 0.14548985 0.52571780 0.20246664 0.16820264 0.07535112 
-##     SIMETO      SOLEX 
-## 0.47958756 0.11673900</code></pre>
+##   COLOSSEO      CRESO     DUILIO     GRAZIA      IRIDE   SANCARLO     SIMETO 
+## 0.15387857 0.14548985 0.52571780 0.20246663 0.16820265 0.07535112 0.47958756 
+##      SOLEX 
+## 0.11673900</code></pre>
 <p>The above code outputs ‘sigma2i’, which does not contain the stability variances. Indeed, we should remove the within-experiment error (<span class="math inline">\(\sigma^2\)</span>), which can only be estimated from the whole dataset. Indeed, if we take the estimate of 0.1488 (see code above), divide by three (the number of blocks) and subtract from ‘sigma2i’, we get:</p>
 <pre class="r"><code>sigma2i - model.mix2$sigma^2/3
-##   COLOSSEO      CRESO     DUILIO     GRAZIA      IRIDE   SANCARLO 
-## 0.10427711 0.09588839 0.47611634 0.15286517 0.11860118 0.02574966 
-##     SIMETO      SOLEX 
-## 0.42998610 0.06713754</code></pre>
+##   COLOSSEO      CRESO     DUILIO     GRAZIA      IRIDE   SANCARLO     SIMETO 
+## 0.10427711 0.09588839 0.47611634 0.15286517 0.11860118 0.02574966 0.42998610 
+##      SOLEX 
+## 0.06713754</code></pre>
 <p>which are the stability variances, as obtained with the analyses of the whole dataset.</p>
 <p>Thanks for reading!</p>
-</div>
-<div id="references" class="section level1">
-<h1>References</h1>
+<p>#References</p>
 <ul>
 <li>Annichiarico, P., 2002. Genotype x Environment Interactions - Challenges and Opportunities for Plant Breeding and Cultivar Recommendations. Plant Production and protection paper, Food &amp; Agriculture Organization of the United Nations (FAO), Roma.</li>
 <li>Gałecki, A., Burzykowski, T., 2013. Linear mixed-effects models using R: a step-by-step approach. Springer, Berlin.</li>
 <li>Piepho, H.-P., 1999. Stability Analysis Using the SAS System. Agronomy Journal 91, 154–160.</li>
-<li>Pinheiro, J.C., Bates, D.M., 2000. Mixed-Effects Models in S and S-Plus, Springer-Verlag Inc. ed. Springer-Verlag Inc., New York.</li>
+<li>Pinheiro, J.C., Bates, D.M., 2000. Mixed-Effects Models in S and S-Plus, Springer-Verlag Inc. ed. Springer-Verlag Inc., New York.</li>
 <li>Shukla, G.K., 1972. Some statistical aspects of partitioning genotype-environmental components of variability. Heredity 29, 237–245.</li>
 </ul>
 </div>

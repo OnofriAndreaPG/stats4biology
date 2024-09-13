@@ -16,7 +16,6 @@ archives:
   - 2020
 ---
 
-<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
 <p><strong>THE CODE IN THIS POST WAS UPDATED ON JANUARY 2022</strong></p>
@@ -93,10 +92,14 @@ summary(modHTE)
 ## b:(Intercept)          4.0273963  0.1960845   20.539 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<p>As seeds are clustered in Petri dishes, in order not to violate the independence assumption, it is preferable to get cluster robust standard errors. One possibility is to use the grouped version of the sandwich estimator, as available in the ‘sandwich’ package (Berger, 2017). The function <code>coeftest()</code> is available in the ‘lmtest’ package (Zeileis, 2002) and its usage is shown in the box below.</p>
-<pre class="r"><code>lmtest::coeftest(modHTE, vcov = vcovCL, cluster = rape$Dish)
+<p>As seeds are clustered in Petri dishes, in order not to violate the independence assumption, it is preferable to get cluster robust standard errors. One possibility is to use the grouped version of the sandwich estimator, as available in the ‘sandwich’ package (Berger, 2017), which is implemented in the ‘drcte’ package.</p>
+<pre class="r"><code>summary(modHTE, robust = T, units = Dish)
 ## 
-## t test of coefficients:
+## Model fitted: Hydro-time model with shifted exponential for Pmax and linear model for GR50
+## 
+## Robust estimation: Cluster robust sandwich SEs 
+## 
+## Parameter estimates:
 ## 
 ##                         Estimate Std. Error   t value  Pr(&gt;|t|)    
 ## G:(Intercept)          0.9577918  0.0080923  118.3591 &lt; 2.2e-16 ***
@@ -106,37 +109,49 @@ summary(modHTE)
 ## b:(Intercept)          4.0273963  0.1934513   20.8187 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<p>Once the model is fitted, we may be interested in using the resulting curve to retrieve some biologically relevant information. For example, it may be interesting to retrieve the germination rates for some selected percentiles (e.g., the 30th, 20th and 10th percentiles). This is possible using the <code>GRate()</code> function, that is a wrapper for the original <code>ED()</code> function in the package <code>drc</code>. It reverses the behavior of the <code>ED()</code> function, in the sense that it considers, by default, the percentiles for the whole population, including the ungerminated fraction, which is, in our opinion, the most widespread interpretation of germination rates in seed science. The <code>GRate()</code> function works very much like the <code>ED()</code> function, although additional variables, such as the selected <span class="math inline">\(\Psi\)</span> level can be specified by using the argument <code>x2</code>.</p>
+<p>Once the model is fitted, we may be interested in using the resulting curve to retrieve some biologically relevant information. For example, it may be interesting to retrieve the germination rates for some selected percentiles (e.g., the 30th, 20th and 10th percentiles). This is possible using the <code>quantile()</code> function in ‘drcte’ package, that is a wrapper for the original <code>ED()</code> function in the package <code>drc</code>. It works very much like the <code>ED()</code> function, although the environmental covariates, such as the selected <span class="math inline">\(\Psi\)</span> level, can be specified as a numeric value.</p>
 <pre class="r"><code>#Naive standard errors
-GRate(modHTE, x2 = -1, respLev = c(30, 20, 10))
-##           Estimate          SE
-## GR:1:30 0.00000000 0.000000000
-## GR:1:20 0.03579236 0.005808732
-## GR:1:10 0.05130356 0.006221881</code></pre>
+quantile(modHTE, probs = c(0.30, 0.20, 0.10), rate = T, Psi = -1)
+## 
+## Estimated quantiles
+## 
+##       Estimate        SE
+## 1:30% 0.000000 0.0000000
+## 1:20% 0.035792 0.0058117
+## 1:10% 0.051304 0.0062243</code></pre>
 <p>In this example, we see that the <span class="math inline">\(GR_{30}\)</span> cannot be calculated, as the germination capacity did not reach 30% at the selected water potential level (<span class="math inline">\(-1 \,\, MPa\)</span>).</p>
-<p>As we said, cluster robust standard errors are recommended. The <code>GRate()</code> function allows entering a user-defined variance-covariance matrix, that is obtained by using the <code>vcovCL()</code> function in the <code>sandwich</code> package. If necessary, germination times can be obtained in a similar way, by using the <code>GTime()</code> function.</p>
+<p>As we said, cluster robust standard errors are recommended, which can be requested by setting the ‘robust = TRUE’ argument and passing a vector for the grouping factor. If necessary, germination times can be obtained in a similar way, by removing the ‘rate’ argument</p>
 <pre class="r"><code>#Cluster robust standard errors
-sc &lt;- vcovCL(modHTE, cluster = rape$Dish)
-GRate(modHTE, x2 = -1, respLev = c(30, 20, 10), vcov.=sc)
-##           Estimate          SE
-## GR:1:30 0.00000000 0.000000000
-## GR:1:20 0.03579236 0.005450975
-## GR:1:10 0.05130356 0.005869140
+quantile(modHTE, probs = c(0.30, 0.20, 0.10), rate = T, Psi = -1, robust = T,
+         units = Dish)
+## 
+## Estimated quantiles
+## 
+##       Estimate        SE
+## 1:30% 0.000000 0.0000000
+## 1:20% 0.035792 0.0054538
+## 1:10% 0.051304 0.0058715
+ r
 #Germination times
-GTime(modHTE, x2 = -1, respLev = c(30, 20, 10), vcov.=sc)
-##        Estimate      SE
-## T:1:30      Inf      NA
-## T:1:20 27.93892 4.25494
-## T:1:10 19.49183 2.22987</code></pre>
+quantile(modHTE, probs = c(0.30, 0.20, 0.10), Psi = -1, robust = T,
+         units = Dish)
+## 
+## Estimated quantiles
+## 
+##       Estimate     SE
+## 1:30%      Inf    NaN
+## 1:20%   27.939 4.2572
+## 1:10%   19.492 2.2308</code></pre>
 <p>Last, but not least, we can predict the proportion of germinated seeds at given time and water potential level.</p>
-<pre class="r"><code>predictSG(modHTE, se.fit=T, vcov. = vcovCL,
+<pre class="r"><code>predict(modHTE, se.fit=T, robust = T,
+         units = Dish,
         newdata = data.frame(Time=c(10, 10, 10), 
                              Psi=c(-1.5, -0.75, 0))
         )
-##      Prediction         SE
-## [1,]  0.0000000 0.00000000
-## [2,]  0.8794025 0.03907487
-## [3,]  0.9576590 0.01493134</code></pre>
+##   Time   Psi Prediction          SE
+## 1   10 -1.50  0.0000000 0.000000000
+## 2   10 -0.75  0.8794025 0.017562676
+## 3   10  0.00  0.9576590 0.008070333</code></pre>
 <hr />
 </div>
 <div id="models-based-on-the-distribution-of-psi_b" class="section level2">
@@ -192,9 +207,13 @@ mod6 &lt;- drmte(nSeeds ~ timeBef + timeAf + Psi,
 ## modHTE 289 2832.481</code></pre>
 <p>The first model <code>modHTE</code> considers explicitly the distribution of germination times and it is the best fitting of all. The other models consider explicitly the distribution of base water potential, while the distribution of germination times is indirectly included. Among these models, the gaussian is the worse fitting, while the log-logistic is the best one (<code>mod4</code>).</p>
 <p>For this latter model, we take a look at the value of estimated parameters, with cluster robust standard errors.</p>
-<pre class="r"><code>lmtest::coeftest(mod4, vcov = vcovCL, cluster = rape$Dish)
+<pre class="r"><code>summary(mod4, robust = T, units = Dish)
 ## 
-## t test of coefficients:
+## Model fitted: Hydrotime model with log-logistic distribution of Psib (Mesgaran et al., 2013)
+## 
+## Robust estimation: Cluster robust sandwich SEs 
+## 
+## Parameter estimates:
 ## 
 ##                     Estimate Std. Error  t value Pr(&gt;|t|)    
 ## thetaH:(Intercept)  0.676804   0.074160   9.1263   &lt;2e-16 ***
@@ -203,28 +222,9 @@ mod6 &lt;- drmte(nSeeds ~ timeBef + timeAf + Psi,
 ## sigma:(Intercept)   0.371971   0.172825   2.1523   0.0322 *  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<p>Germination rates and times for a certain percentile (e.g. GR50, GR30), can be obtained by using the <code>GRate()</code> and <code>GTime()</code> function in <code>drcSeedGerm</code>. Again, the use of cluster-robust standard errors is highly recommended.</p>
-<pre class="r"><code>GRate(mod4, respLev=c(30, 50, 70), x2 = 0, vcov. = vcovCL)
-##          Estimate         SE
-## GR:1:30 0.6775790 0.08365887
-## GR:1:50 0.7140812 0.08509008
-## GR:1:70 0.7710049 0.09376307
-GTime(mod4, respLev=c(30, 50, 70), x2 = 0, vcov. = vcovCL)
-##        Estimate        SE
-## T:1:30 1.475843 0.1822184
-## T:1:50 1.400401 0.1668721
-## T:1:70 1.297009 0.1577312</code></pre>
-<p>We can also make predictions about the germinated proportion for a certain time and water potential level. The code below returns the maximum germinated proportions at -1.5, -0.75, and 0 MPa.</p>
-<pre class="r"><code>predictSG(mod4, se.fit=T, vcov. = vcovCL,
-        newdata = data.frame(Time=c(10, 10, 10), 
-                             Psi=c(-1.5, -0.75, 0))
-        )
-##        Prediction           SE
-## [1,] 6.541125e-15 1.102220e-13
-## [2,] 8.035981e-01 5.617769e-02
-## [3,] 9.906224e-01 9.435188e-03</code></pre>
-<p>Let’s use the <code>predictSG()</code> function to plot the ‘modHTE’ and ‘mod4’ objects together in the same graph.</p>
-<p><img src="/post/Stat_SeedGermination_HT1step_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p>Germination rates and times for a certain percentile (e.g. GR50, GR30), can be obtained as shown above.</p>
+<p>We can use the <code>predict()</code> function to plot the ‘modHTE’ and ‘mod4’ objects together in the same graph.</p>
+<p><img src="/post/Stat_SeedGermination_HT1step_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 <p>Thanks for reading!</p>
 <p>Prof. Andrea Onofri<br />
 Department of Agricultural, Food and Environmental Sciences<br />

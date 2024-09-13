@@ -113,39 +113,41 @@ modHTE <- drmte(nSeeds ~ timeBef + timeAf + Psi,
 summary(modHTE)
 ```
 
-As seeds are clustered in Petri dishes, in order not to violate the independence assumption, it is preferable to get cluster robust standard errors. One possibility is to use the grouped version of the sandwich estimator, as available in the 'sandwich' package (Berger, 2017). The function `coeftest()` is available in the 'lmtest' package (Zeileis, 2002) and its usage is shown in the box below.
+As seeds are clustered in Petri dishes, in order not to violate the independence assumption, it is preferable to get cluster robust standard errors. One possibility is to use the grouped version of the sandwich estimator, as available in the 'sandwich' package (Berger, 2017), which is implemented in the 'drcte' package.
 
 ```{r}
-lmtest::coeftest(modHTE, vcov = vcovCL, cluster = rape$Dish)
+summary(modHTE, robust = T, units = Dish)
 ```
 
 
-Once the model is fitted, we may be interested in using the resulting curve to retrieve some biologically relevant information. For example, it may be interesting to retrieve the germination rates for some selected percentiles (e.g., the 30th, 20th and 10th percentiles). This is possible using the `GRate()` function, that is a wrapper for the original `ED()` function in the package `drc`. It reverses the behavior of the `ED()` function, in the sense that it considers, by default, the percentiles for the whole population, including the ungerminated fraction, which is, in our opinion, the most widespread interpretation of germination rates in seed science. The `GRate()` function works very much like the `ED()` function, although additional variables, such as the selected $\Psi$ level can be specified  by using the argument `x2`.
+Once the model is fitted, we may be interested in using the resulting curve to retrieve some biologically relevant information. For example, it may be interesting to retrieve the germination rates for some selected percentiles (e.g., the 30th, 20th and 10th percentiles). This is possible using the `quantile()` function in 'drcte' package, that is a wrapper for the original `ED()` function in the package `drc`. It  works very much like the `ED()` function, although the environmental covariates, such as the selected $\Psi$ level, can be specified as a numeric value.
 
 ```{r message=FALSE, warning=FALSE}
 #Naive standard errors
-GRate(modHTE, x2 = -1, respLev = c(30, 20, 10))
+quantile(modHTE, probs = c(0.30, 0.20, 0.10), rate = T, Psi = -1)
 ```
 
 
 In this example, we see that the $GR_{30}$ cannot be calculated, as the germination capacity did not reach 30% at the selected water potential level ($-1 \,\, MPa$).
 
-As we said, cluster robust standard errors are recommended. The `GRate()` function allows entering a user-defined variance-covariance matrix, that is obtained by using the `vcovCL()` function in the `sandwich` package. If necessary, germination times can be obtained in a similar way, by using the `GTime()` function.
+As we said, cluster robust standard errors are recommended, which can be requested by setting the 'robust = TRUE' argument and passing a vector for the grouping factor. If necessary, germination times can be obtained in a similar way, by removing the 'rate' argument
 
 
 ```{r message=FALSE, warning=FALSE, paged.print=FALSE}
 #Cluster robust standard errors
-sc <- vcovCL(modHTE, cluster = rape$Dish)
-GRate(modHTE, x2 = -1, respLev = c(30, 20, 10), vcov.=sc)
+quantile(modHTE, probs = c(0.30, 0.20, 0.10), rate = T, Psi = -1, robust = T,
+         units = Dish)
 
 #Germination times
-GTime(modHTE, x2 = -1, respLev = c(30, 20, 10), vcov.=sc)
+quantile(modHTE, probs = c(0.30, 0.20, 0.10), Psi = -1, robust = T,
+         units = Dish)
 ```
 
 Last, but not least, we can predict the proportion of germinated seeds at given time and water potential level. 
 
 ```{r}
-predictSG(modHTE, se.fit=T, vcov. = vcovCL,
+predict(modHTE, se.fit=T, robust = T,
+         units = Dish,
         newdata = data.frame(Time=c(10, 10, 10), 
                              Psi=c(-1.5, -0.75, 0))
         )
@@ -234,42 +236,28 @@ The first model `modHTE` considers explicitly the distribution of germination ti
 For this latter model, we take a look at the value of estimated parameters, with cluster robust standard errors.
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE, paged.print=FALSE}
-lmtest::coeftest(mod4, vcov = vcovCL, cluster = rape$Dish)
+summary(mod4, robust = T, units = Dish)
 ```
 
 
-Germination rates and times for a certain percentile (e.g. GR50, GR30), can be obtained by using the `GRate()` and `GTime()` function in `drcSeedGerm`. Again, the use of cluster-robust standard errors is highly recommended.
+Germination rates and times for a certain percentile (e.g. GR50, GR30), can be obtained as shown above.
 
-```{r}
-GRate(mod4, respLev=c(30, 50, 70), x2 = 0, vcov. = vcovCL)
-GTime(mod4, respLev=c(30, 50, 70), x2 = 0, vcov. = vcovCL)
-```
-
-We can also make predictions about the germinated proportion for a certain time and water potential level. The code below returns the maximum germinated proportions at -1.5, -0.75, and 0 MPa.
-
-```{r}
-predictSG(mod4, se.fit=T, vcov. = vcovCL,
-        newdata = data.frame(Time=c(10, 10, 10), 
-                             Psi=c(-1.5, -0.75, 0))
-        )
-```
-
-Let's use the `predictSG()` function to plot the 'modHTE' and 'mod4' objects together in the same graph.
+We can use the `predict()` function to plot the 'modHTE' and 'mod4' objects together in the same graph.
 
 ```{r echo=FALSE}
-pred <- predictSG(modHTE, se.fit=T, vcov. = vcovCL,
+pred <- predict(modHTE,
         newdata = data.frame(Time=seq(0, 14, 0.1), 
                              Psi=rep(-0.8, 141)) )
 
-pred2 <- predictSG(mod4, se.fit=T, vcov. = vcovCL,
+pred2 <- predict(mod4, 
         newdata = data.frame(Time=seq(0, 14, 0.1), 
                              Psi=rep(-0.8, 141)) )
 plot(propCum ~ timeAf, data=rape, subset=c(Psi == -0.8), ylim=c(0,1), 
   xlab="Time (d)",
   ylab = "Proportion of germinated seeds",
   xlim=c(0, 14))
-lines(pred[,1] ~ seq(0, 14, 0.1), col = "red")
-lines(pred2[,1] ~ seq(0, 14, 0.1), col = "blue")
+lines(pred[,3] ~ seq(0, 14, 0.1), col = "red")
+lines(pred2[,3] ~ seq(0, 14, 0.1), col = "blue")
 ```
 
 Thanks for reading!

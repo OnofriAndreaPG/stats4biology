@@ -31,17 +31,17 @@ WinterWheat$Genotype &lt;- factor(WinterWheat$Genotype)
 WinterWheat$Year &lt;- factor(WinterWheat$Year)
 WinterWheat$Block &lt;- factor(WinterWheat$Block)
 head(WinterWheat, 10)
-##    Plot Block Genotype Yield Year
-## 1     2     1 COLOSSEO  6.73 1996
-## 2     1     1    CRESO  6.02 1996
-## 3    50     1   DUILIO  6.06 1996
-## 4    49     1   GRAZIA  6.24 1996
-## 5    63     1    IRIDE  6.23 1996
-## 6    32     1 SANCARLO  5.45 1996
-## 9   110     2 COLOSSEO  6.96 1996
-## 10  137     2    CRESO  5.34 1996
-## 11   91     2   DUILIO  5.57 1996
-## 12  138     2   GRAZIA  6.09 1996</code></pre>
+##    Year Plot Block Genotype Yield
+## 1  1996    2     1 COLOSSEO  6.73
+## 2  1996    1     1    CRESO  6.02
+## 3  1996   50     1   DUILIO  6.06
+## 4  1996   49     1   GRAZIA  6.24
+## 5  1996   63     1    IRIDE  6.23
+## 6  1996   32     1 SANCARLO  5.45
+## 9  1996  110     2 COLOSSEO  6.96
+## 10 1996  137     2    CRESO  5.34
+## 11 1996   91     2   DUILIO  5.57
+## 12 1996  138     2   GRAZIA  6.09</code></pre>
 <p>Dealing with the above dataset, a good candidate model for data analyses is the so-called ‘environmental variance model’. This model is often used in stability analyses for multi-environment experiments and I will closely follow the coding proposed in Piepho (1999):</p>
 <p><span class="math display">\[y_{ijk} = \mu + g_i + r_{jk}  +  h_{ij} + \varepsilon_{ijk}\]</span></p>
 <p>where <span class="math inline">\(y_{ijk}\)</span> is yield (or other trait) for the <span class="math inline">\(k\)</span>-th block, <span class="math inline">\(i\)</span>-th genotype and <span class="math inline">\(j\)</span>-th environment, <span class="math inline">\(\mu\)</span> is the intercept, <span class="math inline">\(g_i\)</span> is the effect for the i-th genotype, <span class="math inline">\(r_{jk}\)</span> is the effect for the <span class="math inline">\(k\)</span>-th block in the <span class="math inline">\(j\)</span>-th environment, <span class="math inline">\(h_{ij}\)</span> is a random deviation from the expected yield for the <span class="math inline">\(i\)</span>-th genotype in the <span class="math inline">\(j\)</span>-th environment and <span class="math inline">\(\varepsilon_{ijk}\)</span> is the residual variability of yield between plots, within each environment and block.</p>
@@ -54,31 +54,31 @@ head(WinterWheat, 10)
   control = list(opt = &quot;optim&quot;, maxIter = 100),
   data=WinterWheat)
 VarCorr(EnvVarMod)
-##                  Variance             StdDev    Corr                
-## Year =           pdSymm(Genotype - 1)                               
-## GenotypeCOLOSSEO 0.48876512           0.6991174 GCOLOS GCRESO GDUILI
-## GenotypeCRESO    0.70949309           0.8423141 0.969               
-## GenotypeDUILIO   2.37438440           1.5409038 0.840  0.840        
-## GenotypeGRAZIA   1.18078525           1.0866394 0.844  0.763  0.942 
-## GenotypeIRIDE    1.23555204           1.1115539 0.857  0.885  0.970 
-## GenotypeSANCARLO 0.93335518           0.9661031 0.928  0.941  0.962 
-## Year =           pdIdent(Block - 1)                                 
-## Block1           0.02748257           0.1657787                     
-## Block2           0.02748257           0.1657787                     
-## Block3           0.02748257           0.1657787                     
-## Residual         0.12990355           0.3604214                     
-##                               
-## Year =                        
-## GenotypeCOLOSSEO GGRAZI GIRIDE
-## GenotypeCRESO                 
-## GenotypeDUILIO                
-## GenotypeGRAZIA                
-## GenotypeIRIDE    0.896        
-## GenotypeSANCARLO 0.884  0.942 
-## Year =                        
-## Block1                        
-## Block2                        
-## Block3                        
+##                  Variance             StdDev    Corr                       
+## Year =           pdSymm(Genotype - 1)                                      
+## GenotypeCOLOSSEO 0.48876512           0.6991174 GCOLOS GCRESO GDUILI GGRAZI
+## GenotypeCRESO    0.70949309           0.8423141 0.969                      
+## GenotypeDUILIO   2.37438442           1.5409038 0.840  0.840               
+## GenotypeGRAZIA   1.18078525           1.0866394 0.844  0.763  0.942        
+## GenotypeIRIDE    1.23555205           1.1115539 0.857  0.885  0.970  0.896 
+## GenotypeSANCARLO 0.93335518           0.9661031 0.928  0.941  0.962  0.884 
+## Year =           pdIdent(Block - 1)                                        
+## Block1           0.02748257           0.1657787                            
+## Block2           0.02748257           0.1657787                            
+## Block3           0.02748257           0.1657787                            
+## Residual         0.12990355           0.3604214                            
+##                        
+## Year =                 
+## GenotypeCOLOSSEO GIRIDE
+## GenotypeCRESO          
+## GenotypeDUILIO         
+## GenotypeGRAZIA         
+## GenotypeIRIDE          
+## GenotypeSANCARLO 0.942 
+## Year =                 
+## Block1                 
+## Block2                 
+## Block3                 
 ## Residual</code></pre>
 <p>I coded the random effects as a list, by using the ‘Year’ as the nesting factor (Galecki and Burzykowski, 2013). In order to specify a totally unstructured variance-covariance matrix for the genotypes within years, I used the ‘pdMat’ construct ‘pdSymm()’. This model is rather complex and may take long to converge.</p>
 <p>The environmental variances are retrieved by the following code:</p>
@@ -133,16 +133,16 @@ summary(envVarModM)
 ##  Formula: ~1 | Genotype 
 ##  Parameter estimates:
 ## COLOSSEO    CRESO   DUILIO   GRAZIA    IRIDE SANCARLO 
-## 1.000000 1.189653 2.143713 1.528848 1.560620 1.356423 
+## 1.000000 1.189654 2.143712 1.528848 1.560621 1.356423 
 ## 
 ## Coefficients:
 ##                      Value Std.Error   t-value p-value
-## (Intercept)       6.413333 0.2742314 23.386574  0.0000
-## GenotypeCRESO    -0.439524 0.1107463 -3.968746  0.0003
-## GenotypeDUILIO    0.178571 0.3999797  0.446451  0.6579
-## GenotypeGRAZIA   -0.330952 0.2518270 -1.314205  0.1971
-## GenotypeIRIDE     0.281905 0.2580726  1.092347  0.2819
-## GenotypeSANCARLO -0.192857 0.1802547 -1.069915  0.2918
+## (Intercept)       6.413333 0.2742310 23.386607  0.0000
+## GenotypeCRESO    -0.439524 0.1107464 -3.968740  0.0003
+## GenotypeDUILIO    0.178571 0.3999787  0.446452  0.6579
+## GenotypeGRAZIA   -0.330952 0.2518266 -1.314207  0.1971
+## GenotypeIRIDE     0.281905 0.2580722  1.092348  0.2819
+## GenotypeSANCARLO -0.192857 0.1802545 -1.069916  0.2918
 ## 
 ##  Correlation: 
 ##                  (Intr) GCRESO GDUILI GGRAZI GIRIDE
@@ -154,19 +154,19 @@ summary(envVarModM)
 ## 
 ## Standardized residuals:
 ##        Min         Q1        Med         Q3        Max 
-## -2.0949678 -0.5680656  0.1735444  0.7599596  1.3395000 
+## -2.0949708 -0.5680664  0.1735447  0.7599607  1.3395016 
 ## 
-## Residual standard error: 0.7255481 
+## Residual standard error: 0.7255471 
 ## Degrees of freedom: 42 total; 36 residual</code></pre>
-<p>The variance-covariance matrix for residuals can be obtained using the ‘getVarCov()’ function in the ‘nlme’ package, although I had to discover that there is a small buglet there, which causes problems in some instances (such as here). Please, <a href="https://www.jepusto.com/bug-in-nlme-getvarcov/">see this link</a>; I have included the correct code in the ‘getVarCov.gls()’ function in the ‘aomisc’ package, that is the companion package for this blog.</p>
-<pre class="r"><code>R &lt;- getVarCov.gls(envVarModM)
+<p>The variance-covariance matrix for residuals can be obtained using the ‘getVarCov()’ function in the ‘nlme’ package.</p>
+<pre class="r"><code>R &lt;- getVarCov(envVarModM)
 R
 ## Marginal variance covariance matrix
 ##         [,1]    [,2]    [,3]    [,4]    [,5]    [,6]
 ## [1,] 0.52642 0.59280 0.91285 0.65647 0.67116 0.63376
-## [2,] 0.59280 0.74503 1.09440 0.70422 0.84652 0.78560
+## [2,] 0.59280 0.74503 1.09440 0.70421 0.84652 0.78560
 ## [3,] 0.91285 1.09440 2.41920 1.58850 1.67700 1.45230
-## [4,] 0.65647 0.70422 1.58850 1.23040 1.09160 0.93442
+## [4,] 0.65647 0.70421 1.58850 1.23040 1.09160 0.93442
 ## [5,] 0.67116 0.84652 1.67700 1.09160 1.28210 1.01070
 ## [6,] 0.63376 0.78560 1.45230 0.93442 1.01070 0.96855
 ##   Standard Deviations: 0.72555 0.86315 1.5554 1.1093 1.1323 0.98415</code></pre>
@@ -176,12 +176,6 @@ R
 ## 0.5264185 0.7450275 2.4191624 1.2304397 1.2821143 0.9685497</code></pre>
 <p>which can also be retreived by the ‘stability’ package:</p>
 <pre class="r"><code>library(stability)
-## Registered S3 methods overwritten by &#39;lme4&#39;:
-##   method                          from
-##   cooks.distance.influence.merMod car 
-##   influence.merMod                car 
-##   dfbeta.influence.merMod         car 
-##   dfbetas.influence.merMod        car
 envVarStab &lt;-
   stab_measures(
     .data = WinterWheatM,
@@ -191,7 +185,7 @@ envVarStab &lt;-
   )
 
 envVarStab$StabMeasures
-## # A tibble: 6 x 7
+## # A tibble: 6 × 7
 ##   Genotype  Mean GenSS   Var    CV  Ecov ShuklaVar
 ##   &lt;fct&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
 ## 1 COLOSSEO  6.41  3.16 0.526  11.3 1.25     0.258 
@@ -211,6 +205,6 @@ University of Perugia (Italy)</p>
 <li>Gałecki, A., Burzykowski, T., 2013. Linear mixed-effects models using R: a step-by-step approach. Springer, Berlin.</li>
 <li>Muhammad Yaseen, Kent M. Eskridge and Ghulam Murtaza (2018). stability: Stability Analysis of Genotype by Environment Interaction (GEI). R package version 0.5.0. <a href="https://CRAN.R-project.org/package=stability" class="uri">https://CRAN.R-project.org/package=stability</a></li>
 <li>Piepho, H.-P., 1999. Stability Analysis Using the SAS System. Agronomy Journal 91, 154–160.</li>
-<li>Pinheiro, J.C., Bates, D.M., 2000. Mixed-Effects Models in S and S-Plus, Springer-Verlag Inc. ed. Springer-Verlag Inc., New York.</li>
+<li>Pinheiro, J.C., Bates, D.M., 2000. Mixed-Effects Models in S and S-Plus, Springer-Verlag Inc. ed. Springer-Verlag Inc., New York.</li>
 </ul>
 </div>
