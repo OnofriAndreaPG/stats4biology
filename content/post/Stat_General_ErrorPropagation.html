@@ -1,7 +1,7 @@
 ---
 title: 'How do we combine errors? The linear case'
 author: Andrea Onofri
-date: '2019-04-15'
+date: '2024-11-22'
 slug: 'Linear models'
 categories:
   - R
@@ -17,8 +17,8 @@ archives:
 
 
 <p>In our research work, we usually fit models to experimental data. Our aim is to estimate some biologically relevant parameters, together with their standard errors. Very often, these parameters are interesting in themselves, as they represent means, differences, rates or other important descriptors. In other cases, we use those estimates to derive further indices, by way of some appropriate calculations. For example, think that we have two parameter estimates, say Q and W, with standard errors respectively equal to <span class="math inline">\(\sigma_Q\)</span> and <span class="math inline">\(\sigma_W\)</span>: it might be relevant to calculate the amount:</p>
-<p><span class="math display">\[Z = AQ + BW + C\]</span></p>
-<p>where A, B and C are three coefficients. The above operation is named ‘linear combination’; it is a sort of a weighted sum of model parameters. The question is: what is the standard error of Z? I would like to show this by way of a simple biological example.</p>
+<p><span class="math display">\[Z = aQ + bW + c\]</span></p>
+<p>where <span class="math inline">\(a\)</span>, <span class="math inline">\(b\)</span> and <span class="math inline">\(c\)</span> are three coefficients. The above operation is named ‘linear combination’; it is a sort of a weighted sum of model parameters. The question is: what is the standard error of Z? I would like to show this by way of a simple biological example.</p>
 <div id="example" class="section level1">
 <h1>Example</h1>
 <p>We have measured the germination rate for seeds of <em>Brassica rapa</em> at six levels of water potential in the substrate (-1, -0.9, -0.8, -0.7, -0.6 and -0.5 MPa). We would like to predict the germination rate for a water potential level of -0.75 MPa.</p>
@@ -26,8 +26,8 @@ archives:
 <pre class="r"><code>GR &lt;- c(0.11, 0.20, 0.34, 0.46, 0.56, 0.68)
 Psi &lt;- c(-1, -0.9, -0.8, -0.7, -0.6, -0.5)
 lMod &lt;- lm(GR ~ Psi)
-summary(lMod)</code></pre>
-<pre><code>## 
+summary(lMod)
+## 
 ## Call:
 ## lm(formula = GR ~ Psi)
 ## 
@@ -45,39 +45,41 @@ summary(lMod)</code></pre>
 ## Residual standard error: 0.01185 on 4 degrees of freedom
 ## Multiple R-squared:  0.9976,	Adjusted R-squared:  0.997 
 ## F-statistic:  1668 on 1 and 4 DF,  p-value: 2.148e-06</code></pre>
-<p>It is clear that we can use the fitted model to calculate the GR-value at -0.75 MPa, as <span class="math inline">\(GR = 1.26 - 1.16 \times 0.75 = 0.39\)</span>. This is indeed a linear combination of model parameters, as we have shown above. Q and W are the estimated model parameters, while <span class="math inline">\(A = 1\)</span>, <span class="math inline">\(B = -0.75\)</span> and <span class="math inline">\(C = 0\)</span>.</p>
-<p>Of course, the derived response is also an estimate and we need to give a measure of uncertainty. For both model parameters we have standard errors; the question is: how does the uncertainty in parameter estimates propagates to their linear combination? In simpler words: it is easy to build a weightes sum of model parameters, but, how do we make a weighted sum of their standard errors?</p>
+<p>It is clear that we can use the fitted model to calculate the GR-value at -0.75 MPa, as <span class="math inline">\(GR = 1.26 - 1.16 \times 0.75 = 0.39\)</span>. This is indeed a linear combination of model parameters, as we have shown above. Q and W are the estimated model parameters, while <span class="math inline">\(a = 1\)</span>, <span class="math inline">\(b = -0.75\)</span> and <span class="math inline">\(c = 0\)</span>.</p>
+<p>Of course, the derived response is also an estimate and we need to give a measure of uncertainty. For both model parameters we have standard errors; the question is: how does the uncertainty in parameter estimates propagates to their linear combination? In simpler words: it is easy to build a weighted sum of model parameters, but, how do we make a weighted sum of their standard errors?</p>
 <p>Sokal and Rohlf (1981) at pag. 818 of their book, show that, in general, it is:</p>
-<p><span class="math display">\[ \textrm{var}(A \, Q + B \, W) = A^2 \sigma^2_Q + B^2 \sigma^2_W + 2AB \sigma_{QW} \]</span></p>
+<p><span class="math display">\[ \textrm{var}(a \, Q + b \, W) = a^2 \sigma^2_Q + b^2 \sigma^2_W + 2ab \sigma_{QW} \]</span></p>
 <p>where <span class="math inline">\(\sigma_{QW}\)</span> is the covariance of Q and W. I attach the proof below; it is pretty simple to understand and it is worth the effort. However, several students in biology are rather reluctant when they have to delve into maths. Therefore, I would also like to give an empirical ‘proof’, by using some simple R code.</p>
-<p>Let’s take two samples (Q and W) and combine them by using two coefficients A and B. Let’s calculate the variance for the combination:</p>
+<p>Let’s take two samples (Q and W) and combine them by using two coefficients <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span>. Let’s calculate the variance for the combination:</p>
 <pre class="r"><code>Q &lt;- c(12, 14, 11, 9)
 W &lt;- c(2, 4, 7, 8)
-A &lt;- 2
-B &lt;- 3
-C &lt;- 4
-var(A * Q + B * W + C)</code></pre>
-<pre><code>## [1] 35.58333</code></pre>
-<pre class="r"><code>A^2 * var(Q) + B^2 * var(W) + 2 * A * B * cov(Q, W)</code></pre>
-<pre><code>## [1] 35.58333</code></pre>
+a &lt;- 2
+b &lt;- 3
+c &lt;- 4
+var(a * Q + b * W + c)
+## [1] 35.58333
+ r
+a^2 * var(Q) + b^2 * var(W) + 2 * a * b * cov(Q, W)
+## [1] 35.58333</code></pre>
 <p>We see that the results match exactly! In our example, the variance and covariance of estimates are retrieved by using the ‘vcov()’ function:</p>
-<pre class="r"><code>vcov(lMod)</code></pre>
-<pre><code>##              (Intercept)          Psi
+<pre class="r"><code>vcov(lMod)
+##              (Intercept)          Psi
 ## (Intercept) 0.0004749433 0.0006020408
-## Psi         0.0006020408 0.0008027211</code></pre>
-<pre class="r"><code>sigma2Q &lt;- vcov(lMod)[1,1]
+## Psi         0.0006020408 0.0008027211
+ r
+sigma2Q &lt;- vcov(lMod)[1,1]
 sigma2W &lt;- vcov(lMod)[2,2]
 sigmaQW &lt;- vcov(lMod)[1,2]</code></pre>
 <p>The standard error for the prediction is simply obtained as:</p>
-<pre class="r"><code>sqrt( sigma2Q + 0.75^2 * sigma2W - 2 * 0.75 * sigmaQW )</code></pre>
-<pre><code>## [1] 0.004838667</code></pre>
+<pre class="r"><code>sqrt( sigma2Q + 0.75^2 * sigma2W - 2 * 0.75 * sigmaQW )
+## [1] 0.004838667</code></pre>
 </div>
 <div id="the-functions-predict-and-glht" class="section level1">
 <h1>The functions ‘predict()’ and ‘glht()’</h1>
 <p>Now that we have understood the concept, we can use R to make the calculations. For this example, the ‘predict()’ method represents the most logical approach. We only need to pass the model object and the X value which we have to make a prediction for. This latter value needs to be organised as a data frame, with column name(s) matching the name(s) of the X-variable(s) in the original dataset:</p>
 <pre class="r"><code>predict(lMod, newdata = data.frame(Psi = -0.75), 
-        se.fit = T)</code></pre>
-<pre><code>## $fit
+        se.fit = T)
+## $fit
 ##         1 
 ## 0.3916667 
 ## 
@@ -98,8 +100,8 @@ Z2 &lt;- c(1, -0.55)</code></pre>
 <p>And now we pass that matrix to the ‘glht()’ function as an argument:</p>
 <pre class="r"><code>library(multcomp)
 lcombs &lt;- glht(lMod, linfct = M)
-summary(lcombs)</code></pre>
-<pre><code>## 
+summary(lcombs)
+## 
 ## 	 Simultaneous Tests for General Linear Hypotheses
 ## 
 ## Fit: lm(formula = GR ~ Psi)
@@ -113,17 +115,37 @@ summary(lcombs)</code></pre>
 ## (Adjusted p values reported -- single-step method)</code></pre>
 <p>The above method can be easily extended to other types of linear models and linear combinations of model parameters. The ‘adjust’ argument is useful whenever we want to obtain familywise confidence intervals, which can account for the multiplicity problem. But this is another story…</p>
 <p>Happy work with these functions!</p>
-<p>#Appendix</p>
+<hr />
+<p>Prof. Andrea Onofri<br />
+Department of Agricultural, Food and Environmental Sciences<br />
+University of Perugia (Italy)<br />
+Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow <span class="citation">@onofriandreapg</span></a>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</div>
+<div id="appendix" class="section level1">
+<h1>Appendix</h1>
 <p>We know that the variance for a random variable is defined as:</p>
-<p><span class="math display">\[ var(Z) = \frac{1}{n-1}\sum \left(Z - \hat{Z}\right)^2 = \\ = \frac{1}{n-1}\sum \left(Z - \frac{1}{n} \sum{Z}\right)^2\]</span></p>
-<p>If <span class="math inline">\(Z = AQ + BW + C\)</span>, where A, B and C are the coefficients and Q and W are two random variables, we have:</p>
-<p><span class="math display">\[ var(Z) = \frac{1}{n-1}\sum \left[AQ + BW + C - \frac{1}{n} \sum{ \left(AQ + BW + C\right)}\right]^2 = \\
-= \frac{1}{n-1}\sum \left[AQ + BW + C - \frac{1}{n} \sum{ AQ} - \frac{1}{n} \sum{ BW} - \frac{1}{n} \sum{ C}\right]^2 = \]</span></p>
-<p><span class="math display">\[= \frac{1}{n-1}\sum \left[AQ + BW + C - A \hat{Q} - B \hat{W} - C \right]^2 = \\
-= \frac{1}{n-1}\sum \left[\left( AQ - A \hat{Q}\right) + \left( BW - B \hat{W}\right) \right]^2 = \]</span></p>
-<p><span class="math display">\[ =\frac{1}{n-1}\sum \left[A \left( Q - \hat{Q}\right) + B \left( W - \hat{W}\right) \right]^2 = \\
-= \frac{1}{n-1}\sum \left[A^2 \left( Q - \hat{Q}\right)^2 + B^2 \left( W - \hat{W}\right)^2 + 2AB \left( Q - \hat{Q}\right) \left( W - \hat{W}\right)\right] =\]</span></p>
-<p><span class="math display">\[ = A^2 \frac{1}{n-1} \sum{\left( Q - \hat{Q}\right)^2} + B^2 \frac{1}{n-1}\sum \left( W - \hat{W}\right)^2 + 2AB \frac{1}{n-1}\sum{\left[\left( Q - \hat{Q}\right) \left( W - \hat{W}\right)\right]}\]</span></p>
+<p><span class="math display">\[{\begin{array}{l}
+var(Z) = \frac{1}{n-1}\sum \left(Z - \hat{Z}\right)^2 = \\
+= \frac{1}{n-1}\sum \left(Z - \frac{1}{n} \sum{Z}\right)^2
+\end{array}}\]</span></p>
+<p>If <span class="math inline">\(Z = aQ + bW + c\)</span>, where <span class="math inline">\(a\)</span>, <span class="math inline">\(b\)</span> and <span class="math inline">\(c\)</span> are the coefficients and Q and W are two random variables, we have:</p>
+<p><span class="math display">\[ {\begin{array}{l}
+var(Z) = \frac{1}{n-1}\sum \left[aQ + bW + c - \frac{1}{n} \sum{ \left(aQ + bW + c\right)}\right]^2 = \\
+= \frac{1}{n-1}\sum \left[aQ + bW + c - \frac{1}{n} \sum{ aQ} - \frac{1}{n} \sum{ bW} - \frac{1}{n} \sum{ c}\right]^2 =
+\end{array}}
+\]</span></p>
+<p><span class="math display">\[{\begin{array}{l}
+= \frac{1}{n-1}\sum \left[aQ + bW + c - a \hat{Q} - b \hat{W} - c \right]^2 =\\
+= \frac{1}{n-1}\sum \left[\left( aQ - a \hat{Q}\right) + \left( aW - a\hat{W}\right) \right]^2 =
+\end{array}}\]</span></p>
+<p><span class="math display">\[{\begin{array}{l}
+=\frac{1}{n-1}\sum \left[a \left( Q - \hat{Q}\right) + b \left( W - \hat{W}\right) \right]^2 =\\
+= \frac{1}{n-1}\sum \left[a^2 \left( Q - \hat{Q}\right)^2 + b^2 \left( W - \hat{W}\right)^2 + 2ab \left( Q - \hat{Q}\right) \left( W - \hat{W}\right)\right] =
+\end{array}}
+\]</span></p>
+<p><span class="math display">\[ = a^2 \frac{1}{n-1} \sum{\left( Q - \hat{Q}\right)^2} + b^2 \frac{1}{n-1}\sum \left( W - \hat{W}\right)^2 + 2ab \frac{1}{n-1}\sum{\left[\left( Q - \hat{Q}\right) \left( W - \hat{W}\right)\right]}\]</span></p>
 <p>Therefore:</p>
-<p><span class="math display">\[ \textrm{var}(Z) = A^2 \sigma^2_Q + B^2 \sigma^2_W + 2AB \sigma_{Q,W}\]</span></p>
+<p><span class="math display">\[ \textrm{var}(Z) = a^2 \sigma^2_Q + b^2 \sigma^2_W + 2ab \sigma_{Q,W}\]</span></p>
 </div>
