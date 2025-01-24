@@ -1,7 +1,7 @@
 ---
-title: "Drowning in a glass of water: variance-covariance and correlation matrices"
+title: "A trip from variance-covariance to correlation and back"
 author: Andrea Onofri
-date: '2019-02-19'
+date: '2025-01-24'
 slug: correlation
 categories:
   - R
@@ -9,37 +9,35 @@ tags:
   - R
   - correlation
 archives:
-  - 2019
+  - 2025
 ---
 
-One of the easiest tasks in R is to get correlations between each pair of variables in a dataset. As an example, let's take the first four columns in the 'mtcars' dataset, that is available within R. Getting the variances-covariances and the correlations is straightforward.
+The variance-covariance and the correlation matrices are two entities that describe the association between the columns of a two-way data matrix. They are very much used, e.g., in agriculture, biology and ecology and they can be easily calculated with base R, as shown in the box below.
 
 ```{r}
 data(mtcars)
 matr <- mtcars[,1:4]
 
-#Covariances
-cov(matr)
+# Covariances
+Sigma <- cov(matr)
 
-#Correlations
-cor(matr)
+# Correlations
+R <- cor(matr)
 ```
 
-It's really a piece of cake! Unfortunately, a few days ago I had a covariance matrix without the original dataset and I wanted the corresponding correlation matrix. Although this is an easy task as well, at first I was stuck, because I could not find an immediate solution... So I started wondering how I could make it.
+It is useful to be able to go back and forth from variance-covariance to correlation, without going back to the original data matrix. Let's consider that the variance-covariance of the two variables X and Y is:
 
-Indeed, having the two variables X and Y, their covariance is:
-
-$$cov(X, Y) = \sum\limits_{i=1}^{n} {(X_i - \hat{X})(Y_i - \hat{Y})}$$
+$$\textrm{cov}(X, Y) = \sum\limits_{i=1}^{n} {(X_i - \hat{X})(Y_i - \hat{Y})}$$
 
 where $\hat{Y}$ and $\hat{X}$ are the means for each variable. The correlation is:
 
-$$cor(X, Y) = \frac{cov(X, Y)}{\sigma_x \sigma_y} $$
+$$\textrm{cor}(X, Y) = \frac{\textrm{cov}(X, Y)}{\sigma_x \sigma_y} $$
 
 where $\sigma_x$ and $\sigma_y$ are the standard deviations for X and Y.
 
 The opposite relationship is clear:
 
-$$ cov(X, Y) = cor(X, Y) \sigma_x \sigma_y$$
+$$ \textrm{cov}(X, Y) = \textrm{cor}(X, Y) \sigma_x \sigma_y$$
 
 Therefore, converting from covariance to correlation is pretty easy. For example, take the covariance between 'cyl' and 'mpg' above (-9.172379), the correlation is:
 
@@ -53,47 +51,144 @@ On the reverse, if we have the correlation (-0.8521620), the covariance is
 -0.8475514 * sqrt(36.324103) * sqrt(15360.7998)
 ```
 
-My covariance matrix was pretty large, so I started wondering how I could perform this task altogether. What I had to do was to take each element in the covariance matrix and divide it by the square root of the diagonal elements in the same column and in the same row (see below).
+If we consider the whole covariance matrix, we have to take each element in this matrix and divide it by the square roots of the diagonal elements in the same column and in the same row (see figure below).
 
-![](https://lu4yxa.db.files.1drv.com/y4mZ-7ZQc0LCMyDG3kqC_0_bzMZYyEpb37ug_I616tXoPNL_DbILLSOa8HujEZCekvRNeeYsfwtrYP-0T_PfzlOUqUNliHdKU3sDLHwBnr5C4jF-U-u1QkOlWg3ZbQXKJw4TM2VrQIQqjh-Pb-5cOEY49q-3pfnt4ZYJUAYZIBhW4GgJ0svrEEAnKQZfNTs2LW5iZhGyYFYVKFT2Y1O7SjKjA?width=637&height=156&cropmode=none){width=95%}
-
-This is easily done by matrix multiplication. I need a square matrix where the standard deviations for each variable are repeated along the rows:
-
-```{r}
-V <- cov(matr)
-SM1 <- matrix(rep(sqrt(diag(V)), 4), 4, 4)
-SM1
+```{r echo = F}
+# knitr::include_graphics("https://www.casaonofri.it/_Figures/CovarianceCorrelation.png", error = F)
 ```
 
-and another one where they are repeated along the columns
+![](https://www.casaonofri.it/_Figures/CovarianceCorrelation.png){width=95%}
 
-```{r}
-SM2 <- matrix(rep(sqrt(diag(V)), each = 4), 4, 4)
+The question is: how can we do all these calculations in one single step, for all elements in the covariance matrix, to calculate the corresponding correlation matrix? 
+
+If we have some memories of matrix algebra, we might remember that if we take a diagonal matrix of order $n \times n$ and multiply it by a square matrix with the same order, all elements in each column are multiplied by the diagonal element in the corresponding column:
+
+$$\begin{pmatrix}
+1 & 1 & 1 & 1 \\
+1 & 1 & 1 & 1 \\
+1 & 1 & 1 & 1 \\
+1 & 1 & 1 & 1
+\end{pmatrix}
+\times
+\begin{pmatrix}
+1 & 0 & 0 & 0 \\
+0 & 2 & 0 & 0 \\
+0 & 0 & 3 & 0 \\
+0 & 0 & 0 & 4
+\end{pmatrix}
+= 
+\begin{pmatrix}
+1 & 2 & 3 & 4 \\
+1 & 2 & 3 & 4 \\
+1 & 2 & 3 & 4 \\
+1 & 2 & 3 & 4
+\end{pmatrix}$$
+
+```{r eval=FALSE, include=FALSE}
+Mat <- matrix(1, 4, 4, byrow = F)
+MatDiag <- diag(1:4)
+Mat %*% MatDiag
 ```
 
-Now I can take my covariance matrix (V) and simply multiply these three matrices as follows:
+If we reverse the order of factors, all elements in each row are multiplied by the diagonal element in the corresponding row:
+
+$$
+\begin{pmatrix}
+1 & 0 & 0 & 0 \\
+0 & 2 & 0 & 0 \\
+0 & 0 & 3 & 0 \\
+0 & 0 & 0 & 4
+\end{pmatrix}
+\times
+\begin{pmatrix}
+1 & 1 & 1 & 1 \\
+1 & 1 & 1 & 1 \\
+1 & 1 & 1 & 1 \\
+1 & 1 & 1 & 1
+\end{pmatrix}
+= 
+\begin{pmatrix}
+1 & 1 & 1 & 1 \\
+2 & 2 & 2 & 2 \\
+3 & 3 & 3 & 3 \\
+4 & 4 & 4 & 4
+\end{pmatrix}
+$$
 
 
-```{r}
-V * 1/SM1 * 1/SM2
+```{r eval=FALSE, include=FALSE}
+Mat <- matrix(1, 4, 4, byrow = F)
+MatDiag <- diag(1:4)
+MatDiag %*% Mat
 ```
 
-Indeed, there is not even the need to use 'rep' when we create SM1, as R will recycle the elements as needed.
+Therefore, if we take a covariance matrix $\Sigma$ of order $n \times n$ and pre-multiply and post-multiply it for the same diagonal matrix of order $n \times n$, each element in $\Sigma$ is multiplied by both the diagonal elements in the same row and same column, which is exactly what we are looking for.
 
-Going from correlation to covariance can be done similarly:
+In the code below, we:
+
+1. Create a covariance matrix
+2. Take the square roots of the diagonal element (standard deviations) and load them in a diagonal matrix
+3. Invert this diagonal matrix
+4. Pre-multiply and post-multiply the covariance matrix for this diagonal matrix of inverse standard deviations
+
 
 ```{r}
-R <- cor(matr)
-R / (1/SM1 * 1/SM2)
+StDev <- sqrt(diag(Sigma))
+StDevMat <- diag(StDev)
+InvStDev <- solve(StDevMat)
+InvStDev %*% Sigma %*% InvStDev
 ```
 
-This is an easy task, but it got me stuck for a few minutes...
-
-Lately, I finally discovered that there is (at least) one function in R taking care of the above task; it is the 'cov2cor()' function in the 'nlme' package. 
+Going from correlation to covariance can be done similarly, although, in this case, together with the correlation matrix we also need to have the standard deviations of the original variables, because they are not included in the matrix under transformation:
 
 ```{r}
+StDevMat %*% R %*% StDevMat
+```
+
+
+# Solutions with R
+
+Is there any other solutions for those who are not accustomed to matrix algebra? The easiest way to go from covariance to correlation is to use the `cov2cor()` function in the 'nlme' package. 
+
+```{r}
+# From covariance to correlation
 library(nlme)
-cov2cor(V)
+cov2cor(Sigma)
 ```
 
-It is really easy to get drown in a glass of water!
+With base R, we can `sweep()` twice: 
+
+```{r}
+# From covariance to correlation
+sweep(sweep(Sigma, 1, StDev, FUN = "/"), 2, StDev, FUN = "/")
+
+# From correlation to covariance
+sweep(sweep(R, 1, StDev, FUN = "*"), 2, StDev, FUN = "*")
+```
+
+We can also `scale()` and `t()` twice, but it looks far less neat: 
+
+```{r}
+# From covariance to correlation
+scale(t(scale(t(Sigma), center = F, scale = StDev)), 
+      center = F, scale = StDev)
+
+# From correlation to covariance
+scale(t(scale(t(R), center = F, scale = 1/StDev)), 
+      center = F, scale = 1/StDev)
+```
+
+Just curious whether you young students have some better solution; I am sure you have one! Please, drop me a line!
+
+Happy coding!
+
+---
+
+Prof. Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences    
+University of Perugia (Italy)    
+Send comments to: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)
+
+<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow @onofriandreapg</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+

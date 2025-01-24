@@ -6,10 +6,174 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>Copyright © 2023, @AndreaOnofri</copyright>
-    <lastBuildDate>Sat, 26 Nov 2022 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 24 Jan 2025 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://www.statforbiology.com/tags/correlation/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>A trip from variance-covariance to correlation and back</title>
+      <link>https://www.statforbiology.com/2025/stat_general_correlationcovariance/</link>
+      <pubDate>Fri, 24 Jan 2025 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.statforbiology.com/2025/stat_general_correlationcovariance/</guid>
+      <description>
+
+
+&lt;p&gt;The variance-covariance and the correlation matrices are two entities that describe the association between the columns of a two-way data matrix. They are very much used, e.g., in agriculture, biology and ecology and they can be easily calculated with base R, as shown in the box below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;data(mtcars)
+matr &amp;lt;- mtcars[,1:4]
+
+# Covariances
+Sigma &amp;lt;- cov(matr)
+
+# Correlations
+R &amp;lt;- cor(matr)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It is useful to be able to go back and forth from variance-covariance to correlation, without going back to the original data matrix. Let’s consider that the variance-covariance of the two variables X and Y is:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\textrm{cov}(X, Y) = \sum\limits_{i=1}^{n} {(X_i - \hat{X})(Y_i - \hat{Y})}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(\hat{Y}\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(\hat{X}\)&lt;/span&gt; are the means for each variable. The correlation is:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\textrm{cor}(X, Y) = \frac{\textrm{cov}(X, Y)}{\sigma_x \sigma_y} \]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(\sigma_x\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(\sigma_y\)&lt;/span&gt; are the standard deviations for X and Y.&lt;/p&gt;
+&lt;p&gt;The opposite relationship is clear:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ \textrm{cov}(X, Y) = \textrm{cor}(X, Y) \sigma_x \sigma_y\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Therefore, converting from covariance to correlation is pretty easy. For example, take the covariance between ‘cyl’ and ‘mpg’ above (-9.172379), the correlation is:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;-633.097208 / (sqrt(36.324103) * sqrt(15360.7998))&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] -0.8475514&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;On the reverse, if we have the correlation (-0.8521620), the covariance is&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;-0.8475514 * sqrt(36.324103) * sqrt(15360.7998)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] -633.0972&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If we consider the whole covariance matrix, we have to take each element in this matrix and divide it by the square roots of the diagonal elements in the same column and in the same row (see figure below).&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.casaonofri.it/_Figures/CovarianceCorrelation.png&#34; style=&#34;width:95.0%&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;The question is: how can we do all these calculations in one single step, for all elements in the covariance matrix, to calculate the corresponding correlation matrix?&lt;/p&gt;
+&lt;p&gt;If we have some memories of matrix algebra, we might remember that if we take a diagonal matrix of order &lt;span class=&#34;math inline&#34;&gt;\(n \times n\)&lt;/span&gt; and multiply it by a square matrix with the same order, all elements in each column are multiplied by the diagonal element in the corresponding column:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[\begin{pmatrix}
+1 &amp;amp; 1 &amp;amp; 1 &amp;amp; 1 \\
+1 &amp;amp; 1 &amp;amp; 1 &amp;amp; 1 \\
+1 &amp;amp; 1 &amp;amp; 1 &amp;amp; 1 \\
+1 &amp;amp; 1 &amp;amp; 1 &amp;amp; 1
+\end{pmatrix}
+\times
+\begin{pmatrix}
+1 &amp;amp; 0 &amp;amp; 0 &amp;amp; 0 \\
+0 &amp;amp; 2 &amp;amp; 0 &amp;amp; 0 \\
+0 &amp;amp; 0 &amp;amp; 3 &amp;amp; 0 \\
+0 &amp;amp; 0 &amp;amp; 0 &amp;amp; 4
+\end{pmatrix}
+=
+\begin{pmatrix}
+1 &amp;amp; 2 &amp;amp; 3 &amp;amp; 4 \\
+1 &amp;amp; 2 &amp;amp; 3 &amp;amp; 4 \\
+1 &amp;amp; 2 &amp;amp; 3 &amp;amp; 4 \\
+1 &amp;amp; 2 &amp;amp; 3 &amp;amp; 4
+\end{pmatrix}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;If we reverse the order of factors, all elements in each row are multiplied by the diagonal element in the corresponding row:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[
+\begin{pmatrix}
+1 &amp;amp; 0 &amp;amp; 0 &amp;amp; 0 \\
+0 &amp;amp; 2 &amp;amp; 0 &amp;amp; 0 \\
+0 &amp;amp; 0 &amp;amp; 3 &amp;amp; 0 \\
+0 &amp;amp; 0 &amp;amp; 0 &amp;amp; 4
+\end{pmatrix}
+\times
+\begin{pmatrix}
+1 &amp;amp; 1 &amp;amp; 1 &amp;amp; 1 \\
+1 &amp;amp; 1 &amp;amp; 1 &amp;amp; 1 \\
+1 &amp;amp; 1 &amp;amp; 1 &amp;amp; 1 \\
+1 &amp;amp; 1 &amp;amp; 1 &amp;amp; 1
+\end{pmatrix}
+=
+\begin{pmatrix}
+1 &amp;amp; 1 &amp;amp; 1 &amp;amp; 1 \\
+2 &amp;amp; 2 &amp;amp; 2 &amp;amp; 2 \\
+3 &amp;amp; 3 &amp;amp; 3 &amp;amp; 3 \\
+4 &amp;amp; 4 &amp;amp; 4 &amp;amp; 4
+\end{pmatrix}
+\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Therefore, if we take a covariance matrix &lt;span class=&#34;math inline&#34;&gt;\(\Sigma\)&lt;/span&gt; of order &lt;span class=&#34;math inline&#34;&gt;\(n \times n\)&lt;/span&gt; and pre-multiply and post-multiply it for the same diagonal matrix of order &lt;span class=&#34;math inline&#34;&gt;\(n \times n\)&lt;/span&gt;, each element in &lt;span class=&#34;math inline&#34;&gt;\(\Sigma\)&lt;/span&gt; is multiplied by both the diagonal elements in the same row and same column, which is exactly what we are looking for.&lt;/p&gt;
+&lt;p&gt;In the code below, we:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Create a covariance matrix&lt;/li&gt;
+&lt;li&gt;Take the square roots of the diagonal element (standard deviations) and load them in a diagonal matrix&lt;/li&gt;
+&lt;li&gt;Invert this diagonal matrix&lt;/li&gt;
+&lt;li&gt;Pre-multiply and post-multiply the covariance matrix for this diagonal matrix of inverse standard deviations&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;StDev &amp;lt;- sqrt(diag(Sigma))
+StDevMat &amp;lt;- diag(StDev)
+InvStDev &amp;lt;- solve(StDevMat)
+InvStDev %*% Sigma %*% InvStDev&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##            [,1]       [,2]       [,3]       [,4]
+## [1,]  1.0000000 -0.8521620 -0.8475514 -0.7761684
+## [2,] -0.8521620  1.0000000  0.9020329  0.8324475
+## [3,] -0.8475514  0.9020329  1.0000000  0.7909486
+## [4,] -0.7761684  0.8324475  0.7909486  1.0000000&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Going from correlation to covariance can be done similarly, although, in this case, together with the correlation matrix we also need to have the standard deviations of the original variables, because they are not included in the matrix under transformation:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;StDevMat %*% R %*% StDevMat&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##             [,1]       [,2]       [,3]      [,4]
+## [1,]   36.324103  -9.172379  -633.0972 -320.7321
+## [2,]   -9.172379   3.189516   199.6603  101.9315
+## [3,] -633.097208 199.660282 15360.7998 6721.1587
+## [4,] -320.732056 101.931452  6721.1587 4700.8669&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;solutions-with-r&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Solutions with R&lt;/h1&gt;
+&lt;p&gt;Is there any other solutions for those who are not accustomed to matrix algebra? The easiest way to go from covariance to correlation is to use the &lt;code&gt;cov2cor()&lt;/code&gt; function in the ‘nlme’ package.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# From covariance to correlation
+library(nlme)
+cov2cor(Sigma)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##             mpg        cyl       disp         hp
+## mpg   1.0000000 -0.8521620 -0.8475514 -0.7761684
+## cyl  -0.8521620  1.0000000  0.9020329  0.8324475
+## disp -0.8475514  0.9020329  1.0000000  0.7909486
+## hp   -0.7761684  0.8324475  0.7909486  1.0000000&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;With base R, we can &lt;code&gt;sweep()&lt;/code&gt; twice:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# From covariance to correlation
+sweep(sweep(Sigma, 1, StDev, FUN = &amp;quot;/&amp;quot;), 2, StDev, FUN = &amp;quot;/&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##             mpg        cyl       disp         hp
+## mpg   1.0000000 -0.8521620 -0.8475514 -0.7761684
+## cyl  -0.8521620  1.0000000  0.9020329  0.8324475
+## disp -0.8475514  0.9020329  1.0000000  0.7909486
+## hp   -0.7761684  0.8324475  0.7909486  1.0000000&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# From correlation to covariance
+sweep(sweep(R, 1, StDev, FUN = &amp;quot;*&amp;quot;), 2, StDev, FUN = &amp;quot;*&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##              mpg        cyl       disp        hp
+## mpg    36.324103  -9.172379  -633.0972 -320.7321
+## cyl    -9.172379   3.189516   199.6603  101.9315
+## disp -633.097208 199.660282 15360.7998 6721.1587
+## hp   -320.732056 101.931452  6721.1587 4700.8669&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We can also &lt;code&gt;scale()&lt;/code&gt; and &lt;code&gt;t()&lt;/code&gt; twice, but it looks far less neat:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# From covariance to correlation
+scale(t(scale(t(Sigma), center = F, scale = StDev)), 
+      center = F, scale = StDev)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##             mpg        cyl       disp         hp
+## mpg   1.0000000 -0.8521620 -0.8475514 -0.7761684
+## cyl  -0.8521620  1.0000000  0.9020329  0.8324475
+## disp -0.8475514  0.9020329  1.0000000  0.7909486
+## hp   -0.7761684  0.8324475  0.7909486  1.0000000
+## attr(,&amp;quot;scaled:scale&amp;quot;)
+##        mpg        cyl       disp         hp 
+##   6.026948   1.785922 123.938694  68.562868&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# From correlation to covariance
+scale(t(scale(t(R), center = F, scale = 1/StDev)), 
+      center = F, scale = 1/StDev)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##              mpg        cyl       disp        hp
+## mpg    36.324103  -9.172379  -633.0972 -320.7321
+## cyl    -9.172379   3.189516   199.6603  101.9315
+## disp -633.097208 199.660282 15360.7998 6721.1587
+## hp   -320.732056 101.931452  6721.1587 4700.8669
+## attr(,&amp;quot;scaled:scale&amp;quot;)
+##         mpg         cyl        disp          hp 
+## 0.165921457 0.559934979 0.008068505 0.014585154&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Just curious whether you young students have some better solution; I am sure you have one! Please, drop me a line!&lt;/p&gt;
+&lt;p&gt;Happy coding!&lt;/p&gt;
+&lt;hr /&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>The coefficient of determination: is it the R-squared or r-squared?</title>
@@ -535,89 +699,6 @@ rbPear&lt;/code&gt;&lt;/pre&gt;
 &lt;li&gt;Piepho, H.-P., 2018. Allowing for the structure of a designed experiment when estimating and testing trait correlations. The Journal of Agricultural Science 156, 59–70.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;/div&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Drowning in a glass of water: variance-covariance and correlation matrices</title>
-      <link>https://www.statforbiology.com/2019/stat_general_correlationcovariance/</link>
-      <pubDate>Tue, 19 Feb 2019 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.statforbiology.com/2019/stat_general_correlationcovariance/</guid>
-      <description>
-
-
-&lt;p&gt;One of the easiest tasks in R is to get correlations between each pair of variables in a dataset. As an example, let’s take the first four columns in the ‘mtcars’ dataset, that is available within R. Getting the variances-covariances and the correlations is straightforward.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;data(mtcars)
-matr &amp;lt;- mtcars[,1:4]
-
-#Covariances
-cov(matr)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##              mpg        cyl       disp        hp
-## mpg    36.324103  -9.172379  -633.0972 -320.7321
-## cyl    -9.172379   3.189516   199.6603  101.9315
-## disp -633.097208 199.660282 15360.7998 6721.1587
-## hp   -320.732056 101.931452  6721.1587 4700.8669&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#Correlations
-cor(matr)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##             mpg        cyl       disp         hp
-## mpg   1.0000000 -0.8521620 -0.8475514 -0.7761684
-## cyl  -0.8521620  1.0000000  0.9020329  0.8324475
-## disp -0.8475514  0.9020329  1.0000000  0.7909486
-## hp   -0.7761684  0.8324475  0.7909486  1.0000000&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;It’s really a piece of cake! Unfortunately, a few days ago I had a covariance matrix without the original dataset and I wanted the corresponding correlation matrix. Although this is an easy task as well, at first I was stuck, because I could not find an immediate solution… So I started wondering how I could make it.&lt;/p&gt;
-&lt;p&gt;Indeed, having the two variables X and Y, their covariance is:&lt;/p&gt;
-&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[cov(X, Y) = \sum\limits_{i=1}^{n} {(X_i - \hat{X})(Y_i - \hat{Y})}\]&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(\hat{Y}\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(\hat{X}\)&lt;/span&gt; are the means for each variable. The correlation is:&lt;/p&gt;
-&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[cor(X, Y) = \frac{cov(X, Y)}{\sigma_x \sigma_y} \]&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(\sigma_x\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(\sigma_y\)&lt;/span&gt; are the standard deviations for X and Y.&lt;/p&gt;
-&lt;p&gt;The opposite relationship is clear:&lt;/p&gt;
-&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ cov(X, Y) = cor(X, Y) \sigma_x \sigma_y\]&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;Therefore, converting from covariance to correlation is pretty easy. For example, take the covariance between ‘cyl’ and ‘mpg’ above (-9.172379), the correlation is:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;-633.097208 / (sqrt(36.324103) * sqrt(15360.7998))&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## [1] -0.8475514&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;On the reverse, if we have the correlation (-0.8521620), the covariance is&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;-0.8475514 * sqrt(36.324103) * sqrt(15360.7998)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## [1] -633.0972&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;My covariance matrix was pretty large, so I started wondering how I could perform this task altogether. What I had to do was to take each element in the covariance matrix and divide it by the square root of the diagonal elements in the same column and in the same row (see below).&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://lu4yxa.db.files.1drv.com/y4mZ-7ZQc0LCMyDG3kqC_0_bzMZYyEpb37ug_I616tXoPNL_DbILLSOa8HujEZCekvRNeeYsfwtrYP-0T_PfzlOUqUNliHdKU3sDLHwBnr5C4jF-U-u1QkOlWg3ZbQXKJw4TM2VrQIQqjh-Pb-5cOEY49q-3pfnt4ZYJUAYZIBhW4GgJ0svrEEAnKQZfNTs2LW5iZhGyYFYVKFT2Y1O7SjKjA?width=637&amp;amp;height=156&amp;amp;cropmode=none&#34; style=&#34;width:95.0%&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;This is easily done by matrix multiplication. I need a square matrix where the standard deviations for each variable are repeated along the rows:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;V &amp;lt;- cov(matr)
-SM1 &amp;lt;- matrix(rep(sqrt(diag(V)), 4), 4, 4)
-SM1&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##            [,1]       [,2]       [,3]       [,4]
-## [1,]   6.026948   6.026948   6.026948   6.026948
-## [2,]   1.785922   1.785922   1.785922   1.785922
-## [3,] 123.938694 123.938694 123.938694 123.938694
-## [4,]  68.562868  68.562868  68.562868  68.562868&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;and another one where they are repeated along the columns&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;SM2 &amp;lt;- matrix(rep(sqrt(diag(V)), each = 4), 4, 4)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Now I can take my covariance matrix (V) and simply multiply these three matrices as follows:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;V * 1/SM1 * 1/SM2&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##             mpg        cyl       disp         hp
-## mpg   1.0000000 -0.8521620 -0.8475514 -0.7761684
-## cyl  -0.8521620  1.0000000  0.9020329  0.8324475
-## disp -0.8475514  0.9020329  1.0000000  0.7909486
-## hp   -0.7761684  0.8324475  0.7909486  1.0000000&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Indeed, there is not even the need to use ‘rep’ when we create SM1, as R will recycle the elements as needed.&lt;/p&gt;
-&lt;p&gt;Going from correlation to covariance can be done similarly:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;R &amp;lt;- cor(matr)
-R / (1/SM1 * 1/SM2)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##              mpg        cyl       disp        hp
-## mpg    36.324103  -9.172379  -633.0972 -320.7321
-## cyl    -9.172379   3.189516   199.6603  101.9315
-## disp -633.097208 199.660282 15360.7998 6721.1587
-## hp   -320.732056 101.931452  6721.1587 4700.8669&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;This is an easy task, but it got me stuck for a few minutes…&lt;/p&gt;
-&lt;p&gt;Lately, I finally discovered that there is (at least) one function in R taking care of the above task; it is the ‘cov2cor()’ function in the ‘nlme’ package.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(nlme)
-cov2cor(V)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##             mpg        cyl       disp         hp
-## mpg   1.0000000 -0.8521620 -0.8475514 -0.7761684
-## cyl  -0.8521620  1.0000000  0.9020329  0.8324475
-## disp -0.8475514  0.9020329  1.0000000  0.7909486
-## hp   -0.7761684  0.8324475  0.7909486  1.0000000&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;It is really easy to get drown in a glass of water!&lt;/p&gt;
 </description>
     </item>
     

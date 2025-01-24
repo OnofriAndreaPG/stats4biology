@@ -1,7 +1,7 @@
 ---
-title: "Drowning in a glass of water: variance-covariance and correlation matrices"
+title: "A trip from variance-covariance to correlation and back"
 author: Andrea Onofri
-date: '2019-02-19'
+date: '2025-01-24'
 slug: correlation
 categories:
   - R
@@ -9,79 +9,160 @@ tags:
   - R
   - correlation
 archives:
-  - 2019
+  - 2025
 ---
 
 
 
-<p>One of the easiest tasks in R is to get correlations between each pair of variables in a dataset. As an example, let’s take the first four columns in the ‘mtcars’ dataset, that is available within R. Getting the variances-covariances and the correlations is straightforward.</p>
+<p>The variance-covariance and the correlation matrices are two entities that describe the association between the columns of a two-way data matrix. They are very much used, e.g., in agriculture, biology and ecology and they can be easily calculated with base R, as shown in the box below.</p>
 <pre class="r"><code>data(mtcars)
 matr &lt;- mtcars[,1:4]
 
-#Covariances
-cov(matr)</code></pre>
-<pre><code>##              mpg        cyl       disp        hp
-## mpg    36.324103  -9.172379  -633.0972 -320.7321
-## cyl    -9.172379   3.189516   199.6603  101.9315
-## disp -633.097208 199.660282 15360.7998 6721.1587
-## hp   -320.732056 101.931452  6721.1587 4700.8669</code></pre>
-<pre class="r"><code>#Correlations
-cor(matr)</code></pre>
-<pre><code>##             mpg        cyl       disp         hp
-## mpg   1.0000000 -0.8521620 -0.8475514 -0.7761684
-## cyl  -0.8521620  1.0000000  0.9020329  0.8324475
-## disp -0.8475514  0.9020329  1.0000000  0.7909486
-## hp   -0.7761684  0.8324475  0.7909486  1.0000000</code></pre>
-<p>It’s really a piece of cake! Unfortunately, a few days ago I had a covariance matrix without the original dataset and I wanted the corresponding correlation matrix. Although this is an easy task as well, at first I was stuck, because I could not find an immediate solution… So I started wondering how I could make it.</p>
-<p>Indeed, having the two variables X and Y, their covariance is:</p>
-<p><span class="math display">\[cov(X, Y) = \sum\limits_{i=1}^{n} {(X_i - \hat{X})(Y_i - \hat{Y})}\]</span></p>
+# Covariances
+Sigma &lt;- cov(matr)
+
+# Correlations
+R &lt;- cor(matr)</code></pre>
+<p>It is useful to be able to go back and forth from variance-covariance to correlation, without going back to the original data matrix. Let’s consider that the variance-covariance of the two variables X and Y is:</p>
+<p><span class="math display">\[\textrm{cov}(X, Y) = \sum\limits_{i=1}^{n} {(X_i - \hat{X})(Y_i - \hat{Y})}\]</span></p>
 <p>where <span class="math inline">\(\hat{Y}\)</span> and <span class="math inline">\(\hat{X}\)</span> are the means for each variable. The correlation is:</p>
-<p><span class="math display">\[cor(X, Y) = \frac{cov(X, Y)}{\sigma_x \sigma_y} \]</span></p>
+<p><span class="math display">\[\textrm{cor}(X, Y) = \frac{\textrm{cov}(X, Y)}{\sigma_x \sigma_y} \]</span></p>
 <p>where <span class="math inline">\(\sigma_x\)</span> and <span class="math inline">\(\sigma_y\)</span> are the standard deviations for X and Y.</p>
 <p>The opposite relationship is clear:</p>
-<p><span class="math display">\[ cov(X, Y) = cor(X, Y) \sigma_x \sigma_y\]</span></p>
+<p><span class="math display">\[ \textrm{cov}(X, Y) = \textrm{cor}(X, Y) \sigma_x \sigma_y\]</span></p>
 <p>Therefore, converting from covariance to correlation is pretty easy. For example, take the covariance between ‘cyl’ and ‘mpg’ above (-9.172379), the correlation is:</p>
 <pre class="r"><code>-633.097208 / (sqrt(36.324103) * sqrt(15360.7998))</code></pre>
 <pre><code>## [1] -0.8475514</code></pre>
 <p>On the reverse, if we have the correlation (-0.8521620), the covariance is</p>
 <pre class="r"><code>-0.8475514 * sqrt(36.324103) * sqrt(15360.7998)</code></pre>
 <pre><code>## [1] -633.0972</code></pre>
-<p>My covariance matrix was pretty large, so I started wondering how I could perform this task altogether. What I had to do was to take each element in the covariance matrix and divide it by the square root of the diagonal elements in the same column and in the same row (see below).</p>
-<p><img src="https://lu4yxa.db.files.1drv.com/y4mZ-7ZQc0LCMyDG3kqC_0_bzMZYyEpb37ug_I616tXoPNL_DbILLSOa8HujEZCekvRNeeYsfwtrYP-0T_PfzlOUqUNliHdKU3sDLHwBnr5C4jF-U-u1QkOlWg3ZbQXKJw4TM2VrQIQqjh-Pb-5cOEY49q-3pfnt4ZYJUAYZIBhW4GgJ0svrEEAnKQZfNTs2LW5iZhGyYFYVKFT2Y1O7SjKjA?width=637&amp;height=156&amp;cropmode=none" style="width:95.0%" /></p>
-<p>This is easily done by matrix multiplication. I need a square matrix where the standard deviations for each variable are repeated along the rows:</p>
-<pre class="r"><code>V &lt;- cov(matr)
-SM1 &lt;- matrix(rep(sqrt(diag(V)), 4), 4, 4)
-SM1</code></pre>
+<p>If we consider the whole covariance matrix, we have to take each element in this matrix and divide it by the square roots of the diagonal elements in the same column and in the same row (see figure below).</p>
+<p><img src="https://www.casaonofri.it/_Figures/CovarianceCorrelation.png" style="width:95.0%" /></p>
+<p>The question is: how can we do all these calculations in one single step, for all elements in the covariance matrix, to calculate the corresponding correlation matrix?</p>
+<p>If we have some memories of matrix algebra, we might remember that if we take a diagonal matrix of order <span class="math inline">\(n \times n\)</span> and multiply it by a square matrix with the same order, all elements in each column are multiplied by the diagonal element in the corresponding column:</p>
+<p><span class="math display">\[\begin{pmatrix}
+1 &amp; 1 &amp; 1 &amp; 1 \\
+1 &amp; 1 &amp; 1 &amp; 1 \\
+1 &amp; 1 &amp; 1 &amp; 1 \\
+1 &amp; 1 &amp; 1 &amp; 1
+\end{pmatrix}
+\times
+\begin{pmatrix}
+1 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 2 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 3 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 4
+\end{pmatrix}
+=
+\begin{pmatrix}
+1 &amp; 2 &amp; 3 &amp; 4 \\
+1 &amp; 2 &amp; 3 &amp; 4 \\
+1 &amp; 2 &amp; 3 &amp; 4 \\
+1 &amp; 2 &amp; 3 &amp; 4
+\end{pmatrix}\]</span></p>
+<p>If we reverse the order of factors, all elements in each row are multiplied by the diagonal element in the corresponding row:</p>
+<p><span class="math display">\[
+\begin{pmatrix}
+1 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 2 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 3 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 4
+\end{pmatrix}
+\times
+\begin{pmatrix}
+1 &amp; 1 &amp; 1 &amp; 1 \\
+1 &amp; 1 &amp; 1 &amp; 1 \\
+1 &amp; 1 &amp; 1 &amp; 1 \\
+1 &amp; 1 &amp; 1 &amp; 1
+\end{pmatrix}
+=
+\begin{pmatrix}
+1 &amp; 1 &amp; 1 &amp; 1 \\
+2 &amp; 2 &amp; 2 &amp; 2 \\
+3 &amp; 3 &amp; 3 &amp; 3 \\
+4 &amp; 4 &amp; 4 &amp; 4
+\end{pmatrix}
+\]</span></p>
+<p>Therefore, if we take a covariance matrix <span class="math inline">\(\Sigma\)</span> of order <span class="math inline">\(n \times n\)</span> and pre-multiply and post-multiply it for the same diagonal matrix of order <span class="math inline">\(n \times n\)</span>, each element in <span class="math inline">\(\Sigma\)</span> is multiplied by both the diagonal elements in the same row and same column, which is exactly what we are looking for.</p>
+<p>In the code below, we:</p>
+<ol style="list-style-type: decimal">
+<li>Create a covariance matrix</li>
+<li>Take the square roots of the diagonal element (standard deviations) and load them in a diagonal matrix</li>
+<li>Invert this diagonal matrix</li>
+<li>Pre-multiply and post-multiply the covariance matrix for this diagonal matrix of inverse standard deviations</li>
+</ol>
+<pre class="r"><code>StDev &lt;- sqrt(diag(Sigma))
+StDevMat &lt;- diag(StDev)
+InvStDev &lt;- solve(StDevMat)
+InvStDev %*% Sigma %*% InvStDev</code></pre>
 <pre><code>##            [,1]       [,2]       [,3]       [,4]
-## [1,]   6.026948   6.026948   6.026948   6.026948
-## [2,]   1.785922   1.785922   1.785922   1.785922
-## [3,] 123.938694 123.938694 123.938694 123.938694
-## [4,]  68.562868  68.562868  68.562868  68.562868</code></pre>
-<p>and another one where they are repeated along the columns</p>
-<pre class="r"><code>SM2 &lt;- matrix(rep(sqrt(diag(V)), each = 4), 4, 4)</code></pre>
-<p>Now I can take my covariance matrix (V) and simply multiply these three matrices as follows:</p>
-<pre class="r"><code>V * 1/SM1 * 1/SM2</code></pre>
+## [1,]  1.0000000 -0.8521620 -0.8475514 -0.7761684
+## [2,] -0.8521620  1.0000000  0.9020329  0.8324475
+## [3,] -0.8475514  0.9020329  1.0000000  0.7909486
+## [4,] -0.7761684  0.8324475  0.7909486  1.0000000</code></pre>
+<p>Going from correlation to covariance can be done similarly, although, in this case, together with the correlation matrix we also need to have the standard deviations of the original variables, because they are not included in the matrix under transformation:</p>
+<pre class="r"><code>StDevMat %*% R %*% StDevMat</code></pre>
+<pre><code>##             [,1]       [,2]       [,3]      [,4]
+## [1,]   36.324103  -9.172379  -633.0972 -320.7321
+## [2,]   -9.172379   3.189516   199.6603  101.9315
+## [3,] -633.097208 199.660282 15360.7998 6721.1587
+## [4,] -320.732056 101.931452  6721.1587 4700.8669</code></pre>
+<div id="solutions-with-r" class="section level1">
+<h1>Solutions with R</h1>
+<p>Is there any other solutions for those who are not accustomed to matrix algebra? The easiest way to go from covariance to correlation is to use the <code>cov2cor()</code> function in the ‘nlme’ package.</p>
+<pre class="r"><code># From covariance to correlation
+library(nlme)
+cov2cor(Sigma)</code></pre>
 <pre><code>##             mpg        cyl       disp         hp
 ## mpg   1.0000000 -0.8521620 -0.8475514 -0.7761684
 ## cyl  -0.8521620  1.0000000  0.9020329  0.8324475
 ## disp -0.8475514  0.9020329  1.0000000  0.7909486
 ## hp   -0.7761684  0.8324475  0.7909486  1.0000000</code></pre>
-<p>Indeed, there is not even the need to use ‘rep’ when we create SM1, as R will recycle the elements as needed.</p>
-<p>Going from correlation to covariance can be done similarly:</p>
-<pre class="r"><code>R &lt;- cor(matr)
-R / (1/SM1 * 1/SM2)</code></pre>
+<p>With base R, we can <code>sweep()</code> twice:</p>
+<pre class="r"><code># From covariance to correlation
+sweep(sweep(Sigma, 1, StDev, FUN = &quot;/&quot;), 2, StDev, FUN = &quot;/&quot;)</code></pre>
+<pre><code>##             mpg        cyl       disp         hp
+## mpg   1.0000000 -0.8521620 -0.8475514 -0.7761684
+## cyl  -0.8521620  1.0000000  0.9020329  0.8324475
+## disp -0.8475514  0.9020329  1.0000000  0.7909486
+## hp   -0.7761684  0.8324475  0.7909486  1.0000000</code></pre>
+<pre class="r"><code># From correlation to covariance
+sweep(sweep(R, 1, StDev, FUN = &quot;*&quot;), 2, StDev, FUN = &quot;*&quot;)</code></pre>
 <pre><code>##              mpg        cyl       disp        hp
 ## mpg    36.324103  -9.172379  -633.0972 -320.7321
 ## cyl    -9.172379   3.189516   199.6603  101.9315
 ## disp -633.097208 199.660282 15360.7998 6721.1587
 ## hp   -320.732056 101.931452  6721.1587 4700.8669</code></pre>
-<p>This is an easy task, but it got me stuck for a few minutes…</p>
-<p>Lately, I finally discovered that there is (at least) one function in R taking care of the above task; it is the ‘cov2cor()’ function in the ‘nlme’ package.</p>
-<pre class="r"><code>library(nlme)
-cov2cor(V)</code></pre>
+<p>We can also <code>scale()</code> and <code>t()</code> twice, but it looks far less neat:</p>
+<pre class="r"><code># From covariance to correlation
+scale(t(scale(t(Sigma), center = F, scale = StDev)), 
+      center = F, scale = StDev)</code></pre>
 <pre><code>##             mpg        cyl       disp         hp
 ## mpg   1.0000000 -0.8521620 -0.8475514 -0.7761684
 ## cyl  -0.8521620  1.0000000  0.9020329  0.8324475
 ## disp -0.8475514  0.9020329  1.0000000  0.7909486
-## hp   -0.7761684  0.8324475  0.7909486  1.0000000</code></pre>
-<p>It is really easy to get drown in a glass of water!</p>
+## hp   -0.7761684  0.8324475  0.7909486  1.0000000
+## attr(,&quot;scaled:scale&quot;)
+##        mpg        cyl       disp         hp 
+##   6.026948   1.785922 123.938694  68.562868</code></pre>
+<pre class="r"><code># From correlation to covariance
+scale(t(scale(t(R), center = F, scale = 1/StDev)), 
+      center = F, scale = 1/StDev)</code></pre>
+<pre><code>##              mpg        cyl       disp        hp
+## mpg    36.324103  -9.172379  -633.0972 -320.7321
+## cyl    -9.172379   3.189516   199.6603  101.9315
+## disp -633.097208 199.660282 15360.7998 6721.1587
+## hp   -320.732056 101.931452  6721.1587 4700.8669
+## attr(,&quot;scaled:scale&quot;)
+##         mpg         cyl        disp          hp 
+## 0.165921457 0.559934979 0.008068505 0.014585154</code></pre>
+<p>Just curious whether you young students have some better solution; I am sure you have one! Please, drop me a line!</p>
+<p>Happy coding!</p>
+<hr />
+<p>Prof. Andrea Onofri<br />
+Department of Agricultural, Food and Environmental Sciences<br />
+University of Perugia (Italy)<br />
+Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow <span class="citation">@onofriandreapg</span></a>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</div>
