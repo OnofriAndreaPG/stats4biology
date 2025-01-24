@@ -22,7 +22,20 @@ matr &lt;- mtcars[,1:4]
 Sigma &lt;- cov(matr)
 
 # Correlations
-R &lt;- cor(matr)</code></pre>
+R &lt;- cor(matr)
+
+Sigma
+##              mpg        cyl       disp        hp
+## mpg    36.324103  -9.172379  -633.0972 -320.7321
+## cyl    -9.172379   3.189516   199.6603  101.9315
+## disp -633.097208 199.660282 15360.7998 6721.1587
+## hp   -320.732056 101.931452  6721.1587 4700.8669
+R
+##             mpg        cyl       disp         hp
+## mpg   1.0000000 -0.8521620 -0.8475514 -0.7761684
+## cyl  -0.8521620  1.0000000  0.9020329  0.8324475
+## disp -0.8475514  0.9020329  1.0000000  0.7909486
+## hp   -0.7761684  0.8324475  0.7909486  1.0000000</code></pre>
 <p>It is useful to be able to go back and forth from variance-covariance to correlation, without going back to the original data matrix. Let’s consider that the variance-covariance of the two variables X and Y is:</p>
 <p><span class="math display">\[\textrm{cov}(X, Y) = \sum\limits_{i=1}^{n} {(X_i - \hat{X})(Y_i - \hat{Y})}\]</span></p>
 <p>where <span class="math inline">\(\hat{Y}\)</span> and <span class="math inline">\(\hat{X}\)</span> are the means for each variable. The correlation is:</p>
@@ -31,11 +44,11 @@ R &lt;- cor(matr)</code></pre>
 <p>The opposite relationship is clear:</p>
 <p><span class="math display">\[ \textrm{cov}(X, Y) = \textrm{cor}(X, Y) \sigma_x \sigma_y\]</span></p>
 <p>Therefore, converting from covariance to correlation is pretty easy. For example, take the covariance between ‘cyl’ and ‘mpg’ above (-9.172379), the correlation is:</p>
-<pre class="r"><code>-633.097208 / (sqrt(36.324103) * sqrt(15360.7998))</code></pre>
-<pre><code>## [1] -0.8475514</code></pre>
+<pre class="r"><code>-633.097208 / (sqrt(36.324103) * sqrt(15360.7998))
+## [1] -0.8475514</code></pre>
 <p>On the reverse, if we have the correlation (-0.8521620), the covariance is</p>
-<pre class="r"><code>-0.8475514 * sqrt(36.324103) * sqrt(15360.7998)</code></pre>
-<pre><code>## [1] -633.0972</code></pre>
+<pre class="r"><code>-0.8475514 * sqrt(36.324103) * sqrt(15360.7998)
+## [1] -633.0972</code></pre>
 <p>If we consider the whole covariance matrix, we have to take each element in this matrix and divide it by the square roots of the diagonal elements in the same column and in the same row (see figure below).</p>
 <p><img src="https://www.casaonofri.it/_Figures/CovarianceCorrelation.png" style="width:95.0%" /></p>
 <p>The question is: how can we do all these calculations in one single step, for all elements in the covariance matrix, to calculate the corresponding correlation matrix?</p>
@@ -94,15 +107,15 @@ R &lt;- cor(matr)</code></pre>
 <pre class="r"><code>StDev &lt;- sqrt(diag(Sigma))
 StDevMat &lt;- diag(StDev)
 InvStDev &lt;- solve(StDevMat)
-InvStDev %*% Sigma %*% InvStDev</code></pre>
-<pre><code>##            [,1]       [,2]       [,3]       [,4]
+InvStDev %*% Sigma %*% InvStDev
+##            [,1]       [,2]       [,3]       [,4]
 ## [1,]  1.0000000 -0.8521620 -0.8475514 -0.7761684
 ## [2,] -0.8521620  1.0000000  0.9020329  0.8324475
 ## [3,] -0.8475514  0.9020329  1.0000000  0.7909486
 ## [4,] -0.7761684  0.8324475  0.7909486  1.0000000</code></pre>
 <p>Going from correlation to covariance can be done similarly, although, in this case, together with the correlation matrix we also need to have the standard deviations of the original variables, because they are not included in the matrix under transformation:</p>
-<pre class="r"><code>StDevMat %*% R %*% StDevMat</code></pre>
-<pre><code>##             [,1]       [,2]       [,3]      [,4]
+<pre class="r"><code>StDevMat %*% R %*% StDevMat
+##             [,1]       [,2]       [,3]      [,4]
 ## [1,]   36.324103  -9.172379  -633.0972 -320.7321
 ## [2,]   -9.172379   3.189516   199.6603  101.9315
 ## [3,] -633.097208 199.660282 15360.7998 6721.1587
@@ -112,23 +125,23 @@ InvStDev %*% Sigma %*% InvStDev</code></pre>
 <p>Is there any other solutions for those who are not accustomed to matrix algebra? The easiest way to go from covariance to correlation is to use the <code>cov2cor()</code> function in the ‘nlme’ package.</p>
 <pre class="r"><code># From covariance to correlation
 library(nlme)
-cov2cor(Sigma)</code></pre>
-<pre><code>##             mpg        cyl       disp         hp
+cov2cor(Sigma)
+##             mpg        cyl       disp         hp
 ## mpg   1.0000000 -0.8521620 -0.8475514 -0.7761684
 ## cyl  -0.8521620  1.0000000  0.9020329  0.8324475
 ## disp -0.8475514  0.9020329  1.0000000  0.7909486
 ## hp   -0.7761684  0.8324475  0.7909486  1.0000000</code></pre>
 <p>With base R, we can <code>sweep()</code> twice:</p>
 <pre class="r"><code># From covariance to correlation
-sweep(sweep(Sigma, 1, StDev, FUN = &quot;/&quot;), 2, StDev, FUN = &quot;/&quot;)</code></pre>
-<pre><code>##             mpg        cyl       disp         hp
+sweep(sweep(Sigma, 1, StDev, FUN = &quot;/&quot;), 2, StDev, FUN = &quot;/&quot;)
+##             mpg        cyl       disp         hp
 ## mpg   1.0000000 -0.8521620 -0.8475514 -0.7761684
 ## cyl  -0.8521620  1.0000000  0.9020329  0.8324475
 ## disp -0.8475514  0.9020329  1.0000000  0.7909486
-## hp   -0.7761684  0.8324475  0.7909486  1.0000000</code></pre>
-<pre class="r"><code># From correlation to covariance
-sweep(sweep(R, 1, StDev, FUN = &quot;*&quot;), 2, StDev, FUN = &quot;*&quot;)</code></pre>
-<pre><code>##              mpg        cyl       disp        hp
+## hp   -0.7761684  0.8324475  0.7909486  1.0000000
+# From correlation to covariance
+sweep(sweep(R, 1, StDev, FUN = &quot;*&quot;), 2, StDev, FUN = &quot;*&quot;)
+##              mpg        cyl       disp        hp
 ## mpg    36.324103  -9.172379  -633.0972 -320.7321
 ## cyl    -9.172379   3.189516   199.6603  101.9315
 ## disp -633.097208 199.660282 15360.7998 6721.1587
@@ -136,19 +149,19 @@ sweep(sweep(R, 1, StDev, FUN = &quot;*&quot;), 2, StDev, FUN = &quot;*&quot;)</c
 <p>We can also <code>scale()</code> and <code>t()</code> twice, but it looks far less neat:</p>
 <pre class="r"><code># From covariance to correlation
 scale(t(scale(t(Sigma), center = F, scale = StDev)), 
-      center = F, scale = StDev)</code></pre>
-<pre><code>##             mpg        cyl       disp         hp
+      center = F, scale = StDev)
+##             mpg        cyl       disp         hp
 ## mpg   1.0000000 -0.8521620 -0.8475514 -0.7761684
 ## cyl  -0.8521620  1.0000000  0.9020329  0.8324475
 ## disp -0.8475514  0.9020329  1.0000000  0.7909486
 ## hp   -0.7761684  0.8324475  0.7909486  1.0000000
 ## attr(,&quot;scaled:scale&quot;)
 ##        mpg        cyl       disp         hp 
-##   6.026948   1.785922 123.938694  68.562868</code></pre>
-<pre class="r"><code># From correlation to covariance
+##   6.026948   1.785922 123.938694  68.562868
+# From correlation to covariance
 scale(t(scale(t(R), center = F, scale = 1/StDev)), 
-      center = F, scale = 1/StDev)</code></pre>
-<pre><code>##              mpg        cyl       disp        hp
+      center = F, scale = 1/StDev)
+##              mpg        cyl       disp        hp
 ## mpg    36.324103  -9.172379  -633.0972 -320.7321
 ## cyl    -9.172379   3.189516   199.6603  101.9315
 ## disp -633.097208 199.660282 15360.7998 6721.1587
