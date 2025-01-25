@@ -19,8 +19,8 @@ archives:
 ```{r setup, cache = F, echo = F}
 #Put at the beginning
 knitr::opts_chunk$set(echo = TRUE)
-knitr::knit_hooks$set(document = function(x){ 
-  gsub("```\n*```r*\n*", "", x) 
+knitr::knit_hooks$set(document = function(x){
+  gsub("```\n*```r*\n*", "", x)
 })
 ```
 
@@ -81,10 +81,20 @@ It is very easy to see that $R = |r|$ and it is also easy to demonstrate that $r
 SSreg <- sum((predict(mod) - mean(Y))^2)
 SStot <- sum((Y - mean(Y))^2)
 SSres <- sum(residuals(mod)^2)
-SSreg/SStot
-1 - SSres/SStot
+CD1 <- SSreg/SStot
+
+# Alternative equation
+CD2 <- 1 - SSres/SStot
+
+CD1
+CD2
+```
+
+
+```{r}
 r.coef <- cor(X, Y)
 R.coef <- cor(Y, fitted(mod))
+
 r.coef^2
 R.coef^2
 ```
@@ -96,15 +106,19 @@ R.coef^2
 Apart from simple linear regression, for all other types of linear models, provided that an intercept is fitted, it is not, in general, true that $R = |r|$, while it is, in general, true that that the coefficient of determination is equal to the squared coefficient of multiple correlation $R^2$. I'll show a swift example with a polynomial regression in the box below.
 
 ```{r}
+# R and r coefficients
 mod2 <- lm(Y ~ X + I(X^2))
 cor.coef <- cor(X, Y)
 R.coef <- cor(Y, fitted(mod2))
 
 # R and r are not equal
-cor.coef; R.coef
+cor.coef
+R.coef
 
+#
 # The coefficient of determination is R2
-R.coef^2; summary(mod2)$r.squared
+R.coef^2
+summary(mod2)$r.squared
 ```
 
 Furthermore, when we have several predictors (e.g., multiple regression), the correlation coefficient is not unique and we could calculate as many $r$ values as there are predictors in the model. 
@@ -115,11 +129,21 @@ In the box below I show another example where I analysed the 'mtcars' dataset by
 data(mtcars)
 mod <- lm(mpg ~ wt+disp+hp - 1, data = mtcars)  
 summary(mod)$r.squared # Coeff. determination with R
+```
+
+
+```{r}
+# Coefficient of determination by 'hand-calculation'
 SSreg <- sum((predict(mod) - mean(mtcars$mpg))^2)
 SStot <- sum((mtcars$mpg - mean(mtcars$mpg))^2)
 SSres <- sum(residuals(mod)^2)
 SSreg/SStot
 1 - SSres/SStot
+```
+
+
+```{r}
+# The R^2
 R.coef <- cor(mtcars$mpg, fitted(mod))
 R.coef^2
 ```
@@ -201,7 +225,7 @@ We may now come to our final conclusion.
 
 **CONCLUSION 4. With nonlinear models, we should never use either $r^2$ or $R^2$ because they are both wrong. If we need a swift measure of goodness of fit, we can use the $CD_2$ index above, but we should not name it as the $R^2$, because, in general, it does not correspond to the coefficient of determination. We should better use the term Pseudo-R^2^.**
 
-Hope this was useful; for those who are interested in the use of the Pseud-$R^2$ in nonlinear regression, I hav already published one post at this link: [https://www.statforbiology.com/2021/stat_nls_r2/](https://www.statforbiology.com/2021/stat_nls_r2/) .
+Hope this was useful; for those who are interested in the use of the Pseud-$R^2$ in nonlinear regression, I hav already published one post at this link: [https://www.statforbiology.com/2021/stat_nls_r2/](https://www.statforbiology.com/2021/stat_nls_r2/).
 
 Thanks for reading and happy coding!
 

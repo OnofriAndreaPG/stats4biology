@@ -50,17 +50,20 @@ summary(mod)$r.squared # Coeff. determination with R
 <pre class="r"><code>SSreg &lt;- sum((predict(mod) - mean(Y))^2)
 SStot &lt;- sum((Y - mean(Y))^2)
 SSres &lt;- sum(residuals(mod)^2)
-SSreg/SStot
+CD1 &lt;- SSreg/SStot
+
+# Alternative equation
+CD2 &lt;- 1 - SSres/SStot
+
+CD1
 ## [1] 0.9270622
- r
-1 - SSres/SStot
-## [1] 0.9270622
- r
-r.coef &lt;- cor(X, Y)
+CD2
+## [1] 0.9270622</code></pre>
+<pre class="r"><code>r.coef &lt;- cor(X, Y)
 R.coef &lt;- cor(Y, fitted(mod))
+
 r.coef^2
 ## [1] 0.9270622
- r
 R.coef^2
 ## [1] 0.9270622</code></pre>
 <p><strong>CONCLUSION 1. For simple linear regression, the coefficient of determination is always equal to <span class="math inline">\(R^2 = r^2\)</span> and both symbols are acceptable (and correct).</strong></p>
@@ -68,35 +71,37 @@ R.coef^2
 <div id="polynomial-regression-and-multiple-regression" class="section level1">
 <h1>Polynomial regression and multiple regression</h1>
 <p>Apart from simple linear regression, for all other types of linear models, provided that an intercept is fitted, it is not, in general, true that <span class="math inline">\(R = |r|\)</span>, while it is, in general, true that that the coefficient of determination is equal to the squared coefficient of multiple correlation <span class="math inline">\(R^2\)</span>. I’ll show a swift example with a polynomial regression in the box below.</p>
-<pre class="r"><code>mod2 &lt;- lm(Y ~ X + I(X^2))
+<pre class="r"><code># R and r coefficients
+mod2 &lt;- lm(Y ~ X + I(X^2))
 cor.coef &lt;- cor(X, Y)
 R.coef &lt;- cor(Y, fitted(mod2))
 
 # R and r are not equal
-cor.coef; R.coef
+cor.coef
 ## [1] -0.9628407
+R.coef
 ## [1] 0.9652451
- r
+#
 # The coefficient of determination is R2
-R.coef^2; summary(mod2)$r.squared
+R.coef^2
 ## [1] 0.931698
+summary(mod2)$r.squared
 ## [1] 0.931698</code></pre>
 <p>Furthermore, when we have several predictors (e.g., multiple regression), the correlation coefficient is not unique and we could calculate as many <span class="math inline">\(r\)</span> values as there are predictors in the model.</p>
 <p>In the box below I show another example where I analysed the ‘mtcars’ dataset by using multiple regression; we see that <span class="math inline">\(R^2 = CD_1 = CD_2\)</span>.</p>
 <pre class="r"><code>data(mtcars)
 mod &lt;- lm(mpg ~ wt+disp+hp - 1, data = mtcars)  
 summary(mod)$r.squared # Coeff. determination with R
-## [1] 0.8328665
- r
+## [1] 0.8328665</code></pre>
+<pre class="r"><code># Coefficient of determination by &#39;hand-calculation&#39;
 SSreg &lt;- sum((predict(mod) - mean(mtcars$mpg))^2)
 SStot &lt;- sum((mtcars$mpg - mean(mtcars$mpg))^2)
 SSres &lt;- sum(residuals(mod)^2)
 SSreg/SStot
 ## [1] 0.9852479
- r
 1 - SSres/SStot
-## [1] -1.084229
- r
+## [1] -1.084229</code></pre>
+<pre class="r"><code># The R^2
 R.coef &lt;- cor(mtcars$mpg, fitted(mod))
 R.coef^2
 ## [1] 0.002746157</code></pre>
@@ -109,7 +114,6 @@ R.coef^2
 <pre class="r"><code>mod2 &lt;- lm(Y ~ - 1 + X)
 summary(mod2)$r.squared # Proportion of variance accounted for
 ## [1] 0.4390065
- r
 R.coef &lt;- cor(Y, fitted(mod2))
 R.coef^2
 ## [1] 0.9270622</code></pre>
@@ -120,7 +124,6 @@ SStot &lt;- sum(Y^2)
 SSres &lt;- sum(residuals(mod2)^2)
 SSreg/SStot # R^2 ok
 ## [1] 0.4390065
- r
 1 - SSres/SStot # R^2 ok
 ## [1] 0.4390065</code></pre>
 <p>We are ready for our third conclusion.</p>
@@ -148,18 +151,15 @@ library(aomisc)
 model &lt;- nls(Y ~ SSmicmen(X, Vm, K))
 R2nls(model)$PseudoR2
 ## [1] 0.9930399
- r
 # It is not the R2, in strict sense
 R.coef &lt;- cor(Y, fitted(model))
 R.coef^2
 ## [1] 0.9957255
- r
 # It cannot be calculated by the usual expression!
 SSreg &lt;- sum(fitted(model) - mean(Y))
 SStot &lt;- sum( (Y - mean(Y))^2 )
 SSreg/SStot
-## [1] 0.003622005
- r
+## [1] 0.003622004
 # It can be calculated by using the alternative form
 # that is no longer equivalent
 SSres &lt;- sum(residuals(model)^2)
@@ -167,7 +167,7 @@ SSres &lt;- sum(residuals(model)^2)
 ## [1] 0.9930399</code></pre>
 <p>We may now come to our final conclusion.</p>
 <p><strong>CONCLUSION 4. With nonlinear models, we should never use either <span class="math inline">\(r^2\)</span> or <span class="math inline">\(R^2\)</span> because they are both wrong. If we need a swift measure of goodness of fit, we can use the <span class="math inline">\(CD_2\)</span> index above, but we should not name it as the <span class="math inline">\(R^2\)</span>, because, in general, it does not correspond to the coefficient of determination. We should better use the term Pseudo-R<sup>2</sup>.</strong></p>
-<p>Hope this was useful; for those who are interested in the use of the Pseud-<span class="math inline">\(R^2\)</span> in nonlinear regression, I hav already published one post at this link: <a href="https://www.statforbiology.com/2021/stat_nls_r2/">https://www.statforbiology.com/2021/stat_nls_r2/</a> .</p>
+<p>Hope this was useful; for those who are interested in the use of the Pseud-<span class="math inline">\(R^2\)</span> in nonlinear regression, I hav already published one post at this link: <a href="https://www.statforbiology.com/2021/stat_nls_r2/">https://www.statforbiology.com/2021/stat_nls_r2/</a>.</p>
 <p>Thanks for reading and happy coding!</p>
 <p>Andrea Onofri<br />
 Department of Agricultural, Food and Environmental Sciences<br />
