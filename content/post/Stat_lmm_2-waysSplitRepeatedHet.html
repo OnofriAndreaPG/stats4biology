@@ -16,8 +16,7 @@ archives:
 
 
 
-<div id="a-repeated-split-plot-experiment-with-heteroscedastic-errors" class="section level1">
-<h1>A repeated split-plot experiment with heteroscedastic errors</h1>
+<p>In this post I am going to deal with a repeated split-plot experiment with heteroscedastic errors. Ready for this trip?</p>
 <p>Let’s imagine a field experiment, where different genotypes of khorasan wheat are to be compared under different nitrogen (N) fertilisation systems. Genotypes require bigger plots, with respect to fertilisation treatments and, therefore, the most convenient choice would be to lay-out the experiment as a split-plot, in a randomised complete block design. Genotypes would be randomly allocated to main plots, while fertilisation systems would be randomly allocated to sub-plots. As usual in agricultural research, the experiment should be repeated in different years, in order to explore the environmental variability of results.</p>
 <p>What could we expect from such an experiment?</p>
 <p>Please, look at the dataset ‘kamut.csv’, which is available on github. It provides the results for a split-plot experiment with 15 genotypes and 2 N fertilisation treatments, laid-out in three blocks and repeated in four years (360 observations, in all).</p>
@@ -59,7 +58,7 @@ lmmFits
 ##   Year          V1
 ## 1 2004 0.052761644
 ## 2 2005 0.001423833
-## 3 2006 0.776028797
+## 3 2006 0.776028791
 ## 4 2007 0.817594477</code></pre>
 <p>We see great differences! The residual variance in 2005 is more that 500 times smaller than that observed in 2007. Clearly, if we pool the data and make an ANOVA, when we pool the data, we violate the homoscedasticity assumption. In general, this problem has an obvious solution: we can model the variance-covariance matrix of observations, allowing a different variance per year. In R, this is only possible by using the ‘lme()’ function (unless we want to use the ‘asreml-R’ package, which is not freeware, unfortunately). The question is: how do we code such a model?</p>
 <p>First of all, let’s derive a correct mixed model. The treatment model is:</p>
@@ -71,7 +70,6 @@ lmmFits
 <p>which is equivalent to writing:</p>
 <pre><code> ~ Year*Genotype*N</code></pre>
 <p>The year effect can be taken as either as random or as fixed. In this post, we will show both approaches</p>
-</div>
 <div id="year-effect-is-fixed" class="section level1">
 <h1>Year effect is fixed</h1>
 <p>If we take the year effect as fixed and the block effect as random, we see that the random effects are nested (blocks within years and main-plots within blocks and within years). The function ‘lme()’ is specifically tailored to deal with nested random effects and, therefore, fitting the above model is rather easy. In the first snippet we fit a homoscedastic model:</p>
@@ -95,7 +93,7 @@ AIC(modMix1, modMix2)
 ##                    Chisq Df Pr(&gt;Chisq)    
 ## Year              51.072  3  4.722e-11 ***
 ## Genotype         543.499 14  &lt; 2.2e-16 ***
-## N               2289.524  1  &lt; 2.2e-16 ***
+## N               2289.523  1  &lt; 2.2e-16 ***
 ## Year:Genotype    123.847 42  5.281e-10 ***
 ## Year:N            21.695  3  7.549e-05 ***
 ## Genotype:N      1356.179 14  &lt; 2.2e-16 ***
@@ -124,6 +122,10 @@ AIC(modMix1, modMix2)
 <p>It is important to remember that the grouping factors in the list are treated as nested; however, the grouping factor is only one (‘Year’), so that the nesting is irrelevant. The only exception is the genotype, which is regarded as nested within the year. As the consequence, the component ‘Genotype = pdIdent(~N - 1)’, specifies a random year:genotype effect for each level of N treatment, i.e. a random year:genotype:N interaction.</p>
 <p>I agree, this is not straightforward to understand! If necessary, take a look at the good book of Gałecki and Burzykowski (2013). When fitting the above model, be patient; convergence may take a few seconds. I’d only like to reinforce the idea that, in case you need to test for fixed effects, you should not rely on the ‘anova()’ function, but you should prefer Wald chi square tests in the ‘Anova()’ function in the ‘car’ package.</p>
 <pre class="r"><code>Anova(modMix5, type = 2)
+## Warning in model.matrix.default(mod, data = structure(list(Year =
+## structure(c(1L, : variable &#39;MainPlot&#39; is absent, its contrast will be ignored
+## Warning in model.matrix.default(mod, data = structure(list(Year =
+## structure(c(1L, : variable &#39;Block&#39; is absent, its contrast will be ignored
 ## Analysis of Deviance Table (Type II tests)
 ## 
 ## Response: Yield

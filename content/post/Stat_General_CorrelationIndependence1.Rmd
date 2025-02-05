@@ -11,11 +11,19 @@ archives:
   - 2019
 ---
 
-# Observations are grouped
+```{r setup, cache = F, echo = F}
+#Put at the beginning
+knitr::opts_chunk$set(echo = TRUE, message = F, warning = F)
+knitr::knit_hooks$set(document = function(x){ 
+  gsub("```\n*```r*\n*", "", x) 
+})
+```
 
 When we have recorded two traits in different subjects, we can be interested in describing their joint variability, by using the Pearson's correlation coefficient. That's ok, altough we have to respect some basic assumptions (e.g. linearity) that have been detailed elsewhere ([see here](https://www.statforbiology.com/2019/stat_general_correlation_alookat/)). Problems may arise when we need to test the hypothesis that the correlation coefficient is equal to 0. In this case, we need to make sure that all the couples of observations are taken on independent subjects.
 
 Unfortunately, this is most often false whenever measures are taken from designed field experiments. In this case, observations may be grouped by one or more treatment/blocking factors. This has been clearly described by Bland and Altman (1994); we would like to give an example that is more closely related to plant/crop science. Think about a genotype experiment, where we compare the behaviour of several genotypes in a randomised blocks design. Usually, we do not only measure yield. We also measure other traits, such as crop height. At the end of the experiment, we might be interested in reporting the correlation between yield and height. How should we proceed? It would seem an easy task, but it is not.
+
+# Data come in groups
 
 Let's assume that we have a randomised blocks design, with 27 genotypes and 3 replicates. For each plot, we recorded two traits, i.e. yield and the weight of thousand kernels (TKW). In the end, we have 81 plots and just as many couples of measures in all. We will use the dataset 'WheatQuality.csv', that is available on  'gitHub'.
 
@@ -23,7 +31,7 @@ Let's assume that we have a randomised blocks design, with 27 genotypes and 3 re
 library(Hmisc)
 library(knitr)
 library(plyr)
-dataset <- read.csv("https://www.casaonofri.it/_datasets/WheatQuality.csv", header=T)
+dataset <- read.csv("https://www.casaonofri.it/_datasets/WheatQuality.csv")
 head(dataset)
 ```
 
@@ -34,8 +42,12 @@ It may be tempting to consider the whole lot of measures and calculate the corre
 
 ```{r message=FALSE, warning=FALSE, paged.print=FALSE}
 ra <- with(dataset, rcorr(Yield, TKW) )
-ra$r[1,2] #Correlation coefficient
-ra$P[1,2] #P-level
+# 
+# Correlation coefficient
+ra$r[1,2] 
+#
+# P-level
+ra$P[1,2] 
 ```
 
 We observe a positive correlation, and $r$ seems to be significantly different from 0. Therefore, we would be encouraged to conclude that plots with a high value on yield tend to have a high value on TKW, as well. Unfortunately, such a conclusion is not supported by the data.

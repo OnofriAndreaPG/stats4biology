@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=4321&amp;path=livereload" data-no-instant defer></script>
   
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-131792052-1"></script>
   
@@ -28,7 +28,7 @@
     <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
-    <link rel="stylesheet" href="https://www.statforbiology.com/css/blog.css" />
+    <link rel="stylesheet" href="http://localhost:4321/css/blog.css" />
        
 </head>
 <body>
@@ -36,22 +36,22 @@
     
     <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
-            <a class="navbar-item" href="https://www.statforbiology.com/">Home</a>
-            <a class="navbar-item" href="https://www.statforbiology.com/aboutthis" >About this site</a>
-            <a class="navbar-item" href="https://www.statforbiology.com/tutorials" >Tutorials</a>
-            <a class="navbar-item" href="https://www.statforbiology.com/_Statbook" >Book (Italian)</a>
-            <a class="navbar-item" href="https://www.statforbiology.com/_StatbookEng" >Book (English)</a>
-            <a class="navbar-item" href="https://www.statforbiology.com/rpackages" >R packages</a>
-            <a class="navbar-item" href="https://www.statforbiology.com/recentcourses" >Stat Courses</a>
-            <a class="navbar-item" href="https://www.statforbiology.com/links" >Links</a>
-            <a class="navbar-item" href="https://www.statforbiology.com/about" >About me</a>
+            <a class="navbar-item" href="http://localhost:4321/">Home</a>
+            <a class="navbar-item" href="http://localhost:4321/aboutthis" >About this site</a>
+            <a class="navbar-item" href="http://localhost:4321/tutorials" >Tutorials</a>
+            <a class="navbar-item" href="http://localhost:4321/_Statbook" >Book (Italian)</a>
+            <a class="navbar-item" href="http://localhost:4321/_StatbookEng" >Book (English)</a>
+            <a class="navbar-item" href="http://localhost:4321/rpackages" >R packages</a>
+            <a class="navbar-item" href="http://localhost:4321/recentcourses" >Stat Courses</a>
+            <a class="navbar-item" href="http://localhost:4321/links" >Links</a>
+            <a class="navbar-item" href="http://localhost:4321/about" >About me</a>
         </div>
     </nav>
     
 
     
     <section class="hero is-info is-medium">
-        <div class="hero-body" style="background-image: url(https://www.statforbiology.com/img/bg-blog.jpg);">
+        <div class="hero-body" style="background-image: url(http://localhost:4321/img/bg-blog.jpg);">
             <div class="container has-text-centered">
                 <br>
                 <h1 class="title is-size-1">
@@ -81,17 +81,17 @@
                 
 
 
-<div id="observations-are-grouped" class="section level1">
-<h1>Observations are grouped</h1>
 <p>When we have recorded two traits in different subjects, we can be interested in describing their joint variability, by using the Pearson’s correlation coefficient. That’s ok, altough we have to respect some basic assumptions (e.g. linearity) that have been detailed elsewhere (<a href="https://www.statforbiology.com/2019/stat_general_correlation_alookat/">see here</a>). Problems may arise when we need to test the hypothesis that the correlation coefficient is equal to 0. In this case, we need to make sure that all the couples of observations are taken on independent subjects.</p>
 <p>Unfortunately, this is most often false whenever measures are taken from designed field experiments. In this case, observations may be grouped by one or more treatment/blocking factors. This has been clearly described by Bland and Altman (1994); we would like to give an example that is more closely related to plant/crop science. Think about a genotype experiment, where we compare the behaviour of several genotypes in a randomised blocks design. Usually, we do not only measure yield. We also measure other traits, such as crop height. At the end of the experiment, we might be interested in reporting the correlation between yield and height. How should we proceed? It would seem an easy task, but it is not.</p>
+<div id="data-come-in-groups" class="section level1">
+<h1>Data come in groups</h1>
 <p>Let’s assume that we have a randomised blocks design, with 27 genotypes and 3 replicates. For each plot, we recorded two traits, i.e. yield and the weight of thousand kernels (TKW). In the end, we have 81 plots and just as many couples of measures in all. We will use the dataset ‘WheatQuality.csv’, that is available on ‘gitHub’.</p>
 <pre class="r"><code>library(Hmisc)
 library(knitr)
 library(plyr)
-dataset &lt;- read.csv(&quot;https://www.casaonofri.it/_datasets/WheatQuality.csv&quot;, header=T)
-head(dataset)</code></pre>
-<pre><code>##     Genotype Block Height  TKW Whectol Yield
+dataset &lt;- read.csv(&quot;https://www.casaonofri.it/_datasets/WheatQuality.csv&quot;)
+head(dataset)
+##     Genotype Block Height  TKW Whectol Yield
 ## 1 arcobaleno     1     90 44.5    83.2 64.40
 ## 2 arcobaleno     2     90 42.8    82.2 60.58
 ## 3 arcobaleno     3     88 42.7    83.1 59.42
@@ -103,16 +103,20 @@ head(dataset)</code></pre>
 <h1>How many correlations?</h1>
 <p>It may be tempting to consider the whole lot of measures and calculate the correlation coefficient between yield and TKW. This is the result:</p>
 <pre class="r"><code>ra &lt;- with(dataset, rcorr(Yield, TKW) )
-ra$r[1,2] #Correlation coefficient</code></pre>
-<pre><code>## [1] 0.540957</code></pre>
-<pre class="r"><code>ra$P[1,2] #P-level</code></pre>
-<pre><code>## [1] 1.850931e-07</code></pre>
+# 
+# Correlation coefficient
+ra$r[1,2] 
+## [1] 0.540957
+#
+# P-level
+ra$P[1,2] 
+## [1] 1.850931e-07</code></pre>
 <p>We observe a positive correlation, and <span class="math inline">\(r\)</span> seems to be significantly different from 0. Therefore, we would be encouraged to conclude that plots with a high value on yield tend to have a high value on TKW, as well. Unfortunately, such a conclusion is not supported by the data.</p>
 <p>Indeed, the test of significance is clearly invalid, as the 81 plots are not independent; they are grouped by block and genotype and we are totally neglecting these two effects. Are we sure that the same correlation holds for all genotypes/blocks? Let’s check this.</p>
 <pre class="r"><code>wCor &lt;- function(x) cor(x$Yield, x$TKW)
 wgCors &lt;- ddply(dataset, ~Genotype, wCor)
-wgCors</code></pre>
-<pre><code>##       Genotype         V1
+wgCors
+##       Genotype         V1
 ## 1   arcobaleno  0.9847228
 ## 2         baio  0.1611952
 ## 3      claudio -0.9993872
@@ -139,10 +143,10 @@ wgCors</code></pre>
 ## 24 terrabianca -0.4076416
 ## 25       verdi  0.5801404
 ## 26     vesuvio -0.7797493
-## 27    vitromax -0.8056514</code></pre>
-<pre class="r"><code>wbCors &lt;- ddply(dataset, ~Block, wCor)
-wbCors</code></pre>
-<pre><code>##   Block        V1
+## 27    vitromax -0.8056514
+wbCors &lt;- ddply(dataset, ~Block, wCor)
+wbCors
+##   Block        V1
 ## 1     1 0.5998137
 ## 2     2 0.5399990
 ## 3     3 0.5370398</code></pre>
@@ -152,30 +156,30 @@ wbCors</code></pre>
 <pre class="r"><code>mod1 &lt;- lm(Yield ~ factor(Block) + Genotype, data = dataset)
 mod2 &lt;- lm(TKW ~ factor(Block) + Genotype, data = dataset)
 wCor &lt;- rcorr(residuals(mod1), residuals(mod2))
-wCor$r</code></pre>
-<pre><code>##            x          y
+wCor$r
+##            x          y
 ## x 1.00000000 0.03133109
-## y 0.03133109 1.00000000</code></pre>
-<pre class="r"><code>wCor$P</code></pre>
-<pre><code>##           x         y
+## y 0.03133109 1.00000000
+wCor$P
+##           x         y
 ## x        NA 0.7812693
 ## y 0.7812693        NA</code></pre>
 <p>The average within-group correlation is very small and unsignificant. Let’s think about this correlation: residuals represent yield and TKW values for all plots, once the effects of blocks and genotypes have been removed. A high correlation of residuals would mean that, letting aside the effects of the block and genotype to which it belongs, a plot with a high value on yield also shows a high value on TKW. The existence of such correlation is clearly unsopported by our dataset.</p>
 <p>As the next step, we could consider the means for genotypes/blocks and see whether they are correlated. Blocks and genotypes are independent and, in principle, significance testing is permitted. However, this is not recommended with block means, as three data are too few to make tests.</p>
 <pre class="r"><code>means &lt;- ddply(dataset, ~Genotype, summarise, Mu1=mean(Yield), Mu2 = mean(TKW))
 rgPear &lt;- rcorr( as.matrix(means[,2:3]) )
-rgPear$r</code></pre>
-<pre><code>##           Mu1       Mu2
+rgPear$r
+##           Mu1       Mu2
 ## Mu1 1.0000000 0.5855966
-## Mu2 0.5855966 1.0000000</code></pre>
-<pre class="r"><code>rgPear$P</code></pre>
-<pre><code>##            Mu1        Mu2
+## Mu2 0.5855966 1.0000000
+rgPear$P
+##            Mu1        Mu2
 ## Mu1         NA 0.00133149
-## Mu2 0.00133149         NA</code></pre>
-<pre class="r"><code>means &lt;- ddply(dataset, ~Block, summarise, Mu1=mean(Yield), Mu2 = mean(TKW))
+## Mu2 0.00133149         NA
+means &lt;- ddply(dataset, ~Block, summarise, Mu1=mean(Yield), Mu2 = mean(TKW))
 rbPear &lt;- cor( as.matrix(means[,2:3]) )
-rbPear</code></pre>
-<pre><code>##             Mu1         Mu2
+rbPear
+##             Mu1         Mu2
 ## Mu1  1.00000000 -0.08812544
 ## Mu2 -0.08812544  1.00000000</code></pre>
 <p>We note that the correlation between genotype means is high and significant. On the contrary, the correlation between block means is near to 0.</p>
@@ -218,117 +222,117 @@ rbPear</code></pre>
         <h1 class="title is-5">Tags</h1>
         <div class="tags">
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/agricensdata">agricensdata</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/agricensdata">agricensdata</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/ammi_analysis">ammi_analysis</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/ammi_analysis">ammi_analysis</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/aomisc">aomisc</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/aomisc">aomisc</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/asreml">asreml</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/asreml">asreml</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/bayesian_stat">bayesian_stat</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/bayesian_stat">bayesian_stat</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/biplot">biplot</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/biplot">biplot</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/blogdown">blogdown</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/blogdown">blogdown</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/boxplot">boxplot</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/boxplot">boxplot</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/case_study">case_study</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/case_study">case_study</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/climate_data">climate_data</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/climate_data">climate_data</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/correlation">correlation</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/correlation">correlation</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/cva">cva</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/cva">cva</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/data_management">data_management</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/data_management">data_management</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/delta_method">delta_method</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/delta_method">delta_method</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/descriptive_statistics">descriptive_statistics</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/descriptive_statistics">descriptive_statistics</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/diallel_models">diallel_models</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/diallel_models">diallel_models</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/dplyr">dplyr</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/dplyr">dplyr</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/drcseedgerm">drcseedgerm</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/drcseedgerm">drcseedgerm</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/drcte">drcte</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/drcte">drcte</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/drm">drm</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/drm">drm</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/error_propagation">error_propagation</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/error_propagation">error_propagation</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/gge_analysis">gge_analysis</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/gge_analysis">gge_analysis</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/ggh4x">ggh4x</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/ggh4x">ggh4x</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/ggplot">ggplot</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/ggplot">ggplot</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/gls">gls</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/gls">gls</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/gnlht">gnlht</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/gnlht">gnlht</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/jags">jags</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/jags">jags</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/linear_models">linear_models</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/linear_models">linear_models</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/lm">lm</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/lm">lm</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/lmdiallel">lmdiallel</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/lmdiallel">lmdiallel</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/lme">lme</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/lme">lme</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/long_term_experiments">long_term_experiments</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/long_term_experiments">long_term_experiments</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/meta_analysis">meta_analysis</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/meta_analysis">meta_analysis</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/metafor">metafor</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/metafor">metafor</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/mixed_models">mixed_models</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/mixed_models">mixed_models</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/multi_environment_studies">multi_environment_studies</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/multi_environment_studies">multi_environment_studies</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/multivariate_stat">multivariate_stat</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/multivariate_stat">multivariate_stat</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/nlme">nlme</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/nlme">nlme</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/nls">nls</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/nls">nls</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/nonlinear_regression">nonlinear_regression</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/nonlinear_regression">nonlinear_regression</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/p-values">p-values</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/p-values">p-values</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/pca">pca</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/pca">pca</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/percentiles">percentiles</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/percentiles">percentiles</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/plot">plot</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/plot">plot</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/qq_plot">qq_plot</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/qq_plot">qq_plot</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/r">r</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/r">r</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/regression">regression</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/regression">regression</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/repeated_measures">repeated_measures</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/repeated_measures">repeated_measures</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/seed_germination">seed_germination</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/seed_germination">seed_germination</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/split_plot">split_plot</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/split_plot">split_plot</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/statforbiology">statforbiology</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/statforbiology">statforbiology</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/statistical_inference">statistical_inference</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/statistical_inference">statistical_inference</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/subsampling">subsampling</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/subsampling">subsampling</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/tidyverse">tidyverse</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/tidyverse">tidyverse</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/time_to_event_models">time_to_event_models</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/time_to_event_models">time_to_event_models</a></span>
         
-            <span class="tag"><a href="https://www.statforbiology.com/tags/variance">variance</a></span>
+            <span class="tag"><a href="http://localhost:4321/tags/variance">variance</a></span>
         
         </div>          
     </div>
@@ -337,19 +341,19 @@ rbPear</code></pre>
     <div class="card-content">
         <h1 class="title is-5">Recent posts</h1>
         
-            <h1><a href="https://www.statforbiology.com/2025/stat_general_correlationcovariance/">A trip from variance-covariance to correlation and back</a></h1>
+            <h1><a href="http://localhost:4321/2025/stat_general_correlationcovariance/">A trip from variance-covariance to correlation and back</a></h1>
             <time class="has-text-grey-light is-size-7">24 January 2025</time>
         
-            <h1><a href="https://www.statforbiology.com/2024/stat_general_errorpropagation/">How do we combine errors? The linear case</a></h1>
+            <h1><a href="http://localhost:4321/2024/stat_general_errorpropagation/">How do we combine errors? The linear case</a></h1>
             <time class="has-text-grey-light is-size-7">22 November 2024</time>
         
-            <h1><a href="https://www.statforbiology.com/2024/stat_general_thedeltamethod_edit/">How do we combine errors, in biology? The delta method</a></h1>
+            <h1><a href="http://localhost:4321/2024/stat_general_thedeltamethod_edit/">How do we combine errors, in biology? The delta method</a></h1>
             <time class="has-text-grey-light is-size-7">22 November 2024</time>
         
-            <h1><a href="https://www.statforbiology.com/2024/r_ggplot_dualscaledaxes/">Plotting weather data with ggplot()</a></h1>
+            <h1><a href="http://localhost:4321/2024/r_ggplot_dualscaledaxes/">Plotting weather data with ggplot()</a></h1>
             <time class="has-text-grey-light is-size-7">6 June 2024</time>
         
-            <h1><a href="https://www.statforbiology.com/2024/stat_lm_checkassumptions/">Here is why I don&#39;t care about the Levene&#39;s test</a></h1>
+            <h1><a href="http://localhost:4321/2024/stat_lm_checkassumptions/">Here is why I don&#39;t care about the Levene&#39;s test</a></h1>
             <time class="has-text-grey-light is-size-7">15 March 2024</time>
         
     </div>
@@ -359,23 +363,23 @@ rbPear</code></pre>
     <div class="card-content">
         <h1 class="title is-5">Archives</h1>
         
-            <a href="https://www.statforbiology.com/archives/2025">2025</a> (1)<br>
+            <a href="http://localhost:4321/archives/2025">2025</a> (1)<br>
         
-            <a href="https://www.statforbiology.com/archives/2024">2024</a> (5)<br>
+            <a href="http://localhost:4321/archives/2024">2024</a> (5)<br>
         
-            <a href="https://www.statforbiology.com/archives/2023">2023</a> (12)<br>
+            <a href="http://localhost:4321/archives/2023">2023</a> (12)<br>
         
-            <a href="https://www.statforbiology.com/archives/2022">2022</a> (8)<br>
+            <a href="http://localhost:4321/archives/2022">2022</a> (8)<br>
         
-            <a href="https://www.statforbiology.com/archives/2021">2021</a> (16)<br>
+            <a href="http://localhost:4321/archives/2021">2021</a> (16)<br>
         
-            <a href="https://www.statforbiology.com/archives/2020">2020</a> (13)<br>
+            <a href="http://localhost:4321/archives/2020">2020</a> (13)<br>
         
-            <a href="https://www.statforbiology.com/archives/2019">2019</a> (12)<br>
+            <a href="http://localhost:4321/archives/2019">2019</a> (12)<br>
         
-            <a href="https://www.statforbiology.com/archives/2018">2018</a> (2)<br>
+            <a href="http://localhost:4321/archives/2018">2018</a> (2)<br>
         
-            <a href="https://www.statforbiology.com/archives/2014">2014</a> (1)<br>
+            <a href="http://localhost:4321/archives/2014">2014</a> (1)<br>
         
     </div>
 </div>

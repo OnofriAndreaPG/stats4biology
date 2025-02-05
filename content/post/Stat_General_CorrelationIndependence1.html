@@ -13,17 +13,17 @@ archives:
 
 
 
-<div id="observations-are-grouped" class="section level1">
-<h1>Observations are grouped</h1>
 <p>When we have recorded two traits in different subjects, we can be interested in describing their joint variability, by using the Pearson’s correlation coefficient. That’s ok, altough we have to respect some basic assumptions (e.g. linearity) that have been detailed elsewhere (<a href="https://www.statforbiology.com/2019/stat_general_correlation_alookat/">see here</a>). Problems may arise when we need to test the hypothesis that the correlation coefficient is equal to 0. In this case, we need to make sure that all the couples of observations are taken on independent subjects.</p>
 <p>Unfortunately, this is most often false whenever measures are taken from designed field experiments. In this case, observations may be grouped by one or more treatment/blocking factors. This has been clearly described by Bland and Altman (1994); we would like to give an example that is more closely related to plant/crop science. Think about a genotype experiment, where we compare the behaviour of several genotypes in a randomised blocks design. Usually, we do not only measure yield. We also measure other traits, such as crop height. At the end of the experiment, we might be interested in reporting the correlation between yield and height. How should we proceed? It would seem an easy task, but it is not.</p>
+<div id="data-come-in-groups" class="section level1">
+<h1>Data come in groups</h1>
 <p>Let’s assume that we have a randomised blocks design, with 27 genotypes and 3 replicates. For each plot, we recorded two traits, i.e. yield and the weight of thousand kernels (TKW). In the end, we have 81 plots and just as many couples of measures in all. We will use the dataset ‘WheatQuality.csv’, that is available on ‘gitHub’.</p>
 <pre class="r"><code>library(Hmisc)
 library(knitr)
 library(plyr)
-dataset &lt;- read.csv(&quot;https://www.casaonofri.it/_datasets/WheatQuality.csv&quot;, header=T)
-head(dataset)</code></pre>
-<pre><code>##     Genotype Block Height  TKW Whectol Yield
+dataset &lt;- read.csv(&quot;https://www.casaonofri.it/_datasets/WheatQuality.csv&quot;)
+head(dataset)
+##     Genotype Block Height  TKW Whectol Yield
 ## 1 arcobaleno     1     90 44.5    83.2 64.40
 ## 2 arcobaleno     2     90 42.8    82.2 60.58
 ## 3 arcobaleno     3     88 42.7    83.1 59.42
@@ -35,16 +35,20 @@ head(dataset)</code></pre>
 <h1>How many correlations?</h1>
 <p>It may be tempting to consider the whole lot of measures and calculate the correlation coefficient between yield and TKW. This is the result:</p>
 <pre class="r"><code>ra &lt;- with(dataset, rcorr(Yield, TKW) )
-ra$r[1,2] #Correlation coefficient</code></pre>
-<pre><code>## [1] 0.540957</code></pre>
-<pre class="r"><code>ra$P[1,2] #P-level</code></pre>
-<pre><code>## [1] 1.850931e-07</code></pre>
+# 
+# Correlation coefficient
+ra$r[1,2] 
+## [1] 0.540957
+#
+# P-level
+ra$P[1,2] 
+## [1] 1.850931e-07</code></pre>
 <p>We observe a positive correlation, and <span class="math inline">\(r\)</span> seems to be significantly different from 0. Therefore, we would be encouraged to conclude that plots with a high value on yield tend to have a high value on TKW, as well. Unfortunately, such a conclusion is not supported by the data.</p>
 <p>Indeed, the test of significance is clearly invalid, as the 81 plots are not independent; they are grouped by block and genotype and we are totally neglecting these two effects. Are we sure that the same correlation holds for all genotypes/blocks? Let’s check this.</p>
 <pre class="r"><code>wCor &lt;- function(x) cor(x$Yield, x$TKW)
 wgCors &lt;- ddply(dataset, ~Genotype, wCor)
-wgCors</code></pre>
-<pre><code>##       Genotype         V1
+wgCors
+##       Genotype         V1
 ## 1   arcobaleno  0.9847228
 ## 2         baio  0.1611952
 ## 3      claudio -0.9993872
@@ -71,10 +75,10 @@ wgCors</code></pre>
 ## 24 terrabianca -0.4076416
 ## 25       verdi  0.5801404
 ## 26     vesuvio -0.7797493
-## 27    vitromax -0.8056514</code></pre>
-<pre class="r"><code>wbCors &lt;- ddply(dataset, ~Block, wCor)
-wbCors</code></pre>
-<pre><code>##   Block        V1
+## 27    vitromax -0.8056514
+wbCors &lt;- ddply(dataset, ~Block, wCor)
+wbCors
+##   Block        V1
 ## 1     1 0.5998137
 ## 2     2 0.5399990
 ## 3     3 0.5370398</code></pre>
@@ -84,30 +88,30 @@ wbCors</code></pre>
 <pre class="r"><code>mod1 &lt;- lm(Yield ~ factor(Block) + Genotype, data = dataset)
 mod2 &lt;- lm(TKW ~ factor(Block) + Genotype, data = dataset)
 wCor &lt;- rcorr(residuals(mod1), residuals(mod2))
-wCor$r</code></pre>
-<pre><code>##            x          y
+wCor$r
+##            x          y
 ## x 1.00000000 0.03133109
-## y 0.03133109 1.00000000</code></pre>
-<pre class="r"><code>wCor$P</code></pre>
-<pre><code>##           x         y
+## y 0.03133109 1.00000000
+wCor$P
+##           x         y
 ## x        NA 0.7812693
 ## y 0.7812693        NA</code></pre>
 <p>The average within-group correlation is very small and unsignificant. Let’s think about this correlation: residuals represent yield and TKW values for all plots, once the effects of blocks and genotypes have been removed. A high correlation of residuals would mean that, letting aside the effects of the block and genotype to which it belongs, a plot with a high value on yield also shows a high value on TKW. The existence of such correlation is clearly unsopported by our dataset.</p>
 <p>As the next step, we could consider the means for genotypes/blocks and see whether they are correlated. Blocks and genotypes are independent and, in principle, significance testing is permitted. However, this is not recommended with block means, as three data are too few to make tests.</p>
 <pre class="r"><code>means &lt;- ddply(dataset, ~Genotype, summarise, Mu1=mean(Yield), Mu2 = mean(TKW))
 rgPear &lt;- rcorr( as.matrix(means[,2:3]) )
-rgPear$r</code></pre>
-<pre><code>##           Mu1       Mu2
+rgPear$r
+##           Mu1       Mu2
 ## Mu1 1.0000000 0.5855966
-## Mu2 0.5855966 1.0000000</code></pre>
-<pre class="r"><code>rgPear$P</code></pre>
-<pre><code>##            Mu1        Mu2
+## Mu2 0.5855966 1.0000000
+rgPear$P
+##            Mu1        Mu2
 ## Mu1         NA 0.00133149
-## Mu2 0.00133149         NA</code></pre>
-<pre class="r"><code>means &lt;- ddply(dataset, ~Block, summarise, Mu1=mean(Yield), Mu2 = mean(TKW))
+## Mu2 0.00133149         NA
+means &lt;- ddply(dataset, ~Block, summarise, Mu1=mean(Yield), Mu2 = mean(TKW))
 rbPear &lt;- cor( as.matrix(means[,2:3]) )
-rbPear</code></pre>
-<pre><code>##             Mu1         Mu2
+rbPear
+##             Mu1         Mu2
 ## Mu1  1.00000000 -0.08812544
 ## Mu2 -0.08812544  1.00000000</code></pre>
 <p>We note that the correlation between genotype means is high and significant. On the contrary, the correlation between block means is near to 0.</p>
