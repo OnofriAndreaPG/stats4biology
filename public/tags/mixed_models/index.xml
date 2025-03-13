@@ -1,22 +1,259 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Mixed_models on Fixing the bridge between biologists and statisticians</title>
-    <link>http://localhost:4321/tags/mixed_models/</link>
+    <link>http://localhost:6346/tags/mixed_models/</link>
     <description>Recent content in Mixed_models on Fixing the bridge between biologists and statisticians</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>Copyright © 2023, @AndreaOnofri</copyright>
-    <lastBuildDate>Mon, 04 Dec 2023 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 10 Feb 2025 00:00:00 +0000</lastBuildDate>
     
-        <atom:link href="http://localhost:4321/tags/mixed_models/index.xml" rel="self" type="application/rss+xml" />
+        <atom:link href="http://localhost:6346/tags/mixed_models/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
+      <title>Dealing with correlation in designed field experiments: part II</title>
+      <link>http://localhost:6346/2025/stat_general_correlationindependence2/</link>
+      <pubDate>Mon, 10 Feb 2025 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:6346/2025/stat_general_correlationindependence2/</guid>
+      <description>
+
+
+&lt;p&gt;With field experiments, studying the correlation between the observed traits may not be an easy task. For example, we can consider a genotype experiment, laid out in randomised complete blocks, with 27 wheat genotypes and three replicates, where several traits were recorded, including yield (Yield) and weight of thousand kernels (TKW). We might be interested in studying the correlation between those two traits, but we would need to face two fundamental problems:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;the concept of correlation in such a setting is not unique, as we might either consider the correlation between the plot measurements, or the correlation between the residuals or the correlation between genotype means or the correlation between block means;&lt;/li&gt;
+&lt;li&gt;the experimental units are not independent, but they are grouped by genotype and block, which invalidate all inferences based on the independence assumption.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;I have dealt with these two problems (particularly the first one) &lt;a href=&#34;https://www.statforbiology.com/2019/stat_general_correlationindependence1/&#34;&gt;in a previous post&lt;/a&gt;, where I gave a solution based on traditional methods of data analyses.&lt;/p&gt;
+&lt;p&gt;In this post, I would like to present a more advanced solution, that was advocated by Hans-Peter Piepho in a relatively recent manuscript (Piepho, 2018). Such a solution is based on mixed models and it was implemented in SAS, by using PROC MIXED. I spent a few hours ‘transporting’ those models in R, which turned out to be a difficult task, although, in the end, I seem to have came to an acceptable solution, which I would like to share here.&lt;/p&gt;
+&lt;p&gt;First of all, we can load the ‘WheatQuality.csv’ dataset, that is available is available on an Internet repository; it consists of 81 records (plots) of 6 variables, i.e. the Genotype and Block factors, as well as the four responses height, TKW, weight per hectolitre and yield. The code below loads the necessary packages, the data and transforms the numeric variable ‘Block’ into a factor.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rm(list = ls())
+library(dplyr)
+library(sommer)
+library(nlme)
+#
+# Loading data
+dataset &amp;lt;- read.csv(&amp;quot;https://www.casaonofri.it/_datasets/WheatQuality.csv&amp;quot;) |&amp;gt;
+  mutate(Block = factor(Block))
+head(dataset)
+##     Genotype Block Height  TKW Whectol Yield
+## 1 arcobaleno     1     90 44.5    83.2 64.40
+## 2 arcobaleno     2     90 42.8    82.2 60.58
+## 3 arcobaleno     3     88 42.7    83.1 59.42
+## 4       baio     1     80 40.6    81.8 51.93
+## 5       baio     2     75 42.7    81.3 51.34
+## 6       baio     3     76 41.1    81.1 47.78&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Piepho (2018) showed that, for an experiment like this one, all the correlation coefficients can be estimated by coding a multi-response mixed model, as follows:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ Y_{ijk} = \mu_i + \beta_{ik} + \tau_{ij} + \epsilon_{ijk}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(Y_{ijk}\)&lt;/span&gt; is the response for the trait &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt;, the genotype &lt;span class=&#34;math inline&#34;&gt;\(j\)&lt;/span&gt; and the block &lt;span class=&#34;math inline&#34;&gt;\(k\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(\mu_i\)&lt;/span&gt; is the mean for the trait &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(\beta_{ik}\)&lt;/span&gt; is the effect of the block &lt;span class=&#34;math inline&#34;&gt;\(k\)&lt;/span&gt; and trait &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(\tau_{ij}\)&lt;/span&gt; is the effect of genotype &lt;span class=&#34;math inline&#34;&gt;\(j\)&lt;/span&gt; for the trait &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(\epsilon_{ijk}\)&lt;/span&gt; is the residual for the trait &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt;, the genotype &lt;span class=&#34;math inline&#34;&gt;\(j\)&lt;/span&gt; and the block &lt;span class=&#34;math inline&#34;&gt;\(k\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;In the above model, the residuals &lt;span class=&#34;math inline&#34;&gt;\(\epsilon_{ijk}\)&lt;/span&gt; need to be normally distributed and heteroscedastic, with trait-specific variances. Furthermore, residuals belonging to the same plot (the two observed values for the two traits) need to be correlated (correlation of errors).&lt;/p&gt;
+&lt;p&gt;Hans-Peter Piepho, in his paper, put forward the idea that the ‘genotype’ and ‘block’ effects for the two traits can be taken as random, which makes sense, because, for this application, we are mainly interested in variances and covariances. Both random effects (for the genotype and for the block terms) need to be heteroscedastic (trait-specific variance components) and there must be a correlation between the two traits.&lt;/p&gt;
+&lt;p&gt;It should be noted that, for other applications, the genotype and block effects (especially the former) might be better regarded as fixed, but we will not pursue such an idea in this post.&lt;/p&gt;
+&lt;div id=&#34;fitting-a-bivariate-model&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Fitting a bivariate model&lt;/h1&gt;
+&lt;p&gt;To the best of my knowledge, there is no way to fit such a complex model with the ‘nlme’ package and related ‘lme()’ function (I’ll gave a hint later on, for a simpler model). In a previous post at &lt;a href=&#34;https://www.statforbiology.com/2019/stat_general_correlationindependence2_asreml/&#34;&gt;this link&lt;/a&gt;, I have given a solution based on the ‘asreml’ package (Butler et al., 2018), but this is a paid option. In more recent times I have discovered the ‘sommer’ package (Covarrubias-Pazaran, 2016), which seems to be very useful and it is suitable to deal with the requirements of this post. The key function of ‘sommer’ is &lt;code&gt;mmer()&lt;/code&gt;, and, in order to fit the above model, we need to specify the following components.&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;The response variables. When we set a bivariate model with ‘sommer’, we can ‘cbind()’ Yield and TKW.&lt;/li&gt;
+&lt;li&gt;The fixed model, that does not contain any effects, but the intercept (by default, the means for the two effects are separately estimated, as in Piepho, 2018).&lt;/li&gt;
+&lt;li&gt;The random model, that is composed by the ‘genotype’ and ‘block’ effects. For both, I specified a general unstructured variance covariance matrix, so that we can estimate two different variance components (one per trait) and one covariance component. The resulting coding is ‘~ vsr(usr(Genotype)) + vsr(usr(Block))’.&lt;/li&gt;
+&lt;li&gt;The residual structure, where the two observations in the same plot are heteroscedastic and correlated. This structure is fitted by default and it does not require any specific coding.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The model call is:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod.bimix &amp;lt;- mmer(cbind(Yield, TKW) ~ 1,
+                   random = ~ vsr(usr(Genotype)) + vsr(usr(Block)),
+                   data = dataset,
+                  verbose = FALSE, dateWarning = FALSE)
+bimix.obj &amp;lt;- summary(mod.bimix)
+coefs &amp;lt;- bimix.obj$varcomp
+coefs
+##                           VarComp  VarCompSE     Zratio Constraint
+## u:Genotype.Yield-Yield 77.6342608 22.0978545  3.5132035   Positive
+## u:Genotype.Yield-TKW   38.8320973 15.0930429  2.5728475   Unconstr
+## u:Genotype.TKW-TKW     53.8613303 15.3539585  3.5079768   Positive
+## u:Block.Yield-Yield     3.7104682  3.9363372  0.9426195   Positive
+## u:Block.Yield-TKW      -0.2428322  1.9074202 -0.1273092   Unconstr
+## u:Block.TKW-TKW         1.6684549  1.8343512  0.9095613   Positive
+## units.Yield-Yield       6.0939217  1.1951482  5.0988836   Positive
+## units.Yield-TKW         0.1635821  0.7242898  0.2258518   Unconstr
+## units.TKW-TKW           4.4718011  0.8770118  5.0989065   Positive&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The box above shows the results about the variance-covariance parameters. In order to get the correlations, I used the function &lt;code&gt;vpredict()&lt;/code&gt; and specified the necessary combinations of variance-covariance parameters. It is necessary to remember that estimates, in ‘sommer’, are named as V1, V2, … Vn, according to their ordering in model output.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Correlation between genotype means
+vpredict(mod.bimix, rg ~ V2 / (sqrt(V1)*sqrt(V3) ))
+##     Estimate        SE
+## rg 0.6005174 0.1306699&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Correlation between block means
+vpredict(mod.bimix, rt ~ V5 / (sqrt(V4)*sqrt(V6) ))
+##       Estimate        SE
+## rt -0.09759658 0.7571256&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;vpredict(mod.bimix, rt ~ V8 / (sqrt(V7)*sqrt(V9) ))
+##      Estimate        SE
+## rt 0.03133619 0.1385421&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We see that the estimates are very close to those obtained by using the Pearson’s correlation coefficients (see my previous post). The advantage of this mixed model solution is that we can also test hypotheses in a relatively reliable way. For example, I tested the hypothesis that residuals are not correlated by:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;coding a reduced model where residuals are heteroscedastic and independent, and&lt;/li&gt;
+&lt;li&gt;comparing this reduced model with the complete model by way of a REML-based Likelihood Ratio Test (LRT).&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Removing the correlation of residuals is easily done, by using the code below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod.bimix2 &amp;lt;- mmer(cbind(Yield, TKW) ~ 1,
+                   random = ~ vsr(usr(Genotype)) + vsr(usr(Block)),
+                   rcov = ~ vsr(units, Gtc = diag(2)),
+                   data = dataset,
+                  verbose = FALSE, dateWarning = FALSE)
+# Likelihood ratio test
+LRT &amp;lt;- anova(mod.bimix, mod.bimix2)
+## Likelihood ratio test for mixed models
+## ==============================================================
+##      Df       AIC       BIC    loLik   Chisq ChiDf PrChisq
+## mod1 15 -62.41068 -56.23549 33.20534                      
+## mod2 14 -62.35960 -56.18441 33.17980 0.05108     1 0.8212 
+## ==============================================================
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Likewise, I tried to further reduce the model to test the significance of the correlation between block means and genotype means.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Removing correlation between block means
+mod.bimix3 &amp;lt;- mmer(cbind(Yield, TKW) ~ 1,
+                   random = ~ vsr(usr(Genotype)) + vsr(Block, Gtc = diag(2)),
+                   rcov = ~ vsr(units, Gtc = diag(2)),
+                   data = dataset,
+                  verbose = FALSE, dateWarning = FALSE)
+# Likelihood ratio test
+LRT &amp;lt;- anova(mod.bimix, mod.bimix3)
+## Likelihood ratio test for mixed models
+## ==============================================================
+##      Df       AIC       BIC    loLik   Chisq ChiDf  PrChisq
+## mod1 15 -62.41068 -56.23549 33.20534                       
+## mod2 13 -62.34401 -56.16882 33.17200 0.06667     2 0.96722 
+## ==============================================================
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Removing correlation between genotype means
+mod.bimix4 &amp;lt;- mmer(cbind(Yield, TKW) ~ 1,
+                   random = ~ vsr(Genotype, Gtc = diag(2)) + vsr(Block, Gtc = diag(2)),
+                   rcov = ~ vsr(units, Gtc = diag(2)),
+                   data = dataset,
+                  verbose = FALSE, dateWarning = FALSE)
+# Likelihood ratio test
+LRT &amp;lt;- anova(mod.bimix, mod.bimix4)
+## Likelihood ratio test for mixed models
+## ==============================================================
+##      Df       AIC       BIC    loLik    Chisq ChiDf  PrChisq
+## mod1 15 -62.41068 -56.23549 33.20534                        
+## mod2 12 -51.42519 -45.25000 27.71260 10.98549     3 0.0118 *
+## ==============================================================
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We see that only the genotype means are significantly correlated to one another.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;a-solution-with-lme&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;A solution with ‘lme()’&lt;/h1&gt;
+&lt;p&gt;Considering that the block means are not correlated, if we were willing to take the ‘block’ effect as fixed, we could fit a bivariate mixed model also with the ‘nlme’ package and the function &lt;code&gt;lme()&lt;/code&gt; (Pinheiro and Bates, 2000). However, we should cast the model as a univariate model.&lt;/p&gt;
+&lt;p&gt;To this aim, the two variables (Yield and TKW) need to be piled up and a new factor (‘Trait’) needs to be introduced to identify the observations for the two traits. Another factor is also necessary to identify the different plots, i.e. the observational units. To perform such a restructuring, I used the &lt;code&gt;melt()&lt;/code&gt; function in the ‘reshape2’ package (Wickham, 2007) and assigned the name ‘Y’ to the response variable, that is now composed by the two original variables Yield and TKW, one on top of the other.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dataset$Plot &amp;lt;- 1:81
+mdataset &amp;lt;- reshape2::melt(dataset[,c(-3,-5)], variable.name= &amp;quot;Trait&amp;quot;, value.name=&amp;quot;Y&amp;quot;, id=c(&amp;quot;Genotype&amp;quot;, &amp;quot;Block&amp;quot;, &amp;quot;Plot&amp;quot;))
+mdataset$Block &amp;lt;- factor(mdataset$Block)
+head(mdataset)
+##     Genotype Block Plot Trait    Y
+## 1 arcobaleno     1    1   TKW 44.5
+## 2 arcobaleno     2    2   TKW 42.8
+## 3 arcobaleno     3    3   TKW 42.7
+## 4       baio     1    4   TKW 40.6
+## 5       baio     2    5   TKW 42.7
+## 6       baio     3    6   TKW 41.1
+tail(mdataset)
+##     Genotype Block Plot Trait     Y
+## 157  vesuvio     1   76 Yield 54.37
+## 158  vesuvio     2   77 Yield 55.02
+## 159  vesuvio     3   78 Yield 53.41
+## 160 vitromax     1   79 Yield 54.39
+## 161 vitromax     2   80 Yield 50.97
+## 162 vitromax     3   81 Yield 48.83&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The fixed model is:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Y ~ Trait*Block&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In order to introduce a totally unstructured variance-covariance matrix for the random effect, I used the ‘pdMat’ construct:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;random = list(Genotype = pdSymm(~Trait - 1))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Relating to the residuals, heteroscedasticity can be included by using the ‘weight()’ argument and the ‘varIdent’ variance function, which allows a different standard deviation per trait:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;weight = varIdent(form = ~1|Trait)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I also allowed the residuals to be correlated within each plot, by using the ‘correlation’ argument and specifying a general ‘corSymm()’ correlation form. Plots are nested within genotypes, thus I used a nesting operator, as follows:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;correlation = corSymm(form = ~1|Genotype/Plot)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The final model call is:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod &amp;lt;- lme(Y ~ Trait*Block, 
+                 random = list(Genotype = pdSymm(~Trait - 1)),
+                 weight = varIdent(form=~1|Trait), 
+                 correlation = corCompSymm(form=~1|Genotype/Plot),
+                 data = mdataset)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Retrieving the variance-covariance matrices needs some effort, as the function ‘getVarCov()’ does not appear to work properly with this multi-stratum model. First of all, we can retrieve the variance-covariance matrix for the genotype random effect (G) and the corresponding correlation matrix.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#Variance structure for random effects
+obj &amp;lt;- mod
+G &amp;lt;- matrix( as.numeric(getVarCov(obj)), 2, 2 )
+G
+##          [,1]     [,2]
+## [1,] 53.86081 38.83246
+## [2,] 38.83246 77.63485
+cov2cor(G)
+##           [,1]      [,2]
+## [1,] 1.0000000 0.6005237
+## [2,] 0.6005237 1.0000000&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Second, we can retrieve the ‘conditional’ variance-covariance matrix (R), that describes the correlation of errors:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#Conditional variance-covariance matrix (residual error)
+V &amp;lt;- corMatrix(obj$modelStruct$corStruct)[[1]] #Correlation for residuals
+sds &amp;lt;- 1/varWeights(obj$modelStruct$varStruct)[1:2]
+sds &amp;lt;- obj$sigma * sds #Standard deviations for residuals (one per trait)
+R &amp;lt;- t(V * sds) * sds #Going from correlation to covariance
+R
+##           [,1]      [,2]
+## [1,] 4.4718234 0.1635375
+## [2,] 0.1635375 6.0939251
+cov2cor(R)
+##            [,1]       [,2]
+## [1,] 1.00000000 0.03132756
+## [2,] 0.03132756 1.00000000&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The total correlation matrix is simply obtained as the sum of G and R:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Tr &amp;lt;- G + R
+cov2cor(Tr)
+##           [,1]      [,2]
+## [1,] 1.0000000 0.5579906
+## [2,] 0.5579906 1.0000000&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We see that the same results can be obtained by using ‘sommer’ and regarding the block effect as fixed, although the coding is below is much neater!&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod.bimix5 &amp;lt;- mmer(cbind(Yield, TKW) ~ Block,
+                   random = ~ vsr(usr(Genotype)),
+                   data = dataset,
+                  verbose = FALSE, dateWarning = FALSE)
+mod.bimix5$sigma
+## $`u:Genotype`
+##          Yield      TKW
+## Yield 77.63425 38.83209
+## TKW   38.83209 53.86133
+## 
+## $units
+##           Yield       TKW
+## Yield 6.0939217 0.1635824
+## TKW   0.1635824 4.4718011&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Hope this was useful… should you have any better solutions, I’d be happy to learn them; please, drop me a line at the address below. Thanks for reading and happy coding!&lt;/p&gt;
+&lt;p&gt;Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+&lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;Butler, D., Cullis, B.R., Gilmour, A., Gogel, B., Thomson, R., 2018. ASReml-r reference manual - version 4. UK.&lt;/li&gt;
+&lt;li&gt;Covarrubias-Pazaran, G., 2016. Genome-Assisted Prediction of Quantitative Traits Using the R Package sommer. PLOS ONE 11, e0156744. &lt;a href=&#34;https://doi.org/10.1371/journal.pone.0156744&#34; class=&#34;uri&#34;&gt;https://doi.org/10.1371/journal.pone.0156744&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Piepho, H.-P., 2018. Allowing for the structure of a designed experiment when estimating and testing trait correlations. The Journal of Agricultural Science 156, 59–70.&lt;/li&gt;
+&lt;li&gt;Pinheiro, J.C., Bates, D.M., 2000. Mixed-effects models in s and s-plus. Springer-Verlag Inc., New York.&lt;/li&gt;
+&lt;li&gt;Wickham, H., 2007. Reshaping data with the reshape package. Journal of Statistical Software 21.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Repeated measures and subsampling with perennial crops</title>
-      <link>http://localhost:4321/2023/stat_lmm_perennialcropssubsampling/</link>
+      <link>http://localhost:6346/2023/stat_lmm_perennialcropssubsampling/</link>
       <pubDate>Mon, 04 Dec 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:4321/2023/stat_lmm_perennialcropssubsampling/</guid>
+      <guid>http://localhost:6346/2023/stat_lmm_perennialcropssubsampling/</guid>
       <description>
 
 
@@ -104,10 +341,10 @@ University of Perugia (Italy)&lt;br /&gt;
     
     <item>
       <title>Repeated measures with perennial crops</title>
-      <link>http://localhost:4321/2023/stat_lmm_perennialcrops/</link>
+      <link>http://localhost:6346/2023/stat_lmm_perennialcrops/</link>
       <pubDate>Thu, 30 Mar 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:4321/2023/stat_lmm_perennialcrops/</guid>
+      <guid>http://localhost:6346/2023/stat_lmm_perennialcrops/</guid>
       <description>
 
 
@@ -282,10 +519,10 @@ University of Perugia (Italy)&lt;br /&gt;
     
     <item>
       <title>Subsampling in field experiments</title>
-      <link>http://localhost:4321/2023/stat_lmm_subsampling_tkw/</link>
+      <link>http://localhost:6346/2023/stat_lmm_subsampling_tkw/</link>
       <pubDate>Wed, 29 Mar 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:4321/2023/stat_lmm_subsampling_tkw/</guid>
+      <guid>http://localhost:6346/2023/stat_lmm_subsampling_tkw/</guid>
       <description>
 
 
@@ -536,10 +773,10 @@ University of Perugia (Italy)&lt;br /&gt;
     
     <item>
       <title>Multi-environment split-plot experiments</title>
-      <link>http://localhost:4321/2022/stat_lmm_2-wayssplitrepeated/</link>
+      <link>http://localhost:6346/2022/stat_lmm_2-wayssplitrepeated/</link>
       <pubDate>Tue, 13 Sep 2022 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:4321/2022/stat_lmm_2-wayssplitrepeated/</guid>
+      <guid>http://localhost:6346/2022/stat_lmm_2-wayssplitrepeated/</guid>
       <description>
 
 
@@ -620,10 +857,10 @@ Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.o
     
     <item>
       <title>Meta-analysis for a single study. Is it possible?</title>
-      <link>http://localhost:4321/2022/stat_met_metanalyses/</link>
+      <link>http://localhost:6346/2022/stat_met_metanalyses/</link>
       <pubDate>Thu, 21 Jul 2022 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:4321/2022/stat_met_metanalyses/</guid>
+      <guid>http://localhost:6346/2022/stat_met_metanalyses/</guid>
       <description>
 
 
@@ -958,10 +1195,10 @@ Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.o
     
     <item>
       <title>Split-plot designs: the transition to mixed models for a dinosaur</title>
-      <link>http://localhost:4321/2021/stat_lmm_splitplottransition/</link>
+      <link>http://localhost:6346/2021/stat_lmm_splitplottransition/</link>
       <pubDate>Thu, 11 Feb 2021 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:4321/2021/stat_lmm_splitplottransition/</guid>
+      <guid>http://localhost:6346/2021/stat_lmm_splitplottransition/</guid>
       <description>
 
 
@@ -1193,10 +1430,10 @@ Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.o
     
     <item>
       <title>Accounting for the experimental design in linear/nonlinear regression analyses</title>
-      <link>http://localhost:4321/2020/stat_nlmm_designconstraints/</link>
+      <link>http://localhost:6346/2020/stat_nlmm_designconstraints/</link>
       <pubDate>Fri, 04 Dec 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:4321/2020/stat_nlmm_designconstraints/</guid>
+      <guid>http://localhost:6346/2020/stat_nlmm_designconstraints/</guid>
       <description>
 
 
@@ -1221,7 +1458,7 @@ head(dataset)
 ## 6     6       0 33.70
  r
 plot(yield ~ density, data = dataset)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:4321/post/Stat_nlmm_DesignConstraints_files/figure-html/unnamed-chunk-1-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://localhost:6346/post/Stat_nlmm_DesignConstraints_files/figure-html/unnamed-chunk-1-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;We might be tempted to neglect the block effect and run a linear regression analysis of yield against density. This is clearly wrong (I am violating the independence assumption) and inefficient, as any block-to-block variability goes into the residual error term, which is, therefore, inflated.&lt;/p&gt;
 &lt;p&gt;Some of my collegues would take the means for densities and use those to fit a linear regression model (two-steps analysis). By doing so, block-to-block variability is cancelled out and the analysis becomes more efficient. However, such a solution is not general, as it is not feasible, e.g., when we have unbalanced designs and heteroscedastic data. With the appropriate approach, sound analyses can also be made in two-steps (Damesa et al., 2017). From my point of view, it is reasonable to search for more general solutions to deal with one-step analyses.&lt;/p&gt;
 &lt;p&gt;Based on our experience with traditional ANOVA models, we might think of taking the block effect as fixed and fit it as and additive term. See the code below.&lt;/p&gt;
@@ -1363,7 +1600,7 @@ head(dataset)
 ## 6     6       0    -1.623
  r
 plot(yieldLoss ~ density, data = dataset)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:4321/post/Stat_nlmm_DesignConstraints_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://localhost:6346/post/Stat_nlmm_DesignConstraints_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;A swift plot shows that the relationship between density and yield loss is not linear. Literature references (Cousens, 1985) show that this could be modelled by using a rectangular hyperbola:&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[YL = \frac{i \, D}{1 + \frac{i \, D}{a}}\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(YL\)&lt;/span&gt; is the yield loss, &lt;span class=&#34;math inline&#34;&gt;\(D\)&lt;/span&gt; is weed density, &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt; is the slope at the origin of axes and &lt;span class=&#34;math inline&#34;&gt;\(a\)&lt;/span&gt; is the maximum asymptotic yield loss. This function, together with self-starters, is available in the ‘NLS.YL()’ function in the ‘aomisc’ package, which is the accompanying package for this blog. If you do not have this package, please refer to &lt;a href=&#34;https://www.statforbiology.com/rpackages/&#34;&gt;this link&lt;/a&gt; to download it.&lt;/p&gt;
@@ -1491,10 +1728,10 @@ I-06121 - PERUGIA&lt;/p&gt;
     
     <item>
       <title>Building ANOVA-models for long-term experiments in agriculture</title>
-      <link>http://localhost:4321/2020/stat_lte_modelbuilding/</link>
+      <link>http://localhost:6346/2020/stat_lte_modelbuilding/</link>
       <pubDate>Thu, 20 Aug 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:4321/2020/stat_lte_modelbuilding/</guid>
+      <guid>http://localhost:6346/2020/stat_lte_modelbuilding/</guid>
       <description>
 
 
@@ -1864,10 +2101,10 @@ University of Perugia (Italy)&lt;/p&gt;
     
     <item>
       <title>Fitting complex mixed models with nlme. Example #5</title>
-      <link>http://localhost:4321/2020/stat_met_jointreg/</link>
+      <link>http://localhost:6346/2020/stat_met_jointreg/</link>
       <pubDate>Fri, 05 Jun 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:4321/2020/stat_met_jointreg/</guid>
+      <guid>http://localhost:6346/2020/stat_met_jointreg/</guid>
       <description>
 
 
@@ -1878,7 +2115,7 @@ University of Perugia (Italy)&lt;/p&gt;
 &lt;p&gt;A graphical example may be useful; in the figure below we have two genotypes tested in 10 environments. The yield of the first genotype (red) increases as the environmental index increases, with slope &lt;span class=&#34;math inline&#34;&gt;\(\beta_1 = 0.81\)&lt;/span&gt;. On the other hand, the yield of the second genotype (blue) does not change much with the environment (&lt;span class=&#34;math inline&#34;&gt;\(\beta_2 = -0.08)\)&lt;/span&gt;. Clearly, a high value of &lt;span class=&#34;math inline&#34;&gt;\(\beta\)&lt;/span&gt; demonstrates that the genotype is responsive to the environment and makes profit of favorable conditions. Otherwise, a low &lt;span class=&#34;math inline&#34;&gt;\(\beta\)&lt;/span&gt; value (close to 0) demonstrates that the genotype is not responsive and tends to give more or less the same yield in all environments (static stability; Wood, 1976).&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;## `geom_smooth()` using formula = &amp;#39;y ~ x&amp;#39;
 ## `geom_smooth()` using formula = &amp;#39;y ~ x&amp;#39;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:4321/post/Stat_met_JointReg_files/figure-html/unnamed-chunk-1-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://localhost:6346/post/Stat_met_JointReg_files/figure-html/unnamed-chunk-1-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;By now, it should be clear that &lt;span class=&#34;math inline&#34;&gt;\(\beta\)&lt;/span&gt; is a relevant measure of stability. Now, the problem is: how do we determine such value from a multi-environment genotype experiment? As usual, let’s start from a meaningful example.&lt;/p&gt;
 &lt;div id=&#34;a-multi-environment-experiment&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;A multi-environment experiment&lt;/h1&gt;
@@ -2156,10 +2393,10 @@ I-06121 - PERUGIA&lt;/p&gt;
     
     <item>
       <title>Fitting &#39;complex&#39; mixed models with &#39;nlme&#39;: Example #2</title>
-      <link>http://localhost:4321/2019/stat_lmm_2-wayssplitrepeatedhet/</link>
+      <link>http://localhost:6346/2019/stat_lmm_2-wayssplitrepeatedhet/</link>
       <pubDate>Fri, 13 Sep 2019 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:4321/2019/stat_lmm_2-wayssplitrepeatedhet/</guid>
+      <guid>http://localhost:6346/2019/stat_lmm_2-wayssplitrepeatedhet/</guid>
       <description>
 
 
@@ -2317,10 +2554,10 @@ Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.o
     
     <item>
       <title>Testing for interactions in nonlinear regression</title>
-      <link>http://localhost:4321/2019/stat_nlmm_interaction/</link>
+      <link>http://localhost:6346/2019/stat_nlmm_interaction/</link>
       <pubDate>Fri, 13 Sep 2019 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:4321/2019/stat_nlmm_interaction/</guid>
+      <guid>http://localhost:6346/2019/stat_nlmm_interaction/</guid>
       <description>
 
 
@@ -2352,7 +2589,7 @@ head(dataset)
 &lt;li&gt;‘Yield’ represents the harvested biomass.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;It may be useful to take a look at the observed growth data, as displayed on the graph below.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:4321/post/Stat_nlmm_Interaction_files/figure-html/unnamed-chunk-2-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://localhost:6346/post/Stat_nlmm_Interaction_files/figure-html/unnamed-chunk-2-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;We see that the growth is sygmoidal (presumably logistic) and that the variance of observations increases over time, i.e. the variance is proportional to the expected response.&lt;/p&gt;
 &lt;p&gt;The question is: how do we analyse this data? Let’s build a model in a sequential fashion.&lt;/p&gt;
 &lt;div id=&#34;the-model&#34; class=&#34;section level1&#34;&gt;
@@ -2380,7 +2617,7 @@ e_{ijkl} = \mu_e + q_{ei} + N_{ej} + gN_{eij} + \theta_{ek} + \zeta_{el}
             curveid = GEN:N,
             pmodels = c( ~ 1,  ~ N*GEN,  ~ N*GEN), bcVal = 0.5)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;This model may be useful for other circumstances (no blocks and no repeated measures), but it is wrong in our example. Indeed, observations are clustered within blocks and plots; by neglecting this, we violate the assumption of independence of model residuals. A swift plot of residuals against fitted values shows that there are no problems with heteroscedasticity.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:4321/post/Stat_nlmm_Interaction_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;90%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://localhost:6346/post/Stat_nlmm_Interaction_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;90%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Considering the above, we have to use a different model, here, although I will show that this naive fit may turn out useful.&lt;/p&gt;
 &lt;div id=&#34;nonlinear-mixed-model-fitting&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;Nonlinear mixed model fitting&lt;/h2&gt;
@@ -2414,8 +2651,8 @@ summary(modnlme1)$tTable
 ## e.GENC         4.00746113 3.084383636 228  1.2992745 1.951620e-01
 ## e.NLow:GENB   -4.71367433 4.055953643 228 -1.1621618 2.463848e-01
 ## e.NLow:GENC    2.23951083 4.609547667 228  0.4858418 6.275459e-01&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:4321/post/Stat_nlmm_Interaction_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;90%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://localhost:4321/post/Stat_nlmm_Interaction_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;90%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://localhost:6346/post/Stat_nlmm_Interaction_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;90%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://localhost:6346/post/Stat_nlmm_Interaction_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;90%&#34; style=&#34;display: block; margin: auto;&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;From the plots above, we see that the overall fit is good. Fixed effects and variance components for random effects are obtained as follows:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(modnlme1)$tTable
 ##                     Value   Std.Error  DF    t-value      p-value
@@ -2498,10 +2735,10 @@ I-06121 - PERUGIA&lt;/p&gt;
     
     <item>
       <title>The &#39;Environmental Variance&#39; model for Multi-Environment Experiments</title>
-      <link>http://localhost:4321/2019/stat_lmm_environmentalvariance/</link>
+      <link>http://localhost:6346/2019/stat_lmm_environmentalvariance/</link>
       <pubDate>Tue, 20 Aug 2019 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:4321/2019/stat_lmm_environmentalvariance/</guid>
+      <guid>http://localhost:6346/2019/stat_lmm_environmentalvariance/</guid>
       <description>
 
 
@@ -2699,10 +2936,10 @@ University of Perugia (Italy)&lt;/p&gt;
     
     <item>
       <title>Genotype experiments: fitting a stability variance model with R</title>
-      <link>http://localhost:4321/2019/stat_lmm_stabilityvariance/</link>
+      <link>http://localhost:6346/2019/stat_lmm_stabilityvariance/</link>
       <pubDate>Thu, 06 Jun 2019 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:4321/2019/stat_lmm_stabilityvariance/</guid>
+      <guid>http://localhost:6346/2019/stat_lmm_stabilityvariance/</guid>
       <description>
 
 
@@ -2846,223 +3083,11 @@ sigma2i
     </item>
     
     <item>
-      <title>Dealing with correlation in designed field experiments: part II</title>
-      <link>http://localhost:4321/2019/stat_general_correlationindependence2/</link>
-      <pubDate>Fri, 10 May 2019 00:00:00 +0000</pubDate>
-      
-      <guid>http://localhost:4321/2019/stat_general_correlationindependence2/</guid>
-      <description>
-
-
-&lt;p&gt;With field experiments, studying the correlation between the observed traits may not be an easy task. Indeed, in these experiments, subjects are not independent, but they are grouped by treatment factors (e.g., genotypes or weed control methods) or by blocking factors (e.g., blocks, plots, main-plots). I have dealt with this problem &lt;a href=&#34;https://www.statforbiology.com/2019/stat_general_correlationindependence1/&#34;&gt;in a previous post&lt;/a&gt; and I gave a solution based on traditional methods of data analyses.&lt;/p&gt;
-&lt;p&gt;In a recent paper, Piepho (2018) proposed a more advanced solution based on mixed models. He presented four examplary datasets and gave SAS code to analyse them, based on PROC MIXED. I was very interested in those examples, but I do not use SAS. Therefore, I tried to ‘transport’ the models in R, which turned out to be a difficult task. After struggling for awhile with several mixed model packages, I came to an acceptable solution, which I would like to share.&lt;/p&gt;
-&lt;div id=&#34;a-routine-experiment&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;A ‘routine’ experiment&lt;/h1&gt;
-&lt;p&gt;I will use the same example as presented &lt;a href=&#34;https://www.statforbiology.com/2019/stat_general_correlationindependence1/&#34;&gt;in my previous post&lt;/a&gt;, which should allow us to compare the results with those obtained by using more traditional methods of data analyses. It is a genotype experiment, laid out in randomised complete blocks, with 27 wheat genotypes and three replicates. For each plot, the collegue who made the experiment recorded several traits, including yield (Yield) and weight of thousand kernels (TKW). The dataset ‘WheatQuality.csv’ is available on ‘gitHub’; it consists of 81 records (plots) and just as many couples of measures in all. The code below loads the necessary packages, the data and transforms the numeric variable ‘Block’ into a factor.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(reshape2)
-library(plyr)
-library(nlme)
-# library(asreml)
-dataset &amp;lt;- read.csv(&amp;quot;https://www.casaonofri.it/_datasets/WheatQuality.csv&amp;quot;, header=T)
-dataset$Block &amp;lt;- factor(dataset$Block)
-head(dataset)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##     Genotype Block Height  TKW Whectol Yield
-## 1 arcobaleno     1     90 44.5    83.2 64.40
-## 2 arcobaleno     2     90 42.8    82.2 60.58
-## 3 arcobaleno     3     88 42.7    83.1 59.42
-## 4       baio     1     80 40.6    81.8 51.93
-## 5       baio     2     75 42.7    81.3 51.34
-## 6       baio     3     76 41.1    81.1 47.78&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;a href=&#34;https://www.statforbiology.com/2019/stat_general_correlationindependence1/&#34;&gt;In my previous post&lt;/a&gt;, I used the above dataset to calculate the Pearson’s correlation coefficient between Yield and TKW for:&lt;/p&gt;
-&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
-&lt;li&gt;plot measurements,&lt;/li&gt;
-&lt;li&gt;residuals,&lt;/li&gt;
-&lt;li&gt;treatment/block means.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Piepho (2018) showed that, for an experiment like this one, the above correlations can be estimated by coding a multiresponse mixed model, as follows:&lt;/p&gt;
-&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ Y_{ijk} = \mu_i + \beta_{ik} + \tau_{ij} + \epsilon_{ijk}\]&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(Y_{ijk}\)&lt;/span&gt; is the response for the trait &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt;, the rootstock &lt;span class=&#34;math inline&#34;&gt;\(j\)&lt;/span&gt; and the block &lt;span class=&#34;math inline&#34;&gt;\(k\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(\mu_i\)&lt;/span&gt; is the mean for the trait &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(\beta_{ik}\)&lt;/span&gt; is the effect of the block &lt;span class=&#34;math inline&#34;&gt;\(k\)&lt;/span&gt; and trait &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(\tau_{ij}\)&lt;/span&gt; is the effect of genotype &lt;span class=&#34;math inline&#34;&gt;\(j\)&lt;/span&gt; for the trait &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(\epsilon_{ijk}\)&lt;/span&gt; is the residual for each of 81 observations for two traits.&lt;/p&gt;
-&lt;p&gt;In the above model, the residuals &lt;span class=&#34;math inline&#34;&gt;\(\epsilon_{ijk}\)&lt;/span&gt; need to be normally distributed and heteroscedastic, with trait-specific variances. Furthermore, residuals belonging to the same plot (the two observed traits) need to be correlated (correlation of errors).&lt;/p&gt;
-&lt;p&gt;Hans-Peter Piepho, in his paper, put forward the idea that the ‘genotype’ and ‘block’ effects for the two traits can be taken as random, even though they might be of fixed nature, especially the genotype effect. This idea makes sense, because, for this application, we are mainly interested in variances and covariances. Both random effects need to be heteroscedastic (trait-specific variance components) and there must be a correlation between the two traits.&lt;/p&gt;
-&lt;p&gt;To the best of my knowledge, there is no way to fit such a complex model with the ‘nlme’ package and related ‘lme()’ function (I’ll gave a hint later on, for a simpler model). Therefore, I decided to use the package ‘asreml’ (Butler et al., 2018), although this is not freeware. With the function ‘asreml()’, we need to specify the following components.&lt;/p&gt;
-&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
-&lt;li&gt;The response variables. When we set a bivariate model with ‘asreml’, we can ‘cbind()’ Yield and TKW and use the name ‘trait’ to refer to them.&lt;/li&gt;
-&lt;li&gt;The fixed model, that only contains the trait effect. The specification is, therefore, ‘cbind(Yield, TKW) ~ trait - 1’. Following Piepho (2018), I removed the intercept, to separately estimate the means for the two traits.&lt;/li&gt;
-&lt;li&gt;The random model, that is composed by the interactions ‘genotype x trait’ and ‘block x trait’. For both, I specified a general unstructured variance covariance matrix, so that the traits are heteroscedastic and correlated. Therefore, the random model is ~ Genotype:us(trait) + Block:us(trait).&lt;/li&gt;
-&lt;li&gt;The residual structure, where the observations in the same plot (the term ‘units’ is used in ‘asreml’ to represent the observational units, i.e. the plots) are heteroscedastic and correlated.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;The model call is (sorry, I have not renewed my license):&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# mod.asreml &amp;lt;- asreml(cbind(Yield, TKW) ~ trait - 1,
-#        random = ~ Genotype:us(trait, init = c(3.7, -0.25, 1.7)) + 
-#          Block:us(trait, init = c(77, 38, 53)),
-#        residual = ~ units:us(trait, init = c(6, 0.16, 4.5)), 
-#        data=dataset)
-# summary(mod.asreml)$varcomp[,1:3]&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;The box above shows the results about the variance-covariance parameters. In order to get the correlations, I specified the necessary combinations of variance-covariance parameters. It is necessary to remember that estimates, in ‘asreml’, are named as V1, V2, … Vn, according to their ordering in model output.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# parms &amp;lt;- mod.asreml$vparameters
-# vpredict(mod.asreml, rb ~ V2 / (sqrt(V1)*sqrt(V3) ) )
-# vpredict(mod.asreml, rt ~ V5 / (sqrt(V4)*sqrt(V6) ) )
-# vpredict(mod.asreml, re ~ V9 / (sqrt(V8)*sqrt(V10) ) )&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;We see that the estimates are very close to those obtained by using the Pearson’s correlation coefficients (see my previous post). The advantage of this mixed model solution is that we can also test hypotheses in a relatively reliable way. For example, I tested the hypothesis that residuals are not correlated by:&lt;/p&gt;
-&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
-&lt;li&gt;coding a reduced model where residuals are heteroscedastic and independent, and&lt;/li&gt;
-&lt;li&gt;comparing this reduced model with the complete model by way of a REML-based Likelihood Ratio Test (LRT).&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Removing the correlation of residuals is easily done, by changing the correlation structure from ‘us’ (unstructured variance-covariance matrix) to ‘idh’ (diagonal variance-covariance matrix).&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# mod.asreml2 &amp;lt;- asreml(cbind(Yield, TKW) ~ trait - 1,
-#         random = ~ Genotype:us(trait) + Block:us(trait),
-#         residual = ~ units:idh(trait), 
-#         data=dataset)
-# lrt.asreml(mod.asreml, mod.asreml2)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Likewise, I tried to further reduce the model to test the significance of the correlation between block means and genotype means.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# mod.asreml3 &amp;lt;- asreml(cbind(Yield, TKW) ~ trait - 1,
-#         random = ~ Genotype:us(trait) + Block:idh(trait),
-#         residual = ~ units:idh(trait), 
-#         data=dataset)
-# lrt.asreml(mod.asreml, mod.asreml3)
-
-# mod.asreml4 &amp;lt;- asreml(cbind(Yield, TKW) ~ trait - 1,
-#         random = ~ Genotype:idh(trait) + Block:idh(trait),
-#         residual = ~ units:idh(trait), 
-#         data=dataset)
-# lrt.asreml(mod.asreml, mod.asreml4)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;We see that only the genotype means are significantly correlated.&lt;/p&gt;
-&lt;p&gt;An alternative (and more useful) way to code the same model is by using the ‘corgh’ structure, instead of ‘us’. These two structures are totally similar, apart from the fact that the first one uses the correlations, instead of the covariances. Another difference, which we should consider when giving starting values, is that correlations come before variances.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# mod.asreml.r &amp;lt;- asreml(cbind(Yield, TKW) ~ trait - 1,
-#         random = ~ Genotype:corgh(trait, init=c(-0.1, 3.8, 1.8))
-#         + Block:corgh(trait, init = c(0.6, 77, 53)),
-#         residual = ~ units:corgh(trait, init = c(0.03, 6, 4.5)), 
-#         data=dataset)
-# summary(mod.asreml.r)$varcomp[,1:2]&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;The advantage of this parameterisation is that we can test our hypotheses by easily setting up contraints on correlations. One way to do this is to run the model with the argument ‘start.values = T’. In this way I could derive a data frame (‘mod.init$parameters’), with the starting values for REML maximisation.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Getting the starting values
-# mod.init &amp;lt;- asreml(cbind(Yield, TKW) ~ trait - 1,
-#         random = ~ Genotype:corgh(trait, init=c(-0.1, 3.8, 1.8))
-#         + Block:corgh(trait, init = c(0.6, 77, 53)),
-#         residual = ~ units:corgh(trait, init = c(0.03, 6, 4.5)), 
-#         data=dataset, start.values = T)
-# init &amp;lt;- mod.init$vparameters
-# init&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;We see that the ‘init’ data frame has three columns: (i) names of parameters, (ii) initial values and (iii) type of constraint (U: unconstrained, P = positive, F = fixed). Now, if we take the seventh row (correlation of residuals), set the initial value to 0 and set the third column to ‘F’ (meaning: keep the initial value fixed), we are ready to fit a model without correlation of residuals (same as the ‘model.asreml2’ above). What I had to do was just to pass this data frame as the starting value matrix for a new model fit (see the argument ‘R.param’, below).&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# init2 &amp;lt;- init
-# init2[8, 2] &amp;lt;- 0
-# init2[8, 3] &amp;lt;- &amp;quot;F&amp;quot;
-
-# mod.asreml.r2 &amp;lt;- asreml(cbind(Yield, TKW) ~ trait - 1,
-#         random = ~ Genotype:corgh(trait)
-#         + Block:corgh(trait),
-#         residual = ~ units:corgh(trait), 
-#         data=dataset, R.param = init2)
-# summary(mod.asreml.r2)$varcomp[,1:2]
-# lrt.asreml(mod.asreml.r2, mod.asreml.r)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;What is even more interesting is that ‘asreml’ permits to force the parameters to be linear combinations of one another. For instance, we can code a model where the residual correlation is contrained to be equal to the treatment correlation. To do so, we have to set up a two-column matrix (M), with row names matching the component names in the ‘asreml’ parameter vector. The matrix M should contain:&lt;/p&gt;
-&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
-&lt;li&gt;in the first column, the equality relationships (same number, same value)&lt;/li&gt;
-&lt;li&gt;in the second column, the coefficients for the multiplicative relationships&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;In this case, we would set the matrix M as follows:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# firstCol &amp;lt;- c(1, 2, 3, 4, 5, 6, 7, 1, 8, 9)
-# secCol &amp;lt;- c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
-# M &amp;lt;- cbind(firstCol, secCol)
-# dimnames(M)[[1]] &amp;lt;- mod.init$vparameters$Component
-# M&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Please note that in ‘firstCol’, the 1st and 8th element are both equal to 1, which contraints them to assume the same value. We can now pass the matrix M as the value of the ‘vcc’ argument in the model call.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# mod.asreml.r3 &amp;lt;- asreml(cbind(Yield, TKW) ~ trait - 1,
-#         random = ~ Genotype:corgh(trait)
-#         + Block:corgh(trait),
-#         residual = ~ units:corgh(trait), 
-#         data=dataset, R.param = init, vcc = M)
-# summary(mod.asreml.r3)$varcomp[,1:3]
-# lrt.asreml(mod.asreml.r3, mod.asreml.r)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;From the output, we see that the residual and treatment correlations are equal in this latter model. We also see that this reduced model fits significantly worse than the complete model ‘mod.asreml.r’.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div id=&#34;going-freeware&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;Going freeware&lt;/h1&gt;
-&lt;p&gt;Considering that the block means are not correlated, if we were willing to take the ‘block’ effect as fixed, we could fit the resulting model also with the ‘nlme’ package and the function ‘lme()’ (Pinheiro and Bates, 2000). However, we should cast the model as a univariate model.&lt;/p&gt;
-&lt;p&gt;To this aim, the two variables (Yield and TKW) need to be piled up and a new factor (‘Trait’) needs to be introduced to identify the observations for the two traits. Another factor is also necessary to identify the different plots, i.e. the observational units. To perform such a restructuring, I used the ‘melt()’ function in the ‘reshape2’ package Wickham, 2007) and assigned the name ‘Y’ to the response variable, that is now composed by the two original variables Yield and TKW, one on top of the other.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dataset$Plot &amp;lt;- 1:81
-mdataset &amp;lt;- melt(dataset[,c(-3,-6)], variable.name= &amp;quot;Trait&amp;quot;, value.name=&amp;quot;Y&amp;quot;, id=c(&amp;quot;Genotype&amp;quot;, &amp;quot;Block&amp;quot;, &amp;quot;Plot&amp;quot;))
-mdataset$Block &amp;lt;- factor(mdataset$Block)
-head(mdataset)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##     Genotype Block Plot Trait    Y
-## 1 arcobaleno     1    1   TKW 44.5
-## 2 arcobaleno     2    2   TKW 42.8
-## 3 arcobaleno     3    3   TKW 42.7
-## 4       baio     1    4   TKW 40.6
-## 5       baio     2    5   TKW 42.7
-## 6       baio     3    6   TKW 41.1&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;tail(mdataset)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##     Genotype Block Plot   Trait    Y
-## 157  vesuvio     1   76 Whectol 80.4
-## 158  vesuvio     2   77 Whectol 80.9
-## 159  vesuvio     3   78 Whectol 82.1
-## 160 vitromax     1   79 Whectol 81.2
-## 161 vitromax     2   80 Whectol 81.2
-## 162 vitromax     3   81 Whectol 81.3&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;The fixed model is:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;Y ~ Trait*Block&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;In order to introduce a totally unstructured variance-covariance matrix for the random effect, I used the ‘pdMat’ construct:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;random = list(Genotype = pdSymm(~Trait - 1))&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Relating to the residuals, heteroscedasticity can be included by using the ‘weight()’ argument and the ‘varIdent’ variance function, which allows a different standard deviation per trait:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;weight = varIdent(form = ~1|Trait)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;I also allowed the residuals to be correlated within each plot, by using the ‘correlation’ argument and specifying a general ‘corSymm()’ correlation form. Plots are nested within genotypes, thus I used a nesting operator, as follows:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;correlation = corSymm(form = ~1|Genotype/Plot)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;The final model call is:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod &amp;lt;- lme(Y ~ Trait*Block, 
-                 random = list(Genotype = pdSymm(~Trait - 1)),
-                 weight = varIdent(form=~1|Trait), 
-                 correlation = corCompSymm(form=~1|Genotype/Plot),
-                 data = mdataset)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Retreiving the variance-covariance matrices needs some effort, as the function ‘getVarCov()’ does not appear to work properly with this multistratum model. First of all, we can retreive the variance-covariance matrix for the genotype random effect (G) and the corresponding correlation matrix.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#Variance structure for random effects
-obj &amp;lt;- mod
-G &amp;lt;- matrix( as.numeric(getVarCov(obj)), 2, 2 )
-G&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##          [,1]      [,2]
-## [1,] 53.86158 18.043241
-## [2,] 18.04324  9.479339&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cov2cor(G)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##           [,1]      [,2]
-## [1,] 1.0000000 0.7985203
-## [2,] 0.7985203 1.0000000&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Second, we can retreive the ‘conditional’ variance-covariance matrix (R), that describes the correlation of errors:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#Conditional variance-covariance matrix (residual error)
-V &amp;lt;- corMatrix(obj$modelStruct$corStruct)[[1]] #Correlation for residuals
-sds &amp;lt;- 1/varWeights(obj$modelStruct$varStruct)[1:2]
-sds &amp;lt;- obj$sigma * sds #Standard deviations for residuals (one per trait)
-R &amp;lt;- t(V * sds) * sds #Going from correlation to covariance
-R&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##           [,1]      [,2]
-## [1,] 4.4717929 0.6413052
-## [2,] 0.6413052 1.1079777&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cov2cor(R)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##           [,1]      [,2]
-## [1,] 1.0000000 0.2881101
-## [2,] 0.2881101 1.0000000&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;The total correlation matrix is simply obtained as the sum of G and R:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Tr &amp;lt;- G + R
-cov2cor(Tr)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;##           [,1]      [,2]
-## [1,] 1.0000000 0.7518498
-## [2,] 0.7518498 1.0000000&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;We see that the results are the same as those obtained by using ‘asreml’. Hope these snippets are useful!&lt;/p&gt;
-&lt;p&gt;#References&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Butler, D., Cullis, B.R., Gilmour, A., Gogel, B., Thomson, R., 2018. ASReml-r reference manual - version 4. UK.&lt;/li&gt;
-&lt;li&gt;Piepho, H.-P., 2018. Allowing for the structure of a designed experiment when estimating and testing trait correlations. The Journal of Agricultural Science 156, 59–70.&lt;/li&gt;
-&lt;li&gt;Pinheiro, J.C., Bates, D.M., 2000. Mixed-effects models in s and s-plus. Springer-Verlag Inc., New York.&lt;/li&gt;
-&lt;li&gt;Wickham, H., 2007. Reshaping data with the reshape package. Journal of Statistical Software 21.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-</description>
-    </item>
-    
-    <item>
       <title>Dealing with correlation in designed field experiments: part II (asreml)</title>
-      <link>http://localhost:4321/2019/stat_general_correlationindependence2_asreml/</link>
+      <link>http://localhost:6346/2019/stat_general_correlationindependence2_asreml/</link>
       <pubDate>Fri, 10 May 2019 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:4321/2019/stat_general_correlationindependence2_asreml/</guid>
+      <guid>http://localhost:6346/2019/stat_general_correlationindependence2_asreml/</guid>
       <description>
 
 
