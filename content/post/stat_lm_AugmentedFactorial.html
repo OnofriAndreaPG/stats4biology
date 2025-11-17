@@ -23,15 +23,14 @@ library(emmeans)
 library(multcomp)
 fileName &lt;- &quot;https://www.casaonofri.it/_datasets/adjuvants.csv&quot;
 dataset &lt;- read.csv(fileName)
-head(dataset)
-##   Plot   Herbicide   Adjuvant Dose Block WeedCoverage Yield
+head(dataset)</code></pre>
+<pre><code>##   Plot   Herbicide   Adjuvant Dose Block WeedCoverage Yield
 ## 1    1  HandWeeded       None    0     1         0.00 14.55
 ## 2    2     Dicamba    Frigate    1     1        27.70 11.10
 ## 3    3     Dicamba Surfactant    1     1        22.60 13.16
 ## 4    4     Dicamba MineralOil    1     1        16.35 14.22
 ## 5    5     Dicamba       None    1     1        45.00 14.69
 ## 6    6 Rimsulfuron MineralOil   60     1        16.65 12.01
- r
 dataset$DoseF &lt;- with(dataset, factor(ifelse(Dose==60 | Dose == 1, &quot;HIGH&quot;,
                                ifelse(Dose == 0, &quot;NONE&quot;, 
                                       &quot;LOW&quot;))))
@@ -39,8 +38,8 @@ dataset[,c(1:3,5)] &lt;- lapply(dataset[,c(1:3,5)], function(i) factor(i))</code
 <p>To my experience, such an augmented factorial design may give a few troubles at the data analysis stage. In particular, I have noted that many colleagues, in order to avoid problems, combine the three predictors into one and fit a simple one-way ANOVA model, as shown below, e.g., for the yield response</p>
 <pre class="r"><code>Comb &lt;- with(dataset, factor(Herbicide:Adjuvant:DoseF))
 model1 &lt;- lm(Yield ~ Comb, data = dataset)
-anova(model1)
-## Analysis of Variance Table
+anova(model1)</code></pre>
+<pre><code>## Analysis of Variance Table
 ## 
 ## Response: Yield
 ##           Df Sum Sq Mean Sq F value    Pr(&gt;F)    
@@ -54,8 +53,8 @@ anova(model1)
                       ifelse(Herbicide == &quot;Unweeded&quot;, &quot;chk2&quot;,&quot;trt&quot;))))</code></pre>
 <p>Now, we code the model, by nesting the factorial structure within the newly created variable.</p>
 <pre class="r"><code>model2 &lt;- lm(Yield ~ CvT/(Herbicide*DoseF*Adjuvant), data = dataset)
-anova(model2)
-## Analysis of Variance Table
+anova(model2)</code></pre>
+<pre><code>## Analysis of Variance Table
 ## 
 ## Response: Yield
 ##                              Df Sum Sq Mean Sq F value    Pr(&gt;F)    
@@ -71,8 +70,8 @@ anova(model2)
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>The ‘CvT’ effects represents the contrast between the two controls and the treated plots and it has three levels (untreated, hand-weeded and treated). We see that this effect is significant, as well as the ‘Herbicide:Adjuvant’ interaction within treated plots. On the other hand, the ‘Dose’ effect within treated plots, is not significant. We can use the <code>emmeans()</code> function to extract the relevant marginal means and compare them.</p>
-<pre class="r"><code>cld(emmeans(model2, ~CvT), Letters = LETTERS)
-##  CvT  emmean    SE df lower.CL upper.CL .group
+<pre class="r"><code>cld(emmeans(model2, ~CvT), Letters = LETTERS)</code></pre>
+<pre><code>##  CvT  emmean    SE df lower.CL upper.CL .group
 ##  chk2   11.6 0.332 62     11.0     12.3  A    
 ##  trt    13.9 0.117 62     13.6     14.1   B   
 ##  chk1   14.8 0.332 62     14.1     15.5    C  
@@ -84,9 +83,8 @@ anova(model2)
 ## NOTE: If two or more means share the same grouping symbol,
 ##       then we cannot show them to be different.
 ##       But we also did not show them to be the same.
- r
-cld(emmeans(model2, ~CvT:Herbicide:Adjuvant), Letters = LETTERS)
-##  Herbicide   Adjuvant   CvT  emmean    SE df lower.CL upper.CL .group
+cld(emmeans(model2, ~CvT:Herbicide:Adjuvant), Letters = LETTERS)</code></pre>
+<pre><code>##  Herbicide   Adjuvant   CvT  emmean    SE df lower.CL upper.CL .group
 ##  Unweeded    None       chk2   11.6 0.332 62     11.0     12.3  A    
 ##  Rimsulfuron None       trt    13.0 0.332 62     12.3     13.6  AB   
 ##  Dicamba     Frigate    trt    13.3 0.332 62     12.6     13.9   BC  
@@ -105,7 +103,7 @@ cld(emmeans(model2, ~CvT:Herbicide:Adjuvant), Letters = LETTERS)
 ## NOTE: If two or more means share the same grouping symbol,
 ##       then we cannot show them to be different.
 ##       But we also did not show them to be the same.</code></pre>
-<p>I suggest that this type of analysis is simple enough and makes better use of the information contained in our dataset.</p>
+<p>I suggest that this type of analysis is simple enough and makes better use of the information contained in our dataset. The full R code for this analysis can be found at <a href="/R_Codes/stat_lm_AugmentedFactorial.R">this link</a>.</p>
 <p>Thanks for reading and happy coding!</p>
 <p>Andrea Onofri<br />
 Department of Agricultural, Food and Environmental Sciences<br />
