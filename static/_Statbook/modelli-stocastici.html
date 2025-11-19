@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Capitolo 5 Modelli stocastici | Metodologia sperimentale per le scienze agrarie</title>
+  <meta name="description" content="Capitolo 5 Modelli stocastici | Metodologia sperimentale per le scienze agrarie con applicazioni in R" />
+  <meta name="generator" content="bookdown 0.37 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Capitolo 5 Modelli stocastici | Metodologia sperimentale per le scienze agrarie" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="Capitolo 5 Modelli stocastici | Metodologia sperimentale per le scienze agrarie con applicazioni in R" />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Capitolo 5 Modelli stocastici | Metodologia sperimentale per le scienze agrarie" />
+  
+  <meta name="twitter:description" content="Capitolo 5 Modelli stocastici | Metodologia sperimentale per le scienze agrarie con applicazioni in R" />
+  
+
+<meta name="author" content="Andrea Onofri e Dario Sacco" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="le-relazioni-causa-effetto.html"/>
+<link rel="next" href="stime-ed-incertezza.html"/>
+<script src="book_assets/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="book_assets/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="book_assets/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="book_assets/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="book_assets/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="book_assets/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="book_assets/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="book_assets/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="book_assets/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="book_assets/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="book_assets/anchor-sections-1.1.0/anchor-sections.js"></script>
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-131792052-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  
+    gtag('config', 'UA-131792052-1');
+  </script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><strong><a href="./">Metodologia sperimentale</a></strong></li> 
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Premessa</a>
+<ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#obiettivi"><i class="fa fa-check"></i>Obiettivi</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#organizzazione"><i class="fa fa-check"></i>Organizzazione</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#software-statistico"><i class="fa fa-check"></i>Software statistico</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#gli-autori"><i class="fa fa-check"></i>Gli autori</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#ringraziamenti-e-scuse"><i class="fa fa-check"></i>Ringraziamenti e scuse</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#acronimi"><i class="fa fa-check"></i>Acronimi</a></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="scienza-e-pseudo-scienza.html"><a href="scienza-e-pseudo-scienza.html"><i class="fa fa-check"></i><b>1</b> Scienza e pseudo-scienza</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="scienza-e-pseudo-scienza.html"><a href="scienza-e-pseudo-scienza.html#scienza-dati"><i class="fa fa-check"></i><b>1.1</b> Scienza = dati</a></li>
+<li class="chapter" data-level="1.2" data-path="scienza-e-pseudo-scienza.html"><a href="scienza-e-pseudo-scienza.html#dati-buoni-e-cattivi"><i class="fa fa-check"></i><b>1.2</b> Dati ‘buoni’ e ‘cattivi’</a></li>
+<li class="chapter" data-level="1.3" data-path="scienza-e-pseudo-scienza.html"><a href="scienza-e-pseudo-scienza.html#dati-buoni-e-metodi-buoni"><i class="fa fa-check"></i><b>1.3</b> Dati ‘buoni’ e metodi ‘buoni’</a></li>
+<li class="chapter" data-level="1.4" data-path="scienza-e-pseudo-scienza.html"><a href="scienza-e-pseudo-scienza.html#il-principio-di-falsificazione"><i class="fa fa-check"></i><b>1.4</b> Il principio di falsificazione</a></li>
+<li class="chapter" data-level="1.5" data-path="scienza-e-pseudo-scienza.html"><a href="scienza-e-pseudo-scienza.html#falsificare-un-risultato"><i class="fa fa-check"></i><b>1.5</b> Falsificare un risultato</a></li>
+<li class="chapter" data-level="1.6" data-path="scienza-e-pseudo-scienza.html"><a href="scienza-e-pseudo-scienza.html#elementi-fondamentali-del-disegno-sperimentale"><i class="fa fa-check"></i><b>1.6</b> Elementi fondamentali del disegno sperimentale</a>
+<ul>
+<li class="chapter" data-level="1.6.1" data-path="scienza-e-pseudo-scienza.html"><a href="scienza-e-pseudo-scienza.html#controllo-degli-errori"><i class="fa fa-check"></i><b>1.6.1</b> Controllo degli errori</a></li>
+<li class="chapter" data-level="1.6.2" data-path="scienza-e-pseudo-scienza.html"><a href="scienza-e-pseudo-scienza.html#replicazione"><i class="fa fa-check"></i><b>1.6.2</b> Replicazione</a></li>
+<li class="chapter" data-level="1.6.3" data-path="scienza-e-pseudo-scienza.html"><a href="scienza-e-pseudo-scienza.html#randomizzazione"><i class="fa fa-check"></i><b>1.6.3</b> Randomizzazione</a></li>
+<li class="chapter" data-level="1.6.4" data-path="scienza-e-pseudo-scienza.html"><a href="scienza-e-pseudo-scienza.html#esperimenti-invalidi"><i class="fa fa-check"></i><b>1.6.4</b> Esperimenti invalidi</a></li>
+</ul></li>
+<li class="chapter" data-level="1.7" data-path="scienza-e-pseudo-scienza.html"><a href="scienza-e-pseudo-scienza.html#chi-valuta-se-un-esperimento-è-attendibile"><i class="fa fa-check"></i><b>1.7</b> Chi valuta se un esperimento è attendibile?</a></li>
+<li class="chapter" data-level="1.8" data-path="scienza-e-pseudo-scienza.html"><a href="scienza-e-pseudo-scienza.html#conclusioni"><i class="fa fa-check"></i><b>1.8</b> Conclusioni</a></li>
+<li class="chapter" data-level="1.9" data-path="scienza-e-pseudo-scienza.html"><a href="scienza-e-pseudo-scienza.html#esercizi-e-domande"><i class="fa fa-check"></i><b>1.9</b> Esercizi e domande</a></li>
+<li class="chapter" data-level="1.10" data-path="scienza-e-pseudo-scienza.html"><a href="scienza-e-pseudo-scienza.html#altre-letture"><i class="fa fa-check"></i><b>1.10</b> Altre letture</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html"><i class="fa fa-check"></i><b>2</b> Progettare un esperimento</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#gli-elementi-della-ricerca"><i class="fa fa-check"></i><b>2.1</b> Gli elementi della ricerca</a></li>
+<li class="chapter" data-level="2.2" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#ipotesi-scientifica-rightarrow-obiettivo-dellesperimento"><i class="fa fa-check"></i><b>2.2</b> Ipotesi scientifica <span class="math inline">\(\rightarrow\)</span> obiettivo dell’esperimento</a></li>
+<li class="chapter" data-level="2.3" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#identificazione-dei-fattori-sperimentali"><i class="fa fa-check"></i><b>2.3</b> Identificazione dei fattori sperimentali</a>
+<ul>
+<li class="chapter" data-level="2.3.1" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#esperimenti-multi-fattoriali"><i class="fa fa-check"></i><b>2.3.1</b> Esperimenti (multi-)fattoriali</a></li>
+<li class="chapter" data-level="2.3.2" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#controllo-o-testimone"><i class="fa fa-check"></i><b>2.3.2</b> Controllo o testimone</a></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#le-unità-sperimentali"><i class="fa fa-check"></i><b>2.4</b> Le unità sperimentali</a></li>
+<li class="chapter" data-level="2.5" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#allocazione-dei-trattamenti"><i class="fa fa-check"></i><b>2.5</b> Allocazione dei trattamenti</a></li>
+<li class="chapter" data-level="2.6" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#le-variabili-sperimentali"><i class="fa fa-check"></i><b>2.6</b> Le variabili sperimentali</a>
+<ul>
+<li class="chapter" data-level="2.6.1" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#variabili-nominali-categoriche"><i class="fa fa-check"></i><b>2.6.1</b> Variabili nominali (categoriche)</a></li>
+<li class="chapter" data-level="2.6.2" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#variabili-ordinali"><i class="fa fa-check"></i><b>2.6.2</b> Variabili ordinali</a></li>
+<li class="chapter" data-level="2.6.3" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#variabili-quantitative-discrete"><i class="fa fa-check"></i><b>2.6.3</b> Variabili quantitative discrete</a></li>
+<li class="chapter" data-level="2.6.4" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#variabili-quantitative-continue"><i class="fa fa-check"></i><b>2.6.4</b> Variabili quantitative continue</a></li>
+<li class="chapter" data-level="2.6.5" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#rilievi-visivi-e-sensoriali"><i class="fa fa-check"></i><b>2.6.5</b> Rilievi visivi e sensoriali</a></li>
+<li class="chapter" data-level="2.6.6" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#variabili-di-confondimento"><i class="fa fa-check"></i><b>2.6.6</b> Variabili di confondimento</a></li>
+</ul></li>
+<li class="chapter" data-level="2.7" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#esperimenti-di-campo"><i class="fa fa-check"></i><b>2.7</b> Esperimenti di campo</a>
+<ul>
+<li class="chapter" data-level="2.7.1" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#scegliere-il-campo"><i class="fa fa-check"></i><b>2.7.1</b> Scegliere il campo</a></li>
+<li class="chapter" data-level="2.7.2" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#le-unità-sperimentali-in-campo"><i class="fa fa-check"></i><b>2.7.2</b> Le unità sperimentali in campo</a></li>
+<li class="chapter" data-level="2.7.3" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#numero-di-repliche"><i class="fa fa-check"></i><b>2.7.3</b> Numero di repliche</a></li>
+<li class="chapter" data-level="2.7.4" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#la-mappa-di-campo"><i class="fa fa-check"></i><b>2.7.4</b> La mappa di campo</a></li>
+<li class="chapter" data-level="2.7.5" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#lay-out-sperimentale"><i class="fa fa-check"></i><b>2.7.5</b> Lay-out sperimentale</a></li>
+</ul></li>
+<li class="chapter" data-level="2.8" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#altre-letture-1"><i class="fa fa-check"></i><b>2.8</b> Altre letture</a></li>
+<li class="chapter" data-level="2.9" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#domande-ed-esercizi"><i class="fa fa-check"></i><b>2.9</b> Domande ed esercizi</a>
+<ul>
+<li class="chapter" data-level="2.9.1" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#domanda-1"><i class="fa fa-check"></i><b>2.9.1</b> Domanda 1</a></li>
+<li class="chapter" data-level="2.9.2" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#domanda-2"><i class="fa fa-check"></i><b>2.9.2</b> Domanda 2</a></li>
+<li class="chapter" data-level="2.9.3" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#domanda-3"><i class="fa fa-check"></i><b>2.9.3</b> Domanda 3</a></li>
+<li class="chapter" data-level="2.9.4" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#domanda-4"><i class="fa fa-check"></i><b>2.9.4</b> Domanda 4</a></li>
+<li class="chapter" data-level="2.9.5" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#domanda-5"><i class="fa fa-check"></i><b>2.9.5</b> Domanda 5</a></li>
+<li class="chapter" data-level="2.9.6" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#domanda-6"><i class="fa fa-check"></i><b>2.9.6</b> Domanda 6</a></li>
+<li class="chapter" data-level="2.9.7" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#domanda-7"><i class="fa fa-check"></i><b>2.9.7</b> Domanda 7</a></li>
+<li class="chapter" data-level="2.9.8" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#domanda-8"><i class="fa fa-check"></i><b>2.9.8</b> Domanda 8</a></li>
+<li class="chapter" data-level="2.9.9" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#domanda-9"><i class="fa fa-check"></i><b>2.9.9</b> Domanda 9</a></li>
+<li class="chapter" data-level="2.9.10" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#domanda-10"><i class="fa fa-check"></i><b>2.9.10</b> Domanda 10</a></li>
+<li class="chapter" data-level="2.9.11" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#domanda-12"><i class="fa fa-check"></i><b>2.9.11</b> Domanda 12</a></li>
+<li class="chapter" data-level="2.9.12" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#domanda-13"><i class="fa fa-check"></i><b>2.9.12</b> Domanda 13</a></li>
+<li class="chapter" data-level="2.9.13" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#esercizio-1"><i class="fa fa-check"></i><b>2.9.13</b> Esercizio 1</a></li>
+<li class="chapter" data-level="2.9.14" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#esercizio-2"><i class="fa fa-check"></i><b>2.9.14</b> Esercizio 2</a></li>
+<li class="chapter" data-level="2.9.15" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#esercizio-3"><i class="fa fa-check"></i><b>2.9.15</b> Esercizio 3</a></li>
+<li class="chapter" data-level="2.9.16" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#esercizio-4"><i class="fa fa-check"></i><b>2.9.16</b> Esercizio 4</a></li>
+<li class="chapter" data-level="2.9.17" data-path="progettare-un-esperimento.html"><a href="progettare-un-esperimento.html#esercizio-5"><i class="fa fa-check"></i><b>2.9.17</b> Esercizio 5</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="richiami-di-statistica-descrittiva.html"><a href="richiami-di-statistica-descrittiva.html"><i class="fa fa-check"></i><b>3</b> Richiami di statistica descrittiva</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="richiami-di-statistica-descrittiva.html"><a href="richiami-di-statistica-descrittiva.html#descrizione-di-dati-quantitativi"><i class="fa fa-check"></i><b>3.1</b> Descrizione di dati quantitativi</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="richiami-di-statistica-descrittiva.html"><a href="richiami-di-statistica-descrittiva.html#indicatori-di-tendenza-centrale"><i class="fa fa-check"></i><b>3.1.1</b> Indicatori di tendenza centrale</a></li>
+<li class="chapter" data-level="3.1.2" data-path="richiami-di-statistica-descrittiva.html"><a href="richiami-di-statistica-descrittiva.html#indicatori-di-dispersione"><i class="fa fa-check"></i><b>3.1.2</b> Indicatori di dispersione</a></li>
+<li class="chapter" data-level="3.1.3" data-path="richiami-di-statistica-descrittiva.html"><a href="richiami-di-statistica-descrittiva.html#incertezza-delle-misure-derivate"><i class="fa fa-check"></i><b>3.1.3</b> Incertezza delle misure derivate</a></li>
+<li class="chapter" data-level="3.1.4" data-path="richiami-di-statistica-descrittiva.html"><a href="richiami-di-statistica-descrittiva.html#relazioni-tra-variabili-quantitative-correlazione"><i class="fa fa-check"></i><b>3.1.4</b> Relazioni tra variabili quantitative: correlazione</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="richiami-di-statistica-descrittiva.html"><a href="richiami-di-statistica-descrittiva.html#statistiche-descrittive-con-r"><i class="fa fa-check"></i><b>3.2</b> Statistiche descrittive con R</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="richiami-di-statistica-descrittiva.html"><a href="richiami-di-statistica-descrittiva.html#descrizione-dei-sottogruppi"><i class="fa fa-check"></i><b>3.2.1</b> Descrizione dei sottogruppi</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="richiami-di-statistica-descrittiva.html"><a href="richiami-di-statistica-descrittiva.html#altre-letture-2"><i class="fa fa-check"></i><b>3.3</b> Altre letture</a></li>
+<li class="chapter" data-level="3.4" data-path="richiami-di-statistica-descrittiva.html"><a href="richiami-di-statistica-descrittiva.html#domande-ed-esercizi-1"><i class="fa fa-check"></i><b>3.4</b> Domande ed esercizi</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="le-relazioni-causa-effetto.html"><a href="le-relazioni-causa-effetto.html"><i class="fa fa-check"></i><b>4</b> Le relazioni causa-effetto</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="le-relazioni-causa-effetto.html"><a href="le-relazioni-causa-effetto.html#modelli-matematici-e-statistici"><i class="fa fa-check"></i><b>4.1</b> Modelli matematici e statistici</a></li>
+<li class="chapter" data-level="4.2" data-path="le-relazioni-causa-effetto.html"><a href="le-relazioni-causa-effetto.html#componenti-di-un-modello"><i class="fa fa-check"></i><b>4.2</b> Componenti di un modello</a></li>
+<li class="chapter" data-level="4.3" data-path="le-relazioni-causa-effetto.html"><a href="le-relazioni-causa-effetto.html#fitting-di-un-modello"><i class="fa fa-check"></i><b>4.3</b> <em>Fitting</em> di un modello</a></li>
+<li class="chapter" data-level="4.4" data-path="le-relazioni-causa-effetto.html"><a href="le-relazioni-causa-effetto.html#esempio-1-il-modello-della-media"><i class="fa fa-check"></i><b>4.4</b> Esempio 1: il ‘modello della media’</a></li>
+<li class="chapter" data-level="4.5" data-path="le-relazioni-causa-effetto.html"><a href="le-relazioni-causa-effetto.html#esempio-2-un-predittore-quantitativo"><i class="fa fa-check"></i><b>4.5</b> Esempio 2: un predittore quantitativo</a></li>
+<li class="chapter" data-level="4.6" data-path="le-relazioni-causa-effetto.html"><a href="le-relazioni-causa-effetto.html#esempio-3-un-predittore-nominale"><i class="fa fa-check"></i><b>4.6</b> Esempio 3: un predittore nominale</a></li>
+<li class="chapter" data-level="4.7" data-path="le-relazioni-causa-effetto.html"><a href="le-relazioni-causa-effetto.html#lanalisi-della-varianza-anova"><i class="fa fa-check"></i><b>4.7</b> L’analisi della varianza (ANOVA)</a></li>
+<li class="chapter" data-level="4.8" data-path="le-relazioni-causa-effetto.html"><a href="le-relazioni-causa-effetto.html#example-4-due-predittori-nominali"><i class="fa fa-check"></i><b>4.8</b> Example 4: due predittori nominali</a></li>
+<li class="chapter" data-level="4.9" data-path="le-relazioni-causa-effetto.html"><a href="le-relazioni-causa-effetto.html#example-5-due-predittori-nominali-con-interazione"><i class="fa fa-check"></i><b>4.9</b> Example 5: due predittori nominali con interazione</a></li>
+<li class="chapter" data-level="4.10" data-path="le-relazioni-causa-effetto.html"><a href="le-relazioni-causa-effetto.html#interazione-tra-fattori-sperimentali"><i class="fa fa-check"></i><b>4.10</b> Interazione tra fattori sperimentali</a></li>
+<li class="chapter" data-level="4.11" data-path="le-relazioni-causa-effetto.html"><a href="le-relazioni-causa-effetto.html#example-5-segue"><i class="fa fa-check"></i><b>4.11</b> Example 5 (segue)</a></li>
+<li class="chapter" data-level="4.12" data-path="le-relazioni-causa-effetto.html"><a href="le-relazioni-causa-effetto.html#dati-non-bilanciati"><i class="fa fa-check"></i><b>4.12</b> Dati non bilanciati</a></li>
+<li class="chapter" data-level="4.13" data-path="le-relazioni-causa-effetto.html"><a href="le-relazioni-causa-effetto.html#esempio-6-un-crbd-con-un-valore-mancante"><i class="fa fa-check"></i><b>4.13</b> Esempio 6: un CRBD con un valore mancante</a></li>
+<li class="chapter" data-level="4.14" data-path="le-relazioni-causa-effetto.html"><a href="le-relazioni-causa-effetto.html#conclusioni-1"><i class="fa fa-check"></i><b>4.14</b> Conclusioni</a></li>
+<li class="chapter" data-level="4.15" data-path="le-relazioni-causa-effetto.html"><a href="le-relazioni-causa-effetto.html#altre-letture-3"><i class="fa fa-check"></i><b>4.15</b> Altre letture</a></li>
+<li class="chapter" data-level="4.16" data-path="le-relazioni-causa-effetto.html"><a href="le-relazioni-causa-effetto.html#domande-ed-esercizi-2"><i class="fa fa-check"></i><b>4.16</b> Domande ed esercizi</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="modelli-stocastici.html"><a href="modelli-stocastici.html"><i class="fa fa-check"></i><b>5</b> Modelli stocastici</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="modelli-stocastici.html"><a href="modelli-stocastici.html#funzioni-di-probabilitàdensità"><i class="fa fa-check"></i><b>5.1</b> Funzioni di probabilità/densità</a></li>
+<li class="chapter" data-level="5.2" data-path="modelli-stocastici.html"><a href="modelli-stocastici.html#calcolare-le-probabilità"><i class="fa fa-check"></i><b>5.2</b> Calcolare le probabilità</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="modelli-stocastici.html"><a href="modelli-stocastici.html#esempio-5.1-calcolare-la-probabilità-in-un-esperimento-misurativo"><i class="fa fa-check"></i><b>5.2.1</b> Esempio 5.1: Calcolare la probabilità in un esperimento misurativo</a></li>
+<li class="chapter" data-level="5.2.2" data-path="modelli-stocastici.html"><a href="modelli-stocastici.html#esempio-5.2-calcolo-della-probabilità-per-un-esperimento-di-degradazione"><i class="fa fa-check"></i><b>5.2.2</b> Esempio 5.2: Calcolo della probabilità per un esperimento di degradazione</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="modelli-stocastici.html"><a href="modelli-stocastici.html#simulazione-stocastica"><i class="fa fa-check"></i><b>5.3</b> Simulazione stocastica</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="modelli-stocastici.html"><a href="modelli-stocastici.html#esempio-5.3.-simulazione-di-un-esperimento-misurativo"><i class="fa fa-check"></i><b>5.3.1</b> Esempio 5.3. Simulazione di un esperimento misurativo</a></li>
+<li class="chapter" data-level="5.3.2" data-path="modelli-stocastici.html"><a href="modelli-stocastici.html#esempio-5.4-simulazione-di-un-esperimento-di-fertilizzazione"><i class="fa fa-check"></i><b>5.3.2</b> Esempio 5.4: simulazione di un esperimento di fertilizzazione</a></li>
+<li class="chapter" data-level="5.3.3" data-path="modelli-stocastici.html"><a href="modelli-stocastici.html#esempio-5.4-simulazione-di-una-prova-di-confronto-varietale"><i class="fa fa-check"></i><b>5.3.3</b> Esempio 5.4: Simulazione di una prova di confronto varietale</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="modelli-stocastici.html"><a href="modelli-stocastici.html#conclusioni-2"><i class="fa fa-check"></i><b>5.4</b> Conclusioni</a></li>
+<li class="chapter" data-level="5.5" data-path="modelli-stocastici.html"><a href="modelli-stocastici.html#altre-letture-4"><i class="fa fa-check"></i><b>5.5</b> Altre letture</a></li>
+<li class="chapter" data-level="5.6" data-path="modelli-stocastici.html"><a href="modelli-stocastici.html#domande-ed-esercizi-3"><i class="fa fa-check"></i><b>5.6</b> Domande ed esercizi</a></li>
+<li class="chapter" data-level="5.7" data-path="modelli-stocastici.html"><a href="modelli-stocastici.html#soluzioni"><i class="fa fa-check"></i><b>5.7</b> Soluzioni</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="stime-ed-incertezza.html"><a href="stime-ed-incertezza.html"><i class="fa fa-check"></i><b>6</b> Stime ed incertezza</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="stime-ed-incertezza.html"><a href="stime-ed-incertezza.html#ripetere-gli-esperimenti"><i class="fa fa-check"></i><b>6.1</b> Ripetere gli esperimenti</a></li>
+<li class="chapter" data-level="6.2" data-path="stime-ed-incertezza.html"><a href="stime-ed-incertezza.html#la-sampling-distribution-teorica"><i class="fa fa-check"></i><b>6.2</b> La ‘sampling distribution’ teorica</a></li>
+<li class="chapter" data-level="6.3" data-path="stime-ed-incertezza.html"><a href="stime-ed-incertezza.html#lintervallo-di-confidenza-frequentista"><i class="fa fa-check"></i><b>6.3</b> L’intervallo di confidenza frequentista</a></li>
+<li class="chapter" data-level="6.4" data-path="stime-ed-incertezza.html"><a href="stime-ed-incertezza.html#come-otteniamo-lerrore-standard"><i class="fa fa-check"></i><b>6.4</b> Come otteniamo l’errore standard?</a></li>
+<li class="chapter" data-level="6.5" data-path="stime-ed-incertezza.html"><a href="stime-ed-incertezza.html#come-otteniamo-il-moltiplicatore-k"><i class="fa fa-check"></i><b>6.5</b> Come otteniamo il moltiplicatore <span class="math inline">\(k\)</span>?</a></li>
+<li class="chapter" data-level="6.6" data-path="stime-ed-incertezza.html"><a href="stime-ed-incertezza.html#gli-intervalli-di-confidenza-in-pratica"><i class="fa fa-check"></i><b>6.6</b> Gli intervalli di confidenza in pratica</a>
+<ul>
+<li class="chapter" data-level="6.6.1" data-path="stime-ed-incertezza.html"><a href="stime-ed-incertezza.html#esempio-6.1-ic-per-una-media-campionaria"><i class="fa fa-check"></i><b>6.6.1</b> Esempio 6.1: IC per una media campionaria</a></li>
+<li class="chapter" data-level="6.6.2" data-path="stime-ed-incertezza.html"><a href="stime-ed-incertezza.html#example-6.2-cis-for-model-parameters"><i class="fa fa-check"></i><b>6.6.2</b> Example 6.2: CIs for model parameters</a></li>
+</ul></li>
+<li class="chapter" data-level="6.7" data-path="stime-ed-incertezza.html"><a href="stime-ed-incertezza.html#altri-approcci-per-il-calcolo-dei-ci"><i class="fa fa-check"></i><b>6.7</b> Altri approcci per il calcolo dei CI</a></li>
+<li class="chapter" data-level="6.8" data-path="stime-ed-incertezza.html"><a href="stime-ed-incertezza.html#limitazioni-del-ci-frequentista"><i class="fa fa-check"></i><b>6.8</b> Limitazioni del CI frequentista</a></li>
+<li class="chapter" data-level="6.9" data-path="stime-ed-incertezza.html"><a href="stime-ed-incertezza.html#altre-letture-5"><i class="fa fa-check"></i><b>6.9</b> Altre letture</a></li>
+<li class="chapter" data-level="6.10" data-path="stime-ed-incertezza.html"><a href="stime-ed-incertezza.html#domande-ed-esercizi-4"><i class="fa fa-check"></i><b>6.10</b> Domande ed esercizi</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="decisioni-ed-incertezza.html"><a href="decisioni-ed-incertezza.html"><i class="fa fa-check"></i><b>7</b> Decisioni ed incertezza</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="decisioni-ed-incertezza.html"><a href="decisioni-ed-incertezza.html#esempio-7.1-confronto-tra-due-genotipi"><i class="fa fa-check"></i><b>7.1</b> Esempio 7.1: Confronto tra due genotipi</a>
+<ul>
+<li class="chapter" data-level="7.1.1" data-path="decisioni-ed-incertezza.html"><a href="decisioni-ed-incertezza.html#lipotesi-nulla"><i class="fa fa-check"></i><b>7.1.1</b> L’ipotesi ‘nulla’</a></li>
+<li class="chapter" data-level="7.1.2" data-path="decisioni-ed-incertezza.html"><a href="decisioni-ed-incertezza.html#il-test-di-t-wald-test"><i class="fa fa-check"></i><b>7.1.2</b> Il test di t (Wald test)</a></li>
+<li class="chapter" data-level="7.1.3" data-path="decisioni-ed-incertezza.html"><a href="decisioni-ed-incertezza.html#simulazione-monte-carlo"><i class="fa fa-check"></i><b>7.1.3</b> Simulazione Monte Carlo</a></li>
+<li class="chapter" data-level="7.1.4" data-path="decisioni-ed-incertezza.html"><a href="decisioni-ed-incertezza.html#una-soluzione-formale"><i class="fa fa-check"></i><b>7.1.4</b> Una soluzione formale</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="decisioni-ed-incertezza.html"><a href="decisioni-ed-incertezza.html#altri-test-di-t"><i class="fa fa-check"></i><b>7.2</b> Altri test di t</a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="decisioni-ed-incertezza.html"><a href="decisioni-ed-incertezza.html#il-test-t-di-student"><i class="fa fa-check"></i><b>7.2.1</b> Il test t di Student</a></li>
+<li class="chapter" data-level="7.2.2" data-path="decisioni-ed-incertezza.html"><a href="decisioni-ed-incertezza.html#il-test-di-welch"><i class="fa fa-check"></i><b>7.2.2</b> Il test di Welch</a></li>
+<li class="chapter" data-level="7.2.3" data-path="decisioni-ed-incertezza.html"><a href="decisioni-ed-incertezza.html#il-test-di-t-appaiato"><i class="fa fa-check"></i><b>7.2.3</b> Il test di t appaiato</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="decisioni-ed-incertezza.html"><a href="decisioni-ed-incertezza.html#differenze-generalizzate-tra-parametri"><i class="fa fa-check"></i><b>7.3</b> Differenze generalizzate tra parametri</a></li>
+<li class="chapter" data-level="7.4" data-path="decisioni-ed-incertezza.html"><a href="decisioni-ed-incertezza.html#il-test-f-nellanova"><i class="fa fa-check"></i><b>7.4</b> Il test F nell’ANOVA</a></li>
+<li class="chapter" data-level="7.5" data-path="decisioni-ed-incertezza.html"><a href="decisioni-ed-incertezza.html#conclusioni-3"><i class="fa fa-check"></i><b>7.5</b> Conclusioni</a></li>
+<li class="chapter" data-level="7.6" data-path="decisioni-ed-incertezza.html"><a href="decisioni-ed-incertezza.html#altre-letture-6"><i class="fa fa-check"></i><b>7.6</b> Altre letture</a></li>
+<li class="chapter" data-level="7.7" data-path="decisioni-ed-incertezza.html"><a href="decisioni-ed-incertezza.html#esercizi"><i class="fa fa-check"></i><b>7.7</b> Esercizi</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="verifica-dei-modelli.html"><a href="verifica-dei-modelli.html"><i class="fa fa-check"></i><b>8</b> Verifica dei modelli</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="verifica-dei-modelli.html"><a href="verifica-dei-modelli.html#deviazioni-rispetto-alle-assunzioni-di-base"><i class="fa fa-check"></i><b>8.1</b> Deviazioni rispetto alle assunzioni di base</a></li>
+<li class="chapter" data-level="8.2" data-path="verifica-dei-modelli.html"><a href="verifica-dei-modelli.html#scoprire-le-violazioni"><i class="fa fa-check"></i><b>8.2</b> Scoprire le violazioni</a></li>
+<li class="chapter" data-level="8.3" data-path="verifica-dei-modelli.html"><a href="verifica-dei-modelli.html#analisi-grafica-dei-residui"><i class="fa fa-check"></i><b>8.3</b> Analisi grafica dei residui</a>
+<ul>
+<li class="chapter" data-level="8.3.1" data-path="verifica-dei-modelli.html"><a href="verifica-dei-modelli.html#grafico-dei-valori-osservati-aumentato-con-le-previsioni-del-modello"><i class="fa fa-check"></i><b>8.3.1</b> Grafico dei valori osservati, aumentato con le previsioni del modello</a></li>
+<li class="chapter" data-level="8.3.2" data-path="verifica-dei-modelli.html"><a href="verifica-dei-modelli.html#grafico-dei-residui-contro-i-valori-attesi"><i class="fa fa-check"></i><b>8.3.2</b> Grafico dei residui contro i valori attesi</a></li>
+<li class="chapter" data-level="8.3.3" data-path="verifica-dei-modelli.html"><a href="verifica-dei-modelli.html#qq-plot"><i class="fa fa-check"></i><b>8.3.3</b> QQ-plot</a></li>
+</ul></li>
+<li class="chapter" data-level="8.4" data-path="verifica-dei-modelli.html"><a href="verifica-dei-modelli.html#test-dipotesi"><i class="fa fa-check"></i><b>8.4</b> Test d’ipotesi</a>
+<ul>
+<li class="chapter" data-level="8.4.1" data-path="verifica-dei-modelli.html"><a href="verifica-dei-modelli.html#test-di-levene-per-lomogeneità-delle-varianze"><i class="fa fa-check"></i><b>8.4.1</b> Test di Levene per l’omogeneità delle varianze</a></li>
+<li class="chapter" data-level="8.4.2" data-path="verifica-dei-modelli.html"><a href="verifica-dei-modelli.html#test-di-shapiro-wilk-per-la-normalità"><i class="fa fa-check"></i><b>8.4.2</b> Test di Shapiro-Wilk per la normalità</a></li>
+<li class="chapter" data-level="8.4.3" data-path="verifica-dei-modelli.html"><a href="verifica-dei-modelli.html#altri-test"><i class="fa fa-check"></i><b>8.4.3</b> Altri test</a></li>
+</ul></li>
+<li class="chapter" data-level="8.5" data-path="verifica-dei-modelli.html"><a href="verifica-dei-modelli.html#esempio-8.1-analisi-dei-residui-per-il-dataset-mixture"><i class="fa fa-check"></i><b>8.5</b> Esempio 8.1: Analisi dei residui per il dataset “mixture”</a></li>
+<li class="chapter" data-level="8.6" data-path="verifica-dei-modelli.html"><a href="verifica-dei-modelli.html#esempio-8.2-analisi-dei-residui-per-il-dataset-insects"><i class="fa fa-check"></i><b>8.6</b> Esempio 8.2: Analisi dei residui per il dataset ‘insects’</a></li>
+<li class="chapter" data-level="8.7" data-path="verifica-dei-modelli.html"><a href="verifica-dei-modelli.html#misure-correttive"><i class="fa fa-check"></i><b>8.7</b> Misure correttive</a>
+<ul>
+<li class="chapter" data-level="8.7.1" data-path="verifica-dei-modelli.html"><a href="verifica-dei-modelli.html#correzionerimozione-degli-outliers"><i class="fa fa-check"></i><b>8.7.1</b> Correzione/Rimozione degli outliers</a></li>
+<li class="chapter" data-level="8.7.2" data-path="verifica-dei-modelli.html"><a href="verifica-dei-modelli.html#correzione-del-modello"><i class="fa fa-check"></i><b>8.7.2</b> Correzione del modello</a></li>
+<li class="chapter" data-level="8.7.3" data-path="verifica-dei-modelli.html"><a href="verifica-dei-modelli.html#trasformazione-del-predittore"><i class="fa fa-check"></i><b>8.7.3</b> Trasformazione del predittore</a></li>
+<li class="chapter" data-level="8.7.4" data-path="verifica-dei-modelli.html"><a href="verifica-dei-modelli.html#trasformazione-della-risposta"><i class="fa fa-check"></i><b>8.7.4</b> Trasformazione della risposta</a></li>
+<li class="chapter" data-level="8.7.5" data-path="verifica-dei-modelli.html"><a href="verifica-dei-modelli.html#esempio-8.1-segue"><i class="fa fa-check"></i><b>8.7.5</b> Esempio 8.1 (segue)</a></li>
+<li class="chapter" data-level="8.7.6" data-path="verifica-dei-modelli.html"><a href="verifica-dei-modelli.html#esempio-8.2-segue"><i class="fa fa-check"></i><b>8.7.6</b> Esempio 8.2 (segue)</a></li>
+</ul></li>
+<li class="chapter" data-level="8.8" data-path="verifica-dei-modelli.html"><a href="verifica-dei-modelli.html#risultati-contraddittori"><i class="fa fa-check"></i><b>8.8</b> Risultati contraddittori</a></li>
+<li class="chapter" data-level="8.9" data-path="verifica-dei-modelli.html"><a href="verifica-dei-modelli.html#altri-approcci-avanzati"><i class="fa fa-check"></i><b>8.9</b> Altri approcci ‘avanzati’</a></li>
+<li class="chapter" data-level="8.10" data-path="verifica-dei-modelli.html"><a href="verifica-dei-modelli.html#altre-letture-7"><i class="fa fa-check"></i><b>8.10</b> Altre letture</a></li>
+<li class="chapter" data-level="8.11" data-path="verifica-dei-modelli.html"><a href="verifica-dei-modelli.html#esercizi-1"><i class="fa fa-check"></i><b>8.11</b> Esercizi</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="combinazioni-linearinonlineari-dei-parametri.html"><a href="combinazioni-linearinonlineari-dei-parametri.html"><i class="fa fa-check"></i><b>9</b> Combinazioni lineari/nonlineari dei parametri</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="combinazioni-linearinonlineari-dei-parametri.html"><a href="combinazioni-linearinonlineari-dei-parametri.html#esempio-9.1-determinare-leffetto-medio-degli-erbicidi"><i class="fa fa-check"></i><b>9.1</b> Esempio 9.1: Determinare l’effetto medio degli erbicidi</a></li>
+<li class="chapter" data-level="9.2" data-path="combinazioni-linearinonlineari-dei-parametri.html"><a href="combinazioni-linearinonlineari-dei-parametri.html#esempio-9.2-determinare-lefficiacia-erbicida-media"><i class="fa fa-check"></i><b>9.2</b> Esempio 9.2: Determinare l’efficiacia erbicida media</a></li>
+<li class="chapter" data-level="9.3" data-path="combinazioni-linearinonlineari-dei-parametri.html"><a href="combinazioni-linearinonlineari-dei-parametri.html#combinazioni-di-interesse-generale"><i class="fa fa-check"></i><b>9.3</b> Combinazioni di interesse generale</a></li>
+<li class="chapter" data-level="9.4" data-path="combinazioni-linearinonlineari-dei-parametri.html"><a href="combinazioni-linearinonlineari-dei-parametri.html#example-9.4-contrasti-ortogonali-e-non"><i class="fa fa-check"></i><b>9.4</b> Example 9.4: Contrasti ortogonali (e non)</a></li>
+<li class="chapter" data-level="9.5" data-path="combinazioni-linearinonlineari-dei-parametri.html"><a href="combinazioni-linearinonlineari-dei-parametri.html#esempio-9.5-i-confronti-multipli-a-coppie"><i class="fa fa-check"></i><b>9.5</b> Esempio 9.5: I confronti multipli a coppie</a>
+<ul>
+<li class="chapter" data-level="9.5.1" data-path="combinazioni-linearinonlineari-dei-parametri.html"><a href="combinazioni-linearinonlineari-dei-parametri.html#display-a-lettere"><i class="fa fa-check"></i><b>9.5.1</b> Display a lettere</a></li>
+<li class="chapter" data-level="9.5.2" data-path="combinazioni-linearinonlineari-dei-parametri.html"><a href="combinazioni-linearinonlineari-dei-parametri.html#correzione-per-la-molteplicità"><i class="fa fa-check"></i><b>9.5.2</b> Correzione per la molteplicità</a></li>
+<li class="chapter" data-level="9.5.3" data-path="combinazioni-linearinonlineari-dei-parametri.html"><a href="combinazioni-linearinonlineari-dei-parametri.html#procedure-classiche-di-confronto-multiplo"><i class="fa fa-check"></i><b>9.5.3</b> Procedure ‘classiche’ di confronto multiplo</a></li>
+</ul></li>
+<li class="chapter" data-level="9.6" data-path="combinazioni-linearinonlineari-dei-parametri.html"><a href="combinazioni-linearinonlineari-dei-parametri.html#esempio-9.6-confronti-multipli-con-dati-trasformati"><i class="fa fa-check"></i><b>9.6</b> Esempio 9.6: confronti multipli con dati trasformati</a></li>
+<li class="chapter" data-level="9.7" data-path="combinazioni-linearinonlineari-dei-parametri.html"><a href="combinazioni-linearinonlineari-dei-parametri.html#esempio-9.7-previsioni-e-previsioni-inverse"><i class="fa fa-check"></i><b>9.7</b> Esempio 9.7: Previsioni e previsioni inverse</a></li>
+<li class="chapter" data-level="9.8" data-path="combinazioni-linearinonlineari-dei-parametri.html"><a href="combinazioni-linearinonlineari-dei-parametri.html#altre-letture-8"><i class="fa fa-check"></i><b>9.8</b> Altre letture</a></li>
+<li class="chapter" data-level="9.9" data-path="combinazioni-linearinonlineari-dei-parametri.html"><a href="combinazioni-linearinonlineari-dei-parametri.html#esercizi-2"><i class="fa fa-check"></i><b>9.9</b> Esercizi</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="ricomponiamo-il-puzzle.html"><a href="ricomponiamo-il-puzzle.html"><i class="fa fa-check"></i><b>10</b> Ricomponiamo il ‘puzzle’</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="ricomponiamo-il-puzzle.html"><a href="ricomponiamo-il-puzzle.html#esempio-10.1-confronto-tra-erbicidi-in-un-esperimento-a-blocchi-randomizzati"><i class="fa fa-check"></i><b>10.1</b> Esempio 10.1: Confronto tra erbicidi in un esperimento a blocchi randomizzati</a></li>
+<li class="chapter" data-level="10.2" data-path="ricomponiamo-il-puzzle.html"><a href="ricomponiamo-il-puzzle.html#esempio-10.2-confronto-tra-co-adiuvanti-in-un-esperimento-a-quadrato-latino"><i class="fa fa-check"></i><b>10.2</b> Esempio 10.2: confronto tra co-adiuvanti in un esperimento a quadrato latino</a></li>
+<li class="chapter" data-level="10.3" data-path="ricomponiamo-il-puzzle.html"><a href="ricomponiamo-il-puzzle.html#esempio-10.3-interazione-tra-genotipo-e-concimazione-azotata"><i class="fa fa-check"></i><b>10.3</b> Esempio 10.3: interazione tra genotipo e concimazione azotata</a></li>
+<li class="chapter" data-level="10.4" data-path="ricomponiamo-il-puzzle.html"><a href="ricomponiamo-il-puzzle.html#esempio-10.4-confronto-tra-incroci-in-un-disegno-fattoriale-gerarchico"><i class="fa fa-check"></i><b>10.4</b> Esempio 10.4: confronto tra incroci in un disegno fattoriale gerarchico</a></li>
+<li class="chapter" data-level="10.5" data-path="ricomponiamo-il-puzzle.html"><a href="ricomponiamo-il-puzzle.html#esempio-10.5-un-esperimento-di-germinazione-ripetuto-due-volte"><i class="fa fa-check"></i><b>10.5</b> Esempio 10.5: un esperimento di germinazione ripetuto due volte</a></li>
+<li class="chapter" data-level="10.6" data-path="ricomponiamo-il-puzzle.html"><a href="ricomponiamo-il-puzzle.html#altre-letture-9"><i class="fa fa-check"></i><b>10.6</b> Altre letture</a></li>
+<li class="chapter" data-level="10.7" data-path="ricomponiamo-il-puzzle.html"><a href="ricomponiamo-il-puzzle.html#esercizi-3"><i class="fa fa-check"></i><b>10.7</b> Esercizi</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="modelli-di-regressione-avanzati.html"><a href="modelli-di-regressione-avanzati.html"><i class="fa fa-check"></i><b>11</b> Modelli di regressione ‘avanzati’</a></li>
+<li class="chapter" data-level="12" data-path="breve-introduzione-ai-modelli-misti.html"><a href="breve-introduzione-ai-modelli-misti.html"><i class="fa fa-check"></i><b>12</b> Breve introduzione ai modelli misti</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="breve-introduzione-ai-modelli-misti.html"><a href="breve-introduzione-ai-modelli-misti.html#esempio-12.1-un-esperimento-di-lavorazione-a-split-plot"><i class="fa fa-check"></i><b>12.1</b> Esempio 12.1: un esperimento di lavorazione a split-plot</a></li>
+<li class="chapter" data-level="12.2" data-path="breve-introduzione-ai-modelli-misti.html"><a href="breve-introduzione-ai-modelli-misti.html#esempio-12.2-un-esperimento-di-recropping-a-strip-plot"><i class="fa fa-check"></i><b>12.2</b> Esempio 12.2: un esperimento di ‘recropping’ a strip-plot</a></li>
+<li class="chapter" data-level="12.3" data-path="breve-introduzione-ai-modelli-misti.html"><a href="breve-introduzione-ai-modelli-misti.html#esempio-12.3-confronto-varietale-con-blocchi-random"><i class="fa fa-check"></i><b>12.3</b> Esempio 12.3: confronto varietale con blocchi ‘random’</a></li>
+<li class="chapter" data-level="12.4" data-path="breve-introduzione-ai-modelli-misti.html"><a href="breve-introduzione-ai-modelli-misti.html#esempio-12.4-blocchi-randomizzati-con-sub-campionamento"><i class="fa fa-check"></i><b>12.4</b> Esempio 12.4: blocchi randomizzati con sub-campionamento</a></li>
+<li class="chapter" data-level="12.5" data-path="breve-introduzione-ai-modelli-misti.html"><a href="breve-introduzione-ai-modelli-misti.html#esempio-12.5-confronto-varietale-ripetuto-in-più-anni"><i class="fa fa-check"></i><b>12.5</b> Esempio 12.5: confronto varietale ripetuto in più anni</a></li>
+<li class="chapter" data-level="12.6" data-path="breve-introduzione-ai-modelli-misti.html"><a href="breve-introduzione-ai-modelli-misti.html#esempio-12.6-misure-ripetute-nelle-colture-poliennali"><i class="fa fa-check"></i><b>12.6</b> Esempio 12.6: misure ripetute nelle colture poliennali</a></li>
+<li class="chapter" data-level="12.7" data-path="breve-introduzione-ai-modelli-misti.html"><a href="breve-introduzione-ai-modelli-misti.html#fattori-di-raggruppamento-nei-modelli-di-regressione"><i class="fa fa-check"></i><b>12.7</b> Fattori di raggruppamento nei modelli di regressione</a></li>
+<li class="chapter" data-level="12.8" data-path="breve-introduzione-ai-modelli-misti.html"><a href="breve-introduzione-ai-modelli-misti.html#altre-letture-10"><i class="fa fa-check"></i><b>12.8</b> Altre letture</a></li>
+</ul></li>
+<li class="chapter" data-level="13" data-path="appendice-a-breve-introduzione-ad-r.html"><a href="appendice-a-breve-introduzione-ad-r.html"><i class="fa fa-check"></i><b>13</b> Appendice A: Breve introduzione ad R</a>
+<ul>
+<li class="chapter" data-level="" data-path="appendice-a-breve-introduzione-ad-r.html"><a href="appendice-a-breve-introduzione-ad-r.html#cosa-è-r"><i class="fa fa-check"></i>Cosa è R?</a></li>
+<li class="chapter" data-level="" data-path="appendice-a-breve-introduzione-ad-r.html"><a href="appendice-a-breve-introduzione-ad-r.html#installazione-di-r"><i class="fa fa-check"></i>Installazione di R</a></li>
+<li class="chapter" data-level="13.1" data-path="appendice-a-breve-introduzione-ad-r.html"><a href="appendice-a-breve-introduzione-ad-r.html#prima-di-iniziare"><i class="fa fa-check"></i><b>13.1</b> Prima di iniziare</a></li>
+<li class="chapter" data-level="13.2" data-path="appendice-a-breve-introduzione-ad-r.html"><a href="appendice-a-breve-introduzione-ad-r.html#oggetti-e-assegnazioni"><i class="fa fa-check"></i><b>13.2</b> Oggetti e assegnazioni</a></li>
+<li class="chapter" data-level="13.3" data-path="appendice-a-breve-introduzione-ad-r.html"><a href="appendice-a-breve-introduzione-ad-r.html#tipi-di-oggetti"><i class="fa fa-check"></i><b>13.3</b> Tipi di oggetti</a>
+<ul>
+<li class="chapter" data-level="13.3.1" data-path="appendice-a-breve-introduzione-ad-r.html"><a href="appendice-a-breve-introduzione-ad-r.html#costanti-e-vettori"><i class="fa fa-check"></i><b>13.3.1</b> Costanti e vettori</a></li>
+<li class="chapter" data-level="13.3.2" data-path="appendice-a-breve-introduzione-ad-r.html"><a href="appendice-a-breve-introduzione-ad-r.html#matrici"><i class="fa fa-check"></i><b>13.3.2</b> Matrici</a></li>
+<li class="chapter" data-level="13.3.3" data-path="appendice-a-breve-introduzione-ad-r.html"><a href="appendice-a-breve-introduzione-ad-r.html#dataframe"><i class="fa fa-check"></i><b>13.3.3</b> Dataframe</a></li>
+</ul></li>
+<li class="chapter" data-level="13.4" data-path="appendice-a-breve-introduzione-ad-r.html"><a href="appendice-a-breve-introduzione-ad-r.html#lavorare-con-gli-oggetti"><i class="fa fa-check"></i><b>13.4</b> Lavorare con gli oggetti</a>
+<ul>
+<li class="chapter" data-level="13.4.1" data-path="appendice-a-breve-introduzione-ad-r.html"><a href="appendice-a-breve-introduzione-ad-r.html#visualizzazione"><i class="fa fa-check"></i><b>13.4.1</b> Visualizzazione</a></li>
+<li class="chapter" data-level="13.4.2" data-path="appendice-a-breve-introduzione-ad-r.html"><a href="appendice-a-breve-introduzione-ad-r.html#indicizzazione"><i class="fa fa-check"></i><b>13.4.2</b> Indicizzazione</a></li>
+<li class="chapter" data-level="13.4.3" data-path="appendice-a-breve-introduzione-ad-r.html"><a href="appendice-a-breve-introduzione-ad-r.html#estrazione-di-slots"><i class="fa fa-check"></i><b>13.4.3</b> Estrazione di <em>slots</em></a></li>
+</ul></li>
+<li class="chapter" data-level="13.5" data-path="appendice-a-breve-introduzione-ad-r.html"><a href="appendice-a-breve-introduzione-ad-r.html#espressioni-funzioni-e-argomenti"><i class="fa fa-check"></i><b>13.5</b> Espressioni, funzioni e argomenti</a></li>
+<li class="chapter" data-level="13.6" data-path="appendice-a-breve-introduzione-ad-r.html"><a href="appendice-a-breve-introduzione-ad-r.html#funzioni-di-uso-comune"><i class="fa fa-check"></i><b>13.6</b> Funzioni di uso comune</a></li>
+<li class="chapter" data-level="13.7" data-path="appendice-a-breve-introduzione-ad-r.html"><a href="appendice-a-breve-introduzione-ad-r.html#creazione-di-funzioni-personalizzate"><i class="fa fa-check"></i><b>13.7</b> Creazione di funzioni personalizzate</a></li>
+<li class="chapter" data-level="13.8" data-path="appendice-a-breve-introduzione-ad-r.html"><a href="appendice-a-breve-introduzione-ad-r.html#uso-di-librerie-aggiuntive"><i class="fa fa-check"></i><b>13.8</b> Uso di librerie aggiuntive</a></li>
+<li class="chapter" data-level="13.9" data-path="appendice-a-breve-introduzione-ad-r.html"><a href="appendice-a-breve-introduzione-ad-r.html#workspace"><i class="fa fa-check"></i><b>13.9</b> Workspace</a></li>
+<li class="chapter" data-level="13.10" data-path="appendice-a-breve-introduzione-ad-r.html"><a href="appendice-a-breve-introduzione-ad-r.html#importare-dati-esterni"><i class="fa fa-check"></i><b>13.10</b> Importare dati esterni</a></li>
+<li class="chapter" data-level="13.11" data-path="appendice-a-breve-introduzione-ad-r.html"><a href="appendice-a-breve-introduzione-ad-r.html#cenni-sulle-funzionalità-grafiche-in-r"><i class="fa fa-check"></i><b>13.11</b> Cenni sulle funzionalità grafiche in R</a></li>
+<li class="chapter" data-level="13.12" data-path="appendice-a-breve-introduzione-ad-r.html"><a href="appendice-a-breve-introduzione-ad-r.html#altre-letture-11"><i class="fa fa-check"></i><b>13.12</b> Altre letture</a></li>
+</ul></li>
+<li class="chapter" data-level="14" data-path="appendice-b-statistica-descrittiva-per-le-variabili-nominali.html"><a href="appendice-b-statistica-descrittiva-per-le-variabili-nominali.html"><i class="fa fa-check"></i><b>14</b> Appendice B: Statistica descrittiva per le variabili nominali</a>
+<ul>
+<li class="chapter" data-level="14.1" data-path="appendice-b-statistica-descrittiva-per-le-variabili-nominali.html"><a href="appendice-b-statistica-descrittiva-per-le-variabili-nominali.html#distribuzioni-di-frequenze-e-classamento"><i class="fa fa-check"></i><b>14.1</b> Distribuzioni di frequenze e classamento</a></li>
+<li class="chapter" data-level="14.2" data-path="appendice-b-statistica-descrittiva-per-le-variabili-nominali.html"><a href="appendice-b-statistica-descrittiva-per-le-variabili-nominali.html#statistiche-descrittive-per-le-distribuzioni-di-frequenze"><i class="fa fa-check"></i><b>14.2</b> Statistiche descrittive per le distribuzioni di frequenze</a></li>
+<li class="chapter" data-level="14.3" data-path="appendice-b-statistica-descrittiva-per-le-variabili-nominali.html"><a href="appendice-b-statistica-descrittiva-per-le-variabili-nominali.html#rappresentazione-grafica-delle-distribuzioni-di-frequenza"><i class="fa fa-check"></i><b>14.3</b> Rappresentazione grafica delle distribuzioni di frequenza</a></li>
+<li class="chapter" data-level="14.4" data-path="appendice-b-statistica-descrittiva-per-le-variabili-nominali.html"><a href="appendice-b-statistica-descrittiva-per-le-variabili-nominali.html#distribuzioni-di-frequenza-bivariate-le-tabelle-di-contingenze"><i class="fa fa-check"></i><b>14.4</b> Distribuzioni di frequenza bivariate: le tabelle di contingenze</a></li>
+<li class="chapter" data-level="14.5" data-path="appendice-b-statistica-descrittiva-per-le-variabili-nominali.html"><a href="appendice-b-statistica-descrittiva-per-le-variabili-nominali.html#connessione"><i class="fa fa-check"></i><b>14.5</b> Connessione</a></li>
+<li class="chapter" data-level="14.6" data-path="appendice-b-statistica-descrittiva-per-le-variabili-nominali.html"><a href="appendice-b-statistica-descrittiva-per-le-variabili-nominali.html#il-chi-quadro-con-r"><i class="fa fa-check"></i><b>14.6</b> Il chi quadro con R</a></li>
+<li class="chapter" data-level="14.7" data-path="appendice-b-statistica-descrittiva-per-le-variabili-nominali.html"><a href="appendice-b-statistica-descrittiva-per-le-variabili-nominali.html#altre-letture-12"><i class="fa fa-check"></i><b>14.7</b> Altre letture</a></li>
+<li class="chapter" data-level="14.8" data-path="appendice-b-statistica-descrittiva-per-le-variabili-nominali.html"><a href="appendice-b-statistica-descrittiva-per-le-variabili-nominali.html#esercizi-4"><i class="fa fa-check"></i><b>14.8</b> Esercizi</a></li>
+<li class="chapter" data-level="14.9" data-path="appendice-b-statistica-descrittiva-per-le-variabili-nominali.html"><a href="appendice-b-statistica-descrittiva-per-le-variabili-nominali.html#soluzioni-1"><i class="fa fa-check"></i><b>14.9</b> Soluzioni</a></li>
+</ul></li>
+<li class="chapter" data-level="15" data-path="appendice-c-intervalli-di-confidenza-per-una-proporzione.html"><a href="appendice-c-intervalli-di-confidenza-per-una-proporzione.html"><i class="fa fa-check"></i><b>15</b> Appendice C: Intervalli di confidenza per una proporzione</a>
+<ul>
+<li class="chapter" data-level="15.1" data-path="appendice-c-intervalli-di-confidenza-per-una-proporzione.html"><a href="appendice-c-intervalli-di-confidenza-per-una-proporzione.html#popolazioni-gaussiane-e-non"><i class="fa fa-check"></i><b>15.1</b> Popolazioni gaussiane e non</a></li>
+<li class="chapter" data-level="15.2" data-path="appendice-c-intervalli-di-confidenza-per-una-proporzione.html"><a href="appendice-c-intervalli-di-confidenza-per-una-proporzione.html#cosa-fare-se-il-teorema-centrale-del-limite-non-funziona"><i class="fa fa-check"></i><b>15.2</b> Cosa fare se il teorema centrale del limite non funziona?</a></li>
+</ul></li>
+<li class="chapter" data-level="16" data-path="appendice-e-confronto-di-due-proporzioni.html"><a href="appendice-e-confronto-di-due-proporzioni.html"><i class="fa fa-check"></i><b>16</b> Appendice E: Confronto di due proporzioni</a>
+<ul>
+<li class="chapter" data-level="16.1" data-path="appendice-e-confronto-di-due-proporzioni.html"><a href="appendice-e-confronto-di-due-proporzioni.html#il-test-di-chi-quadro"><i class="fa fa-check"></i><b>16.1</b> Il test di ‘chi quadro’</a></li>
+<li class="chapter" data-level="16.2" data-path="appendice-e-confronto-di-due-proporzioni.html"><a href="appendice-e-confronto-di-due-proporzioni.html#confronto-tra-due-proporzioni-con-simulazione-di-monte-carlo"><i class="fa fa-check"></i><b>16.2</b> Confronto tra due proporzioni con simulazione di Monte Carlo</a></li>
+<li class="chapter" data-level="16.3" data-path="appendice-e-confronto-di-due-proporzioni.html"><a href="appendice-e-confronto-di-due-proporzioni.html#esercizi-5"><i class="fa fa-check"></i><b>16.3</b> Esercizi</a></li>
+</ul></li>
+<li class="chapter" data-level="17" data-path="appendice-f-alcuni-problemi-collegati-con-le-deviazioni-rispetti-agli-assunti-di-base.html"><a href="appendice-f-alcuni-problemi-collegati-con-le-deviazioni-rispetti-agli-assunti-di-base.html"><i class="fa fa-check"></i><b>17</b> Appendice F: Alcuni problemi collegati con le deviazioni rispetti agli assunti di base</a></li>
+<li class="divider"></li>
+<li><strong><a href="https://www.statforbiology.com">Back to blog</a></strong></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Metodologia sperimentale per le scienze agrarie</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="modelli-stocastici" class="section level1 hasAnchor" number="5">
+<h1><span class="header-section-number">Capitolo 5</span> Modelli stocastici<a href="modelli-stocastici.html#modelli-stocastici" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>Nel Capitolo precedente abbiamo visto che i fenomeni biologici possono essere descritti ricorrendo a modelli statistici, che contengono una componente deterministica che produce la risposta attesa (<span class="math inline">\(Y_E = f(X, \theta)\)</span>) ed una componente stocastica (<span class="math inline">\(\varepsilon = Y_O - Y_E\)</span>), che ‘confonde’ le nostre osservazioni (<span class="math inline">\(Y_O\)</span>), rendendole diverse da quanto previsto dal modello deterministico. Abbiamo anche visto che i dati sperimentali possono essere utilizzati per specificare un modello generale (teorico), assegnando valori ben definiti ai parametri del modello.</p>
+<p>A questo punto è lecito chiedersi: possiamo utilizzare questo modello così specificato per prevedere i risultati di un esperimento futuro dello stesso tipo? La risposta non è così ovvia; infatti, possiamo utilizzare la parte deterministica del modello per fare previsioni sul risultato atteso (<span class="math inline">\(Y_E\)</span>), che si ottiene tramite una relazione causa-effetto. Sfortunatamente, il risultato effettivo (<span class="math inline">\(Y_O\)</span>) è totalmente imprevedibile, a causa degli effetti degli elementi stocastici <span class="math inline">\(\varepsilon\)</span>, che cambiano casualmente a ogni tentativo di campionamento e confondono le nostre osservazioni.</p>
+<p>Sebbene non abbiamo alcun modo di prevedere un risultato casuale (che altrimenti non potrebbe essere tale), possiamo fare alcune ipotesi ragionevoli. Immaginiamo di studiare l’altezza delle piante in un campo di avena ed immaginiamo che il valore atteso, come previsto dal modello, sia <span class="math inline">\(Y_E = 120\)</span>; dovremmo aspettarci che, se il modello è corretto, sia molto probabile osservare un valore di 119 o 121 cm (<span class="math inline">\(\varepsilon = \pm 1\)</span>), meno probabile osservare 100 o 140 cm (<span class="math inline">\(\varepsilon = \pm 20\)</span>), molto improbabile osservare 80 o 160 cm (<span class="math inline">\(\varepsilon = \pm 40\)</span>). Di conseguenza, dovremmo poter assegnare una probabilità a ciascun possibile valore di <span class="math inline">\(\varepsilon\)</span> (e quindi a ciascun possibile risultato osservato <span class="math inline">\(Y_O\)</span>), utilizzando una qualche <strong>funzione di probabilità</strong>.</p>
+<div id="funzioni-di-probabilitàdensità" class="section level2 hasAnchor" number="5.1">
+<h2><span class="header-section-number">5.1</span> Funzioni di probabilità/densità<a href="modelli-stocastici.html#funzioni-di-probabilitàdensità" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Se avessimo rilevato una qualità del soggetto, come il sesso (M/F), la mortalità (vivo/morto), la germinabilità (germinato/non germinato), avremmo una variabile categorica nominale e potremmo calcolare le probabilità definita come rapporto tra il numero degli eventi favorevoli e il numero totale di eventi possibili (probabilità ‘frequentista’). Ad esempio, se il nostro esperimento consistesse nell’estrarre una carta da un mazzo di carte francesi, potremmo calcolare la probabilità di estrarre un asso <span class="math inline">\(4/52 = 0.077\)</span>, oppure, se il nostro esperimento consistesse nell’effettuare due lanci della monetina, potremmo calcolare la probabilità di ottenere due teste considerando che ci sono quattro eventi possibili (testa/testa, croce/testa, testa/croce e croce/croce) e quindi la probabilità di uno di questi è <span class="math inline">\(1/4 = 0.25\)</span>.</p>
+<p>Nel caso di una variabile quantitativa, come l’altezza, non ha molto senso chiedersi, ad esempio, qual è la probabilità di trovare un individuo esattamente alto 100 cm (e non 100.0000001, o 99.99999). Capiamo da soli che questa probabilità è infinitesima. Al contrario, potremmo pensare di calcolare la probabilità di ottenere un valore compreso in un intervallo, per esempio da 99 a 101 cm: se la popolazione è ampia, ma finita, basta usare la regola che conosciamo e contare il numero di soggetti nell’intervallo, dividendoli per il numero totale di soggetti nella popolazione. Il problema però sta nel fatto che si viene ad introdurre un elemento arbitrario, cioè l’ampiezza dell’intervallo prescelto per calcolare la probabilità. Possiamo tuttavia pensare di calcolare la <strong>densità di probabilità</strong>, vale a dire il rapporto tra la probabilità di un intervallo e la sua ampiezza (cioè la probabilità per unità di ampiezza dell’intervallo; per questo si parla di densità). Ora, se immaginiamo di restringere l’intervallo fino a farlo diventare infinitamente piccolo, anche la probabilità tende a diventare infinitesima con la stessa ‘velocità’, in modo che la densità di probabilità di un singolo valore di concentrazione tende ad un numero finito (ricordate il limite del rapporto di polinomi?), come mostrato in Figura <a href="modelli-stocastici.html#fig:figName50b">5.1</a>.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:figName50b"></span>
+<img src="_main_files/figure-html/figName50b-1.png" alt="Densità di probabilità per una variabile continua discretizzata, su intervalli di ampiezza decrescente. Quando l'intervallo diviene piccolissimo, la funzione di densità tende a diventare un curva continua" width="90%" />
+<p class="caption">
+Figura 5.1: Densità di probabilità per una variabile continua discretizzata, su intervalli di ampiezza decrescente. Quando l’intervallo diviene piccolissimo, la funzione di densità tende a diventare un curva continua
+</p>
+</div>
+<p>La funzione di densità (PDF) rappresentata nella Figura <a href="modelli-stocastici.html#fig:figName50b">5.1</a> è la gaussiana ed è così comune in agricoltura e biologia che è solitamente nota come <strong>curva normale</strong>. L’equazione è:</p>
+<p><span class="math display">\[P(Y) = \frac{1}{{\sigma \sqrt {2\pi } }}\exp \left[{\frac{\left( {Y - \mu } \right)^2 }{2\sigma ^2 }} \right]\]</span></p>
+<p>ove <span class="math inline">\(P(Y)\)</span> è la densità di probabilità di una certa misura <span class="math inline">\(Y\)</span>, mentre <span class="math inline">\(\mu\)</span> e <span class="math inline">\(\sigma\)</span> sono rispettivamente la media e la deviazione standard della popolazione (per la dimostrazione si rimanda a testi specializzati). Le variabili casuali la cui densità può essere descritta con la curva di Gauss, prendono il nome di <em>variabili normali</em> o <em>normalmente distribuite</em>.</p>
+<p>Guardando la curva di Gauss possiamo notare che ha una forma ‘a campana’ che dipende da solo da <span class="math inline">\(\mu\)</span> e <span class="math inline">\(\sigma\)</span> (figura <a href="modelli-stocastici.html#fig:figName51">5.2</a>).</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:figName51"></span>
+<img src="_main_files/figure-html/figName51-1.png" alt="Distribuzioni normali con diversa media e deviazione standard (rispettivamente 5 e 1 a sinistra, 6 e 3 a destra)" width="90%" />
+<p class="caption">
+Figura 5.2: Distribuzioni normali con diversa media e deviazione standard (rispettivamente 5 e 1 a sinistra, 6 e 3 a destra)
+</p>
+</div>
+<p>Per calcolare la densità gaussiana con R, possiamo usare la funzione <code>dnorm()</code>; ad esempio, se vogliamo conoscere la densità di probabilità di ottenere un produzione di 12 t/ha, campionando una parcella da una popolazione di parcelle con media pari a 11 e deviazione standard pari a 1,5, possiamo usare il codice fornito nel riquadro 5.1.</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="modelli-stocastici.html#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Code box 5.1</span></span>
+<span id="cb41-2"><a href="modelli-stocastici.html#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb41-3"><a href="modelli-stocastici.html#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Gaussian density calculation</span></span>
+<span id="cb41-4"><a href="modelli-stocastici.html#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="fu">dnorm</span>(<span class="dv">12</span>, <span class="at">mean =</span> <span class="dv">11</span>, <span class="at">sd =</span> <span class="fl">1.5</span>)</span>
+<span id="cb41-5"><a href="modelli-stocastici.html#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 0.2129653</span></span></code></pre></div>
+<p>La densità non è una probabilità reale e non è interessante di per sé (almeno, non in termini assoluti), ma la PDF ha il vantaggio di restituire la probabilità di un intervallo di eventi come Area Sotto la Curva (Area Under the Curve: AUC). Ad esempio, la Figura <a href="modelli-stocastici.html#fig:figName52">5.3</a> evidenzia l’AUC tra 11 e 12, che rappresenta la probabilità di campionare una percella con una produzione in quell’intervallo, partendo da una popolazione di parcelle con media pari a 11 e deviazione standard pari a 1,5.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:figName52"></span>
+<img src="_main_files/figure-html/figName52-1.png" alt="Area-Under-the-Curve per una PDF gaussiana, che descrive la probabilità di campionare una parcella che ha una produzione nell'intervallo tra 11 e 12, quando la media è 11 e la deviazione standard è 1.5" width="75%" />
+<p class="caption">
+Figura 5.3: Area-Under-the-Curve per una PDF gaussiana, che descrive la probabilità di campionare una parcella che ha una produzione nell’intervallo tra 11 e 12, quando la media è 11 e la deviazione standard è 1.5
+</p>
+</div>
+<p>Di conseguenza, l’AUC e, quindi, la probabilità, possono essere calcolate integrando la curva gaussiana su un intervallo; in relazione alla Figura <a href="modelli-stocastici.html#fig:figName52">5.3</a>, la probabilità tra 11 e 12 è 0,248 (vedere il riquadro 5.2). Più semplicemente, la funzione <code>pnorm()</code> restituisce l’AUC tra <span class="math inline">\(-\infty\)</span> e qualsiasi valore <span class="math inline">\(y\)</span> (<strong>Funzione di distribuzione cumulativa</strong>; vedere la Figura <a href="modelli-stocastici.html#fig:figName52c">5.4</a>) e può essere utilizzata per evitare il calcolo di un integrale.</p>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="modelli-stocastici.html#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Code box 5.2</span></span>
+<span id="cb42-2"><a href="modelli-stocastici.html#cb42-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-3"><a href="modelli-stocastici.html#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Integration of the gaussian density function</span></span>
+<span id="cb42-4"><a href="modelli-stocastici.html#cb42-4" aria-hidden="true" tabindex="-1"></a>AUC <span class="ot">&lt;-</span> <span class="fu">integrate</span>(<span class="cf">function</span>(x) <span class="fu">dnorm</span>(x, <span class="dv">11</span>, <span class="fl">1.5</span>), <span class="dv">11</span>, <span class="dv">12</span>)</span>
+<span id="cb42-5"><a href="modelli-stocastici.html#cb42-5" aria-hidden="true" tabindex="-1"></a>AUC<span class="sc">$</span>value</span>
+<span id="cb42-6"><a href="modelli-stocastici.html#cb42-6" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 0.2475075</span></span>
+<span id="cb42-7"><a href="modelli-stocastici.html#cb42-7" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb42-8"><a href="modelli-stocastici.html#cb42-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Use of the cumulative probability function</span></span>
+<span id="cb42-9"><a href="modelli-stocastici.html#cb42-9" aria-hidden="true" tabindex="-1"></a><span class="co"># (same result as above)</span></span>
+<span id="cb42-10"><a href="modelli-stocastici.html#cb42-10" aria-hidden="true" tabindex="-1"></a><span class="fu">pnorm</span>(<span class="dv">12</span>, <span class="at">mean =</span> <span class="dv">11</span>, <span class="at">sd =</span> <span class="fl">1.5</span>) <span class="sc">-</span> <span class="fu">pnorm</span>(<span class="dv">11</span>, <span class="at">mean =</span> <span class="dv">11</span>, <span class="at">sd =</span> <span class="fl">1.5</span>)</span>
+<span id="cb42-11"><a href="modelli-stocastici.html#cb42-11" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 0.2475075</span></span></code></pre></div>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:figName52c"></span>
+<img src="_main_files/figure-html/figName52c-1.png" alt="Probabilità cumulativa gaussiana, considerando una distribuzione con media pari ad 11 e deviazione standard pari a 1.5" width="75%" />
+<p class="caption">
+Figura 5.4: Probabilità cumulativa gaussiana, considerando una distribuzione con media pari ad 11 e deviazione standard pari a 1.5
+</p>
+</div>
+<p>Le più importanti proprietà di una curva Gaussiano sono le seguenti:</p>
+<ol style="list-style-type: decimal">
+<li>la curva ha due asintoti e tende a 0 quando x tende a infinito. Questo ci dice che se assumiamo che un fenomeno è descrivibile con una curva di Gauss, allora assumiamo che tutte le misure sono possibili, anche se la loro frequenza decresce man mano che ci si allontana dalla media;</li>
+<li>L’integrale della curva di densità gaussiana da <span class="math inline">\(-\infty\)</span> a <span class="math inline">\(+\infty\)</span> è uguale ad 1. Infatti la somma delle frequenze relative di tutte le varianti possibili non può che essere uguale ad 1;</li>
+<li>la curva è simmetrica. Questo indica che la frequenza dei valori superiori alla media è esattamente uguale alla frequenza dei valori inferiori alla media;</li>
+<li>dato <span class="math inline">\(\sigma\)</span>, possiamo dire che la frequenza dei valori superiori a <span class="math inline">\(\mu + \sigma\)</span> è pari al 15.87% ed è uguale alla frequenza dei valori inferiori a <span class="math inline">\(\mu - \sigma\)</span>.</li>
+</ol>
+<p>Ora arriviamo alla domanda più interessante: come utilizzare la curva gaussiana? Se la variabile che stiamo studiando è continua (ma, con un po’ di prudenza, potremmo includere anche conteggi e rapporti), potremmo supporre che l’elemento stocastico <span class="math inline">\(\varepsilon\)</span> sia distribuito in modo gaussiano, con media uguale a 0 e deviazione standard uguale a <span class="math inline">\(\sigma\)</span>:</p>
+<p><span class="math display">\[\varepsilon \sim \textrm{Norm}(0, \sigma)\]</span></p>
+<p>Analogamente, potremmo supporre che il risultato di un esperimento sia distribuito in modo gaussiano con media uguale a <span class="math inline">\(Y_E\)</span> (come previsto dal modello deterministico) e deviazione standard uguale a <span class="math inline">\(\sigma\)</span>:</p>
+<p><span class="math display">\[Y_O \sim \textrm{Norm}(Y_E, \sigma)\]</span></p>
+<p>Se questa ipotesi è ragionevole, si aprono delle possibilità molto interessanti. In particolare, data una popolazione ed il modello che la descrive, possiamo:</p>
+<ol style="list-style-type: decimal">
+<li>calcolare le probabilità di ottenere un certo risultato osservato;</li>
+<li>simulare i risultati di esperimenti futuri.</li>
+</ol>
+<p>Vediamo come possiamo operare in alcune situazioni piuttosto comuni.</p>
+</div>
+<div id="calcolare-le-probabilità" class="section level2 hasAnchor" number="5.2">
+<h2><span class="header-section-number">5.2</span> Calcolare le probabilità<a href="modelli-stocastici.html#calcolare-le-probabilità" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In pratica, se assumiamo che un modello completamente specificato possa descrivere adeguatamente un particolare fenomeno, possiamo utilizzare tale modello per prevedere il risultato atteso. Successivamente, se conosciamo anche la deviazione standard del termine di errore residuo, possiamo utilizzare l’equazione della curva gaussiana per calcolare la probabilità di qualsiasi possibile risultato osservato.</p>
+<div id="esempio-5.1-calcolare-la-probabilità-in-un-esperimento-misurativo" class="section level3 hasAnchor" number="5.2.1">
+<h3><span class="header-section-number">5.2.1</span> Esempio 5.1: Calcolare la probabilità in un esperimento misurativo<a href="modelli-stocastici.html#esempio-5.1-calcolare-la-probabilità-in-un-esperimento-misurativo" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Ipotizziamo di avere un pozzo inquinato dai residui di una certa sostanza xeniobiotica ad una concentrazione pari a 120 <span class="math inline">\(mg/L\)</span> ed ipotizziamo di effettuare l’analisi chimica per la determinazione della concentrazione dei residui, utilizzando uno strumento caratterizzato da un coefficiente di variabilità del 10%, che equivale ad una deviazione standard pari a 12 <span class="math inline">\(mg/L\)</span> (<span class="math inline">\(\sigma = 12\)</span>). Con queste informazioni possiamo rispondere a tutte le seguenti domande:</p>
+<ol style="list-style-type: decimal">
+<li>Che modello possiamo utilizzare per descrivere i risultati di questo esperimento?</li>
+<li>Qual è la misura di concentrazione più probabile?</li>
+<li>Qual è la densità di probabilità di ottenere una concentrazione pari a 120 <span class="math inline">\(mg/L\)</span>?</li>
+<li>Qual è la probabilità di ottenere una concentrazione inferiore a 110 <span class="math inline">\(mg/L\)</span>?</li>
+<li>Qual è la probabilità di ottenere una concentrazione superiore a 130 <span class="math inline">\(mg/L\)</span>?</li>
+<li>Qual è la probabilità di ottenere una concentrazione compresa tra 110 e 130 <span class="math inline">\(mg/L\)</span></li>
+<li>Quale concentrazione è superiore al 90% di tutte i valori ottenibili (90° percentile)?</li>
+<li>Quali sono quei due valori, simmetrici rispetto alla media e tali da formare un intervallo all’interno del quale cadono il 95% delle misure possibili?</li>
+</ol>
+<p>Per questo esperimento misurativo, il modello della media è del tutto appropriato (<span class="math inline">\(Y_E = 120\)</span> mg/L). Tuttavia, si tratta di un modello semplicistico, a causa del fatto che il nostro strumento chimico non è esente da errori di misura; di conseguenza, dovremmo aggiungere la componente stocastica, come <span class="math inline">\(Y_O = 120 + \varepsilon\)</span>, dove <span class="math inline">\(\varepsilon \sim \textrm{Norm}(0, \sigma = 12)\)</span>, ovvero <span class="math inline">\(Y_O \sim \textrm{Norm}(120, 12)\)</span>.</p>
+<p>La risposta alla seconda domanda è banale (<span class="math inline">\(Y_E = 120\)</span>), mentre per rispondere alle altre domande possiamo utilizzare le apposite funzioni di R. Per ogni distribuzione abbiamo a disposizione una funzione di densità (con prefisso ‘d’), una funzione di probabilità cumulata (con prefisso ‘p’) e una funzione inversa (prefisso ‘q’) che consente di calcolare i percentili. Nel caso della funzione gaussiana, abbiamo le funzioni <code>dnorm()</code>, <code>pnorm()</code> e <code>qnorm()</code>, che possiamo utilizzare per calcolare densità, probabilità e percentili, come indicato di seguito.</p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="modelli-stocastici.html#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Domanda 2</span></span>
+<span id="cb43-2"><a href="modelli-stocastici.html#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dnorm</span>(<span class="dv">120</span>, <span class="at">mean =</span> <span class="dv">120</span>, <span class="at">sd =</span> <span class="dv">12</span>)</span>
+<span id="cb43-3"><a href="modelli-stocastici.html#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 0.03324519</span></span>
+<span id="cb43-4"><a href="modelli-stocastici.html#cb43-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Domanda 3</span></span>
+<span id="cb43-5"><a href="modelli-stocastici.html#cb43-5" aria-hidden="true" tabindex="-1"></a><span class="fu">pnorm</span>(<span class="dv">110</span>, <span class="at">mean =</span> <span class="dv">120</span>, <span class="at">sd =</span> <span class="dv">12</span>)</span>
+<span id="cb43-6"><a href="modelli-stocastici.html#cb43-6" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 0.2023284</span></span></code></pre></div>
+<p>Per la quarta domanda dobbiamo considerare che la funzione <code>pnorm()</code> fornisce la coda bassa della funzione, mentre dobbiamo individuare la coda alta (altezze maggiori della soglia data). Pertanto, abbiamo due possibili soluzioni, come indicato più sotto.</p>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="modelli-stocastici.html#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Domanda 4</span></span>
+<span id="cb44-2"><a href="modelli-stocastici.html#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="fu">pnorm</span>(<span class="dv">130</span>, <span class="at">mean =</span> <span class="dv">120</span>, <span class="at">sd =</span> <span class="dv">12</span>, <span class="at">lower.tail =</span> F)</span>
+<span id="cb44-3"><a href="modelli-stocastici.html#cb44-3" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 0.2023284</span></span>
+<span id="cb44-4"><a href="modelli-stocastici.html#cb44-4" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">-</span> <span class="fu">pnorm</span>(<span class="dv">130</span>, <span class="at">mean =</span> <span class="dv">120</span>, <span class="at">sd =</span> <span class="dv">12</span>)</span>
+<span id="cb44-5"><a href="modelli-stocastici.html#cb44-5" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 0.2023284</span></span>
+<span id="cb44-6"><a href="modelli-stocastici.html#cb44-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Domanda 5</span></span>
+<span id="cb44-7"><a href="modelli-stocastici.html#cb44-7" aria-hidden="true" tabindex="-1"></a><span class="fu">pnorm</span>(<span class="dv">130</span>, <span class="at">mean =</span> <span class="dv">120</span>, <span class="at">sd =</span> <span class="dv">12</span>) <span class="sc">-</span> <span class="fu">pnorm</span>(<span class="dv">110</span>, <span class="at">mean =</span> <span class="dv">120</span>, <span class="at">sd =</span> <span class="dv">12</span>)</span>
+<span id="cb44-8"><a href="modelli-stocastici.html#cb44-8" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 0.5953432</span></span>
+<span id="cb44-9"><a href="modelli-stocastici.html#cb44-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Domanda 6</span></span>
+<span id="cb44-10"><a href="modelli-stocastici.html#cb44-10" aria-hidden="true" tabindex="-1"></a><span class="fu">qnorm</span>(<span class="fl">0.9</span>, <span class="at">mean =</span> <span class="dv">120</span>, <span class="at">sd =</span> <span class="dv">12</span>)</span>
+<span id="cb44-11"><a href="modelli-stocastici.html#cb44-11" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 135.3786</span></span>
+<span id="cb44-12"><a href="modelli-stocastici.html#cb44-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Domanda 7</span></span>
+<span id="cb44-13"><a href="modelli-stocastici.html#cb44-13" aria-hidden="true" tabindex="-1"></a><span class="fu">qnorm</span>(<span class="fl">0.025</span>, <span class="at">mean =</span> <span class="dv">120</span>, <span class="at">sd =</span> <span class="dv">12</span>)</span>
+<span id="cb44-14"><a href="modelli-stocastici.html#cb44-14" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 96.48043</span></span>
+<span id="cb44-15"><a href="modelli-stocastici.html#cb44-15" aria-hidden="true" tabindex="-1"></a><span class="fu">qnorm</span>(<span class="fl">0.975</span>, <span class="at">mean =</span> <span class="dv">120</span>, <span class="at">sd =</span> <span class="dv">12</span>)</span>
+<span id="cb44-16"><a href="modelli-stocastici.html#cb44-16" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 143.5196</span></span></code></pre></div>
+</div>
+<div id="esempio-5.2-calcolo-della-probabilità-per-un-esperimento-di-degradazione" class="section level3 hasAnchor" number="5.2.2">
+<h3><span class="header-section-number">5.2.2</span> Esempio 5.2: Calcolo della probabilità per un esperimento di degradazione<a href="modelli-stocastici.html#esempio-5.2-calcolo-della-probabilità-per-un-esperimento-di-degradazione" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Sappiamo che la concentrazione <span class="math inline">\(C\)</span> di una sostanza erbicida nel suolo diminuisce con il tempo <span class="math inline">\(t\)</span> secondo secondo una cinetica del primo ordine, che può essere descritta con il modello: <span class="math inline">\(C = C_0 \times 10{^{-0.01 \, t}}\)</span>, dove <span class="math inline">\(C_0\)</span> è la concentrazione iniziale dell’erbicida. Supponiamo di arricchire un campione di suolo con questa sostanza fino a una concentrazione <span class="math inline">\(C_0 = 75\)</span> ng g<sup>-1</sup>, qual è la probabilità di osservare una concentrazione inferiore a 3 ng g<sup>-1</sup> a 20 giorni dal trattamento? Si consideri che tutte le fonti sconosciute di errore sperimentale possono essere considerate gaussiane, con un coefficiente di variabilità pari al 10%.</p>
+<p>Supponendo che la relazione causa-effetto sia affidabile, la concentrazione prevista a 20 giorni dal trattamento dovrebbe essere 4,22 ng g<sup>-1</sup> (riquadro 5.5). Tuttavia, il risultato osservato dipende dall’errore sperimentale, che è un evento casuale imprevedibile; se assumiamo che la funzione di probabilità per la concentrazione osservata sia gaussiana, con media di 4,22 e deviazione standard di 0,422 (ovvero 7,5 volte il 10%), la probabilità di ottenere una misura minore o uguale a 3 ng g<sup>-1</sup> è inferiore allo 0,2%, il che dimostra che si tratta di un evento alquanto improbabile.</p>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="modelli-stocastici.html#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Codice casella 5.5</span></span>
+<span id="cb45-2"><a href="modelli-stocastici.html#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Concentrazione attesa</span></span>
+<span id="cb45-3"><a href="modelli-stocastici.html#cb45-3" aria-hidden="true" tabindex="-1"></a>Ct <span class="ot">&lt;-</span> <span class="dv">75</span> <span class="sc">*</span> <span class="dv">10</span><span class="sc">^</span>(<span class="sc">-</span><span class="fl">0.05</span> <span class="sc">*</span> <span class="dv">25</span>)</span>
+<span id="cb45-4"><a href="modelli-stocastici.html#cb45-4" aria-hidden="true" tabindex="-1"></a>Ct</span>
+<span id="cb45-5"><a href="modelli-stocastici.html#cb45-5" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 4.21756</span></span>
+<span id="cb45-6"><a href="modelli-stocastici.html#cb45-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Probabilità di osservare una concentrazione &lt;= 3</span></span>
+<span id="cb45-7"><a href="modelli-stocastici.html#cb45-7" aria-hidden="true" tabindex="-1"></a><span class="fu">pnorm</span>(<span class="dv">3</span>, Ct, Ct <span class="sc">*</span> <span class="fl">0.1</span>)</span>
+<span id="cb45-8"><a href="modelli-stocastici.html#cb45-8" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 0.001945398</span></span></code></pre></div>
+</div>
+</div>
+<div id="simulazione-stocastica" class="section level2 hasAnchor" number="5.3">
+<h2><span class="header-section-number">5.3</span> Simulazione stocastica<a href="modelli-stocastici.html#simulazione-stocastica" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Guardandolo dal punto di vista che abbiamo appena illustrato, ogni esperimento scientifico non è altro che un’operazione di campionamento da una certa distribuzione di probabilità, che può essere simulato impiegando un generatore di numeri casuali, con un procedimento che prende il nome di ‘metodo Monte Carlo’.</p>
+<p>In pratica, possiamo:
+1. Simulare i risultati attesi utilizzando il modello causa-effetto selezionato per ciascuna unità sperimentale.
+2. Associare la variabilità casuale ai risultati attesi campionando da una PDF gaussiana.</p>
+<p>In R, il generatore di numeri casuali gaussiani è implementato nella funzione rnorm(), che richiede tre argomenti: il numero di valori casuali che intendiamo estrarre, la media della distribuzione e la sua deviazione standard.</p>
+<div id="esempio-5.3.-simulazione-di-un-esperimento-misurativo" class="section level3 hasAnchor" number="5.3.1">
+<h3><span class="header-section-number">5.3.1</span> Esempio 5.3. Simulazione di un esperimento misurativo<a href="modelli-stocastici.html#esempio-5.3.-simulazione-di-un-esperimento-misurativo" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Prendiamo ancora il nostro pozzo inquinato e contenente 120 <span class="math inline">\(mg/L\)</span> di un erbicida e immaginiamo di misurare la concentrazione di tre campioni d’acqua, utilizzando uno strumento caratterizzato da <span class="math inline">\(\sigma = 12\)</span>. I risultati di questo esperimento possono essere simulati:</p>
+<ol style="list-style-type: decimal">
+<li>usando il modello deterministico per definire il valore atteso della produzione per ogni dose di azoto, che sarà la stessa per tutte le repliche (in questo caso <span class="math inline">\(Y_E = 120\)</span>);</li>
+<li>utilizzando un generatore gaussiano di numeri casuali, per simulare gli effetti stocastici, campionandoli da una distribuzione normale, con le caratteristiche desiderate.</li>
+</ol>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="modelli-stocastici.html#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb46-2"><a href="modelli-stocastici.html#cb46-2" aria-hidden="true" tabindex="-1"></a>Y_E <span class="ot">&lt;-</span> <span class="dv">120</span></span>
+<span id="cb46-3"><a href="modelli-stocastici.html#cb46-3" aria-hidden="true" tabindex="-1"></a>epsilon <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">12</span>)</span>
+<span id="cb46-4"><a href="modelli-stocastici.html#cb46-4" aria-hidden="true" tabindex="-1"></a>Y_O <span class="ot">&lt;-</span> Y_E <span class="sc">+</span> epsilon</span>
+<span id="cb46-5"><a href="modelli-stocastici.html#cb46-5" aria-hidden="true" tabindex="-1"></a>Y_O</span>
+<span id="cb46-6"><a href="modelli-stocastici.html#cb46-6" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 105.5152 123.3292 133.0133</span></span></code></pre></div>
+<p>La generazione di numeri casuali con il computer viene fatta attraverso algoritmi che, a partire da un <em>seed</em> iniziale, forniscono sequenze che obbediscono a certe proprietà fondamentali (numeri pseudo-casuali). Il comando <code>set.seed(1234)</code> ci permette di partire da un <em>seed</em> predefinito, in modo che, chiunque ripeta la simulazione con lo stesso <em>seed</em>, ottiene lo stesso risultato. Un’altra cosa da notare è che il nome della funzione che genera numeri casuali è formato dal nome della distribuzione (‘norm’) più il prefisso ‘r’. Questo è vero per tutte le altre distribuzioni in R (‘rbinom’, ‘rt’ e così via). Inoltre, il primo argomento definisce il numero di valori che vogliamo ottenere (tre, tanti quante sono le repliche).</p>
+<p>La stessa strategia può essere utilizzata per simulare risultati sotto modelli deterministici più complessi: definisco i risultati attesi con il modello deterministico prescelto e ci aggiungo una componente casuale, campionandola da un distribuzione di probabilità/densità adeguata (usualmente gaussiana).</p>
+</div>
+<div id="esempio-5.4-simulazione-di-un-esperimento-di-fertilizzazione" class="section level3 hasAnchor" number="5.3.2">
+<h3><span class="header-section-number">5.3.2</span> Esempio 5.4: simulazione di un esperimento di fertilizzazione<a href="modelli-stocastici.html#esempio-5.4-simulazione-di-un-esperimento-di-fertilizzazione" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Con la stessa tecnica, possiamo provare a simulare i risultati di un esperimento per determinare la resa del grano trattato con quattro diversi dosaggi di azoto (0, 60, 120 e 180 kg/ha); immaginamo che il disegno sperimentale sia completamente randomizzato con quattro repliche (sedici dati in totale) e il modello causa-effetto sia:</p>
+<p><span class="math display">\[Y_O = 25 + 0.15 \, X + \varepsilon\]</span></p>
+<p>ove: <span class="math inline">\(Y_O\)</span> è la produzione osservata, <span class="math inline">\(X\)</span> è la dose di azoto, e l’elemento stocastico è <span class="math inline">\(\varepsilon \sim N(0, \sigma = 2.5)\)</span>. Il
+codice per la simulazione è riportato nel box sottostante.</p>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="modelli-stocastici.html#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Code box 5.6</span></span>
+<span id="cb47-2"><a href="modelli-stocastici.html#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Stochastic simulation, Example 5.3</span></span>
+<span id="cb47-3"><a href="modelli-stocastici.html#cb47-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-4"><a href="modelli-stocastici.html#cb47-4" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb47-5"><a href="modelli-stocastici.html#cb47-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-6"><a href="modelli-stocastici.html#cb47-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating the vector to host the experimental design</span></span>
+<span id="cb47-7"><a href="modelli-stocastici.html#cb47-7" aria-hidden="true" tabindex="-1"></a>Dose <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">60</span>, <span class="dv">120</span>, <span class="dv">180</span>), <span class="at">each=</span><span class="dv">4</span>)</span>
+<span id="cb47-8"><a href="modelli-stocastici.html#cb47-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-9"><a href="modelli-stocastici.html#cb47-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Predicting the expected yield</span></span>
+<span id="cb47-10"><a href="modelli-stocastici.html#cb47-10" aria-hidden="true" tabindex="-1"></a>Yield_E <span class="ot">&lt;-</span> <span class="dv">25</span> <span class="sc">+</span> <span class="fl">0.15</span> <span class="sc">*</span> Dose</span>
+<span id="cb47-11"><a href="modelli-stocastici.html#cb47-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-12"><a href="modelli-stocastici.html#cb47-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Predicting the residuals</span></span>
+<span id="cb47-13"><a href="modelli-stocastici.html#cb47-13" aria-hidden="true" tabindex="-1"></a>epsilon <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">16</span>, <span class="dv">0</span>, <span class="fl">2.5</span>)</span>
+<span id="cb47-14"><a href="modelli-stocastici.html#cb47-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-15"><a href="modelli-stocastici.html#cb47-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Predicting the observations</span></span>
+<span id="cb47-16"><a href="modelli-stocastici.html#cb47-16" aria-hidden="true" tabindex="-1"></a>Yield <span class="ot">&lt;-</span> Yield_E <span class="sc">+</span> epsilon</span>
+<span id="cb47-17"><a href="modelli-stocastici.html#cb47-17" aria-hidden="true" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(Dose, Yield)</span>
+<span id="cb47-18"><a href="modelli-stocastici.html#cb47-18" aria-hidden="true" tabindex="-1"></a>dataset</span>
+<span id="cb47-19"><a href="modelli-stocastici.html#cb47-19" aria-hidden="true" tabindex="-1"></a><span class="do">##    Dose    Yield</span></span>
+<span id="cb47-20"><a href="modelli-stocastici.html#cb47-20" aria-hidden="true" tabindex="-1"></a><span class="do">## 1     0 21.98234</span></span>
+<span id="cb47-21"><a href="modelli-stocastici.html#cb47-21" aria-hidden="true" tabindex="-1"></a><span class="do">## 2     0 25.69357</span></span>
+<span id="cb47-22"><a href="modelli-stocastici.html#cb47-22" aria-hidden="true" tabindex="-1"></a><span class="do">## 3     0 27.71110</span></span>
+<span id="cb47-23"><a href="modelli-stocastici.html#cb47-23" aria-hidden="true" tabindex="-1"></a><span class="do">## 4     0 19.13576</span></span>
+<span id="cb47-24"><a href="modelli-stocastici.html#cb47-24" aria-hidden="true" tabindex="-1"></a><span class="do">## 5    60 35.07281</span></span>
+<span id="cb47-25"><a href="modelli-stocastici.html#cb47-25" aria-hidden="true" tabindex="-1"></a><span class="do">## 6    60 35.26514</span></span>
+<span id="cb47-26"><a href="modelli-stocastici.html#cb47-26" aria-hidden="true" tabindex="-1"></a><span class="do">## 7    60 32.56315</span></span>
+<span id="cb47-27"><a href="modelli-stocastici.html#cb47-27" aria-hidden="true" tabindex="-1"></a><span class="do">## 8    60 32.63342</span></span>
+<span id="cb47-28"><a href="modelli-stocastici.html#cb47-28" aria-hidden="true" tabindex="-1"></a><span class="do">## 9   120 41.58887</span></span>
+<span id="cb47-29"><a href="modelli-stocastici.html#cb47-29" aria-hidden="true" tabindex="-1"></a><span class="do">## 10  120 40.77491</span></span>
+<span id="cb47-30"><a href="modelli-stocastici.html#cb47-30" aria-hidden="true" tabindex="-1"></a><span class="do">## 11  120 41.80702</span></span>
+<span id="cb47-31"><a href="modelli-stocastici.html#cb47-31" aria-hidden="true" tabindex="-1"></a><span class="do">## 12  120 40.50403</span></span>
+<span id="cb47-32"><a href="modelli-stocastici.html#cb47-32" aria-hidden="true" tabindex="-1"></a><span class="do">## 13  180 50.05937</span></span>
+<span id="cb47-33"><a href="modelli-stocastici.html#cb47-33" aria-hidden="true" tabindex="-1"></a><span class="do">## 14  180 52.16115</span></span>
+<span id="cb47-34"><a href="modelli-stocastici.html#cb47-34" aria-hidden="true" tabindex="-1"></a><span class="do">## 15  180 54.39874</span></span>
+<span id="cb47-35"><a href="modelli-stocastici.html#cb47-35" aria-hidden="true" tabindex="-1"></a><span class="do">## 16  180 51.72429</span></span></code></pre></div>
+</div>
+<div id="esempio-5.4-simulazione-di-una-prova-di-confronto-varietale" class="section level3 hasAnchor" number="5.3.3">
+<h3><span class="header-section-number">5.3.3</span> Esempio 5.4: Simulazione di una prova di confronto varietale<a href="modelli-stocastici.html#esempio-5.4-simulazione-di-una-prova-di-confronto-varietale" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Proviamo ora a simulare i risultati di un esperimento di confronto varietale, con cinque genotipi in quattro blocchi (20 osservazioni in totale). La relazione causa-effetto è la seguente:</p>
+<p><span class="math display">\[Y_{O(ij)} = \mu + \alpha_i + \gamma_j + \varepsilon_{ij}\]</span></p>
+<p>dove <span class="math inline">\(Y_O\)</span> è la resa osservata, <span class="math inline">\(\mu\)</span> è la resa media del primo genotipo nel primo blocco, <span class="math inline">\(\alpha\)</span> è l’effetto del genotipo e <span class="math inline">\(\gamma\)</span> è l’effetto del blocco a cui appartiene ogni parcella. Poniamo che <span class="math inline">\(\mu\)</span> sia 48 q/ha, i valori di <span class="math inline">\(\alpha\)</span> siano rispettivamente 0, 1, 3, -2, -3 per i cinque genotipi, mentre i valori di <span class="math inline">\(\gamma\)</span> siano rispettivamente 0, -2, 3, 1 per i quattro blocchi. Poniamo inoltre che l’errore sperimentale <span class="math inline">\(\varepsilon\)</span> sia gaussiano con media uguale a 0 e <span class="math inline">\(\sigma = 5\)</span>.</p>
+<p>Con questi dati, il processo di simulazione è mostrata nel riquadro sottostante.</p>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="modelli-stocastici.html#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Code box 5.7</span></span>
+<span id="cb48-2"><a href="modelli-stocastici.html#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Stochastic simulation, Example 5.4</span></span>
+<span id="cb48-3"><a href="modelli-stocastici.html#cb48-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-4"><a href="modelli-stocastici.html#cb48-4" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb48-5"><a href="modelli-stocastici.html#cb48-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-6"><a href="modelli-stocastici.html#cb48-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare the vectors for the experimental design</span></span>
+<span id="cb48-7"><a href="modelli-stocastici.html#cb48-7" aria-hidden="true" tabindex="-1"></a>Genotype <span class="ot">&lt;-</span> <span class="fu">rep</span>(LETTERS[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>], <span class="at">each=</span><span class="dv">4</span>) </span>
+<span id="cb48-8"><a href="modelli-stocastici.html#cb48-8" aria-hidden="true" tabindex="-1"></a>Block <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>, <span class="at">times =</span> <span class="dv">5</span>)</span>
+<span id="cb48-9"><a href="modelli-stocastici.html#cb48-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-10"><a href="modelli-stocastici.html#cb48-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Input the value of parameters</span></span>
+<span id="cb48-11"><a href="modelli-stocastici.html#cb48-11" aria-hidden="true" tabindex="-1"></a>mu <span class="ot">&lt;-</span> <span class="dv">48</span></span>
+<span id="cb48-12"><a href="modelli-stocastici.html#cb48-12" aria-hidden="true" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">3</span>, <span class="sc">-</span><span class="dv">2</span>, <span class="sc">-</span><span class="dv">3</span>), <span class="at">each =</span> <span class="dv">4</span>) </span>
+<span id="cb48-13"><a href="modelli-stocastici.html#cb48-13" aria-hidden="true" tabindex="-1"></a>gamma <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="sc">-</span><span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">1</span>), <span class="at">times =</span> <span class="dv">5</span>)</span>
+<span id="cb48-14"><a href="modelli-stocastici.html#cb48-14" aria-hidden="true" tabindex="-1"></a>sigma <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb48-15"><a href="modelli-stocastici.html#cb48-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-16"><a href="modelli-stocastici.html#cb48-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Predict the expected yields</span></span>
+<span id="cb48-17"><a href="modelli-stocastici.html#cb48-17" aria-hidden="true" tabindex="-1"></a>Yield_E <span class="ot">&lt;-</span> mu <span class="sc">+</span> alpha <span class="sc">+</span> gamma</span>
+<span id="cb48-18"><a href="modelli-stocastici.html#cb48-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-19"><a href="modelli-stocastici.html#cb48-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulate the residuals and the observed values</span></span>
+<span id="cb48-20"><a href="modelli-stocastici.html#cb48-20" aria-hidden="true" tabindex="-1"></a>epsilon <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">20</span>, <span class="dv">0</span>, sigma)</span>
+<span id="cb48-21"><a href="modelli-stocastici.html#cb48-21" aria-hidden="true" tabindex="-1"></a>Yield <span class="ot">&lt;-</span> Yield_E <span class="sc">+</span> epsilon</span>
+<span id="cb48-22"><a href="modelli-stocastici.html#cb48-22" aria-hidden="true" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(Genotype, Block, Yield)</span>
+<span id="cb48-23"><a href="modelli-stocastici.html#cb48-23" aria-hidden="true" tabindex="-1"></a>dataset</span>
+<span id="cb48-24"><a href="modelli-stocastici.html#cb48-24" aria-hidden="true" tabindex="-1"></a><span class="do">##    Genotype Block    Yield</span></span>
+<span id="cb48-25"><a href="modelli-stocastici.html#cb48-25" aria-hidden="true" tabindex="-1"></a><span class="do">## 1         A     1 41.96467</span></span>
+<span id="cb48-26"><a href="modelli-stocastici.html#cb48-26" aria-hidden="true" tabindex="-1"></a><span class="do">## 2         A     2 47.38715</span></span>
+<span id="cb48-27"><a href="modelli-stocastici.html#cb48-27" aria-hidden="true" tabindex="-1"></a><span class="do">## 3         A     3 56.42221</span></span>
+<span id="cb48-28"><a href="modelli-stocastici.html#cb48-28" aria-hidden="true" tabindex="-1"></a><span class="do">## 4         A     4 37.27151</span></span>
+<span id="cb48-29"><a href="modelli-stocastici.html#cb48-29" aria-hidden="true" tabindex="-1"></a><span class="do">## 5         B     1 51.14562</span></span>
+<span id="cb48-30"><a href="modelli-stocastici.html#cb48-30" aria-hidden="true" tabindex="-1"></a><span class="do">## 6         B     2 49.53028</span></span>
+<span id="cb48-31"><a href="modelli-stocastici.html#cb48-31" aria-hidden="true" tabindex="-1"></a><span class="do">## 7         B     3 49.12630</span></span>
+<span id="cb48-32"><a href="modelli-stocastici.html#cb48-32" aria-hidden="true" tabindex="-1"></a><span class="do">## 8         B     4 47.26684</span></span>
+<span id="cb48-33"><a href="modelli-stocastici.html#cb48-33" aria-hidden="true" tabindex="-1"></a><span class="do">## 9         C     1 48.17774</span></span>
+<span id="cb48-34"><a href="modelli-stocastici.html#cb48-34" aria-hidden="true" tabindex="-1"></a><span class="do">## 10        C     2 44.54981</span></span>
+<span id="cb48-35"><a href="modelli-stocastici.html#cb48-35" aria-hidden="true" tabindex="-1"></a><span class="do">## 11        C     3 51.61404</span></span>
+<span id="cb48-36"><a href="modelli-stocastici.html#cb48-36" aria-hidden="true" tabindex="-1"></a><span class="do">## 12        C     4 47.00807</span></span>
+<span id="cb48-37"><a href="modelli-stocastici.html#cb48-37" aria-hidden="true" tabindex="-1"></a><span class="do">## 13        D     1 42.11873</span></span>
+<span id="cb48-38"><a href="modelli-stocastici.html#cb48-38" aria-hidden="true" tabindex="-1"></a><span class="do">## 14        D     2 44.32229</span></span>
+<span id="cb48-39"><a href="modelli-stocastici.html#cb48-39" aria-hidden="true" tabindex="-1"></a><span class="do">## 15        D     3 53.79747</span></span>
+<span id="cb48-40"><a href="modelli-stocastici.html#cb48-40" aria-hidden="true" tabindex="-1"></a><span class="do">## 16        D     4 46.44857</span></span>
+<span id="cb48-41"><a href="modelli-stocastici.html#cb48-41" aria-hidden="true" tabindex="-1"></a><span class="do">## 17        E     1 42.44495</span></span>
+<span id="cb48-42"><a href="modelli-stocastici.html#cb48-42" aria-hidden="true" tabindex="-1"></a><span class="do">## 18        E     2 38.44402</span></span>
+<span id="cb48-43"><a href="modelli-stocastici.html#cb48-43" aria-hidden="true" tabindex="-1"></a><span class="do">## 19        E     3 43.81414</span></span>
+<span id="cb48-44"><a href="modelli-stocastici.html#cb48-44" aria-hidden="true" tabindex="-1"></a><span class="do">## 20        E     4 58.07918</span></span></code></pre></div>
+</div>
+</div>
+<div id="conclusioni-2" class="section level2 hasAnchor" number="5.4">
+<h2><span class="header-section-number">5.4</span> Conclusioni<a href="modelli-stocastici.html#conclusioni-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Come conclusione di questa parte, possiamo fare le seguenti affermazioni:</p>
+<ol style="list-style-type: decimal">
+<li>i modelli possono fornire una descrizione molto utile delle relazioni causa-effetto e possono essere utilizzati per descrivere i risultati sperimentali in una data situazione, sebbene possano solo prevedere il valore atteso;</li>
+<li>a causa della presenza di effetti casuali, il risultato esatto di ogni singolo individuo è imprevedibile; tuttavia possiamo calcolare la probabilità di ottenere uno dei diversi risultati possibili utilizzando modelli stocastici, sotto forma di funzioni di densità di probabilità (PDF);</li>
+<li>la PDF gaussiana è quella più utilizzata per le variabili continue, ma, con le dovute precauzioni (vedi più avanti) può essere utilizzata anche con conteggi e rapporti.</li>
+</ol>
+<p>Sebbene in questo capitolo abbiamo considerato solo un modello stocastico (PDF gaussiana), esistono diverse altre funzioni di densità di probabilità, che potrebbero essere utilizzate per raggiungere lo stesso obiettivo, ovvero descrivere la variabilità casuale. Ad esempio, nel resto di questo libro incontreremo la distribuzione t di Student e la distribuzione di Fisher-Snedecor. Chi fosse interessato a questo argomento, potrà trovare numerose informazioni nel grande libro di Ben Bolker, citato di seguito.</p>
+<hr />
+</div>
+<div id="altre-letture-4" class="section level2 hasAnchor" number="5.5">
+<h2><span class="header-section-number">5.5</span> Altre letture<a href="modelli-stocastici.html#altre-letture-4" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<ol style="list-style-type: decimal">
+<li>Bolker, B.M., 2008. Ecological models and data in R. Princeton University Press, Books.</li>
+<li>Schabenberger, O., Pierce, F.J., 2002. Contemporary statistical models for the plant and soil sciences. Taylor &amp; Francis, CRC Press, Books.</li>
+</ol>
+</div>
+<div id="domande-ed-esercizi-3" class="section level2 hasAnchor" number="5.6">
+<h2><span class="header-section-number">5.6</span> Domande ed esercizi<a href="modelli-stocastici.html#domande-ed-esercizi-3" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<ol style="list-style-type: decimal">
+<li>Un ricercatore sta studiando una popolazione di insetti ed ha valutato che la loro lunghezza è distribuita normalmente, con <span class="math inline">\(\mu = 23 \, \textrm{mm}\)</span> e <span class="math inline">\(\sigma = 1.6\)</span>. Calcolare la probabilità di estrarre individui con lunghezza: (1) maggiore di 25, (2) minore di 21 e (3) compresa tra 21 e 25.</li>
+<li>Una macchina confezionatrice riempe automaticamente delle confezioni di seme. Il peso dichiarato sulla confezione è 12.5 kg, ma la precisione della macchina è <span class="math inline">\(\pm\)</span> 1 kg. Calcolare la probabilità che una confezione contenga: (1) meno del peso dichiarato, (2) meno di 12 kg e (3) più di 13 Kg. Si vuole regolare la macchina in modo che non più del 5% dei sacchi contenga un peso inferiore a quello dichiarato. Su quale peso dovrebbe essere regolata la macchina di riempimento? (SUGGERIMENTO: se io regolo la macchina a 12.5 kg, la quantità effettivamente erogata è normalmente distribuita, con media 12.5 e deviazione standard 1. In questo caso, c’è un 5% di probabilità di erogare meno di _____ kg; di conseguenza, devo alzare la media di ____ kg per far si che la quantità erogata non sia inferiore a 12.5 kg, se non nel 5% dei casi)</li>
+<li>Uno strumento di analisi ha un coefficiente di variabilità pari al 10%. Ammettendo di utilizzare quello strumento su una matrice la cui concentrazione è 10 ng/g, calcolare la probabilità di ottenere una misura: (1) inferiore a 9 ng/g, (2) superiore a 11 ng/g e (3) compresa tra 9 e 11 ng/g.</li>
+<li>Un erbicida si degrada nel terreno seguendo una cinetica del primo ordine (<span class="math inline">\(Y = 100 \, e^{-0.07 \, t}\)</span>), dove Y è la concentrazione al tempo t. Dopo aver spruzzato questo erbicida, che probabilità abbiamo di osservare, dopo 50 giorni, una concentrazione che risulti al disotto della soglia di tossicità per i mammiferi (2 ng/g)? Tenere conto che lo strumento di misura produce un coefficiente di variabilità del 20%</li>
+<li>Una sostanza xenobiotica si degrada nell’acqua a 20°C seguendo una cinetica del primo ordine (<span class="math inline">\(Y = C_0 \, e^{-0.06 \, t}\)</span>, dove Y è la concentrazione al tempo t. Simulare i risultati di un esperimento in cui, dopo la somministrazione di questa sostanza alla dose <span class="math inline">\(C_0 = 63\)</span> ng/mL, facciamo dodici prelievi settimanali e misuriamo la concentrazione del residuo. Considerare che (1) l’errore sperimentale è gaussiano e omoscedastico sul logaritmo della concentrazione, con media 0 e deviazione standard pari a 0.25; (2) l’esperimento è a randomizzazione completa con tre repliche.</li>
+<li>Una coltura produce in funzione della sua fittezza, secondo la seguente relazione: $ Y = 0.8 + 0.8 , X - 0.07 , X^2$. Stabilire la fittezza necessaria per ottenere il massimo produttivo (graficamente o analiticamente). Valutare la probabilità di ottenere una produzione compresa tra 2.5 e 3 t/ha, seminando alla fittezza ottimale. Considerare che la variabilità stocastica è del 12%.</li>
+<li>La tossicità di un insetticida varia con la dose, secondo la legge log-logistica: $ Y = $, dove Y è la proporzione di animali morti e X è la dose. Se trattiamo 150 insetti con una dose pari a 35 g, qual è la probabilità di trovare più di 120 morti? Considerare che la risposta è variabile da individuo ad individuo nella popolazione e questa variabilità può essere approssimata utilizzando una distribuzione gaussiana con una deviazione standard pari a 0.10.</li>
+<li>Simulare i risultati di un esperimento varietale, con sette varietà di frumento e quattro repliche. Considerare che il modello deterministico è un modello ANOVA, nel quale vengono definite le medie delle sette varietà (valori attesi). Decidere autonomamente sui parametri da impiegare per la simulazione (da <span class="math inline">\(\mu_1\)</span> a <span class="math inline">\(\mu_7\)</span> e <span class="math inline">\(\sigma\)</span>)</li>
+<li>Considerando il testo dell’esercizio 6, simulare un esperimento in cui la coltura viene seminata a fittezze di 2, 4, 6, 8 piante per metro quadrato, con quattro repliche.</li>
+<li>Considerando il testo dell’esercizio 7, simulare un esperimento in cui l’insetticida viene utilizzato a cinque dosi crescenti (a vostra scelta), con quattro repliche.</li>
+</ol>
+</div>
+<div id="soluzioni" class="section level2 hasAnchor" number="5.7">
+<h2><span class="header-section-number">5.7</span> Soluzioni<a href="modelli-stocastici.html#soluzioni" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="modelli-stocastici.html#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Esercizio 2</span></span>
+<span id="cb49-2"><a href="modelli-stocastici.html#cb49-2" aria-hidden="true" tabindex="-1"></a>delta <span class="ot">&lt;-</span> <span class="dv">125</span> <span class="sc">-</span> <span class="fu">qnorm</span>(<span class="fl">0.05</span>, <span class="dv">125</span>, <span class="dv">1</span>)</span>
+<span id="cb49-3"><a href="modelli-stocastici.html#cb49-3" aria-hidden="true" tabindex="-1"></a><span class="fu">pnorm</span>(<span class="dv">125</span>, <span class="dv">125</span> <span class="sc">+</span> delta, <span class="dv">1</span>)</span>
+<span id="cb49-4"><a href="modelli-stocastici.html#cb49-4" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 0.05</span></span></code></pre></div>
+<hr />
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="modelli-stocastici.html#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Esercizio 4</span></span>
+<span id="cb50-2"><a href="modelli-stocastici.html#cb50-2" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">exp</span>(<span class="sc">-</span><span class="fl">0.07</span> <span class="sc">*</span> <span class="dv">50</span>)</span>
+<span id="cb50-3"><a href="modelli-stocastici.html#cb50-3" aria-hidden="true" tabindex="-1"></a>res</span>
+<span id="cb50-4"><a href="modelli-stocastici.html#cb50-4" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 3.019738</span></span>
+<span id="cb50-5"><a href="modelli-stocastici.html#cb50-5" aria-hidden="true" tabindex="-1"></a><span class="fu">pnorm</span>(<span class="dv">2</span>, res, res <span class="sc">*</span> <span class="dv">20</span><span class="sc">/</span><span class="dv">100</span>)</span>
+<span id="cb50-6"><a href="modelli-stocastici.html#cb50-6" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 0.04566198</span></span></code></pre></div>
+<hr />
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="modelli-stocastici.html#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Esercizio 5</span></span>
+<span id="cb51-2"><a href="modelli-stocastici.html#cb51-2" aria-hidden="true" tabindex="-1"></a>time <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">84</span>, <span class="dv">7</span>), <span class="at">each =</span> <span class="dv">3</span>)</span>
+<span id="cb51-3"><a href="modelli-stocastici.html#cb51-3" aria-hidden="true" tabindex="-1"></a>logConc <span class="ot">&lt;-</span> <span class="fu">log</span>(<span class="dv">63</span>) <span class="sc">-</span> <span class="fl">0.06</span> <span class="sc">*</span> time <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="dv">39</span>, <span class="dv">0</span>, <span class="fl">0.25</span>)</span>
+<span id="cb51-4"><a href="modelli-stocastici.html#cb51-4" aria-hidden="true" tabindex="-1"></a>Conc <span class="ot">&lt;-</span> <span class="fu">exp</span>(logConc)</span>
+<span id="cb51-5"><a href="modelli-stocastici.html#cb51-5" aria-hidden="true" tabindex="-1"></a>Conc</span>
+<span id="cb51-6"><a href="modelli-stocastici.html#cb51-6" aria-hidden="true" tabindex="-1"></a><span class="do">##  [1] 65.1476858 55.7269155 56.4298209 46.4340064 34.8030374 28.8204008</span></span>
+<span id="cb51-7"><a href="modelli-stocastici.html#cb51-7" aria-hidden="true" tabindex="-1"></a><span class="do">##  [7] 31.4004950 21.0567420 27.0950255 14.1419785 23.5401886 15.8669203</span></span>
+<span id="cb51-8"><a href="modelli-stocastici.html#cb51-8" aria-hidden="true" tabindex="-1"></a><span class="do">## [13]  9.8333013 10.3586323  7.8135653  5.7616847  4.4732929  5.5172880</span></span>
+<span id="cb51-9"><a href="modelli-stocastici.html#cb51-9" aria-hidden="true" tabindex="-1"></a><span class="do">## [19]  4.7094035  4.5116383  7.2827519  2.5496958  2.6893340  3.1048921</span></span>
+<span id="cb51-10"><a href="modelli-stocastici.html#cb51-10" aria-hidden="true" tabindex="-1"></a><span class="do">## [25]  1.7066796  1.7177343  1.6591496  1.0514164  1.2613438  1.2698798</span></span>
+<span id="cb51-11"><a href="modelli-stocastici.html#cb51-11" aria-hidden="true" tabindex="-1"></a><span class="do">## [31]  0.6014733  0.8167810  0.7159910  0.4816171  0.5960429  0.7145507</span></span>
+<span id="cb51-12"><a href="modelli-stocastici.html#cb51-12" aria-hidden="true" tabindex="-1"></a><span class="do">## [37]  0.6157521  0.3361480  0.6093345</span></span>
+<span id="cb51-13"><a href="modelli-stocastici.html#cb51-13" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(Conc) <span class="sc">~</span> time)</span>
+<span id="cb51-14"><a href="modelli-stocastici.html#cb51-14" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mod)</span>
+<span id="cb51-15"><a href="modelli-stocastici.html#cb51-15" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-16"><a href="modelli-stocastici.html#cb51-16" aria-hidden="true" tabindex="-1"></a><span class="do">## Call:</span></span>
+<span id="cb51-17"><a href="modelli-stocastici.html#cb51-17" aria-hidden="true" tabindex="-1"></a><span class="do">## lm(formula = log(Conc) ~ time)</span></span>
+<span id="cb51-18"><a href="modelli-stocastici.html#cb51-18" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-19"><a href="modelli-stocastici.html#cb51-19" aria-hidden="true" tabindex="-1"></a><span class="do">## Residuals:</span></span>
+<span id="cb51-20"><a href="modelli-stocastici.html#cb51-20" aria-hidden="true" tabindex="-1"></a><span class="do">##      Min       1Q   Median       3Q      Max </span></span>
+<span id="cb51-21"><a href="modelli-stocastici.html#cb51-21" aria-hidden="true" tabindex="-1"></a><span class="do">## -0.41736 -0.14930 -0.02928  0.05614  0.51074 </span></span>
+<span id="cb51-22"><a href="modelli-stocastici.html#cb51-22" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-23"><a href="modelli-stocastici.html#cb51-23" aria-hidden="true" tabindex="-1"></a><span class="do">## Coefficients:</span></span>
+<span id="cb51-24"><a href="modelli-stocastici.html#cb51-24" aria-hidden="true" tabindex="-1"></a><span class="do">##              Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span id="cb51-25"><a href="modelli-stocastici.html#cb51-25" aria-hidden="true" tabindex="-1"></a><span class="do">## (Intercept)  3.994864   0.068446   58.37   &lt;2e-16 ***</span></span>
+<span id="cb51-26"><a href="modelli-stocastici.html#cb51-26" aria-hidden="true" tabindex="-1"></a><span class="do">## time        -0.059411   0.001383  -42.96   &lt;2e-16 ***</span></span>
+<span id="cb51-27"><a href="modelli-stocastici.html#cb51-27" aria-hidden="true" tabindex="-1"></a><span class="do">## ---</span></span>
+<span id="cb51-28"><a href="modelli-stocastici.html#cb51-28" aria-hidden="true" tabindex="-1"></a><span class="do">## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span>
+<span id="cb51-29"><a href="modelli-stocastici.html#cb51-29" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-30"><a href="modelli-stocastici.html#cb51-30" aria-hidden="true" tabindex="-1"></a><span class="do">## Residual standard error: 0.2262 on 37 degrees of freedom</span></span>
+<span id="cb51-31"><a href="modelli-stocastici.html#cb51-31" aria-hidden="true" tabindex="-1"></a><span class="do">## Multiple R-squared:  0.9803, Adjusted R-squared:  0.9798 </span></span>
+<span id="cb51-32"><a href="modelli-stocastici.html#cb51-32" aria-hidden="true" tabindex="-1"></a><span class="do">## F-statistic:  1846 on 1 and 37 DF,  p-value: &lt; 2.2e-16</span></span></code></pre></div>
+<hr />
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="modelli-stocastici.html#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Esercizio 6</span></span>
+<span id="cb52-2"><a href="modelli-stocastici.html#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fl">0.8</span> <span class="sc">+</span> <span class="fl">0.8</span><span class="sc">*</span>x <span class="sc">-</span> <span class="fl">0.07</span><span class="sc">*</span>x<span class="sc">^</span><span class="dv">2</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">10</span>))</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-49-1.png" /><!-- --></p>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="modelli-stocastici.html#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">D</span>(<span class="fu">expression</span>(<span class="fl">0.8</span> <span class="sc">+</span> <span class="fl">0.8</span><span class="sc">*</span>x <span class="sc">-</span> <span class="fl">0.07</span><span class="sc">*</span>x<span class="sc">^</span><span class="dv">2</span>), <span class="st">&quot;x&quot;</span>)</span>
+<span id="cb53-2"><a href="modelli-stocastici.html#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="do">## 0.8 - 0.07 * (2 * x)</span></span>
+<span id="cb53-3"><a href="modelli-stocastici.html#cb53-3" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fl">0.8</span><span class="sc">/</span>(<span class="dv">2</span><span class="sc">*</span><span class="fl">0.07</span>)</span>
+<span id="cb53-4"><a href="modelli-stocastici.html#cb53-4" aria-hidden="true" tabindex="-1"></a>prod <span class="ot">&lt;-</span> <span class="fl">0.8</span> <span class="sc">+</span> <span class="fl">0.8</span><span class="sc">*</span>x <span class="sc">-</span> <span class="fl">0.07</span><span class="sc">*</span>x<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb53-5"><a href="modelli-stocastici.html#cb53-5" aria-hidden="true" tabindex="-1"></a>prod</span>
+<span id="cb53-6"><a href="modelli-stocastici.html#cb53-6" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 3.085714</span></span>
+<span id="cb53-7"><a href="modelli-stocastici.html#cb53-7" aria-hidden="true" tabindex="-1"></a><span class="fu">pnorm</span>(<span class="dv">3</span>, prod, prod <span class="sc">*</span> <span class="fl">0.12</span>) <span class="sc">-</span> <span class="fu">pnorm</span>(<span class="fl">2.5</span>, prod, prod <span class="sc">*</span> <span class="fl">0.12</span>)</span>
+<span id="cb53-8"><a href="modelli-stocastici.html#cb53-8" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 0.3516216</span></span></code></pre></div>
+<hr />
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="modelli-stocastici.html#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Esercizio 7</span></span>
+<span id="cb54-2"><a href="modelli-stocastici.html#cb54-2" aria-hidden="true" tabindex="-1"></a>prob <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span> ( <span class="sc">-</span><span class="dv">2</span> <span class="sc">*</span> (<span class="fu">log</span>(<span class="dv">35</span>) <span class="sc">-</span> <span class="fu">log</span>(<span class="dv">15</span>))))</span>
+<span id="cb54-3"><a href="modelli-stocastici.html#cb54-3" aria-hidden="true" tabindex="-1"></a>prob</span>
+<span id="cb54-4"><a href="modelli-stocastici.html#cb54-4" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 0.8448276</span></span>
+<span id="cb54-5"><a href="modelli-stocastici.html#cb54-5" aria-hidden="true" tabindex="-1"></a><span class="fu">pnorm</span>(<span class="dv">120</span>, <span class="dv">150</span><span class="sc">*</span>prob, <span class="dv">10</span>, <span class="at">lower.tail =</span> F)</span>
+<span id="cb54-6"><a href="modelli-stocastici.html#cb54-6" aria-hidden="true" tabindex="-1"></a><span class="do">## [1] 0.7493398</span></span></code></pre></div>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="le-relazioni-causa-effetto.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="stime-ed-incertezza.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="book_assets/gitbook-2.6.7/js/app.min.js"></script>
+<script src="book_assets/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="book_assets/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="book_assets/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="book_assets/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="book_assets/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="book_assets/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="book_assets/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "section",
+"scroll_highlight": true
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

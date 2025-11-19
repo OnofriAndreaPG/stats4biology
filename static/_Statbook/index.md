@@ -1,9 +1,10 @@
 ---
 title: "Metodologia sperimentale per le scienze agrarie"
 author: "Andrea Onofri e Dario Sacco"
-date: "Update: v. 1.30 (Anno Accademico 2023-2024; giugno), compil. 2024-05-30"
+date: "Update: v. 0.5 (Early Draft, Anno Accademico 2025-2026; giugno), compil. 2025-11-19"
 #site: bookdown::bookdown_site
 documentclass: book
+fontsize: 12pt
 citation_package: natbib
 bibliography: [statBook.bib]
 biblio-style: apalike
@@ -15,19 +16,17 @@ delete_merged_file: true
 
 
 
-
 # Premessa {-}
 
 <img src= "_images/cover.jpeg" width="350" align="right" alt="" class="cover" />
 
-
-In questo sito troverete il libro "Metodologia sperimentale per le scienze agrarie", con il quale ci siamo posti il compito di fornirvi informazioni su come sia possibile ottenere informazioni scientificamente attendibili, partendo da un esperimento opportunamente pianificato ed organizzato. Siamo convinti che già sappiate come gli esperimenti siano l'elemento chiave del progresso scientifico; forse però non siete coscienti del fatto che non tutti gli esperimenti sono ugualmente buoni e producono dati ugualmente validi. In questo libro, cercheremo di mostrarvi come si riconosce un buon esperimento da un cattivo esperimento e, di conseguenza, come si riconosce la scienza dalla pseudoscienza.
+In questo sito troverete l'e-book “Metodologia sperimentale per le scienze agrarie”, con il quale ci siamo posti il compito di fornirvi informazioni su come sia possibile ottenere informazioni scientificamente attendibili, partendo da un esperimento opportunamente pianificato ed organizzato. Siamo convinti che già sappiate come gli esperimenti siano l'elemento chiave del progresso scientifico; forse però non siete coscienti del fatto che non tutti gli esperimenti sono ugualmente buoni e producono dati ugualmente validi. In questo libro, cercheremo di mostrarvi come si riconosce un buon esperimento da un cattivo esperimento e, di conseguenza, come si riconosce la scienza dalla pseudoscienza.
 
 Ovviamente, un buon ricercatore non è soltanto in grado di pianificare un esperimento valido ed ottenere quindi risultati scientificamente affidabili. Un buon ricercatore deve essere anche in grado di interpretarne correttamente i risultati, attraverso l'impiego di metodiche di analisi statistica, che consentano di separare l'informazione dal rumore di fondo. Siamo perfettamente coscienti del fatto che la statistica non è una materia molto praticata nei piani di studio relativi alle scienze agrarie e, di conseguenza, in questo libro seguiremo un approccio fondamentalmente pratico, orientato al 'problem solving'; in fin dei conti, quando impariamo a guidare un auto ci preoccupiamo di riuscire a raggiungere la nostra destinazione senza incidenti, ma non ci preoccupiamo esattamente di capire quali siano le reazioni chimiche che avvengono all'interno del motore.
 
 Secondo questo approccio, faremo grande uso di esempi, in gran parte relativi a sperimentazioni tipiche delle scienze agrarie, con le quali si confrontano tecniche colturali, genotipi innovativi, erbicidi ed altri metodi di controllo dei patogeni, degli insetti e delle piante infestanti. Siamo fermamente convinti che qualunque progresso tecnico in agricoltura debba sempre essere basata su dati attendibili ottenuti con esperimenti validi; delle opinioni, per quanto autorevoli, abbiamo da sempre imparato a dubitare...
 
-Questo sito web è e sempre sarà gratuito, seconda la licenza Creative Commons Attribution-NonCommercial-NoDerivs 3.0. È stato scritto in R, con un linguaggio favoloso, chiamato RMarkdown e utilizzando la libreria 'bookdown'. Viene ricompilato di frequente, perché sia sempre il più aggiornato possibile, cosa che è indispensabile in quanto R è un linguaggio che si evolve molto rapidamente.
+Questo libro rappresenta la versione italiana del testo "Field Research Methods in Agriculture" edito dalla Springer. Si tratta di un progetto che è partito molti anni fa in lingua italiana, insieme all'amico Dario Sacco; successivamente è stato portato in lingua inglese e perfezionato, fino a fargli assumere una struttura molto diversa da quella iniziale, il che ci ha permesso di pubblicarlo e renderlo disponibile in ambito Internazionale. Oggi lo abbiamo ritradotto in italiano e lo mettiamo a disposizione della comunità scientifica del nostro paese, in forma gratuita, seconda la licenza Creative Commons Attribution-NonCommercial-NoDerivs 3.0. È stato scritto in R, con un linguaggio favoloso, chiamato RMarkdown e utilizzando la libreria 'bookdown'. Viene ricompilato di frequente, perché sia sempre il più aggiornato possibile, cosa che è indispensabile in quanto R è un linguaggio che si evolve molto rapidamente.
 
 ## Obiettivi {-}
 
@@ -66,6 +65,26 @@ Andrea è Professore Associato al Dipartimento di Scienze Agrarie, Alimentari e 
 Iniziamo con le scuse. C'è una cosa che, probabilmente non piacerà a qualcuno: in questo testo abbiamo utilizzato il punto come separatore decimale. Sappiamo che questo non è del tutto corretto nella tradizione italiano, ma ci siamo resi conto che se avessimo utilizzato la virgola nel testo avremmo generato una gran confusione, in quanto non saremmo comunque riusciti ad evitare l'uso del punto decimale nel codice R e nei suoi risultati.
 
 Per quanto riguarda i ringraziamenti, siamo profondamente grati a tutto il Core Team di R per aver creato e per mantenere questo ambiente di programmazione estremamente potente e gratuito. Siamo inoltre grati a Yihui Xie e ai suoi collaboratori per la disponibilità di Rmarkdown e Bookdown, due pacchetti fondamentali per la redazione di questo testo, nelle due versioni online e a stampa.
+
+## Acronimi {-}
+
+DA TRADURRE!!!!
+
+ANOVA: Analisi della varianza (ANalysis Of VAriance)
+CRD:  Completely Randomised Design
+CI: Intervallo di confidenza (Confidence Interval)
+DF DegreesofDreedom
+EDA Exploratory DataAnalyses
+LM LinearModel
+LMM LinearMixed Model
+RCBD RandomisedCompleteBlockDesign
+SD Standard Deviation
+SE Standard errors
+SEM Standard Error of aMean
+SED Standard Error of aDiﬀerence
+
+In this book, we will also use the term ’dataframe’ to refer to the R ’data.frame’
+object,i.e.atabular data structure with rowsand columns.
 
 <!--chapter:end:index.Rmd-->
 
@@ -321,6 +340,10 @@ In conclusione, possiamo ripartire dalla domanda iniziale: "Che cosa è la scien
 
 Qual è il *take-home message* di questo capitolo? Fidatevi solo delle riviste scientifiche attendibili, cioè quelle che adottano un serio processo di *peer review* prima della pubblicazione.
 
+## Esercizi e domande
+
+
+
 ---
 
 ## Altre letture
@@ -355,6 +378,7 @@ Dall'ipotesi, in modo consequenziale scaturiscono gli obiettivi della ricerca, c
 Il rischio che si corre con obiettivi mal posti è quello di eseguire una ricerca dispersiva, con raccolta di dati non necessari e/o mancanza di dati fondamentali, con costi più elevati del necessario e un uso poco efficiente delle risorse. In genere, prima si definisce un obiettivo generale, poi si definiscono uno o più obiettivi specifici, proiettati su un più breve spazio temporale, anche per marcare le fasi necessarie per raggiungere l'obiettivo generale.
 
 Non è un caso se, in un lavoro scientifico, gli obiettivi della ricerca sono posti in fondo all'introduzione, appena prima dell'esposizione dei materiali e metodi.
+
 
 ## Identificazione dei fattori sperimentali
 
@@ -626,7 +650,84 @@ Questo disegno è detto **strip-plot** ed è molto comodo perché consente di la
 2. LeClerg, E.L., Leonard, W.H., Clark, A.G., 1962. Field Plot Technique. Burgess Publishing Company, Books.
 
 
+## Domande ed esercizi
 
+
+### Domanda 1
+
+Quali sono le caratteristiche fondamentali di un esperimento scientifico, perché possa essere ritenuto valido?
+
+### Domanda 2
+
+Illustrare brevemente il metodo scientifico 'galileiano'.
+
+### Domanda 3
+
+Illustrare brevemente la differenza tra errori casuali e sistematici. In presenza di quale dei due è possibile ottenere risultati scientifici validi?
+
+### Domanda 4
+
+Qual è la differenza tra repliche vere e pseudo-repliche?
+
+### Domanda 5
+
+Cosa è il confounding e come può rendere distorti i risultati di un esperimento scientifico?
+
+### Domanda 6
+
+Quali sono gli elementi comuni a tutti gli esperimenti scientifici?
+
+### Domanda 7
+
+Quali tipi di variabili conoscete e quali sono le loro caratteristiche?
+
+### Domanda 8
+
+Qual è la differenza tra un esperimento fattoriale innestato ed uno incrociato
+
+### Domanda 9
+
+Quali sono le caratteristiche principali degli esperimenti a randomizzazione completa, blocchi randomizzati e quadrato latino?
+
+### Domanda 10
+
+Come è fatto e quando si utilizza uno schema sperimentale a split-plot?
+
+### Domanda 12
+
+Cosa è l'effetto di bordo e come si può controllare?
+
+### Domanda 13
+
+Illustrare e discutere le caratteristiche fondamentali delle 'parcelle' (forma, dimensioni, numero ...)
+
+
+### Esercizio 1
+
+Vi è stata affidata una prova sperimentale per la taratura agronomica di un nuovo diserbante appartenente al gruppo chimico delle solfoniluree (AGRISULFURON), utilizzabile alla dose presumibile di 20 g/ha, per il diserbo di post-emergenza del mais. Gli obiettivi della prova sono:
+
+1.  Valutare se è opportuno un certo aggiustamento della dose (incremento/diminuzione)
+2.  Valutare se è opportuna l'aggiunta di un bagnante non-ionico
+3.  Valutare se è opportuno splittare la dose di 20 g/ha in due distribuzioni
+4.  Valutare l'efficacia del nuovo diserbante con gli opportuni controlli (testimoni)
+
+Coerentemente con questi obiettivi, scrivere un protocollo sperimentale sufficientemente dettagliato (una pagina) ed aggiungere la mappa di campo della prova. Considerare che abbiamo a disposizione un campo lungo 80 metri e largo 26 metri, in direzione Nord-Sud, lavorato nel senso della lunghezza e con un gradiente di 'fertilità' trasversale, nel senso della larghezza.
+
+### Esercizio 2
+
+Dovete progettare una prova sperimentale per valutare i possibili effetti dell'epoca di semina (autunnale oppure primaverile) su sette varietà di favino (che etichetteremo con le lettere da A a G). Progettare un esperimento di pieno campo, decidendo il numero di repliche ed il lay-out sperimentale. Redigere la mappa di campo ed allocare i trattamenti, in base al lay-out prescelto. Aggiungere alla mappa di campo tutti i dettagli necessari (dimensioni delle parcelle, localizzazione ed orientamento dell'esperimento). Considerate che abbiamo a disposizione un campo lungo 60 metri e largo 40 metri, in direzione Est-Ovest, lavorato nel senso della lunghezza e con un gradiente di 'fertilità' longitudinale.
+
+### Esercizio 3
+
+Illustrate il disegno sperimentale che adottereste per organizzare una prova che metta a confronto quattro concimi azotati (urea, solfato ammonico, nitrato di calcio e nitrato di sodio) e un testimone non concimato su barbabietola da zucchero. Motivate opportunamente le vostre scelte. Considerate che abbiamo a disposizione un campo lungo 50 metri e largo 30 metri, in direzione Est-Ovest, lavorato nel senso della lunghezza e con due gradienti di 'fertilità', longitudinale e trasversale.
+
+### Esercizio 4
+
+Descrivete lo schema sperimentale che adottereste per organizzare un esperimento di confronto tra quattro dosi di un diserbate per il frumento, utilizzato con e senza un coadiuvante. Motivate opportunamente le vostre scelte. Considerate che abbiamo a disposizione un campo lungo 50 metri e largo 20 metri, in direzione Est-Ovest, lavorato nel senso della lunghezza e con due gradienti di 'fertilità', longitudinale e trasversale.
+
+### Esercizio 5
+
+Descrivete lo schema sperimentale che utilizzereste per organizzare una prova su pomodoro da industria, per la valutazione dell'effetto di tre livelli di concimazione azotata (0, 80 e 160 kg/ha) e tre tipologie di interventi irrigui (asciutto, basso volume irriguo, alto volume irriguo). Motivate opportunamente le vostre scelte. Considerate che abbiamo a disposizione un campo lungo 100 metri e largo 25 metri, in direzione Est-Ovest, lavorato nel senso della lunghezza e con un gradiente di fertilità longitudinale.
 
 
 
@@ -636,25 +737,19 @@ Questo disegno è detto **strip-plot** ed è molto comodo perché consente di la
 
 # Richiami di statistica descrittiva
 
-Qualunque esperimento include un processo di raccolta dati, tramite osservazioni e/o misurazioni, al termine del quale abbiamo a disposizione un collettivo di valori, di solito organizzati sotto forma di tabella ('dataset'), dove ogni riga corrisponde ad un'unità sperimentale (soggetto) con tutti i suoi attributi, mentre ogni colonna (detta anche variabile) corrisponde ad un attributo e contiene i valori rilevati per tutte le unità sperimentali. Un esempio di dataset è riportato nella Tabella \@ref(tab:tabName1).
+Qualunque esperimento include un processo di raccolta dati, tramite osservazioni e/o misurazioni, al termine del quale abbiamo a disposizione un collettivo di valori, di solito organizzati sotto forma di tabella ('dataset'), dove ogni riga corrisponde ad un'unità sperimentale (soggetto) con tutti i suoi attributi, mentre ogni colonna (detta anche variabile) corrisponde ad un attributo e contiene i valori rilevati per tutte le unità sperimentali. Un esempio delle prime righe di un dataset è riportato nella Tabella \@ref(tab:tabName1).
 
 
-Table: (\#tab:tabName1)Numero totale (in migliaia) di passeggeri nei voli internazionali dal 1949 al 1960 (Box and Jenkins airline data).
+Table: (\#tab:tabName1)Prime 6 righe di un dataset relativo alla qualità di alcuni genotipi di frumento. Ogni riga rappresenta un'unità sperimentale ed ogni colonna rappresenta un attributo di quella unità sperimentale (TKW: peso dei mille semi in grammi; Whectol: peso ettolitrico in kg; Yield: produzione di granella in quintali per ettaro; height: altezza in cm.)
 
-|     | Gen| Feb| Mar| Apr| Mag| Giu| Lug| Ago| Set| Ott| Nov| Dic|
-|:----|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-|1949 | 112| 115| 145| 171| 196| 204| 242| 284| 315| 340| 360| 417|
-|1950 | 118| 126| 150| 180| 196| 188| 233| 277| 301| 318| 342| 391|
-|1951 | 132| 141| 178| 193| 236| 235| 267| 317| 356| 362| 406| 419|
-|1952 | 129| 135| 163| 181| 235| 227| 269| 313| 348| 348| 396| 461|
-|1953 | 121| 125| 172| 183| 229| 234| 270| 318| 355| 363| 420| 472|
-|1954 | 135| 149| 178| 218| 243| 264| 315| 374| 422| 435| 472| 535|
-|1955 | 148| 170| 199| 230| 264| 302| 364| 413| 465| 491| 548| 622|
-|1956 | 148| 170| 199| 242| 272| 293| 347| 405| 467| 505| 559| 606|
-|1957 | 136| 158| 184| 209| 237| 259| 312| 355| 404| 404| 463| 508|
-|1958 | 119| 133| 162| 191| 211| 229| 274| 306| 347| 359| 407| 461|
-|1959 | 104| 114| 146| 172| 180| 203| 237| 271| 305| 310| 362| 390|
-|1960 | 118| 140| 166| 194| 201| 229| 278| 306| 336| 337| 405| 432|
+|Genotype   | Block| Height|  TKW| Whectol| Yield|
+|:----------|-----:|------:|----:|-------:|-----:|
+|arcobaleno |     1|     90| 44.5|    83.2| 64.40|
+|arcobaleno |     2|     90| 42.8|    82.2| 60.58|
+|arcobaleno |     3|     88| 42.7|    83.1| 59.42|
+|baio       |     1|     80| 40.6|    81.8| 51.93|
+|baio       |     2|     75| 42.7|    81.3| 51.34|
+|baio       |     3|     76| 41.1|    81.1| 47.78|
 
 
 Il nostro primo compito è quello di comprendere e descrivere le caratteristiche fondamentali di ogni variabile, utilizzando statistiche descrittive opportunamente scelte, in base al tipo di dato e alle caratteristiche che si vogliono descrivere.
@@ -667,7 +762,11 @@ Se i dati sono stati ottenuti con un processo di misurazione e rappresentano una
 1. tendenza centrale
 2. dispersione
 
-La tendenza centrale è un valore che rappresenta il 'centro', attorno al quale si collocano tutte le osservazioni; al contrario, la dispersione misura la distanza delle osservazioni tra di loro, cioè, in altre parole, la loro variabilità. Ovviamente, esistono anche altre importanti proprietà di una variabile quantitativa, come la simmetria e la curtosi, anche se in questo capitolo ci accontenteremo di esaminare le più diffuse statistiche descrittive di tendenza centrale e dispersione. 
+La tendenza centrale è un valore che rappresenta il 'centro', attorno al quale si collocano tutte le osservazioni; al contrario, la dispersione misura la distanza delle osservazioni tra di loro, cioè, in altre parole, la loro variabilità. Ovviamente, esistono anche altre importanti proprietà di una variabile quantitativa, come la simmetria e la curtosi, che, tuttavia, non verranno prese in considerazione in questo libro, rimandando alla lettura di testi più approfonditi (Sokal e Rohlf, 1981; Leti e Cerbara, 2009).
+
+Un altro aspetto che è necessario precisare è che, almeno nella sperimentazione agraria, non è infrequente rilevare, in ogni parcella, alcune variabili nominali, come la presenza di individui infetti la presenza/assenza di piante infestanti oppure alcune variabili discrete, frutto di conteggio, ad esempio il numero di piante infestanti o la fittezza della coltura e così via. Nonostante esistano metodi specifici per variabili nominali e discrete, è comune trasformare le variabili nominali in forma di frequenze relative (ad esempio, il numero di piante infette sul totale campionato) per ogni parcella, che sono poi trattate alla stregua delle variabili quantitative, così come i conteggi per parcella.
+
+
 
 ### Indicatori di tendenza centrale
 
@@ -786,94 +885,6 @@ $$r = \frac{184.11}{\sqrt{176.22 \times 239.56}} = 0.896$$
 
 
 Vediamo che il coefficiente di correlazione è abbastanza vicino ad 1 e quindi possiamo concludere che i due metodi di analisi danno risultati ben concordanti.
-
-## Descrizione di dati qualitativi
-
-Nel capitolo 2 abbiamo visto che le variabili qualitative sono ottenute assegnando ogni soggetto di un collettivo ad una classe scelta tra due o più possibili opzioni. Al termine di questo processo di classificazione, di solito calcoliamo le *frequenza assolute*, cioè il numero di individui assegnato ad ogni classe. Ad esempio, se abbiamo esaminato 500 insetti rilevando l'ordine a cui appartengono, le frequenze assolute potrebbero essere: 100 ditteri, 200  imenotteri e 150 ortotteri.
-
-Oltre alle frequenze assolute, possiamo calcolare anche le *frequenze relative*, dividendo le frequenze assolute per il numero totale degli individui del collettivo. Nel caso precedentemente menzionato, la frequenza relativa dei ditteri è pari a $100/500 = 0.2$.
-
-Se le classi possono essere logicamente ordinate, oltre alle frequenze assolute e relative, possiamo calcolare anche le cosiddette *frequenze cumulate*, che si ottengono cumulando le frequenze relative di una classe con quelle di tutte le classi precedenti.
-
-### Distribuzioni di frequenze e classamento
-
-Quando rappresentiamo, in un grafico o in una tabella, le frequenze (assolute, relative o cumulate) per tutte le classi e tutti gli individui del collettivo, otteniamo una *distribuzione di frequenze*. 
-
-Ad esempio, se consideriamo il famoso database 'mtcars', relativo alle 32 auto storiche censite dalla rivista Motor Trends nel 1974, e analizziamo il numero delle marce, otteniamo la seguente distribuzione di frequenze assolute, relative e cumulate.
-
-
-| Marce| Freq.Ass| Freq.Rel| Freq.Cum|
-|-----:|--------:|--------:|--------:|
-|     3|       15|     0.47|     0.47|
-|     4|       12|     0.38|     0.84|
-|     5|        5|     0.16|     1.00|
-
-
-Le distribuzioni di frequenze possono essere costruite anche per le variabili quantitative, tramite un’operazione di *classamento*, che consiste nel suddividere il campo di variazione dei dati in una serie di intervalli (esempio, da 10 a 20, da 20 a 40 e così via) e contare i soggetti in ogni classe. In questo modo, se le osservazioni sono molto numerose, la lettura delle informazioni risulta più semplice e più completa che non elencando tutti i valori o, d'altra parte, riportando solo la loro media e la loro deviazione standard. Daremo un esempio di questa tecnica in un paragrafo successivo.
-
-
-### Statistiche descrittive per le distribuzioni di frequenze 
-
-Per una distribuzione di frequenze, il più semplice indicatore di tendenza centrale è la *moda*, cioè il valore della classe che presenta la maggior frequenza. Ovviamente, se la variabile è quantitativa ed è stata sottoposta a classamento, si considera come moda il punto centrale della classe con maggior frequenza. L’individuazione della moda è banale e non richiede calcoli di sorta.
-
-In alcune condizioni (distribuzioni di frequenze per caratteri qualitativi ordinabili o quantitativi sottoposti a classamento), oltre alla moda possiamo calcolare la *mediana* e gli altri percentili, nonché la media e le altre statistiche descrittive indicate per i caratteri quantitativi. Tuttavia, si tratta di una situazione più tipica delle scienze economiche e sociali che non delle scienze agrarie e biologiche e, per questo motivo, non la prenderemo in ulteriore considerazione.
-
-### Distribuzioni di frequenza bivariate: le tabelle di contingenze
-
-In alcuni casi, in ciascuna unità sperimentale del collettivo vengono studiati due (o più) caratteri qualitativi, che possiamo rappresentare in una *tabella di contingenze*. Si tratta di tabelle a due (o più) entrate, nelle quali ogni valore rappresenta la frequenza assoluta per una particolare combinazione dei caratteri rilevati.
-
-Ad esempio, potremmo aver valutato la germinabilità di cariossidi di frumento sottoposte a due tipi di illuminazione, rossa o blu. Per ogni cariosside abbiamo quindi due informazioni, il trattamento a cui è stata sottoposta (luce rossa o blu) e se è germinata oppure no, per un totale di quattro possibili combinazioni (Rosso-si, Rosso-no, Blu-si, Blu-no). Supponendo di aver osservato 95 cariossidi germinate su 110 testate con luce rossa e 67 germinate su 120 testate con luce blu, possiamo definire la tabella di contingenze riportata di seguito.
-
-
-
-|      | SI| NO|
-|:-----|--:|--:|
-|ROSSO | 95| 15|
-|BLU   | 67| 53|
-
-Ogni riga della tabella sovrastante costituisce una distribuzione di frequenze per la germinabilità, data una certa tipologia di luce (distribuzione di frequenze condizionate).
-
-
-### Connessione
-
-Se guardiamo le due distribuzioni condizionate per la luce rossa e blu, possiamo notare che esiste una certa differenza e che la germinabilità pare maggiore con luce rossa. Potremmo chiederci quindi se una certa modalità del carattere luce (rossa o blue) influenzi il presentarsi di una particolare modalità del carattere germinabilità (si o no). Se così fosse, potremmo parlare di dipendenza o connessione, mentre, nel caso contrario, si dovrebbe parlare di indipendenza dei caratteri.
-
-Come si fa a stabilire se i caratteri sono indipendenti o connessi? Il punto di partenza è pensare che, se i caratteri fossero indipendenti, la germinabilità dovrebbe essere la stessa con entrambi i trattamenti; in totale, abbiamo osservato 230 semi, di cui 162 sono germinati e 68 non lo sono e, di conseguenza, la  proporzione di semi germinati è stata pari a 162/230 = 0.704. Ebbene, questa proporzione la si dovrebbe riscontrare con entrambi i trattamenti. In cifre, il numero di semi germinati con luce rossa dovrebbe essere pari a $110 \times 0.704 = 77.44$, mentre il numero di semi germinati con luce blu dovrebbe essere pari a $120 \times 0.704 = 84.48$. Rispettando i totali marginali (cioè il numero totale di semi saggiati con luce rossa e blu dovrebbe essere pari, rispettivamente a 110 e 120), possiamo costruire la tabella delle frequenze assolute attese, nell'ipotesi di indipendenza completa tra i due caratteri.
-
-
-|      |    SI|    NO|
-|:-----|-----:|-----:|
-|ROSSO | 77.44| 32.56|
-|BLU   | 84.48| 35.52|
-
-A questo punto possiamo costruire un indice statistico di connessione, detto $\chi^2$, che misuri la discrepanzatra le due tabelle, quella delle frequenze osservate e quella delle frequenze teoriche che si sarebbero dovute osservare nell’ipotesi di indipendenza perfetta:
-
-$$\chi ^2  = \sum \left[ \frac{\left( {f_o  - f_a } \right)^2 }{f_a } \right]$$
-
-dove $f_o$ sta per frequenza osservata ed $f_a$ sta per frequenza attesa nel caso indipendenza. Questo indice assume valore pari a zero nel caso di indipendenza completa (le frequenze osservate sono uguali a quelle attese) ed assume un valore positivo tanto più alto quanto maggiore è la connessione tra i due caratteri.
-
-Nel nostro esempio:
-
-$$\chi^2  = \frac{\left( {95  - 77.44 } \right)^2 }{77.44 } + \frac{\left( {15  - 32.56 } \right)^2 }{32.56 } + \frac{\left( {67  - 84.48 } \right)^2 }{84.48 } + \frac{\left( {53  - 35.52 } \right)^2 }{35.52 } = 25.67$$
-
-
-Se i caratteri fossero veramente indipendenti, la tabella delle frequenze osservate dovrebbe essere uguale a quella delle frequenze atteso, il che implicherebbe $\chi^2 = 0$. Il valore da noi osservato è maggiore di 0 e quindi possiamo dire che esiste un certo grado di connessione, ma non sappiamo dire quanto questa sia elevata. Qual è il $\chi^2$ massimo possibile?
-
-Intuitivamente, possiamo immaginare che la connessione potrebbe essere la più elevata possibile quando con uno dei due trattamenti i semi sono tutti germinati, mentre con l'altro non ne è germinato nessuno, come indicato nella tabella seguente:
-
-
-|      |  SI|  NO|
-|:-----|---:|---:|
-|ROSSO | 110|   0|
-|BLU   |   0| 120|
-
-
-
-Se calcoliamo il valore di $\chi^2$ per la tabella sovrastante otteniamo 230, che è appunto il massimo valore possibile nella nostra condizione. Più in generale, il $\chi^2$ massimo è dato dal prodotto del numero degli individui per il valore minimo tra il numero di righe meno una e il numero di colonne meno una:
-
-$$\max \chi ^2  = n \cdot \min (r - 1,\,c - 1)$$
-
-Possiamo concludere che la connessione tra i due caratteri è pari all'11% circa di quello massima ($25.67/230 = 0.112$).
 
 
 ## Statistiche descrittive con R
@@ -994,123 +1005,37 @@ boxplot(values ~ series)
 </div>
 
 
-### Distribuzioni di frequenze e classamento
-
-Utilizziamo il dataset 'mtcars' disponibile nell'installazione di gbase di R, che possiamo caricare utilizzando la funzione `data()`.
-
-
-```r
-data(mtcars)
-```
-
-In questo dataset, la variabile 'gear' indica il numero di marce e le frequenze assolute possono essere ottenute con la funzione `table()`.
-
-
-```r
-# Frequenze assolute
-table(mtcars$gear)
-## 
-##  3  4  5 
-## 15 12  5
-```
-
-Per le frequenze relative e percentuali, possiamo combinare il codice soprastante con l’impiego della funzione `length()`, che restituisce il numero di elementi in un vettore.
-
-
-```r
-#Frequenze relative
-table(mtcars$gear)/length(mtcars$gear)
-## 
-##       3       4       5 
-## 0.46875 0.37500 0.15625
-#Frequenze percentuali
-table(mtcars$gear)/length(mtcars$gear) * 100
-## 
-##      3      4      5 
-## 46.875 37.500 15.625
-```
-
-Mostriamo ora l'operazione di classamento di una variabile quantitativa, che tornerà utile nei prossimi capitoli. Prendiamo con R mille valori casuali da una distribuzione uniforme nell'intervallo da 130 a 200 ed esprimiamo questi mille valori tramite una distribuzione di frequenze nelle sei classi: <140, 140-150, 150-160, 160-170, 170-190, >190. Per il classamento si utilizza la funzione `cut()`, che con l'argomento `breaks()` consente di specificare gli estremi inferiori delle classi, inclusi per default nella classe precedente (intervalli aperti a destra e chiusi a sinistra).
-
-
-```r
-vals <- runif(1000, min = 130, max = 200)
-freq <- table( cut(vals, breaks = c(100, 140,150,160,170,190,200)) )
-freq
-## 
-## (100,140] (140,150] (150,160] (160,170] (170,190] (190,200] 
-##       141       135       143       139       282       160
-```
-
-Per le frequenze cumulate si usa invece la funzione `cumsum()`.
-
-
-```r
-cumsum(freq)
-## (100,140] (140,150] (150,160] (160,170] (170,190] (190,200] 
-##       141       276       419       558       840      1000
-```
-
-Una distribuzione di frequenze può essere rappresentata con un grafico a torta, che, in R, può essere disegnato con le funzioni `pie()`. Il grafico sottostante è abbastanza banale, in quanto le classi sono più o meno di ampiezza equivalente, dato che abbiamo utilizzato un campionamento da una distribuzione uniforme.
-
-
-```r
-pie(table(freq))
-```
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName243-1.png" alt="Rappresentazione di una distribuzione di frequenze con un grafico a torta" width="70%" />
-<p class="caption">(\#fig:figName243)Rappresentazione di una distribuzione di frequenze con un grafico a torta</p>
-</div>
-
-
-### Connessione
-
-Consideriamo il dataset 'HairEyeColor', disponibile nell'installazione di base di R e relativo al colore degli occhi e dei capelli di 520 studenti di statistica. La tabella delle contingenze, per le femmine, è la seguente:
-
-
-```r
-data(HairEyeColor)
-tab <- HairEyeColor[,,2]
-tab
-##        Eye
-## Hair    Brown Blue Hazel Green
-##   Black    36    9     5     2
-##   Brown    66   34    29    14
-##   Red      16    7     7     7
-##   Blond     4   64     5     8
-```
-
-Se vogliamo sapere se il colore degli occhi è legato a quello dei capelli, possiamo utilizzare la funzione `as.table()` per trasformare l'oggetto  `tab` in una tabella di contingenze (in questo caso non sarebbe necessario, visto che 'tab' è già una tabella di contingenze) ed applicare la funzione `summary()`. Oltre al chi quadro, l'output fornisce altre informazioni, che approfondiremo in un prossimo capitolo.
-
-
-```r
-summary(as.table (tab))
-## Number of cases in table: 313 
-## Number of factors: 2 
-## Test for independence of all factors:
-## 	Chisq = 106.66, df = 9, p-value = 7.014e-19
-## 	Chi-squared approximation may be incorrect
-```
-
-
-
 ---
 
 ## Altre letture
 
 1. F. Crivellari (2006). Analisi statistica dei dati con R. Apogeo, Milano.
-2. G. Leti e L. Cerbara (2009). Elementi di statistica descrittiva. Il Mulino Editore, Bologna.
+2. G. Leti and L. Cerbara (2009). Elementi di statistica descrittiva. Il Mulino Editore, Bologna.
+3. R.R Sokal and Rohlf, F.J. (1981). Biometry. W.H. Freeman and Company, Books.
+
+## Domande ed esercizi
+
+1. Illustrare e discutere i principali indici di tendenza centrale per le variabili quantitative
+2. Illustrare e discutere i principali indici di variabilità per le variabili quantitative
+3. Illustrare e discutere il coefficiente di correlazione di Pearson
+4. Un'analisi chimica è stata eseguita in triplicato e i risultati sono stati i seguenti: 125, 169 and 142 ng/g. Calcolate la media e tutti gli indicatori di variabilità che conoscete. In che modo può essere espressa l'incertezza assoluta della misura?
+5. Un ricercatore ha misurato l'altezza di quattro alberi ed il loro diametro (entrambi in metri). I risultati ottenuti sono i seguenti: `Altezza <- c(2.3, 2.7, 3.1, 3.5)` e `Diametro <- c(0.46, 0.51, 0.59, 0.64)`. Calcolare il coefficiente di correlazione di Pearson e valutare l'entità della correlazione in base ai valori massimi e minimi ammissibili per questa statistica.
+4. Considerate il file EXCEL 'rimsulfuron.csv', che potete trovare in questo percorso: [https://www.casaonofri.it/_datasets/rimsulfuron.csv](https://www.casaonofri.it/_datasets/rimsulfuron.csv). In questo file sono riportati i risultati di un esperimento con 16 trattamenti e 4 repliche, nel quale sono stati posti a confronti diversi erbicidi e/o dosi per il diserbo nel mais. Calcolare le medie produttive ottenute con le diverse tesi sperimentali e riportarle su un grafico, includendo anche un'indicazione di variabilità. Verificare se la produzione è correlata con il ricoprimento (WeedCover) delle piante infestanti.
 
 
 <!--chapter:end:03-StatisticaDescrittiva.Rmd-->
 
-# Modelli statistici ed analisi dei dati
+# Le relazioni causa-effetto
 
+Nel capitolo precedente abbiamo visto come possiamo utilizzare semplici statistiche per descrivere alcuni tratti dei nostri dati sperimentali, come la tendenza centrale e la dispersione e, se abbiamo due o più variabili, abbiamo visto come possiamo descrivere la loro variabilità congiunta. Nel lavoro di ricerca, la relazione tra variabili più importante è la cosiddetta **causalità**, che si verifica ogni volta che una variabile (solitamente denominata "predittore") provoca un cambiamento in un'altra variabile (solitamente denominata "risposta"); ad esempio, una variazione del genotipo può causare un cambiamento nella resa del frumento, oppure una variazione nella tecnica di lavorazione può causare un cambiamento nel tempo di emergenza del mais. Questo effetto diretto del predittore sulla risposta (e non viceversa) è ciò che rende la causalità diversa, ad esempio, dalla correlazione, che implica solo variazione congiunta, senza una chiara distinzione tra predittore e risposta, cioè tra la causa e l'effetto.
 
-L'eredità galileiana ci porta ad immaginare che il funzionamento della natura sia basato su una serie di relazioni causa-effetto, descrivibili utilizzando il linguaggio universale della matematica. La conoscenza esatta di queste relazioni, nella teoria, ci potrebbe consentire di prevedere l'andamento di ogni fenomeno naturale, almeno quelli osservabili con sufficiente precisione.
+Gli esperimenti controllati, replicati e randomizzati sono particolarmente adatti a stabilire relazioni causa-effetto; infatti, la probabilità di effetti confondenti è ridotta al minimo, così che le discrepanze tra le unità osservate sottoposte a trattamenti diversi possono essere ragionevolmente attribuite all'effetto di tali trattamenti sperimentali e non ad altre cause sistematiche, ma ignote.
 
-In effetti era proprio questa l'ambizione più grande degli scienziati all'inizio dell'ottocento: conoscendo lo stato iniziale di un sistema, doveva essere possibile prevederne con precisione l'evoluzione futura. Laplace diceva: *"Possiamo considerare lo stato attuale dell'universo come l'effetto del suo passato e la causa del suo futuro. Un intelletto che ad un determinato istante dovesse conoscere tutte le forze che mettono in moto la natura, e tutte le posizioni di tutti gli oggetti di cui la natura è composta, se questo intelletto fosse inoltre sufficientemente ampio da sottoporre questi dati ad analisi, esso racchiuderebbe in un'unica formula i movimenti dei corpi più grandi dell'universo e quelli degli atomi più piccoli; per un tale intelletto nulla sarebbe incerto ed il futuro proprio come il passato sarebbe evidente davanti ai suoi occhi"*. In realtà si è ben presto scoperto che si trattava di un'ambizione irrealistica, non tanto e non solo per la comparsa della meccanica quantistica un secolo dopo, ma anche per l'aumento di importanza degli studi in ambito psichiatrico e medico/biologico. Questi studi, infatti, venivano (e vengono) eseguiti su organismi viventi molto complessi, che, se sottoposti allo stesso stimolo, davano risposte altamente variabili e, spesso, anche difficilmente misurabili e controllabili.
+## Modelli matematici e statistici
+
+Per descrivere le relazioni causali, possiamo utilizzare i **modelli statistici**, cioè delle equazioni in cui le osservazioni sperimentali sono prodotte come risultato dell'effetto di uno o più predittori.
+
+In effetti, questo approccio alla scienza è fondato sull'eredità galileiana, che ci porta ad immaginare che il funzionamento della natura sia descrivibile utilizzando il linguaggio universale della matematica. In effetti era proprio questa l'ambizione più grande degli scienziati all'inizio dell'ottocento: conoscendo lo stato iniziale di un sistema, doveva essere possibile prevederne con precisione l'evoluzione futura. Laplace diceva: *"Possiamo considerare lo stato attuale dell'universo come l'effetto del suo passato e la causa del suo futuro. Un intelletto che ad un determinato istante dovesse conoscere tutte le forze che mettono in moto la natura, e tutte le posizioni di tutti gli oggetti di cui la natura è composta, se questo intelletto fosse inoltre sufficientemente ampio da sottoporre questi dati ad analisi, esso racchiuderebbe in un'unica formula i movimenti dei corpi più grandi dell'universo e quelli degli atomi più piccoli; per un tale intelletto nulla sarebbe incerto ed il futuro proprio come il passato sarebbe evidente davanti ai suoi occhi"*. In realtà si è ben presto scoperto che si trattava di un'ambizione irrealistica, non tanto e non solo per la comparsa della meccanica quantistica un secolo dopo, ma anche per l'aumento di importanza degli studi in ambito psichiatrico e medico/biologico. Questi studi, infatti, venivano (e vengono) eseguiti su organismi viventi molto complessi, che, se sottoposti allo stesso stimolo, davano (e danno) risposte altamente variabili e, spesso, anche difficilmente misurabili e controllabili.
 
 Queste difficoltà fecero prevalere, tra i biologi, la convinzione che la natura funzionasse in base a meccanismi deterministici ben definiti, anche se difficilmente osservabili nella pratica sperimentale, a causa dei numerosi elementi d'incertezza che si manifestavano nel corso delle osservazioni sperimentali. Insomma, la natura è perfetta, ma l'osservazione è fallace, perché influenzata dalla presenza di una forte componente stocastica ed imprevedibile, che va sotto il nome generico di errore sperimentale. Di questo abbiamo già parlato nei capitoli precedenti. Abbiamo anche visto che Ronald Fisher, nel suo famoso testo “Il disegno degli esperimenti” ha posto le basi per una corretta metodica sperimentale, finalizzata a minimizzare l'impatto della componente stocastica e, soprattutto, ad impedire che essa si confondesse con gli effetti degli stimoli sperimentali in studio. 
 
@@ -1121,232 +1046,907 @@ Minimizzare, tuttavia, non significa eliminare ed è evidente che, pur con tutti
 
 Di conseguenza, la descrizione di qualunque risultato sperimentale non può essere realistica se non utilizzando un modello in grado di considerare contemporaneamente sia i nessi causa-effetto, che le altre forze ignote e, almeno apparentemente, di natura stocastica. I modelli matematici che incorporano anche effetti di natura casuale sono detti modelli statistici.
 
-## Verità 'vera' e modelli deterministici
 
-In semplice linguaggio algebrico, possiamo porrescrivere un modello deterministico causa-effetto utilizzando una funzione di questo tipo:
+## Componenti di un modello
 
-$$ Y_E = f(X, \theta) $$
+In semplice linguaggio algebrico, possiamo scrivere un modello causa-effetto utilizzando un'a funzione'equazione generale come la seguente:
 
-dove $Y_E$ è l'effetto atteso dello stimolo $X$, secondo la funzione $f$, basata su una collezioni di parametri $\theta$. 
+$$ Y_E = f(X, \theta)$$
 
-In questo modello vi sono una serie di componenti, che proviamo a guardare un po' più nel dettaglio. La risposta attesa ($Y_E$) è l'oggetto del nostro studio e può assumere le forme più disparate: spesso è numerica, ma a volte rappresenta una qualità. In questo libro consideremo solo la situazione in cui $Y_E$ è rappresentato da una sola variabile (analisi univariata), ma esistono casi in cui viene osservata ed analizzata la risposta di soggetti in relazione a molte variabili (analisi multivariata).
+dove $Y_E$ è l'effetto atteso dello stimolo $X$, secondo la funzione $f$, basata su una collezioni di parametri $\theta$ 
 
-Lo stimolo sperimentale ($X$) è costituito da una o più variabili continue, discrete o categoriche, che rappresentano i trattamenti sperimentali. Insieme ad $Y_E$, $X$ è l'elemento noto di un esperimento, in quanto viene definito *a priori* con il disegno sperimentale.
+Le componenti di questo modello sono la risposta attesa ($Y_E$) che è l'oggetto del nostro studio e può assumere le forme più disparate: spesso è numerica, ma a volte rappresenta una qualità. In questo libro consideremo solo la situazione in cui $Y_E$ è rappresentato da una sola variabile (analisi univariata), ma esistono casi in cui viene osservata ed analizzata la risposta di soggetti in relazione a molte variabili (analisi multivariata).
+
+Lo stimolo sperimentale ($X$) è costituito da una o più variabili continue, discrete o categoriche (predittori), che rappresentano i trattamenti sperimentali. Insieme ad $Y_E$, $X$ è l'elemento noto di un esperimento, in quanto viene definito *a priori* in fase di progettazione.
 
 La 'funzione' di risposta ($f$) è un'equazione, lineare o non-lineare, scelta in base a considerazioni di carattere biologico, o con un approccio puramente empirico, osservando l’andamento della curva di risposta.
 
 I parametri di una funzione ($\theta$) sono un insieme di valori numerici che permettono di definire l’equazione di risposta.
 
-Vediamo alcuni esempi.
+Il predittore può essere rappresentato da una dose; ad esempio un aumento della dose di una sostanza erbicida provoca una diminuzione della crescita delle erbe infestanti. In questo caso usiamo il termine modello dose-risposta, che è forse uno dei modelli più famosi e risale a Paracelso (1493-1541), che coniò la sua famosa massima "*Cosa c'è che non sia veleno? Tutte le cose sono veleno e nulla è senza veleno. Soltanto la dose determina che una cosa non è un veleno*".
 
-Il modello più semplice è il cosiddetto *modello della media*:
+Il modello sovrastante, in accordo con la logica galileiana,  postula che un fenomeno naturale segua una legge ben definita. Tuttavia, la realtà è più complessa delle nostre aspettative e, a causa di errori sperimentali e altri effetti di natura puramente casuale, non osserviamo mai il risultato atteso $Y_E$, ma osserviamo un valore diverso $Y_O \neq Y_E$. Dobbiamo quindi ampliare il modello aggiungendo la componente stocastica $\varepsilon$:
 
-$$ Y = \mu $$
+$$ Y_O = f(X, \theta) + \varepsilon$$
 
-Si tratta di una funzione identità, secondo la quale un'osservazione sperimentale dovrebbe conformarsi ad un certo valore atteso, come effetto di un unico stimolo sperimentale noto. Ha un solo parametro, cioè $\mu$.
+cioè il cosiddetto 'residuo', la discrepanza tra ciò che prevede il modello e ciò che effettivamente osserviamo:
 
-Un modello analogo, ma più complesso è il cosidetto *modello ANOVA*:
+$$\varepsilon = Y_O - Y_E $$
 
-$$
-Y = \left\{ {\begin{array}{ll}
-\mu_1 & se \quad X = A \\
-\mu_2 & se \quad X = B
-\end{array}} \right.
-$$
+In un esperimento con $n$ unità sperimentali, abbiamo $n$ residui, con media pari a 0 e deviazione standard pari a $\sigma$ (Root Mean Squared Error, ovvero l'RMSE o $\sigma$). In parole povere, **i residui misurano quanto "cattivo" è il modello: più alti sono i residui, peggiore è la capacità del modello di descrivere una certa relazione causa-effetto**.
 
-In questo caso la risposta attesa dipende dallo stimolo sperimentale $X$, che è composto di due trattamenti: se il soggetto è trattato con A, fornisce la risposta $\mu_1$, se è trattato con B fornisce $\mu_2$. Il trattamento sperimentale è costituito da una variabile categorica con due modalità e quindi abbiamo due parametri ($\mu_1$ e $\mu_2$), ma l'estensione a più di due modalità è immediata.
+## *Fitting* di un modello
 
-Un ulteriore esempio di modello che vedremo in questo libro è la *regressione lineare semplice*, dove la relazione di risposta è descrivibile con una retta, la cui equazione generale è:
+Nella ricerca, possiamo utilizzare i modelli per capire se due o più variabili sperimentali sono in una relazione causa-effetto tra di loro. Il nostro lavoro consisterà nel: 
 
-$$ Y = \beta_0 + \beta_1 \times X $$
+1. definire un modello un modello statistico potenzialmente capace di descrivere adeguatamente le relazioni causa-effetto in studio. In altre parole si potrebbe dire che lo sforzo è quello di tradurre un'ipotesi scientifica in un modello statistico, per verificare se il modello è supportato dai dati, così come l'ipotesi scientifica di cui esso è la 'traduzione'. Questo modello sarà posto nella sua forma generale e sarà basato su una serie di parametri dal valore ignoto ($\theta$ e $\sigma$). 
+2. Eseguire l'esperimento e raccogliere i dati;
+3. utilizzare il set di dati per assegnare valori precisi a tutti i parametri ignoti (**fitting del modello** o, in alcune applicazioni, **calibrazione del modello**);
+4. valutare se il modello parametrizzato fornisca una descrizione accurata dei dati sperimentali (**valutazione del modello**);
+5. se necessario, selezionare il modello migliore tra tutti quelli quelli possibili (**confronto dei modelli**).
 
-In questo caso sia la $Y$ che la $X$ sono variabili quantitative e vi sono due parametri $\beta_0$ e $\beta_1$.
+Il fitting del modello viene solitamente eseguito dall'algoritmo dei "minimi quadrati", che consiste nel selezionare i valori dei parametri che minimizzano la somma dei residui al quadrato:
 
-I modelli finora descritti sono lineari, ma esistono numerose funzioni che descrivono relazioni curvilinee, come, ad esempio, la parabola:
+$$RSS = \sum_{i = 1}^n{\left( Y_{O_i} - Y_{E_i} \right)^2}$$
 
-$$ Y = \beta_0 + \beta_1 \, X + \beta_2 \, X^2$$
+In generale, la minimizzazione dei quadrati dei residui non viene eseguita mediante calcoli manuali, in quanto è molto più semplice avvalersi delle funzioni di adattamento più adatte in R. In particolare, per i modelli lineari utilizzeremo la funzione `lm()`, secondo la seguente sintassi:
 
-caratterizzata da tre parametri, oppure la funzione esponenziale:
+```
+mod <- lm(Y ~ X dati = set di dati)
+```
 
-$$ Y = \beta_0 \, e^{\beta_1 X} $$
+Il primo argomento è l'equazione che vogliamo adattare: sul lato sinistro dobbiamo specificare il nome della variabile di risposta, la 'tilde' (~) significa 'è una funzione di' e sostituisce il segno '=', mentre, sul lato destro, dobbiamo specificare il nome del/i predittore/i. Come secondo argomento, se necessario, forniamo il nome del dataset in cui sono archiviate le variabili. Non dobbiamo specificare l'intercetta e il termine stocastico $\varepsilon$, che sono inclusi per impostazione predefinita. C'è inoltre da tenere presente che, prima dell'analisi, ogni volta che vogliamo utilizzare una variabile numerica come fattore, dovremmo eseguire esplicitamente questa trasformazione utilizzando la funzionottenere risultati sbagliati (come vedremo nei capitoli seguenti).
 
-caratterizzata da due parametri ($\beta_0$ e $\beta_1$), mentre $e$ è l'operatore di Nepero. Delle funzioni curvilinee parleremo al termine di questo libro.
 
-## Genesi deterministica delle osservazioni sperimentali
+Un modello causa-effetto completamente specificato può fornire una buona descrizione dei dati sperimentali, **postulando l'esistenza di un meccanismo causa-effetto che produce i risultati sperimentali**. Con la dovuta prudenza, questo modello può essere utilizzato per fare previsioni; ad esempio, il modello precedente suggerisce che una fertilizzazione con azoto di 150 kg/ha dovrebbe, prevedibilmente, dare come risultato un livello di resa $Y_E = 65$ quintali per ettaro.
 
-Le equazioni esposte più sopra sono tutte nella loro forma generale e non sono utilizzabili se ai parametri non viene sostituito un valore numerico. E'proprio questo il nostro punto di partenza: **un fenomeno scientifico può essere descritto attraverso un'equazione, nella quale ogni parametro assume un valore numerico specifico**.
 
-Facciamo un esempio: un pozzo è inquinato e contiene esattamente 120 $mg/L$ di una sostanza erbicida. Pertanto, se facciamo un esperimento è preleviamo un'aliquota d'acqua da quel pozzo, determinando la concentrazione di erbicida, dovremmo ottenere un valore pari a 120 $mg/L$. Utilizzando il modello della media, questo concetto si può esprimere come: $Y_E = 120$; in questo caso $f$ è la funzione identità e $\theta = \mu = 120$.
+## Esempio 1: il 'modello della media'
 
-Innalzando leggermente il livello di complessità, potremmo immaginare che la risposta produttiva (Y) del frumento dipenda dalla dose della concimazione azotata (X), seguendo un andamento lineare, con $\beta_0 = 25$ e $\beta_1 = 0.15$. Rifacendosi alla notazione esposta sopra, diremo che $f$ è una retta e $\theta = [25, 0.15]$. Di conseguenza, un eventuale esperimento di concimazione azotata, in assenza di qualunque fattore perturbativo, dovrebbe dare risultati assolutamento prevedili, come mostrato nel *box* sottostante, considerando livelli di concimazione pari a 0, 60, 120 e 180 kg/ha di azoto per ettaro.
+Abbiamo condotto un esperimento misurativo, in cui abbiamo raccolto tre campioni di acqua da un pozzo, per misurare la concentrazione di una sostanza xenobiotica. I risultati sono 116, 119, 125 mg/L e vogliamo calcolare la media e la deviazione standard dei tre campioni.
+
+Questo problema è piuttosto semplice e potrebbe essere meglio risolto utilizzando semplici statistiche descrittive (vedi Capitolo 3); tuttavia, è interessante vedere come lo stesso problema può essere risolto con un'operazione di 'model fitting': non abbiamo alcun predittore e, pertanto, possiamo supporre che le osservazioni siano generate in base al modello della media, che abbiamo mostrato in precedenza ($Y_i = \mu + \varepsilon_i$).
+
+Assegnare un valore a tutti i parametri sconosciuti è banale, utilizzando i semplici calcoli mostrati nel Capitolo 3 (vale a dire, $\mu = 120$ e $\sigma = 4.58$). Tuttavia, possiamo ottenere gli stessi risultati utilizzando l'approccio di minimizzazione dei minimi quadrati, come mostrato nel riquadro seguente. Si noti che utilizziamo '1' come lato destro dell'equazione del modello, poiché non abbiamo alcun predittore.
+
+\vspace{12pt}
+
+```r
+Y <- c(116, 119, 125)
+mod <- lm(Y ~ 1)
+```
+
+La stima di $\mu$ può essere ottenuta con la seguente funzione R:
+
+\vspace{12pt}
+
+```r
+coef(mod)
+## (Intercept) 
+##         120
+```
+
+Per quanto riguarda la componente stocastica, possiamo ottenere i residui, la loro devianza e la loro deviazione standard con le seguenti funzioni R:
+
+\vspace{12pt}
+
+```r
+# Residui
+residuals(mod)
+##  1  2  3 
+## -4 -1  5
+#
+# Devianza dei residui
+deviance(mod)
+## [1] 42
+#
+# Deviazione standard dei residui
+summary(mod)$sigma
+## [1] 4.582576
+```
+
+Il modello della media descrive una situazione in cui non abbiamo predittori e, pertanto, non vi sono nessi causa-effetto; di conseguwnza, è il peggior modello possibile, il punto di riferimento rispetto al quale valutare ogni altro modello alternativo. Per queste sue caratteristiche, il modello della media è spesso definito come **modello nullo**.
+
+## Esempio 2: un predittore quantitativo
+
+
+
+L'algoritmo dei minimi quadrati è facile da comprendere se consideriamo un'indagine in cui la resa del mais (in q/ha) è stata determinata, come conseguenza della copertura delle erbacce, all'inizio del ciclo colturale. In una situazione del genere, potremmo aspettarci una relazione causa-effetto, in cui la copertura delle erbacce è il predittore e la resa è la risposta, secondo la funzione lineare (linea retta) $Y_i = b_0 + b_1 \, Xx_i + \varepsilon_i$, che è solitamente nota come **modello di regressione semplice**.
+
+I due parametri $b_0$ e $b_1$ rappresentano, rispettivamente, l'intercetta (livello di resa senza erbacce) e la pendenza (variazione della resa per un aumento di 1 unità nella copertura delle erbacce). Per stimare questi due valori, possiamo usare la funzione 'lm()' (riquadro codice 4.2), che produce i risultati mostrati nella Figura \@ref(fig:figName41a).
+
 
 
 ```r
-X <- c(0, 60, 120, 180)
-Ye <- 25 + 0.15 * X
-Ye
-## [1] 25 34 43 52
+# Code box 4.2
+# Fitting a simple linear regression model
+
+# Entering the data
+yield <- c(29.8, 88.9, 47.0, 96.6, 83.0, 95.3, 91.5, 97.9, 
+           89.2, 88.3, 96.9, 93.9, 84.6, 51.9, 21.8, 35.7)
+weedCover <- c(105.35, 27.5, 68.8, 23.8, 12.7, 42.7, 31.5, 
+               37.8, 18.9, 35.8, 44.5, 11.4, 31.6, 87.9, 
+               133.9, 136.525)
+
+# Fitting the model
+mod <- lm(yield ~ weedCover)
+
+# Inspecting the estimates
+coef(mod)
+## (Intercept)   weedCover 
+## 106.5979798  -0.6033652
 ```
 
-Qualcuno potrebbe obiettare che si tratta di una situazione irrealistica, perché la relazione tra concimazione azotata e produzione del frumento non è lineare. Non importa; in questo momento vogliamo semplicemente illustrare qual è la genesi delle osservazioni sperimentali. Fondamentalmente postuliamo l'esistenza di un modello matematico deterministico (causa-effetto) che, in assenza di errore sperimentale, è in grado di descrivere il comportamento della natura in una data situazione pedo-climatica.
-
-## Errore sperimentale e modelli stocastici
-
-In pratica, le risposte attese sono impossibili da riscontrare; infatti, l'errore sperimentale, puramente stocastico, confonde le nostre osservazioni e le rende diverse da quanto previsto dal modello deterministico. Come fare per incorporare questi effetti stocastici in un modello matematico?
-
-Continuiamo a considerare l'esempio precedente, relativo al pozzo inquinato con un erbicida e caratterizzato da una concentrazione pari a 120 $mg/L$. Anche se un qualunque campione di acqua analizzata con un gas-cromatografo dovrebbe restituire una misura pari esattamente a 120 $mg/L$, ci rendiamo conto che, nella pratica, è molto probabile che questo non accada. Infatti, lo strumento è comunque caratterizzato da una sua imprecisione di misura che, per quanto piccola, fa si che ogni campione di acqua $i$ restituisca una concentrazione diversa da quella degli altri campioni eventualmente analizzati. Quindi non osserveremo esattamente $Y_E = 120$, ma, al suo posto, osserveremo $Y_O \neq Y_E$, o meglio $Y_O = 120 + \varepsilon$, dove $\varepsilon$ è appunto una misura della componente stocastica individuale che distorce i risultati ogni volta che ripetiamo la misura.
-
-Ci chiediamo: che valori potrebbe assumere $\varepsilon$? I valori individuali esatti non possiamo prevederli perchè sono frutto di errori casuali. Ma possiamo fare alcune considerazioni probabilistiche: se il valore atteso è 120, trovare concentrazioni comprese tra 119 e 121 (quindi $\varepsilon = \pm 1$) dovrebbe essere molto più frequente che non trovare concentrazioni pari a 40 $mg/L$ o 200 $mg/L$ ($\varepsilon = \pm 80$). In generale, trovare valori di $\varepsilon$ vicini allo 0 dovrebbe essere molto più probabile che non trovarli lontani.
-
-Insomma, anche se non siamo in grado di prevedere con esattezza $\varepsilon$ per ogni misura che andremo a fare, potremmo pensare di utilizzare una funzione che restituisca la probabilità di ottenere una certa risposta, piuttosto che un'altra. Potremmo quindi pensare di modellizzare l'elemento stocastico con una **funzione di probabilità**.
-
-### Funzioni di probabilità
-
-Se avessimo rilevato una qualità del soggetto, come il sesso (M/F), la mortalità (vivo/morto), la germinabilità (germinato/non germinato), avremmo una variabile categorica nominale e potremmo calcolare le probabilità definita come rapporto tra il numero degli eventi favorevoli e il numero totale di eventi possibili (probabilità 'frequentista').
-
-Ad esempio, immaginiamo di aver rilevato il numero di germogli 'laterali' di accestimento di 20 piante di frumento e di averne trovate 4 con 0 germogli, 6 con 1 germoglio, 8 con due germogli e 2 con tre germogli. La funzione che assegna la probabilità P ad ognuno dei quattro eventi Y possibili (**funzione di probabilità**) è:
-
-$$
-P(Y) = \left\{ \begin{array}{l}
- 4/20 = 0.2 \,\,\,\,\,\,se\,\,\,\,\,\,Y = 0 \\ 
- 6/20 = 0.3 \,\,\,\,\,\,se\,\,\,\,\,\,Y = 1 \\ 
- 8/20 = 0.4\,\,\,\,\,\,se\,\,\,\,\,\, Y = 2 \\ 
- 2/20 = 0.1 \,\,\,\,\,\,se\,\,\,\,\,\,Y = 3 \\ 
- \end{array} \right.
-$$
-
-Viene ad essere definita una **distribuzione di probabilità**, che ha due caratteristiche importanti:
-
-1. P(Y) è sempre non-negativo (ovvio! le probabilità sono solo positive o uguali a 0);
-2. la somma delle probabilità di tutti gli eventi è sempre pari ad 1 (ovvio anche questo: la probabilità che capiti uno qualunque degli eventi è sempre 1).
-
-Se gli eventi possibili sono ordinabili (come nel caso precedente), oltre alla funzione di probabilità, si può definire anche la **funzione di probabilità cumulata**, detta anche **funzione di ripartizione**, con la quale si assegna ad ogni evento la sua probabilità più quella di tutti gli eventi 'inferiori'. Nell'esempio precedente:
-
-$$
-P(Y) = \left\{ \begin{array}{l}
- 0.2\,\,\,\,\,\,se\,\,\,\,\,\,Y \leq 0 \\ 
- 0.5\,\,\,\,\,\,se\,\,\,\,\,\,Y \leq 1 \\ 
- 0.9\,\,\,\,\,\,se\,\,\,\,\,\,Y \leq 2 \\ 
- 1.0\,\,\,\,\,\,se\,\,\,\,\,\,Y \leq 3 \\ 
- \end{array} \right.
-$$
 
 
-Per una distribuzione di probabilità come questa (classi numeriche ordinate), considerando il valore centrale di ogni classe, possiamo calcolare la media (valore atteso) come:
- 
-$$
-\mu  = E(Y) = \sum{\left[ y_i \cdot P(Y = y_i ) \right]}
-$$
- 
-e la varianza come:
+<div class="figure">
+<img src="_main_files/figure-html/figName41a-1.png" alt="Example 2: the least square estimate is represented by the straight line that passes as close as possible to the observed points." width="85%" />
+<p class="caption">(\#fig:figName41a)Example 2: the least square estimate is represented by the straight line that passes as close as possible to the observed points.</p>
+</div>
 
-$$\sigma ^2  = Var(Y) = E\left[ {Y - E(Y)} \right]^2  = \sum{ \left[ {\left( {y_i  - \mu } \right)^2 \cdot P(Y = y_i )} \right]}$$
 
-In questo caso specifico, la media è pari a:
+## Esempio 3: un predittore nominale
+
+Immaginiamo un esperimento sul campo per confrontare la resa di quattro genotipi di avena (denominati A, B, C e D), con un disegno completamente randomizzato con tre repliche. I risultati (in tonnellate per ettaro) sono mostrati nella Tabella \@ref(tab:tabName4b1).
+
+
+Table: (\#tab:tabName4b1)Esempio di una dataset proveniente da una prova varietale a randomizzazione completa con quattro genotipi di avena (A, B, C and D) e tre repliche.
+
+---  ----  ----  ----
+A     4.5   4.3   4.8
+B     3.9   3.6   4.0
+C     3.9   4.2   4.3
+D     4.6   4.7   5.0
+---  ----  ----  ----
+
+In questo esperimento, abbiamo una risposta quantitativa (la resa) e un fattore nominale (il genotipo) e la relazione causa-effetto tra queste due variabili può essere descritta con il modello seguente:
+
+$$Y_i = \mu + \alpha_j + \varepsilon_i$$
+
+Questo modello postula che ogni osservazione $Y_i$ derivi dal valore $\mu$ (la cosiddetta intercetta) più le quantità $\alpha_j$, che dipendono dal genotipo $j$, più gli effetti stocastici $\varepsilon_i$, che sono specifici per ogni osservazione ed hanno media 0 e una deviazione standard pari a $\sigma$.
+
+Per comprendere il significato biologico di $\mu$ ed $\alpha$ dobbiamo entrare un po' di più nei dettagli matematici. Consideriamo la prima osservazione $Y_1 = 4.5$; dobbiamo stimare tre valori ($\mu$, $\alpha_1$ e $\varepsilon_1$) che, sommati, restituiscano questa osservazione. Chiaramente il problema è indeterminato, in quanto esistono infinite triplette di valori, che, sommate, restituiscono 4.5; pertanto è necessario imporre dei vincoli su alcuni parametri del modello (**parametrizzazioni del modello**). Un vincolo molto comune è $\alpha_1 = 0$ (**vincolo sul trattamento**):
+
+$$\left\{ {\begin{array}{l}
+\mu_1 = \mu + \alpha_1 = \mu + 0\\
+\mu_2 = \mu + \alpha_2 \\
+\mu_3 = \mu + \alpha_3 \\
+\mu_4 = \mu + \alpha_4
+\end{array}} \right.$$
+
+Con tale vincolo, $\mu$ è la media del primo genotipo (in R: **primo in ordine alfabetico**), mentre $\alpha_2$, $\alpha_3$ e $\alpha_4$ sono, rispettivamente, le differenze tra le medie del secondo, terzo e quarto genotipo, 
+rispetto al primo. In generale, con questa parametrizzazione, i parametri del modello sono medie o differenze tra medie.
+
+Un altro possibile vincolo è $\sum{\alpha_j} = 0$ (vincolo sulla somma). Se prendiamo l'equazione precedente e sommiamo tutti i membri otteniamo:
+
+$$\mu_1 + \mu_2 + \mu_3 + \mu_4 = 4 \mu + \sum{\alpha_j}$$
+
+Imponendo il vincolo di somma a zero otteniamo:
+
+$$\mu_1 + \mu_2 + \mu_3 + \mu_4 = 4 \mu$$
+
+e quindi a:
+
+$$\mu = \frac{\mu_1 + \mu_2 + \mu_3 + \mu_4}{4}$$
+
+Con questa parametrizzazione $\mu$ è la media generale dei dati, mentre i valori $\alpha_j$ rappresentano le differenze tra le medie dei trattamenti e la media generale (**effetti dei trattamenti**): valori $\alpha$ positivi ed elevati identificano i genotipi superiori alla media, mentre valori $\alpha$ elevati, ma negativi identificano i genotipi inferiori alla media. In generale, con questa parametrizzazione, i parametri del modello rappresentano medie ed effetti.
+
+Un terzo possibile vincolo si ottiene rimuovendo l'intercetta (ovvero, imponendo che $\mu = 0$). In questo caso, i valori di $\alpha_j$ saranno le medie dei genotipi ed il modello riduce a:
+
+$$Y_i = \mu_j + \varepsilon_i$$
+
+La selezione dei vincoli spetta all'utente, a seconda degli obiettivi dell'esperimento. **In R, il vincolo del trattamento è utilizzato di default**, sebbene gli altri vincoli possano essere facilmente ottenuti, utilizzando la codifica appropriata.
+
+La stima dei parametri del modello potrebbe essere facilmente eseguita a mano, ma noi utilizziamo la funzione 'lm()' in R.
+
+\vspace{12pt}
+
+```r
+Yield <- c(4.5, 4.3, 4.8,
+3.9, 3.6, 4.0,
+3.9, 4.2, 4.3,
+4.6, 4.7, 5.0)
+Genotype <- rep(LETTERS[1:4], each = 3)
+mod <- lm(Yield ~ Genotype)
+```
+
+I parametri stimati, i residui, la deviazione residua e la deviazione standard possono essere ottenuti con la solita codifica:
+
+\vspace{12pt}
+
+```r
+# Stima dei parametri
+coef(mod)
+## (Intercept)   GenotypeB   GenotypeC   GenotypeD 
+##   4.5333333  -0.7000000  -0.4000000   0.2333333
+#
+# Residui
+residuals(mod)
+##           1           2           3           4           5 
+## -0.03333333 -0.23333333  0.26666667  0.06666667 -0.23333333 
+##           6           7           8           9          10 
+##  0.16666667 -0.23333333  0.06666667  0.16666667 -0.16666667 
+##          11          12 
+## -0.06666667  0.23333333
+#
+# Devianza dei residui
+deviance(mod)
+## [1] 0.3866667
+#
+# Deviazione standard del residui (RMSE)
+summary(mod)$sigma
+## [1] 0.2198484
+```
+
+Ora che il modello è completamente specificato, abbiamo tutti gli ingredienti per descrivere le 12 osservazioni, sommando $\mu + \alpha_j + \varepsilon_i$; ad esempio, per la prima osservazione, appartenente al primo genotipo, abbiamo:
+
+$$y_1 = 4.5 = 4.533 + 0 - 0.033$$
+mentre, per la quarta osservazione, appartenente al 2° genotipo, abbiamo:
+
+$$y_4 = 3.9 = 4.533 - 0.7 + 0.067$$
+
+Per completezza, potrebbe essere utile mostrare che, in R, possiamo modificare la parametrizzazione, impostando l'argomento 'contrasts' e passando un elenco di fattori associati alla parametrizzazione richiesta. Ad esempio, se utilizziamo `Treat = "contr.sum"`, otteniamo il vincolo sulla somma; di conseguenza, l'effetto dell'ultimo genotipo non è mostrato, perché è vincolato ad eseere l'opposto della somma degli altri tre effetti.
+
+\vspace{12pt}
+
+```r
+mod2 <- lm(Yield ~ Genotype,
+contrasts = list(Genotype = "contr.sum"))
+coef(mod2)
+## (Intercept)   Genotype1   Genotype2   Genotype3 
+##   4.3166667   0.2166667  -0.4833333  -0.1833333
+```
+
+Un'altra possibile parametrizzazione consiste nel rimuovere l'intercetta, che è possibile utilizzando `-1` sul lato destro dell'espressione, come mostrato di seguito.
+
+\vspace{12pt}
+
+```r
+mod3 <- lm(Yield ~ Genotype - 1)
+coef(mod3)
+## GenotypeA GenotypeB GenotypeC GenotypeD 
+##  4.533333  3.833333  4.133333  4.766667
+```
+
+Esistono diversi altri metodi per modificare la parametrizzazione, sia globalmente (per l'intera sessione R) sia a livello di fattore; ulteriori informazioni sono disponibili in letteratura.
+
+## L'analisi della varianza (ANOVA)
+
+In questo secondo esempio abbiamo descritto una relazione causa-effetto, tramite un modello contenente un predittore. L'RMSE ($\sigma$) è uguale a 0.220, ma questa non è una buona metrica per capire se la relazione causa-effetto è rilevante o meno. Una possibilità è quella di dividere l'RMSE per la media dei valori osservati, per ottenere il coefficiente di variabilità (RRMSE: Relative Root Mean Squared Error), che è 0.051 (o 5.1%), il che indica che l'errore residuo è piuttosto piccolo, rispetto al valore medio atteso.
+
+
+
+Un altro indicatore per descrivere la bontà della relazione causa-effetto definita dal modello è il cosiddetto **coefficiente di determinazione (R^2^)**, ottenuto sottraendo da 1 il rapporto tra la devianza dei residui e la devianza totale delle osservazioni (che poi sarebbe la devianza dei residui del modello nullo). Nel nostro caso, il modello nullo è ottenuto trascurando l'effetto del genotipo e la devianza dei residui è quella indicata nel box sottostante:
 
 
 ```r
-mu <- 0 * 0.2 + 1 * 0.3 + 2 * 0.4 + 3 * 0.1
-mu
-## [1] 1.4
+modnull <- lm(Yield ~ 1)
+deviance(modnull)
+## [1] 1.936667
 ```
 
-e la varianza è pari a:
+Il coefficiente di determinazione è quindi:
+
+$$R^2 = 1 - \frac{SS_{res}}{SS_{tot}} = 1 - \frac{0.3866667}{1.936667} = 0.800$$
+
+cosa che può essere verificata utilizzando il codice R:
 
 
 ```r
-(0 - mu)^2 * 0.2 + (1 - mu)^2 * 0.3 + (2 - mu)^2 * 0.4 +
-  (3 - mu)^2 * 0.1
-## [1] 0.84
+summary(mod)$r.squared
+## [1] 0.8003442
 ```
 
-Mediamente, le nostre piante hanno 1.4 germogli con una varianza pari a 0.84.
+Il coefficiente di determinazione varia da 0 ad 1, più è alto il valore tanto migliore è la bontà del modello.
+
+Oltre a queste statistiche (RMSE, RRMSE e R^2^), vi è una tecnica famosissima per valutare l'entità dell'evidenza in favore dell'esistenza di una relazione causa effetto ben definita; questa tecnica si chiama **Analisi della Varianza (ANOVA)** ed è stata originariamente ideata da Ronald Fisher durante gli anni '30 del XX secolo; oggi è ancora molto utilizzata, seppure in una forma leggermente diversa da quella originale.
 
 
-### Funzioni di densità
-
-Ciò che abbiamo detto finora non si applica al nostro caso, in quanto abbiamo rilevato una variabile continua (concentrazione) e non abbiamo intenzione di discretizzarla in classi. In teoria, misure ripetute di concentrazione possono portare ad un numero di valori pressoché infinito e non ha molto senso chiedersi, ad esempio, qual è la probabilità di trovare una concentrazione esattamente pari a 120 $mg/L$ (e non 120.0000001, o 119.99999). Capiamo da soli che questa probabilità è infinitesima.
-
-Al contrario, potremmo pensare di calcolare la probabilità di ottenere un valore compreso in un intervallo, per esempio da 119 a 121 $mg/L$, anche se questa operazione porterebbe all'introduzione di un elemento arbitrario, cioè l'ampiezza dell'intervallo prescelto. Possiamo tuttavia pensare di calcolare la **densità di probabilità**, vale a dire il rapporto tra la probabilità di un intervallo e la sua ampiezza (cioè la probabilità per unità di ampiezza dell'intervallo; per questo si parla di densità). Ora, se immaginiamo di restringere l’intervallo fino a farlo diventare infinitamente piccolo, anche la probabilità tende a diventare infinitesima con la stessa 'velocità', in modo che la densità di probabilità di un singolo valore di concentrazione tende ad un numero finito (ricordate il limite del rapporto di polinomi?).
-
-Insomma, con i fenomeni continui non possiamo calcolare la probabilità dei singoli eventi puntiformi, ma possiamo calcolare la loro densità di probabilità e definire quindi apposite **funzioni di densità**. Analogamente alle funzioni di probabilità, le funzioni di densità debbono avere due caratteristiche:
-
-1. assumere solo valori non-negativi;
-2. la somma delle probabilità di tutti gli eventi possibili, calcolabile come integrale della funzione di densità, deve essere unitaria (anche in questo caso la densità di probabilità di tutti gli eventi possibili è pari ad 1).
-
-Data una funzione di densità, possiamo costruire la corrispondente **funzione di probabilità cumulata**, facendo l'integrale per ogni evento pari o inferiore a quello dato (esempio: probabilità di trovare concentrazioni inferiori a 120 $mg/L$). Più in generale, per variabili continue sia la funzione di ripartizione (probabilità cumulata), che la media o la devianza sono definite ricorrendo agli integrali:
-
-$$ \begin{array}{l}
-P(Y) = f(y) \\ 
-P(Y \leq y) = \int\limits_{ - \infty }^y {f(y)} dy \\ 
-\mu  = E(Y) = \int\limits_{ - \infty }^{ + \infty } {yf(y)} dy \\ 
-\sigma^2  = Var(Y) = \int\limits_{ - \infty }^{ + \infty } {\left( {y - \mu } \right)^2 f(y)} dy \\ 
-\end{array}$$
- 
- 
-In pratica, vedremo che, a seconda della funzione di densità, è possibile adottare formule semplificate per le diverse statistiche descrittive.
 
 
-### La distribuzione normale (curva di Gauss)
+Il principio di fondo è che, considerando un modello che contenga almeno un predittore, è sempre possibile associare allo stesso dataset un secondo modello 'nullo' (modello della media), ottenuto dal precedente per rimozione del predittore. Ad esempio, con riferimento all'esempio 2, abbiamo già visto che il modello ANOVA è:
 
-Torniamo ancora alla nostra popolazione di misure, relative alle concentrazioni di campioni di acqua prelevati dal pozzo inquinato. E' ragionevole pensare che, effettuando le misurazioni con uno strumento sufficientemente preciso e in presenza delle sole variazioni casuali (visto che abbiamo idealmente rimosso ogni differenza sistematica spiegabile), i risultati tendono a differire tra di loro, muovendosi intorno ad un valor medio, rispetto al quale le misure superiori ed inferiori sono equiprobabili e tendono ad essere più rare, via via che ci si allontana dal valore medio. Questo ragionamento ci porta verso una densità di probabilità (parliamo di variabili continue) a forma di campana, che potrebbe essere descritta con una funzione continua detta **curva di Gauss**.
+```
+Yield ~ Genotype
+```
 
-La curva è descritta dalla seguente funzione di densità:
+mentre il modello nullo è:
+
+```
+Yield ~ 1
+```
+
+Rimuovere l'effetto del genotipo dal modello npn può che indurre un incremento dei residui, dato che non si tiene più in considerazione il fatto che parte della differenza tra le osservazioni è dovuto al fatto che esse appartengono a genotipi di versi. Infatti, il codice sovrastante e sottostante mostrano che la devianza dei residui (RSS: Residual Sum of Squares) è pari a:
+
+
+```r
+epsilon <- residuals(mod)
+RSS <- sum(epsilon^2)
+RSS
+## [1] 0.3866667
+```
+
+mentre la devianza dei residui del modello nullo (pari alla devianza totale delle osservazioni), è pari a:
+
+
+
+```r
+# Residual deviance null model
+RSS.null <- sum(residuals(modnull)^2)
+RSS.null
+## [1] 1.936667
+```
+
+Insomma, rimuovendo l'effetto del genotipo, il modello è 'peggiorato', con un incremento dei residui quantificabile come differenza:
+
+
+
+```r
+# Contribution of genotype effect
+SS_g <- RSS.null - RSS
+SS_g
+## [1] 1.55
+```
+
+È evidente che più è grande questa differenza, più è grande l'effetto del genotipo. In altre parole, abbiamo appena scomposto la devianza totale delle osservazioni ($SS_{tot} = 1.937$) in due quote, una dovuta all'effetto causale del trattamento sperimentale ($SS_g = 1.55$) e l'altra dovuta a tutti gli altri effetti ignoti di natura casuale (errore sperimentale: $RSS = 0.387$). Questa seconda quota costituisce una specie di 'rumore di fondo', contro il quale si può valutare il 'segnale', cioè l'intensità dell'effetto del trattamento sperimentale.
+
+Come abbiamo visto nel Capitolo 3, non possiamo confrontare direttamente $SS_g$ e $RSS$, poiché queste due devianze hanno un diverso numero di gradi di libertà (DF); il numero di DF per il trattamento è uguale al numero dei suoi livelli meno uno ($DF_g$ = 3), mentre il numero di gradi di libertà per la devianza residua $RSS$ è $p \times (k -1)$, dove $p$ è il numero di trattamenti e $k$ è il numero di repliche, supponendo che questo sia costante tra i trattamenti. Di conseguenza, $DF_{RSS} = 4 \times (3 - 1) = 8$. Possiamo quindi calcolare le relative varianze (Qudrati Medi: MS) come segue:
+
+\vspace{12pt}
+
+```r
+# Varianza del genotipo
+MS_g <- SS_g/3
+MS_g
+## [1] 0.5166667
+#
+# Varianza del residuo
+RMS <- RSS/8
+RMS
+## [1] 0.04833333
+```
+
+Queste due varianze (trattamento e residuo) possono essere confrontate direttamente, utilizzando il cosiddetto rapporto F:
+
+$$F = \frac{MS_g}{RMS} = \frac{0.517}{0.048} = 10.69$$
+
+Il nome 'rapporto F' deriva da Fisher, che lo inventò. Mostra che la variabilità imposta dal trattamento sperimentale è più di 10 volte superiore alla variabilità dovuta al rumore di fondo (errore sperimentale), il che supporta l'idea che l'effetto causale del genotipo sulla resa sia molto rilevante. In termini generali, più alto è il rapporto F, più forte è il nesso causa-effetto. Possiamo riassumere questi risultati nella cosiddetta tabella ANOVA, che si ottiene facilmente utilizzando il metodo 'anova()' con R.
+
+\vspace{12pt}
+
+```r
+anova(mod)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##           Df  Sum Sq Mean Sq F value   Pr(>F)   
+## Genotype   3 1.55000 0.51667   10.69 0.003584 **
+## Residuals  8 0.38667 0.04833                    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+Rispetto a quanto esposto in precedenza, la tabella ottenuta con R contiene solo un valore che non abbiamo ancora spiegato, il cosidetto P-level, che si trova all'estrema destra (P = 0.003584). Si tratta di un indicatore inferenziale che sarà illustrato nei Capitoli seguenti anche se è opportuno dare ora indicazioni per la sua interpretazione. In dettaglio, più il P-level è basso, più è forte l'evidenza scientifica contro l'ipotesi 'nulla' che il trattamento sperimentale (in questo caso il genotipo) non abbia avuto alcun effetto sulla variabile risposta (produzione della coltura). Ancora più in dettaglio, se il P-level è inferiore a 0.05 ed è accompagnato da uno o più asterischi, la conclusione è che l'effetto del trattamento è *statisticamente significativo*.
+
+
+## Example 4: due predittori nominali
+
+Consideriamo lo stesso esperimento dell'esempio precedente ed immaginiamo che sia stato disegnato a blocchi randomizzati (la prima osservazione di ogni genotipo è stata presa nel primo blocco, la seconda nel secondo blocco e così via). In questo caso, il nesso causa-effetto e, di consegeunza, il modello interpretativo sono diversi, perché la resa dipende da due fattori sperimentali, ovvero il genotipo e il blocco. L'equazione è:
+
+$$ Y_{ij} = \mu + \gamma_i + \alpha_j + \varepsilon_{ij}$$
+
+dove $Y_{ij}$ è la resa parcellare nell' $i$^esimo^ blocco e per il $j$^esimo^ genotipo, $\mu$ è l'intercetta, $\gamma_i$ è l'effetto del $i$^esimo^ blocco, $\alpha_j$ è l'effetto del $j$^esimo^ genotipo e $\varepsilon$ è l'errore residuo di ogni parcella, con deviazione standard pari a $\sigma$. Come abbiamo fatto per il modello ANOVA ad una via, dobbiamo porre dei vincoli sui valori $\alpha$ e $\gamma$, in modo che i parametri del modello siano stimabili; in particolare, imporremo che $\alpha_1 = \gamma_1 = 0$, in modo che $\mu$ è la produzione nel primo blocco e col primo genotipo (in R, convenzionalmente il primo in ordine alfabetico). Abbiamo quindi 3 parametri da stimare per l'effetto del genotipo e 2 parametri da stimare per l'effetto del blocco, oltre a $\sigma$.
+
+La stima dei parametri del modello può essere eseguita con R, aggiungendo l'effetto blocco all'equazione del modello:
+
+
+```r
+# I dati sono stati inseriti in un box precedente, 
+# qui creiamo il vettore che identifica il blocco
+Block <- rep(LETTERS[1:3], times = 4)
+mod <- lm(Yield ~ Genotype + Block)
+```
+
+Le stime dei parametri sono:
+
+
+```r
+# Alpha e beta
+coef(mod)
+## (Intercept)   GenotypeB   GenotypeC   GenotypeD      BlockB 
+##   4.4416667  -0.7000000  -0.4000000   0.2333333  -0.0250000 
+##      BlockC 
+##   0.3000000
+#
+# Sigma
+summary(mod)$sigma
+## [1] 0.1443376
+```
+
+I residui e la loro devianza sono:
+
+
+```r
+epsilon <- residuals(mod)
+RSS <- sum(epsilon^2)
+RSS
+## [1] 0.125
+```
+
+Come previsto, i residui di questo modello sono più piccoli e quindi hanno una devianza minore di quelli del modello precedente, senza l'effetto del blocco. La rimozione dell'effetto del blocco fa si che la devianza del residuo aumenti da 0.125 a 0.38667 (vedi sopra), con una differenza pari a 0.262, che misura appunto l'effetto del blocco 8devianza del blocco: SS~b~). Anche in questo caso, se consideriamo un modello ridotto, contenente solo il blocco, ma non il genotipo (quindi rimuoviamo dal modello l'effetto del genotipo), possiamo misurare la devianza del fattore sperimentale rimosso, che, coerentemente con quanto visto in precedenza, ammonta a 1.55.
+
+
+```r
+# Rimozione dei blocchi
+mod2 <- lm(Yield ~ Genotype) # Stesso modello di prima
+deviance(mod2)
+## [1] 0.3866667
+SS_b <- deviance(mod2) - RSS
+SS_b
+## [1] 0.2616667
+# Rimozione dei genotipi
+mod3 <- lm(Yield ~ Block)
+deviance(mod3)
+## [1] 1.675
+SS_g <- deviance(mod3) - RSS
+SS_g
+## [1] 1.55
+```
+
+Il numero di gradi di libertà è, rispettivamente, 11 per la devianza totale ($SS_{tot} = n - 1 = 12 - 1 = 11$), 3 per i genotipi (numero dei genotipi meno 1) e 2 per i blocchi (numero dei blocchi meno 1); per sottrazione, arriviamo a 6 DF per la devianza del residuo. A questo punto possiamo calcolare le varianze dei blocchi, dei genotipi e del residuo, che anche in questo caso è attribuibile a tutte le sorgenti di variabilità casuali non controllate (errore sperimentale o rumore di fondo). In questo caso possiamo calcolare due rapporti F, uno per l'effetto del blocco e uno per l'effetto del genotipo; per comodità, possiamo saltare tutti i calcoli manuali e arrivare direttamente alla tabella ANOVA finale usando il metodo 'anova()' in R.
+
+
+```r
+anova(mod)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##           Df  Sum Sq Mean Sq F value    Pr(>F)    
+## Genotype   3 1.55000 0.51667   24.80 0.0008833 ***
+## Block      2 0.26167 0.13083    6.28 0.0337847 *  
+## Residuals  6 0.12500 0.02083                      
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+I rapporti F suggeriscono che l'effetto causale del genotipo è elevato e significativo (presenza di asterischi), mentre l'effetto blocco è significativo, ma il valore F è più basso e P è più alto di quello del genotipo, il che porta a pensare che l'effetto prodotto dal blocco sia meno rilevante.
+
+## Example 5: due predittori nominali con interazione
+
+Immaginiamo che l'esperimento presentato nell'Esempio 1 sia stato ripetuto in un'altra località, utilizzando sempre un disegno completamente randomizzato. I dati osservati sono riportati nella Tabella \@ref(tab:tabName4b4).
+
+
+Table: (\#tab:tabName4b4)Risultati di un esperimento di campo a randomizzazione completa per il confronto di quattro genotipi di avena (A, B, C and D), ripetuto in due località.
+
+Genotype   Location    Yield
+---------  ---------  ------
+A          LOC1          4.5
+A          LOC1          4.3
+A          LOC1          4.8
+B          LOC1          3.9
+B          LOC1          3.6
+B          LOC1          4.0
+C          LOC1          3.9
+C          LOC1          4.2
+C          LOC1          4.3
+D          LOC1          4.6
+D          LOC1          4.7
+D          LOC1          5.0
+A          LOC2          5.4
+A          LOC2          5.5
+A          LOC2          4.1
+B          LOC2          5.8
+B          LOC2          7.1
+B          LOC2          5.8
+C          LOC2          4.2
+C          LOC2          4.5
+C          LOC2          4.8
+D          LOC2          5.0
+D          LOC2          6.2
+D          LOC2          5.6
+
+In questo esperimento abbiamo due fattori incrociati, ma, a differenza dell'esempio precedente, abbiamo tre repliche per ciascuna delle otto combinazioni tra i livelli di genotipo e località. In questo modo, oltre agli effetti di genotipo e località, possiamo anche valutare la cosiddetta **interazione** tra i due fattori sperimentali, che è un'informazione molto importante.
+
+## Interazione tra fattori sperimentali
+
+Per comprendere meglio il concetto di interazione, osserviamo la Figura \@ref(fig:figName4b5), dove sono mostrate le medie di quattro trattamenti, ottenuti dalla combinazione fattoriale di un trattamento A con due livelli (A1 e A2) e di un trattamento B con altrettanti livelli (B1 e B2). Nel grafico, ogni combinazione è rappresentata da un simbolo.
+
+Concentriamoci un attimo sul grafico di sinistra e consideriamo la prima combinazione in ordine alfabetico (A1B1): per questa, la media è pari a 10. Se passiamo da A1 ad A2, fermo restando B1, l'incremento è + 4. Se invece passiamo da B1 a B2, fermo restando A1, l'incremento è + 5. Si deduce che, se gli effetti fossero puramente additivi, la media di A2B2 dovrebbe essere pari a 10 + 4 + 5 = 19, in quanto vengono modificati entrambi i livelli, da A1 ad A2 e da B1 a B2. Vediamo che l'osservazione conferma questa aspettativa di additività degli effetti e di mancanza di interazione.
+
+Al contrario, nel grafico centrale vediamo che il risultato osservato di A2B2 non può essere ottenuto per semplice somma di effetti, perché, a fronte di un risultato atteso pari a 19 otteniamo invece 16. Evidentemente, vi è qualcosa in questa combinazione che altera l'effetto congiunto di A e B. Questo qualcosa può essere quantificato con il valore -3, così che la media A2B2 è pari a 10 + 4 + 5 - 3 = 16. Il valore -3 rappresenta la mancanza di additività o interazione; in questo caso si tratta di **interazione semplice**, in quanto la graduatoria dei trattamenti non cambia: A2 è sempre meglio di A1 e B2 è sempre meglio di B1, anche se gli effetti non sono quelli previsti.
+
+Nel grafico di sinistra la situazione è analoga, ma più estrema: l'effetto dell'interazione è -10 e comporta un'inversione della graduatoria, per cui parliamo di **interazione cross-over**.
+
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName4b5-1.png" alt="Esempi di interazione tra fattori sperimentali" width="90%" />
+<p class="caption">(\#fig:figName4b5)Esempi di interazione tra fattori sperimentali</p>
+</div>
+
+Perchè siamo così interessati all'interazione e, in particolare, all'interazione cross-over? Esaminiamo più da vicino i valori nel grafico a destra in Figura \@ref(fig:figName4b5), riportandoli nella tabella \@ref(tab:tabName4b6), insieme alle medie dei quattro livelli A1, A2, B1 e B2. Le medie delle combinazioni sono dette **medie di cella**, mentre le medie dei livelli principali sono dette **medie marginali**, perché si trovano al margine della tabella.
+
+
+Table: (\#tab:tabName4b6)Interazione cross-over tra fattori sperimentali
+
+|      |   B1|   B2| Media|
+|:-----|----:|----:|-----:|
+|A1    | 10.0| 15.0|  12.0|
+|A2    | 14.0|  9.0|  12.0|
+|Media | 12.5| 11.5|  12.0|
+
+Se guardassimo solo le medie marginali, avremmo l'impressione sbagliata che il fattore A, da solo, non ha alcun effetto (le medie A1 e A2 sono uguali) e che il fattore B ha solo un piccolissimo effetto. La realtà è invece che entrambi i fattori hanno un grande effetto, ma la presenza dell'interazione lo nasconde completamente, impedendoci di raggiungere conclusioni attendibili guardando ai due fattori, uno separatamente dall'altro. 
+
+## Example 5 (segue)
+
+Tornando al nostro esempio, è chiaro che le produzioni osservate sono determinate dall'effetto di:
+
+1. genotipo
+2. località
+4. interazione 'genotipo $\times$ località'
+
+Il modello lineare può essere così definito:
+
+$$Y_{ij} = \mu + \alpha_i + \beta_j + \alpha\beta_{ij} + \varepsilon_{ij}$$
+
+dove $\mu$ è l'intercetta (produzione del primo genotipo nella prima località, sotto il vincolo che $\alpha_1 = \beta_1 = 0$), $\alpha_i$ è la differenza tra il genotipo $i$^esimo^ ed il primo in ordine alfabetico, $\beta_j$ è la differenza tra la località $j$^esima^ e la prima in ordine alfabetico e $\alpha\beta_{ij}$ è l'interazione tra il genotipo $i$^esimo^ e la località $j$^esima^ (sotto i vincoli che $\alpha\beta_{1.} = \alpha\beta_{.1} = 0$). I residui sono quantificati dai valori $\varepsilon_{ij}$, con media uguale a 0 e deviazione standard uguale a $\sigma$.
+
+Per stimare i parametri del modello, possiamo utiliozzare R, considerando che il termine di interazione viene codificato con l'operatore ':', ad esempio:
+
+```
+Y ~ A + B + A:B
+```
+
+che può essere abbreviato come:
+
+```
+Y ~ A * B
+```
+
+
+```r
+Yield <- c(4.5, 4.3, 4.8,
+3.9, 3.6, 4.0,
+3.9, 4.2, 4.3,
+4.6, 4.7, 5.0,
+5.4, 5.5, 4.1,
+5.8, 7.1, 5.8,
+4.2, 4.5, 4.8,
+5.0, 6.2, 5.6)
+Genotype <- rep(rep(LETTERS[1:4], each = 3), 2)
+Location <- rep(c("LOC1", "LOC2"), each = 12)
+dfr <- data.frame(Genotype, Location, Yield)
+mod <- lm(Yield ~ Genotype * Location, data = dfr)
+
+# Stima dei parametri
+coef(mod)
+##            (Intercept)              GenotypeB              GenotypeC 
+##              4.5333333             -0.7000000             -0.4000000 
+##              GenotypeD           LocationLOC2 GenotypeB:LocationLOC2 
+##              0.2333333              0.4666667              1.9333333 
+## GenotypeC:LocationLOC2 GenotypeD:LocationLOC2 
+##             -0.1000000              0.3666667
+#
+# Sigma
+summary(mod)$sigma
+## [1] 0.4765326
+```
+
+L'analisi della varianza viene eseguita rimuovendo dal modello i tre termini uno alla volta, ma rispettando un criterio di marginalità, che tenga conto del fatto che l'interazione viene dopo che sono stati inseriti gli effetti principali che la costituiscono e, quindi, dovrebbe essere omessa per prima e non dovrebbe essere lasciata nel modello, quando uno degli effetti principali coinvolti viene rimosso. Lo schema è illustrato nel box seguente.
+
+
+```r
+RSS <- deviance(mod)
+#
+# rimozione dell'interazione
+modred <- lm(Yield ~ Genotype + Location, data = dfr)
+SSint <- deviance(modred) - RSS
+SSint
+## [1] 4.008333
+#
+# rimozione del genotipo E dell'interazione
+modred <- lm(Yield ~ Location, data = dfr)
+SSloc <- deviance(modred) - RSS - SSint
+SSloc
+## [1] 2.601667
+#
+# rimozione della località E dell'interazione
+modred <- lm(Yield ~ Genotype, data = dfr)
+SSgen <- deviance(modred) - RSS - SSint
+SSgen
+## [1] 6.201667
+```
+
+Anche in questo esempio, abbiamo suddiviso la variabilità totale dei dati in quattro termini, tre dei quali sono correlati all'effetto causale, mentre il quarto è correlato a tutti gli altri effetti casuali. In pratica, i calcoli manuali non sono necessari, perchè possiamo utilizzare la funzione 'anova()' in R. Nella tabella sottostante, l'unico elemento di cui non abbiamo parlato finora è il numero di gradi di libertà per l'interazione, che è **uguale al prodotto del numero di DF per gli effetti principali**.
+
+
+```r
+anova(mod)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##                   Df Sum Sq Mean Sq F value    Pr(>F)    
+## Genotype           3 2.6017  0.8672  3.8190   0.03077 *  
+## Location           1 6.2017  6.2017 27.3101 8.322e-05 ***
+## Genotype:Location  3 4.0083  1.3361  5.8838   0.00662 ** 
+## Residuals         16 3.6333  0.2271                      
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+Vediamo che tutti gli effetti in gioco (genotipo, località ed interazione) sono significativi ed hanno quindi un nesso causa-effetto rilevante sulla produzione della coltura. La presnza di un'interaione significativa mostra che, probabilmente, la valutazione dei genotipi performanti non è comune alle due località anche se questa affermazione richiede analisi successive che vedremo in seguito.
+
+## Dati non bilanciati
+
+Prima di concludere questo capitolo, è necessario sottolineare che esistono diversi metodi per calcolare la somma dei quadrati per gli effetti del modello e che non portano necessariamente agli stessi risultati, in particolare quando i dati sono non bilanciati, ovvero quando c'è un numero diverso di repliche per ogni gruppo di trattamento. Il metodo da noi proposto si basa su:
+
+1. adattamento del modello completo ai dati osservati
+2. rimozione dell'effetto in studio e adattamento del modello ridotto
+3. sottrazione della somma residua dei quadrati del modello completo dalla somma residua dei quadrati del modello ridotto.
+
+Questo approccio produce la cosiddetta *somma marginale dei quadrati* e non è lo stesso dell'approccio utilizzato nella funzione 'anova()' in base R, che produce la cosiddetta *somma sequenziale dei quadrati*. Questi due metodi danno gli stessi risultati con dati bilanciati, sebbene, con dati non bilanciati, raccomandiamo la *somma marginale dei quadrati*, che può essere ottenuta utilizzando la funzione 'Anova()' (si noti la lettera maiuscola all'inizio) nel pacchetto 'car', come mostrato nel seguente esempio.
+
+## Esempio 6: un CRBD con un valore mancante
+
+Se consideriamo i dati nel precedente Esempio 3 e se immaginiamo che il genotipo A manchi dal terzo blocco (vedere il valore 'NA' nel riquadro Codice 4.14, che significa Non disponibile), il metodo 'anova()' in base R porta a diverse tabelle ANOVA, a seconda dell'ordine con cui i due effetti (genotipo e blocco) vengono inseriti nel modello (vedere riquadro Codice 4.14). Poiché non abbiamo una logica per decidere quale effetto debba essere inserito per primo, le conclusioni che otteniamo con la funzione 'anova()' sono puramente arbitrarie, il che non è accettabile nella scienza.
+
+
+```r
+# Codice box 4.14
+# Dati non bilanciati
+
+Yield <- c(4.5, 4.3, NA,
+3.9, 3.6, 4.0,
+3.9, 4.2, 4.3,
+4.6, 4.7, 5.0)
+Genotype <- rep(LETTERS[1:4], each = 3)
+Block <- rep(LETTERS[1:3], times = 4)
+
+# Adattamento di un modello
+mod1 <- lm(Yield ~ Genotype + Block)
+mod2 <- lm(Yield ~ Block + Genotype)
+
+# Partizionamento della varianza
+anova(mod1)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##           Df  Sum Sq Mean Sq F value   Pr(>F)   
+## Genotype   3 1.40182 0.46727 19.7671 0.003338 **
+## Block      2 0.16181 0.08090  3.4224 0.115770   
+## Residuals  5 0.11819 0.02364                    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+anova(mod2)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##           Df  Sum Sq Mean Sq F value   Pr(>F)   
+## Block      2 0.10765 0.05383   2.277 0.198135   
+## Genotype   3 1.45597 0.48532  20.531 0.003061 **
+## Residuals  5 0.11819 0.02364                    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+L'approccio proposto in precedenza, basato sulla rimozione dei due predittori, uno alla volta, porta alla somma dei quadrati mostrata nel Codice box 4.15 e possiamo notare che questa somma di quadrati (per gli effetti genotipo e blocco) sono gli stessi, indipendentemente dall'ordine con cui i due effetti sono stati inclusi nel modello completo. Queste somme marginali di quadrati possono essere riprodotte utilizzando la funzione 'Anova()' nel pacchetto 'car' e impostando l'argomento 'type = 2'. Ulteriori informazioni sui tipi di somma di quadrati possono essere trovate in Lansrud (2003).
+
+
+```r
+# Casella di codice 4.15
+
+# Rimozione dei predittori uno alla volta (modello 1)
+RSS <- deviance(mod1)
+mod1.red <- lm(Yield ~ Block) # Rimozione del genotipo
+SS_g <- deviance(mod1.red) - RSS
+SS_g
+## [1] 1.455972
+mod1.red2 <- lm(Yield ~ Genotype) # Rimozione del blocco
+SS_b <- deviance(mod1.red2) - RSS
+SS_b
+## [1] 0.1618056
+# Rimozione dei predittori uno alla volta (modello 2)
+RSS <- deviance(mod2)
+mod2.red <- lm(Yield ~ Block) # Rimozione del genotipo
+SS_g <- deviance(mod2.red) - RSS
+SS_g
+## [1] 1.455972
+mod2.red2 <- lm(Yield ~ Genotype) # Rimozione del blocco
+SS_b <- deviance(mod2.red2) - RSS
+SS_b
+## [1] 0.1618056
+# Utilizzo del metodo Anova() nel pacchetto 'car'
+library(car)
+Anova(mod1, type = 2)
+## Anova Table (Type II tests)
+## 
+## Response: Yield
+##            Sum Sq Df F value   Pr(>F)   
+## Genotype  1.45597  3 20.5307 0.003061 **
+## Block     0.16181  2  3.4224 0.115770   
+## Residuals 0.11819  5                    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Anova(mod2, type = 2)
+## Anova Table (Type II tests)
+## 
+## Response: Yield
+##            Sum Sq Df F value   Pr(>F)   
+## Block     0.16181  2  3.4224 0.115770   
+## Genotype  1.45597  3 20.5307 0.003061 **
+## Residuals 0.11819  5                    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+## Conclusioni
+
+In questo capitolo abbiamo presentato un metodo per valutare se un certo set di dati ottenuto da un esperimento controllato può ragionevolmente supportare l'esistenza di relazioni causa-effetto tra le variabili in esame.
+
+Questo metodo consiste in:
+
+1. adattamento di un modello causa-effetto ragionevole nei dati osservati;
+2. utilizzo del metodo di partizionamento della varianza (ANOVA) per ottenere i quadrati medi (varianze) per tutti gli effetti causali in esame e il quadrato medio per tutti gli altri effetti di natura casuale (quadrato medio residuo);
+3. confronto dei quadrati medi per gli effetti causali con il quadrato medio per gli effetti casuali, utilizzando i rapporti F. Più alto è il rapporto F, più forte è la relazione causa-effetto.
+
+Per il metodo di partizionamento della varianza con R, sono disponibili due funzioni, 'anova()' in base R e 'Anova()' nel pacchetto 'car'. Queste due funzioni forniscono gli stessi risultati con dati bilanciati, ma la seconda è altamente consigliata quando i dati non sono bilanciati.
+
+
+---
+
+
+## Altre letture
+
+1. Faraway, J.J., 2002. Practical regression and Anova using R. In: http://cran.r-project.org/doc/contrib/Faraway-PRA.pdf.
+2. Kuehl, R. O., 2000. Design of experiments: statistical principles of research design and analysis. Duxbury Press
+
+
+## Domande ed esercizi
+
+1. Qual è la differenza tra variazione congiunta e causalità?
+2. In valore, cosa intendiamo quando diciamo "effetto del trattamento"?
+3. Descrivi in poche frasi cos'è l'ANOVA e perché viene utilizzata.
+4. Qual è la definizione di "interazione tra due fattori sperimentali"? Spiega brevemente.
+5. Considera il file Excel "rimsulfuron.csv" da [https://www.casaonofri.it/_datasets/rimsulfuron.csv](https://www.casaonofri.it/_datasets/rimsulfuron.csv) (puoi scaricarlo o leggerlo direttamente dal repository web). Questo è un set di dati relativo a un esperimento sul campo per confrontare 14 erbicidi e due controlli non trattati, con 4 repliche per trattamento. L'esperimento è stato progettato in blocchi randomizzati. Esegui l'ANOVA con R e valuta la rilevanza dell'effetto erbicida.
+6. Hai eseguito un esperimento con un layout completamente randomizzato con due repliche, per confrontare due genotipi di mais (G1 e G2) con due diverse strategie di fertilizzazione (F1 e F2). Calcola i quadrati medi e i rapporti F per il genotipo, gli effetti della fertilizzazione e per la loro interazione. Gli effetti causali sono rilevanti? Il set di dati è mostrato di seguito.
+
+
+Genotype   Fertiliser        Yield
+---------  -----------  ----------
+G1         F1            11.292934
+G1         F1            12.777429
+G1         F2            12.584441
+G1         F2             9.154302
+G2         F1            14.929125
+G2         F1            15.006056
+G2         F2            12.925260
+G2         F2            12.953368
+
+
+
+<!--chapter:end:04-CausaEffetto.Rmd-->
+
+# Modelli stocastici
+
+Nel Capitolo precedente abbiamo visto che i fenomeni biologici possono essere descritti ricorrendo a modelli statistici, che contengono una componente deterministica che produce la risposta attesa ($Y_E = f(X, \theta)$) ed una componente stocastica ($\varepsilon = Y_O - Y_E$), che 'confonde' le nostre osservazioni ($Y_O$), rendendole diverse da quanto previsto dal modello deterministico. Abbiamo anche visto che i dati sperimentali possono essere utilizzati per specificare un modello generale (teorico), assegnando valori ben definiti ai parametri del modello.
+
+A questo punto è lecito chiedersi: possiamo utilizzare questo modello così specificato per prevedere i risultati di un esperimento futuro dello stesso tipo? La risposta non è così ovvia; infatti, possiamo utilizzare la parte deterministica del modello per fare previsioni sul risultato atteso ($Y_E$), che si ottiene tramite una relazione causa-effetto. Sfortunatamente, il risultato effettivo ($Y_O$) è totalmente imprevedibile, a causa degli effetti degli elementi stocastici $\varepsilon$, che cambiano casualmente a ogni tentativo di campionamento e confondono le nostre osservazioni.
+
+Sebbene non abbiamo alcun modo di prevedere un risultato casuale (che altrimenti non potrebbe essere tale), possiamo fare alcune ipotesi ragionevoli. Immaginiamo di studiare l'altezza delle piante in un campo di avena ed immaginiamo che il valore atteso, come previsto dal modello, sia $Y_E = 120$; dovremmo aspettarci che, se il modello è corretto, sia molto probabile osservare un valore di 119 o 121 cm ($\varepsilon = \pm 1$), meno probabile osservare 100 o 140 cm ($\varepsilon = \pm 20$), molto improbabile osservare 80 o 160 cm ($\varepsilon = \pm 40$). Di conseguenza, dovremmo poter assegnare una probabilità a ciascun possibile valore di $\varepsilon$ (e quindi a ciascun possibile risultato osservato $Y_O$), utilizzando una qualche **funzione di probabilità**.
+
+
+## Funzioni di probabilità/densità
+
+Se avessimo rilevato una qualità del soggetto, come il sesso (M/F), la mortalità (vivo/morto), la germinabilità (germinato/non germinato), avremmo una variabile categorica nominale e potremmo calcolare le probabilità definita come rapporto tra il numero degli eventi favorevoli e il numero totale di eventi possibili (probabilità 'frequentista'). Ad esempio, se il nostro esperimento consistesse nell'estrarre una carta da un mazzo di carte francesi, potremmo calcolare la probabilità di estrarre un asso  $4/52 = 0.077$, oppure, se il nostro esperimento consistesse nell'effettuare due lanci della monetina, potremmo calcolare la probabilità di ottenere due teste considerando che ci sono quattro eventi possibili (testa/testa, croce/testa, testa/croce e croce/croce) e quindi la probabilità di uno di questi è $1/4 = 0.25$.
+
+Nel caso di una variabile quantitativa, come l'altezza, non ha molto senso chiedersi, ad esempio, qual è la probabilità di trovare un individuo esattamente alto 100 cm (e non 100.0000001, o 99.99999). Capiamo da soli che questa probabilità è infinitesima. Al contrario, potremmo pensare di calcolare la probabilità di ottenere un valore compreso in un intervallo, per esempio da 99 a 101 cm: se la popolazione è ampia, ma finita, basta usare la regola che conosciamo e contare il numero di soggetti nell'intervallo, dividendoli per il numero totale di soggetti nella popolazione. Il problema però sta nel fatto che si viene ad introdurre un elemento arbitrario, cioè l'ampiezza dell'intervallo prescelto per calcolare la probabilità.  Possiamo tuttavia pensare di calcolare la **densità di probabilità**, vale a dire il rapporto tra la probabilità di un intervallo e la sua ampiezza (cioè la probabilità per unità di ampiezza dell'intervallo; per questo si parla di densità). Ora, se immaginiamo di restringere l’intervallo fino a farlo diventare infinitamente piccolo, anche la probabilità tende a diventare infinitesima con la stessa 'velocità', in modo che la densità di probabilità di un singolo valore di concentrazione tende ad un numero finito (ricordate il limite del rapporto di polinomi?), come mostrato in Figura \@ref(fig:figName50b).
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName50b-1.png" alt="Densità di probabilità per una variabile continua discretizzata, su intervalli di ampiezza decrescente. Quando l'intervallo diviene piccolissimo, la funzione di densità tende a diventare un curva continua" width="90%" />
+<p class="caption">(\#fig:figName50b)Densità di probabilità per una variabile continua discretizzata, su intervalli di ampiezza decrescente. Quando l'intervallo diviene piccolissimo, la funzione di densità tende a diventare un curva continua</p>
+</div>
+
+La funzione di densità (PDF) rappresentata nella Figura \@ref(fig:figName50b) è la gaussiana ed è così comune in agricoltura e biologia che è solitamente nota come **curva normale**. L'equazione è:
 
 $$P(Y) = \frac{1}{{\sigma \sqrt {2\pi } }}\exp \left[{\frac{\left( {Y - \mu } \right)^2 }{2\sigma ^2 }} \right]$$
 
-ove $P(Y)$ è la densità di probabilità di una certa misura $Y$, mentre $\mu$ e $\sigma$ sono rispettivamente la media e la deviazione standard della popolazione (per la dimostrazione si rimanda a testi specializzati). Le variabili casuali che possono essere descritte con la curva di Gauss, prendono il nome di *variabili normali* o *normalmente distribuite*.
+ove $P(Y)$ è la densità di probabilità di una certa misura $Y$, mentre $\mu$ e $\sigma$ sono rispettivamente la media e la deviazione standard della popolazione (per la dimostrazione si rimanda a testi specializzati). Le variabili casuali la cui densità può essere descritta con la curva di Gauss, prendono il nome di *variabili normali* o *normalmente distribuite*.
 
-Studiare le principali proprietà matematiche della curva di Gauss è estremamente utile. Ad esempio, senza voler entrare troppo nel dettaglio, guardando la curva di Gauss possiamo notare che:
+Guardando la curva di Gauss possiamo notare che ha una forma 'a campana' che dipende da solo da $\mu$ e $\sigma$ (figura \@ref(fig:figName51)).
 
-1. la forma della curva dipende da solo da $\mu$ e $\sigma$ (figura \@ref(fig:figName51)). Ciò significa che, se prendiamo un gruppo di individui e partiamo dal presupposto (**assunzione parametrica**) che in relazione ad un determinato carattere quantitativo (es. produzione) la distribuzione di frequenza è normale (e quindi può essere descritta con una curva di Gauss), allora basta conoscere la media e la deviazione standard degli individui e immediatamente conosciamo l'intera distribuzione di frequenza (cioè l'intera popolazione di misure);
-2. la curva ha due asintoti e tende a 0 quando x tende a infinito. Questo ci dice che se assumiamo che un fenomeno è descrivibile con una curva di Gauss, allora assumiamo che tutte le misure sono possibili, anche se la loro frequenza decresce man mano che ci si allontana dalla media;
-3. la probabilità che la x assuma valori compresi in un certo intervallo è data dall'integrale della curva di Gauss in quell'intervallo. Ad esempio, la figura \@ref(fig:figName52) mostra l'80° percentile, cioè la misura più alta dell'80% delle misure possibili;
-4. Se la curva di Gauss è stata costruita utilizzando le frequenze relative, l'integrale della funzione è uguale ad 1. Infatti la somma delle frequenze relative di tutte le varianti possibili non può che essere uguale ad 1;
-5. la curva è simmetrica. Questo indica che la frequenza dei valori superiori alla media è esattamente uguale alla frequenza dei valori inferiori alla media.
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName51-1.png" alt="Distribuzioni normali con diversa media e deviazione standard (rispettivamente 5 e 1 a sinistra, 6 e 3 a destra)" width="90%" />
+<p class="caption">(\#fig:figName51)Distribuzioni normali con diversa media e deviazione standard (rispettivamente 5 e 1 a sinistra, 6 e 3 a destra)</p>
+</div>
+
+
+Per calcolare la densità gaussiana con R, possiamo usare la funzione `dnorm()`; ad esempio, se vogliamo conoscere la densità di probabilità di ottenere un produzione di 12 t/ha, campionando una parcella da una popolazione di parcelle con media pari a 11 e deviazione standard pari a 1,5, possiamo usare il codice fornito nel riquadro 5.1.
+
+\small
+\vspace{12pt}
+
+```r
+# Code box 5.1
+#
+# Gaussian density calculation
+dnorm(12, mean = 11, sd = 1.5)
+## [1] 0.2129653
+```
+\normalsize
+
+La densità non è una probabilità reale e non è interessante di per sé (almeno, non in termini assoluti), ma la PDF ha il vantaggio di restituire la probabilità di un intervallo di eventi come Area Sotto la Curva (Area Under the Curve: AUC). Ad esempio, la Figura \@ref(fig:figName52) evidenzia l'AUC tra 11 e 12, che rappresenta la probabilità di campionare una percella con una produzione in quell'intervallo, partendo da una popolazione di parcelle con media pari a 11 e deviazione standard pari a 1,5.
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName52-1.png" alt="Area-Under-the-Curve per una PDF gaussiana, che descrive la probabilità di campionare una parcella che ha una produzione nell'intervallo tra 11 e 12, quando la media è 11 e la deviazione standard è 1.5" width="75%" />
+<p class="caption">(\#fig:figName52)Area-Under-the-Curve per una PDF gaussiana, che descrive la probabilità di campionare una parcella che ha una produzione nell'intervallo tra 11 e 12, quando la media è 11 e la deviazione standard è 1.5</p>
+</div>
+
+Di conseguenza, l'AUC e, quindi, la probabilità, possono essere calcolate integrando la curva gaussiana su un intervallo; in relazione alla Figura \@ref(fig:figName52), la probabilità tra 11 e 12 è 0,248 (vedere il riquadro 5.2). Più semplicemente, la funzione `pnorm()` restituisce l'AUC tra $-\infty$ e qualsiasi valore $y$ (**Funzione di distribuzione cumulativa**; vedere la Figura \@ref(fig:figName52c)) e può essere utilizzata per evitare il calcolo di un integrale.
+
+\small
+\vspace{12pt}
+
+```r
+#Code box 5.2
+
+# Integration of the gaussian density function
+AUC <- integrate(function(x) dnorm(x, 11, 1.5), 11, 12)
+AUC$value
+## [1] 0.2475075
+#
+# Use of the cumulative probability function
+# (same result as above)
+pnorm(12, mean = 11, sd = 1.5) - pnorm(11, mean = 11, sd = 1.5)
+## [1] 0.2475075
+```
+\normalsize
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName52c-1.png" alt="Probabilità cumulativa gaussiana, considerando una distribuzione con media pari ad 11 e deviazione standard pari a 1.5" width="75%" />
+<p class="caption">(\#fig:figName52c)Probabilità cumulativa gaussiana, considerando una distribuzione con media pari ad 11 e deviazione standard pari a 1.5</p>
+</div>
+
+Le più importanti proprietà di una curva Gaussiano sono le seguenti:
+
+1. la curva ha due asintoti e tende a 0 quando x tende a infinito. Questo ci dice che se assumiamo che un fenomeno è descrivibile con una curva di Gauss, allora assumiamo che tutte le misure sono possibili, anche se la loro frequenza decresce man mano che ci si allontana dalla media;
+4. L'integrale della curva di densità gaussiana da $-\infty$ a $+\infty$ è uguale ad 1. Infatti la somma delle frequenze relative di tutte le varianti possibili non può che essere uguale ad 1;
+5. la curva è simmetrica. Questo indica che la frequenza dei valori superiori alla media è esattamente uguale alla frequenza dei valori inferiori alla media;
 6. dato  $\sigma$, possiamo dire che la frequenza dei valori superiori a $\mu + \sigma$ è pari al 15.87\% ed è uguale alla frequenza dei valori inferiori a $\mu - \sigma$.
 
+Ora arriviamo alla domanda più interessante: come utilizzare la curva gaussiana? Se la variabile che stiamo studiando è continua (ma, con un po' di prudenza, potremmo includere anche conteggi e rapporti), potremmo supporre che l'elemento stocastico $\varepsilon$ sia distribuito in modo gaussiano, con media uguale a 0 e deviazione standard uguale a $\sigma$:
 
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName51-1.png" alt="Distribuzioni normali con diversa media e deviazione standard (rispettivamente 5 e 1 a sinistra, 6 e 3 a destra" width="90%" />
-<p class="caption">(\#fig:figName51)Distribuzioni normali con diversa media e deviazione standard (rispettivamente 5 e 1 a sinistra, 6 e 3 a destra</p>
-</div>
+$$\varepsilon \sim \textrm{Norm}(0, \sigma)$$
 
+Analogamente, potremmo supporre che il risultato di un esperimento sia distribuito in modo gaussiano con media uguale a $Y_E$ (come previsto dal modello deterministico) e deviazione standard uguale a $\sigma$:
 
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName52-1.png" alt="Integrale della curva di densità normale (80° percentile; sinistra) e curva di probabilità cumulata (destra)" width="90%" />
-<p class="caption">(\#fig:figName52)Integrale della curva di densità normale (80° percentile; sinistra) e curva di probabilità cumulata (destra)</p>
-</div>
+$$Y_O \sim \textrm{Norm}(Y_E, \sigma)$$
 
+Se questa ipotesi è ragionevole, si aprono delle possibilità molto interessanti. In particolare, data una popolazione ed il modello che la descrive, possiamo:
 
-## Modelli 'a due facce'
+1. calcolare le probabilità di ottenere un certo risultato osservato;
+2. simulare i risultati di esperimenti futuri.
 
-Teendo conto di quanto appena detto, possiamo modificare i nostri modelli per la descrizione dei risultati degli esperimenti in questo modo:
+Vediamo come possiamo operare in alcune situazioni piuttosto comuni.
 
+## Calcolare le probabilità
 
-$$Y_i = f(X, \theta) + \varepsilon_i$$
+In pratica, se assumiamo che un modello completamente specificato possa descrivere adeguatamente un particolare fenomeno, possiamo utilizzare tale modello per prevedere il risultato atteso. Successivamente, se conosciamo anche la deviazione standard del termine di errore residuo, possiamo utilizzare l'equazione della curva gaussiana per calcolare la probabilità di qualsiasi possibile risultato osservato.
 
-introducendo l'elemento stocastico $\varepsilon$ per descrivere l' effetti casuali che subisce ogni soggetto $i$. Globalmente, questi effetti vengono considerati come normalmente distribuiti, con media 0 e deviazione standard $\sigma$:
+### Esempio 5.1: Calcolare la probabilità in un esperimento misurativo
 
-$$ \varepsilon_i \sim N(0, \sigma) $$
+Ipotizziamo di avere un pozzo inquinato dai residui di una certa sostanza xeniobiotica ad una concentrazione pari a 120 $mg/L$ ed ipotizziamo di effettuare l'analisi chimica per la determinazione della concentrazione dei residui, utilizzando uno strumento caratterizzato da un coefficiente di variabilità del 10%, che equivale ad una deviazione standard pari a 12 $mg/L$ ($\sigma = 12$). Con queste informazioni possiamo rispondere a tutte le seguenti domande:
 
-Analogamente, possiamo scrivere:
+1. Che modello possiamo utilizzare per descrivere i risultati di questo esperimento?
+2. Qual è la misura di concentrazione più probabile?
+3. Qual è la densità di probabilità di ottenere una concentrazione pari a 120 $mg/L$?
+4. Qual è la probabilità di ottenere una concentrazione inferiore a 110 $mg/L$?
+5. Qual è la probabilità di ottenere una concentrazione superiore a 130 $mg/L$?
+6. Qual è la probabilità di ottenere una concentrazione compresa tra 110 e 130 $mg/L$
+7. Quale concentrazione è superiore al 90% di tutte i valori ottenibili (90° percentile)?
+8. Quali sono quei due valori, simmetrici rispetto alla media e tali da formare un intervallo all'interno del quale cadono il 95% delle misure possibili?
 
-$$Y_i \sim N[f(X, \theta), \sigma]$$
+Per questo esperimento misurativo, il modello della media è del tutto appropriato ($Y_E = 120$ mg/L). Tuttavia, si tratta di un modello semplicistico, a causa del fatto che il nostro strumento chimico non è esente da errori di misura; di conseguenza, dovremmo aggiungere la componente stocastica, come $Y_O = 120 + \varepsilon$, dove $\varepsilon \sim \textrm{Norm}(0, \sigma = 12)$, ovvero $Y_O \sim \textrm{Norm}(120, 12)$.
 
-cioè che il valore osservato è normalmente distribuita con media che cambia in funzione dello stimolo $X$ e deviazione standard $\sigma$. Dato che si tratta di una semplice traslazione di una distribuzione normale lungo l'asse delle ascisse (come in figura \@ref(fig:figName51)), le due espressioni sono totalmente equivalenti.
-
-Un modello di questo tipo (a due facce: deterministica + stocastica) ci consente la miglior descrizione di un qualunque fenomeno biologico: la parte deterministica ci consente di prevedere il risultato atteso, quella stocastica ci consente di capire quali osservazioni sono più probabili in pratica. Ad esempio, se ipotizziamo di misurare la concentrazione del nostro pozzo con uno strumento caratterizzato da $\sigma = 12$, possiamo rispondere a tutte le seguenti domande
-
-1. Qual è la misura di concentrazione più probabile?
-2. Qual è la densità di probabilità di ottenere una concentrazione pari a 120 $mg/L$?
-3. Qual è la probabilità di ottenere una concentrazione inferiore a 110 $mg/L$?
-4. Qual è la probabilità di ottenere una concentrazione superiore a 130 $mg/L$?
-5. Qual è la probabilità di ottenere una concentrazione compresa tra 110 e 130 $mg/L$
-6. Quale concentrazione è superiore al 90% di tutte i valori ottenibili (90° percentile)?
-7. Quali sono quei due valori, simmetrici rispetto alla media e tali da formare un intervallo all'interno del quale cadono il 95% delle misure possibili?
-
-La risposta alla prima domanda è banale ($Y_E = 120$), mentre per rispondere alle altre domande possiamo utilizzare le apposite funzioni di R. Per ogni distribuzione abbiamo a disposizione una funzione di densità (con prefisso 'd'), una funzione di probabilità cumulata (con prefisso 'p') e una funzione inversa (prefisso 'q') che consente di calcolare i percentili. Nel caso della funzione gaussiana, abbiamo le funzioni `dnorm()`, `pnorm()` e `qnorm()`, che possiamo utilizzare per calcolare densità, probabilità e percentili, come indicato di seguito. 
+La risposta alla seconda domanda è banale ($Y_E = 120$), mentre per rispondere alle altre domande possiamo utilizzare le apposite funzioni di R. Per ogni distribuzione abbiamo a disposizione una funzione di densità (con prefisso 'd'), una funzione di probabilità cumulata (con prefisso 'p') e una funzione inversa (prefisso 'q') che consente di calcolare i percentili. Nel caso della funzione gaussiana, abbiamo le funzioni `dnorm()`, `pnorm()` e `qnorm()`, che possiamo utilizzare per calcolare densità, probabilità e percentili, come indicato di seguito. 
 
 
 ```r
@@ -1380,14 +1980,35 @@ qnorm(0.975, mean = 120, sd = 12)
 ## [1] 143.5196
 ```
 
+### Esempio 5.2: Calcolo della probabilità per un esperimento di degradazione
 
-## E allora?
+Sappiamo che la concentrazione $C$ di una sostanza erbicida nel suolo diminuisce con il tempo $t$ secondo secondo una cinetica del primo ordine, che può essere descritta con il modello: $C = C_0 \times 10{^{-0.01 \, t}}$, dove $C_0$ è la concentrazione iniziale dell'erbicida. Supponiamo di arricchire un campione di suolo con questa sostanza fino a una concentrazione $C_0 = 75$ ng g^-1^, qual è la probabilità di osservare una concentrazione inferiore a 3 ng g^-1^ a 20 giorni dal trattamento? Si consideri che tutte le fonti sconosciute di errore sperimentale possono essere considerate gaussiane, con un coefficiente di variabilità pari al 10%.
 
-Cerchiamo di ricapitolare. I risultati sperimentali sono un oggetto largamente ignoto e inconoscibile, perché sono, in parte, determinati in base a relazioni causa-effetto, ma, d'altra parte, essi sono puramente stocastici. Tuttavia è ragionevole supporre che essi seguano una qualche funzione di probabilità/densità (**assunzione parametrica**). Se questo è vero, allora possiamo utilizzare queste funzioni e i loro integrali per calcolare la probabilità di ottenere un certo risultato o un insieme di risultati.
+Supponendo che la relazione causa-effetto sia affidabile, la concentrazione prevista a 20 giorni dal trattamento dovrebbe essere 4,22 ng g^-1^ (riquadro 5.5). Tuttavia, il risultato osservato dipende dall'errore sperimentale, che è un evento casuale imprevedibile; se assumiamo che la funzione di probabilità per la concentrazione osservata sia gaussiana, con media di 4,22 e deviazione standard di 0,422 (ovvero 7,5 volte il 10%), la probabilità di ottenere una misura minore o uguale a 3 ng g^-1^ è inferiore allo 0,2%, il che dimostra che si tratta di un evento alquanto improbabile.
 
-## Le simulazioni Monte Carlo
 
-Guardandolo dal punto di vista che abbiamo appena illustrato, ogni esperimento scientifico non è altro che un'operazione di campionamento da una certa distribuzione di probabilità e questo campionamento può essere simulato impiegando un generatore di numeri casuali, con un procedimento che prende il nome di 'metodo Monte Carlo'.
+```r
+# Codice casella 5.5
+# Concentrazione attesa
+Ct <- 75 * 10^(-0.05 * 25)
+Ct
+## [1] 4.21756
+# Probabilità di osservare una concentrazione <= 3
+pnorm(3, Ct, Ct * 0.1)
+## [1] 0.001945398
+```
+
+## Simulazione stocastica
+
+Guardandolo dal punto di vista che abbiamo appena illustrato, ogni esperimento scientifico non è altro che un'operazione di campionamento da una certa distribuzione di probabilità, che può essere simulato impiegando un generatore di numeri casuali, con un procedimento che prende il nome di 'metodo Monte Carlo'.
+
+In pratica, possiamo:
+1. Simulare i risultati attesi utilizzando il modello causa-effetto selezionato per ciascuna unità sperimentale.
+2. Associare la variabilità casuale ai risultati attesi campionando da una PDF gaussiana.
+
+In R, il generatore di numeri casuali gaussiani è implementato nella funzione rnorm(), che richiede tre argomenti: il numero di valori casuali che intendiamo estrarre, la media della distribuzione e la sua deviazione standard.
+
+### Esempio 5.3. Simulazione di un esperimento misurativo
 
 Prendiamo ancora il nostro pozzo inquinato e contenente 120 $mg/L$ di un erbicida e immaginiamo di misurare la concentrazione di tre campioni d'acqua, utilizzando uno strumento caratterizzato da $\sigma = 12$. I risultati di questo esperimento possono essere simulati:
 
@@ -1407,14 +2028,36 @@ Y_O
 
 La generazione di numeri casuali con il computer viene fatta attraverso algoritmi che, a partire da un *seed* iniziale, forniscono sequenze che obbediscono a certe proprietà fondamentali (numeri pseudo-casuali). Il comando `set.seed(1234)` ci permette di partire da un *seed* predefinito, in modo che, chiunque ripeta la simulazione con lo stesso *seed*, ottiene lo stesso risultato. Un'altra cosa da notare è che il nome della funzione che genera numeri casuali è formato dal nome della distribuzione ('norm') più il prefisso 'r'. Questo è vero per tutte le altre distribuzioni in R ('rbinom', 'rt' e così via). Inoltre, il primo argomento definisce il numero di valori che vogliamo ottenere (tre, tanti quante sono le repliche).
 
-La stessa strategia può essere utilizzata per simulare risultati sotto modelli deterministici più complessi: definisco i risultati attesi con il modello deterministico prescelto e ci aggiungo una componente casuale, campionandola da un distribuzione di probabilità/densità adeguata (usualmente gaussiana). Come ulteriore esempio possiamo considerare il codice sottostante, che può essere utilizzato per simulare un esperimento di concimazione azotata del frumento, con quattro dosi (0, 60, 120 e 180 kg/ha) e quattro repliche (sedici dati in totale).
+La stessa strategia può essere utilizzata per simulare risultati sotto modelli deterministici più complessi: definisco i risultati attesi con il modello deterministico prescelto e ci aggiungo una componente casuale, campionandola da un distribuzione di probabilità/densità adeguata (usualmente gaussiana).
 
+### Esempio 5.4: simulazione di un esperimento di fertilizzazione
+
+Con la stessa tecnica, possiamo provare a simulare i risultati di un esperimento per determinare la resa del grano trattato con quattro diversi dosaggi di azoto (0, 60, 120 e 180 kg/ha); immaginamo che il disegno sperimentale sia completamente randomizzato con quattro repliche (sedici dati in totale) e il modello causa-effetto sia:
+
+$$Y_O = 25 + 0.15 \, X + \varepsilon$$
+
+ove: $Y_O$ è la produzione osservata, $X$ è la dose di azoto, e l'elemento stocastico è $\varepsilon \sim N(0, \sigma = 2.5)$. Il
+codice per la simulazione è riportato nel box sottostante.
+
+\small
+\vspace{12pt}
 
 ```r
+# Code box 5.6
+# Stochastic simulation, Example 5.3
+
 set.seed(1234)
-Dose <- rep(c(0, 60, 120, 180), each=4) 
+
+# Creating the vector to host the experimental design
+Dose <- rep(c(0, 60, 120, 180), each=4)
+
+# Predicting the expected yield
 Yield_E <- 25 + 0.15 * Dose
+
+# Predicting the residuals
 epsilon <- rnorm(16, 0, 2.5)
+
+# Predicting the observations
 Yield <- Yield_E + epsilon
 dataset <- data.frame(Dose, Yield)
 dataset
@@ -1436,20 +2079,79 @@ dataset
 ## 15  180 54.39874
 ## 16  180 51.72429
 ```
+\normalsize
+
+### Esempio 5.4: Simulazione di una prova di confronto varietale 
+
+Proviamo ora a simulare i risultati di un esperimento di confronto varietale, con cinque genotipi in quattro blocchi (20 osservazioni in totale). La relazione causa-effetto è la seguente:
+
+$$Y_{O(ij)} = \mu + \alpha_i + \gamma_j + \varepsilon_{ij}$$
+
+dove $Y_O$ è la resa osservata, $\mu$ è la resa media del primo genotipo nel primo blocco, $\alpha$ è l'effetto del genotipo e $\gamma$ è l'effetto del blocco a cui appartiene ogni parcella. Poniamo che $\mu$ sia 48 q/ha, i valori di $\alpha$ siano rispettivamente 0, 1, 3, -2, -3 per i cinque genotipi, mentre i valori di $\gamma$ siano rispettivamente 0, -2, 3, 1 per i quattro blocchi. Poniamo inoltre che l'errore sperimentale $\varepsilon$ sia gaussiano con media uguale a 0 e $\sigma = 5$.
+
+Con questi dati, il processo di simulazione è mostrata nel riquadro sottostante.
+
+\small
+\vspace{12pt}
+
+```r
+# Code box 5.7
+# Stochastic simulation, Example 5.4
+
+set.seed(1234)
+
+# Prepare the vectors for the experimental design
+Genotype <- rep(LETTERS[1:5], each=4) 
+Block <- rep(1:4, times = 5)
+
+# Input the value of parameters
+mu <- 48
+alpha <- rep(c(0, 1, 3, -2, -3), each = 4) 
+gamma <- rep(c(0, -2, 3, 1), times = 5)
+sigma <- 5
+
+# Predict the expected yields
+Yield_E <- mu + alpha + gamma
+
+# Simulate the residuals and the observed values
+epsilon <- rnorm(20, 0, sigma)
+Yield <- Yield_E + epsilon
+dataset <- data.frame(Genotype, Block, Yield)
+dataset
+##    Genotype Block    Yield
+## 1         A     1 41.96467
+## 2         A     2 47.38715
+## 3         A     3 56.42221
+## 4         A     4 37.27151
+## 5         B     1 51.14562
+## 6         B     2 49.53028
+## 7         B     3 49.12630
+## 8         B     4 47.26684
+## 9         C     1 48.17774
+## 10        C     2 44.54981
+## 11        C     3 51.61404
+## 12        C     4 47.00807
+## 13        D     1 42.11873
+## 14        D     2 44.32229
+## 15        D     3 53.79747
+## 16        D     4 46.44857
+## 17        E     1 42.44495
+## 18        E     2 38.44402
+## 19        E     3 43.81414
+## 20        E     4 58.07918
+```
+\normalsize
 
 
-## Analisi dei dati e 'model fitting'
+## Conclusioni
 
-Nelle simulazioni sovrastanti abbiamo ipotizzato di conoscere il meccanismo di base che ha generato le nostre osservazioni sperimentali. In particolare, considerando il modello $Y = f(X, \theta)$   abbiamo ipotizzato di conoscere $f$, $X$ e $\theta$ ed abbiamo simulato $Y$.
+Come conclusione di questa parte, possiamo fare le seguenti affermazioni:
 
-Nella realtà, noi non conosciamo i meccanismi che governano i fenomeni naturali ed è proprio per questo che facciamo esperimenti. Di conseguenza noi conosciamo $X$ (stimolo sperimentale) ed $Y$, ma ignoriamo $f$ e $\theta$. L'aspetto interessante è che l'ipotesi scientifica che sta alla base di un esperimento può essere posta sotto forma di modello matematico $f$ e i risultati sperimentali possono essere utilizzati per determinare $\theta$, con una tecnica definita *model fitting*. 
+1. i modelli possono fornire una descrizione molto utile delle relazioni causa-effetto e possono essere utilizzati per descrivere i risultati sperimentali in una data situazione, sebbene possano solo prevedere il valore atteso;
+2. a causa della presenza di effetti casuali, il risultato esatto di ogni singolo individuo è imprevedibile; tuttavia possiamo calcolare la probabilità di ottenere uno dei diversi risultati possibili utilizzando modelli stocastici, sotto forma di funzioni di densità di probabilità (PDF);
+3. la PDF gaussiana è quella più utilizzata per le variabili continue, ma, con le dovute precauzioni (vedi più avanti) può essere utilizzata anche con conteggi e rapporti.
 
-Le diverse tecniche di analisi dei dati che descriveremo nei capitoli successivi sono accomunate dall'essere appunto tecniche di *model fitting*. Vedremo anche come queste tecniche possono essere utilizzate per verificare che le osservazioni sperimentali si conformino ad un dato modello (*goodness of fit*) oppure per confrontare due ipotesi alternative poste sotto forma di modelli diversi (*model comparison*).
-
-
-## Modelli stocastici non-normali
-
-In questo capitolo abbiamo utilizzato un solo modello stocastico, cioè la funzione di densità gaussiana. Oltre a questa, che è largamente la più importante, esistono molti altri modelli stocastici, sia per eventi continui che discreti. La trattazione dei modelli stocastici non-normali esula dagli obiettivi di questo testo; chi fosse interessato, può trovare abbondanti informazioni in letteratura e, in particolare, nel primo dei riferimenti bibliografici forniti più sotto.
+Sebbene in questo capitolo abbiamo considerato solo un modello stocastico (PDF gaussiana), esistono diverse altre funzioni di densità di probabilità, che potrebbero essere utilizzate per raggiungere lo stesso obiettivo, ovvero descrivere la variabilità casuale. Ad esempio, nel resto di questo libro incontreremo la distribuzione t di Student e la distribuzione di Fisher-Snedecor. Chi fosse interessato a questo argomento, potrà trovare numerose informazioni nel grande libro di Ben Bolker, citato di seguito.
 
 ---
 
@@ -1458,391 +2160,577 @@ In questo capitolo abbiamo utilizzato un solo modello stocastico, cioè la funzi
 1. Bolker, B.M., 2008. Ecological models and data in R. Princeton University Press, Books.
 2. Schabenberger, O., Pierce, F.J., 2002. Contemporary statistical models for the plant and soil sciences. Taylor & Francis, CRC Press, Books.
 
+## Domande ed esercizi
+
+1. Un ricercatore sta studiando una popolazione di insetti ed ha valutato che la loro lunghezza è distribuita normalmente, con $\mu = 23 \, \textrm{mm}$ e $\sigma = 1.6$. Calcolare la probabilità di estrarre individui con lunghezza: (1) maggiore di 25, (2) minore di 21 e (3) compresa tra 21 e 25.
+2. Una macchina confezionatrice riempe automaticamente delle confezioni di seme. Il peso dichiarato sulla confezione è 12.5 kg, ma la precisione della macchina è $\pm$ 1 kg. Calcolare la probabilità che una confezione contenga: (1) meno del peso dichiarato, (2) meno di 12 kg e (3) più di 13 Kg. Si vuole regolare la macchina in modo che non più del 5% dei sacchi contenga un peso inferiore a quello dichiarato. Su quale peso dovrebbe essere regolata la macchina di riempimento? (SUGGERIMENTO: se io regolo la macchina a 12.5 kg, la quantità effettivamente erogata è normalmente distribuita, con media 12.5 e deviazione standard 1. In questo caso, c'è un 5% di probabilità di erogare meno di _____ kg; di conseguenza, devo alzare la media di ____ kg per far si che la quantità erogata non sia inferiore a 12.5 kg, se non nel 5% dei casi)
+3. Uno strumento di analisi ha un coefficiente di variabilità pari al 10\%. Ammettendo di utilizzare quello strumento su una matrice la cui concentrazione è 10 ng/g, calcolare la probabilità di ottenere una misura: (1) inferiore a 9 ng/g, (2) superiore a 11 ng/g e (3) compresa tra 9 e 11 ng/g.
+4. Un erbicida si degrada nel terreno seguendo una cinetica del primo ordine ($Y = 100 \, e^{-0.07 \, t}$), dove Y è la concentrazione al tempo t. Dopo aver spruzzato questo erbicida, che probabilità abbiamo di osservare, dopo 50 giorni, una concentrazione che risulti al disotto della soglia di tossicità per i mammiferi (2 ng/g)? Tenere conto che lo strumento di misura produce un coefficiente di variabilità del 20%
+5. Una sostanza xenobiotica si degrada nell'acqua a 20°C seguendo una cinetica del primo ordine ($Y = C_0 \, e^{-0.06 \, t}$, dove Y è la concentrazione al tempo t. Simulare i risultati di un esperimento in cui, dopo la somministrazione di questa sostanza alla dose $C_0 = 63$ ng/mL, facciamo dodici prelievi settimanali e misuriamo la concentrazione del residuo. Considerare che (1) l'errore sperimentale è gaussiano e omoscedastico sul logaritmo della concentrazione, con media 0 e deviazione standard pari a 0.25; (2) l'esperimento è a randomizzazione completa con tre repliche.
+6. Una coltura produce in funzione della sua fittezza, secondo la seguente relazione: $ Y = 0.8 + 0.8 \, X - 0.07 \, X^2$. Stabilire la fittezza necessaria per ottenere il massimo produttivo (graficamente o analiticamente). Valutare la probabilità di ottenere una produzione compresa tra 2.5 e 3 t/ha, seminando alla fittezza ottimale. Considerare che la variabilità stocastica è del 12%. 
+7. La tossicità di un insetticida varia con la dose, secondo la legge log-logistica: $ Y = \frac{1}{1 + exp\left\{ -2 \, \left[log(X) - log(15)\right] \right\}}$, dove Y è la proporzione di animali morti e X è la dose. Se trattiamo 150 insetti con una dose pari a 35 g, qual è la probabilità di trovare più di 120 morti? Considerare che la risposta è variabile da individuo ad individuo nella popolazione e questa variabilità può essere approssimata utilizzando una distribuzione gaussiana con una deviazione standard pari a 0.10.
+8. Simulare i risultati di un esperimento varietale, con sette varietà di frumento e quattro repliche. Considerare che il modello deterministico è un modello ANOVA, nel quale vengono definite le medie delle sette varietà (valori attesi). Decidere autonomamente sui parametri da impiegare per la simulazione (da $\mu_1$ a $\mu_7$ e $\sigma$)
+9. Considerando il testo dell'esercizio 6, simulare un esperimento in cui la coltura viene seminata a fittezze di 2, 4, 6, 8 piante per metro quadrato, con quattro repliche.
+10. Considerando il testo dell'esercizio 7, simulare un esperimento in cui l'insetticida viene utilizzato a cinque dosi crescenti (a vostra scelta), con quattro repliche.
+
+## Soluzioni
+
+
+```r
+# Esercizio 2
+delta <- 125 - qnorm(0.05, 125, 1)
+pnorm(125, 125 + delta, 1)
+## [1] 0.05
+```
+
+---
+
+```r
+# Esercizio 4
+res <- 100 * exp(-0.07 * 50)
+res
+## [1] 3.019738
+pnorm(2, res, res * 20/100)
+## [1] 0.04566198
+```
+
+---
+
+```r
+# Esercizio 5
+time <- rep(seq(0, 84, 7), each = 3)
+logConc <- log(63) - 0.06 * time + rnorm(39, 0, 0.25)
+Conc <- exp(logConc)
+Conc
+##  [1] 65.1476858 55.7269155 56.4298209 46.4340064 34.8030374 28.8204008
+##  [7] 31.4004950 21.0567420 27.0950255 14.1419785 23.5401886 15.8669203
+## [13]  9.8333013 10.3586323  7.8135653  5.7616847  4.4732929  5.5172880
+## [19]  4.7094035  4.5116383  7.2827519  2.5496958  2.6893340  3.1048921
+## [25]  1.7066796  1.7177343  1.6591496  1.0514164  1.2613438  1.2698798
+## [31]  0.6014733  0.8167810  0.7159910  0.4816171  0.5960429  0.7145507
+## [37]  0.6157521  0.3361480  0.6093345
+mod <- lm(log(Conc) ~ time)
+summary(mod)
+## 
+## Call:
+## lm(formula = log(Conc) ~ time)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.41736 -0.14930 -0.02928  0.05614  0.51074 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  3.994864   0.068446   58.37   <2e-16 ***
+## time        -0.059411   0.001383  -42.96   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.2262 on 37 degrees of freedom
+## Multiple R-squared:  0.9803,	Adjusted R-squared:  0.9798 
+## F-statistic:  1846 on 1 and 37 DF,  p-value: < 2.2e-16
+```
+
+---
+
+```r
+# Esercizio 6
+curve(0.8 + 0.8*x - 0.07*x^2, xlim = c(0,10))
+```
+
+![](_main_files/figure-html/unnamed-chunk-49-1.png)<!-- -->
+
+```r
+D(expression(0.8 + 0.8*x - 0.07*x^2), "x")
+## 0.8 - 0.07 * (2 * x)
+x <- 0.8/(2*0.07)
+prod <- 0.8 + 0.8*x - 0.07*x^2
+prod
+## [1] 3.085714
+pnorm(3, prod, prod * 0.12) - pnorm(2.5, prod, prod * 0.12)
+## [1] 0.3516216
+```
+
+---
+
+```r
+# Esercizio 7
+prob <- 1/(1 + exp ( -2 * (log(35) - log(15))))
+prob
+## [1] 0.8448276
+pnorm(120, 150*prob, 10, lower.tail = F)
+## [1] 0.7493398
+```
 
 
 
 
-<!--chapter:end:04-ModelliSperimentazione.Rmd-->
+
+
+<!--chapter:end:05-ModelliStocastici.Rmd-->
 
 # Stime ed incertezza
 
 
 
 
-Nel capitolo precedente, abbiamo visto che: 
+Abbiamo visto che: 
 
-1.  i fenomeni biologici seguono una legge di natura (verità 'vera'), che ne costituisce il meccanismo deterministico fondamentale. Questa legge di natura produce un risultato atteso $Y_E$.
-2.  Quando si organizza un esperimento, i soggetti sperimentali obbediscono a questo meccanismo di fondo, al quale tuttavia si sovrappongono molto altri elementi di 'confusione', altamente incontrollabili, che vanno sotto il nome di errore sperimentale.
+1.  i fenomeni biologici seguono una legge di natura (verità 'vera'), che ne costituisce il meccanismo deterministico fondamentale. A livello di popolazione, questa legge di natura produce un risultato atteso (media) $Y_E$.
+2.  Quando si organizza un esperimento, i soggetti sperimentali obbediscono a questo meccanismo di fondo, al quale tuttavia si sovrappongono molto altri elementi di 'confusione', altamente incontrollabili, che vanno sotto il nome di errore sperimentale. Il più importante ed inevitabile elemento di confusione è il fatto che il campione prescelto, anche se rappresentativo non riflette mai esattamente le caratteristiche della popolazione da cui proviene (*sampling error*).
 3.  L'osservazione sperimentale è quindi un'immagine confusa della verità vera ($Y_O \neq Y_E$) e, soprattutto, essa tende ad essere sempre diversa, anche quando ripetiamo lo stesso esperimento nelle stesse condizioni.
 
-Come facciamo, quindi, a gestire questa fondamentale 'irriproducibilità' dei risultati? Usualmente ci serviamo di un processo che prende il nome di **inferenza statistica**, attraverso il quale utilizziamo il campione per ottenere informazioni relative alla popolazione che lo ha generato, come in Figura \@ref(fig:figName61). Questo processo, nella sua forma classica, è basato sulle teorie di Karl Pearson (1857-1936), di suo figlio Egon Pearson (1895-1980), di Jarzy Neyman (1894-1981), in aggiunta al contributo di Ronald Fisher, del quale abbiamo già detto in precedenza.
+Come facciamo, quindi, a gestire questa fondamentale 'irriproducibilità' dei risultati? E, soprattutto, come facciamo a dare informazioni sulla 'verità vera' quando ne conosciamo soltanto una 'copia sbiadita' (Fig. \@ref(fig:figName61))? Usualmente ci serviamo di un processo che prende il nome di **inferenza statistica** ed è basato sulle teorie di Karl Pearson (1857-1936), di suo figlio Egon Pearson (1895-1980), di Jarzy Neyman (1894-1981), in aggiunta al contributo di Ronald Fisher, del quale abbiamo già detto in precedenza.
 
 <div class="figure" style="text-align: center">
 <img src="_images/InferenceProcess.jpeg" alt="Osservazioni sperimentali e meccanismi perturbativi" width="75%" />
 <p class="caption">(\#fig:figName61)Osservazioni sperimentali e meccanismi perturbativi</p>
 </div>
 
+Riprendiamo l'esempio relativo ad un pozzo inquinato da un erbicida a concentrazione pari a 120 $mg/L$ (Capitolo 5), misurata tramite uno strumento che, unitamente a tutte le altre fonti ignote di errore, produce un coefficiente di variabilità del 10% (corrispondente ad una deviazione standard di 12 $mg/L$). Abbiamo visto che, immaginando di fare le analisi in triplicato, i risultati di questo esperimento possono essere simulati con il modello della media, come lo abbiamo descritto nel capitolo precedente, cioè $Y_O = Y_E + \varepsilon$, con $\varepsilon \sim N(0, \sigma)$, $Y_E = 120$ e $\sigma = 12$.
 
-## Esempio: una soluzione erbicida
+Nell'esempio 5.3, la simulazione di Monte Carlo ha portato ai seguenti risultati: 105,5, 123,3 e 133,01 mg/L. Se adattiamo il "modello della media" a questo set di dati otteniamo un valore $m = 120.62$, che differisce, anche se di poco, dal valore vero $\mu = 120$. C'è quindi una discrasia tra la statistica campionaria e quella della popolazione ($m \neq \mu$).
 
-Riprendiamo l'esempio relativo ad un pozzo inquinato da un erbicida a concentrazione pari a 120 $mg/L$ (Capitolo 4), misurata tramite un gascromatografo che, unitamente a tutte le altre fonti ignote di errore, produce un coefficiente di variabilità del 10% (corrispondente ad una deviazione standard di 12 $mg/L$). Immaginando di fare le analisi in triplicato, come usuale per questo tipo di lavori, i risultati di questo esperimento possono essere simulati ricorrendo ad un generatore di numeri casuali, come nel box sottostante (ricordiamo che l'impiego della funzione `set.seed()` rende riproducibili i calcoli che seguono)
 
 
 ```r
 set.seed(1234)
-Y <- rnorm(3, 120, 12)
-Y
-## [1] 105.5152 123.3292 133.0133
+Y_E <- 120
+epsilon <- rnorm(3, 0, 12)
+Y_O <- Y_E + epsilon
+
+# Fitting the ’model of the mean’ to the observed results
+mod <- lm(Y_O ~ 1)
+coef(mod)
+## (Intercept) 
+##    120.6192
 ```
 
 
-### Analisi dei dati: stima dei parametri
+A questo punto rimettiamoci in una situazione reale: non sappiamo quale sia la concentrazione nel pozzo e cerchiamo di determinarla utilizzando i risultati dell'esperimento appena citato. In assenza di altre informazioni, è logico concludere che $\mu = m$,  cioè che la statistica della popolazione coincida con quella campionaria. Questo processo con il quale assegniamo alla popolazione il valore della statistica campionaria prende il nome di **stima puntuale**. È un processo legittimo, ma insufficiente, in quanto  $m \neq \mu$, il che non ci sorprende: non è ragionevole infatti pensare che un qualunque campione possa riflettere con esattezza le caratteristiche della popolazione che lo ha generato. La nostra stima dovrà quindi essere ben più prudenziale.
 
-A questo punto mettiamoci in una situazione reale: non sappiamo quale sia la concentrazione nel pozzo e, per determinarla, abbiamo a disposizione i risultati dell'esperimento appena citato. Per prima cosa, come abbiamo visto nel Capitolo 3, calcoliamo le statistiche descrittive di tendenza centrale e dispersione, cioè media e deviazione standard, che chiameremo, rispettivamente $m$ ed $s$.
-
-
-```r
-m <- mean(Y)
-s <- sd(Y)
-m; s
-## [1] 120.6192
-## [1] 13.9479
-```
-
-Il passo avanti è relativo al fatto che non siamo semplicemente interessati alle tre osservazioni che abbiamo fatto, ma siamo interessati a trarre conclusioni generali, relative all'intero pozzo e quindi a tutti i numerosi campioni che avremmo potute estrarre, ma che non abbiamo estratto. Facciamo quindi un'ipotesi sul meccanismo causa-effetto che genera le osservazioni sperimentali, che potrebbe essere del tipo:
-
-$$Y_i = \mu + \varepsilon_i$$
-
-con:
-
-$$\varepsilon_i \sim N(0, \sigma)$$
-
-Nelle due equazioni sovrastanti, gli elementi incogniti sono $\mu$ e $\sigma$, ai quali, in assenza di altre informazioni, assegniamo, rispettivamente, i valori $m$ ed $s$. Questo processo con il quale assegniamo alla popolazione le caratteristiche del campione prende il nome di **stima puntuale** dei parametri.
-
-Si conferma che l'osservazione sperimentale non coincide con la verità 'vera' ($m \neq \mu$ e $s \neq \sigma)$, anche se, in questo caso, non siamo molto distanti, considerando il 10% di variabilità dello strumento di analisi. Tuttavia, visto che dobbiamo trarre conclusioni che riguardano l'intero meccanismo causa-effetto e non il campione, è giustificato da parte nostra un atteggiamento prudenziale: prima di dire che la concentrazione erbicida nella soluzione è pari 120.6192187, dobbiamo chiederci: che cosa succederebbe se ripetessimo l'esperimento molte altre volte?
+L'approccio tradizionale consiste nel determinare un un intervallo di valori, che sia in grado di "catturare" la statistica della popolazione con elevata confidenza e una bassa probabilità di errore (**stima per intervallo**). Tale intervallo è chiamato **Intervallo di confidenza** (Confidence Interval: CI) ed è basato sulle teorie di Karl Pearson (1857-1936), di suo figlio Egon Pearson (1895-1980) e di Jerzy Neyman (1894-1981), nonché sul lavoro di Ronald Fisher. Il CI è uno dei fondamenti della cosiddetta inferenza frequentista, che non è l'unico tipo di inferenza disponibile e non è esente da alcune incongruenze concettuali (vedi Morey et al., 2016). Tuttavia, è molto comune e ampiamente utilizzata nella maggior parte degli articoli scientifici. Il termine “frequentista” deriva dal fatto che l’IC è costruito considerando la variabilità  delle stime campionarie quando gli esperimenti vengono ripetuti e la frequenza con cui vengono ottenute i valori 'sbagliati'.
 
 
-### La 'sampling distribution' empirica
+## Ripetere gli esperimenti
 
-Il nostro esperimento è solo simulato e possiamo quindi ripeterlo un numero anche molto elevato di volte, seguendo questa procedura:
+Il nostro esperimento è solo simulato e possiamo quindi ripeterlo 'gratuitamente' un numero anche molto elevato di volte, seguendo questa procedura:
 
-1.  Ripetiamo l'estrazione precedente per 100'000 volte (in altre parole: immaginiamo di ripetere l'analisi chimica per 100'000 volte, sempre con tre repliche)
+1. Ripetiamo l'estrazione precedente per 100'000 volte (in altre parole: immaginiamo di ripetere l'analisi chimica per 100'000 volte, sempre con tre repliche)
 2. Otteniamo 100'000 medie
 3. Calcoliamo la media delle medie e la deviazione standard delle medie
 
 
+
+
+
 ```r
-# Simulazione MONTE CARLO - Esempio 1
+# Code box 6.2
+
+# Monte Carlo simulation #1
+nrep <- 3
+mean <- 120
+sigma <- 12
 set.seed(1234)
 result <- rep(0, 100000)
 for (i in 1:100000){
-  sample <- rnorm(3, 120, 12)
-  result[i] <- mean(sample)
+  sample <- rnorm(nrep, mean, sigma)
+  mod <- lm(sample ~ 1)
+  result[i] <- coef(mod)
 }
+
+# Characterising the population of estimates
+min(result)
+
+## [1] 90.14123
+
+max(result)
+
+## [1] 149.0346
+
+result[result == 120]
+
+## numeric(0)
+
 mean(result)
+
 ## [1] 120.0341
+
 sd(result)
+
 ## [1] 6.939063
 ```
+\normalsize
 
-Alla fine del processo ci troviamo con una popolazione di medie, che viene detta **sampling distribution**; si tratta di un 'oggetto' abbastanza 'teorico', ma fondamentale per la statistica frequentista, perché caratterizza la variabilità dei risultati di un esperimento, e quindi la sua riproducibilità.
+
+
+
+Alla fine del processo ci troviamo con una popolazione di medie, che viene detta distribuzione campionaria (**sampling distribution**); si tratta di un 'oggetto' abbastanza 'teorico', ma fondamentale per la statistica frequentista, perché caratterizza la variabilità dei risultati di un esperimento, e quindi la sua riproducibilità.
 
 Notiamo che:
 
-1.  La media delle medie è praticamente coincidente con $\mu$, la verità 'vera'. Ciò conferma che $m$ è uno stimatore non distorto di $\mu$, perché tende a convergere su $\mu$ quando il numero di repliche tende a diventare molto elevato;
-2.  La deviazione standard delle medie è pari a 6.939063. Questo valore è più basso della deviazione standard della popolazione di partenza, prende il nome di **errore standard** della media (SEM) e, in qualche modo, caratterizza la replicabilità di un esperimento, ovvero la sua precisione.
+1.  La media delle medie è praticamente coincidente con $\mu$, la verità 'vera'. Ciò conferma che la stima puntuale $m$ è uno stimatore non distorto di $\mu$, perché tende a convergere su $\mu$ quando il numero di repliche tende a diventare molto elevato;
+2.  La deviazione standard delle medie è pari a 6.939063 e prende il nome di **errore standard** (SE).
 
-Con R possiamo visualizzare la *sampling distribution*, discretizzando la variabile concentrazione e riportando le frequenze di ogni intervallo su un grafico a barre (Fig. \@ref(fig:figName62) ). Vediamo con chiarezza che essa somiglia molto ad una distribuzione normale, con media pari a 120 e deviazione standard pari a 6.94. 
+Quest'ultima statistica è di importanza fondamentale, in quanto caratterizza la replicabilità di un esperimento, ovvero la sua precisione. Più è alto l'errore standard, più è incerta la stima e più è alta la sua variabilità in caso di esperimenti ripetuti.
 
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName62-1.png" alt="Sampling distribution empirica e teorica" width="90%" />
-<p class="caption">(\#fig:figName62)Sampling distribution empirica e teorica</p>
-</div>
-
-
-### La 'sampling distribution' teorica
-
-La *sampling distribution* definita più sopra è puramente empirica e potrebbe essere comunque utilizzata per gli sviluppi che seguono, anche se sarebbe molto utile poterla descrivere con una funzione di densità formale. Quanto osservato in Figura \@ref(fig:figName62) sulla somiglianza tra la *sampling distribution* empirica e la curva di Gauss può essere generalizzato grazie al teorema centrale del limite (o teorema del limite centrale), col quale si dimostra che, qualunque sia la popolazione di partenza, le medie di campioni casuali, indipendenti e di numerosità sufficientemente elevata tendono ad essere distribuite in modo normale. Insomma, la *sampling distribution* è effettivamente gaussiana, con media uguale alla media della popolazione di partenza, mentre, tenendo conto della legge di propagazione degli errori, si può dimostrare che l'errore standard è uguale a:
-
-
-$$\sigma_m  = \frac{\sigma }{\sqrt n }$$
-
-dove *n* è la dimensione del campione. Il valore ottenuto per questa espressione è pari a $12/\sqrt{3} = 6.928$ ed è molto simile a quello riscontrato con la simulazione Monte Carlo.
-
-A questo punto possiamo trarre le nostra prima importante conclusione: **se ripetiamo un esperimento un numero molto elevato di volte, la variabilità delle medie campionarie e quindi la riproducibilità dei risultati possono essere caratterizzate utilizzando una *sampling distribution* gaussiana, con media pari alla media della popolazione di partenza e deviazione standard pari alla deviazione standard della popolazione di partenza, divisa per la radice quadrata del numero delle repliche**
-
-E'importante ricordare che questa conclusione, oltre che alla media, può essere estesa ad altri stimatori campionari, anche se il calcolo dell'errore standard viene effettuato in modo diverso.
-
-
-## Stima per intervallo
-
-Sapendo che la *sampling distribution* è gaussiana, siamo in grado di individuare due valori simmetrici rispetto alla media, che contengono il 95% delle medie campionarie possibili e lasciano al loro esterno solo il 5% delle medie campionarie più 'rare'. 
-
-<div class="figure" style="text-align: center">
-<img src="_images/ConfidenceInterval.png" alt="Costruzione di un intervallo di confidenza (P = 0.95): se campioniamo da una popolazione gaussiana con media uguale a 120 e deviazione standard uguale a 12, il 95% delle medie campionarie ricadono nell'intervallo evidenziato" width="75%" />
-<p class="caption">(\#fig:figName62b)Costruzione di un intervallo di confidenza (P = 0.95): se campioniamo da una popolazione gaussiana con media uguale a 120 e deviazione standard uguale a 12, il 95% delle medie campionarie ricadono nell'intervallo evidenziato</p>
-</div>
-
-L'espressione algebrica è la seguente:
-
-$$P \left[ \mu - k \times \frac{\sigma}{\sqrt{n} } \leq m \leq \mu + k \times \frac{\sigma}{\sqrt{n} } \right] = 0.95 \, ,$$
-
-dove vediamo che gli estremi dell'intervallo sono definiti aggiungendo e togliendo dalla media della popolazione $\mu$ un multiplo dell'errore standard, con moltiplicatore $k$.
-
-
-
-
-Con semplici passaggi algebrici, possiamo ricavare l'espressione seguente:
-
-$$P \left[ m - k \times \frac{\sigma}{\sqrt{n} } \leq \mu \leq m + k \times \frac{\sigma}{\sqrt{n} } \right] = 0.95$$
-che è di estrema importanza, in quanto esprime il concetto che, **se facciamo un esperimento ed otteniamo una media pari ad $m$ e scegliamo accuratamente $k$, possiamo costruire un intervallo di confidenza intorno alla nostra stima, pari a $k$ volte l'errore standard e tale da contenere la media vera $\mu$ con una probabilità del 95%**. Questa espressione fornisce l'euristica più utilizzata per costruire il cosiddetto **intervallo di confidenza**.
-
-Dato che non conosciamo $\sigma$ lo sostituiamo con la sua stima puntuale $s$; per il nostro esempio, otteniamo quindi il seguente errore standard:
-
-$$s_m = \frac{13.95}{\sqrt{3}} = 8.053$$
-
-A questo punto dobbiamo individuare il valore più opportuno per $k$; in prima istanza, potremmo considerare $k = 1$ e calcolare l'intervallo di confidenza $120.6192 \pm 8.053$, che permette di definire gli estremi $112.5662$ e $128.6722$. Questo intervallo è molto utilizzato in pratica come indicazione della precisione della stima e della riproducibilità dei risultati, risultando tanto più ampio quanto più il fenomeno in studio è variabile (alto valore di $\sigma$), oppure quanto meno numerose sono le repliche ($n$ piccolo).
-
-Tuttavia, dobbiamo anche sapere che questo intervallo non è in grado di ottenere un 'coverage' del 95%, cioè non è in grado di 'catturare' la media della popolazione nel 95% dei casi. Nel codice sottostante, abbiamo ripetuto 100'000 volte l'esperimento iniziale, calcolando 100'000 intervalli di confidenza. Per ognuno di questi intervalli, abbiamo verificato se esso 'contenesse' il valore della media vera, cioè 120, oppure no (funzione `ifelse()`); nel primo caso abbiamo assegnato al vettore 'result' il valore 1, altrimenti gli abbiamo assegnato il valore 0. Alla fine del ciclo iterativo il numero dei successi (media vera catturata) sul totale degli intervalli di confidenza calcolati costituisce una misura del già citato 'coverage'.
+Inoltre, possiamo osservare che il 2.5° e il 97.5° percentile sono, rispettivamente:
 
 
 ```r
-# Simulazione MONTE CARLO
-# Coverage intervallo di confidenza
-set.seed(1234)
-result <- rep(0, 100000)
-for (i in 1:100000){
-  sample <- rnorm(3, 120, 12)
-  media <- mean(sample)
-  ES <- sd(sample)/sqrt(3)
-  limSup <- media + ES
-  limInf <- media - ES
-  result[i] <- ifelse(limSup > 120 & limInf < 120, 1, 0)
-}
-sum(result)/100000
-## [1] 0.57749
+quantile(result, probs =c(0.025, 0.975))
+##     2.5%    97.5% 
+## 106.4884 133.6434
 ```
 
-Vediamo che esso è pari al 58% circa, quindi piuttosto basso. Se la *sampling distribution* fosse veramente gaussiana, si potrebbe utilizzare un valore $k$ pari al 97.5-esimo percentile di una distribuzione normale standardizzata, cioè 1.96, approssimabile a 2, per semplicità. Purtroppo però, la *sampling distribution* non è effettivamente gaussiana, per il fatto che, nel calcolo dell'errore standard, abbiamo dovuto sostituire $\sigma$ (che è costante, ma ignoto) con la sua miglior stima $s$, che cambia ad ogni estrazione. In effetti, il teorema centrale del limite dice che la *sampling distribution* dovrebbe comunque essere approssimativamente gaussiana, ma solo quando il campione è molto numeroso (più di 15-20 unità, almeno). Nel nostro caso, la numerosità è bassa (n = 3) è l'impiego di $k = 2$ porta ad un 'coverage' dell'82%, che è ancora insufficiente, rispetto alle nostre esigenze.
+Possiamo quindi dire che, ripetendo un esperimento un numero elevatissimo di volte, il 95% dei risultati sono contenuti in un intervallo ben definito, che comprende al suo interno il valore 'vero' della statistica da stimare. 
+
+## La 'sampling distribution' teorica
+
+La *sampling distribution* definita più sopra è puramente empirica e sarebbe molto utile poterla descrivere con una funzione di densità formale.  Se discretizziamo il vettore 'result' e riportiamo le frequenze su un grafico a barre (Fig. \@ref(fig:figName62) ), vediamo con chiarezza che la *sampling distribution* empirica somiglia molto ad una distribuzione normale, con media pari a 120 e deviazione standard pari a 6.94. 
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName62-1.png" alt="Empirical distribution of 100,000 sample estimates (n = 3), drawn from a Gaussian population with mean = 120 and SD = 12. The solid line shows the theoretical Gaussian PDF, with mean = 120 and SD = 6.94" width="75%" />
+<p class="caption">(\#fig:figName62)Empirical distribution of 100,000 sample estimates (n = 3), drawn from a Gaussian population with mean = 120 and SD = 12. The solid line shows the theoretical Gaussian PDF, with mean = 120 and SD = 6.94</p>
+</div>
+
+Questa somiglianza può essere spiegato in base al teorema centrale del limite (o teorema del limite centrale), che teorizza che, qualunque sia la popolazione di partenza, molte statistiche campionarie, tra cui la media, calcolate su campioni casuali ed indipendenti, tendono a distribuirsi in modo approssimativamente normale, con una media pari alla corrispondente statistica della popolazione^[Il teorema centrale del limite vale per campioni di dimensione elevata, composti da almeno 20-25 unità].
+
+Ammettendo che la *sampling distribution* fosse Gaussiana, l'intervallo di cui abbiamo parlato poco sopra potrebbe essere individuato facilmente considerando un multiplo dell'errore standard, come $\mu - k \times SE$ e $\mu + k \times SE$ (Fig. \@ref(fig:figName62b)). Inoltre, $k$ sarebbe pari al 97.5° percentile di una distribuzione gaussiana standardizzata (ovvero una distribuzione gaussiana con media uguale a 0 e deviazione standard pari a 1), che è prossimo a 2 (con R: `qnorm(0,975) = 1.960`). Sfortunatamente, nella maggior parte dei casi, la distribuzione campionaria è solo approssimativamente gaussiana, quindi $k$ deve essere determinato in modo diverso, come vedremo in seguito. 
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName62b-1.png" alt="A gaussian sampling distribution with a mean of 120 and standard deviation equal to 6.94 (n = 3); the red interval contains 95% of our sample means and it is obtained by adding/subtracting to/from 120 a value equal to, approximately, twice the standard error" width="75%" />
+<p class="caption">(\#fig:figName62b)A gaussian sampling distribution with a mean of 120 and standard deviation equal to 6.94 (n = 3); the red interval contains 95% of our sample means and it is obtained by adding/subtracting to/from 120 a value equal to, approximately, twice the standard error</p>
+</div>
+
+## L'intervallo di confidenza frequentista
+
+Come abbiamo detto, l'intervallo menzionato in precedenza contiene il 95% delle stime campionarie e, di conseguenza, soddisfa la seguente espressione:
+
+$$P \left[ \mu - k \times SE  \leq m \leq \mu + k \times SE \right] = 0.95$$
+
+Con semplici passaggi algebrici (sottraiamo $\mu$ ed $m$ da tutti i termini, moltiplichiamo per $-1$ e riorganizziamo l'espressione), possiamo ricavare la seguente:
+
+$$P \left[ m - k \times SE \leq \mu \leq m + k \times SE \right] = 0.95$$
+
+che è di estrema importanza, in quanto esprime il concetto che, **se facciamo un esperimento ed otteniamo una media pari ad $m$ e scegliamo accuratamente $k$, possiamo costruire un intervallo di confidenza intorno alla nostra stima, pari a $k$ volte l'errore standard e tale da contenere la media vera $\mu$ con una probabilità del 95%**. Questa espressione costituisce l'euristica più utilizzata per costruire l'**intervallo di confidenza**, anche se dobbiamo capire come ottenere SE e k.
+
+## Come otteniamo l'errore standard?
+
+In alcuni casi, l'errore standard può essere ottenuto tramite semplici regole (Cochran, 1950), a partire dalla deviazione standard della popolazione di partenza. Ad esempio, nel caso della media campionaria, l'errore standard (SEM: Standard Error of a Mean) può essere ottenuto con la legge di propagazione degli errori (vedi capitolo 3.3):
+
+$$\textrm{SEM}  = \frac{\sigma}{\sqrt n}$$
+
+Nell'esempio precedente, l'errore standard è  $12/\sqrt{3} = 6,928$, molto vicino alla deviazione standard della distribuzione campionaria empirica.
+
+Allo stesso modo, è possibile dimostrare che l'errore standard della differenza tra le medie di due campioni (SED: Standard Error of a Difference) indipendenti con numerosità, rispettivamente, pari a $n_1$ ed $n_2$, estratti da due popolazioni con la stessa varianza e la stessa media è:
+
+$$\textrm{SED}  =  \sqrt{ \frac{\sigma^2}{n_1} + \frac{\sigma^2}{n_2}}$$
+
+A parte questi due semplici casi, calcolare manualmente l'errore standard è difficile, ma, fortunatamente, possiamo utilizzare quelli prodotti dal software statistico in nostra vece. In particolare, per i modelli ottenuti con la funzione `lm()` o con altre funzioni di *fitting* in R, gli errori standard per le stime dei parametri possono essere ricavati con la funzione `summary()`, passando l'oggetto che risulta dal *fitting* come argomento. Ad esempio, riconsideriamo i dati dell'esperimento varietale a randomizzazione completa con tre repliche e quattro genotipi di avena, denominati A, B, C e D (Esempio 4.3). Se adattiamo ai risultati un semplice modello ANOVA ad una via ($Y_i = \mu + \alpha_j + \varepsilon_i$), le stime dei parametri con i relativi errori standard possono essere ottenute come mostrato nel riquadro sottostante.
 
 
 ```r
-# Simulazione MONTE CARLO
-# Coverage intervallo di confidenza - 2
+# Standard errors for parameter estimates
+# Input the data and fit the model (as in Chapter 4)
+library(statforbiology)
+dataset <- getAgroData("Oat1L")
+mod6.1 <- lm(Yield ~ Genotype, data = dataset)
+# Derive estimates and standard errors
+summary(mod6.1)
+## 
+## Call:
+## lm(formula = Yield ~ Genotype, data = dataset)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.17333 -0.08917  0.01833  0.07417  0.16333 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  4.58000    0.07566  60.531 6.17e-12 ***
+## GenotypeB   -1.02667    0.10700  -9.595 1.16e-05 ***
+## GenotypeC   -0.49667    0.10700  -4.642  0.00166 ** 
+## GenotypeD    0.01667    0.10700   0.156  0.88008    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.1311 on 8 degrees of freedom
+## Multiple R-squared:  0.9412,	Adjusted R-squared:  0.9192 
+## F-statistic: 42.71 on 3 and 8 DF,  p-value: 2.866e-05
+```
+
+## Come otteniamo il moltiplicatore $k$?
+
+Per selezionare il moltiplicatore $k$, dobbiamo considerare il *coverage* dell'intervallo di confidenza, ovvero la frequenza con cui esso "cattura" il valore reale della statistica della popolazione. Generalmente, maggiore è il valore di $k$, maggiore è l'ampiezza dell'intervallo e maggiore è il *coverage*. Le informazioni di letteratura suggeriscono un *coverage* del 95%, corrispondente a una probabilità di errore del 5%; di conseguenza, dovremmo chiederci: quale valore di $k$ consenta di raggiungere tale confidenza?
+
+Abbiamo già visto che, se la *sampling distribution* fosse veramente gaussiana, $k$ sarebbe all'incirca uguale a 2. Per determinare il *coverage* con questo valore di $k$ possiamo utilizzare il metodo Monte Carlo;  in relazione all'esempio iniziale, riguardante il pozzo inquinato con una sostanza erbicida, possiamo eseguire, ripetutamente, queste operazioni:
+
+1. campioniamo tre individui da una popolazione gaussiana, con media pari a 120 e deviazione standard pari a 12;
+2. adattiamo a questi tre individui il modello della media per ottenere una stima della media dell'intero pozzo, insieme al suo errore standard;
+3. costruiamo un CI, utilizzando come moltiplicatore $k = 2$. Se tale CI contiene il valore reale di 120 mg/L, l'esito è positivo e quindi assegniamo al risultato il valore 1 e lo immagazziniamo nel vettore 'result'. Altrimenti assegniamo il valore 0 (funzione `ifelse()`);;
+4. ripetiamo i passaggi da 1 a 3 almeno per 100.000 volte e contiamo il numero di successi.
+
+
+
+```r
+# Code box 6.4
+
+# Monte Carlo simulation - 2
+# Coverage of a confidence interval 
+# depending on the multiplier k
+# Sampling 3 reps from a gaussian with mean=120 and sd=12
+mean <- 120
+sigma <- 12
+nrep <- 3
+# nrep <- 20
+k <- 2
+# k <- qt(0.975, nrep - 1)
 set.seed(1234)
 result <- rep(0, 100000)
 for (i in 1:100000){
-  sample <- rnorm(3, 120, 12)
-  media <- mean(sample)
-  ES <- sd(sample)/sqrt(3)
-  limSup <- media + 2 * ES
-  limInf <- media - 2 * ES
-  result[i] <- ifelse(limSup > 120 & limInf < 120, 1, 0)
+  sample.i <- rnorm(nrep, mean, sigma)
+  mod <- lm(sample.i ~ 1)
+  m <- coef(mod)
+  se <- summary(mod)$coef[1,2]
+  limInf <- m - k * se
+  limSup <- m + k * se
+  # did we capture the mean?
+  result[i] <- ifelse(limInf < 120 & limSup > 120, 1, 0)
 }
 sum(result)/100000
 ## [1] 0.81708
 ```
 
-Più in generale, si può dimostrare che è possibile ottenere il coverage desiderato (95%) utilizzando $k$ uguale al 97.5-esimo percentile della distribuzione 't di Student' con $n - 1$ gradi di libertà. Questa distribuzione di densità, simila alla normale, ma più variabile, è stata definita da William Sealy Gosset (1876 - 1937), uno statistico impiegato presso la fabbrica londinese della famosa birra Guinness, dove elaborava i dati relativi all'andamento del processo di maltazione. Egli, avendo definito questa nuova funzione di densità, per aggirare il divieto di pubblicazione impostogli dal suo datore di lavoro, pubblicò i suoi risultati sotto lo pseudonimo 'Student', da cui deriva il nome della distribuzione. 
+Il box sovrastante mostra che, impostando $k = 2$ si ottiene un *coverage* molto basso (inferiore all'82%), corrispondente a una probabilità di errore di quasi il 19%, che è inaccettabile. Il problema è che la dimensione del campione è molto piccola e, pertanto, la distribuzione campionaria di $m$ non è ben approssimata con una PDF gaussiana. Se la stessa simulazione viene eseguita con 20 repliche anziché 3, il *coverage* aumenta al 94% (provare per credere; basta cambiare la linea di codice `nrep <- 3` con `nrep <- 20`). In pratica, utilizzare $k = 2$ è ritenuto accettabile solo quando la dimensione del campione è superiore a 20-25 unità.
 
-La simulazione sottostante conferma che questa tecnica di calcolo degli intervalli di confidenza fornisce effettivamente un 'coverage' del 95%.
+Per piccoli campioni (e in generale), è possibile ottenere un *coverage* esatto del 95% utilizzando il 97,5° percentile della distribuzione t di Student. Per ottenere questo valore, si può utilizzare la funzione `qt()` in R, che richiede, come minimo, due argomenti: il primo è il percentile desiderato, mentre il secondo rappresenta il numero di gradi di libertà per l'errore standard. Nel nostro esempio abbiamo tre repliche, quindi il numero di DF è 3 − 1 = 2 e il 97,5° percentile della distribuzione t di Student è pari a `qt(0,975, 2)` = 4,303, molto più alto di 2. In genere, il 97,5° percentile della distribuzione t di Student diminuisce all'aumentare del numero di gradi di libertà, tendendo ad 1,96, quando il numero di DF tende a $\infty$. Se utilizziamo il codice sovrastante e sostituiamo alla linea `k <- 2`, il comando `k <- qt(0.975, nrep - 1)` possiamo confermare che il *coverage* diviene quasi esattamente del 95% (quasi, poiché il numero di simulazioni è molto alto, ma non infinito).
+
+Se necessario, possiamo anche costruire un intervallo di confidenza del 99%, che riduce il rischio di errore all'1%. Basta utilizzare il 99,5° percentile di una distribuzione t di Student. In generale, se $\alpha$ è il livello di confidenza desiderato, il percentile corrispondente è $q_{\alpha} = 1 − (1 − \alpha/2)$ (quindi $q_{0,05} = 1−(1−0,95)/2=0,975$ e $q_{0,99} =1−(1−0,99)/2=0,995)$.
 
 
-```r
-# Simulazione MONTE CARLO
-# Coverage intervallo di confidenza - 2
-set.seed(1234)
-result <- rep(0, 100000)
-for (i in 1:100000){
-  sample <- rnorm(3, 120, 12)
-  media <- mean(sample)
-  ES <- sd(sample)/sqrt(3)
-  limSup <- media + qt(0.975, 2) * ES
-  limInf <- media - qt(0.975, 2) * ES
-  result[i] <- ifelse(limSup > 120 & limInf < 120, 1, 0)
-}
-sum(result)/100000
-## [1] 0.94936
-```
+## Gli intervalli di confidenza in pratica
 
-Considerando che, nel nostro caso (3 soggetti per campione e quindi 2 gradi di libertà), il 97.5-esimo percentile del t di Student è pari a:
+### Esempio 6.1: IC per una media campionaria
+
+Immaginiamo di aver condotto un esperimento misurativo per determinare la resa media dei girasoli in un macro-ambiente dell'Italia centrale. Abbiamo quindi selezionato venti campi casuali in questo macro-ambiente ed abbiamo determinato i valori di resa riportati nel riquadro sottostante; sulla base di questi risultati, qual è la resa media nell'intero macro-ambiente?
+In questo esempio, la media campionaria è $m = 58,68$ ed è una stima puntuale affidabile della resa media nell'intero macro-ambiente. Per calcolare il CI, dobbiamo determinare:
+1. l'errore standard, che può essere facilmente calcolato utilizzando la semplice equazione riportata più sopra ($\textrm{SEM}  = {\sigma}/{\sqrt n}$).  La deviazione standard della popolazione $\sigma$ è ignota, ma possiamo sostituirla con la deviazione standard del campione, che è 3,47 (principio del 'plug-in');
+2. Il moltiplicatore $k$, pari al 97,5° percentile della distribuzione t di Student (ovvero, 2,09).
+Di conseguenza, i due limiti dell'intervallo di confidenza sono rispettivamente 58,68 − 2,09 × 0,775 = 57,1 e 58,68 + 2,09 × 0,775 = 60,3. La conclusione è che, con un livello di confidenza del 95%, la resa media nel macro-ambiente rientra nell'intervallo tra 57,1 e 60,3.
 
 
 ```r
-qt(0.975, 2)
-## [1] 4.302653
+# Example 6.1
+# Confidence interval for a sample mean
+# Input the sample and calculate the mean
+Y <- c(54.08, 66.31, 56.17, 56.32, 52.01, 58.91, 58.74, 57.49,
+59.57, 61.71, 56.89, 54.82, 56.88, 60.05, 59.39, 57.19,
+64.76, 61.36, 62.03, 58.83)
+m <- mean(Y)
+m
+## [1] 58.6755
+## [1] 58.6755
+# Calculate the standard error
+s <- sd(Y)
+SEM <- s/sqrt(length(Y))
+SEM
+## [1] 0.7754783
+## [1] 0.7754783
+# Determine the multiplier
+k <- qt(0.975, length(Y) - 1)
+k
+## [1] 2.093024
+## [1] 2.093024
+# Calculate the limits of the CI # Lower limit
+mean(Y) - k * SEM
+## [1] 57.05241
+## [1] 57.05241
+# Higher limit mean(Y) + k * SEM ## [1] 60.29859
 ```
 
-la miglior stima per intervallo della concentrazione nel pozzo è pari a $120.6192 \pm 4.302 \times 8.053$.
-
-Questo intervallo di confidenza (detto anche intervallo di confidenza classico o frequentista) non è solo una misura di precisione e riproducibilità dei risultati, ma esprime anche la nostra fiducia nel fatto che, se ripetessimo l'esperimento un numero molto elevato di volte, il nostro intervallo di confidenza conterrebbe la media vera della popolazione nel 95% dei casi, limitando i nostri errori entro un margine accettabile. Ovviamente, questa fiducia non si può riferire al singolo sforzo di campionamento in quanto non sapremo mai se uno specifico intervallo di confidenza (nel nostro caso, da 86.0 a 155.3) contenga o no $\mu$ e con quale probabilità (nel nostro caso lo contiene, ma possiamo dirlo solo perché conoscevamo la popolazione di partenza che, nella realtà, sarebbe totalmente ignota). Più propriamente, l'uso dell'intervallo di confidenza classico garantisce solo che, nel lungo periodo, un ricercatore dovrebbe riuscire a contenere la sua probabilità d'errore di stima al disotto del 5%. Ed è proprio per questo che abbiamo fiducia nella scienza, in quanto il metodo adottato consente di evitare errori frequenti e gravi.
-
-## Inferenza statistica: conclusioni
-
-Considerando quanto finora detto, possiamo riassumere la logica dell'inferenza classica nel modo seguente:
-
-1. un esperimento è solo un campione di un numero infinito di esperimenti simili che avremmo potuto/dovuto eseguire, ma che non abbiamo eseguito, per mancanza di risorse;
-2. utilizziamo il campione per stimare i parametri del modello deterministico/stocastico che presumiamo abbia generato le nostre osservazioni sperimentali;
-3. definiamo, per ogni stima, la sua *sampling distribution* in modo da caratterizzare i risultati delle infinite repliche del nostro esperimento, che avremmo dovuto fare, ma che non abbiamo fatto. Per costruire la *sampling distribution*, assumiamo che questa sia gaussiana (in coerenza con il teorema centrale del limite) e che l'errore standard sia definibile con l'impiego di una formula affidabile. Ad esempio, per l'inferenze sulla media, utilizziamo la deviazione standard del campione divisa per la radice quadrata del numero di repliche;
-4. definiamo gli intervalli di confidenza, aggiungendo e togliendo dalla stima un multiplo del relativo errore standard.
-
-Per quanto riguarda la scelta del moltiplicatore $k$, è frequente trovare nelle pubblicazioni scientifiche l'intervallo composto dalla media più o meno l'errore standard ($k = 1$); si tratta di una tecnica accettabile per esprimere l'incertezza di stima della media o di altre statistiche campionarie, ma bisogna che il lettore sia informato di come abbiamo calcolato questo intervallo, per evitare che gli attribuisca un 'coverage' che, in realtà, esso non ha. Altrimenti, più in generale, si utilizza la distribuzione t di Student, a meno che la numerosità non sia molto elevata, nel qual caso si può semplificare, utilizzando $k = 2$. 
-
-Concludiamo con una precisazione: nel capitolo sulla statistica descrittiva abbiamo visto che l'incertezza assoluta di un gruppo di misure può essere espressa utilizzando un intervallo ottenuto sommando e sottraendo alla media del campione la sua deviazione standard. Questo intervallo non ha nulla a che vedere con l'intervallo di confidenza e non ha alcun ruolo inferenziale; è semplicemente un intervallo descrittivo che caratterizza la variabilità del campione, insieme alla sua tendenza centrale, senza alcun riferimento alla popolazione che ha generato il campione.
-
-In ultimo, ribadiamo che questo processo classico di inferenza può essere applicato anche ad altri importanti stimatori campionari, perché ci sia un metodo affidabile per il calcolo dell'errore standard.
-
-## Per chi avesse voglia di approfondire un po'...
-
-### Popolazioni gaussiane e non 
-
-In questo esempio siamo partiti da una popolazione con distribuzione gaussiana. In altri casi potrebbe non essere così. Ad esempio, immaginiamo di avere una popolazione di insetti, nella quale il rapporto tra maschi e femmine è ignoto. Campioniamo 40 insetti e contiamo 14 femmine. Qual è la proporzione di femmine nella popolazione originaria?
-
-Stiamo studiando una grandezza che, almeno nel principio, non può essere gaussiana, ma, nonostante questo, grazie al teorema centrale del limite, possiamo utilizzare la stessa tecnica per la stima dell'intervallo di confidenza; basta sapere che la proporzione osservata è $p = 14/40 = 0.375$, mentre la deviazione standard di una proporzione (che non abbiamo finora incontrato) è pari a $\sigma = \sqrt{0.375 \times (1 - 0.375)} = 0.484$ (Snedecor e Cochran, 1989).  L'errore standard è $0.484 / \sqrt{40} = 0.077$ e l'intervallo di confidenza, considerando che il campione è molto numeroso, potrà essere approssimato come:
+Più facilmente, possiamo pervenire allo stesso risultato stimando un modello della media, ed utilizzando la funzione `confint()`, come indicato nel riquadro sottostante.
 
 
 ```r
-0.375 - 2 * 0.077
-## [1] 0.221
-0.375 + 2 * 0.077
-## [1] 0.529
+# Example 6.1 [continuation]
+# Retrieving confidence intervals from model fit
+mod <- lm(Y ~ 1)
+confint(mod)
+##                2.5 %   97.5 %
+## (Intercept) 57.05241 60.29859
 ```
 
+### Example 6.2: CIs for model parameters
 
-### Cosa fare se il teorema centrale del limite non funziona?
-
-Nel caso precedente, avevamo a che fare con una distribuzione non gaussiana, ma avevamo comunque un campione numeroso, oltre ad una formula per il calcolo dell'errore standard. In altri casi, non abbiamo nessuno di questi elementi e quindi non possiamo calcolare l'intervallo di confidenza classico, come suggerito da Neyman. L'esempio tipico è la varianza, per la quale non sappiamo come calcolare un errore standard attendibile (anche se sono disponibili in letteratura alcune formule di uso comune).
-
-Ad esempio, immaginiamo di avere un campione di 30 soggetti, la cui media è pari a 7.0 e la cui varianza è 0.5. Possiamo dire che la media della popolazione che ha generato il campione è presumibilmente compresa tra:
+Lo stesso approccio del riquadro sovrastante può essere utilizzato praticamente con ogni altro modello in R. Ad esempio, riconsiderando i dati 'Oat1L' dell' Esempio 4.3 e stimando un modello ANOVA ad una via come nel riquadro 4.3, gli intervalli di confidenza per le stime dei parametri possono essere ottenuti come nel riquadro 6.7.
 
 
 ```r
-7 - qt(0.975, 29) * sqrt(0.5)/sqrt(30)
-## [1] 6.735962
+# Code box 6.7
+# Example 6.2
+# CIs for model parameters for the ’Oat1l’ data
+# Load libraries and data library(statforbiology)
+dataset <- getAgroData("Oat1L")
+# Fit the model
+mod6.1 <- lm(Yield ~ Genotype, data = dataset)
+# CIs for model parameters 
+confint(mod6.1)
+##                  2.5 %     97.5 %
+## (Intercept)  4.4055191  4.7544809
+## GenotypeB   -1.2734199 -0.7799134
+## GenotypeC   -0.7434199 -0.2499134
+## GenotypeD   -0.2300866  0.2634199
 ```
 
-e
 
+##  Altri approcci per il calcolo dei CI
 
-```r
-7 + qt(0.975, 29) * sqrt(0.5)/sqrt(30)
-## [1] 7.264038
-```
+L'approccio proposto in questo capitolo si basa su due pre-requisiti fondamentali:
 
-Invece, in relazione alla varianza della popolazione, possiamo solo dire che la stima puntuale è pari a 0.5, ma non abbiamo una formula attendibile per stimare l'errore standard e quindi per calcolare l'intervallo di confidenza. In questo caso, possiamo determinare una *sampling distribution* empirica, con una simulazione di Monte Carlo, come indicato nel codice sottostante:
+1. la distribuzione campionaria sia gaussiana (almeno approssimativamente), e
+2. sia possibile, in qualche modo, calcolare un errore standard affidabile.
 
+Nei casi in cui questi due pre-requisiti non siano soddisfatti, gli intervalli di confidenza possono essere determinati con altri approcci, come il metodo Monte Carlo (simile a quello utilizzato nel riquadro 6.2) o il metodo *bootstrap* (Chernick, 2011). Inoltre, vale la pena menzionare l'"Intervallo Credibile" (*Credible Interval*), che è la controparte bayesiana dell'intervallo di confidenza frequentista (Kruschke, 2011).
 
-```r
-# Simulazione Monte Carlo - Varianza
-set.seed(1234)
-result <- rep(0, 100000)
-for (i in 1:100000){
-  sample <- rnorm(30, 7, sqrt(0.5))
-  result[i] <- var(sample)
-}
-mean(result)
-## [1] 0.5004283
-sd(result)
-## [1] 0.1313021
-```
+Questi metodi fanno parte della cosiddetta *computer intensive statistic* e possono essere molto utili in alcune circostanze, ma non saranno illustrati in dettaglio perché sono molto avanzati ed esulano dallo scopo di questo libro introduttivo.
 
-Vediamo che la *sampling distribution* empirica ha media pari a 0.5 circa (questo non ci sorprende) e che l'errore standard è pari a 0.131. Possiamo anche calcolare il 2.5-esimo e il 97.5-esimo percentile ed utilizzarli come margini dell'intervallo di confidenza, che comprende al suo interno il 95% dei valori:
+## Limitazioni del CI frequentista
 
+L'intervallo di confidenza frequentista è ampiamente utilizzato nella letteratura scientifica, mentre la stima puntuale è spesso considerata inaccettabile. Ad esempio, le linee guida per gli autori di Weed Research, una rivista internazionale di alto livello nel campo delle scienze vegetali, affermano: "Tutti i valori stimati (ad esempio, parametri del modello, medie, differenze, ecc.) devono essere presentati insieme a un'adeguata misura di variabilità sia nel testo, che nelle tabelle e nei grafici". Gli intervalli di confidenza, molto spesso, sono presentati nella forma più semplice "stima ± SE", sebbene la copertura di tale intervallo sia piuttosto bassa. Basta comunque che il lettore sia avvisato sulla modalità utilizzata per la costruzione dell'intervallo presentato.
 
-```r
-quantile(result, probs = c(0.025, 0.975))
-##      2.5%     97.5% 
-## 0.2770264 0.7871032
-```
+Per evitare gravi abusi interpretativi o di linguaggio, è necessario essere ben consapevoli dei limiti dell'intervallo di confidenza frequentista (Hastie et al., 2009), che deve essere sempre interpretato con riferimento ad una distribuzione campionaria, ovvero alle ipotetiche ripetizioni dello stesso esperimento con campioni diversi. Al contrario, è sbagliato interpretare il CI con riferimento ad ogni singolo esperimento; in altre parole, se il nostro intervallo di confidenza, determinato per uno specifico esperimento, va da 10 a 13, non è corretto affermare che il parametro incognito della popolazione è compreso tra 10 e 13 con una probabilità del 95% perché ciò non è vero (ricordate che l'IC cambia a ogni tentativo di campionamento; vedere il riquadro 6.4 e vedere anche Morey et al., 2016). Possiamo invece affermare che, nel lungo periodo, ripetendo lo stesso esperimento e continuando a calcolare gli intervalli di confidenza nello stesso modo, la nostra probabilità di errore si mantiene entro il 5%. Si tratta di una differenza piuttosto sottile, ma di fondamentale importanza! 
 
-Questo intervallo di confidenza empirico funziona piuttosto bene ed ha campi di impiego abbastanza vasti, anche quando il teorema centrale del limite non vale; tuttavia, l'intervallo di confidenza così ottenuto può non essere simmetrico rispetto alla media, il che non dovrebbe stupire, dato che la *sampling distribution* non è gaussiana e può essere più o meno asimmetrica.
 
 ## Altre letture
 
-1. Hastie, T., Tibshirani, R., Friedman, J., 2009. The elements of statistical learning, Springer Series in Statistics. Springer Science + Business Media, California, USA.
-2. Morey, RD, R Hoekstra, JN Rouder, MD Lee, E-J Wagenmakers, 2016. The fallacy of placing confidence in confidence intervals. Psychonomic Bulletin & Review 23, 103–123
-3. Snedecor G.W. and Cochran W.G., 1989. Statistical Methods. Ames: Iowa State University Press (1989).
+1. Chernick MR (2011) An Introduction to Bootstrap Methods with Applications to R. Wiley, USA
+2. Cochran WG, Cox GM (1950) Experimental design. John Wiley & Sons, Inc., USA
+3. Hastie, T., Tibshirani, R., Friedman, J., 2009. The elements of statistical learning, Springer Series in Statistics. Springer Science + Business Media, California, USA.
+4. Kruschke JK (2011) Doing bayesian data analyses. A tutorial with R and BUGS. Academic Press, Burlington, MA (USA)
+5. Morey, RD, R Hoekstra, JN Rouder, MD Lee, E-J Wagenmakers, 2016. The fallacy of placing confidence in confidence intervals. Psychonomic Bulletin & Review 23, 103–123
+
+## Domande ed esercizi
+
+1. In un campo di frumento sono state campionate trenta aree di saggio di un metro quadrato ciascuna, sulle quali è stata determinata la produzione. La media delle trenta aree è stata di 6.2 t/ha, con una varianza pari a 0.9. Stimare la produzione dell'intero appezzamento.
+2. Siamo interessati a conoscere il contenuto medio di nitrati dei pozzi della media valle del Tevere. Per questo organizziamo un esperimento, durante il quale campioniamo 20 pozzi rappresentativi, riscontrando  le concentrazioni riportate di seguito. Stimare la concentrazione media per l'intera valle del Tevere
+
+```
+38.3 38.6 38.1 39.9 36.3 41.6 37.0 39.8 39.1     
+35.0 38.1 37.4 38.3 34.8 40.4 39.3 37.0 38.7    
+38.2 38.4    
+```
+
+3. E'stata impostata una prova sperimentale per confrontare due varietà di mais, con uno schema sperimentale a blocchi randomizzati con tre repliche. La prima varietà ha mostrato produzioni di 14, 12, 15 e 13 t/ha, mentre la seconda varietà ha mostrato produzioni pari a 12, 11, 10.5 e 13 t/ha. Stimare le produzioni medie delle due varietà, nell'ambiente di studio.
+4. Un campione di 400 insetti a cui è stato somministrato un certo insetticida mostra che 136 di essi sono sopravvissuti. Determinare un intervallo di confidenza con grado di fiducia del 95% per la proporzione della popolazione insensibile al trattamento.
+5. È stata studiata la risposta produttiva del sorgo alla concimazione azotata, con un esperimento i cui risultati sono riportati di seguito .Assumendo che la relazione sia lineare (retta), stimare la pendenza e l'intercetta della popolazione di riferimento, dalla quale è stato estratto il campione in studio. Utilizzare la funzione `lm(Yield ~ Dose)` ed estrarre gli errori standard con il metodo `summary()`.
+
+| Dose | Yield |
+|:----:|:----:|
+| 0   | 1.26 |
+| 30  | 2.50 |
+| 60  | 3.25 |
+| 90  | 4.31 |
+|120  | 5.50 |
 
 
-<!--chapter:end:05-InferenzaStatistica.Rmd-->
+6. Utilizzando una simulazione Monte Carlo opportunamente pianificata, mostrare che la varianza del campione (uguale alla devianza divisa per il numero di individui meno uno) fornisce una stima più accurata della varianza della popolazione, rispetto allo scarto quadratico medio (devianza divisa per il numero di soggetti) che è invece uno stimatore distorto. Suggerimento: ricordare che uno stimatore accurato ha una distribuzione campionaria (*sampling distribution*) il cui valore atteso coincide con il valore da stimare.
+
+
+
+
+
+
+<!--chapter:end:06-InferenzaStatistica.Rmd-->
 
 # Decisioni ed incertezza
 
-Dovrebbero ormai essere chiari i motivi per cui i risultati di un esperimento non corrispondono alla verità vera e si presentano in modo diverso ogni volta che lo ripetiamo. Nel capitolo precedente abbiamo visto come è possibile (e necessario) esplicitare la nostra incertezza in relazione alla verità vera, aggiungendo alle nostre stime campionarie il cosiddetto **intervallo di confidenza**, basato sulla *sampling distribution* della stima, che mostra come quest'ultima vari quando ripetiamo l'esperimento. Un approccio affine può essere utilizzato per prendere decisioni in presenza di incertezza, con un procedimento che si chiama **test d'ipotesi**. Anche per questo argomento, vediamo alcuni semplici, ma realistici, esempi.
+Dovrebbero ormai essere chiari i motivi per cui i risultati di un esperimento non corrispondono alla verità vera e si presentano in modo diverso ogni volta che lo ripetiamo. Nel capitolo precedente abbiamo visto come è possibile (e necessario) esplicitare la nostra incertezza in relazione alla verità vera, aggiungendo alle nostre stime campionarie il cosiddetto **intervallo di confidenza**, basato sulla *sampling distribution* della stima, che mostra come quest'ultima vari quando ripetiamo l'esperimento. Un approccio affine può essere utilizzato per prendere decisioni in presenza di incertezza, con un procedimento che si chiama **test d'ipotesi** ed è basato sul cosiddetto **P-level**. Anche per questo argomento, vediamo alcuni semplici, ma realistici, esempi.
 
-## Il test t di Student
+## Esempio 7.1: Confronto tra due genotipi
 
 Immaginiamo che un ricercatore abbia testato la produzione di due genotipi (A e P) in un disegno sperimentale a randomizzazione completa, con cinque repliche (dieci parcelle in totale). I risultati ottenuti (q/ha) sono i seguenti:
-
-
-```r
-A <- c(65, 68, 69, 71, 78)
-P <- c(80, 81, 84, 88, 94)
-```
 
 Come al solito, l'analisi dei dati inizia con il calcolo delle più importanti statistiche descrittive per ogni campione, come abbiamo visto nel Capitolo 3. Trattandosi di una serie di misure quantitative, calcoliamo quindi media e deviazione standard, come indicato nel box sottostante.
 
 
 ```r
+# Example 7.1
+# A comparison between two genotypes
+
+# Load the data
+A <- c(65, 68, 69, 71, 78)
+P <- c(80, 81, 84, 88, 94)
+
+# Descriptive statistics for A
 m1 <- mean(A)
-m2 <- mean(P)
 s1 <- sd(A)
-s2 <- sd(P)
 n1 <- length(A)
-n2 <- length(P)
 m1; s1; n1
 ## [1] 70.2
 ## [1] 4.868265
 ## [1] 5
+# Descriptive statistics for P
+m2 <- mean(P)
+s2 <- sd(P)
+n2 <- length(P)
 m2; s2; n2
 ## [1] 85.4
 ## [1] 5.727128
 ## [1] 5
 ```
 
-Il passo precedente è importante e ci consente di comprendere alcune caratteristiche dei due campioni, ma non dobbiamo mai dimenticare il fatto che noi siamo interessati a trarre conclusioni generali, relative a tutte le infinite parcelle che avremmo potuto coltivare e che non abbiamo coltivato, per la limitatezza delle risorse a nostra disposizione. Il passo successivo è quello di fare un'ipotesi ragionevole sul meccanismo causa-effetto che ha generato le nostre osservazioni sperimentali, da esplicitare con un modello statistico a due componenti (deterministica e stocastica), come abbiamo visto nel Capitolo 4. Il modello dovrà essere un po' più complesso rispetto a quello introdotto nel Capitolo 5, in quanto dovrà considerare l'effetto varietale, che potremmo immaginare come additivo, così come indicato di seguito:
+Vediamo che la media per il genotipo P è più alta della media per il genotipo A, ma tali medie campionarie non sono sufficienti per i nostri obiettivi. Il passo successivo è postulare un modello descrittivo per rappresentare il meccanismo tramite cui le nostre osservazioni (e altre osservazioni future) potrebbero essere originate. Tale modello dovrebbe tenere conto dell'effetto di una variabile predittiva, ovvero il genotipo. Un modello ragionevole è:
 
 $$
-Y_i = \mu_1 + \delta_j + \varepsilon_{i} 
+Y_i = \mu + \delta_j + \varepsilon_{i}
 $$
 
-dove $Y_i$ è la produzione della i-esima parcella ($i$ va da 1 a 10), $\mu_1$ è la produzione attesa della prima varietà (A, in ordine alfabetico), mentre $\delta_j$ è l'effetto della varietà, che è fisso ed uguale a 0 per la prima varietà ($\delta_1 = 0$) mentre è uguale alla differenza tra le due medie per la seconda varietà ($\delta_2 = \mu_2 - \mu_1$), cosicché la produzione attesa della seconda varietà è $\mu_2 = \mu_1 + \delta_2$. I termini $\varepsilon_i$ rappresentano gli effetti di confusione, casuali e diversi per ogni i-esima osservazione e che assumiamo gaussiani, con media 0 e deviazione standard $\sigma$. La scelta di utilizzare $\mu_1$ come parametro esplicito nel modello è puramente arbitraria, nel senso che avremmo potuto benissimo utilizzare $\mu_2$, rovesciando il segno della differenza $\delta_2$.
+dove $Y_i$ è la resa dell'i^-esimo^ grafico ($i$ va da 1 a 10), $\mu$ è la resa prevista per il genotipo A, mentre $\delta_j$ è l'effetto del genotipo (con $j$ che va da 1 a 2) che è vincolato a essere 0 per il primo genotipo ($\delta_1 = 0$) e, per il secondo genotipo, è uguale alla differenza di resa tra i due genotipi ($\delta_2 = \mu_2 - \mu_1$). Di conseguenza, la resa prevista per P è $\mu_2 = \mu_1 + \delta_2$ e i residui $\varepsilon_i$ rappresentano tutte le altre fonti sconosciute di variabilità, che sono indipendenti e specifiche per ogni grafico. I residui sono assunti come gaussiani, con media uguale a 0 e deviazione standard uguale a $\sigma$. La scelta di usare $\delta_2$ (differenze tra la seconda varietà è la prima) come parametro esplicito nel modello è puramente arbitraria: avremmo potuto anche includere $\delta_1$ (differenze tra la prima varietà e la seconda) che sarebbe stata uguale a $\delta_2$ in valore assoluto, ma con segno invertito e avrebbe reso $\mu$ uguale alla media del secondo genotipo, invece che del primo.
 
+La stima dei parametri del modello può essere eseguita utilizzando la funzione `lm()` in R, come mostrato nel Capitolo 4.
 
-
-Una volta definito il modello generale, possiamo utilizzare i dati osservati per stimarne i parametri ignoti. Le stime puntuali sono: $\mu_1 = m_1 = 70.2$, $\delta_2 = d_2 = 15.2$ (dove $d_2$ è la differenza campionaria osservata) e, di conseguenza, $\mu_2 = 70.2 + 15.2 = 85.4$. Per quanto riguarda $\sigma$ (la deviazione standard dei residui $\varepsilon_i$), la formulazione del modello prevede che essa sia costante e comune per tutte le osservazioni, indipendentemente dalla varietà a cui 'appartengono'. Questa condizione è detta di **omoscedasticità** (od **omoschedasticità**) ed è ragionevole, in quanto si può ipotizzare che l'effetto varietà agisca solo sulla produzione media, ma non solo sulla deviazione standard. Vedremo in seguito che questa semplificazione non è strettamente necessaria.
-
-Nell'ipotesi di omoscedasticità, la miglior stima di $\sigma$ può essere ottenuta da una sorta di media delle varianze campionarie, pesata sui relativi gradi di libertà:
-
-$$s_{pool} = \sqrt{ \frac{s_1^2 \, (n_1 - 1) + s_2^2 \, (n_2 - 1)}{n_1 + n_2 - 2} }$$
-
-dove $s_1$ ed $s_2$ sono le deviazioni standard dei due campioni e $n_1$ ed $n_2$ sono le due numerosità (entrambe uguali a cinque):
 
 
 ```r
-s_pool <- sqrt( (sd(A)^2 * (n1 - 1) + sd(P)^2 * (n2 - 1))/(n1 + n2 - 2) )
-s_pool
-## [1] 5.315073
+# Example 7.1 [continuation]
+
+# Fitting a model with one nominal predictor
+# to the data at Code box 7.1
+
+yield <- c(A, P)
+genotype <- rep(c("A", "P"), each = 5)
+mod <- lm(yield ~ genotype)
+summary(mod)
+## 
+## Call:
+## lm(formula = yield ~ genotype)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+##  -5.40  -3.85  -1.30   2.15   8.60 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)   70.200      2.377  29.533 1.87e-09 ***
+## genotypeP     15.200      3.362   4.522  0.00195 ** 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 5.315 on 8 degrees of freedom
+## Multiple R-squared:  0.7188,	Adjusted R-squared:  0.6836 
+## F-statistic: 20.45 on 1 and 8 DF,  p-value: 0.001945
+confint(mod)
+##                 2.5 %   97.5 %
+## (Intercept) 64.718691 75.68131
+## genotypeP    7.448258 22.95174
 ```
 
+È importante notare che la deviazione standard residua ($\sigma$), con una terminologia confusa, è indicata come 'errore standard residuo' ($\sigma = 5,315$) nell'output R. È anche importante notare che, in base al nostro modello, la deviazione standard dei residui è unica e comune a tutte le osservazioni e, pertanto, stiamo assumendo che l'effetto genotipo influenzi il livello di resa e non la sua variabilità tra le repliche. Tale ipotesi è chiamata **omoschedasticità** (od **omoscedasticità**) e dovrebbe essere attentamente verificata, come mostreremo più avanti in questo libro.
 
+Gli errori standard per tutte le stime puntuali sono già disponibili nell'output di R: confermano che c'è una certa incertezza sulla reale differenza basata sulla popolazione $\delta_2$, che dovrebbe essere compresa tra 7,45 e 22,95. Il fatto che l'intervallo di confidenza per $\delta_2$ non contenga 0 è una prova indiretta che l'effetto genotipo è significativo.
 
-La deviazione standard 'comune' ha $n_1 + n_2 - 2 = 8$ gradi di libertà, pari allo somma dei gradi di libertà di ogni campione.
-
-Dopo la stima puntuale dei parametri, dobbiamo procedere alla determinazione degli errori standard, che sono l'ingrediente fondamentale dell'inferenza statistica. L'errore standard della media $\mu_1$ è $5.315/\sqrt{5} = 2.377$ mentre l'errore standard della differenza $\delta_2$ (abbreviato come SED), in base alla legge di propagazione degli errori e per campioni estratti in modo indipendente, può essere ottenuta come la radice quadrata della somma pesata delle varianze campionarie, comuni ai due campioni:
-
-$$SED = \sqrt {\frac{s_{pool}^2}{ n_1}  + \frac{s_{pool}^2}{n_2} }$$
-
-Considerando che in questo caso anche il numero delle osservazioni è costante, l'errore standard della differenza si riduce a:
-
-
-```r
-sed <- s_pool * sqrt(2/5)
-sed
-## [1] 3.361547
-```
-
-### L'ipotesi 'nulla' e l'ipotesi 'alternativa'
+### L'ipotesi 'nulla'
 
 Dopo aver completato l'inferenza statistica, ci chiediamo se, a livello di popolazione, sia possibile concludere che il genotipo P è più produttivo del genotipo A, coerentemente con i risultati osservati nei due campioni. Non dimentichiamoci che i due campioni sono totalmente irrilevanti, perché vogliamo trarre conclusioni generali e non specifiche per il nostro esperimento. Dobbiamo quindi **trovare un metodo per decidere se il genotipo P, in generale, è più produttivo del genotipo A**, pur in presenza dell'incertezza legata all'errore sperimentale.
 
@@ -1850,73 +2738,33 @@ Innanzitutto, ricordiamo la logica Popperiana illustrata nel primo capitolo, sec
 
 $$H_0: \delta_2 = 0$$
 
-In altre parole, stiamo cercando di dimostrare che uno dei parametri stimati nel modello sia, in realtà, uguale a 0; questa ipotesi si chiama **ipotesi nulla** e, se riuscissimo a falsificarla, avremmo conseguito il nostro obiettivo, in totale coerenza con la logica Popperiana. Dobbiamo però avere un'ipotesi alternativa ($H_1$) da abbracciare nel caso in cui quella nulla risultasse falsa, ad esempio:
-
-$$H_1: \delta_2 \neq 0$$
-
-In questa ipotesi alternativa non viene considerata la direzione della differenza (positiva o negativa) ma solo la sua esistenza (**ipotesi alternativa semplice**), il che è coerente con la scelta puramente arbitraria di inserire $\mu_1$ come parametro esplicito nel modello; se avessimo infatti scelto di inserire $\mu_2$, il segno di $\delta_2$ sarebbe stato opposto.
-
-In altri casi potrebbe essere opportuno adottare **ipotesi alternative complesse**, del tipo
-
-$$H_1 :\delta_2  > 0$$
-
-oppure:
-
-$$H_1 :\delta_2  < 0$$
-
-Vedremo tra breve che l'adozione di ipotesi alternative complesse è conveniente in termini di potenza del test, ma richiede informazioni preliminari di supporto (pensate che sia possibile fare una scommessa dopo aver visto accadere un evento?). Ciò può realizzarsi, ad esempio, quando andiamo a sperimentare un concime di cui sia nota l'assenza di effetti collaterali negativi e per il quale sia quindi lecito attendersi che, rispetto al testimone non concimato, vi possa essere solo un incremento produttivo più o meno alto, non un decremento. Nel nostro caso, trattandosi di due varietà, non vi è nessuna informazione preliminare attendibile che possa portarci ad escludere *a priori* che P \> A o che P \< A e quindi la nostra ipotesi alternativa dovrà essere per forza semplice.
-
-### La statistica T
-
-Un primo approccio intuitivo per il test d'ipotesi potrebbe essere basato sull'intervallo di confidenza di $\delta_2$, che, tenendo conto che l'errore standard di questa stima ha 8 gradi di libertà, può essere calcolato come:
+In altre parole, stiamo cercando di dimostrare che uno dei parametri stimati nel modello sia, in realtà, uguale a 0; questa ipotesi si chiama **ipotesi nulla** e, se riuscissimo a falsificarla, avremmo conseguito il nostro obiettivo, in totale coerenza con la logica Popperiana.
 
 
-```r
-delta <- mean(P) - mean(A)
-delta + qt(0.975, 8) * sed
-## [1] 22.95174
-delta - qt(0.975, 8) * sed
-## [1] 7.448258
-```
+### Il test di t (Wald test)
 
+In practica, stiamo cercando di dimostrare che un parametro del modello è uguale a 0, quando, in realtà, la nostra stima puntuale è diversa da 0. È intuitivamente chiaro che un certo grado di discrepanza tra la realtà e l'osservazione è accettabile come caratteristica intrinseca del processo di campionamento, ma è anche chiaro che maggiore è la discrepanza, minore è la probabilità che l'ipotesi "nulla" sia vera. In particolare, la nostra intuizione è che un parametro è significativamente diverso da zero quando il suo valore è molto più grande dell'incertezza con cui lo abbiamo stimato.
 
+Un statistica che risponde alla nostra esigenza è quella indicata di seguito:
 
-La differenza è positiva e l'intervallo di confidenza non contiene lo zero, il che supporta, in qualche modo, l'idea che esista effettivamente una differenza significativa tra le due varietà. 
+$$T = \frac{d_2}{SE_{d_2}} = \frac{15.2}{3.362} = 4.521727$$
 
-
-
-Anche se questo criterio basato sull'intervallo di confidenza è, in qualche modo, accettabile, in pratica si preferisce utilizzare un altro criterio più rigoroso, basato sul calcolo di probabilità.
-
-La domanda è: come è possibile falsificare l'ipotesi nulla? Ad esempio, potremmo chiederci: "ma se l'ipotesi nulla è vera, perché io ho osservato due compioni con medie così diverse?". In effetti esiste una spiegazione: anche se ho campionato due volte dalla stessa popolazione, potrei aver campionato cinque parcelle dalla coda sinistra (e quindi con bassa produzione) e cinque parcelle dalla coda destra (con elevata produzione), in modo che $m_1 \neq m_2$ e quindi $d_2 \neq 0$. Di conseguenza, la differenza osservata sarebbe solo casuale, legata ad un campionamento 'sfortunato'. Sarebbe un po' come osservare, per esempio, cinque teste consecutive in altrettanti lanci di una moneta: un 'outcome' possibile, ma abbastanza improbabile. La domanda è quindi: "Quanto è improbabile il nostro risultato, quando l'ipotesi nulla è vera?".
-
-Nello stabilire la probabilità di trovare $d_2 \neq 0$, dobbiamo tener conto di due aspetti:
-
-1.  l'entità della differenza stessa: più la differenza è alta e più è improbabile che essa si sia prodotta per caso;
-2.  l'entità dell'errore standard: maggiore l'incertezza di stima, maggiore la probabilità di trovare differenze casuali anche ampie.
-
-Una statistica che considera entrambi gli aspetti è quella indicata di seguito:
-
-$$T = \frac{d_2}{SED}$$
-
-Il valore osservato è:
-
-$$T = \frac{15.2}{3.361547} = 4.5217$$
+Se l'ipotesi nulla fosse vera, dovremmo osservare $T = 0$, mentre abbiamo osservato $T = 4,522$. Possiamo rifiutare il nullo? Non lo sappiamo, dipende da quanto è probabile ottenere un valore così discrepante quando il nullo è vero. Pertanto, dobbiamo chiederci: **qual è la distribuzione campionaria per $T$ sotto l'ipotesi nulla?**
 
 ### Simulazione Monte Carlo
 
-Ipotizzando che l'ipotesi nulla sia vera ($\delta = 0$), che valori può assumere la statistica T? E'facile intuire che il valore più probabile sia 0, ma possiamo anche aspettarci che T sia diverso da zero. Tuttavia, trovare valori di T molto alti o molto bassi dovrebbe essere via via meno probabile.
-
-Nel nostro esperimento, il valore di T che abbiamo ottenuto è ben diverso da zero, il che indica un certo grado di discrepanza tra l'osservazione è l'ipotesi nulla. **Possiamo affermare che ciò sia imputabile solo alla variabilità di campionamento e che quindi il nostro esperimento confermi l'ipotesi nulla**?
 
 Per rispondere a questa domanda, supponiamo che l'ipotesi nulla sia vera. In questo caso, immaginiamo che le nostre dieci parcelle siano tutte estratte da una sola popolazione di parcelle con media e deviazione standard stimate (stima puntuale) come segue:
 
 
 ```r
-media <- mean(c(A, P))
-devSt <- sd(c(A, P))
-media
+# Example 7.1 [ continuation]
+# We assume a single group, with no genotype distinction
+# and calculate the descriptive statistics
+mu <- mean(yield)
+devStAP <- sd(c(A, P))
+mu; devStAP
 ## [1] 77.8
-devSt
 ## [1] 9.44928
 ```
 
@@ -1924,111 +2772,123 @@ Prendiamo quindi questa popolazione normale, con $\mu = 77.8$ e $\sigma = 9.45$,
 
 
 ```r
-T_obs <- -4.521727
-set.seed(34)
-result <- rep(0, 100000)
-for (i in 1:100000){
-  sample1 <- rnorm(5, media, devSt)
-  sample2 <- rnorm(5, media, devSt)
-  d <- (mean(sample1) - mean(sample2))
-  s_pool <- sqrt( (sd(sample1)^2 * 4 + sd(sample2)^2 * 4)/8 )
-  sed <- s_pool * sqrt(2/5)
-  result[i] <-  d / sed
-}
+# Example 7.1 [ continuation]
 
-# Valutazione dei valori di T
-mean(result)
-## [1] -0.001230418
-max(result)
-## [1] 9.988315
+# Building a sampling distribution for T
+# assuming that the null hypothesis is true
+
+set.seed(34)
+result <- rep(NA, 100000)
+for (i in 1:100000){
+  epsilon <- rnorm(10, 0, devStAP)
+  Yo <- mu + epsilon
+  mod <- lm(Yo ~ genotype)
+  d2 <- coef(mod)[2]
+  SE <- summary(mod)$coefficients[[2,2]]
+  Ti <- d2 / SE
+  result[i] <- Ti
+}
+mean(result) 
+## 0.001230418
+
 min(result)
-## [1] -9.993187
-# Quanti valori sono più discrepanti del mio?
-length(result[result < T_obs]) / 100000
-## [1] 0.00095
-length(result[result > - T_obs]) /100000
-## [1] 0.00082
+## -9.988315
+
+max(result)
+## 9.993187
 ```
 
-Come risultato (vettore 'result') otteniamo una lista di 100'000 valori di T, tutti compatibili con l'ipotesi nulla vera ($\delta_2 = 0$); in altre parole, otteniamo una *sampling distribution* per T, in quanto le variazioni tra un valore e l'altro sono solo dovute al campionamento, visto che l'ipotesi nulla è vera. In mezzo a questi 100'000 valori ne troviamo alcuni piuttosto alti ($> 9$) o piuttosto bassi ($< - 9$). Negli anni 20 del 1900, Fischer propose di utilizzare come **'forza dell'evidenza scientifica'** proprio la probabilità di ottenere un risultato uguale o più estremo di quello osservato, supponendo vera l'ipotesi nulla. Per applicare questo criterio, dobbiamo partire dalla nostra osservazione ($T = 4.521727$) e considerare che il valore è positivo, ma solo perché abbiamo scritto la differenza come $m_2 - m_1$ invece che come $m_1 - m_2$. Quindi dobbiamo andarci a cercare nel vettore 'result' i valori che risultano maggiori di 4.5217 e minori di -4.5217, che sono più discrepanti di quello da noi osservato. Dobbiamo quindi tener conto di entrambe le 'code' della *sampling distribution* e, per questo, si parla di **test a due code**.
-
-Vediamo che, dei 100'000 valori di T simulati assumendo vera l'ipotesi nulla, poco meno dell'uno per mille sono inferiori a -4.5217 e altrettanti sono superiori al suo reciproco (4.5217). In totale, la probabilità di osservare un valore di T uguale o più estremo di quello da noi osservato è molto bassa a pari allo 0.18% circa. Questo valore di probabilità è detto **P-level** (o **P-value**) e viene utilizzato come criterio decisionale: se esso è inferiore a 0.05 (5% di probabilità), come in questo caso, rifiutiamo l'ipotesi nulla ed abbracciamo l'alternativa, concludendo che i due trattamenti sono significativamente diversi tra loro (in termini di risposta prodotta nei soggetti trattati, ovviamente).
 
 
-### Soluzione formale
-
-Eseguire una simulazione di Monte Carlo per costruire una *sampling distribution* empirica per T non è sempre agevole e, pertanto, ci dobbiamo chiedere se esista una funzione di densità formale da utilizzare come *sampling distribution* teorica. Nel grafico sottostante abbiamo reppresentato il vettore 'result', è quindi la *sampling distribution* empirica, come una distribuzione discreta di frequenze, considerando intervalli di ampiezza pari a 2.5.
 
 
 ```r
-#Sampling distribution per T 
-max(result);min(result)
-## [1] 9.988315
-## [1] -9.993187
-b <- seq(-10, 10, by = 0.25)
-hist(result, breaks = b, freq=F, 
-  xlab = "T", ylab="Density", 
-  xlim=c(-10,10), ylim=c(0,0.45), main="")
-curve(dnorm(x), add=TRUE, col="blue")
-curve(dt(x, 8), add=TRUE, col="red")
+mean(result) 
+## [1] 0.001230418
+min(result)
+## [1] -9.988315
+max(result)
+## [1] 9.993187
+```
+
+Quali valori abbiamo ottenuto per $T$? In media, i valori sono prossimi a 0, come previsto, considerando che abbiamo simulato i risultati di esperimenti in cui $\delta_2$ era assunto pari a 0. Tuttavia, notiamo anche valori piuttosto alti e bassi (vicini a 10 e -10), il che dimostra che le fluttuazioni del campionamento casuale possono anche portare a risultati molto "strani". Per il nostro esperimento reale abbiamo ottenuto $T = 4,522$, sebbene il segno positivo sia solo un artefatto, legato al modo in cui abbiamo formulato il nostro modello: avremmo potuto ottenere anche $T = -4,522$ se avessimo utilizzato $\mu_2$ come parametro esplicito, invece di $\mu_1$.
+
+**Ronald Fisher ha proposto di rifiutare l'ipotesi nulla, in base alla probabilità di ottenere valori tanto 'estremi' o più 'estremi' di quello osservato, quando l'ipotesi nulla è vera**. Osservando il vettore "result", vediamo che la proporzione di valori inferiori a -4,521727 e superiori a 4,521727 è $0,00095 + 0,00082 = 0,00177$. Questo è il cosiddetto **P-Level** o **P-value** (vedere il codice sottostante).
+
+\vspace{12pt}
+
+```r
+# Example 7.1 [ continuation]
+# P-value with Monte Carlo simulation
+T_obs <- 4.521727
+upperTail <- length(result[result > T_obs]) / 100000
+lowerTail <- length(result[result < - T_obs]) /100000 
+upperTail + lowerTail
+## [1] 0.00177
+```
+
+
+Ora proviamo a riassumere. Abbiamo visto che, quando l'ipotesi nulla è vero, la distribuzione campionaria di $T$ contiene una percentuale molto bassa di valori al di fuori dell'intervallo da -4,522 a 4,522. Pertanto, la nostra osservazione rientra in un intervallo molto improbabile, che ha scarsissima probabilità di verificarsi (P-value = 0.0017); **il P-value di riferimento per il rigetto della nulla è 0,05**, quindi, coerentemente, la rigettiamo. Lo facciamo perché, se l'ipotesi nulla fosse vera, avremmo ottenuto un risultato molto improbabile; in altre parole, l'e nostre prove scientifiche contro il valore nullo 'evidenza scientifica contro l'ipotesi nulla è sufficientemente forte da permetterci di rigettarla.
+
+### Una soluzione formale
+
+Calcolare il P-value poco sopra ha richiesto di costruire una *sampling distribution* empirica con una serie di simulazioni Monte Carlo, piuttosto 'costose' in termini di tempo di calcolo. Allora è opportuno chiedersi: esiste una Funzione di Densità di Probabilità (PDF) formale che possiamo utilizzare al posto *sampling distribution* empirica? Se prendiamo il vettore 'result' e lo 'discretizziamo', riportandolo in un istogramma (Fig. \@ref(fig:figName71)) possiamo vedere che la distribuzione empirica non assomiglia del tutto ad una gaussiana standardizzata, ma può essere descritta con un altro tipo di distribuzione, ovvero la 't di Student', con otto gradi di libertà (ovvero la somma dei gradi di libertà dei due campioni)^[La distribuzione t di Student fu ideata dallo 'studente' William Sealy Gosset (1876 - 1937), che utilizzava questo pseudonimo nei suoi articoli scientifici mentre lavorava alla Guinness Brewery di Dublino. E' simile a una distribuzione gaussiana standardizzata, ma con code più alte, cioè con una maggiore probabilità di ottenere outliers, sia positivi, che negativi. L'altezza delle code è inversamente proporzionale al parametro $\nu$ (il numero di DF), in modo che questa distribuzione tende ad una gaussiana quando $\nu$ tende ad infinito].
+
+
+
+```
+## Warning: Removed 25 rows containing non-finite outside the scale range
+## (`stat_bin()`).
+## Warning: Removed 32 rows containing missing values or values outside the scale
+## range (`geom_bar()`).
 ```
 
 <div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName71-1.png" alt="Sampling distribution empirica a confronto con una distribuzione normale (in rosso) e una distribuzione t di Student con otto gradi di libertà" width="85%" />
-<p class="caption">(\#fig:figName71)Sampling distribution empirica a confronto con una distribuzione normale (in rosso) e una distribuzione t di Student con otto gradi di libertà</p>
+<img src="_main_files/figure-html/figName71-1.png" alt="Empirical sampling distribution for the T statistic, compared to a standardised gaussian (blue line) and a Student's t distribution with 8 degrees of freedom (red line). The observed T-values have been highlighted and the total probability (area-under-the-curve) of sampling outside the interval from -4.522 to 4.522 represents the P-value" width="85%" />
+<p class="caption">(\#fig:figName71)Empirical sampling distribution for the T statistic, compared to a standardised gaussian (blue line) and a Student's t distribution with 8 degrees of freedom (red line). The observed T-values have been highlighted and the total probability (area-under-the-curve) of sampling outside the interval from -4.522 to 4.522 represents the P-value</p>
 </div>
 
-Vediamo che l'istogramma non è rappresentabile fedelmente con una curva gaussiana (curva blu in Figura \@ref(fig:figName71)), in quanto le code sono leggermente più alte. Al contrario, si può utilizzare la distribuzione di densità di 't di Student', di cui abbiamo già parlato nel Capitolo 5 e che, rispetto alla gaussiana, è caratterizzata da una più elevata densità nelle code, soprattutto quando il numero di gradi di libertà è basso (in questo caso ne abbiamo 8, come abbiamo precisato più sopra). Possiamo vedere che la distribuzione t di Student con 8 gradi di libertà si adatta perfettamente alla *sampling distribution* empirica (curva rossa in Figura \@ref(fig:figName71)). 
+Di conseguenza, possiamo utilizzare la distribuzione t di Student per calcolare il *P-value*, come mostrato nel riquadro sottostante. Invece che sommare le probabilità di ottenere valori superiori a 4.522 e di ottenere valori inferiori a -4.522, possiamo anche moltiplicare per due la probabilità di ottenere valori superiori al valore assoluto del T osservata. Infatti, la distribuzione di t di Student è simmetrica, e quindi le due code sono uguali.
 
-L'impiego della curva 't di Student' ci permette di calcolare il P-level molto velocemente, senza dover ricorrere ad una simulazione Monte Carlo. Chiaramente, dato che l'ipotesi alternativa è quella semplice dobbiamo considerare entrambe le code, utilizzando il codice sottostante: 
-
+\vspace{12pt}
 
 ```r
-2 * pt(abs(T_obs), 8, lower.tail = F) 
+# Example 7.1 [continuation}
+
+# P-value from the Student's t distribution
+
+pt(T_obs, df=8, lower.tail = FALSE) # probability that T > 4.522
+## [1] 0.0009727353
+pt(-T_obs, df=8) # probability that T < -4.522
+## [1] 0.0009727353
+2 * pt(abs(T_obs), df=8, lower.tail = F) # P-value
 ## [1] 0.001945471
 ```
 
-Abbiamo moltiplicato per 2 il risultato, in quanto la funzione `dt()` fornisce la probabilità di trovare individui superiori al valore assoluto di 4.5217 ('abs(T_obs)' e 'lower.tail = F'), ma, essendo la curva t di Student simmetrica, la probabilità di trovare soggetti nell'altra coda è esattamente la stessa. L'impiego della funzione valore assoluto è irrilevante nel nostro caso, ma è utile quando la differenza osservata è negativa.
 
-Vediamo che il P-level ottenuto formalmente è simile a quello ottenuto empiricamente, ma, rispetto a quest'ultimo, è più preciso, in quanto con la simulazione di Monte Carlo non abbiamo potuto considerare, come avremmo dovuto, un numero infinito di repliche dell'esperimento. Tuttavia bisogna precisare che **l'impiego di una sampling distribution formale richiede che siano vere alcune condizioni di base, come, ad esempio, l'omogeneità delle varianze e la normalità dei residui** $\varepsilon_i$, altrimenti il test è invalido. Questo aspetto non va assolutamente dimenticato e, per questo, daremo alcuni indicazioni in seguito.
+Vediamo che il P-level ottenuto formalmente è simile a quello ottenuto empiricamente, ma, rispetto a quest'ultimo, è più preciso, in quanto con la simulazione di Monte Carlo non abbiamo potuto considerare, come avremmo dovuto, un numero infinito di repliche dell'esperimento.
 
+Per concludere questa sezione, dobbiamo precisare che **l'impiego di una *sampling distribution* formale richiede che siano verificate due condizioni di base**:
 
-### Interpretazione del P-level
+1. i residui sono campionati da una distribuzione normale (normalità);
+2. la deviazione standard è unica e non è influenzata dal trattamento sperimentale (omoschedasticità).
 
-Abbiamo detto che quando il P-level è inferiore a 0.05, concludiamo che vi sono prove scientifiche sufficientemente forti per rifiutare la nostra ipotesi di partenza.
+Avrete infatti notato che queste due condizioni erano 'incapsulate' nella simulazione Monte Carlo che abbiamo eseguito in precedenza per ottenere la *sampling distribution* empirica di T. Se le due ipotesi non fossero rispettate, la distribuzione t di Student non rappresenterebbe esattamente la *sampling distribution* della statistica T e, di conseguenza, il P-level non sarebbe valido. Più avanti in questo libro vedremo come è possibile verificare che le due assunzioni di base siano effettivamente rispettate.
 
-Bisogna sottolineare come il P-level nella statistica tradizionale sia stato inizialmente proposto da Fisher come criterio di comportamento e non come un vero e proprio criterio inferenziale-probabilistico. Successivamente, Jarzy Neyman ed Egon Pearson, intorno al 1930, proposero di utilizzare il P-level come probabilità di errore di I specie, cioè come probabilità di rifiutare erroneamente l'ipotesi nulla. Tuttavia, trattandosi di una probabilità calcolata a partire da una *sampling distribution*, cioè da un'ipotetica infinita ripetizione dell'esperimento, essa non ha alcun valore in relazione al singolo esperimento effettivamente eseguito, come i due autori menzionati in precedenza hanno esplicitamente chiarito.
+## Altri test di t
 
-Di conseguenza, nel caso in esempio, affermare che abbiamo una probabilità di errore pari a 0.0019 nel rifiutare l'ipotesi nulla, rappresenterebbe un abuso: le nostre conclusioni potrebbero essere false o vere, ma non abbiamo alcun elemento per scegliere tra le due opzioni. Possiamo solo affermare che, se ripetessimo infinite volte l'esperimento e se l'ipotesi nulla fosse vera, otterremmo un risultato estremo come il nostro o più estremo solo in 2 casi (circa) su 1000. In altre parole, basando sempre le nostre conclusioni sul criterio anzidetto (rifiuto l'ipotesi nulla se il P-value è inferiore a 0.05), possiamo contenere la nostra probabilità di errore (falso-positivo) sotto il 5% nel lungo periodo, non in relazione ad ogni singolo sforzo sperimentale di campionamento.
+### Il test t di Student
 
-## Altri esempi dell'uso del test di t di Student
+Il test t che abbiamo appena mostrato è utilizzato come supporto alle procedure di *model fitting* (Wald test) e permette di verificare l'ipotesi che uno dei parametri stimati sia significativamente diverso da 0. Il test t di Student è invece una tecnica tradizionale di analisi dei dati (risale al 1908) per il confronto tra due medie campionarie, senza alcun legame col *model fitting*. Sebbene, al giorno d'oggi il test t di Student debba essere considerato un po' obsoleto, è comunque opportuno conoscere come questa procedura possa essere eseguita in R, con la funzione `t.test()`. Il box sottostante mostra che i risultati che si ottengono sono identici a quelli ottenuti nella sezione precedente.
 
-In questo capitolo abbiamo utilizzato il test t di Student per valutare la significatività della stima di un parametro, sotto l'ipotesi nulla che il valore del parametro nella popolazione sia uguale a 0. Questo approccio è sempre possibile ed è generalizzabile in questo modo:
-
-1. poniamo di avere un parametro $\beta$ da stimare ed otteniamo lo stimatore campionario $b$ = 12);
-2. determiniamo il suo errore standard (ad esempio 1.5, con 7 gradi di libertà) con un metodo adeguato;
-3. calcoliamo il rapporto tra la stima e il suo errore standard (ad esempio T = 12/1.5 = 8 con 7 gradi di libertà);
-4. Utilizziamo la distribuzione t di Student per calcolare il P-level per l'ipotesi nulla $H_0: \beta = 0$, come mostrato nel box sottostante.
-
+\vspace{12pt}
 
 ```r
-T_obs <- 12/1.5
-2 * pt(abs(T_obs), 7, lower.tail = F)
-## [1] 9.114921e-05
-```
+# Example 7.1 [continuation]
 
-Quando il P-level è inferiore a 0.05, rigettiamo l'ipotesi nulla e concludiamo che il valore del parametro nella popolazione è significativamente diverso da zero.
+# Traditional Student's t-test with R
 
-
-### Confronto tra due medie campionarie
-
-Tradizionalmente, il test t di Student è utilizzato per saggiare la differenza tra due medie campionarie, anche senza costruire un modello statistico come il nostro. In particolare, il processo è analogo a quello sopra indicato, salvo il fatto che, all'inizio, calcoliamo le medie dei due campioni, la loro differenza e l'errore standard di questa differenza. Successivamente, dividiamo la differenza per il suo errore standard e procediamo come sopra.
-
-In R, questo processo è agevolato dalla funzione `t.test()`, che, nel caso del nostro esempio iniziale, riceve in input i due campioni, assieme alla specifica 'var.equal = T', che permette di eseguire un test omoscedastico, con risultati assolutamente uguali a quelli riportati più sopra.
-
-
-```r
-t.test(A, P, var.equal = T)
+t.test(A, P, var.equal = TRUE)
 ## 
 ## 	Two Sample t-test
 ## 
@@ -2042,242 +2902,341 @@ t.test(A, P, var.equal = T)
 ##      70.2      85.4
 ```
 
+### Il test di Welch
 
-### Varianze non omogenee
+Anche il test di t di Student richiede l'omoschedasticità dei dati e necessita dell'argomento `var.equal = TRUE`. Tuttavia, la funzione `t.test()` può essere facilmente estesa alle situazioni in cui i due campioni hanno varianze diverse, modificando il codice con l'argomento `var.equal = FALSE`. In questo modo viene eseguito il test di t eteroschedastico, noto anche come test di Welch. Grazie al suo maggiore livello di robustezza, il test di Welch è solitamente preferito al test t di Student ed è, quindi, l'opzione predefinita in R.
 
-Se le varianze dei due campioni di cui vogliamo confrontare le medie non sono uguali, possiamo utilizzare il test di t eteroscedastico, meglio noto con il nome di test di Welch. Consideriamo, per esempio, i due campioni riportati di seguito e caratterizzati da varianze molto diverse, per cui l'ipotesi di omoscedasticità non è difendibile.
-
-
-
+\vspace{12pt}
 
 ```r
-D1
-## [1] 12.06608 11.79470 11.85008 12.14712 12.14591
-D2
-## [1] 35.14014 35.20918 31.96391 34.51307 33.91213
-mean(D1)
-## [1] 12.00078
-mean(D2)
-## [1] 34.14769
-var(D1)
-## [1] 0.02798071
-var(D2)
-## [1] 1.767402
-```
+# Code box 7.8
+# Example 7.1 [continuation]
 
-Il test di Welch è analogo al test di t, ma l'errore standard della differenza viene calcolato utilizzando le deviazioni standard dei due campioni, senza calcolare una deviazione standard comune. Inoltre, il numero di gradi di libertà non è ottenuto per semplice somma dei gradi di libertà di ogni campione, ma è approssimato con la formula di Satterthwaite:
+# Heteroscedastic t-test (Welch test) with R
 
-$$DF_s \simeq \frac{ \left( s^2_1 + s^2_2 \right)^2 }{ \frac{(s^2_1)^2}{DF_1} + \frac{(s^2_2)^2}{DF_2} }$$
-
-Vediamo che se le varianze e i gradi di libertà sono uguali, la formula precedente riduce a:
-
-$$DF_s = 2 \times DF$$
-
-In questo esempio:
-
-
-```r
-sed <- sqrt( var(D1)/5 + var(D2)/5 )
-dfS <- (var(D1) + var(D2))^2 / 
-  ((var(D1)^2)/4 + (var(D2)^2)/4)
-2 * pt(abs(mean(D1) - mean(D2))/sed, dfS, lower.tail = F)
-## [1] 2.325897e-06
-```
-
-Con R, il test di Welch si esegue utilizzando l'argomento 'var.equal = F', che è l'opzione di default; è leggermente meno potente di quello omoscedastico (P-level più basso), ma permette di rilasciare l'assunzione di omogeneità delle varianze e fornisce risultati validi anche quando i due campioni hanno una variabilità molto diversa.
-
-
-```r
-t.test(D1, D2, var.equal = F)
+t.test(A, P, var.equal = F)
 ## 
 ## 	Welch Two Sample t-test
 ## 
-## data:  D1 and D2
-## t = -36.959, df = 4.1266, p-value = 2.326e-06
+## data:  A and P
+## t = -4.5217, df = 7.7977, p-value = 0.002076
 ## alternative hypothesis: true difference in means is not equal to 0
 ## 95 percent confidence interval:
-##  -23.79070 -20.50312
-## sample estimates:
-## mean of x mean of y 
-##  12.00078  34.14769
-```
-
-Dato che le varianze di due campioni non sono mai esattamente uguali, ci si può chiedere quando sia opportuno utilizzare il test di t di Student e quando sia invece preferibile il test di Welch. Non c'è una risposta esatta: in genere il test t di Student è preferibile per la sua semplicità e potenza quando le varianze sono poco diverse, nello stesso ordine di grandezza e con un rapporto pari ad 1/2 o 1/3 massimo. Secondo alcuni, invece, il test di Welch è sempre preferibile, per la maggior protezione che garantisce, come dimostra il fatto che esso costituisca l'opzione di default in R.
-
-### Differenze generalizzate tra parametri
-
-Il test di Welch può essere generalizzato a qualunque situazione in cui abbiamo due stime indipendenti e vogliamo valutare se la loro differenza è significativa. Ad esempio, immaginiamo di avere la stima di $\gamma_1 = 22$ con errore standard pari a 1.3 e la stima di $\gamma_2 = 31$, con errore standard pari a 2.9. L'errore standard della differenza sarà pari a:
-
-$$\textrm{SED} = \sqrt{\textrm{SEM}_1^2 + \textrm{SEM}_2^2} = 3.178$$
-
-Avendo anche i gradi di libertà dei due SEM, potrei approssimare i gradi di libertà del SED utilizzando la formula di Satterthwaite. Altrimenti, nell'ipotesi che il numero di gradi di libertà sia sufficientemente alto (maggiore di 15-20, all'incirca), potrei utilizzare una approssimazione gaussiana, come indicato nel box sottostante.
-
-
-```r
-T_obs <- (22 - 31)/3.178
-2 * pnorm(abs(T_obs), lower.tail = F)
-## [1] 0.004626222
-```
-
-Anche in questo caso il P-level è abbondantemente inferiore allo 0.05, per cui rigettiamo l'ipotesi nulla.
-
-### Misure appaiate
-
-Il t-test appaiato è quello in cui le misure sono state prese negli stessi soggetti, prima e dopo un certo trattamento sperimentale. Ad esempio, se le misure D1 e D2 fossero state rilevate sugli stessi soggetti (due misure per soggetto, in posizioni corrispondenti dei vettori D1 e D2), allora avremmo cinque soggetti invece che dieci e, di conseguenza, avremmo solo solo 4 gradi di libertà invece che 8:
-
-
-```r
-t.test(D1, D2, var.equal = F, paired=T)
-## 
-## 	Paired t-test
-## 
-## data:  D1 and D2
-## t = -38.002, df = 4, p-value = 2.864e-06
-## alternative hypothesis: true mean difference is not equal to 0
-## 95 percent confidence interval:
-##  -23.76497 -20.52885
-## sample estimates:
-## mean difference 
-##       -22.14691
-```
-
-### Test ad una coda 
-
-Se fosse ragionevole adottare un ipotesi alternativa complessa del tipo $H_1: \delta_2 < 0$, allora potremmo effettuare un **test ad una coda**. Tornando all'esempio precedente, avendo osservato un valore di T uguale a -4.5217, potremmo limitarci a valutare la probabilità di ottenere, con l'ipotesi nulla vera, valori pari o inferiori a quello da noi osservati, trascurando invece l'altra coda della distribuzione di riferimento (valori pari o superiori a 4.5217). In questo modo il test produrrebbe un P-level inferiore e risulterebbe quindi più potente (sarebbe più facile rigettare l'ipotesi nulla). Un esempio è dato nel box sottostante
-
-
-```r
-pt(-4.5217, 8, lower.tail = T)
-## [1] 0.0009727699
-t.test(A, P, var.equal = T, alternative = "less") # più semplice
-## 
-## 	Two Sample t-test
-## 
-## data:  A and P
-## t = -4.5217, df = 8, p-value = 0.0009727
-## alternative hypothesis: true difference in means is less than 0
-## 95 percent confidence interval:
-##       -Inf -8.949041
+##  -22.986884  -7.413116
 ## sample estimates:
 ## mean of x mean of y 
 ##      70.2      85.4
 ```
 
-Ricordiamo come l'ipotesi alternativa complessa possa essere adottata solo nei casi in cui essa risulti ragionevole già prima di effettuare l'esperimento e non dopo averne visti i risultati.
+### Il test di t appaiato
 
-## Altri test d'ipotesi: il test $\chi^2$
-
-Il test di t, con tutte le sue varianti, è fondamentalmente basato sul rapporto tra una stima ed il suo errore standard, la cui *sampling distribution* è approssimativamente gaussiana o, più precisamente, segue la distribuzione di 't di Student'. Tuttavia, io posso testare ipotesi di ogni tipo, mi basta avere una qualunque statistica che descriva l'andamento dell'esperimento e conoscere la sua *sampling distribution*, assumendo che l'ipotesi nulla sia vera. Questa *sampling distribution* può essere empirica (cioè ottenuta per simulazione Monte Carlo) o meglio teorica, scelta in base a considerazioni di natura statistico-matematica; su di essa, vado a cercare la probabilità di trovare valori per la statistica in studio che siano tanto estremi o più estremi di quello da noi riscontrato.
-
-Ad esempio, immaginiamo che io abbia una stima pari a 22 ed immaginiamo che la *sampling distribution* per questa stima, assumendo vera l'ipotesi nulla, segua la distribuzione di $\chi^2$ con 10 gradi di libertà (per menzionare una qualunque distribuzione che non conosciamo ancora). Allora io posso ottenere un P-level per l'ipotesi nulla andandomi a guardare la probabilità di osservare un valore altrettanto estremo o più estremo di 22 (test ad una coda), come indicato nel box sottostante.
+In alcuni casi, l'esperimento prevede due misure sullo stesso soggetto ed è finalizzato a verificare se esiste una differenza significativa tra la prima e la seconda misura. Ad esempio, immaginiamo di aver esaminato un campione di venti topi pesandoli all'inizio e alla fine di un certo programma alimentare; in questo modo,si viene ad avere, per ogni individuo, due misurazioni appaiate, per un totale di quaranta valori. In tali condizioni, le due misure non sono indipendenti tra di loro e dobbiamo necessariamente eseguire un test di t appaiato, impostando l'argomento `paired = TRUE`, come mostrato nel riquadro sottostante. Si noti che, anche se abbiamo 40 valori, il numero di gradi di libertà è 19, perché abbiamo solo 20 soggetti indipendenti e due misure per soggetto.
 
 
-```r
-pchisq(22, 10, lower.tail = F)
-## [1] 0.0151046
-```
 
-Il test di $\chi^2$ funziona esattamente in questo modo ed è utilizzato per valutare la significatività della connessione tra due caratteri qualitativi, per i quali sia stata costruita una tabella delle contingenze (ricordate il Capitolo 3?). 
 
-Ad esempio, immaginiamo un esperimento per verificare se un coadiuvante aumenta l'efficacia di un insetticida. In questo esperimento, utilizziamo l'insetticida da solo e miscelato con il coadiuvante su due gruppi di insetti diversi. Nel primo gruppo (trattato con insetticida) contiamo 56 morti su 75 insetti trattate, mentre nel secondo gruppo (trattato con insetticida e coadiuvante) otteniamo 48 morti su 50 insetti trattati.
+## Differenze generalizzate tra parametri
 
-Nel capitolo 3 abbiamo visto come costruire una tabella di contingenze e come calcolare il $\chi^2$ per misurare l'entità della connessione:
+Il test di Welch può essere generalizzato a qualunque situazione in cui abbiamo due stime indipendenti e vogliamo valutare se la loro differenza è significativa. Ad esempio, immaginiamo di aver stimato il tasso di crescita della barbabietola da zucchero con due diverse pratiche agronomiche e di aver ottenuto le stime $\rho_1 = 0.22$ con un errore standard di 0.013 e $\rho_2 = 0.31$ con un errore standard di 0.029. Il valore di T può essere ottenuto come:
+
+$$T = \frac{0.31 - 0.22}{\sqrt{0.031^2 + 0.029^2}} = -2.12$$
+
+Se la dimensione del campione è sufficientemente ampia e le due stime provengono da un ugual numero di soggetti, potremmo utilizzare un'approssimazione gaussiana per ottenere il P-value, come mostrato nel box sottostante.
+
 
 
 ```r
-counts <- c(56, 19, 48, 2)
-tab <- matrix(counts, 2, 2, byrow = T)
-row.names(tab) <- c("I", "IC")
-colnames(tab) <- c("M", "V")
-tab
-##     M  V
-## I  56 19
-## IC 48  2
-summary( as.table(tab) )
-## Number of cases in table: 125 
-## Number of factors: 2 
-## Test for independence of all factors:
-## 	Chisq = 9.768, df = 1, p-value = 0.001776
+# Code box 7.10
+
+# Example 7.3
+# testing differences between model parameters
+
+T_obs <- (0.22 - 0.31)/sqrt(0.031^2 + 0.029^2)
+2 * pnorm(abs(T_obs), lower.tail = F)
+## [1] 0.033994
 ```
 
-Il valore di $\chi^2$ osservato è pari a 9.768, il che indica un certo grado di connessione, in quanto è diverso dal valore atteso in assenza di connessione che sarebbe zero (Capitolo 3). Tuttavia, noi non siamo interessati solo ai 125 insetti osservati, ma siamo interessati a trarre conclusioni generali e valide per l'intera popolazione che ha generato il nostro campione. A questo fine abbiamo bisogno di un test d'ipotesi formale; se non esiste connessione, la proporzione di insetti controllati dal trattamento dovrebbe la stessa, indipendentemente dalla presenza del coadiuvante. Cioè:
+Anche in questo caso il P-level è abbondantemente inferiore allo 0.05, per cui rigettiamo l'ipotesi nulla.
 
-$$H_o :\pi_1  = \pi_2  = \pi$$
 
-Vediamo che, come negli altri esempio, l'ipotesi nulla riguarda i parametri delle popolazioni ($\pi_1$ e $\pi_2$), non quelli dei campioni ($p_1$ e $p_2$). Ci chiediamo: se l'ipotesi nulla fosse vera ($\pi_1 = \pi_2$), quale sarebbe la *sampling distribution* per $\chi^2$? E soprattutto, quanto sarebbe probabile ottenere un valore alto come il nostro o più alto? Karl Pearson ha dimostrato che il valore di $\chi^2$, quando l'ipotesi nulla è vera, segue la distribuzione di $\chi^2$, con un numero di gradi di libertà pari a quelli della tabelle delle contingenze (bisogna prendere il minimo valore tra il numero di righe meno una e il numero di colonne meno una; vedi il Capitolo 3). Il box sottostante mostra come utilizzare la funzione 'pchi()' per il calcolo del P-level (in questo caso il test è ad una coda, perché la connessione implica valori di $\chi^2$ alti e non bassi).
+## Il test F nell'ANOVA
 
+Il rapporto F è una misura della forza di una relazione causale tra un insieme di predittori nominali/quantitativi e una risposta quantitativa (vedi Capitoli 3 e 4). Ogni volta che i dati osservati rappresentano un campione di una popolazione più ampia, il valore F osservato è solo una stima di un numero infinito di possibili valori F, che definiscono una distribuzione campionaria. Che forma ha questa distribuzione campionaria?
+
+Ad esempio, se riconsideriamo l'esperimento di confronto varietale nell'Esempio 4.3 (dati 'oat1L'), il rapporto F nell'ANOVA (box 4.7) per il genotipo è pari a 42.71, con 3 gradi di libertà al numeratore e 8 gradi di libertà al denominatore.
+
+
+
+Per questo esperimento, l'ipotesi nulla corrisponderebbe a una situazione in cui, a livello di popolazione, è:
+
+$$H_0: \mu_1 = \mu_2 = \mu_3 = \mu_4$$
+
+Ciò equivale a dire che tutti gli effetti dei trattamenti sono uguali a 0:
+
+$$H_0: \alpha_1 = \alpha_2 = \alpha_3 = \alpha_4 = 0$$
+
+Il rapporto F osservato sembra contraddire l'ipotesi nulla, ma potrebbe trattarsi di un valore inaspettatamente alto capitato per caso, senza che vi sia una reale differenza tra i genotipi. Dobbiamo chiederci: qual è la distribuzione campionaria del rapporto F quando l'ipotesi nulla è vera?
+
+Una tale distribuzione campionaria potrebbe essere costruita tramite simulazione Monte Carlo; tuttavia, l'impiego di una CDF teorica è un approccio più semplice. Il matematico americano George Snedecor ha dimostrato che quando il valore nullo è vero e i residui sono indipendenti, distribuiti gaussianamente e omoschedastici, 
+
+Sebbene potremmo costruire una tale distribuzione campionaria tramite simulazione Monte Carlo, il più delle volte è molto meglio utilizzare una CDF teorica. Il matematico americano George Snedecor ha dimostrato che, quando l'ipotesi nulla è vera e i residui sono gaussiani e omoschedastici, la distribuzione campionaria per il rapporto F può essere descritta con la cosiddetta distribuzione F di Fisher (o meglio, Fisher-Snedecor), che è definita solo per valori positivi e ha una forma asimmetrica (right-skewed), che dipende del numero di gradi di libertà al numeratore e al denominatore. Un esempio è mostrato in Figura \ref{fig:figNameF}.
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figNameF-1.png" alt="Fisher-Snedecor density function with 3 and 8 degrees of freedom. Considering a hypothetical F-ratio of 3, the total probability (Area-Under-the-Curve) above this value represents the P-value, that is 0.095" width="90%" />
+<p class="caption">(\#fig:figNameF)Fisher-Snedecor density function with 3 and 8 degrees of freedom. Considering a hypothetical F-ratio of 3, the total probability (Area-Under-the-Curve) above this value represents the P-value, that is 0.095</p>
+</div>
+
+In R, il P-value si può calcolare con la funzione `pf()`, come indicato nel box sottostante.
+
+\vspace{12pt}
 
 ```r
-pchisq(9.768, df = 1, lower.tail = F)
-## [1] 0.001775755
+pf(42.707, 3, 8, lower.tail = F)
+## [1] 2.866138e-05
 ```
 
-Vediamo che questo P-level era già disponibile nell'output della funzione `summary()`; essendo inferiore a 0.05, ci consente di rigettare l'ipotesi nulla, affermando che esiste una differenza significativa tra l'effetto dell'insetticida quando è utilizzato da solo e quando è utilizzando in abbinamento con un coadiuvante.
+Possiamo vedere che il valore P è inferiore a 0,05 e, di conseguenza, possiamo rifiutare l'ipotesi nulla e accettare l'alternativa, ovvero che l'effetto del genotipo è significativo e che c'è almeno un genotipo con una media diversa rispetto agli altri.
 
-Allo stesso risultato, ma in modo più semplice, è possibile pervenire utilizzando la funzione `chisq.test()`, applicata alla tabella di contingenza:
+## Conclusioni
 
+Concludiamo ribadendo che l'incertezza intrinseca nei dati sperimentali non consente di trarre conclusioni senza rischio di errore. Poiché il nostro obiettivo è quello di rifiutare l'ipotesi nulla, dobbiamo proteggerci dal rischio di un rifiuto erroneo, che ci porterebbe a concludere che il trattamento è 'efficace' quando in realtà ciò non è vero (falso positivo). La protezione dall'errore di falso positivo si mette in atto con la seguente procedura:
 
-```r
-chisq.test(tab, correct = F)
-## 
-## 	Pearson's Chi-squared test
-## 
-## data:  tab
-## X-squared = 9.768, df = 1, p-value = 0.001776
-```
+1. calcolare una statistica utile (statistica pivotale) per riassumere i risultati di un esperimento (come il valore T o il rapporto F);
+2. identificare una distribuzione campionaria per esprimere la variabilità della statistica oggetto di studio, quando l'ipotesi nulla è vera e si ripete l'esperimento con lo stesso disegno sperimentale, ma un diverso campione di soggetti. La distribuzione campionaria può essere una funzione di probabilità teorica od empirica, ad esempio ottenuta con una simulazione di Monte Carlo;
+3. utilizzare la distribuzione campionaria selezionata per derivare la probabilità di eventi altrettanto estremi o più estremi di quello osservato nello specifico esperimento in studio;
+4. rigettare l'ipotesi nulla se la probabilità calcolata al punto 3 è inferiore a 0.05.
 
-L'opzione 'correct = F' permette di evitare la correzione per la continuità (correzione di Yates), che è invece necessaria quando il numero dei soggetti è piccolo (minore di 30, grosso modo).
+Prima di concludere, vorremmo sottolineare tre questioni fondamentali, che dovremmo sempre tenere a mente:
 
 
-## Test d'ipotesi con simulazione di Monte Carlo
+1. Il P-value è considerato come la probabilità di rifiutare erroneamente l'ipotesi nulla (errore di I specie o di falso positivo). Tuttavia, tale probabilità va interpretata con riferimento alla distribuzione campionaria, non mai in relazione al singolo esperimento oggetto di studio. Insomma, quando riusciamo a rigettare l'ipotesi nulla, siamo in grado di concludere che: *se l'ipotesi nulla fosse vera e ripetessimo l'esperimento un numero infinito di volte, avremmo meno del 5% di probabilità di ottenere un valore T o F altrettanto elevato o più elevato (in valore assoluto) di quello da noi osservato*. Quindi avere una probabilità d'errore del 5% significa che, adottando una procedura formale di test d'ipotesi, su 100 esperimenti in cui l'ipotesi nulla è vera, solo in cinque di essi l'ipotesi nulla verrebbe rigettata errorneamente. Al contrario, non possiamo concludere che la nostra specifica conclusione di rigettare l'ipotesi nulla abbia *meno del 5% di probabilità di essere  errata*, perchè non abbiamo nessun elemento per stabilire se l'ipotesi nulla è vera o falsa nel nostro caso.
+2. Il P-value è calcolato a partire da una certa sampling distribution teorica, individuata assumendo che i residui siano normali ed omoschedastici. Se queste assunzioni di base non sono soddisfatte, il P-value è invalido. In uno dei prossimi capitoli mostreremo come verificare che gli assunti di base siano rispettati.
+3. Oltre all'ipotesi nulla, Neyman e Pearson hanno proposto di adottare un'ipotesi alternativa che si considera vera quando l'ipotesi nulla viene rifiutata. Ad esempio (vedi Sezione 7.1), se l'ipotesi nulla è $H_0: \delta_2 = 0$, l'alternativa è $H_1: \delta_δ_2 \neq 0$. Sono possibili anche ipotesi alternative più complesse, come $H_1: \delta_2 > 0$ o $H1: \delta_2 < 0$, sebbene queste ipotesi alternative complesse possano essere adottate solo quando vi è una conoscenza a priori che le giustifica. Ciò si rende necessario in quanto un test d'ipotesi con un'ipotesi alternativa complessa (test ad una coda) è più potente di un test a due code.In ogni caso, dovremmo evitare il comune equivoco secondo cui rifiutare l'ipotesi nulla implichi che l'alternativa sia dimostrata o che l'alternativa sia vera con una probabilità $P_{alt} = 1 − \textrm{P-value}$ (Gigerenzer, 2018).
+4. Quando prendiamo una decisione "statistica", non corriamo solo il rischio di commettere un errore di falso positivo (errore di tipo I), ma corriamo anche il rischio di commettere un errore di falso negativo (errore di tipo II), se non rifiutiamo un'ipotesi falsa nulla. Questi due tipi di errore sono ben rappresentati nella Figura \@ref(fig:figName72), comunemente disponibile sul web. Si noti inoltre che i due tipi di errore sono correlati e maggiore è la protezione contro l'errore falso positivo, maggiore è il rischio di commettere un errore falso negativo. In generale, dovremmo sempre essere attenti a decidere quale dei due errori potrebbe essere più pericoloso per il nostro obiettivo specifico.
 
-Vi sono situazioni nelle quali non vi è una chiara indicazione su quale sia la distribuzione di probabilità/densità più opportuna per descrivere la *sampling distribution* di una statistica sotto l'ipotesi nulla. Ciò è vero anche per il test di $\chi^2$ appena esposto, per il quale la distribuzione di $\chi^2$ è cosniderata solo una buona approssimazione.
+<div class="figure" style="text-align: center">
+<img src="_images/statisticalErrors.jpeg" alt="The two types of statistical errors" width="85%" />
+<p class="caption">(\#fig:figName72)The two types of statistical errors</p>
+</div>
 
-In queste situazioni è possibile costruire una *sampling distribution* empirica analogamente a quanto abbiamo fatto in precedenza per il test di t di Student. Nel caso del test di $\chi^2$, possiamo utilizzare la funzione `r2dtable()`, che, partendo da una situazione in cui l'ipotesi nulla è vera (cioè $\pi_1 = \pi_2$) e quindi i due caratteri sono indipendenti, produce tante tabelle di contingenza (nel nostro caso 10'000), rispettando i totali marginali della nostra tabella di partenza. Le tabelle prodotte sono restituite come lista, quindi possiamo utilizzare la funzione `lapply()` per applicare ad ogni elemento della lista la funzione che restituisce il $\chi^2$ ('chiSim').
-
-
-```r
-chiSim <- function(x) summary(as.table(x))$stat
-set.seed(1234)
-tabs <- r2dtable(10000, apply(tab, 1, sum), apply(tab, 2, sum))
-chiVals <- as.numeric( lapply( tabs, chiSim) )
-length(chiVals[chiVals > 9.768])
-## [1] 19
-```
-
-Vediamo che vi sono 19 valori so 10'000 più alti di quello da noi osservato, quindi il P-value è 0.0019, molto simile a quello osservato con il test formale.
-
-
-## Conclusioni e riepilogo
-
-Abbiamo visto il P-level è lo strumento giusto per tirare conclusioni in presenza di incertezza sperimentale. Dovrebbe essere evidente che anche le nostre conclusioni sono incerte, in quanto soggette all'errore di campionamento. In particolare, abbiamo visto che esiste un rischio di errore di prima specie, cioè rifiutare erroneamente l'ipotesi nulla (falso positivo). Allo stesso modo, esiste anche un rischio di errore di II specie, cioè accettare erroneamente l'ipotesi nulla (falso negativo). Insomma, per quanto possiamo affannarci, la ricerca scientifica non consente mai soluzioni certe, anche se rimane la certezza del metodo, che è largamente condiviso all'interno della comunità di scienziati.
-
-Concludiamo proprio ricordando questo metodo di lavoro:
-
-1.  si formula l'ipotesi nulla.
-2.  Si individua una statistica che descriva l'andamento dell'esperimento, in relazione all'ipotesi nulla.
-3.  Si individua la *sampling distribution* per questa statistica, assumendo vera l'ipotesi nulla; la sampling distribution può essere empirica (ottenuta per simulazione Monte Carlo) o meglio teorica, scelta in base a considerazioni probabilistiche.
-4.  Si calcola la probabilità che, essendo vera l'ipotesi nulla, si possa osservare una valore altrettanto estremo o più estremo di quello calcolato, per la statistica di riferimento.
-5.  Se il livello di probabilità è inferiore ad una certa soglia $\alpha$ prefissata (generalmente 0.05), si rifiuta l'ipotesi nulla e si accetta l'ipotesi alternativa.
-
----
 
 ## Altre letture
 
-1.  Hastie, T., Tibshirani, R., Friedman, J., 2009. The elements of statistical learning, Springer Series in Statistics. Springer Science + Business Media, California, USA.
-
-<!--chapter:end:06-TestIpotesi.Rmd-->
-
-# Modelli ANOVA ad una via
+1. Gigerenzer G (2018) Statistical Rituals: The Replication Delusion and How We Got There. Advances in Methods and Practices in Psychological Science 1(2):198–218, DOI 10.1177/2515245918771329, URL https://journals.sagepub.com/doi/10.1177/2515245918771329
 
 
-Nel capitolo 4 abbiamo già parlato di come assumiamo che risultati di un esperimento si generino attraverso un doppio meccanismo deterministico e stocastico, rappresentabile attraverso un modello matematico contenento uno o più elementi casuali, descritti da una funzione di densità, solitamente gaussiana. Abbiamo già visto che i modelli più utilizzati sono lineari e, tra questi, il gruppo più diffuso, almeno in ambito biologico-agrario, è quello dei modelli ANOVA.
+## Esercizi
 
-La nomenclatura è impropria; infatti, con il termine ANOVA, si intende un'operazione di scomposizione della varianza, inventata da Fisher negli anni '30 del '900, che costituisce ancora oggi una delle più fondamentali tecniche di analisi dei dati sperimentali. Tuttavia, ci sono alcuni modelli che, più naturalmente di altri, sono connessi all'esecuzione dell'ANOVA fisheriana. Si tratta di modelli lineari nei quali la/le variabile/i indipendenti, che descrivono gli stimoli sperimentali, sono nominali (categoriche) e, nella letteratura anglosassone, prendono il nome di 'factors' (fattori sperimentali).
+1. La nostra miglior stima puntuale del parametro $\gamma$ di un modello statistico è $g = -7.2$, con un errore standard pari a 2.8, con 16 gradi di libertà. E'possibile che, in realtà, sia $\gamma = 0$? Qual è il P-level per l'ipotesi nulla? Devo accettarla o posso rifiutarla?
+2. La nostra miglior stima puntuale del parametro $\delta$ di un modello statistico è $d = 13.5$, con un errore standard pari a 8.4, ma non è disponibile, per questo errore standard, una stima accurata dei gradi di libertà. E'possibile che, in realtà, sia $\delta = 0$? Qual è il P-level per l'ipotesi nulla? Devo accettarla o posso rifiutarla?
+3. Uno sperimentatore ha impostato un esperimento per confrontare due tesi sperimentali (A, B). I risultati sono i seguenti (in t/ha) `A <- c(9.3, 10.2, 9.7)` e `B <- c(12.6, 12.3, 12.5)`. Stabilire se i risultati per le due tesi sperimentali possono essere considerati significativamente diversi, per un livello di probabilità di errore di I specie del 5%.
+4. Uno sperimentatore ha impostato un esperimento per confrontare se l'effetto di un fungicida è significativo, in un disegno sperimentale con tre ripetizioni. Con ognuna delle due opzioni di trattamento i livelli di infestazione (in percentuale) sono: `A <- c(6.5, 7.1, 6.8)` e `NT <- c(54.1, 48.2, 63.1)`. E'significativo l'effetto del trattamento fungicida, per un livello di probabilità del 5%? SUGGERIMENTO: prestare attenzione all'omogeneità delle varianze.
+5. Con un esperimento in laboratorio, abbiamo stimato che il tasso di degradazione di una sostanza xenobiotica in acqua è $k_1 = -0.071 \pm 0.012$ (7 gradi di libertà). Per una sostanza affine il tasso di degradazione è pari a $k_2 = -0.153 \pm 0.024$ (7 gradi di lbertà); possiamo concludere che il tasso di degradazione delle due sostanze, in realtà, non è significativamente diverso?
+6. In un ospedale, è stata misurata la concentrazione di colesterolo nel sangue di otto pazienti, prima e dopo un trattamento medico. Per ogni paziente, sono stati analizzati due campioni, ottenendo le seguenti concentrazioni (in ordine di paziente): `Prima <- c(167.3, 186.7, 107.0, 214.5, 149.5, 171.5, 161.5, 243.6)` e `Dopo <- c(166.7, 184.2, 104.9, 205.3, 148.5, 157.3, 149.4, 241.5)`. Si può concludere che il trattamento medico è stato efficace?
+7. Un veterinario ha organizzato un esperimento per valutare l'effetto di una dieta innovativa, sulla pressione arteriosa sistolica di cavalli da corsa. Le informazioni preliminari mostrano con chiarezza che questa dieta innovativa non può avere effetti negativi, ma, eventualmente, solo positivi. Il ricercatore ha selezionato a caso 16 animali, ne ha misurato la pressione arteriosa a riposo ed ha ripetuto la stessa misurazione dopo sei mesi di questa dieta. I risultati ottenuti sono i seguenti: I risultati ottenuti sono: `prima <- c(113.5, 116.5, 118.1, 111.3, 116.8, 117.0, 114.8, 114.9, 114.8, 114.2, 115.0, 114.0, 114.4, 116.1, 117.9, 115.7)` e `dopo <- c(110.9, 110.1, 110.3, 116.8, 112.2, 111.0, 111.1, 112.9, 110.6, 109.1, 113.1, 109.9, 111.9, 110.1, 114.2, 111.0)`. Stabilire se la dieta è efficace, con una probabilità di errore P < 0.05. SUGGERIMENTO: ricordare che la l'effetto atteso della dieta, per le informazioni preliminari disponibili, può, eventualmente, essere solo quello di abbassare la pressione, mai quello di alzarla.
+8. I Q.I. di 16 studenti provenienti da un quartiere di una certa città sono risultati pari a: `QI1 <- c(90.31, 112.63, 101.93, 121.47, 111.37, 100.37, 106.80, 101.57, 113.25, 120.76,  88.58, 107.53, 102.62, 104.26, 95.06, 104.88)`. Gli studenti provenienti da un altro quartiere della stessa città hanno invece mostrato i seguenti Q.I.: `QI2 <- c(90.66, 101.41, 104.61,  91.77, 107.06,  89.51,  87.91, 92.31, 112.96,  90.33,  99.86,  88.99,  98.97,  97.92)`. Esiste una differenza significativa tra i Q.I. nei due quartieri della città?
+9. Viene estratto un campione di rondelle da una macchina in perfette condizioni di funzionamento. Lo spessore delle rondelle misurate è: `S1 <- c(0.0451, 0.0511, 0.0478, 0.0477, 0.0458, 0.0509, 0.0446, 0.0516, 0.0458, 0.0490)`. Dopo alcuni giorni, per determinare se la macchina sia ancora a punto, viene estratto un altro campione di 10 rondelle, il cui spessore medio risulta: `S2 <- c(0.0502, 0.0528, 0.0492, 0.0556, 0.0501, 0.0500, 0.0498, 0.0526, 0.0517, 0.0550)`. Verificare se la macchina sia ancora ben tarata, oppure necessiti di revisione.
+10. Le varianze di due campioni composti da 30 unità sono risultate pari, rispettivamente a 115.3 e 356.4; stabilire se il secondo campione ha una varianza significativamente più alta del primo. SUGGERIMENTO: considerare che il rapporto tra due varianze di campioni estratti dalla stessa popolazione gaussiana segue la distribuzione F di Fisher. Considerare anche che, in R, la funzione `pf(x, n1, n2, lower.tail = F)` restituisce la probabilità di ottenere valori pari o superiori ad $x$, da una distribuzione $F$ di Fisher con $n1$ ed $n2$ gradi di libertà. Considerare anche che il rapporto di due varianze può solo essere positivo.
+11. Un agronomo ha organizzato un esperimento varietale, per confrontare tre varietà di frumento, cioè GUERCINO, ARNOVA e BOLOGNA. Per far questo ha individuato, in un campo uniforme dell'areale umbro, trenta parcelle da 18 m^2^ e ne ha selezionate dieci a caso, da coltivare con GUERCINO, altre dieci a caso sono state coltivate con ARNOVA e le ultime dieci sono state coltivate con BOLOGNA. Al termine dell'esperimento, le produttività osservate erano le seguenti: `guercino <- c(53.2, 59.1, 62.3, 48.6, 59.7, 60, 55.7, 55.8, 55.7, 54.4)`, `arnova <- c(53.1, 51, 51.9, 55.3, 58.8, 54.6, 53, 51.4, 51.7, 64.7)` e `bologna <- c(43.5, 41, 41.2, 44.8, 40.2, 37.2, 45.3, 38.9, 42.9, 39.3)`. Descrivere i tre campioni, utilizzando opportunamente un indicatore di tendenza centrale ed un indicatore di variabilità. Inferire le medie delle tre popolazioni (cioè quelle che hanno generato i tre campioni), utilizzando opportunamente un intervallo di incertezza. Per ognuna delle tre coppie (guercino vs arnova, guercino vs bologna, arnova vs bologna), valutare la differenza tra le medie e il suo errore standard. Valutare la significatività della differenza tra le medie delle tre popolazioni, esplicitando l'ipotesi nulla e calcolando il livello di probabilità di errore nel rifiuto dell'ipotesi nulla.
 
-Questi modelli rappresentano il punto di ingresso nell'analisi dei dati e la gran parte della letteratura scientifica è basata proprio su questi modelli. Pertanto, ad essi dedicheremo ampio spazio nel seguito di questo libro.
 
-## Caso-studio: confronto tra erbicidi in vaso
+
+
+
+<!--chapter:end:07-TestIpotesi.Rmd-->
+
+# Verifica dei modelli
+
+
+
+Nei capitoli precedenti, abbiamo studiato i modelli come "strumenti" per descrivere le relazioni causa-effetto tra le variabili sperimentali e per trarre conclusioni testando ed eventualmente rigettando ipotesi scientifiche rilevanti. Tuttavia, abbiamo anche visto che i modelli statistici e le inferenze su di essi basate, assumono che siano verificate alcune condizioni fondamentali:
+
+1.  il modello fornisce una buona descrizione dei dati sperimentali (bontà di adattamento);
+2.  i residui sono indipendenti l'uno dall'altro (indipendenza);
+3.  i residui hanno una distribuzione gaussiana di probabilità (normalità);
+4.  tutti i residui hanno la stessa varianza (omoschedasticità).
+
+Oltre alle ipotesi di cui sopra, i dati osservati devono rispettare anche un altro requisito essenziale: l'assenza di valori anomali (*outliers*), ovvero osservazioni che differiscono notevolmente da tutte le altre osservazioni nello stesso gruppo di trattamento. Questi valori anomali producono residui negativi o positivi enormi, che possono essere molto influenti, sia per il test d'ipotesi che per l'affidabilità delle stime.
+
+Purtroppo, bisogna riconoscere che i problemi relativi alle assunzioni di base sono tutt'altro che infrequenti, come vedremo in seguito.
+
+## Deviazioni rispetto alle assunzioni di base
+
+La mancanza di 'bontà d'adattamento' (più semplicemente: 'mancanza d'adattamento') può verificarsi quando le previsioni del modello sembrano deviare sistematicamente rispetto ai dati osservati, ad esempio quando una modello di regressione lineare viene adattato ad una risposta curvilinea. In caso di mancanza di adattamento, dovremo concludere che i dati e il modello non si supportano a vicenda e, quindi, che il modello "non consente al ricercatore di rispondere alle sue domande scientifiche" (Kass et al., 2016).
+
+La mancanza d'indipendenza dei residui del modello può verificarsi a causa di:
+
+1.  intrusioni sistematiche,
+2.  presenza di fattori di raggruppamento non considerati nel modello,
+3.  mancanza di adattamento sistematica dovuta alla selezione errata del modello, o
+4.  mancanza di randomizzazione adeguata (vedere anche Sezione 4.6 e Capitolo 12).
+
+La mancanza di indipendenza è considerata una delle assunzioni di base più pericolose da violare, poiché comporta un rischio elevato di errore di I specie (Frey et al., 2024), ovvero un rischio maggiore di rifiutare erroneamente un'ipotesi nulla vera (falso positivo).
+
+La normalità viene violata quando i residui del modello non "riflettono" la forma tipica di una distribuzione gaussiana, ovvero quando sono asimmetrici (distribuzione asimmetrica: la media non è uguale alla mediana) o quando le code sono troppo 'alte' (distribuzione platicurtica: troppi valori estremi) o troppo 'basse' (distribuzione leptocurtica: i valori sono troppo "concentrati" attorno alla media)(Fig. \@ref(fig:figName100prima)). In assenza di *outliers* (vedi più avanti), la non normalità è considerata meno dannosa di altre deviazioni (Knief e Forstmeier, 2021), in quanto non provoca forti distorsioni nella stima dei parametri od un incremento del rischio di errore di I specie. Tuttavia, si raccomanda sempre un atteggiamento cauto, poiché le deviazioni dalla normalità possono essere associate ad altri tipi di deviazioni più pericolose, come l'eteroschedasticità. Deviazioni dalla normalità possono verificarsi anche a causa della presenza di *outliers*, collegati ad errori casuali di entità eccezionale (ad esempio, procedure difettose, scarso controllo o intrusioni di qualsiasi tipo). Questi *outliers* modificano profondamente medie e deviazioni standard, portando ad un'errata interpretazione dei risultati sperimentali (Cochran, 1947).
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName100prima-1.png" alt="Alcune distribuzioni non-normali dei residui." width="85%" />
+<p class="caption">(\#fig:figName100prima)Alcune distribuzioni non-normali dei residui.</p>
+</div>
+
+L'eteroschedasticità può verificarsi, ad esempio, quando i trattamenti sperimentali producono effetti sia sulla media che sulle deviazioni standard (ad esempio, effetti moltiplicativi) in modo tale che queste due statistiche diventino proporzionali tra loro (quando la media aumenta, aumenta proporzionalmente anche la deviazione standard). Altre cause comuni di eteroschedasticità includono attacchi di parassiti e altre intrusioni, nonché un grado inferiore di controllo in alcune parti dell'esperimento di campo. È stato dimostrato che l'eteroschedasticità si traduce in una stima distorta della deviazione standard dei residui e porta a P-value non validi, così che il reale rischio d'errore di I specie può essere anche molto diverso da quello nominale (Glass et al., 1972).
+
+## Scoprire le violazioni
+
+Il rispetto di alcune assunzioni di base, come l'indipendenza dei residui e l'assenza di errori sistematici, è garantito dall'adozione di un disegno sperimentale a 'regola d'arte', cioè basato su repliche indipendenti e correttamente randomizzate. Bisogna tenere presente che gli eventuali vincoli alla randomizzazione introdotti in fase di disegno sperimentale (blocchi randomizzati, quadrato latino, split-plot...) possono inficiare l'indipendenza dei residui; ad esempio, con i blocchi randomizzati, le osservazioni all'interno dello stesso blocco si assomigliano di più che non quelle in blocchi diversi, proprio perché condividono le condizioni ambientali caratteristiche di ciascun blocco. Insomma, si realizza un certo grado di 'parentela' tra le osservazioni, che non è compatibile con l'ipotesi di totale indipendenza. Vedremo nei capitoli successivi che queste situazioni vengono gestite includendo nel modello ANOVA anche il fattore di blocco o gli altri vincoli eventualmente imposti alla randomizzazione completa.
+
+Per quanto riguarda le altre assunzioni di base, come la bontà di adattamento, l'omogeneità delle varianze e la normalità dei residui, la verifica può essere fatta solo *a posteriori*, cioè dopo aver effettuato la stima dei parametri ed aver individuato i residui stessi.
+
+Oltre a quanto abbiamo finora dotto, dobbiamo anche tener presente che il dataset non dovrebbe contenere le cosiddette osservazioni aberranti od *outliers*. Si tratta di osservazioni molto diverse dalle altre, che spesso fanno sospettare che sia avvenuto qualche errore grossolano; la loro assenza non è postulata da alcun modello statistico, anche se esse, proprio perché molto diverse dalle altre, finiscono per inficiare la normalità dei residui e l'omogeneità delle varianze, oltre a stravolgere pericolosamente le nostre conclusioni. Pertanto, alla loro individuazione deve essere sempre dedicata la debita attenzione.
+
+Per diagnosticare eventuali problemi con le assunzioni di base e/o con la presenza di outliers, possiamo utilizzare sia metodi grafici che metodi formali, basati sul test d'ipotesi. Vediamo ora alcune possibilità.
+
+## Analisi grafica dei residui
+
+Dato che la gran parte delle assunzioni riguarda la struttura dei residui, l'ispezione grafica di questi ultimi è in grado di evidenziare chiaramente la gran parte dei problemi e dovrebbe, pertanto, essere considerata come una metodica da applicare in modo routinario. Esistono diversi tipi di grafici, ma ne elenchiamo fondamentalmente due: il grafico dei residui contro i valori attesi e il QQ-plot.
+
+### Grafico dei valori osservati, aumentato con le previsioni del modello
+
+Per tutti i tipi di modelli di regressione, lo strumento più importante per verificare la bontà di adattamento è un grafico a dispersione della risposta osservata rispetto al predittore, integQuest'ultima dovrebbe seguire fedelmente i dati osservati (Fig. \@ref(fig:figName100)A) senza mostrare alcun segno di deviazioni sistematiche, come illustrato nelle Figure \@ref(fig:figName100)B, C e D.
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName100-1.png" alt="Grafico a dispersione delle risposte osservate (simboli), integrati con le previsioni del modello (linee e curve). Il panel in alto a sinistra mostra un modello con un buon adattamento, mentre gli altri grafici mostrano diversi tipi di violazioni."  />
+<p class="caption">(\#fig:figName100)Grafico a dispersione delle risposte osservate (simboli), integrati con le previsioni del modello (linee e curve). Il panel in alto a sinistra mostra un modello con un buon adattamento, mentre gli altri grafici mostrano diversi tipi di violazioni.</p>
+</div>
+
+### Grafico dei residui contro i valori attesi
+
+Il metodo grafico più utilizzato per l'analisi dei residui consiste nel plottare i residui stessi contro i valori attesi. Se non vi sono problemi, i punti nel grafico dovrebbero essere distribuiti in modo assolutamente casuale, come in Figura \@ref(fig:figName101), in alto a sinistra. Le osservazioni aberranti (*outliers*) appaiono invece come punti isolati rispetto agli altri (Fig. \@ref(fig:figName101); in alto a destra). L'eterogeneità delle varianze è invece indicata da residui che si allargano o si stringono procedendo verso i margini del grafico (Figura \@ref(fig:figName101), in basso a sinistra), facendo emergere una sorta di proporzionalità tra media e varianza. In ultimo, la mancanza di adattamento nei modelli di regressione è evidenziata da un qualche evidente *pattern*, come quando i residui sono tendenzialmente negativi per bassi valori attesi e positivi per alti valori, chiaro segnale di un modello deterministico che sovrastima le osservazioni quando sono basse e le sottostima quando sono alte (Fig. \@ref(fig:figName101); in basso a destra).
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName101-1.png" alt="Plot dei residui contro i valori attesi: una disposizione dei punti totalmente casuale supportata l'ipotesi che le assunzioni di base siano rispettate (in alto a sinistra). Gli *outliers* sono evidenziati come punti 'isolati' (in alto a destra), mentre una disposizione ad 'imbuto' rivela che le varianze sono direttamente o inversamente proporzionali alle medie (in basso a sinistra). La mancanza d'adattamento è invece rivelata da un qualkunque evidente pattern nella disposizione dei punti, come, ad esempio, dei residui associati di ugual segno in una certa zona del grafico (in basso a destra)."  />
+<p class="caption">(\#fig:figName101)Plot dei residui contro i valori attesi: una disposizione dei punti totalmente casuale supportata l'ipotesi che le assunzioni di base siano rispettate (in alto a sinistra). Gli *outliers* sono evidenziati come punti 'isolati' (in alto a destra), mentre una disposizione ad 'imbuto' rivela che le varianze sono direttamente o inversamente proporzionali alle medie (in basso a sinistra). La mancanza d'adattamento è invece rivelata da un qualkunque evidente pattern nella disposizione dei punti, come, ad esempio, dei residui associati di ugual segno in una certa zona del grafico (in basso a destra).</p>
+</div>
+
+### QQ-plot
+
+Per evidenziare problemi di non-normalità, risulta molto utile un QQ-plot (quantile-quantile plot), nel quale i residui *standardizzati* vengono 'plottati' contro i rispettivi percentili di una distribuzione normale standardizzata. Con residui normali, queste due entità (i residui standardizzati e i percentili corrispondenti di una distribuzione normale standardizzata) sono largamente coincidenti, in modo che i punti nel QQ-plot giacciono lungo la bisettrice del primo e del terzo quadrante (\@ref(fig:figName105) in alto a sinistra).
+
+Le deviazioni più diffuse dalla normalità sono relative alla simmetria (skewness) e alla curtosi della popolazione da cui i residui sono campionati. In particolare, può capitare che i residui provengano da una popolazione con asimmetria positiva (right-skewed), come, ad esempio, una popolazione log-normale. In questo caso, la media è maggiore della mediana e i residui negativi sono più numerosi, ma più piccoli in valore assoluto di quelli positivi. Il QQ-plot si presenta come in figura \@ref(fig:figName105) in alto al centro. Al contrario, se i residui provengono da una popolazione con asimmetria negativa ('left-skewed'), caratterizzata, ad esempio, da una funzione di densità 'beta', la media è minore della mediana e, di conseguenza, i valori positivi sono più numerosi, ma più vicini allo zero di quelli negativi. In questa situazione, il QQ-plot presenta un andamento abbastanza tipico, come indicato in Figura \@ref(fig:figName105) in alto a destra.
+
+Per quanto riguarda la curtosi, è necessario osservare le code della distribuzione: se queste sono più alte di una distribuzione normale parliamo di distribuzione platicurtica, mentre se sono più basse parliamo di distribuzione leptocurtica. Ad esempio, se i residui provengono da una distribuzione t di Student con pochi gradi di libertà sono platicurtici ed il QQ-plot mostra l'andamento indicato in figura \@ref(fig:figName105) in basso a sinistra. Al contrario, se i residui provengono da una distribuzione uniforme sono tipicamente leptocurtici e presentano un QQ-plot come quello riportato in Figura \@ref(fig:figName105) in basso al centro.
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName105-1.png" alt="QQ-plot per residui gaussiani (in alto a sinistra) e per residui che mostrano diversi tipi di violazioni dalla normalità (vedi anche Fig. 8.1)."  />
+<p class="caption">(\#fig:figName105)QQ-plot per residui gaussiani (in alto a sinistra) e per residui che mostrano diversi tipi di violazioni dalla normalità (vedi anche Fig. 8.1).</p>
+</div>
+
+## Test d'ipotesi
+
+La valutazioni illustrate in precedenza sono basate sulla semplice osservazione di uno o più grafici, ma sono considerate sufficientemente attendibili per la maggior parte delle situazioni. Tuttavia, esistono anche test statistici formali che consentono di saggiare l'ipotesi nulla di 'assenza di deviazioni', che può essere rifiutata qualora il P-level fosse inferiore a 0.05.
+
+Rispetto alle procedure grafiche, il test d'ipotesi formale può dare una miglior sensazione di obiettività, anche se non è tutto oro quel che luccica. Infatti, questi test possono creare più problemi di quanti ne risolvano dato che, ad esempio, richiedono campioni di grandi dimensioni e fanno affidamento su assunzioni di base molto stringenti, tanto che, alla fine, l'affidabilità dei risultati è spesso discutibile (Kozak e Piepho 2018). Per questi motivi, il loro utilizzo è sconsigliato e dovrebbe essere riservato a supportare situazioni complesse in cui i metodi grafici non forniscono risposte sufficientemente chiare.
+
+Le procedure presentate in questo capitolo sono state selezionate perché ampiamente utilizzate e facilmente disponibili in R.
+
+### Test di Levene per l'omogeneità delle varianze
+
+Secondo gli studi di Conover et al. (1981), il test di Levene è una delle procedure più affidabili per saggiare l'ipotesi di omoschedasticità nei modelli con predittori nominali; consiste nel'eseguire l'analisi della varianza di una 'pseudo-risposta', ottenuta sostituendo ciascun dato osservato con il valore assoluto della sua differenza con il centro del gruppo a cui appartiene (dati 'group-centered').
+
+Inizialmente, Levene propose di utilizzare come centro di gruppo la media; l'idea di fondo era che, sebbene le medie di gruppo di dati 'group-centered' siano pari a zero, prendendo i valori assoluto (cioè rimuovendo i segno negativi), queste medie diventano diverse da zero e sono tanto più alte quanto più la varianza di gruppo è alta. Questo concetto sarà più semplice da comprendere utilizzando un esempio pratico. Consideriamo due gruppi sperimentali `A <- c(19, 20, 21)` e `B <- c(26, 30, 34)`, che hanno, rispettivamente, medie pari a 20 e 30, e varianze pari a 1 e 16. Sottraendo dalle osservazioni di ogni gruppo la media del gruppo stesso, otteniamo le pseudo-osservazioni `Ac <- c(-1, 0, 1)` e `Bc <- c(-4, 0, 4)`, la cui media è zero, mentre le varianze restano inalterate. Se escludiamo i segno negativi, le medie dei due gruppi divengono pari, rispettivamente, a 2/3 e 8/3, mostrando come il gruppo con più alta varianza abbia prodotto pseudo-osservazioni con media più alta. Se la differenza tra le due medie delle pseudo-osservazioni è significativa, l'ipotesi nulla di omogeneità delle varianze può essere rigettata.
+
+
+
+Lavori successivi (Brown e Forsythe, 1974) hanno mostrato che è preferibile sostituire la media del gruppo con la sua mediana, per ottenere un test più robusto per dati non normali.
+
+Sia il test di Levene che il test di Brown-Forsythe sono disponibili nella funzione `leveneTest()` del package `car`, ma il secondo è largamente preferito e considerato come la procedura di 'default'. Un esempio di questo test è fornito nel Riquadro 8.3, che confronta due genotipi di mais in un disegno completamente randomizzato con 11 repliche. Il secondo genotipo (B) presenta una varianza maggiore e il test di Levene risulta significativo (il valore P è inferiore a 0,05 e l'ipotesi nulla di omoschedasticità viene rifiutata). I due test (centrato sulle medie o centrato sulle mediane) producono risultati simili, il che potrebbe suggerire che i dati originali non si discostino significativamente dalla normalità.
+
+
+```r
+# Code Box 8.1
+# Testing hypotheses about model residuals
+# Levene’s test for homoscedasticity
+library(car)
+
+# Entering the data
+dataset <- data.frame(Genotype = c("A", "A", "A", "A", "A",
+                                   "A", "A", "A", "A", "A",
+                                   "A", "B", "B", "B", "B",
+                                   "B", "B", "B", "B", "B",
+                                   "B", "B"),
+                      Yield = c(10.0, 10.7, 11.9, 10.3, 10.0,
+                                7.8, 10.4, 9.7, 10.0, 9.2, 9.7,
+                                15.0, 11.2, 13.7, 11.9, 9.4,
+                                10.6, 12.6, 10.1, 9.9, 15.3, 12.2))
+head(dataset)
+##   Genotype Yield
+## 1        A  10.0
+## 2        A  10.7
+## 3        A  11.9
+## 4        A  10.3
+## 5        A  10.0
+## 6        A   7.8
+dataset$Genotype <- factor(dataset$Genotype)
+
+# Fitting the model
+mod <- lm(Yield ~ Genotype, data = dataset)
+
+# Centering the data by subtracting, for each genotype 
+# the group mean (Levene’s test)
+GroupMeans <- tapply(dataset$Yield, dataset$Genotype, mean)
+YieldC <- dataset$Yield - rep(GroupMeans, each = 11)
+
+# Re-fitting the same model to the absolute values of 
+# centered data and run an ANOVA
+modlevene <- lm(abs(YieldC) ~ dataset$Genotype)
+anova(modlevene)
+## Analysis of Variance Table
+## 
+## Response: abs(YieldC)
+##                  Df  Sum Sq Mean Sq F value  Pr(>F)  
+## dataset$Genotype  1  5.2129  5.2129  5.8944 0.02475 *
+## Residuals        20 17.6878  0.8844                  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+# Centering the data by subtracting, for each genotype
+# the group median (Brown-Forsythe’s test)
+GroupMedians <- tapply(dataset$Yield, dataset$Genotype, median)
+YieldC <- dataset$Yield - rep(GroupMedians, each = 11)
+
+# Re-fitting the same model to the absolute values of # centered data and run an ANOVA
+modlevene <- lm(abs(YieldC) ~ dataset$Genotype)
+anova(modlevene)
+## Analysis of Variance Table
+## 
+## Response: abs(YieldC)
+##                  Df  Sum Sq Mean Sq F value  Pr(>F)  
+## dataset$Genotype  1  5.2041  5.2041  5.7245 0.02666 *
+## Residuals        20 18.1818  0.9091                  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+# Non-robust Levene’s test with R (centering with means)
+leveneTest(mod, center = "mean")
+## Levene's Test for Homogeneity of Variance (center = "mean")
+##       Df F value  Pr(>F)  
+## group  1  5.8944 0.02475 *
+##       20                  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+# Levene’s test with R (centering with medians; default)
+leveneTest(mod)
+## Levene's Test for Homogeneity of Variance (center = median)
+##       Df F value  Pr(>F)  
+## group  1  5.7245 0.02666 *
+##       20                  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+### Test di Shapiro-Wilk per la normalità
+
+Il test di Shapiro-Wilk per la normalità fornisce la statistica W e un valore P per l'ipotesi nulla che i residui siano distribuiti normalmente. La procedura di test non è così semplice come quella del test di Levene e i calcoli manuali non sono altrettanto facili da eseguire. Tuttavia, possiamo utilizzare la funzione `shapiro.test()` in R, passando i residui del modello come argomento (vedi l'esempio seguente).
+
+### Altri test
+
+Vale la pena menzionare alcune tecniche numeriche per l'individuazione di valori anomali, come i metodi proposti da Anscombe e Tukey (1963) e Grubbs (1969).
+
+## Esempio 8.1: Analisi dei residui per il dataset "mixture"
 
 Abbiamo eseguito un esperimento in vaso, nel quale abbiamo utilizzato quattro trattamenti erbicidi:
 
@@ -2286,17 +3245,26 @@ Abbiamo eseguito un esperimento in vaso, nel quale abbiamo utilizzato quattro tr
 3.  Metribuzin + rimsulfuron
 4.  Testimone non trattato
 
-Lo scopo dell'esperimento era quello di verificare se la miscela metribuzin e rimsulfuron è più efficace dei due componenti utilizzati separatamente. L'esperimento era disegnato a randomizzazione completa con quattro repliche e prevedeva il rilievo della biomassa presente su ogni vaso, tre settimane dopo il trattamento: un più basso valore di biomassa implica un miglior effetto del trattamento.
+Lo scopo dell'esperimento era quello di verificare se la miscela metribuzin e rimsulfuron è più efficace dei due componenti utilizzati separatamente.
 
-I risultati di questo esperimento sono riportati nel dataset 'mixture.csv', che è disponibile su una repository web. Per prima cosa, carichiamo il file.
+A questo fine, sono stati preparati sedici vasi uniformi e sono stati seminati con *Solanum nigrum*, un importante infestante di alcune colture primaverili estive, come mais e pomodoro. Quando le piante hanno raggiunto lo stadio di 4 foglie vere, sono state trattate con una delle tesi sopra elencate, secondo un disegno sperimentale completamente randomizzato con quattro repliche. Tre settimane dopo i trattamenti, le piante in ciascun vaso sono state raccolte e pesate; minore era il peso, maggiore era l'efficacia degli erbicidi (Onofri et al. 1995).
 
-\vspace{12pt}
+Per questo esperimento, è possibile adattare un modello lineare con un predittore nominale (il trattamento erbicida) (vedere Eq. 4.6 nel Cap. 4), come mostrato nel riquadro sottostante.
 
 
 ```r
-fileName <- "https://www.casaonofri.it/_datasets/mixture.csv"
-dataset <- read.csv(fileName, header = T)
-head(dataset)
+# Code box 8.2
+# Example 8.1
+# Checking the residuals for the `mixture' data
+
+# Loading the packages
+library(statforbiology)
+library(car)
+
+# Loading and transforming the data
+mixture <- getAgroData("mixture")
+mixture$Treat <- factor(mixture$Treat)
+head(mixture)
 ##             Treat Weight
 ## 1 Metribuzin__348  15.20
 ## 2 Metribuzin__348   4.38
@@ -2304,689 +3272,13 @@ head(dataset)
 ## 4 Metribuzin__348   6.80
 ## 5     Mixture_378   6.14
 ## 6     Mixture_378   1.95
+# Model fitting
+mod1 <- lm(Weight ~ Treat, data = mixture)
 ```
 
-Il dataset è organizzato come un database, nel quale ogni riga contraddistingue un'unità sperimentale (record) e ogni colonna rappresenta una caratteristica del record (campo). In questo caso abbiamo due colonne: una per la variabile indipendente (fattore sperimentale 'Treat'), che ci dice con quale erbicida è stata trattata ogni unità sperimentale, ed una per la variabile dipendente ('Weight').
+Dopo aver effettuato la stima dei parametri, i grafici dei residui possono essere ottenuti utilizzando la funzione `plot()` applicata al risultato del fitting lineare. L'argomento 'which' specifica il tipo di grafico: se utilizziamo: 'which = 1' otteniamo il grafico dei residui verso gli attesi, se invece utilizziamo 'which = 2' otteniamo il QQ-plot. I due comandi sono:
 
-## Descrizione del dataset
-
-La prima analisi dei dati consiste nella valutazione descrittiva del dataset. In particolare, calcoliamo:
-
-1.  le medie per ogni tesi sperimentale
-2.  Le deviazioni standard per ogni tesi sperimentale
-
-Utilizziamo la funzione `tapply` in R.
-
-
-```r
-medie <- tapply(dataset$Weight, dataset$Treat, mean)
-SDs <- tapply(dataset$Weight, dataset$Treat, sd)
-descrit <- cbind(medie, SDs)
-descrit
-##                   medie      SDs
-## Metribuzin__348  9.1750 4.699089
-## Mixture_378      5.1275 2.288557
-## Rimsulfuron_30  16.8600 4.902353
-## Unweeded        26.7725 3.168673
-```
-
-Che cosa ci dice questa tabella, in base agli obiettivi dell'esperimento?
-
-Ci suggerisce che:
-
-1.  La miscela sembra leggermente più efficace dei prodotti singoli
-2.  Esiste una certa variabilità (errore sperimentale), che impedisce un giudizio certo
-3.  La variabilità è abbastanza simile per tutti i trattamenti
-
-## Definizione di un modello lineare
-
-Sappiamo che, dietro ai campioni osservati, vi sono una o più popolazioni di riferimento, alle quali è rivolto il nostro interesse: abbiamo infatti osservato $m_1$, $m_2$, $m_3$ ed $m_4$ (le medie dei campioni), ma siamo effettivamente interessati a conoscere $\mu_1$, $\mu_2$, $\mu_3$ e $\mu_4$, cioè le medie delle popolazioni da cui i campioni sono tratti. E siamo anche interessati a capire se la differenza è sufficientemente ampia da poter ritenere che non sia di natura puramente casuale.
-
-Per descrivere le osservazioni possiamo utilizzare un modello lineare del tipo:
-
-$$Y_i = \mu + \alpha_j + \varepsilon_i$$
-
-Questo modello impone che le osservazioni $Y$ derivino da una valore $\mu$, detto intercetta, a cui si aggiunge l'effetto del trattamento $\alpha_j$ e l'effetto stocastico $\varepsilon$, che è un elemento che influenza ogni singola osservazione $i$.
-
-Il valore atteso per un soggetto, in assenza di errore sperimentale, è:
-
-$$\bar{Y_i} = \mu + \alpha_j$$
-
-È abbastanza facile intuire che, se non ci fosse l'errore sperimentale, un soggetto dovrebbe avere un valore pari alla media del gruppo di cui fa parte, per cui:
-
-$$\bar{Y_i} = \mu_j = \mu + \alpha_j$$
-
-## Parametrizzazione del modello
-
-Dobbiamo spendere alcune parole per capire il significato della espressione prima riportata ($Y_i = \mu + \alpha_j + \varepsilon_i$) con la quale, di fatto, ci stiamo proponendo di ottenere la quantità $Y_i$ (ognuno dei dati osservati) come somma di tre valori incogniti. È chiaro che, posto in questi termini, il problema è indeterminato. Infatti esistono infinite triplette di valori che, sommati, possono restituire $Y_i$, qualunque esso sia. Proviamo per un attimo a considerare il primo dato del nostro dataset, cioè $15.20$: esso può essere ottenuto come $10 + 5 + 0.2$ oppure come $9 + 6 + 0.2$ oppure in un numero infinito di altri modi diversi. Come facciamo allora a individuare i valori $\mu$, $\alpha_j$ e $\varepsilon_i$? Dobbiamo porre qualche vincolo, in modo che il problema diventi determinato.
-
-Una prima possibilità consiste nell'imporre che la somma degli $\alpha_j$ sia pari a 0 (**vincolo sulla somma**). Abbiamo visto che le medie dei quattro gruppi ($\mu_j$) sono pari alla somma $\mu + \alpha_j$ e quindi, sommando le quattro medie otteniamo:
-
-$$ \mu_1 + \mu_2 + \mu_3 + \mu_4 = 4 \mu + \sum{\alpha_j}$$
-
-Con il vincolo sulla somma:
-
-$$ \mu_1 + \mu_2 + \mu_3 + \mu_4 = 4 \mu$$
-
-quindi:
-
-$$\mu = \frac{\mu_1 + \mu_2 + \mu_3 + \mu_4}{4} $$
-
-cioè $\mu$ è la media generale e $\alpha_j$ rappresentano gli scostamenti di ogni trattamento rispetto alla media generale, usualmente definiti **effetti dei trattamenti**. Se un prodotto è efficace, abbasserà di più il peso delle infestanti e quindi avrà un elevato effetto negativo.
-
-Ora il problema è completamente definito: se $\mu = 14.48375$ e $\mu_1 = 9.175$ allora deve essere $\alpha_1 = 9.175 - 14.48375 = -5.30875$ ed $\epsilon_1 = 15.20 - 9.175 = 6.025$, cosicché $14.48375 - 5.30875 + 6.025 = 15.20 = Y_1$.
-
-Questa parametrizzazione con vincolo sulla somma è abbastanza ben 'comprensibile' e, se il disegno è bilanciato, è facile stimare i parametri 'a mano', partendo dalle medie aritmetiche dei trattamenti e dalla media generale, come vedremo tra poco. Tuttavia, non possiamo non precisare che questa parametrizzazione non è quella utilizzata di default dalla gran parte dei software statistici, incluso R. In particolare, R impone il vincolo che $\alpha_1 = 0$ (**vincolo sul trattamento**), in modo che:
-
-$$ \left\{ {\begin{array}{l}
-\mu_1 = \mu + \alpha_1 = \mu + 0\\
-\mu_2 = \mu + \alpha_2 \\
-\mu_3 = \mu + \alpha_3 \\
-\mu_4 = \mu + \alpha_4
-\end{array}} \right.$$
-
-Di conseguenza, $\mu$ è la media del primo trattamento, usualmente inteso in ordine alfabetico (ma il riferimento può cambiare, a seconda delle esigenze) a i valori $\alpha_j$, sono differenze tra le medie dei gruppi da 2 a 4 con la media del gruppo 1. Anche in questo caso, il problema è completamente definito: la prima osservazione deve essere ottenuta sommando $\mu = 9.175$ (media del primo trattamento), $\alpha_1 = 0$ ed un valore $\epsilon$ che possiamo individuare come pari a $\epsilon_1 = Y_1 - \mu_1 = 5.20 - 9.175 = 6.025$.
-
-Vediamo che le stima di $\mu$ ed $\alpha_j$ ottenute con le due parametrizzazioni sono diverse, ma il residuo $\epsilon$ non cambia. Nel seguito di questo libro, per i calcoli manuali utilizzeremo sempre il vincolo sulla somma, che è più facile da gestire e dovremo tener presente che le nostre stime non corrisponderanno con quelle ottenute con R con le impostazioni di default. Ma, come vedremo, entrambi i metodi ci porteranno alle stesse conclusioni.
-
-## Assunzioni di base
-
-In questa costruzione algebrica abbiamo implicitamente posto alcuni 'punti fermi', detti **assunzioni di base**, che sono i seguenti:
-
-1.  la componente deterministica è lineare e additiva ($\mu + \alpha_j$)
-2.  non vi sono altri effetti, se non il trattamento e l'errore, che è puramente stocastico, senza componenti sistematiche
-3.  gli errori sono campionati in modo indipendente, da una distribuzione normale, con media 0 e deviazione standard $\sigma$
-4.  le varianze sono omogenee (unico valore di $\sigma$, comune per tutti i gruppi)
-
-È evidente che il nostro dataset deve conformarsi a queste nostre aspettative, altrimenti il modello è invalido. Ci occuperemo di questa verifica nel prossimo capitolo.
-
-## Fitting del modello: metodo manuale
-
-Abbiamo definito un modello con il quale descrivere le nostre osservazioni sperimentali. Ora bisogna assegnare un valore ai parametri di questo modello, cioè $\mu$, $\alpha_1$, $\alpha_2$, $\alpha_3$, $\alpha_4$ e $\sigma$, in modo che il modello non sia più una rappresentazione generale di un fenomeno, bensì diventi una rappresentazione specifica del nostro esperimento. Anche se nella pratica professionale il *model fitting* viene eseguito con il computer, inzialmente procederemo a mano, per comprendere bene il senso delle operazioni effettuate. In genere, il model fitting si compone delle seguenti fasi:
-
-1.  stima dei parametri $\mu$ ed $\alpha$;
-2.  calcolo dei residui;
-3.  stima di $\sigma$
-4.  scomposizione delle varianze;
-5.  test d'ipotesi ed inferenza.
-
-### Stima dei parametri
-
-Imponendo un vincolo sulla somma e considerando che il disegno è bilanciato (stesso numero di repliche per tutti i trattamenti), la stima dei parametri può essere fatta a mano, a partire dalle medie aritmetiche dei trattamenti e dalla media generale (metodo dei momenti). La media generale è $14.48375$, quindi:
-
-$$ \left\{ {\begin{array}{l}
-\mu = 14.48375\\
-\alpha_1 = \mu_1 - \mu = 9.175 - 14.48375 =  - 5.30875\\
-\alpha_2 = \mu_2 - \mu = 5.1275 - 14.48375 =  - 9.35625\\
-\alpha_3 = \mu_3 - \mu = 16.86 - 14.48375 =  2.37625\\
-\alpha_4 = \mu_4 - \mu = 26.7725 - 14.48375 =  12.28875\\
-\end{array}} \right.$$
-
-### Calcolo dei residui
-
-Abbiamo già visto che i valori attesi ($\bar{Y_i}$) sono pari, per ogni osservazione, alla somma tra $\mu$ e il valor $\alpha$ relativo al gruppo di cui l'osservazione fa parte. Per facilitare i calcoli, costruiamo una tabella in cui riportiamo la media generale, gli affetti $\alpha_j$ e i valori attesi, ottenuti come indicato poco fa. I residui possono essere calcolati facilmente, come scostamenti tra i valori osservati e i valori attesi (Tabella \@ref(tab:tabResidui)).
-
-
-Table: (\#tab:tabResidui)Tabella dei dati osservati, dei valori attesi, dei residui e dei loro quadrati
-
-|Erbicida        | Weight|     mu|  alpha| Attesi| Residui|
-|:---------------|------:|------:|------:|------:|-------:|
-|Metribuzin__348 |  15.20| 14.484| -5.309|  9.175|   6.025|
-|Metribuzin__348 |   4.38| 14.484| -5.309|  9.175|  -4.795|
-|Metribuzin__348 |  10.32| 14.484| -5.309|  9.175|   1.145|
-|Metribuzin__348 |   6.80| 14.484| -5.309|  9.175|  -2.375|
-|Mixture_378     |   6.14| 14.484| -9.356|  5.127|   1.012|
-|Mixture_378     |   1.95| 14.484| -9.356|  5.128|  -3.178|
-|Mixture_378     |   7.27| 14.484| -9.356|  5.128|   2.142|
-|Mixture_378     |   5.15| 14.484| -9.356|  5.128|   0.022|
-|Rimsulfuron_30  |  10.50| 14.484|  2.376| 16.860|  -6.360|
-|Rimsulfuron_30  |  20.70| 14.484|  2.376| 16.860|   3.840|
-|Rimsulfuron_30  |  20.74| 14.484|  2.376| 16.860|   3.880|
-|Rimsulfuron_30  |  15.50| 14.484|  2.376| 16.860|  -1.360|
-|Unweeded        |  24.62| 14.484| 12.289| 26.773|  -2.152|
-|Unweeded        |  30.94| 14.484| 12.289| 26.773|   4.168|
-|Unweeded        |  24.02| 14.484| 12.289| 26.773|  -2.753|
-|Unweeded        |  27.51| 14.484| 12.289| 26.773|   0.738|
-
-### Stima di $\sigma$
-
-Abbiamo detto che $\sigma$ è la deviazione standard dei residui, che tuttavia deve essere calcolata facendo attenzione al numero dei gradi di libertà. In primo luogo, calcoliamo la devianza dei residui, cioè la somma dei quadrati degli scarti rispetto alla media (RSS: *Residual Sum of Squares*). Siccome la media dei residui è zero per definizione, la devianza dei residui non è altro che la somma dei loro quadrati ed è pari a:
-
-$$\textrm{RSS} = 6.025^2 + (-4.795^2) ... + 0.738^2 = 184.1774$$
-
-I residui costituiscono lo scostamento di ogni dato rispetto alla media del trattamento e, di conseguenza, per ogni gruppo la loro somma deve essere 0. Quindi per ogni gruppo vi sono 3 gradi di libertà, cioè 12 gradi di libertà in totale (3 $\times$ 4, cioè il numero dei trattamenti per il numero delle repliche meno una). Ne consegue che la varianza dei residui è pari a:
-
-$$MS_{e}  = \frac{184.178}{12} = 15.348$$
-
-La deviazione standard $\sigma$ è:
-
-$$ \sqrt{15.348} = 3.9177$$
-
-## Scomposizione della varianza
-
-La scomposizione della varianza, il cui significato sarà più chiaro in seguito, è la vera e propria ANOVA fisheriana, che può essere eseguita facilmente utilizzando la Tabella \@ref(tab:tabResidui).
-
-Il primo elemento da stimare è la devianza totale dei dati, cioè la somma dei quadrati degli scarti di ogni dato rispetto alla media generale:
-
-$$\begin{array}{c}
-SS = \left(24.62 - 14.48375\right)^2 + \left(30.94 - 14.48375\right)^2 + ... \\
-... + \left(15.50 - 14.48375\right)^2 = 1273.706
-\end{array}$$
-
-Questa devianza esprime la variabilità totale tra un dato e l'altro, sia quella dovuta al trattamento, sia quella puramente stocastica.
-
-Abbiamo già calcolato la devianza dei residui (RSS = 184.17745), che quantifica la variabilità dei dati dovuta ad effetti puramente casuali, ma non al trattamento sperimentale. Infatti, la variabilità di un dato rispetto alla media del gruppo a cui appartiene non può essere dovuta al trattamento, in quanto i soggetti dello stesso gruppo sono trattati allo stesso modo.
-
-A questo punto ci chiediamo: qual è la devianza prodotta dal trattamento sperimentale? La devianza totale rappresenta la variabilità totale dei dati (trattamento + effetti stocastici), la devianza residua rappresenta la sola variabilità stocastica, di conseguenza, la differenza di queste due quantità rappresenta la devianza dovuta al trattamento sperimentale:
-
-$$SS_t = SS - RSS = 1273.706 + 184.1774 = 1089.529$$
-
-In realtà, oltreché per differenza, la devianza del trattamento potrebbe anche essere ottenuta direttamente, sommando i quadrati dei valori $\alpha$, il che equivale al quadruplo (abbiamo quattro repliche) della devianza tra le medie dei trattamenti:
-
-$${\begin{array}{l}
-SS_t = 4 \times \left[ \left(9.1750 - 14.48375\right)^2 
-+ \left(5.1275 - 14.48375\right)^2 + \right. \\
-+ \left. \left(16.86 - 14.48375\right)^2 + \left(26.7725 - 14.48375\right)^2 \right] = 1089.529
-\end{array}}$$
-
-A questo punto, ricordiamo che il nostro obiettivo è stabilire se il trattamento ha avuto un effetto significativo, cioè se l'effetto da esso prodotto si distingue dal 'rumore di fondo', ossia dall'elemento casuale rappresentato dal residuo. Tuttavia, le devianza del trattamento e del residuo non possono essere confrontate direttamente, in quanto hanno un numero diverso di gradi di libertà.
-
-In particolare, la devianza del trattamento ha tre gradi di libertà (tre scarti liberi; in genere numero dei trattamenti - 1) e quindi la relativa varianza è:
-
-$$MS_t = \frac{1089.529}{3} = 363.1762$$
-
-La varianza del residuo è invece pari a 15.348 e, come abbiamo visto più sopra, ha 12 gradi di libertà. Le due varianze così ottenute possono essere confrontate, all'interno di una procedura di test d'ipotesi, che vedremo di seguito.
-
-Prima, però, vale la pena di sottolineare come la procedura precedente ci abbia permesso di suddividere la variabilità totale delle osservazioni in due componenti, una dovuta al trattamento e una dovuta all'errore sperimentale. Per questo motivo, parliamo di scomposizione della varianza (variance partitioning) o analisi della varianza (ANalysis Of VAriance = ANOVA), che è lo strumento più utilizzato nella sperimentazione biologica e che dobbiamo totalmente all'inventiva di Ronald Fisher.
-
-## Test d'ipotesi
-
-Abbiamo descritto il nostro esperimento e ne abbiamo individuato le caratteristiche rilevanti, stimando i parametri che meglio le descrivono (effetti dei trattamenti e varianza). Come già detto, dobbiamo chiederci se i dati rispettano le assunzioni di base del modello, ma di questo parleremo in una lezione a parte.
-
-Ora, il nostro scopo è capire se il trattamento sperimentale abbia prodotto un effetto rilevante, maggiore di quello prodotto da altri elementi puramente casuali ('rumore di fondo').
-
-L'ipotesi nulla è che il trattamento non abbia avuto effetto, cioè che:
-
-$$H_0: \mu_1 = \mu_2 = \mu_3 = \mu_4$$
-
-In altri termini, se l'ipotesi nulla è vera, i quattro campioni sono estratti da quattro popolazioni identiche, o meglio, dalla stessa popolazione. Ciò può essere anche declinato come:
-
-$$H_0: \alpha_1 = \alpha_2 = \alpha_3 = \alpha_4 = 0$$
-
-Una statistica rilevante per testare questa ipotesi è data dal rapporto tra la varianza del trattamento e quella dell'errore:
-
-$$F = \frac{MS_t}{MS_e} = \frac{363.18}{15.348} = 23.663$$
-
-E' evidente che se il trattamento non fosse stato efficace, non dovrebbe aver prodotto una variabilità di molto superiore a quella dell'errore (quindi F = 1). In questo caso la variabilità prodotta dal trattamento è stata oltre 23 volte superiore a quella dell'errore. Delle due l'una: o il trattamento è stato efficace oppure io sono stato particolarmente sfortunato e, nell'organizzare questo esperimento, si è verificato un caso particolarmente raro.
-
-Ci chiediamo: "se l'ipotesi nulla è vera, qual è la probabilità di osservare un valore di F così alto o più alto?". In altre parole, "qual è la *sampling distribution* per F?". Potremmo costruire questa distribuzione empiricamente, attraverso una simulazione Monte Carlo.
-
-Se assumiamo che l'ipotesi nulla è vera, allora i dati dovrebbero essere campionati da una distribuzione gaussiana con media pari a 14.48375 e deviazione standard pari a 3.9177 (vedi sopra). In base a questo, possiamo utilizzare un generatore di numeri casuali gaussiani, per ottenere un dataset, per il quale l'ipotesi nulla è certamente vera, perché non vi è l'effetto del trattamento, come mostriamo nel box sottostante:
-
-
-```r
-Ysim <- rnorm(16, 14.48375, 3.9177)
-Ysim
-##  [1] 11.25108 15.84385 10.87910 13.35805 12.32459 17.80849 19.59052
-##  [8] 12.41272 17.47276 21.49765 16.50393 16.48161 17.92167 13.28823
-## [15] 10.57145 17.53845
-```
-
-Se sottoponiamo questo dataset alla scomposizione della varianza, possiamo calcolare il relativo valore F. Se ripetiamo questo processo, ad esempio, 100'000 volte, otteniamo 100'000 valori F compatibili con l'ipotesi nulla, in quanto generati assumendola come vera. Otteniamo quindi una *sampling distribution* empirica per F e possiamo valutare qual è la probabilità di ottenere valori superiori a 23.66. In questo caso, il test è ad una sola coda, perché la statistica F è un rapporto do varianze, che sono, per definizione, positive.
-
-Per chi voglia eseguire questa simulazione, il codice da utilizzare è riportato nel box sottostante.
-
-
-
-
-
-```r
-# Fvals <- c()
-# set.seed(1234)
-# for(i in 1:100000){
-#   Ysim <- rnorm(16, 14.48375, 3.9177)
-#   mu <- mean(Ysim)
-#   muj <- rep(tapply(Ysim, dataset$Treat, mean), each = 4)
-#   alpha <- muj - mu
-#   epsilon <- Ysim - (mu + alpha)
-#   Fvals[i] <- (sum(alpha^2)/3)/(sum(epsilon^2)/12)
-# }
-# min(Fvals)
-# max(Fvals)
-# length(Fvals[Fvals > 23.663])
-# min(Fvals)
-# [1] 0.0001855014
-# max(Fvals)
-# [1] 32.87431
-# mean(Fvals)
-# [1] 1.194453
-# median(Fvals)
-# [1] 0.8362404
-# length(Fvals[Fvals > 23.663])
-# [1] 2
-```
-
-
-Il valore minimo di F è stato 0.00019, il massimo 32.87, la media è stata 1.19 e la mediana 0.84. Tra tutti i 100'000 valori, ne abbiamo trovati solo due pari o superiori a quello osservato, il che vuol dire che la probabilità che l'ipotesi nulla sia vera con F = 23.66 è pari a 2 $\times 10^{-5}$.
-
-La sampling distribution (opportunamente discretizzata) è riportata in figura \@ref(fig:figName91). Si tratta di una distribuzione chiaramente non normale, ma descrivibile con la funzione di densità F di Fisher (in realtà l'invenzione è di Snedecor, allievo di Fisher), con 3 gradi di libertà al numeratore e 12 al denominatore (in blue in figura).
-
-
-
-<div class="figure" style="text-align: center">
-<img src="_images/SamplingDistribF.png" alt="Sampling distribution empirica per la statistica F, ottenuta assumendo vera l'ipotesi nulla. La linea azzurra rappresenta la funzione di densità F di Fisher, con 3 e 12 gradi di libertà." width="85%" />
-<p class="caption">(\#fig:figName91)Sampling distribution empirica per la statistica F, ottenuta assumendo vera l'ipotesi nulla. La linea azzurra rappresenta la funzione di densità F di Fisher, con 3 e 12 gradi di libertà.</p>
-</div>
-
-Di conseguenza, possiamo evitare la simulazione Monte Carlo ed utilizzare la F di Fisher per calcolare la probabilità di ottenere un valore di F altrettanto estremo o più estremo del nostro. Ad esempio, in R, possiamo utilizzare la funzione:
-
-
-```r
-pf(23.663, 3, 12, lower.tail = F)
-## [1] 2.508789e-05
-```
-
-che porta ad un risultato molto simile a quello ottenuto con la simulazione di Monte Carlo. Insomma, in assenza di un effetto del trattamento (quindi per il solo effetto del caso), se ripetessimo l'esperimento infinite volte, avremmo una probabilità molto bassa che si produca un valore di F altrettanto alto o più alto di quello da noi osservato.
-
-Di conseguenza, rifiutiamo l'ipotesi nulla di assenza di effetto del trattamento e accettiamo l'ipotesi alternativa (il trattamento ha avuto effetto significativo). In questo modo, ci assumiamo un rischio d'errore estremamente piccolo, comunque molto al disotto della soglia prefissata del 5%.
-
-## Inferenza statistica
-
-Abbiamo visto che la varianza d'errore è pari a 15.348 e pertiene ad ogni singola osservazione effettuata durante l'esperimento. Questa osservazione ci può aiutare a costruire una banda di inferenza attorno alle medie stimate; infatti, noi abbiamo osservato $m_1$, $m_2$, $m_3$ ed $m_4$ e con la nostra stima puntuale, abbiamo assunto che i valori osservati coincidessero rispettivamente con $\mu_1$, $\mu_2$, $\mu_3$ e $\mu_4$. Analogamente a quanto abbiamo visto in un capitolo precedente, possiamo calcolare l'incertezza associata alle nostre stime attraverso l'Errore Standard di una Media (SEM), pari a:
-
-$$SEM = \sqrt{ \frac{MS_e}{n} } =  \frac{3.9177}{\sqrt{4}}$$
-
-Oltre che di una media, spesso siamo interessati anche a conoscere la varianza della differenza di due medie. Dato che la differenza di variabili casuali ha una varianza pari alla somma delle varianza delle due variabili originali, possiamo scrivere che:
-
-$$SED = \sqrt{ MS_{media1} + MS_{media2} } = \sqrt{ 2 \cdot \frac{MS_e}{n} } =  \sqrt{2}  \cdot \frac{3.9177}{\sqrt{4}} = \sqrt{2} \cdot SEM$$
-
-## Fitting del modello con R
-
-La stima dei parametri di un modello lineare, in R, può essere eseguita in modo molto banale, utilizzando la funzione 'lm()' Il codice è il seguente:
-
-
-```r
-mod <- lm(Weight ~ factor(Treat), data = dataset)
-```
-
-Il primo argomento rappresenta il modello lineare che vogliamo adattare ai dati: l'incusione dell'intercetta, codificata con il carattere '1' è opzionale ('Weight \~ 1 + Treat' e 'Weight \~ Treat' sono equivalenti), mentre il termine stocastico $\epsilon$ viene incluso di default e non deve essere indicato. Il termine 'factor' sta a significare che la variabile 'Treat' è un fattore sperimentale; questa specifica è opzionale quando la variabile è di tipo 'carattere' (come in questo caso), ma è fondamentale quando abbiamo a che fare con una variabile a codifica numerica.
-
-Una volta operato l'adattamento, l'oggetto 'mod' contiene tutti i risultati, che possiamo ottenere con opportuni 'estrattori'. Ad esempio, la funzione 'summary()' restituisce le stime dei parametri:
-
-\vspace{12pt}
-
-\tiny
-
-```r
-summary(mod)
-## 
-## Call:
-## lm(formula = Weight ~ factor(Treat), data = dataset)
-## 
-## Residuals:
-##    Min     1Q Median     3Q    Max 
-## -6.360 -2.469  0.380  2.567  6.025 
-## 
-## Coefficients:
-##                             Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)                    9.175      1.959   4.684 0.000529 ***
-## factor(Treat)Mixture_378      -4.047      2.770  -1.461 0.169679    
-## factor(Treat)Rimsulfuron_30    7.685      2.770   2.774 0.016832 *  
-## factor(Treat)Unweeded         17.598      2.770   6.352 3.65e-05 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 3.918 on 12 degrees of freedom
-## Multiple R-squared:  0.8554,	Adjusted R-squared:  0.8193 
-## F-statistic: 23.66 on 3 and 12 DF,  p-value: 2.509e-05
-```
-\normalsize
-
-Notiamo immediatamente che viene utilizzata la parametrizzazione con vincolo sul trattamento, visto che l'intercetta coincide con la media del primo trattamento. I valori di $\alpha$ non sono altro che differenze tra questa media e tutte le altre medie.
-
-I valori attesi e i residui possono essere ottenuti, in R, applicando due metodi 'fitted()' e 'residuals()' all'oggetto ottenuto dal fitting:
-
-
-```r
-attesi <- fitted(mod)
-epsilon <- residuals(mod)
-```
-
-La devianza del residuo (somma dei quadrati degli scarti) è:
-
-
-```r
-deviance(mod)
-## [1] 184.1774
-```
-
-ementre la deviazione standard del residuo ($\sigma$), già visualizzabile nell'output della funzione 'summary()', può essere estratta come:
-
-
-```r
-summary(mod)$sigma
-## [1] 3.917668
-```
-
-La tabella finale dell'ANOVA può essere ottenuta in R utilizzando la seguente funzione:
-
-
-```r
-anova(mod)
-## Analysis of Variance Table
-## 
-## Response: Weight
-##               Df  Sum Sq Mean Sq F value    Pr(>F)    
-## factor(Treat)  3 1089.53  363.18  23.663 2.509e-05 ***
-## Residuals     12  184.18   15.35                      
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-```
-
-## Medie marginali attese
-
-Abbiamo visto che le somme $\mu + \alpha_j$ restituiscono le medie dei trattamenti e prendono il nome di **medie marginali attese**. Quando l'esperimento è bilanciato (ugual numero di repliche per ogni trattamento), esse sono uguali alle medie aritmetiche di ogni gruppo, mentre, quando l'esperimento è sbilanciato esso sono diverse, ma costituiscono una stima migliore delle medie delle popolazioni da cui i gruppi sono estratti rispetto alle medie aritmetiche. In R, il metodo più semplice per calcolare le medie marginali attese è quello di utilizzare la funzione 'emmeans()', nel package 'emmeans' (Lenth, 2016), che deve essere preventivamente installato e caricato in memoria.
-
-
-```r
-#install.packages("emmeans") # Installare il package
-library(emmeans) #Caricare il package in memoria
-medie <- emmeans(mod, ~Treat)
-medie
-##  Treat           emmean   SE df lower.CL upper.CL
-##  Metribuzin__348   9.18 1.96 12     4.91     13.4
-##  Mixture_378       5.13 1.96 12     0.86      9.4
-##  Rimsulfuron_30   16.86 1.96 12    12.59     21.1
-##  Unweeded         26.77 1.96 12    22.50     31.0
-## 
-## Confidence level used: 0.95
-```
-
-## Per concludere ...
-
-1.  Con l'ANOVA la variabilità totale dei dati viene decomposta in due quote, una attribuibile al trattamento sperimentale ed una inspiegabile (residuo)
-2.  L'effetto del trattamento è significativo, se la variabilità che esso provoca è superiore a quella inspiegabile
-3.  Il confronto tra varianze viene impostato sotto forma di rapporto (F).
-4.  L'ipotesi nulla è che il trattamento NON HA AVUTO effetto significativo
-5.  Sotto questa ipotesi nulla, l'F osservato ha una distribuzione F di Fisher
-6.  L'ipotesi nulla è rifiutata quando P $\leq$ 0.05 (livello di protezione arbitrario, ma universalmente accettato)
-
-Ovviamente, è necessario ricordare che tutte le considerazioni fatte finora sono valide se il dataset è conforme alle assunzioni di base per l'ANOVA, per cui bisogna sempre eseguire i necessari controlli, di cui parleremo nel prossimo capitolo.
-
-----
-
-
-## Altre letture
-
-1.  Faraway, J.J., 2002. Practical regression and Anova using R. <http://cran.r-project.org/doc/contrib/Faraway-PRA.pdf>, R.
-2.  Fisher, Ronald (1918). "Studies in Crop Variation. I. An examination of the yield of dressed grain from Broadbalk" (PDF). Journal of Agricultural Science. 11 (2): 107--135.
-3.  Kuehl, R. O., 2000. Design of experiments: statistical principles of research design and analysis. Duxbury Press (CHAPTER 2)
-4.  Lenth, R.V., 2016. Least-Squares Means: The R Package lsmeans. Journal of Statistical Software 69. <https://doi.org/10.18637/jss.v069.i01>
-
-<!--chapter:end:07-ANOVAunaVia.Rmd-->
-
-# La verifica delle assunzioni di base
-
-
-Torniamo ad esaminare il modello che abbiamo impiegato nel capitolo precedente:
-
-$$Y_i = \mu + \alpha_j + \varepsilon_i$$
-
-con:
-
-$$ \varepsilon_i \sim N(0, \sigma) $$
-
-Questa equazione implica che la componente random $\varepsilon_i$ (residuo) sia ottenibile per differenza tra i valori attesi e quelli osservati:
-
-$$\varepsilon_i = Y_i - Y_{Ei}$$
-
-dove:
-
-$$Y_{Ei} = \mu + \alpha_i$$
-
-Per costruzione, la media dei residui deve essere zero e la deviazione standard è comune a tutti i trattamenti. Potete notare che stiamo facendo un certo numero di assunzioni (**assunzioni di base**), la cui validità generale non è scontata, ma deve essere attentamente verificata ogni volta. In particolare, assumiamo:
-
-1. **bontà di adattamento**: la parte deterministica del modello descrive la risposta osservata in modo sufficientemente fedele, senza deviazioni sistematiche di alcun tipo;
-2. **indipendenza dei residui**: i residui sono puramente stocastici, indipendenti dal modello ed indipendenti tra loro;
-3. **normalità**: i residui sono normalmente distribuiti;
-4. **omoscedasticità** (dal greco 'skedasis' = dispersione): i residui hanno media zero e varianze omogenee per tutti i trattamenti (omoscedasticità).
-
-Il rispetto di alcune di queste assunzioni di base, come l'indipendenza dei residui e l'assenza di errori sistematici, è garantito dal disegno sperimentale, quando questo sia eseguito a 'regola d'arte', cioè basato su repliche indipendenti e randomizzate. Bisogna tenere presente che gli eventuali vincoli alla randomizzazione introdotti in fase di disegno possono inficiare l'indipendenza dei residui; ad esempio, con i blocchi randomizzati, le osservazioni all'interno di ogni blocco si assomigliano di più che non quelle in blocchi diversi, proprio perché condividono le condizioni ambientali caratteristiche di ciascun blocco. Insomma, si realizza un certo grado di 'parentela' tra le osservazioni, che non è compatibile con l'ipotesi di totale indipendenza. Vedremo nei capitoli successivi che queste situazioni vengono gestite includendo nel modello ANOVA anche il fattore blocco o gli altri vincoli eventualmente imposti alla randomizzazione completa. 
-
-Per quanto riguarda le altre assunzioni, come la bontà di adattamento l'omogeneità delle varianze e la normalità dei residui, la verifica può essere fatta solo *a posteriori*, cioè dopo aver effettuato la stima dei parametri ed aver individuato i residui stessi.
-
-Oltre a quanto abbiamo finora esposto, dobbiamo anche tener presente che il dataset non dovrebbe contenere le cosiddette osservazioni aberranti od *outliers*. Si tratta di osservazioni molto diverse dalle altre, che spesso fanno sospettare che sia avvenuto qualche errore grossolano; la loro assenza non è postulata da alcun modello statistico, anche se esse, proprio perché molto diverse dalle altre, finiscono per inficiare la normalità dei residui e l'omogeneità delle varianze, oltre a stravolgere pericolosamente le nostre conclusioni. Pertanto, alla loro individuazione deve essere sempre dedicata la debita attenzione.
-
-## Violazioni delle assunzioni di base
-
-Il rispetto delle assunzioni di normalità e omogeneità delle varianze è fondamentale, dato che la *sampling distribution* di F, e quindi il P-level, sono costruiti campionando residui normali ed omoscedastici. Nel codice sottostante abbiamo immaginato di campionare residui da distribuzioni normali con la stessa media, ma diverse deviazioni standard per ognuno dei quattro trattamenti sperimentali. Abbiamo quindi ottenuti 100'000 datasets nei quali l'ipotesi nulla è vera (nessuna differenza tra le medie), ma non sussiste l'omogeneità delle varianze. Sottoponendo questi datasets ad ANOVA, notiamo che la *sampling distribution* per F non può essere descritta con la curva di densità F di Fisher e, soprattutto, che quest'ultima funzione, nella coda destra, produce una chiara sottostima della probabilità reale e, quindi del P-level. In altre parole, quando non vi è omoscedasticità, si può incorrere in un incremento del rischio di rifiutare erroneamente l'ipotesi nulla, il che rende le nostre conclusioni meno attendibili.
-
-```
-Fvals <- c()
-set.seed(1234)
-Treat <- factor(rep(1:4, each = 4))
-for(i in 1:100000){
-  # Ysim <- rnorm(16, 14.48375, 3.9177) # Omoscedasticità
-  Ysim1 <- rnorm(4, 14.48375, 0.39177)
-  Ysim2 <- rnorm(4, 14.48375, 3.9177)
-  Ysim3 <- rnorm(4, 14.48375, 6.9177)
-  Ysim4 <- rnorm(4, 14.48375, 9.9177)
-  Ysim <- c(Ysim1, Ysim2, Ysim3, Ysim4)
-  mod <- lm(Ysim ~ Treat)
-  Fvals[i] <- anova(mod)$F[1]
-}
-```
-
-<div class="figure" style="text-align: center">
-<img src="_images/SamplingDistribF_false.png" alt="Sampling distribution empirica per F, in caso di disomogeneità delle varianze. Vediamo che, in questo caso, la funzione di densità F di Fisher non costituisce un buon riferimento per il calcolo del P-level." width="85%" />
-<p class="caption">(\#fig:figName101a)Sampling distribution empirica per F, in caso di disomogeneità delle varianze. Vediamo che, in questo caso, la funzione di densità F di Fisher non costituisce un buon riferimento per il calcolo del P-level.</p>
-</div>
-
-
-## Procedure diagnostiche
-
-
-Per diagnosticare eventuali problemi con le assunzioni di base, possiamo utilizzare sia metodi grafici che metodi formali, basati sul test d'ipotesi. Vediamo ora alcune possibilità.
-
-
-## Analisi grafica dei residui
-
-Dato che la gran parte delle assunzioni riguarda la struttura dei residui, l’ispezione grafica di questi ultimi è in grado di evidenziare chiaramente la gran parte dei problemi e dovrebbe, pertanto, essere considerata come una metodica da applicare in modo routinario. Esistono diversi tipi di grafici, ma ne elenchiamo fondamentalmente due: il grafico dei residui contro i valori attesi e il QQ-plot.
-
-
-### Grafico dei residui contro i valori attesi
-
-Il metodo grafico più utilizzato per l'analisi dei residui consiste nel plottare i residui verso i valori attesi. Se non vi sono problemi, i punti nel grafico dovrebbero essere distribuiti in modo assolutamente casuale, come in Figura \@ref(fig:figName101).
-
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName101-1.png" alt="Grafico dei residui verso gli attesi: non è visibile nessuna deviazione rispetto agli assunti di base dei modelli lineari" width="85%" />
-<p class="caption">(\#fig:figName101)Grafico dei residui verso gli attesi: non è visibile nessuna deviazione rispetto agli assunti di base dei modelli lineari</p>
-</div>
-
-Le osservazioni aberranti (*outliers*) appaiono come punti isolati rispetto agli altri (Figura \@ref(fig:figName102)). 
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName102-1.png" alt="Grafico dei residui verso gli attesi: presenza di un dato aberrante" width="85%" />
-<p class="caption">(\#fig:figName102)Grafico dei residui verso gli attesi: presenza di un dato aberrante</p>
-</div>
-
-L’eterogeneità delle varianze è invece indicata da residui che si allargano o si stringono procedendo verso i margini del grafico (Figura \@ref(fig:figName103)), facendo emergere una sorta di proporzionalità tra media e varianza.
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName103-1.png" alt="Grafico dei residui verso gli attesi: esempio di eteroscedasticità" width="85%" />
-<p class="caption">(\#fig:figName103)Grafico dei residui verso gli attesi: esempio di eteroscedasticità</p>
-</div>
-
-La mancanza di adattamento è un problema che non riguarda tanto i modelli ANOVA, ma, soprattutto i modelli di regressione, di cui parleremo al termine di questo libro. Essa provoca effetti sul segno dei residui, che non è più casuale, ma mostra un qualche evidente *pattern* legato al valore assunto dalla variabile indipendente. Ad esempio, nella figura \@ref(fig:figName104) i residui sono tendenzialmente negativi per bassi valori attesi e positivi per alti valori, chiaro segnale di un modello deterministico che sovrastima le osservazioni quando sono basse e le sottostima quando sono alte.
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName104-1.png" alt="Grafico dei residui verso gli attesi: esempio di lack of fit (nonlinearità)" width="85%" />
-<p class="caption">(\#fig:figName104)Grafico dei residui verso gli attesi: esempio di lack of fit (nonlinearità)</p>
-</div>
-
-### QQ-plot
-
-Per evidenziare problemi di non-normalità, risulta molto utile un QQ-plot (quantile-quantile plot), nel quale i residui *standardizzati* vengono 'plottati' contro i rispettivi percentili di una distribuzione normale standardizzata. Con residui normali, queste due entità (i residui standardizzati e i percentili corrispondenti di una distribuzione normale standardizzata) sono largamente coincidenti, in modo che i punti nel QQ-plot giacciono lungo la bisettrice del primo e del terzo quadrante (\@ref(fig:figName105)).
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName105-1.png" alt="QQ-plot per un dataset normalmente distribuito" width="85%" />
-<p class="caption">(\#fig:figName105)QQ-plot per un dataset normalmente distribuito</p>
-</div>
-
-Le deviazioni più diffuse dalla normalità sono relative alla simmetria (skewness) e alla curtosi della popolazione da cui i residui sono campionati. In particolare, può capitare che i residui provengano da una popolazione con asimmetria positiva (right-skewed), come, ad esempio, una popolazione log-normale. In questo caso, la media è maggiore della mediana e i residui negativi sono più numerosi, ma più piccoli in valore assoluto di quelli positivi. Il QQ-plot si presenta come in figura \@ref(fig:figName106).
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName106-1.png" alt="QQ-plot per un dataset con asimmetria positiva (right-skewed)" width="85%" />
-<p class="caption">(\#fig:figName106)QQ-plot per un dataset con asimmetria positiva (right-skewed)</p>
-</div>
-
-
-Al contrario, se i residui provengono da una popolazione con asimmetria negativa ('left-skewed'), caratterizzata, ad esempio, da una funzione di densità 'beta', la media è minore della mediana e, di conseguenza, i valori positivi sono più numerosi, ma più vicini allo zero di quelli negativi. In questa situazione, il QQ-plot presenta un andamento abbastanza tipico, come indicato in Figura \@ref(fig:figName107).
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName107-1.png" alt="QQ-plot per un dataset con asimmetria negativa (left-skewed)" width="85%" />
-<p class="caption">(\#fig:figName107)QQ-plot per un dataset con asimmetria negativa (left-skewed)</p>
-</div>
-
-Per quanto riguarda la curtosi, è necessario osservare le code della distribuzione: se queste sono più alte di una distribuzione normale parliamo di distribuzione platicurtica, mentre se sono più basse parliamo di distribuzione leptocurtica. Ad esempio, se i residui provengono da una distribuzione t di Student con pochi gradi di libertà sono platicurtici ed il QQ-plot mostra l'andamento indicato in figura \@ref(fig:figName108).
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName108-1.png" alt="QQ-plot per un dataset con distribuzione platicurtica" width="85%" />
-<p class="caption">(\#fig:figName108)QQ-plot per un dataset con distribuzione platicurtica</p>
-</div>
-
-Al contrario, se i residui provengono da una distribuzione uniforme sono tipicamente leptocurtici e presentano un QQ-plot come quello riportato in Figura \@ref(fig:figName109).
-
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName109-1.png" alt="QQ-plot per un dataset con distribuzione leptocurtica" width="85%" />
-<p class="caption">(\#fig:figName109)QQ-plot per un dataset con distribuzione leptocurtica</p>
-</div>
-
-
-## Test d'ipotesi
-
-La valutazioni precedentemente esposte sono basate sulla semplice osservazione di uno o più grafici, ma sono considerate sufficientemente attendibili per la maggior parte delle situazioni. Tuttavia, esistono anche test statistici formali che consentono di saggiare l’ipotesi nulla di ’assenza di deviazioni’, rifiutandola quando il P-level è inferiore a 0.05.
-
-Per l'omogeneità delle varianze veniva utilizzato il test di Bartlett, che, tuttavia, è oggi caduto in disuso, data la sua sensibilità alla non-normalità dei residui, quasi sempre presente, insieme all'eteroscedasticità. Oggi si preferisce utilizzare il test di Levene, che consiste nel sottoporre ad ANOVA i residui in valore assoluto, al posto dei dati osservati. Per ogni trattamento, i residui hanno media zero, ma se vengono presi in valore assoluto, hanno medie più alte quando la loro varianza è alta. Per esempio, possiamo prendere due campioni centrati, con media zero a varianza rispettivamente pari a 1 e 4:
-
-
-```r
-A <- c(-1, 0, 1); B <- c(-4, 0, 4)
-mean(A); mean(B)
-## [1] 0
-## [1] 0
-var(A); var(B)
-## [1] 1
-## [1] 16
-```
-
-Se prendiamo i valori assoluti, la media del primo campione è 2/3, mentre la media del secondo campione è 8/3. Se questa differenza è significativa, essa produce il rifiuto dell'ipotesi nulla di omogeneità delle varianze. Il test di Levene, in R, si può eseguire con la funzione 'leveneTest()' nel package 'car'.
-
-
-```r
-res <- c(A, B)
-tratt <- rep(c("A", "B"), each = 3)
-model <- lm(res ~ factor(tratt))
-anova(model)
-## Analysis of Variance Table
-## 
-## Response: res
-##               Df Sum Sq Mean Sq F value Pr(>F)
-## factor(tratt)  1      0     0.0       0      1
-## Residuals      4     34     8.5
-car::leveneTest(res ~ factor(tratt), center=mean)
-## Levene's Test for Homogeneity of Variance (center = mean)
-##       Df F value Pr(>F)
-## group  1  2.1176 0.2193
-##        4
-```
-
-Il test di Levene può anche essere effettuato considerando gli scarti rispetto alla mediana (invece che alla media), in modo da ottenere un test più robusto nei confronti degli outliers.
-
-Per quanto riguarda le deviazioni dalla normalità, può essere utilizzato il test di Shapiro-Wilks. Per esempio, nel caso di un dataset ottenuto da una distribuzione uniforme (quindi non-normale), il test di Shapiro porta al rifiuto dell'ipotesi nulla.
-
-
-
-```r
-shapiro.test(runif(100, min = -2, max = 2))
-## 
-## 	Shapiro-Wilk normality test
-## 
-## data:  runif(100, min = -2, max = 2)
-## W = 0.94547, p-value = 0.0004227
-```
-
-## Risultati contraddittori
-
-La valutazione degli assunti di base è un passo fondamentale nell’analisi dei dati sperimentali è non deve mai essere dimenticata. Tuttavia, l'esperienza insegna che, nella pratica, è molto facile incontrare situazioni dubbie, nelle quali i risultati ottenuti con le diverse tecniche diagnostiche appaiono contraddittori e difficili da interpretare. Come comportarsi in questi casi? A mio parere bisogna sempre ricordare che la ’verità vera’ ci sfugge e, di conseguenza, tutte le valutazioni debbono essere sempre condotte con il massimo ’buon senso’.
-
-Un aspetto importante da considerare è la tipologia del dato: conteggi e proporzioni difficilmente sono normalmente distribuiti ed omoscedastici e, con questi dati, la prudenza non è mai troppa, quando si tratta di impiegare modelli lineari. Allo stesso modo, è necessaria una grande prudenza quando si analizzano variabili quantitative dove la differenza tra le diverse tesi è molto grande, orientativamente più di un ordine di grandezza. Con conteggi proporzioni e variabili quantitative con medie molto diverse tra loro, l'assunzione di omogeneità delle varianze è quasi sempre violata ed è quindi necessario essere molto prudenti prima di confermare il rispetto delle assunzioni di base.
-
-
-## 'Terapia'
-
-Se le procedure diagnostiche hanno evidenziato deviazioni rispetto agli assunti di base, è necessario valutare se e come intraprendere azioni correttive. Ovviamente,  la 'terapia' cambia al cambiare della 'patologia'.
-
-### Correzione/Rimozione degli outliers
-
-In presenza di outliers, la 'terapia' più opportuna è, banalmente, quella di rimuoverli, ottenendo così un dataset 'sbilanciato' (diverso numero di repliche per trattamento). Oggigiorno, trattare un dataset sbilanciato non costituisce un problema, ovviamente se si utilizzano le metodiche di analisi opportune. Qualche anno fa, al contrario, si cercava di evitare lo sbilanciamento a tutti i costi, utilizzando tecniche di *imputing* per l'immissione di valori ’ragionevoli’ in sostituzione di quelli mancanti/aberranti. Con le dovute eccezioni, le tecniche di *imputing* sembrano oggi abbastanza obsolete, almeno in questo contesto.
-
-Vorremmo porre l'attenzione sul fatto che i dati aberranti possono influenzare in modo molto marcato il risultato dell’analisi (sono dati 'influenziali'); pertanto, se è sbagliato correggerli arbitrariamente, senza aver prima accertato che siano effettivamente frutto di errore, può essere altrettanto sbagliato lasciarli nel dataset. Ovviamente, la rimozione non può che riguardare una larga minoranza dei dati sperimentali raccolti, altrimenti si dovrà necessariamente pensare di ripetere l’esperimento.
-
-
-### Correzione del modello
-
-Abbiamo visto che il modello impiegato potrebbe non essere adatto a descrivere il dataset (mancanza di adattamento). Gli effetti potrebbero non essere additivi, ma moltiplicativi, oppure potrebbero essere non-lineari. Potrebbero essere presenti asintoti che il nostro modello non è in grado di descrivere, oppure la crescita/decrescita osservata potrebbero essere più lente/veloci di quanto la nostra funzione sia in grado di descrivere. Per tutti questi casi, ovviamente, la strategia più consigliabile è quella di utilizzare un diverso modello, capace di descrivere meglio le osservazioni sperimentali.
-
-### Trasformazione della variabile indipendente
-
-A volte la variabile dipendente non è qualitativa, bensì quantitativa. Vedremo meglio questo aspetto nei prossimi capitoli, quando parleremo di regressione. Tuttavia, anticipiamo che, quando la variabile indipendente è quantitativa, essa può essere sottoposta ad opportuna trasformazione. Ad esempio, se i dati mostrano un andamento esponenziale, la trasformazione della variabile indipendente in logaritmo può portare al sensibile miglioramento del fitting con un'equazione lineare.
-
-
-### Trasformazioni stabilizzanti
-
-Una strategia empirica, ma molto semplice, diffusa ed efficace, è quella di ricorrere alle trasformazioni correttive. Con questa tecnica, si trasformano i dati in modo da portarli su una metrica che soddisfi le assunzioni di base dei modelli lineari; successivamente si ripete l’elaborazione sui dati trasformati.
-
-Le trasformazioni possibili sono molte: ad esempio, per i conteggi oppure per variabili continue caratterizzate da medie proporzionali alle varianze, vengono usualmente consigliate la trasformazione nella radice quadrata o quella nel logaritmo, oppure per i dati percentuali viene consigliata la trasformazione angolare (arcoseno della radice quadrata). Per evitare di scegliere la trasformazione 'al buio', si può impiegare la procedura suggerita da Box e Cox (1964), basata su una 'famiglia di trasformazioni', così definita:
-
-$$ W = \left\{ \begin{array}{ll}
-\frac{Y^\lambda - 1}{\lambda} & \quad \textrm{if} \,\,\, \lambda \neq 0 \\
-\log(Y) & \quad \textrm{if} \,\,\, \lambda = 0
-\end{array} \right.$$
-
-dove $W$ è la variabile trasformata, $Y$ è la variabile originale e $\lambda$ è il parametro che definisce la trasformazione ^[Nota: Considerate che il limite dell'espressione $(Y^\lambda -1)/\lambda$ per $\lambda \rightarrow 0$ è proprio $\log(Y)$]
-
-Questa famiglia è molto flessibile, nel senso che cambiando il valore di $\lambda$ possiamo rimediare alla gran parte delle deviazioni rispetto alle assunzioni di base. Per scegliere il valore ottimale per questo parametro, possiamo procedere in modo empirico, confrontando la verosimiglianza di modelli basati su trasformazioni diverse. In R, questa procedura è automatizzata nella funzione `boxcox()`, disponibile nel package MASS è verrà illustrata negli esempi che seguono. Bisogna tener presente che, qualora il valore ottimale risultasse $\lambda = 1$, la trasformazione sarebbe completamente fittizia, in quanto, da ogni dato, verrebbe semplicemente sottratta un'unità, senza quindi alterare minimamente i risultati dell'analisi. **Di conseguenza, trovare che $\lambda$ ottimale è uguale ad 1 viene considerato come evidenza del fatto che la trasformazione non è necessaria.**
-
-
-## Esempio 1
-
-Prima di tutto, sottoponiamo a controllo il dataset impiegato nel capitolo precedente ('mixture.csv'). Carichiamo il file e ripetiamo il fitting di un modello ANOVA ad una via, utilizzando la variabile 'Weight' come risposta e 'Treat' come fattore sperimentale.
-
-
-```r
-repo <- "https://www.casaonofri.it/_datasets/"
-file <- "mixture.csv"
-pathData <- paste(repo, file, sep = "")
-
-dataset <- read.csv(pathData, header = T)
-head(dataset)
-##             Treat Weight
-## 1 Metribuzin__348  15.20
-## 2 Metribuzin__348   4.38
-## 3 Metribuzin__348  10.32
-## 4 Metribuzin__348   6.80
-## 5     Mixture_378   6.14
-## 6     Mixture_378   1.95
-dataset$Treat <- factor(dataset$Treat)
-mod <- lm(Weight ~ Treat, data = dataset)
-```
-
-Dopo aver effettuato la stima dei parametri, i grafici dei residui possono essere ottenuti utilizzando la funzione `plot() ` applicata al risultato del fitting lineare. L'argomento 'which' specifica il tipo di grafico: se utilizziamo: 'which = 1' otteniamo il grafico dei residui verso gli attesi, se invece utilizziamo 'which = 2' otteniamo il QQ-plot. I due comandi sono:
-
-```
+```         
 plot(mod, which = 1)
 plot(mod, which = 2)
 ```
@@ -2998,86 +3290,148 @@ e il risultato è mostrato nella figura \@ref(fig:figName110a).
 <p class="caption">(\#fig:figName110a)Analisi grafica dei residui per un modello ANOVA ad una via adattato al dataset 'mixture.csv'</p>
 </div>
 
-Nessuno dei grafici suggerisce l'esistenza di particolari problematiche e, considerando anche che che non si tratta di un conteggio o una proporzione e che le differenze tra le medie sono piuttosto piccole (meno di un ordine di grandezza), possiamo concludere che non vi sono motivi per dubitare del rispetto delle assunzioni di base. Questa conclusione può essere confermata utilizzando la funzione `boxcox()` nel package MASS, per individuare il valore di $\lambda$ più adatto per i nostri dati. Il comando è:
+Nessuno dei grafici suggerisce l'esistenza di particolari problematiche e, considerando anche che che non si tratta di un conteggio o una proporzione e che le differenze tra le medie sono piuttosto piccole (meno di un ordine di grandezza), possiamo concludere che non vi sono motivi per dubitare del rispetto delle assunzioni di base.
 
-```
-library(MASS)
-boxcox(mod)
-```
-
-e fornisce l'output in figura \@ref(fig:figName111a); il valore ottimale sarebbe $\lambda = 0.83$, ma vediamo che anche $\lambda = 1$ rientra nell'intervallo di confidenza di $\lambda$ ottimale e, di conseguenza, si conferma che non è necessaria alcuna trasformazione stabilizzante.
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName111a-1.png" alt="Scelta del valore ottimale di 'lambda' per la trasformazione di Box e Cox: caso in cui la trasformazione non è necessaria" width="85%" />
-<p class="caption">(\#fig:figName111a)Scelta del valore ottimale di 'lambda' per la trasformazione di Box e Cox: caso in cui la trasformazione non è necessaria</p>
-</div>
-
-
-## Esempio 2
-
-Proviamo ad analizzare il dataset 'insects', disponibile nella solita repository online. Si tratta di un dataset nel quale quindici piante sono state trattate con tre insetticidi diversi in modo completamente randomizzato, scegliendo cinque piante a caso per insetticida. Alcune settimane dopo il trattamento è stato rilevato il numero di insetti presenti su ciascuna pianta. Lasciando da parte le statistiche descrittive, eseguiamo subito la stima dei parametri.
+Sebbene ciò non sia necessario, possiamo confermare la nostra conclusione eseguendo i test di Levene e Shapiro-Wilk. Nel codice sottostante possiamo notare come la funzione `leveneTest()` richieda come argomento l'oggetto risultante dal fitting lineare, mentre la funzione `shapiro.test()` richiede i residui del modello.
 
 
 ```r
-fileName <- "https://www.casaonofri.it/_datasets/insects.csv"
-dataset <- read.csv(fileName, header = T)
-dataset$Insecticide <- factor(dataset$Insecticide)
-mod <- lm(Count ~ Insecticide, data = dataset)
+# Example 8.1 [continuation]
+
+# Levene's test and Shapiro-Wilk's test
+leveneTest(mod1)
+## Levene's Test for Homogeneity of Variance (center = median)
+##       Df F value Pr(>F)
+## group  3  1.0698 0.3984
+##       12
+shapiro.test(residuals(mod1))
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  residuals(mod1)
+## W = 0.97615, p-value = 0.9257
 ```
 
-L'analisi grafica dei residui fornisce l'output riportato in figura \@ref(fig:figName110).
+## Esempio 8.2: Analisi dei residui per il dataset 'insects'
+
+Proviamo ad analizzare il dataset 'insects', che si riferisce ad un esperimento nel quale quindici piante sono state trattate con tre insetticidi diversi in modo completamente randomizzato, scegliendo cinque piante a caso per insetticida. Tre settimane dopo il trattamento è stato rilevato il numero di insetti presenti su ciascuna pianta.
+
+Per testare l'effetto degli insetticidi, è stato adattato ai dati osservati un modello ANOVA ad una via, utilizzando la variabile "Insecticide" come predittore nominale. In questo caso, il controllo delle deviazioni dagli assunti di base richiede grande attenzione, poiché la variabile di risposta è un conteggio e le statistiche descrittive, che si lasciano per eercizio al lettore, indicano che le deviazioni standard sono in qualche modo proporzionali alle medie. Le analisi grafiche dei residui in Figura \@ref(fig:figName110) mostrano chiari segni di eteroschedasticità (grafico a sinistra) e residui asimmetrici a destra (grafico a destra). Queste deviazioni sono confermate dal test di Levene (valore P = 0,043) e dal test di Shapiro-Wilks (valore P = 0,048).
+
+
+```r
+# Example 8.2
+# checking the residuals for the `insects' data
+
+# Loading the packages
+library(statforbiology)
+library(car)
+
+# Loading and transforming the data
+insects <- getAgroData("insects")
+insects$Insecticide <- factor(insects$Insecticide)
+head(insects)
+##   Insecticide Rep Count
+## 1          T1   1   448
+## 2          T1   2   906
+## 3          T1   3   484
+## 4          T1   4   477
+## 5          T1   5   634
+## 6          T2   1   211
+# Fitting a model
+mod2 <- lm(Count ~ Insecticide, data = insects)
+
+# Graphical analyses of residuals (not run, see Figure)
+# plot(mod2, which = 1)
+# plot(mod2, which = 2)
+
+# Levene's test
+leveneTest(mod2)
+## Levene's Test for Homogeneity of Variance (center = median)
+##       Df F value Pr(>F)
+## group  2  1.0263 0.3878
+##       12
+# Shapiro-Wilks' test
+shapiro.test(residuals(mod2))
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  residuals(mod2)
+## W = 0.87689, p-value = 0.04265
+```
 
 <div class="figure" style="text-align: center">
 <img src="_main_files/figure-html/figName110-1.png" alt="Analisi grafica dei residui per il dataset 'insects.csv'" width="85%" />
 <p class="caption">(\#fig:figName110)Analisi grafica dei residui per il dataset 'insects.csv'</p>
 </div>
 
-Questo dataset mostra una chiara eteroscedasticità (vedi il grafico di sinistra) e qualche indizio di asimmetria positiva.
+## Misure correttive
 
+Se le procedure diagnostiche hanno evidenziato deviazioni rispetto agli assunti di base, è necessario valutare se e come intraprendere azioni correttive. Ovviamente, la 'terapia' cambia al cambiare della 'patologia'.
 
-```r
-car::leveneTest(mod)
-## Levene's Test for Homogeneity of Variance (center = median)
-##       Df F value Pr(>F)
-## group  2  1.0263 0.3878
-##       12
-shapiro.test(residuals(mod) )
-## 
-## 	Shapiro-Wilk normality test
-## 
-## data:  residuals(mod)
-## W = 0.87689, p-value = 0.04265
-```
+### Correzione/Rimozione degli outliers
 
-I test di Levene e Shapiro-Wilks confermano che la mancanza di normalità è significativa e, pertanto, scegliamo di impiegare una trasformazione correttiva. Utilizziamo quindi la funzione `boxcox(mod)` per individuare la trasformazione più adatta a correggere la patologia riscontrata, ottenendo l'output in figura \@ref(fig:figName111b).
+In presenza di outliers, la 'terapia' più opportuna è, banalmente, quella di rimuoverli, ottenendo così un dataset 'sbilanciato' (diverso numero di repliche per trattamento). Oggigiorno, trattare un dataset sbilanciato non costituisce un problema, ovviamente se si utilizzano le metodiche di analisi opportune. Qualche anno fa, al contrario, si cercava di evitare lo sbilanciamento a tutti i costi, utilizzando tecniche di *imputing* per l'immissione di valori 'ragionevoli' in sostituzione di quelli mancanti/aberranti. Con le dovute eccezioni, le tecniche di *imputing* sembrano oggi abbastanza obsolete, almeno in questo contesto.
+
+Vorremmo porre l'attenzione sul fatto che i dati aberranti possono influenzare in modo molto marcato il risultato dell'analisi (sono dati 'influenziali'); pertanto, se è sbagliato correggerli arbitrariamente, senza aver prima accertato che siano effettivamente frutto di errore, può essere altrettanto sbagliato lasciarli nel dataset. Ovviamente, la rimozione non può che riguardare una larga minoranza dei dati sperimentali raccolti, altrimenti si dovrà necessariamente pensare di ripetere l'esperimento.
+
+### Correzione del modello
+
+Abbiamo visto che il modello impiegato potrebbe non essere adatto a descrivere il dataset (mancanza di adattamento). Gli effetti potrebbero non essere additivi, ma moltiplicativi, oppure potrebbero essere non-lineari. Potrebbero essere presenti asintoti che il nostro modello non è in grado di descrivere, oppure la crescita/decrescita osservata potrebbero essere più lente/veloci di quanto la nostra funzione sia in grado di descrivere. Per tutti questi casi, ovviamente, la strategia più consigliabile è quella di utilizzare un diverso modello, capace di descrivere meglio le osservazioni sperimentali.
+
+### Trasformazione del predittore
+
+Quando il predittore è quantitativo e la risposta sembra non essere lineare è possibile trasformare il predittore stesso in modo da linearizzare la risposta. Ad esempio, se la risposta mostra un andamento esponenziale, la trasformazione del predittore in logaritmo può portare al sensibile miglioramento del fitting con un'equazione lineare. Vedremo un esempio di questa tecnica in un capitolo successivo.
+
+### Trasformazione della risposta
+
+Una strategia empirica, ma molto semplice, diffusa ed efficace, è quella di ricorrere alle trasformazioni correttive. Con questa tecnica, si trasformano i dati in modo da portarli su una metrica che soddisfi le assunzioni di base dei modelli lineari; successivamente si ripete l'elaborazione sui dati trasformati.
+
+Le trasformazioni possibili sono molte: ad esempio, i libri di testo più tradizionali (esempio: Snedecor e Cochran, 1991) consigliano la trasformazione in radice quadrata per i conteggi, la trasformazione angolare (arcoseno della radice quadrata) per le percentuali e la trasformazione in logaritmo per i dati log-normali, dove le variance sono proporzionali alle medie.
+
+Per evitare di scegliere la trasformazione 'al buio', si può impiegare la procedura suggerita da Box e Cox (1964), basata su una 'famiglia di trasformazioni', così definita:
+
+$$ W = \left\{ \begin{array}{ll}
+\frac{Y^\lambda - 1}{\lambda} & \quad \textrm{if} \,\,\, \lambda \neq 0 \\
+\log(Y) & \quad \textrm{if} \,\,\, \lambda = 0
+\end{array} \right.$$
+
+dove $W$ è la variabile trasformata, $Y$ è la variabile originale e $\lambda$ è il parametro che definisce la trasformazione [^08-assunzionibase-1]
+
+[^08-assunzionibase-1]: Nota: Considerate che il limite dell'espressione $(Y^\lambda -1)/\lambda$ per $\lambda \rightarrow 0$ è proprio $\log(Y)$
+
+Questa famiglia è molto flessibile, nel senso che cambiando il valore di $\lambda$ possiamo rimediare alla gran parte delle deviazioni rispetto alle assunzioni di base. Il valore ottimale (di massima verosimiglianza) per questo parametro può essere scelto con la funzione `boxcox()`, nel package `MASS`, come sarà mostrato negli esempi seguenti. Bisogna tener presente che, qualora il valore ottimale risultasse $\lambda = 1$, la trasformazione sarebbe completamente fittizia, in quanto, da ogni dato, verrebbe semplicemente sottratta un'unità, senza quindi alterare minimamente i risultati dell'analisi. **Di conseguenza, trovare che** $\lambda$ ottimale è uguale ad 1 viene considerato come evidenza del fatto che la trasformazione non è necessaria.
+
+### Esempio 8.1 (segue)
+
+Sebbene le analisi precedenti abbiano mostrato che il dataset "mixture" non viola significativamente le assunzioni di base per i modelli lineari, possiamo comunque valutare la necessità di una trasformazione, utilizzando la funzione `boxcox()` contenuta nel package `MASS` e passando l'oggetto risultante dal fitting come argomento (Codice sottostante). Questa funzione restituisce un grafico delle verosimiglianze associate a diversi valori di $\lambda$ (Fig. \@ref(fig:figName111a)); il valore ottimale sarebbe $\lambda = 0.83$, ma vediamo che anche $\lambda = 1$ rientra nell'intervallo di confidenza di $\lambda$ ottimale e, di conseguenza, si conferma che non è necessaria alcuna trasformazione stabilizzante.
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName111a-1.png" alt="Scelta del valore ottimale di 'lambda' per la trasformazione di Box e Cox: caso in cui la trasformazione non è necessaria" width="85%" />
+<p class="caption">(\#fig:figName111a)Scelta del valore ottimale di 'lambda' per la trasformazione di Box e Cox: caso in cui la trasformazione non è necessaria</p>
+</div>
+
+### Esempio 8.2 (segue)
+
+Il metodo Box-Cox per il dataset "insects" restituisce il grafico in Figura \@ref(fig:figName111b); il valore di massima verosimiglianza è $\lambda = 0.14$, e l'intervallo di confidenza del 95% va da poco meno di zero a circa 0.5. Pertanto, per semplicità, selezioniamo $\lambda = 0$, che corrisponde a una trasformazione logaritmica. Questa scelta è motivata dal fatto che si tratta di una trasformazione molto nota e, quindi, facilmente comprensibile.
 
 <div class="figure" style="text-align: center">
 <img src="_main_files/figure-html/figName111b-1.png" alt="Scelta del valore ottimale di 'lambda' per la trasformazione di Box e Cox: caso in cui è consigliabile una trasformazione logaritmica" width="85%" />
 <p class="caption">(\#fig:figName111b)Scelta del valore ottimale di 'lambda' per la trasformazione di Box e Cox: caso in cui è consigliabile una trasformazione logaritmica</p>
 </div>
 
-Vediamo che la verosimiglianza del modello raggiunge il massimo valore quando $\lambda$ è pari a 0.14. I limiti dell'intervallo di confidenza (linee verticali tratteggiate) vanno da poco sotto lo 0 a 0.5 circa. Rimanendo nell'ambito dell'intervallo di confidenza, scegliamo il valore $\lambda = 0$, che corrisponde alla trasformazione logaritmica. Questa scelta è motivata dal fatto che si tratta di una trasformazione molto nota e facilmente comprensibile.
+Il processo di analisi dei dati continua quindi trasformando i dati osservati nel loro logaritmo,e ripetendo il processo di stima del modello e sottoponendo a nuova verifica i residui risultanti. E' importante notare nel codice sottostante come la trasformazione dei dati venga eseguita all'interno del comando di adattamento del modello, il che è utile per motivi che saranno discussi nel prossimo capitolo.
 
-Pertanto, trasformiamo i dati nel logaritmo e ripetiamo la stima dei parametri.
+L'analisi grafica dei residui (che si lascia per esercizio) relativi ai dati trasformati non mostra più alcun sintomo di eteroschedasticità e, di conseguenza, il P-level calcolato sulla metrica logaritmica è totalmente affidabile. Procediamo quindi con l'analisi e richiediamo la tabella ANOVA, da cui si deduce che le differenze tra insetticidi sono significative ($P = 1.49 \times 10^{−6}$. Se confrontiamo le tabelle ANOVA ottenute con e senza trasformazione, osserviamo che vi sono lievi differenze nel P-value e che, in questo caso specifico, l'analisi sui dati trasformati è leggermente più potente. Comunque, l'analisi sui dati non trasformati è sbagliata ed invalida, perché non rispetta le assunzioni di base dei modelli lineari.
 
 
-```r
-mod <- lm(log(Count) ~ Insecticide, data = dataset)
-par(mfrow = c(1,2))
-plot(mod, which = 1)
-plot(mod, which = 2)
-```
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName112-1.png" alt="Analisi grafica dei residui per il dataset 'insects.csv', previa trasformazione logaritmica" width="85%" />
-<p class="caption">(\#fig:figName112)Analisi grafica dei residui per il dataset 'insects.csv', previa trasformazione logaritmica</p>
-</div>
-
-Vediamo che i dati trasformati non mostrano più alcun sintomo di eteroscedasticità e, di conseguenza, il P-level calcolato su questa metrica è totalmente affidabile. Procediamo quindi con l'analisi e richiediamo la tabella ANOVA, da cui si deduce che le differenze tra insetticidi sono significative (P = 1.493e-06).
 
 
 ```r
-anova(mod)
+# Adopting a stabilizing transformation
+
+mod2t <- lm(log(Count) ~ Insecticide, data = insects)
+anova(mod2t)
 ## Analysis of Variance Table
 ## 
 ## Response: log(Count)
@@ -3086,13 +3440,8 @@ anova(mod)
 ## Residuals   12  1.8938  0.1578                      
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-```
-
-Se confrontiamo la tabella sovrastante con quella che si ottiene dai dati non trasformati, riportata di seguito, vediamo che vi sono lievi differenze nel P-value, ma, comunque, in entrambi i casi si può procedere al rigetto dell'ipotesi nulla.
-
-
-```r
-anova(lm(Count ~ Insecticide, data = dataset))
+# Comparing with ANOVA on the untransformed data
+anova(mod2)
 ## Analysis of Variance Table
 ## 
 ## Response: Count
@@ -3103,14 +3452,12 @@ anova(lm(Count ~ Insecticide, data = dataset))
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-Tuttavia, l'analisi sui dati non trasformati è comunque sbagliata ed il P-value è invalido, il che può fare una grossa differenza nel caso in cui ci trovassimo vicini al valore critico di 0.05. La scelta della trasformazione è quindi un aspetto da non trascurare in fase di analisi dei dati delle prove sperimentali.
-
 Concludiamo con un'osservazione pratica: nel caso in cui risultasse che il valore di $\lambda$ ottimale è diverso sia da 1 che da 0, la trasformazione $W = (Y^\lambda - 1)/\lambda$ potrebbe essere semplificata in $W = Y^\lambda$, in modo da ottenere una metrica più facile da interpretare. Infatti, con $\lambda = 0.5$ avremmo una semplice trasformazione nella radice quadrata, mentre con $\lambda = -1$ avremmo l'altrettanto semplice trasformazione nel reciproco. Il box seguente mostra un esempio dell'equivalenza della trasformazione di Box e Cox nella forma originale e in quella semplificata: possiamo infatti notare che il rapporto F e il P-level sono esattamente uguali.
 
 
 ```r
-mod.1 <- lm(sqrt(Count) ~ Insecticide, data = dataset)
-mod.2 <- lm((Count^0.5 - 1)/0.5 ~ Insecticide, data = dataset)
+mod.1 <- lm(sqrt(Count) ~ Insecticide, data = insects)
+mod.2 <- lm((Count^0.5 - 1)/0.5 ~ Insecticide, data = insects)
 anova(mod.1)
 ## Analysis of Variance Table
 ## 
@@ -3131,49 +3478,94 @@ anova(mod.2)
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
+Un'altra osservazione di cui tener conto è che la famiglia di trasformazioni di Box-Cox non funziona quando i dati sono negativi o uguali a zero. In questi casi, è possibile selezionare un valore costante, $k$, da aggiungere alle osservazioni originali in modo che diventino strettamente positive. Ad esempio, se l'osservazione negativa più bassa è $-0.9$, possiamo usare la trasformazione $W = log(y + 1)$, che non produce errore in quanto non implica il calcolo del logaritmo di un numero negativo.
+
+## Risultati contraddittori
+
+La valutazione degli assunti di base è un passo fondamentale nell'analisi dei dati sperimentali è non deve mai essere dimenticata. Tuttavia, l'esperienza insegna che, nella pratica, è molto facile incontrare situazioni dubbie, nelle quali i risultati ottenuti con le diverse tecniche diagnostiche appaiono contraddittori e difficili da interpretare. Come comportarsi in questi casi? A mio parere bisogna sempre ricordare che la 'verità vera' ci sfugge e, di conseguenza, tutte le valutazioni debbono essere sempre condotte con il massimo 'buon senso'.
+
+Un aspetto importante da considerare è la tipologia del dato: conteggi e proporzioni difficilmente sono normalmente distribuiti ed omoscedastici e, con questi dati, la prudenza non è mai troppa, quando si tratta di impiegare modelli lineari. Allo stesso modo, è necessaria una grande prudenza quando si analizzano variabili quantitative dove la differenza tra le diverse tesi è molto grande, orientativamente più di un ordine di grandezza. Con conteggi proporzioni e variabili quantitative con medie molto diverse tra loro, l'assunzione di omogeneità delle varianze è quasi sempre violata ed è quindi necessario essere molto prudenti prima di confermare il rispetto delle assunzioni di base.
 
 ## Altri approcci 'avanzati'
 
-L'uso di trasformazioni stabilizzanti è stato molto di moda fino agli anni '80 del '900, quando la potenza di calcolo era estremamente bassa e rendeva possibile solo l'impiego di procedure semplici, come quelle indicate in questo libro. Oggigiorno, la diffusione di computer potenti a costo relativamente basso ha permesso la diffusione di modelli in grado di gestire anche errori non-normali e dati eteroscedastici. Questi modelli appartengono alle classi dei cosiddetti Modelli Lineari Generalizzati (GLM) o dei modelli con fitting basato sui Minimi Quadrati Generalizzati (GLS); sono molto flessibili, ma sono anche abbastanza complessi e non possono essere trattati su un testo introduttivo.
+L'uso di trasformazioni stabilizzanti è stato molto di moda fino agli anni '80 del '900, quando la potenza di calcolo era estremamente bassa e rendeva possibile solo l'impiego di procedure semplici, come quelle indicate in questo libro. Oggigiorno, la diffusione di computer potenti a costo relativamente basso ha permesso la diffusione di modelli in grado di gestire anche errori non-normali e dati eteroscedastici. Questi modelli appartengono alle classi dei cosiddetti Modelli Lineari Generalizzati (GLM) o dei modelli con fitting basato sui Minimi Quadrati Generalizzati (GLS); sono molto flessibili, ma sono anche abbastanza complessi e non possono essere trattati su un testo introduttivo (potete studiare, ad esempio, Venables e Ripley, 2002).
 
-Inoltre, per completezza di informazione, mensioneremo il fatto che esistono anche metodi di analisi dei dati che non fanno assunzioni parametriche o che ne fanno molto poche e sono, pertanto, noti come metodi non-parametrici. Non parleremo neanche di questi, rinviando chi fosse interessato alla lettura di testi specifici. 
+Inoltre, per completezza di informazione, mensioneremo il fatto che esistono anche metodi di analisi dei dati che non fanno assunzioni parametriche o che ne fanno molto poche e sono, pertanto, noti come metodi non-parametrici. Non parleremo neanche di questi, rinviando chi fosse interessato alla lettura di testi specifici (esempio: Siegel e Castellan 1988).
 
-
----
+------------------------------------------------------------------------
 
 ## Altre letture
 
+1.  Ahrens, W. H., D. J. Cox, and G. Budwar. 1990, Use of the arcsin and square root trasformation for subjectively determined percentage data. Weed science 452-458.
+2.  Anscombe, F. J. and J. W. Tukey. 1963, The examination and analysis of residuals. Technometrics 5: 141-160.
+3.  Box, G. E. P. and D. R. Cox. 1964, An analysis of transformations. Journal of the Royal Statistical Society, B-26, 211-243, discussion 244-252.
+4.  Brown MB, Forsythe AB (1974) Robust tests for the equality of variances. J Am Stat Assoc 69(346):364--367
+5.  Cochran WG (1947) Some consequences when the assumptions for the analysis of variance are not satisfied. Biometrics 3(1):22. <https://doi.org/10.2307/3001535>. <https://www.jstor.org/stable/3001535?origin=crossref>
+6.  Conover WJ, Johnson ME, Johnson MM (1981) A comparative study of tests for homogeneity of variances, with applications to the outer continental shelf bidding data. Technometrics 23(4):351--361
+7.  Frey J, Hartung J, Ogutu J, Piepho H (2024) Analyze as randomized---why dropping block effects in designed experiments is a bad idea. Agron J 116(3):1371--1381. <https://doi.org/10.1002/agj2>. 21570. <https://acsess.onlinelibrary.wiley.com/doi/10.1002/agj2.21570>
+8.  Glass G, Peckham P, Sanders J (1972) Consequences of failure to meet assumptions underlying the fixed effects analyses of variance and covariance. Rev Educ Res 42(3):237--288
+9.  Grubbs FE (1969) Procedures for detecting outlying observations in samples. Technometrics 11(1):1--21
+10. Kass RE, Caffo BS, Davidian M, Meng XL, Yu B, Reid N (2016) Ten simple rules for effective statistical practice. PLOS Comput Biol 12(6):e1004961. <https://doi.org/10.1371/journal.pcbi>. 1004961. <https://dx.plos.org/10.1371/journal.pcbi.1004961>
+11. Knief U, Forstmeier W (2021) Violating the normality assumption may be the lesser of two evils. Behav Res Methods 53(6):2576--2590. <https://doi.org/10.3758/s13428-021-01587-5>. <https://> link.springer.com/10.3758/s13428- 021- 01587- 5
+12. Kozak M, Piepho H (2018) What's normal anyway? Residual plots are more telling than significance tests when checking ANOVA assumptions. J Agron Crop Sci 204(1):86--98. <https://> doi.org/10.1111/jac.12220. <https://onlinelibrary.wiley.com/doi/10.1111/jac.12220>
+13. Onofri A, Covarelli L, Tei F (1995) Efficacy of rimsulfuron and metribuzin against Solanum nigrum L. at different growth stages in tomato. In: International Meeting on Weed Control. Proceedings 16th COLUMA Conference, Reims, ANPP, Reprints, pp 993--1000
+14. Siegel S, Castellan NJ (1988) Nonparametric Statistics for the Behavioral Sciences. McGraw-Hill, Columbus
+15. Snedecor GW, Cochran WG (1991) Statistical Methods, 8th edn. IOWA State University Press, Ames
+16. Venables WN, Ripley BD (2002) Modern Applied Statistics with S. Statistics and Computing, 4th edn. Springer, New York
 
-1. Ahrens, W. H., D. J. Cox, and G. Budwar. 1990, Use of the arcsin and square root trasformation for subjectively determined percentage data. Weed science 452-458.
-2. Anscombe, F. J. and J. W. Tukey. 1963, The examination and analysis of residuals. Technometrics 5: 141-160.
-3. Box, G. E. P. and D. R. Cox. 1964, An analysis of transformations. Journal of the Royal Statistical Society, B-26, 211-243, discussion 244-252.
-4. D’Elia, A. 2001, Un metodo grafico per la trasformazione di Box-Cox: aspetti esplorativi ed inferenziali. STATISTICA LXI: 630-648.
-5. Pinheiro, J.C., Bates, D.M., 2000. Mixed-Effects Models in S and S-Plus, Springer-Verlag Inc. ed. Springer-Verlag Inc., New York.
-6. Saskia, R. M. 1992, The Box-Cox transformation technique: a review. Statistician 41: 169-178.
-7. Siegel, S e Castellan N.J. (1992) Statistica non-parametrica. McGraw-Hill, Milano.
+## Esercizi
 
+1.  Considerare gli esercizi dal 5 al 7 nel capitolo 4. Per tutti questi esercizi, verificare che le ipotesi di base per i modelli lineari siano soddisfatte, utilizzando metodi grafici e test di ipotesi formali.
 
 <!--chapter:end:08-AssunzioniBase.Rmd-->
 
-# Contrasti e confronti multipli
+# Combinazioni lineari/nonlineari dei parametri
 
 
-La scomposizione della varianza (ANOVA fisheriana) rappresenta frequentemente il primo passo nell'elaborazione statistica dei dati sperimentali. Essa consente di quantificare l'errore sperimentale e ci permette di sapere se l'effetto del trattamento (nel suo complesso) è risultato significativo. Tuttavia, con la sola ANOVA non possiamo ancora definire una graduatoria di merito tra i diversi trattamenti sperimentale e capire cosa è stato meglio di cosa.  Per questo motivo, dopo l'ANOVA, l'analisi dei dati prosegue, di solito, con il confronto tra medie o tra gruppi di medie, per capire se vi siano differenze significative tra un trattamento e l'altro. Ovviamente, La significatività di queste differenze è solo uno degli aspetti che più ci interessano, in quanto è anche molto importante valutare la loro rilevanza biologica. Infatti una differenza potrebbe essere significativa, ma irrilevante da un punto di vista agronomico o, viceversa, essa potrebbe essere non significativa, ma estremamente rilevante, quindi meritevole di ulteriori approfondimenti scientifici.
 
-Questa parte del lavoro viene usualmente eseguita utilizzando i **contrasti lineari**, che introdurremo utilizzando lo stesso dataset che abbiamo già iniziato ad analizzare nei due capitoli precedenti ('mixture.csv').
 
-## Esempio 1
+Dopo aver dimostrato che un modello fornisca una buona descrizione dei dati sperimentali e che non vi siano violazioni degli assunti di base, è possibile testare diverse ipotesi rilevanti che siano 'traducibili' in combinazioni lineari o non lineari dei parametri del modello, cioè delle funzioni che coinvolgono i parametri ed un insieme di coefficienti; per comprendere questo concetto e la sua importanza, iniziamo con un esempio.
 
-Torniamo al nostro esperimento in cui abbiamo confrontato due erbicidi e la loro miscela con il testimone non trattato, in un disegno sperimentale completamente randomizzato con quattro repliche. Ricarichiamo il dataset ed eseguiamo l'ANOVA, come abbiamo visto nel Capitolo 7. Ricordiamo anche che, nel Capitolo 8, l'analisi grafica dei residui ha confermato che, per questo dataset, non vi sono problemi con le assunzioni di base per i modelli lineari.
+## Esempio 9.1: Determinare l'effetto medio degli erbicidi
 
+Torniamo al nostro esperimento in cui abbiamo confrontato due erbicidi e la loro miscela con il testimone non trattato, in un disegno sperimentale completamente randomizzato con quattro repliche. Nel capitolo precedente, abbiamo visto che non vi sono problemi con nessuna delle assunzioni di base per il fitting dei modelli lineari, mentre l'analisi della varianza ed il relativo test di F hanno mostrato come esistano differenze significative tra alcuni dei trattamenti. Nel riquadro sottostante riportimo nuovamente il codice R per l'adattamento del modello.
 
 
 ```r
-repo <- "https://www.casaonofri.it/_datasets/"
-file <- "mixture.csv"
-pathData <- paste(repo, file, sep = "")
-dataset <- read.csv(pathData, header = T)
+# Example 9.1
+# Determining the average effect of herbicides in the 'mixture' data
+
+# Loading the packages
+library(statforbiology)
+library(multcomp)
+
+# Loading the data
+dataset <- getAgroData("mixture")
+
+# Fitting a one-way ANOVA model
 model <- lm(Weight ~ Treat, data=dataset)
+summary(model)
+## 
+## Call:
+## lm(formula = Weight ~ Treat, data = dataset)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -6.360 -2.469  0.380  2.567  6.025 
+## 
+## Coefficients:
+##                     Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)            9.175      1.959   4.684 0.000529 ***
+## TreatMixture_378      -4.047      2.770  -1.461 0.169679    
+## TreatRimsulfuron_30    7.685      2.770   2.774 0.016832 *  
+## TreatUnweeded         17.598      2.770   6.352 3.65e-05 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 3.918 on 12 degrees of freedom
+## Multiple R-squared:  0.8554,	Adjusted R-squared:  0.8193 
+## F-statistic: 23.66 on 3 and 12 DF,  p-value: 2.509e-05
+# Variance partitioning
 anova(model)
 ## Analysis of Variance Table
 ## 
@@ -3185,13 +3577,212 @@ anova(model)
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-L'analisi della varianza ed il relativo test di F ci dicono che esiste una qualche differenza significativa tra i trattamenti, ma rimane il problema di classificare le soluzioni diserbanti in ordine di efficacia. Per prima cosa, calcoliamo le medie dei trattamenti, utilizzando la funzione `emmeans()` del package 'emmeans':
+A questo punto, è rilevante chiedersi: "Il controllo delle piante infestanti è stato (in media) una pratica efficace?". Questa domanda 'biologica' può essere tradotta in una combinazione lineare dei parametri stimati, cioè: $\mu$ = 9.175, $\alpha_2$ = -4,0475, $\alpha_3$ = 7.685 e $\alpha_4$ = 17.5975, dove $\mu$ è la media del primo erbicida (in ordine alfabetico), $\alpha_2$, $\alpha_3$ e $\alpha_4$ sono, rispettivamente, le differenze tra le medie del secondo, terzo e quarto trattamento e la media del primo (vedi Capitolo 4). Con queste stime, possiamo calcolare la media dei vasi non trattati come $\mu_u = \mu + \alpha_4$, e la media dei vasi trattati come $\mu_t = [\mu + (\mu + \alpha_2) + (\mu + \alpha_3)]/3$, ovvero $\mu_t = \mu + 1/3 \, \alpha_2 + 1/3 \, \alpha_3$. Di conseguenza, la differenza tra vasi trattati e non trattati è uguale alla seguente combinazione lineare: $\delta_{tu} = \mu_t - \mu_{ut} = 1/3 \, \alpha_2 + 1/3 \, \alpha_3 - \alpha_4$. Il risultato di questa combinazione ($\delta_{tu}$) risponde alla domanda precedente: se $\delta_{tu} < 0$ possiamo concludere che il trattamento erbicida è, in media, efficace nel ridurre la biomassa di *Solanum nigrum*.
+
+La combinazione lineare sopra definita può essere espressa come somma dei prodotti di un insieme di parametri per un insieme di coefficienti:
+
+$$C = 0 \cdot \mu + \frac{1}{3} \cdot \alpha_2 + \frac{1}{3} \cdot \alpha_3 - 1 \cdot \alpha_4$$
+
+In questa espressione, la matrice dei coefficienti è:
+
+$$K = \left[0 \,\,\, 1/3 \,\,\, 1/3 \,\, -1 \right]$$
+
+Vedremo che in R esistono alcune funzioni che ricevono in input l'elenco dei parametri stimati e la matrice dei coefficienti e restituiscono il valore della combinazione (in questo caso: $C = \delta_{tu} = -16,385$), insieme al suo errore standard ottenuto tramite la legge di propagazione degli errori, considerando le varianze e le covarianze dei parametri del modello. Maggiori dettagli sulla propagazione degli errori sono reperibili nel blog associato a questo libro[^09-confrontomultiplo-1].
+
+[^09-confrontomultiplo-1]: vedi: \url{https://www.statforbiology.com/2024/stat_general_errorpropagation/}
+
+Una delle funzioni più importanti è flessibili è `glht()`, contenuta nel package `multcomp`, il cui impiego è mostrato nel riquadro sottostante, insieme a quello della funzione `confint()` che può essere utilizzata per ottenere l'intervallo di confidenza.
 
 
 ```r
-library(emmeans)
-medie <- emmeans(model, ~Treat)
-medie
+# Example 9.1 [continuation]
+
+# Fitting linear combinations with the 'glht()' function in R
+library(multcomp)
+
+# Setting the matrix of coefficients
+K <- matrix(c(0, 1/3, 1/3, -1),
+            nrow = 1, ncol = 4, byrow = T)
+row.names(K) <- c("delta_tu")
+K
+##          [,1]      [,2]      [,3] [,4]
+## delta_tu    0 0.3333333 0.3333333   -1
+# Fitting the contrast
+con <- glht(model, linfct = K)
+summary(con)
+## 
+## 	 Simultaneous Tests for General Linear Hypotheses
+## 
+## Fit: lm(formula = Weight ~ Treat, data = dataset)
+## 
+## Linear Hypotheses:
+##               Estimate Std. Error t value Pr(>|t|)    
+## delta_tu == 0  -16.385      2.262  -7.244 1.02e-05 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## (Adjusted p values reported -- single-step method)
+# Confidence intervals 
+confint(con)
+## 
+## 	 Simultaneous Confidence Intervals
+## 
+## Fit: lm(formula = Weight ~ Treat, data = dataset)
+## 
+## Quantile = 2.1788
+## 95% family-wise confidence level
+##  
+## 
+## Linear Hypotheses:
+##               Estimate lwr      upr     
+## delta_tu == 0 -16.3850 -21.3132 -11.4568
+```
+
+È importante notare che la stima $\delta_{tu}$ può essere divisa per il suo errore standard per ottenere un test t per l'ipotesi nulla che la stima osservata non sia significativamente diversa da zero (vedere Sezione 7.1). Il valore P corrispondente è molto basso, consentendo il rifiuto dell'ipotesi nulla. Pertanto, concludiamo che l'effetto medio dell'erbicida è statisticamente significativo.
+
+## Esempio 9.2: Determinare l'efficiacia erbicida media
+
+I concetti precedenti possono essere estesi a qualsiasi altra funzione dei parametri del modello, anche se non può essere ricondotta alla somma dei prodotti dei coefficienti per i parametri (come nell'Equazione riportata nel precedente paragrafo) oppure se è intrinsecamente non lineare (cioè contiene logaritmi o altre funzioni che non siano semplici somme di parametri). L'unica differenza è che, con le combinazioni non lineari, gli errori standard non possono essere calcolati con il metodo di propagazione degli errori, ma debbono essere approssimati utilizzando il cosiddetto **metodo delta** (Weisberg, 2005)[^09-confrontomultiplo-2].
+
+[^09-confrontomultiplo-2]: Chi fosse interessato può trovare informazioni sul nel blog associato, all'indirizzo \\url{<https://www.statforbiology.com/2024/stat_general_thedeltamethod_edit/>
+
+In R, possiamo utilizzare la funzione `gnlht()` nel package `statforbiology`, che generalizza l'approccio della `glht()`. Come esempio, riconsideriamo il dataset "mixture" ed utilizziamo i parametri del modello per calcolare la riduzione percentuale della crescita delle infestanti rispetto al controllo non trattato (efficacia erbicida; HE). Per il primo erbicida, è:
+
+$$\textrm{HE} = \frac{\mu_4 - \mu_1}{\mu_4} \times 100 = \frac{\mu_1 + \alpha_4 - \mu_1}{\mu_1 + \alpha_4} \times 100 = \frac{\alpha_4}{\mu_1 + \alpha_4} \times 100$$
+
+In questa espressione, i parametri $\mu_1$ e $\alpha_4$ sono al denominatore e, pertanto, questa combinazione è non lineare. Le espressioni per ottenere gli HE per tutti gli altri erbicidi possono essere ottenute con semplici calcoli algebrici, come riportato nel succesivo riquadro.
+
+Per utilizzare la funzione `gnlht()` bisogna codificare la lista delle funzioni da calcolare e passarla come argomento. Inoltre, il legame tra il nome dei parametri utilizzati in tali combinazioni e la posizione delle relative stime come risulta nell'output della funzione `coef()` viene creato con l'argomento `parameterNames`. Le efficacie dei tre erbicidi sono rispettivamente del 65%, 80% e 37% e sono tutte significativamente diverse da 0 (riquadro sottostante)
+
+
+```r
+# Esempio 9.2
+# Determinazione dell'efficacia media degli erbicidi nei dati della miscela
+
+# Caricamento dei pacchetti e dei dati
+library(statforbiology)
+dataset <- getAgroData("mixture")
+
+# Adattamento di un modello ANOVA ad una via
+model <- lm(Weight ~ Treat, data=dataset)
+
+# Adattamento di combinazioni non lineari con 'gnlht()'
+library(statforbiology)
+funList <- list(~ a4/(mu1 + a4) * 100,
+                ~ (a4 - a2)/(mu1 + a4) * 100, 
+                ~ (a4 - a3)/(mu1 + a4) * 100)
+gnlht(model, funList, parameterNames = c("mu1", "a2", "a3", "a4"))
+##                         Form Estimate       SE   t-value      p-value
+## 1        a4/(mu1 + a4) * 100 65.72976 7.734313  8.498461 2.014359e-06
+## 2 (a4 - a2)/(mu1 + a4) * 100 80.84788 7.449568 10.852694 1.469226e-07
+## 3 (a4 - a3)/(mu1 + a4) * 100 37.02493 8.646543  4.282050 1.065143e-03
+```
+
+## Combinazioni di interesse generale
+
+Le funzioni lineari e non lineari dei parametri del modello sono molto utili per rispondere a specifiche domande di ricerca, anche se, soprattutto quando sono molte, la codifica 'manuale' della matrice dei coefficienti può rivelarsi un compito molto noioso. Fortunatamente, R ci ci mette a disposizione diverse matrici pre-definite per le combinazioni lineari o non lineari di maggior interesse generale, cioè:
+
+1.  Medie Marginali attese (EMMs)
+2.  Contrasti ortogonali (e non)
+3.  Confronti a coppie
+4.  Retrotrasformazioni
+5.  Previsioni e previsioni inverse
+
+\section{Esempio 9.3: Medie marginali attese}
+
+Nelle situazioni in cui abbiamo uno o più predittori nominali, il nostro interesse principale, di solito, è quello di stimare le medie della popolazione per ogni livello di trattamento (ad esempio, $\mu_1$, $\mu_2$, $\mu_3$, $\ldots{}$ e $\mu_n$, dove $n$ è il numero di livelli di trattamento). Sebbene le medie aritmetiche dei gruppi di trattamento possano essere utilizzate come stimatori delle medie delle relative popolazioni (vedere la funzione `tapply()` nel Capitolo 3), è necessario tener conto che si tratta di stimatori che, in alcune circostanze, possono essere distorti, ad esempio quando i dati sono sbilanciati (numero diverso di repliche per ciascun gruppo di trattamento). Le medie marginali attese (Expected Marginal Means; EMMs) rappresentano un'importante alternativa: sono uguali alle medie aritmetiche quando i dati sono bilanciati, mentre forniscono stimatori migliori delle medie della popolazione quando i dati sono sbilanciati. Le EMMs possono essere facilmente ottenute come combinazioni lineari dei parametri del modello; ad esempio, tornando al dataset "mixture", nell'esempio 9.1, dove i parametri stimati sono $\mu = 9.175$, $\alpha_2 = -4.0475$, $\alpha_3 = 7.685$ e $\alpha_4 = 17.5975$ ed hanno il significato biologico illustrato in precedenza (media del primo gruppo e differenze tra le medie degli altri gruppi rispetto al primo), le quattro EMMs possono essere ottenuti dalle seguenti combinazioni lineari:
+
+$$\left\{ {\begin{array}{l}
+C_1 = \mu_1 = 1 \cdot \mu + 0 \cdot \alpha_2 + 0 \cdot\alpha_3 + 0 \cdot\alpha_4 = 9,18\\
+C_2 = \mu_2 = 1 \cdot \mu + 1 \cdot \alpha_2 + 0 \cdot\alpha_3 + 0 \cdot\alpha_4 = 5,13\\
+C_3 = \mu_3 = 1 \cdot \mu + 0 \cdot \alpha_2 + 1 \cdot\alpha_3 + 0 \cdot\alpha_4 = 16:86\\
+C_4 = \mu_4 = 1 \cdot \mu + 0 \cdot \alpha_2 + 0 \cdot\alpha_3 + 1 \cdot\alpha_4 = 26,77\\
+\end{array}} \right.$$
+
+La matrice dei coefficienti è:
+
+$$ K = \left[ {\begin{array}{llll}
+1 & 0 & 0 & 0\\
+1 & 1 & 0 & 0\\
+1 & 0 & 1 & 0\\
+1 & 0 & 0 & 1
+\end{array}} \right]$$
+
+In linea di principio, per calcolare queste combinazioni si può utilizzare la funzione `glht()` nel package `multcomp`, come mostrato nel riquadro sottostante.
+
+
+```r
+# Esempio 9.3
+# Medie dei minimi quadrati per i dati 'mixture'
+
+# Caricamento dei pacchetti
+library(statforbiology)
+library(multcomp)
+
+# Caricamento dei dati
+dataset <- getAgroData("mixture")
+
+# Adattamento di un modello ANOVA ad una via
+model <- lm(Weight ~ Treat, data=dataset)
+
+# Stima degli EMM con la funzione 'glht()'
+
+# Impostazione della matrice dei coefficienti
+K <- matrix(c(1,0,0,0,1,1,0,0,1,0,1,0,1,0,0,1),
+nrow = 4, ncol = 4, byrow = T)
+row.names(K) <- c("mu1", "mu2", "mu3", "mu4")
+K
+##     [,1] [,2] [,3] [,4]
+## mu1    1    0    0    0
+## mu2    1    1    0    0
+## mu3    1    0    1    0
+## mu4    1    0    0    1
+# Calcolo della combinazione lineare
+con <- glht(model, linfct = K)
+summary(con)
+## 
+## 	 Simultaneous Tests for General Linear Hypotheses
+## 
+## Fit: lm(formula = Weight ~ Treat, data = dataset)
+## 
+## Linear Hypotheses:
+##          Estimate Std. Error t value Pr(>|t|)    
+## mu1 == 0    9.175      1.959   4.684  0.00199 ** 
+## mu2 == 0    5.127      1.959   2.618  0.08143 .  
+## mu3 == 0   16.860      1.959   8.607  < 0.001 ***
+## mu4 == 0   26.773      1.959  13.668  < 0.001 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## (Adjusted p values reported -- single-step method)
+# Intervalli di confidenza
+confint(con)
+## 
+## 	 Simultaneous Confidence Intervals
+## 
+## Fit: lm(formula = Weight ~ Treat, data = dataset)
+## 
+## Quantile = 2.8936
+## 95% family-wise confidence level
+##  
+## 
+## Linear Hypotheses:
+##          Estimate lwr     upr    
+## mu1 == 0  9.1750   3.5069 14.8431
+## mu2 == 0  5.1275  -0.5406 10.7956
+## mu3 == 0 16.8600  11.1919 22.5281
+## mu4 == 0 26.7725  21.1044 32.4406
+```
+
+Tuttavia, soprattutto quando il numero di medie è molto elevato, codificare la matrice dei coefficienti da zero può essere un compito arduo; pertanto, per il calcolo degli EMMs, si preferisce la funzione `emmeans()` nel pacchetto `emmeans` (Lenth, 2016), perché è molto più semplice da usare. Richiede due argomenti di base: l'oggetto modello e il predittore per il quale si desidera calcolare le EMMs (riquadro sottostante).
+
+
+```r
+# Esempio 9.3 [continuazione]
+
+# EMMs con la funzione 'emmeans()'
+
+library(emmeans) # Carica il pacchetto
+muj <- emmeans(model, ~Treat)
+muj
 ##  Treat           emmean   SE df lower.CL upper.CL
 ##  Metribuzin__348   9.18 1.96 12     4.91     13.4
 ##  Mixture_378       5.13 1.96 12     0.86      9.4
@@ -3201,122 +3792,172 @@ medie
 ## Confidence level used: 0.95
 ```
 
-Vediamo che l'output di R riporta anche gli errori standard delle medie (SEM) e gli intervalli di confidenza. 
+Oltre a essere stime affidabili delle medie della popolazione, le EMMs possono anche servire come punto di partenza per costruire ulteriori combinazioni lineari o non lineari, che saranno esaminate in seguito.
 
-## I contrasti
+## Example 9.4: Contrasti ortogonali (e non)
 
-Si definisce CONTRASTO una combinazione lineare delle medie dei trattamenti, in modo che i coefficienti sommati diano 0. Ad esempio, considerando i parametri del modello precedente, una combinazione lineare del tipo:
+Nell'Esempio 9.1, abbiamo visto che una combinazione lineare dei parametri del modello può aiutare a rispondere ad una domanda 'biologica' rilevante, basata sulla differenza tra la media dei vasi non trattati e la media dei vasi trattati. Considerando sempre il dataset "mixture", è possibile pianificare tre combinazioni che reppresentano differenze tra medie, cioè:
 
+1.  trattato vs. non trattato (in media)
+2.  miscela vs. erbicidi singoli (in media)
+3.  metribuzin vs. rimsulfuron
 
-$$k = \frac{1}{3} \cdot 9.18 + \frac{1}{3} \cdot 5.13 + \frac{1}{3} \cdot 16.86 - 1 \cdot 26.77  = -16.385$$
+Invece che combinare i parametri del modello come nell'Esempio 9.1, le tre combinazioni di cui sopra possono anche essere codificate come combinazioni tra le medie. Se consideriamo l'ordine con cui compaiono le quattro medie nel dataset `muj` in un riquadro precedente, in Code box 9.5, le tre combinazioni lineari possono essere scritte come:
 
-è un contrasto, in quanto la somma dei coefficienti è:
+$$\left\{ {\begin{array}{l}
+C_1 = \frac{1}{3} \, \mu_1 + \frac{1}{3} \, \mu_2 + \frac{1}{3} \,\mu_3 - \mu_4\\
+C_2 = \frac{1}{2} \, \mu_1 - \mu_2 + \frac{1}{2} \,\mu_3 - 0 \cdot \mu_4\\
+C_3 = \mu_1 - 0 \cdot \mu_2  - \mu_3 - 0 \cdot \mu_4
+\end{array}} \right.$$
 
-$$\frac{1}{3} + \frac{1}{3} + \frac{1}{3} - 1 = 0$$
+Le tre combinazioni lineari C1, C2 e C3 hanno la tipica proprietà che, per ognuna, la somma dei coefficienti è zero e, per questo, sono chiamate **contrasti**. Ne consegue che il risultato di un contrasto deve essere uguale a 0, quando la differenza tra medie o gruppi di medie che esso sottende è uguale a zero, di modo che sia possibile utilizzare un test di t per saggiare questa ipotesi nulla.
 
-Al contrario una combinazione lineare del tipo:
+Inoltre, i tre contrasti sopra riportati hanno l'ulteriore caratteristica che i loro coefficienti sono reciprocamente non correlati e, pertanto, sono chiamati **contrasti ortogonali**. Normalmente, in un dataset esistono tanti contrasti ortogonali quante sono le medie meno una.
 
-$$k2 = 1 \cdot 9.18 + 1 \cdot 5.13 + 1 \cdot 16.86 - 1 \cdot 26.77$$
+L'ortogonalità era considerata una proprietà desiderabile perché la somma delle devianze associate ad ogni contrasto corrisponde alla devianza del trattamento (vedere il riquadro sottostante). Pertanto, l'applicazione dei contrasti ortogonali era considerata un metodo elegante ed efficiente per sfruttare l'intera informazione contenuta (Chew, 1976). Oggigiorno, l'enfasi sull'ortogonalità è minore, ma può essere utile fornire un esempio di come i contrasti ortogonali possano essere calcolati con R, utilizzando la funzione `contrast()` nel package `emmeans`.
 
+I tre passaggi tipici sono:
 
-non è un contrasto, perché la somma dei coefficienti non è zero (1 + 1 + 1 - 1 = 2).
-
-Il primo contrasto $k$, ha un preciso significato biologico, in quanto stima la differenza tra il non diserbato e la media dei diserbati. Il risultato è -16.39, il che farebbe pensare che, nei vasetti diserbati vi siano, mediamente, meno infestanti che non in quelli non trattati. Tuttavia, noi non siamo interessati ai soli vasetti impiegati in prova, ma vogliamo trarre conclusioni di carattere generale. Sappiamo già che l'errore sperimentale produce incertezza sulla stima delle medie delle popolazioni, che si propaga al contrasto, per il quale dovremmo cercare di calcolare la deviazione standard e l'intervallo di confidenza.
-
-La varianza di un contrasto può essere calcolata come combinazione lineare di varianze, attraverso il metodo di propagazione degli errori. Considerando che le medie sono, usualmente, indipendenti, la varianza di un contrasto tra medie è:
-
-
-$$\textrm{var}(A \mu_1 + B \mu_2) = (A \cdot \sigma_{\mu_1} )^{2}  + (B \cdot \sigma_{\mu_2} ) ^ 2$$
-
-
-dove A e B sono i coefficienti del contrasto, $\mu_1$ e $\mu_2$ sono due medie e $\sigma_{\mu_1}$ e $\sigma_{\mu_2}$ sono gli errori standard di $\mu_1$ e $\mu_2$. Nel nostro caso, la varianza del contrasto è:
-
-$$\textrm{var}(k) = \left( \frac{1}{3} \right)^2 \cdot 3.83703  +  \left( \frac{1}{3}\right)^2 \cdot 3.83703 + \left( \frac{1}{3}  \right)^2 \cdot 3.83703 + \left( - 1 \right)^2 \cdot 3.83703  = 5.11604$$
-
-mentre la deviazione standard (cioè l'errore standard) del contrasto è pari a:
-
-$$ SE(k) = \sqrt{5.11604} = 2.261866$$
-
-Insomma, per il contrasto $k$ abbiamo una stima puntuale (-16.4) e un errore standard (2.26), che può essere utilizzato per calcolare l'intervallo di confidenza del contrasto, secondo le metodiche usuali che abbiamo gia visto in un capitolo precedente. Ovviamente, se l'intervallo di confidenza di un contrasto contiene lo 0, siamo portati, intuitivamente, a concludere che il contrasto stesso non è significativo.
-
-In modo più formale, potremmo chiederci: "E' possibile che il contrasto, nella realtà, sia uguale a 0?". Ovviamente è possibile: il nostro è solo un campione e, se ripetessimo il campionamento, potremmo ottenere valori di $k$ totalmente diversi da quello effettivamente osservato. Poniamo l'ipotesi nulla in questi termini:
-
-$$H_0: \kappa = 0$$
-
-dove $\kappa$ è il valore 'vero' del contrasto, per le popolazioni che hanno generato i dati. Scriviamo la statistica:
-
-$$T = \frac{k}{ES(k)} = \frac{-16.385}{2.261866} = -7.244$$
-
-Se l'ipotesi nulla è vera, che probabilità abbiamo di osservare T = -7.244? Abbia già visto che il rapporto tra una stima ed il suo errore standard ha una distribuzione t di Student, con un numero di gradi di libertà pari a quelli del residuo dell'ANOVA. Di conseguenza possiamo saggiare l'ipotesi nulla che il contrasto è uguale a 0 calcolando la probabilità di trovare un valore di T pari o superiore (in valore assoluto) a quello da noi ottenuto. Nell'esempio sottostante abbiamo moltiplicato la probabilità trovata per 2, dato che si tratta di un test a due code:
+1. preparare una lista con i coefficienti, assegnando un nome a ciascun contrasto (si noti che questa è una differenza rispetto alla funzione `glht()`, che richiede una matrice di coefficienti, non una lista);
+2. utilizzare la funzione `contrast()` nel package `emmeans`, passando i seguenti argomenti: (i) l'oggetto risultante dalla chiamata alla funzione `emmeans()`; (ii) la lista dei contrasti $K$, come argomento `method`; (iii) il tipo di aggiustamento (ne parleremo più avanti, per ora utilizzate il comando così come mostrato nel riquadro sottostante)
 
 
 ```r
-Tval <- -16.385 / 2.261866
-2 * pt(abs(Tval), 12, lower.tail = F)
-## [1] 1.023001e-05
+# Example 9.4
+# Orthogonal contrasts with the 'emmeans()' function
+
+# Loading the packages
+library(statforbiology)
+library(emmeans)
+library(multcomp)
+
+# Loading the data
+dataset <- getAgroData("mixture")
+
+# Fitting a one-way ANOVA model
+model <- lm(Weight ~ Treat, data=dataset)
+
+# Creating a vector of coefficients for each contrast
+C1 <- c(1/3, 1/3, 1/3, -1)
+C2 <- c(1/2, -1, 1/2, 0)
+C3 <- c(1, 0, -1, 0)
+
+# Creating a list of contrasts (NOT a matrix)
+K <- list("U vs T" = C1, 
+          "mix vs single" = C2,
+          "met vs rim" = C3)
+
+# Fitting the contrasts, using the 'muj' object
+muj <- emmeans(model, ~Treat)
+con <- contrast(muj, method = K, adjust="none")
+con
+##  contrast      estimate   SE df t.ratio p.value
+##  U vs T          -16.39 2.26 12  -7.244  <.0001
+##  mix vs single     7.89 2.40 12   3.289  0.0065
+##  met vs rim       -7.68 2.77 12  -2.774  0.0168
+# Confidence intervals
+confint(con)
+##  contrast      estimate   SE df lower.CL upper.CL
+##  U vs T          -16.39 2.26 12   -21.31   -11.46
+##  mix vs single     7.89 2.40 12     2.66    13.12
+##  met vs rim       -7.68 2.77 12   -13.72    -1.65
+## 
+## Confidence level used: 0.95
 ```
 
-
-Possiamo quindi concludere che la differenza tra la media dei vasetti trattati e quella dei vasetti non trattati è pari a -16.34 g e ci sono elementi sufficienti per ritenere che essa sia diversa da 0.
-
-
-## I contrasti con R
-
-Nel caso in esempio, si potrebbero pianificare quattro contrasti (incluso quello già discusso):
-
-1. trattato vs. non trattato (in media)
-2. miscela vs. erbicidi singoli (in media)
-3. miscela vs. rimsulfuron
-4. miscela vs. metribuzin
-
-Per eseguire i contrasti con R, dobbiamo, in primo luogo, definire i vettori dei coefficienti. Per il primo contrasto, abbiamo già visto che questo vettore è:
+I contrasti ortogonali possono essere calcolati anche utilizzando la funzione `aov()`. In questo caso, l'elenco dei contrasti deve essere trasformato in una matrice e associato al fattore sperimentale tramite la funzione `C()` (notare la lettera maiuscola; vedere il riquadro sottostante). Utilizzando questa codifica, è possibile vedere che la somma dei quadrati per l'effetto del trattamento è completamente suddivisa in tre parti, una per ciascun contrasto, producendo valori P identici a quelli mostrati nel riquadro precedente.
 
 
 ```r
-k1 <- c(1/3, 1/3, 1/3, -1)
+# Example 9.4 [continuation]
+
+# Fitting orthogonal contrasts and partitioning
+# the sum of squares for the treatment effect
+
+# Creating a vector of coefficients for each contrast (as in Code box 9.6)
+C1 <- c(1/3, 1/3, 1/3, -1)
+C2 <- c(1/2, -1, 1/2, 0)
+C3 <- c(1, 0, -1, 0)
+
+# Creating a list of contrasts (as in Code box 9.6)
+K <- list("U vs T" = C1, 
+          "mix vs single" = C2,
+          "met vs rim" = C3)
+
+# Transform the list of contrasts into a matrix
+Kmat <- do.call(rbind, K)
+
+# Associate the matrix of coefficients to the treatment factor
+dataset$Treat2 <- C(factor(dataset$Treat), t(Kmat))
+
+# Fit the model with the 'aov()' function
+mod <- aov(Weight ~ Treat2, dataset)
+summary(mod, split = list(Treat2 = list(1,2,3)))
+##              Df Sum Sq Mean Sq F value   Pr(>F)    
+## Treat2        3 1089.5   363.2  23.663 2.51e-05 ***
+##   Treat2: C1  1  805.4   805.4  52.476 1.02e-05 ***
+##   Treat2: C2  1  166.0   166.0  10.816  0.00647 ** 
+##   Treat2: C3  1  118.1   118.1   7.696  0.01683 *  
+## Residuals    12  184.2    15.3                     
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-Per gli altri tre contrasti, i coefficienti sono:
 
+## Esempio 9.5: I confronti multipli a coppie
 
-```r
-k2 <- c(1/2, -1, 1/2, 0)
-k3 <- c(0, -1, 1, 0)
-k4 <- c(1, -1, 0, 0)
-```
+Non sempre le prove sperimentali consentono di saggiare pochi contrasti pre-stabiliti, ma spesso è necessario confrontare tutte le possibili coppie di trattamenti (*pairwise comparisons*). In questo caso dovremmo definire un contrasto per ogni coppia di medie, anche se l'impiego del package 'emmeans' agevola, non di poco, il lavoro.
 
-Una volta definiti i coefficienti, possiamo utilizzare il package  ‘emmeans’, con la funzione `contrast()`, passandole, come argomento, l'oggetto 'medie', ottenuto con la funzione `emmeans()` (vedi sopra), ed una lista contenente i quattro vettori dei coefficienti (k1, k2, k3, k4).
+In particolare, possiamo immaginare due situazioni di riferimento: tutti contro tutti (confronti tipo "Tukey") e tutti verso uno (confronti tipo "Dunnett")(Hsu, 1996). Questo secondo tipo di contrasto può essere interessante, quando sia importante confrantare tutti i trattamenti verso un riferimento prescelto, ad esempio la miscela tra i due erbicidi. Con il metodo di Tukey, il numero di contrasti è molto elevato, ed è pari a $n \times (n - 1) / 2$, dove $n$ è il numero di medie da confrontare. Con il metodo di Dunnett, il numero di contrasti si riduce a $n - 1$, e tale riduzione potrebbe essere importante per ragioni che verranno descritte più avanti.
+
+Bisogna tener presente che l'adozione di confronti a coppie non è particolarmente elegante perché implica molti test non pianificati e privi di un obiettivo chiaro (una sorta di "spray and pray"; Cousens, 1988). Inoltre, secondo lo scienziato inglese John Tukey: "tutto ciò che sappiamo del mondo ci insegna che gli effetti di A e B sono sempre diversi, purchè noi consideriamo un numero di decimali sufficientemente elevato. Pertanto, chiedersi se gli effetti siano diversi è sciocco". Ciononostante, i confronti a coppie possono essere molto utili; sono di moda da quasi un secolo e quindi vale la pena conoscerli.
+
+Per il dataset "mixture", ci sono quattro medie da confrontare e, quindi, un totale di sei confronti a coppie che possono essere definiti come segue:
+
+$$\left\{ {\begin{array}{*{20}{c}}
+C_1 = \mu_1 - \mu_2 = 1 \cdot \mu_1 - 1 \cdot \mu_2 + 0 \cdot \mu_3 + 0 \cdot \mu_4 \\
+C_2 = \mu_1 - \mu_3 = 1 \cdot \mu_1 - 0 \cdot \mu_2 - 1 \cdot \mu_3 + 0 \cdot \mu_4 \\
+C_3 = \mu_1 - \mu_4 = 1 \cdot \mu_1 - 0 \cdot \mu_2 + 0 \cdot \mu_3 - 1 \cdot \mu_4 \\
+C_4 = \mu_2 - \mu_3 = 0 \cdot \mu_1 + 1 \cdot \mu_2 - 1 \cdot \mu_3 + 0 \cdot \mu_4 \\
+C_5 = \mu_2 - \mu_4 = 0 \cdot \mu_1 + 1 \cdot \mu_2 + 0 \cdot \mu_3 - 1 \cdot \mu_4 \\
+C_6 = \mu_3 - \mu_4 = 0 \cdot \mu_1 + 0 \cdot \mu_2 + 1 \cdot \mu_3 - 1 \cdot \mu_4
+\end{array}} \right.$$
+
+La matrice dei coefficienti è:
+
+$$K = \left[ {\begin{array}{rrrr}
+1 & - 1 & 0 & 0\\
+1 & 0 & - 1 & 0\\
+1 & 0 & 0 & - 1\\
+0 & 1 & - 1 & 0\\
+0 & 1 & 0 & - 1\\
+0 & 0 & 1 & - 1
+\end{array}} \right]$$
+
+Fortunatamente, non è necessario codificare la matrice $K$ da zero; nel quadro sottostante mostriamo come si possa ottenere il confronto multiplo con la funzione `contrast()` (come sopra) e passando il valore 'tukey' o 'dunnett' all'argomento 'method'. In questo secondo caso, R confronta tutte le tesi con metribuzin, che è il primo livello in ordine alfabetico, mentre noi avremmo preferito confrontare tutte le tesi con la miscela. Per ottenere questo risultato basta aggiungere l'argomento 'ref' ed assegnare il valore '2', considerando che la miscela è la seconda tesi in ordine alfabetico:
 
 \small
 
 
 ```r
-K <- list(k1 = k1, K2 = k2, k3 = k3, k4 = k4)
-contrast(medie, method = K, adjust="none")
-##  contrast estimate   SE df t.ratio p.value
-##  k1         -16.39 2.26 12  -7.244  <.0001
-##  K2           7.89 2.40 12   3.289  0.0065
-##  k3          11.73 2.77 12   4.235  0.0012
-##  k4           4.05 2.77 12   1.461  0.1697
-```
+# Example 9.5
+# Pairwise comparisons for the 'mixture' data
 
-\normalsize
+# Loading the packages
+library(statforbiology)
+library(multcomp)
 
-Il test mostra che il diserbo ha avuto, in media, un effetto significativo, che la miscela è più efficace dei trattamenti singoli, che la miscela è più efficace di rimsulfuron da solo, ma non è significativamente più efficace di metribuzin da solo.
+# Loading the data
+dataset <- getAgroData("mixture")
 
-## I confronti multipli a coppie (pairwise comparisons)
+# Fitting a one-way ANOVA model
+model <- lm(Weight ~ Treat, data=dataset)
 
-Non sempre le prove sperimentali consentono di saggiare pochi contrasti pre-stabiliti, ma spesso è necessario confrontare tutte le possibili coppie di trattamenti  (*pairwise comparisons*). In questo caso dovremmo definire un contrasto per ogni coppia di medie, anche se l'impiego del package ‘emmeans’ agevola, non di poco, il lavoro.
+# Determining the least square means
+muj <- emmeans(model, ~Treat)
 
-In particolare, possiamo immaginare due situazioni di riferimento: tutti contro tutti (confronti tipo "Tukey") e tutti verso uno (confronti tipo "Dunnett"). Questo secondo tipo di contrasto può essere interessante, quando sia importante confrantare tutti i trattamenti verso un riferimento prescelto, ad esempio la miscela tra i due erbicidi.
-
-Nel quadro sottostante mostriamo un confronto tipo Tukey (tutti contro tutti), eseguito utilizzando la funzione `contrast()` (come sopra) e passando il valore 'pairwise' all'argomento 'method'. Vediamo che ci sono sei contrasti a coppie, tutti significativi, meno uno.
-
-\footnotesize
-
-```r
-#Confronti multipli a coppie
-contrast(medie, adjust="none", method="pairwise")
+# All-pairwise comparisons (Tukey's method)
+contrast(muj, adjust="none", method="tukey")
 ##  contrast                         estimate   SE df t.ratio p.value
 ##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  0.1697
 ##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.0168
@@ -3324,75 +3965,44 @@ contrast(medie, adjust="none", method="pairwise")
 ##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0012
 ##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  <.0001
 ##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0038
-```
-\normalsize
-
-Per i confronti del tipo 'tutti verso uno' è possibile utilizzare la stessa funzione, assegnando però il valore 'dunnett' (invece che 'pairwise') all' argomento 'method'.
-
-\small
-
-
-```r
-contrast(medie, adjust="none", method="dunnett")
-##  contrast                         estimate   SE df t.ratio p.value
-##  Mixture_378 - Metribuzin__348       -4.05 2.77 12  -1.461  0.1697
-##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12   2.774  0.0168
-##  Unweeded - Metribuzin__348          17.60 2.77 12   6.352  <.0001
-```
-\normalsize
-
-Così facendo vediamo che R confronta tutte le tesi con metribuzin, che è il primo livello in ordine alfabetico, mentre noi volevamo confrontare tutte le tesi con la miscela. Per ottenere questo risultato basta aggiungere l'argomento 'ref' ed assgnare il valore '2', considerando che la miscela è la seconda tesi in ordine alfabetico:
-
-\small
-
-
-```r
-contrast(medie, adjust="none", method="dunnett", ref = 2)
+## Comparisons all-against-one (Dunnett's method)
+con <- contrast(muj, adjust="none", method="dunnett", ref = 2)
+con
 ##  contrast                      estimate   SE df t.ratio p.value
 ##  Metribuzin__348 - Mixture_378     4.05 2.77 12   1.461  0.1697
 ##  Rimsulfuron_30 - Mixture_378     11.73 2.77 12   4.235  0.0012
 ##  Unweeded - Mixture_378           21.64 2.77 12   7.813  <.0001
+## Confidence intervals
+confint(con)
+##  contrast                      estimate   SE df lower.CL upper.CL
+##  Metribuzin__348 - Mixture_378     4.05 2.77 12    -1.99     10.1
+##  Rimsulfuron_30 - Mixture_378     11.73 2.77 12     5.70     17.8
+##  Unweeded - Mixture_378           21.64 2.77 12    15.61     27.7
+## 
+## Confidence level used: 0.95
 ```
 
 \normalsize
 
 Il risultato delle elaborazioni sovrastanti mostra i contrasti con il loro errore standard e potrebbe essere interessante calcolare anche l'intervallo di confidenza per le differenze stimate. Ciò può esser fatto facilmente assegnando il risultato della funzione `contrast()` ad una variabile ed esplorando quest'ultima con il metodo `confint()`.
 
-\small
 
-```r
-# Confidence intervals
-con <- contrast(medie, adjust="none", 
-                method="pairwise", ref = 2)
-confint(con)
-##  contrast                         estimate   SE df lower.CL upper.CL
-##  Metribuzin__348 - Mixture_378        4.05 2.77 12    -1.99    10.08
-##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12   -13.72    -1.65
-##  Metribuzin__348 - Unweeded         -17.60 2.77 12   -23.63   -11.56
-##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12   -17.77    -5.70
-##  Mixture_378 - Unweeded             -21.64 2.77 12   -27.68   -15.61
-##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12   -15.95    -3.88
-## 
-## Confidence level used: 0.95
-```
-\normalsize
+### Display a lettere
 
-## Display a lettere
-
-I risultati di un confronto multiplo a coppie possono essere presentati anche con un display a lettere, nel quale le medie seguite da lettere diverse sono significativamente diverse per un livello di probabilità di errore minore di quello dato. 
+I risultati di un confronto multiplo a coppie possono essere presentati anche con un display a lettere, nel quale le medie seguite da lettere diverse sono significativamente diverse per un livello di probabilità di errore minore di quello dato.
 
 Realizzare un display a lettere manualmente è piuttosto facile, utilizzando la seguente procedura:
 
-1. ordinare le medie in senso crescente/decrescente
-2. partire dalla prima media e aggiungere la lettera A a tutte quelle che non sono significativamente diverse
-3. passare alla seconda media e aggiungere la lettera B a tutte quelle che non sono significativamente diverse
-4. procedere analogamente con tutte le medie successive, finche non vengono più individuate differenze significative.
+1.  ordinare le medie in senso crescente/decrescente
+2.  partire dalla prima media e aggiungere la lettera A a tutte quelle che non sono significativamente diverse
+3.  passare alla seconda media e aggiungere la lettera B a tutte quelle che non sono significativamente diverse
+4.  procedere analogamente con tutte le medie successive, finche non vengono più individuate differenze significative.
 
 Con R si può sfruttare il package 'emmeans', utilizzando i comandi sottostanti.
 
 
 ```r
-multcomp::cld(medie, adjust="none", Letters=LETTERS)
+multcomp::cld(muj, adjust="none", Letters=LETTERS)
 ##  Treat           emmean   SE df lower.CL upper.CL .group
 ##  Mixture_378       5.13 1.96 12     0.86      9.4  A    
 ##  Metribuzin__348   9.18 1.96 12     4.91     13.4  A    
@@ -3406,15 +4016,13 @@ multcomp::cld(medie, adjust="none", Letters=LETTERS)
 ##       But we also did not show them to be the same.
 ```
 
+### Correzione per la molteplicità
 
-
-## Tassi di errore per confronto e per esperimento
-
-Operando nel modo anzidetto, ogni contrasto/confronto ha una probabilità di errore del 5% ($\alpha_C = 0.05$). Se i contrasti/confronti sono più di uno (‘famiglia’ di *n* contrasti), la probabilità di sbagliarne almeno uno (*maximum experimentwise error rate*: $\alpha_E$) è data da:
+Operando nel modo anzidetto, ogni contrasto/confronto ha una probabilità di errore del 5% ($\alpha_C = 0.05$). Se i contrasti/confronti sono più di uno ('famiglia' di *n* contrasti), la probabilità di sbagliarne almeno uno (*maximum experimentwise error rate*: $\alpha_E$) è data da:
 
 $$\alpha_E = 1 - (1 - \alpha_C)^n$$
 
-Bisogna premettere che l'anzidetta formula vale quando i contrasti sono totalmente indipendenti tra loro, cosa che quasi mai avviene, dato che, anche in un semplice modello ANOVA, i contrasti condividono la stessa varianza d'errore e sono quindi più o meno correlati tra di loro. Con contrasti non indipendenti la formula anzidetta fornisce una sovrastima di $\alpha_E$  (per questo si parla di *maximum experimentwise error rate*).
+Bisogna premettere che l'anzidetta formula vale quando i contrasti sono totalmente indipendenti tra loro, cosa che quasi mai avviene, dato che, anche in un semplice modello ANOVA, i contrasti condividono la stessa varianza d'errore e sono quindi più o meno correlati tra di loro. Con contrasti non indipendenti la formula anzidetta fornisce una sovrastima di $\alpha_E$ (per questo si parla di *maximum experimentwise error rate*).
 
 Il numero di confronti a coppie per esperimento può essere anche molto elevato: se ho *k* medie il numero dei confronti possibili è pari a $k \cdot (k-1)/2$. Di conseguenza, la probabilità di errore per esperimento ($\alpha_E$) può essere molto più alta del valore $\alpha_C$ prefissato per confronto.
 
@@ -3422,21 +4030,20 @@ Ad esempio, se ho 15 medie, ho $(15 \cdot 14)/2 = 105$ confronti possibili. Se u
 
 Per questo motivo, quando si elaborano i dati di un esperimento nel quale è necessario fare molti contrasti, o confronti, o, più in generale, molti test d'ipotesi simultanei, si potrebbe voler esprimere un giudizio globale (simultaneo) sull'intera famiglia di contrasti/confronti, minimizzando la possibilità che anche solo uno o pochi di essi siano sbagliati. In particolare, ciò potrebbe capitare quando:
 
-1. vogliamo trovare i migliori di *k* trattamenti, senza correre rischi di escluderne erroneamente qualcuno. In questa situazione, facendo ogni confronto con il 5% di probabilità di errore, la probabilità di escludere erroneamente anche solo un trattamento dal lotto dei migliori è molto più alta di quella prefissata, perché basta sbagliare anche uno solo dei *k - 1* confronti con il migliore.
-2. Abbiamo utilizzato un display a lettere e intendiamo affermare che 'i trattamenti seguiti da lettere diverse sono significativamente diversi'. In questo caso, stiamo tirando una conclusione basata sull'intera famiglia di confronti e non possiamo lecitamente riportare la probabilità di errore di un singolo confronto.
-
-## Aggiustamento per la molteplicità
+1.  vogliamo trovare i migliori di *k* trattamenti, senza correre rischi di escluderne erroneamente qualcuno. In questa situazione, facendo ogni confronto con il 5% di probabilità di errore, la probabilità di escludere erroneamente anche solo un trattamento dal lotto dei migliori è molto più alta di quella prefissata, perché basta sbagliare anche uno solo dei *k - 1* confronti con il migliore.
+2.  Abbiamo utilizzato un display a lettere e intendiamo affermare che 'i trattamenti seguiti da lettere diverse sono significativamente diversi'. In questo caso, stiamo tirando una conclusione basata sull'intera famiglia di confronti e non possiamo lecitamente riportare la probabilità di errore di un singolo confronto.
 
 In tutte le condizioni analoghe a quelle più sopra accennate si pone il problema di applicare un aggiustamento per la molteplicità, in modo da rispettare un certo livello prestabilito di protezione per esperimento (e non per confronto). La prima possibilità che abbiamo è quella di aggiustare il P-level per ogni confronto, in modo da diminuire la probabilità di errore per l'intera famiglia di sei confronti. Utilizzando la formula che lega la probabilità d'errore per esperimento ($\alpha_E$) alla probabilità d'errore per confronto ($\alpha_C$; vedi sopra), possiamo prendere la sesta colonna del dataframe 'con', quella che contiene i P-levels non corretti, e trasformarla come segue:
 
 \scriptsize
 
+
 ```r
 alphaC <- as.data.frame(con)[,6]
 1 - (1 - alphaC)^6
-## [1] 6.722991e-01 9.683462e-02 2.190543e-04 6.923077e-03 2.869757e-05
-## [6] 2.255183e-02
+## [1] 6.722991e-01 6.923077e-03 2.869757e-05
 ```
+
 \normalsize
 
 Più facilmente, possiamo arrivare allo stesso risultato con il package 'emmeans':
@@ -3445,7 +4052,7 @@ Più facilmente, possiamo arrivare allo stesso risultato con il package 'emmeans
 
 
 ```r
-contrast(medie, method = "pairwise", adjust = "sidak")
+contrast(muj, method = "tukey", adjust = "sidak")
 ##  contrast                         estimate   SE df t.ratio p.value
 ##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  0.6723
 ##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.0968
@@ -3465,21 +4072,19 @@ Un'alternativa più nota (e semplice) è quella di utilizzare la diseguaglianza 
 
 $$\alpha_E = \alpha_C \cdot k$$
 
-
 Quest'ultima è un po' più conservativa della precedente, nel senso che fornisce un P-level aggiustato leggermente più alto dell'altra.
 
 
 ```r
 alphaC * 6
-## [1] 1.018071e+00 1.009900e-01 2.190743e-04 6.943132e-03 2.869792e-05
-## [6] 2.276671e-02
+## [1] 1.018071e+00 6.943132e-03 2.869792e-05
 ```
 
 Oppure possiamo utilizzare la funzione `contrast()`:
 
 
 ```r
-contrast(medie, method = "pairwise", adjust = "bonferroni")
+contrast(muj, method = "pairwise", adjust = "bonferroni")
 ##  contrast                         estimate   SE df t.ratio p.value
 ##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  1.0000
 ##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.1010
@@ -3491,7 +4096,6 @@ contrast(medie, method = "pairwise", adjust = "bonferroni")
 ## P value adjustment: bonferroni method for 6 tests
 ```
 
-
 Esistono altre procedure di aggiustamento del P-level (metodi di Holm, Hochberg, Hommel), ma nessuna di queste tiene conto della correlazione eventualmente esistente tra i contrasti e tutte quindi sono da definirsi più o meno 'conservative'.
 
 Oltre che aggiustare il P-level, possiamo anche utilizzare altre procedure di aggiustamento, basate sulla distribuzione multivariata di t e in grado di tener conto dell'eventuale correlazione esistente tra i contrasti stessi. Una di queste procedure viene impiegata di default nella funzione `contrast()` nel package 'emmeans':
@@ -3501,7 +4105,7 @@ Oltre che aggiustare il P-level, possiamo anche utilizzare altre procedure di ag
 
 ```r
 #Confronti multipli a coppie, basati sul t multivariato
-contrast(medie, method="pairwise")
+contrast(muj, method="tukey")
 ##  contrast                         estimate   SE df t.ratio p.value
 ##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  0.4885
 ##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.0698
@@ -3522,7 +4126,7 @@ Ovviamente la correzione per la molteplicità ed il conseguente innalzamento del
 
 ```r
 #Confronti multipli a coppie, basati sul t multivariato
-contrast(medie, method="dunnett")
+contrast(muj, method="dunnett")
 ##  contrast                         estimate   SE df t.ratio p.value
 ##  Mixture_378 - Metribuzin__348       -4.05 2.77 12  -1.461  0.3711
 ##  Rimsulfuron_30 - Metribuzin__348     7.68 2.77 12   2.774  0.0442
@@ -3531,7 +4135,54 @@ contrast(medie, method="dunnett")
 ## P value adjustment: dunnettx method for 3 tests
 ```
 
-## Esempio 2: confronti multipli con dati trasformati
+
+### Procedure 'classiche' di confronto multiplo
+
+In questo libro, i confronti a coppie sono inseriti nel contesto dei contrasti lineari, come, ad esempio, in Hsu (1996). In passato, i confronti multipli si basavano sulla determinazione di una differenza critica, in base alla quale due medie venivano considerate significativamente diverse quando la loro differenza superava la differenza critica. Nella letteratura scientifica si trovano molte procedure di questo tipo, tra le quali segnaliamo:
+
+1.  Minima Differenza Significativa (MDS o LSD)
+2.  *Honest Significant Difference* di Tukey
+3.  Test di Dunnett
+4.  Test di Duncan
+5.  Test di Newman-Keuls
+6.  Test di confronto multiplo di Tukey
+
+Il primo metodo corrisponde esattamente a quello che abbiamo utilizzato all'inizio, per fare confronti multipli 'tutti contro tutti', senza correzione per la molteplicità. Il secondo e il terzo metodo corrispondono rispettivamente al test di confronto 'tutti verso tutti' e 'uno verso tutti' indicati in precedenza, con correzione per la molteplicità.
+
+Non è necessario dettagliare gli altri test, in quanto, seppur siano ancora molto utilizzati, vengono ormai ritenuti obsoleti e sconsigliabili, da parecchi ricercatori. Chi vuole, trova altre informazioni nella letteratura indicata in fondo al capitolo; mostriamo solo come la HSD di Tukey HSD possa essere calcolata ed utilizzata per in confronto multiplo, utilizzando la funzione `aov()` per la stima del modello e la funzione `TukeyHSD()` per il confronto multiplo con correzione per la molteplicità (Code Box 9.13).
+
+
+```r
+# Esempio 9.5 [continuazione]
+# Tukey HSD per un modello lineare adattato con la funzione 'aov()' 
+mod2 <- aov(Weight ~ Treat, data = dataset)
+TukeyHSD(mod2)
+##   Tukey multiple comparisons of means
+##     95% family-wise confidence level
+## 
+## Fit: aov(formula = Weight ~ Treat, data = dataset)
+## 
+## $Treat
+##                                   diff        lwr       upr     p adj
+## Mixture_378-Metribuzin__348    -4.0475 -12.271978  4.176978 0.4884620
+## Rimsulfuron_30-Metribuzin__348  7.6850  -0.539478 15.909478 0.0698118
+## Unweeded-Metribuzin__348       17.5975   9.373022 25.821978 0.0001854
+## Rimsulfuron_30-Mixture_378     11.7325   3.508022 19.956978 0.0055015
+## Unweeded-Mixture_378           21.6450  13.420522 29.869478 0.0000247
+## Unweeded-Rimsulfuron_30         9.9125   1.688022 18.136978 0.0172572
+```
+
+Per concludere la sezione sui confronti multipli vogliamo dare alcuni consigli pratici di buon senso.
+
+1. Quando è possibile, pianificare gli esperimenti in modo da ottenere le risposte cercate con pochi contrasti di interesse. In questo modo il problema della molteplicità è minimizzato.
+2.  Non usare mai contrasti con serie di dati quantitative. In questo caso la regressione è l'approccio corretto e ne parleremo in un prossimo capitolo. In generale, utilizzare i contrasti solo se sono coerenti con la logica dell'esperimento.
+3. Evitare di utilizzare i confronti multipli nei disegno fattoriale per confrontare tutte le combinazioni dei fattori sperimentali e preferire invece il confronto dei lvelli di un fattore all'interno dei livelli dell'altri.
+4.  Pianificare esattamente il numero di contrasti necessari ed eseguirli, fornendo il valore del contrasto e il suo errore standard.
+5.  Decidere è necessario aggiustare il p-level (e gli intervalli di confidenza) per la molteplicità (tasso di errore *comparisonwise* o *experimentwise*).
+6.  Se si decide di aggiustare il p-level, considerare che le procedure di Bonferroni o Sidak possono essere eccessivamente protette. Preferire quindi le procedure di aggiustamento basate sulla distribuzione t multivariata, il che, a livello di confronto multiplo con dati bilanciati, è equivalente ad utilizzate la Tukey HSD o il test di Dunnett.
+7.  Evitare le procedure di Duncan e Newmann-Keuls: non danno il livello di protezione cercato e, inoltre, non sono basate su una differenza critica costante (quindi sono difficili da discutere).
+
+## Esempio 9.6: confronti multipli con dati trasformati
 
 Un altro aspetto di cui tener conto è relativo al fatto che, nel caso in cui si fosse reso necessario qualche tipo di trasformazione stabilizzante, il test di confronto multiplo deve opportunamente adeguato. Per capire questo aspetto, possiamo riprendere in mano il dataset 'insects.csv' già esplorato nel capitolo precedente e relativo alle quindici piante trattate con tre insetticidi (cinque piante per insetticida), su ciascuna delle quali, alcune settimane dopo il trattamento, sono stati contati gli insetti presenti e vitali. Ricarichiamo il dataset e, tenendo conto dell'esigenza emerse nel capitolo precedente, analizziamo i dati previa trasformazione logaritmica. Quest'ultima viene eseguita direttamente nel corso del 'model fitting' e non nel dataset, per un motivo che sarà chiaro in seguito.
 
@@ -3639,9 +4290,9 @@ emmeans(updGrid, ~Insecticide, type = "response")
 ## Intervals are back-transformed from the inverse scale
 ```
 
-Questo metodo si può utilizzare con numerose funzioni, come, ad esempio "identity", "1/mu^2", "inverse", "reciprocal", "log10", "log2", "asin.sqrt" e "asinh.sqrt".
+Questo metodo si può utilizzare con numerose funzioni, come, ad esempio "identity", "1/mu\^2", "inverse", "reciprocal", "log10", "log2", "asin.sqrt" e "asinh.sqrt".
 
-Un approccio analogo può essere utilizzato se vogliamo effettuare la trasformazione di Box-Cox nella sua forma semplificata ($W = Y^{\lambda}$), utilizzando un valore $\lambda$ diverso da quelli 'semplici' (cioè diverso da 1, 0, 0.5 o -1). Ad esempio, se vogliamo utilizzare $\lambda = 0.25$, dobbiamo operare in modo simile a quello descritto in precedenza, utilizzando la funzione `make.tran()`, come evidenziato nel box seguente. 
+Un approccio analogo può essere utilizzato se vogliamo effettuare la trasformazione di Box-Cox nella sua forma semplificata ($W = Y^{\lambda}$), utilizzando un valore $\lambda$ diverso da quelli 'semplici' (cioè diverso da 1, 0, 0.5 o -1). Ad esempio, se vogliamo utilizzare $\lambda = 0.25$, dobbiamo operare in modo simile a quello descritto in precedenza, utilizzando la funzione `make.tran()`, come evidenziato nel box seguente.
 
 
 ```r
@@ -3658,1233 +4309,569 @@ emmeans(updGrid, ~Insecticide, type = "response")
 ## Intervals are back-transformed from the mu^0.25 scale
 ```
 
+## Esempio 9.7: Previsioni e previsioni inverse
 
-## E le classiche procedure di confronto multiplo?
+Per i modelli di regressione lineare o non lineare, lavorare con le medie è solitamente irrilevante, mentre può essere necessario utilizzare il modello per fare previsioni, ovvero per calcolare la risposta attesa con un certo valore della variabile indipendente oppure per calcolare quale valore di una variabile indipendente consente di ottenere la risposta voluta  (previsione inversa). Anche le previsioni possono essere considerate combinazioni lineari o non lineari dei parametri del modello e possono essere calcolate con R, utilizzando una delle numerose funzioni disponibili, come `predict()`, `emmeans()`, `glht()` e `gnlht()`.
 
-Il confronto multiplo tradizionale è basato sul calcolo di una differenza critica minima, da utilizzare come base per il confronto tra due medie. In pratica, due medie sono considerate significativamente diverse quando la loro differenza supera la differenza critica. Nella letteratura scientifica si trovano molte procedure di confronto multiplo, tra le quali segnaliamo:
+A titolo di esempio, possiamo considerare i dati 'Ammi94', relativi a un esperimento per definire la relazione tra la densità di *Ammi majus* (un'importante infestante di diverse colture primaverili nell'Italia centrale) espressa come numero di piante per metro quadrato e la resa del girasole in tonnellate per ettaro. Le diverse densità delle infestanti sono state ottenute con semina mauale, mentre i dati di resa rappresentano la media di quattro repliche (Onofri et al., 1994). Il dataset è disponibile nel pacchetto `statforbiology` e nel riquadro successivo, si vede come venga adattato un semplice modello di regressione lineare e le due stime (intercetta e pendenza, ovvero $\beta_0$ e $\beta_1$) vengono recuperate e visualizzate.
 
-1. Minima Differenza Significativa (MDS o LSD)
-2. *Honest Significant Difference* di Tukey
-3. Test di Dunnett
-4. Test di Duncan
-5. Test di Newman-Keuls
-6. Test di confronto multiplo di Tukey
 
-Il primo metodo corrisponde esattamente a quello che abbiamo utilizzato all'inizio, per fare confronti multipli 'tutti contro tutti', senza correzione per la molteplicità. Il secondo e il terzo metodo corrispondono rispettivamente al test di confronto 'tutti verso tutti' e 'uno verso tutti' indicati in precedenza, con correzione per la molteplicità.
+```r
+# Example 9.7
+# Predictions and inverse predictions for linear regression
+# Weed density/Yield relationship for Ammi majus
 
-Non è necessario dettagliare gli altri test, in quanto, seppur siano ancora molto utilizzati, vengono ormai ritenuti obsoleti e sconsigliabili, da parecchi ricercatori. Chi vuole, trova altre informazioni nella letteratura indicata in fondo al capitolo.
+# Loading the packages
+library(statforbiology)
+library(multcomp)
+library(emmeans)
 
-## Consigli pratici
+# Loading the data
+dataset <- getAgroData("Ammi94")
+dataset
+##   Density  Yield
+## 1       0 2.4866
+## 2      16 2.1806
+## 3      21 1.8456
+## 4      36 1.8412
+## 5      49 1.6486
+# Fitting a regression model
+mod <- lm(Yield ~ Density, data = dataset)
+summary(mod)
+## 
+## Call:
+## lm(formula = Yield ~ Density, data = dataset)
+## 
+## Residuals:
+##        1        2        3        4        5 
+##  0.08403  0.04167 -0.21094  0.03182  0.05342 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  2.402566   0.108697  22.103 0.000203 ***
+## Density     -0.016477   0.003667  -4.494 0.020567 *  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.138 on 3 degrees of freedom
+## Multiple R-squared:  0.8707,	Adjusted R-squared:  0.8275 
+## F-statistic: 20.19 on 1 and 3 DF,  p-value: 0.02057
+```
 
-La cosa fondamentale è muoversi in coerenza con le finalità dell'esperimento. Si consiglia di:
+In un esperimento del genere, vi sono due interessi fondamentali:
 
-1. Quando è possibile, pianificare gli esperimenti in modo da ottenere le risposte cercate con pochi contrasti di interesse. In questo modo il problema della molteplicità è minimizzato.
-2. Non usare mai contrasti con serie di dati quantitative. In questo caso la regressione è l'approccio corretto e ne parleremo in un prossimo capitolo. In generale, utilizzare i contrasti solo se sono coerenti con la logica dell'esperimento.
-3. Pianificare esattamente il numero di contrasti necessari ed eseguirli, fornendo il valore del contrasto e il suo errore standard.
-4. Decidere è necessario aggiustare il p-level (e gli intervalli di confidenza) per la molteplicità (tasso di errore *comparisonwise* o *experimentwise*). 
-5. Se si decide di aggiustare il p-level, considerare che le procedure di Bonferroni o Sidak possono essere eccessivamente protette. Preferire quindi le procedure di aggiustamento basate sulla distribuzione t multivariata, il che, a livello di confronto multiplo con dati bilanciati, è equivalente ad utilizzate la Tukey HSD o il test di Dunnett.
-6. Evitare le procedure di Duncan e Newmann-Keuls: non danno il livello di protezione cercato e, inoltre, non sono basate su una differenza critica costante (quindi sono difficili da discutere).
+1. Prevedere la resa con misurazioni precoci della densità delle infestanti (previsione);
+2. Determinare la densità delle infestanti che provoca un certo livello di perdita di resa (previsione inversa).
 
---- 
+Queste stime possono essere ottenute come combinazioni lineari o non lineari. Ad esempio, immaginiamo di voler determinare il livello di resa previsto con 10 piante di *Ammi majus* per metro quadrato. Ci sono tre possibilità:
+
+1. Utilizzare la funzione `glht()` per adattare un contrasto $C = 1 \times \beta_0 + 10 \times \beta_1$, dove i parametri $\beta_0$ e $\beta_1$ sono, rispettivamente, l'intercetta e la pendenza del modello lineare;
+2. Utilizzare la funzione `predict()` e passare un dataframe (non un vettore!) contenente il livello di densità per la previsione (argomento 'newdata');
+3. Utilizzare la funzione `emmeans()`, passando il livello di densità come dataframe all'argomento 'at'.
+
+Tutte e tre le possibilità sono illustrate nel riquadro sottostante; i risultati sono, ovviamente, del tutto equivalenti.
+
+
+```r
+# Example 9.7 [continuation]
+
+# Three methods for predictions
+
+# 1.Fitting with 'glht()'##################
+# Setting a contrast matrix
+K <- matrix(c(1, 10), nrow = 1, ncol = 2)
+summary(glht(mod, linfct = K))
+## 
+## 	 Simultaneous Tests for General Linear Hypotheses
+## 
+## Fit: lm(formula = Yield ~ Density, data = dataset)
+## 
+## Linear Hypotheses:
+##        Estimate Std. Error t value Pr(>|t|)    
+## 1 == 0  2.23779    0.08123   27.55 0.000105 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## (Adjusted p values reported -- single-step method)
+# 2.Fitting with 'predict()' ################
+predict(mod, newdata = data.frame(Density= c(10)), se.fit = T)
+## $fit
+##        1 
+## 2.237793 
+## 
+## $se.fit
+## [1] 0.08123191
+## 
+## $df
+## [1] 3
+## 
+## $residual.scale
+## [1] 0.1380352
+# 3.Fitting with 'emmeans()' ####################
+emmeans(mod, ~Density, at = data.frame(Density= c(10)))
+##  Density emmean     SE df lower.CL upper.CL
+##       10   2.24 0.0812  3     1.98      2.5
+## 
+## Confidence level used: 0.95
+```
+
+
+Immaginiamo ora di voler stimare il livello di densità delle malerbe che provoca una riduzione della resa del 10%. Considerando che la resa senza malerbe è di 2.403 tonnellate per ettaro (l'intercetta stimata più sopra), una riduzione della resa del 10% corrisponde all'ottenimento di un livello di resa pari a $2.403 - 0.1 \times 2.403 = 2.163$, che è pari a $(2,163 - \beta_0)/\beta_1$. Quest'ultima equazione è intrinsecamente non lineare; pertanto, si deve utilizzare la funzione `gnlht()`, come mostrato qui sotto.
+
+
+```r
+# Example 9.7 [continuation]
+
+# Inverse prediction with gnlht()
+
+gnlht(mod, func = list(~(21.53 - b0)/b1), 
+      parameterNames = c("b0", "b1"))
+##              Form  Estimate       SE  t-value   p-value
+## 1 (21.53 - b0)/b1 -1160.835 263.7767 4.400825 0.0217523
+```
+
+---
 
 ## Altre letture
 
-1. Hsu, J., 1996. Multiple comparisons. Theory and methods. Chapman and Hall.
-1. Bretz, F., T. Hothorn, and P. Westfall. 2002, On Multiple Comparison Procedures in R. R News 2: 14-17.
-2. Calinsky, T. and L. C. A. Corsten. 1985, Clustering means in ANOVA by simultaneus testing. Biometrics, 41, 39-48.
-3. Cargnelutti, A. F., L. Storck, L. A. Dal'Col, L. Pisaroglo de Carvalho, and P. Machado dos Santos. 2003, A precisao experimental relacionada ao uso de bordaduras nas extremidades das fileiras em ensaios de milho. Ciencia Rural 33: 607-614.
-4. Carmer, S. G. and M. R. Swanson. 1971, Detection of difference between mens: a Monte Carlo study of five pairwise multiple comparison procedures. Agronomy Journal, 63, 940-945.
-5. Carmer, S. G. 1976, Optimal significance levels for application of the least significant difference in crop performance trials. Crop Science, 16, 95-99.
-6. Chew, V. 1976, Comparing treatment means: a compendium. Hortscience, 11(4), 348-357.
-7. Cousens, R. 1988, Misinterpretetion of results in weed research through inappropriate use of statistics. Weed Research, 28, 281-289.
-8. Edwards, A. W. F. and L. L. Cavalli-Sforza. 1965, A method for cluster analysis. Biometrics, 21, 362-375.
-9. Gates, C. E. and J. D. Bilbro. 1978, Illustration of a cluster analysis method for mean separation. Agronomy journal, 70, 462-465.
-10. O'Neill, R. and G. B. Wetherill. 1971, The present state of multiple comparison methods. Journ. Roy. Stat. Soc. , 2, 218-249.
-11. Petersen, R. G. 1977, Use and misuse of multiple comparison procedurs. Agronomy Journal, 69, 205-208.
-12. Scott, A. J. and M. Knott. 1974, A cluster analysis method for grouping means in the analysis of variance. Biometrics, 30, 507-512.
-6. Weisberg, S., 2005. Applied linear regression, 3rd ed. John Wiley & Sons Inc. (per il metodo 'delta')
-13. Willavize, S. A., S. G. Carmer, and W. M. Walker. 1980, Evaluation of cluster analysis for comparing treatment means. Agronomy journal, 72,317-320.
+1. Bretz F, Hothorn T, Westfall P (2011) Multiple Comparisons Using R. CRC Press, Boca Raton, FL 
+2. Chew V (1976) Comparing treatment means: a compendium. Hortscience 11(4):348–357
+3. Cousens R (1988) Misinterpretetion of results in weed research through inappropriate use of statistics. Weed Res 28:281–289
+4. Hsu JC (1996) Multiple Comparisons: Theory and Methods. Chapman & Hall, London
+5. Lenth RV (2016) Least-squares means: the R package lsmeans. J Stat Softw 69(1). https://doi.org/10.18637/jss.v069.i01. 
+6. Onofri A, Tei F (1994) Competitive ability and threshold levels for three broadleaf weed species in sunflower. Weed Res 34:471–479
+7. Onofri A, Carbonell EA, Piepho HP, Mortimer AM, Cousens RD (2010) Current statistical issues in Weed Research. Weed Res 50(1):5–24
+8. Piepho HP (2004) An algorithm for a letter-based representation of all-pairwise comparisons. J Comput Graph Stat 13(2):456–466
+9. Weisberg S (2005) Applied Linear Regression, 3rd edn. Wiley, Hoboken
+
+## Esercizi
+
+1. Considerare gli esercizi da 5 a 7 nel Capitolo 4. Per tutti questi esercizi, dopo essersi accertati se è necessaria una trasformazione per soddisfare le ipotesi di base per i modelli lineari, eseguire il test di confronto multiplo, adottando una correzione appropriata per la molteplicità.
+
+
+
 
 <!--chapter:end:09-ConfrontoMultiplo.Rmd-->
 
-# Modelli ANOVA con fattori di blocco
+# Ricomponiamo il 'puzzle'
 
+È giunto ormai il momento di riunire tutti gli strumenti presentati nei capitoli precedenti e sviluppare un piano di lavoro per eseguire analisi dei dati corrette, produrre risultati affidabili e giungere a conclusioni pienamente supportate dai dati a nostra disposizione. Il piano di lavoro proposto non deve essere preso troppo alla lettera: è solo uno dei possibili approcci all'analisi dei dati e deve essere inteso solo come punto di partenza per 'principianti'. Il piano di lavoro è il seguente:
 
+1. Caricare i dati ed eseguire le eventuali trasformazioni che si rendano necessarie (ad es. le trasformazioni delle variabili numeriche in 'factors' oppure le trasformazioni stabilizzanti).
+2. Descrivere i dati, calcolando almeno un indicatore di tendenza centrale (media) e un indicatore di variabilità (deviazione standard) come indicato nel Capitolo 3. Se necessario, utilizzare grafici per scoprire le caratteristiche principali del dataset in studio, scoprire pattern e individuare valori anomali: lasciare che i dati parlino da soli e "ascoltare" ciò che hanno da dire. Questa fase preliminare è definita Analisi Esplorativa dei Dati (EDA) ed è una parte fondamentale dell'analisi dei dati, prima dell'adattamento del modello, dell'inferenza e del test d'ipotesi.
+3. Specificare il modello descrittivo più opportuno a stimarne i parametri con R.
+4. Controllare il fitting per il rispetto delle assunzioni di base. Se necessario, trasformare i dati e ripetere il fitting
+5. Calcolare gli errori standard e/o gli intervalli di confidenza e aggiungerli a tutte le stime puntuali. Verificare la significatività di tutti gli effetti tramite il test di F nell'ANOVA.
+6. Utilizzare combinazioni lineari o non lineari dei parametri o delle medie per testare ulteriori ipotesi di interesse e rispondere a tutti i quesiti di ricerca.
+7. Presentare i risultati sotto forma di grafici e tabelle, in modo conciso e assicurandosi di evidenziare tutte le caratteristiche chiave di interesse per il set di dati in questione.
 
+In questo capitolo mostreremo come questo piano di lavoro possa essere messo in pratica, lavorando su alcuni dataset reali, relativi ad esperimenti agronomici di pieno campo.
 
-Nel capitolo 7 abbiamo impiegato un modello ANOVA con una sola variabile indipendente categorica, assumendo che le unità sperimentali, escluso l'effetto del trattamento, fossero totalmente indipendenti tra di loro. Questa assunzione era totalmente realistica, poiché si trattava di un disegno sperimentale a randomizzazione completa, dove non sussistevano raggruppamenti di alcun tipo, escluso quello dettato dal trattamento in studio.
+## Esempio 10.1: Confronto tra erbicidi in un esperimento a blocchi randomizzati
 
-Se invece l'esperimento include uno o più *blocking factors*, le osservazioni che appartengono allo stesso blocco sono più simila tra loro delle osservazioni che appartengono a blocchi diversi, proprio perché condividono le condizioni del blocco stesso. Per non invalidare l'indipendenza dei residui dobbiamo definire un modello ANOVA che tenga conto anche dei fattori di raggruppamento, in modo che il loro effetto non sia trascurato e, di conseguenza, si sommi agli effetti residui. Come al solito, affrontiamo questo tema partendo da alcuni esempi pratici.
-
-## Caso-studio: confronto tra erbicidi in campo
-
-Abbiamo una prova di confronto tra erbicidi in mais, con 13 formulati, due testimoni inerbiti (che, per comodità, considereremo due trattamenti diversi) e un testimone scerbato. Al momento di impiantare la prova, era lecito ipotizzare che, pur scegliendo un appezzamento il più omogeneo possibile, avremmo potuto riscontrare differenze di infestazione tra un punto e l'altro del campo, con un presumibile gradiente procedendo dai lati (vicino alle fosse) verso il centro. In questa situazione, se l'esperimento fosse stato disegnato a randomizzazione completa, le differenze di infestazione tra una parte e l'altra del campo sarebbero state trascurate e avrebbero finito per incrementare l'errore sperimentale, diminuendo l'efficienza dell'esperimento.
-
-Abbiamo quindi impiegato un disegno a blocchi randomizzati con quattro repliche; il campo è stato suddiviso in tante sezioni (dette blocchi) quante erano le repliche (quattro), perpendicolarmente al gradiente di infestazione trasversale. In questo modo, l'ambiente era relativamente omogeneo all'interno di ciascun blocco, nel quale è stata collocata una replica per trattamento.
-
-Il dataset dei risultati ('rimsulfuron.csv') è disponibile nella solita *repository* online. Nel box sottostante, carichiamo il file e trasformiamo le due variabili esplicative (blocco e trattamento) in fattori sperimentali. Più sotto, mostriamo la tabella in formato 'WIDE' (una riga per trattamento, con le repliche sulle colonne), con le medie di riga (trattamento) e di colonna (blocco)
-
-
-```r
-fileName <- "https://www.casaonofri.it/_datasets/rimsulfuron.csv"
-rimsulfuron <- read.csv(fileName)
-rimsulfuron$Code <- factor(rimsulfuron$Code)
-rimsulfuron$Herbicide <- factor(rimsulfuron$Herbicide)
-rimsulfuron$Block <- factor(rimsulfuron$Block)
-```
-
-\scriptsize
-
-
-```
-##                                                 1       2       3       4  Medie
-## Alachlor + terbuthylazine                  12.060  49.580  41.340  16.370 29.838
-## Hand-Weeded                                77.580  92.080  86.590  99.630 88.970
-## Metolachlor + terbuthylazine (pre)         51.770  52.100  49.460  34.670 47.000
-## Pendimethalin (post) + rimsuulfuron (post) 94.820  87.720 102.050 101.940 96.632
-## Pendimethalin (pre) + rimsulfuron (post)   65.510  88.720  95.520  82.390 83.035
-## Rimsulfuron (40)                           85.910  91.090 111.420  93.150 95.392
-## Rimsulfuron (45)                           93.030 105.000  89.190  79.040 91.565
-## Rimsulfuron (50)                           86.930 105.820 110.020  89.100 97.968
-## Rimsulfuron (50+30 split)                  71.360  77.570 115.910  92.160 89.250
-## Rimsulfuron (60)                           52.990 102.860 100.620  97.040 88.377
-## Rimsulfuron + Atred                        94.110  89.860 104.340  99.630 96.985
-## Rimsulfuron + hoeing                       73.220  86.060 118.010  98.320 93.903
-## Rimsulfuron + thyfensulfuron               75.280  82.590  94.960  85.850 84.670
-## Thifensulfuron                             78.470  42.320  62.520  24.340 51.913
-## Unweeded 1                                 10.880  31.770  23.920  20.850 21.855
-## Unweeded 2                                 27.580  51.550  25.130  38.610 35.718
-## Medie                                      65.719  77.293  83.188  72.068 74.567
-```
-
-\normalsize
-
-## Definizione di un modello lineare
-
-La produzione di ogni unità sperimentale (parcella) è condizionata da più di un effetto:
-
-1. il diserbante con cui essa è stata trattata;
-2. il blocco di cui essa fa parte;
-3. ogni altro effetto non conoscibile e puramente casuale (residuo).
-
-
-Il modello è quindi:
-
-$$ Y_{ij} = \mu + \gamma_i + \alpha_j + \varepsilon_{ij}$$
-
-dove $Y$ è la produzione nel blocco $i$ e con il diserbo $j$, $\mu$ è l'intercetta, $\gamma$ è l'effetto del blocco $i$, $\alpha$ è l'effetto del trattamento $j$ e $\varepsilon$ è l'errore sperimentale per ogni singola parcella, che si assume normalmente distribuito, con media 0 e deviazione standard $\sigma$. Anche in questo caso, come nel capitolo 7, poniamo un vincolo sulla somma degli effetti del trattamento e del blocco ($\sum \gamma_i = 0$ e $\sum \alpha_j = 0$), in modo che $\mu$ rappresenti la media generale. In totale, vi sono 19 parametri da stimare (un'intercetta, 15 effetti dei trattamenti e tre effetti dei blocchi, più $\sigma$).
-
-## Stima dei parametri
-
-### Coefficienti del modello
-
-In questo caso l'esperimento è completamente bilanciato e la stima dei parametri può essere fatta banalmente, considerando i valori osservati e le medie aritmetiche per gruppo. Per prima cosa, calcoliamo tutte le medie (generale, dei blocchi e dei trattamenti), come mostrato nel box sottostante.
-
+Consideriamo un esperimento di campo per confrontare otto genotipi di frumento, disegnato a blocchi randomizzati con tre repliche, nella collina Umbra durante la stagione di semina 2002 (Ciriciofolo, 2004; pubblicato in Belocchi et al. 2003). La variabile di risposta è la resa (in tonnellate per ettaro) e il set di dati è disponibile come "WinterWheat2002" nel package `statforbiology`. La variabile "blocco" deve essere trasformata in un fattore prima dell'analisi, altrimenti, R stimerebbe erroneamente un modello di regressione lineare (mentre i blocchi sono classi nominali e non ordinate). Anche la variabile "genotipo" può essere trasformata in un fattore, sebbene ciò sia facoltativo, poiché i genotipi non sono rappresentati con numeri.
+L'EDA rivela che i genotipi, ad eccezione di Simeto, sono relativamente simili in termini di resa media. Allo stesso tempo, esistono alcune differenze in termini di deviazione standard, che potrebbero giustificare un attento controllo di eteroschedasticità.
 
 
 ```r
-mu <- mean(rimsulfuron$Yield)
-mu_bl <- with(rimsulfuron, tapply(Yield, Block, mean))
-mu_tr <- with(rimsulfuron, tapply(Yield, Code, mean))
-mu
-## [1] 74.56687
-mu_bl
-##        1        2        3        4 
-## 65.71875 77.29313 83.18750 72.06812
-mu_tr
-##       1       2       3       4       5       6       7       8       9      10      11      12      13      14      15      16 
-## 95.3925 91.5650 97.9675 88.3775 89.2500 84.6700 93.9025 83.0350 96.6325 96.9850 51.9125 47.0000 29.8375 88.9700 21.8550 35.7175
+# Example 10.1
+# A genotype experiment in blocks
+
+# Loading the packages
+library(statforbiology)
+library(MASS)
+library(car)
+library(emmeans)
+library(multcomp)
+
+# Loading the 'WinterWheat2002' dataset and performing an EDA
+dataset <- getAgroData("WinterWheat2002")
+head(dataset)
+##   Plot Block Genotype Yield
+## 1   57     A COLOSSEO  4.31
+## 2   61     B COLOSSEO  4.73
+## 3   11     C COLOSSEO  5.64
+## 4   60     A    CRESO  3.99
+## 5   10     B    CRESO  4.82
+## 6   42     C    CRESO  4.17
+dataset$Block <- factor(dataset$Block)
+dataset$Genotype <- factor(dataset$Genotype)
+
+with(dataset, data.frame(Mean = tapply(Yield, Genotype, mean),
+                         SD = tapply(Yield, Genotype, sd)))
+##              Mean        SD
+## COLOSSEO 4.893333 0.6798774
+## CRESO    4.326667 0.4366158
+## DUILIO   4.240000 0.1400000
+## GRAZIA   4.340000 0.3764306
+## IRIDE    4.963333 0.1892969
+## SANCARLO 4.503333 0.2250185
+## SIMETO   3.340000 0.3915354
+## SOLEX    4.790000 0.2645751
 ```
 
+La produzione di ogni unità sperimentale (parcella) è determinata da:
 
-L'effetto dei blocchi si calcola sottraendo dalle relative medie la media generale, mentre l'effetto dei trattamenti si calcola in modo analogo, sostituendo alla media dei blocchi la media dei trattamenti.
+1. il genotipo in essa coltivato;
+2. il blocco di cui fa parte;
+3. altri effetti non conoscibile e puramente casuale (residuo).
+
+Quindi, possiamo stimare un modello con due predittori nominali, come mostrato nell'Esempio 4.3 del Capitolo 4. Le analisi grafiche dei residui mostrano alcuni lievi segni di eteroschedasticità (Figura \@ref(fig:figName121), sinistra), ma nessuna chiara evidenza di mancanza di normalità. La funzione `leveneTest()` non può essere utilizzata con dati provenienti da esperimenti a blocchi randomizzati, ma possiamo adattarla eseguendola sui residui in valore assoluto (Bhandary e Dai 2013; vedi riquadro sottostante); questo test non è significativo e il grafico di Box-Cox (non mostrato) conferma che non è necessaria alcuna trasformazione dei dati. Di conseguenza, concludiamo che non ci sono deviazioni significative dalle assunzioni di base e procediamo esaminando la tabella ANOVA. Il controllo preliminare dei gradi di libertà conferma che il modello è stato specificato correttamente (vale a dire, i DF sono uguali, rispettivamente, al numero di blocchi meno uno e al numero di genotipi meno uno) e, in base al P-value, rigettiamo l'ipotesi nulla concludendo che esistono differenze significative tra i genotipi.
 
 
 ```r
-gamma <- mu_bl - mu
-alpha <- mu_tr - mu
-```
+# Example 10.1 [continuation]
 
-A questo punto, per ogni osservazione, possiamo calcolare il valore atteso, sommando i valori $\mu$, $\gamma$ ed $\alpha$ corrispondenti; inoltre, possiamo calcolare i residui, come scostamenti tra i valori osservati e i valori attesi. La tabella sottostante schematizza i calcoli necessari per le prime otto osservazioni e mostra come la somma degli elementi del modello restituisca le osservazioni originali.
+# Model fitting with two nominal predictors
+mod <- lm(Yield ~ Block + Genotype, data = dataset)
 
+# Inspection of plots (not run)
+# par(mfrow=c(2,2))
+# plot(mod, which = 1)
+# plot(mod, which = 2)
+# boxcox(mod)
 
-```r
-gamma <- gamma[rimsulfuron$Block]
-alpha <- alpha[rimsulfuron$Code]
-res <- data.frame(Yield = rimsulfuron$Yield,
-                  mu = mu, gamma = gamma, alpha = alpha,
-                  Atteso = mu + gamma + alpha)
-res$Residuo = res$Yield - res$Atteso
-res$Verifica = res$Atteso + res$Residuo
-print(round(res, 2)[1:8,])
-##   Yield    mu gamma alpha Atteso Residuo Verifica
-## 1 85.91 74.57 -8.85 20.83  86.54   -0.63    85.91
-## 2 93.03 74.57 -8.85 17.00  82.72   10.31    93.03
-## 3 86.93 74.57 -8.85 23.40  89.12   -2.19    86.93
-## 4 52.99 74.57 -8.85 13.81  79.53  -26.54    52.99
-## 5 71.36 74.57 -8.85 14.68  80.40   -9.04    71.36
-## 6 75.28 74.57 -8.85 10.10  75.82   -0.54    75.28
-## 7 73.22 74.57 -8.85 19.34  85.05  -11.83    73.22
-## 8 65.51 74.57 -8.85  8.47  74.19   -8.68    65.51
-```
-
-
-### Stima di $\sigma$
-
-In primo luogo, calcoliamo la devianza dei residui, come somma dei loro quadrati; da questa, possiamo ottenere la deviazione standard ($\sigma$), considerando che abbiamo 16 gruppi con quattro repliche, quindi tre gradi di libertà per gruppo. Tuttavia, dobbiamo anche tener presente che le repliche di ogni gruppo non differiscono solo per motivi casuali, ma anche perché appartengono a blocchi diversi. Abbiamo quattro blocchi, quindi tre gradi di libertà, che vanno dedotti dai 48 (16 x 3) precedentemente calcolati.
-
-
-
-```r
-RSS <- sum( res$Residuo^2 )
-sigma <- sqrt(RSS/45)
-RSS; sigma
-## [1] 7187.348
-## [1] 12.63799
-```
-
-
-Da $\sigma$ possiamo ottenere anche SEM e SED, anche se questo calcolo ve lo lascio per esercizio (ricordate che abbiamo quattro repliche per trattamento).
-
-## Scomposizione della varianza
-
-La scomposizione della varianza è analoga a quella che abbiamo operato per l'ANOVA ad una via; tuttavia, dobbiamo tener presente che, in questo caso, la devianza totale delle osservazione deve essere decomposta in tre quote: una dovuta al trattamento, una dovuta al blocco ed una dovuta agli effetti stocastici.
-
-La devianza dei residui l'abbiamo già calcolata, mentre la devianza dei trattamenti possiamo calcolarla come somma dei quadrati degli scarti del vettore 'alpha'. Analogamente, possiamo ottenere la devianza dei blocchi, considerando il vettore 'gamma'.
-
-
-```r
-TSS <- sum(res$alpha^2)
-BSS <- sum(res$gamma^2)
-TSS; BSS
-## [1] 43931.23
-## [1] 2660.491
-```
-
-Verifichiamo che la devianza del trattamento, sommata alle devianze dei blocchi e dei residui restituisce la devianza totale delle osservazioni (somma dei quadrati degli scarti rispetto alla media generale).
-
-
-```r
-TSS + BSS + RSS
-## [1] 53779.07
-sum( (rimsulfuron$Yield - mu)^2 )
-## [1] 53779.07
-```
-
-
-Ci chiediamo se gli effetti attribuibili ai blocchi e ai trattamenti siano significativamente più grandi degli effetti stocastici. Sappiamo già di non poter confrontare le devianze, ma possiamo calcolare e confrontare con un test di F le relative varianze. Basta tener conto che i gradi di libertà dei blocchi e dei trattamenti sono rispettivamente 3 e 15, cioè il numero dei blocchi meno uno e il numero dei trattamenti meno uno.
-
-
-```r
-MSt <- TSS/15
-MSb <- BSS/3
-MSe <- RSS/45
-```
-
-La significatività della differenza tra blocchi è poco rilevate, mentre siamo interessati a valutare la significatività della differenza tra trattamenti con un apposito test di F:
-
-
-```r
-Fratio <- MSt/MSe
-Fratio
-## [1] 18.3369
-```
-
-Il valore osservato si mostra abbastanza discrepante rispetto all'ipotesi nulla, che possiamo porre nella forma $H_0: \mu_1 = \mu_2 = ... = \mu_{16} = \mu$. Notate come stiamo facendo riferimento alle medie delle 16 popolazioni che hanno generato i nostri campioni, assumendole uguali tra di loro, come se i 16 campioni fossero stati, nella realtà, estratti dalla stessa popolazione. Ancora una volta, come nel capitolo 7, vedete che stiamo anche assumendo che le varianze delle 16 popolazioni siano omogenee.
-
-Ci chiediamo, che possibilità esiste che, nonostante l'ipotesi nulla sia vera, noi osserviamo un valore di F così alto o più alto? Potremmo determinare la *sampling distribution* per F attraverso una simulazione di Monte Carlo, oppure, assumendo che i residui siano gaussiani, possiamo utilizzare la funzione di densità F di Fisher, con 15 gradi di libertà al numeratore e 45 gradi di libertà al denominatore.
-
-
-```r
-pf(Fratio, 15, 45, lower.tail = F)
-## [1] 2.328653e-14
-```
-
-Vediamo che la probabilità che l'ipotesi nulla sia vera è molto piccola e, pertanto, rifiutiamo l'ipotesi nulla, accettando l'alternativa: esiste in effetti una differenza significativa tra i trattamenti erbicidi.
-
-## Adattamento del modello con R
-
-Il model fitting può essere comodamente effettuato con R, utilizzando la funzione `lm()`, come mostrato nel box sottostante. Per brevità, utilizziamo il codice del trattamento erbicida invece che il nome.
-
-
-```r
-mod <- lm(Yield ~ Block + Code, data = rimsulfuron)
-```
-
-
-La tabella ANOVA può essere facilmente ottenuta con la funzione `anova()`:
-
-
-```r
+# Levene test (modified version for RCBDs)
+leveneTest(abs(residuals(mod)) ~ Genotype, data = dataset)
+## Levene's Test for Homogeneity of Variance (center = median)
+##       Df F value Pr(>F)
+## group  7  0.7932 0.6037
+##       16
+# Variance partitioning
 anova(mod)
 ## Analysis of Variance Table
 ## 
 ## Response: Yield
 ##           Df Sum Sq Mean Sq F value    Pr(>F)    
-## Block      3   2660  886.83  5.5524  0.002496 ** 
-## Code      15  43931 2928.75 18.3369 2.329e-14 ***
-## Residuals 45   7187  159.72                      
+## Block      2 0.7977 0.39883  3.8502 0.0465178 *  
+## Genotype   7 5.6305 0.80436  7.7651 0.0006252 ***
+## Residuals 14 1.4502 0.10359                      
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-Ovviamente, prima di considerare questa tabella dovremo preoccuparci del fatto che le assunzioni di base siano rispettate (vedi capitolo 8), cosa che possiamo facilmente verificare con un'analisi grafica dei residui, utilizzando il codice sottostante. L'output è visibile in Figura \@ref(fig:figName121).
-
-```
-par(mfrow=c(1,2))
-plot(mod, which = 1)
-plot(mod, which = 2)
-```
-
-
 <div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName121-1.png" alt="Analisi grafica dei residui per la prova di confronto erbicida" width="90%" />
-<p class="caption">(\#fig:figName121)Analisi grafica dei residui per la prova di confronto erbicida</p>
+<img src="_main_files/figure-html/figName121-1.png" alt="Analisi grafica dei residui per la prova di confronto varietale a blocchi randomizzati" width="90%" />
+<p class="caption">(\#fig:figName121)Analisi grafica dei residui per la prova di confronto varietale a blocchi randomizzati</p>
 </div>
 
-
-Dopo esserci rassicurati su questo importante aspetto, possiamo vedere che abbiamo due ipotesi nulle da testare (effetto dei trattamenti non significativo ed effetto dei blocchi non significativo), che possono essere entrambe rifiutate per P < 0.05.
-
-Da questo punto in avanti, l'analisi procede come usuale, calcolando le medie marginali attese ed, eventualmente, confrontandole tra loro con una procedura di confronto multiplo, come descritto nei capitoli precedenti. Tener presente che, in questo esperimento, abbiamo 16 trattamenti, cioè $16 \times 15 / 2 = 120$ confronti; di conseguenza, è opportuno operare la correzione per la molteplicità. Inoltre, dato che il trattamento più interessante è quello che rende massima la produzione, sarà opportuno ordinare le medie in senso decrescente, utilizzando l'argomento 'reverse = T'.
-
-\scriptsize
+Le stime dei parametri del modello sono relativamente poco interessanti in questo caso, mentre i confronti a coppie possono essere utili per la raccomandazione varietale. Con otto genotipi e, quindi, $(8 \times 7)/2 = 28$ contrasti, è necessaria una correzione per la molteplicità. Oltre ai confronti a coppie con i relativi intervalli di confidenza, riportiamo una tabella delle medie in ordine decrescente di resa, con le lettere di significanza. La conclusione è che Simeto è risultato significativamente peggiore di tutti gli altri genotipi, ad eccezione di Duilio.
 
 
 ```r
-library(emmeans)
-medie <- emmeans(mod, ~Code)
-multcomp::cld(medie, Letters = LETTERS, reverse = T)
-##  Code emmean   SE df lower.CL upper.CL .group
-##  3      98.0 6.32 45    85.24    110.7  A    
-##  10     97.0 6.32 45    84.26    109.7  A    
-##  9      96.6 6.32 45    83.91    109.4  A    
-##  1      95.4 6.32 45    82.67    108.1  A    
-##  7      93.9 6.32 45    81.18    106.6  A    
-##  2      91.6 6.32 45    78.84    104.3  A    
-##  5      89.2 6.32 45    76.52    102.0  A    
-##  14     89.0 6.32 45    76.24    101.7  A    
-##  4      88.4 6.32 45    75.65    101.1  A    
-##  6      84.7 6.32 45    71.94     97.4  A    
-##  8      83.0 6.32 45    70.31     95.8  AB   
-##  11     51.9 6.32 45    39.19     64.6   BC  
-##  12     47.0 6.32 45    34.27     59.7    C  
-##  16     35.7 6.32 45    22.99     48.4    C  
-##  13     29.8 6.32 45    17.11     42.6    C  
-##  15     21.9 6.32 45     9.13     34.6    C  
+# Example 10.1 [continuation]
+
+# Multiple comparisons
+meds <- emmeans(mod, ~Genotype)
+confint(contrast(meds, method = "pairwise"))
+##  contrast            estimate    SE df lower.CL upper.CL
+##  COLOSSEO - CRESO      0.5667 0.263 14  -0.3606    1.494
+##  COLOSSEO - DUILIO     0.6533 0.263 14  -0.2740    1.581
+##  COLOSSEO - GRAZIA     0.5533 0.263 14  -0.3740    1.481
+##  COLOSSEO - IRIDE     -0.0700 0.263 14  -0.9973    0.857
+##  COLOSSEO - SANCARLO   0.3900 0.263 14  -0.5373    1.317
+##  COLOSSEO - SIMETO     1.5533 0.263 14   0.6260    2.481
+##  COLOSSEO - SOLEX      0.1033 0.263 14  -0.8240    1.031
+##  CRESO - DUILIO        0.0867 0.263 14  -0.8406    1.014
+##  CRESO - GRAZIA       -0.0133 0.263 14  -0.9406    0.914
+##  CRESO - IRIDE        -0.6367 0.263 14  -1.5640    0.291
+##  CRESO - SANCARLO     -0.1767 0.263 14  -1.1040    0.751
+##  CRESO - SIMETO        0.9867 0.263 14   0.0594    1.914
+##  CRESO - SOLEX        -0.4633 0.263 14  -1.3906    0.464
+##  DUILIO - GRAZIA      -0.1000 0.263 14  -1.0273    0.827
+##  DUILIO - IRIDE       -0.7233 0.263 14  -1.6506    0.204
+##  DUILIO - SANCARLO    -0.2633 0.263 14  -1.1906    0.664
+##  DUILIO - SIMETO       0.9000 0.263 14  -0.0273    1.827
+##  DUILIO - SOLEX       -0.5500 0.263 14  -1.4773    0.377
+##  GRAZIA - IRIDE       -0.6233 0.263 14  -1.5506    0.304
+##  GRAZIA - SANCARLO    -0.1633 0.263 14  -1.0906    0.764
+##  GRAZIA - SIMETO       1.0000 0.263 14   0.0727    1.927
+##  GRAZIA - SOLEX       -0.4500 0.263 14  -1.3773    0.477
+##  IRIDE - SANCARLO      0.4600 0.263 14  -0.4673    1.387
+##  IRIDE - SIMETO        1.6233 0.263 14   0.6960    2.551
+##  IRIDE - SOLEX         0.1733 0.263 14  -0.7540    1.101
+##  SANCARLO - SIMETO     1.1633 0.263 14   0.2360    2.091
+##  SANCARLO - SOLEX     -0.2867 0.263 14  -1.2140    0.641
+##  SIMETO - SOLEX       -1.4500 0.263 14  -2.3773   -0.523
 ## 
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
-## P value adjustment: tukey method for comparing a family of 16 estimates 
+## Conf-level adjustment: tukey method for comparing a family of 8 estimates
+# Letter display
+cld(meds, Letters = LETTERS, reverse = T)
+##  Genotype emmean    SE df lower.CL upper.CL .group
+##  IRIDE      4.96 0.186 14     4.56     5.36  A    
+##  COLOSSEO   4.89 0.186 14     4.49     5.29  A    
+##  SOLEX      4.79 0.186 14     4.39     5.19  A    
+##  SANCARLO   4.50 0.186 14     4.10     4.90  A    
+##  GRAZIA     4.34 0.186 14     3.94     4.74  A    
+##  CRESO      4.33 0.186 14     3.93     4.73  A    
+##  DUILIO     4.24 0.186 14     3.84     4.64  AB   
+##  SIMETO     3.34 0.186 14     2.94     3.74   B   
+## 
+## Results are averaged over the levels of: Block 
+## Confidence level used: 0.95 
+## P value adjustment: tukey method for comparing a family of 8 estimates 
 ## significance level used: alpha = 0.05 
 ## NOTE: If two or more means share the same grouping symbol,
 ##       then we cannot show them to be different.
 ##       But we also did not show them to be the same.
 ```
 
-\normalsize
 
-Vi lascio il commento dei risultati come esercizio.
+## Esempio 10.2: confronto tra co-adiuvanti in un esperimento a quadrato latino
 
-## Disegni a quadrato latino
+Consideriamo un esperimento a quadrato latino con quattro repliche, finalizzato a confrontare tre possibili co-adiuvanti per l'erbicida rimsulfuron (Onofri, 1990; dati non pubblicati). I risultati di questo esperimento sono disponibili nel dataset 'adjuvantsLS', nel package `statforbiology`; la colonna 'Yield' è la risposta, la colonna 'Adjuvant' il predittore nominale, mentre le colonne 'Row' and 'Column' rappresentano le righe e le colonne della griglia a quadrato latino e costituiscono i due fattori di raggruppamento da inserire nel modello. Le tre variabili indipendenti dovranno essere trasformate in fattori prima dell'analisi, sebbene ciò sia strettamente necessario solo per le righe e le colonne, che sono caratterizzate da codifica numerica. Invece di trasformare le tre variabili una alla volta (come nell'esempio 10.1), possiamo utilizzare la funzione `transform()`, passandole il 'dataframe' come primo argomento e  l'elenco delle trasformazioni da eseguire all'interno di tale 'dataframe' (vedere il codice più sotto).
 
-A volte i fattori di blocco sono più di uno e danno origine ad un disegno sperimentale detto 'quadrato latino' di cui abbiamo parlato nel capitolo 3. Qui, forniremo un esempio tratto dalla pratica sperimentale industriale.
+L'EDA si basa sull'analisi delle medie aritmetiche e delle deviazioni standard (DS) dei diversi trattamenti: la media per il tensioattivo sembra essere più alta rispetto alle altre medie. Allo stesso tempo, non ci sono evidenti differenze tra i co-adiuvanti in termini di deviazioni standard.
 
-## Caso studio: confronto tra metodi costruttivi
 
-Immaginiamo di voler studiare il tempo necessario per costruire un componente elettronico, utilizzando quattro metodi diversi: è evidente che il tempo di costruzione sarà influenzato dalla perizia del tecnico e, per questo, utilizziamo quattro tecnici diversi, ad ognuno dei quali facciamo utilizzare tutti e quattro i metodi. Un esperimento così disegnato sarebbe a blocchi randomizzati, con il tecnico che fa da blocco per i trattamenti. Tuttavia, dobbiamo anche riconoscere che i quattro tecnici saranno via via meno efficienti, e quindi il metodo che utilizzeranno per primo sarà avvantaggiato, mentre quello che utilizzeranno per ultimo sarà svantaggiato. E'vero che i metodi sono assegnati in ordine random ad ogni tecnico, ma non si può comunque evitare che un metodo venga avvantaggiato rispetto ad un altro, perché, ad esempio, non viene mai ad occupare l'ultima posizione (o meglio, l'ultimo turno). Abbiamo già illustrato questa situazione in un capitolo precedente ed abbiamo visto come essa possa essere gestita imponendo un vincolo ulteriore alla randomizzazione e facendo in modo che ogni metodo occupi tutte e quattro i turni, in tecnici diversi. Il disegno è quindi a quadrato latino.
 
-Il dataset dei risultati è disponibile online:
 
 
 ```r
-fileName <- "https://www.casaonofri.it/_datasets/Technicians.csv"
-dataset <- read.csv(fileName, header=T)
-dataset
-##    Shift Technician Method Time
-## 1      I     Andrew      C   90
-## 2     II     Andrew      B   90
-## 3    III     Andrew      A   89
-## 4     IV     Andrew      D  104
-## 5      I       Anna      D   96
-## 6     II       Anna      C   91
-## 7    III       Anna      B   97
-## 8     IV       Anna      A  100
-## 9      I    Michael      A   84
-## 10    II    Michael      D   96
-## 11   III    Michael      C   98
-## 12    IV    Michael      B  104
-## 13     I      Sarah      B   88
-## 14    II      Sarah      A   88
-## 15   III      Sarah      D   98
-## 16    IV      Sarah      C  106
+# Example 10.2
+# Comparing adjuvants on a latin square
+
+# Loading the packages
+library(statforbiology)
+library(MASS)
+library(emmeans)
+library(multcomp)
+
+# Loading and transforming the data
+dataset <- getAgroData("adjuvantsLS")
+dataset <- transform(dataset, 
+                     Adjuvant = factor(Adjuvant),
+                     Row = factor(Row),
+                     Column = factor(Column))
+head(dataset[,c(2, 6, 7, 24)])
+##           Adjuvant Column Row Yield
+## 1 AmmoniumSulphate      1   3 58.23
+## 2 AmmoniumSulphate      2   1 47.98
+## 3 AmmoniumSulphate      3   4 92.39
+## 4 AmmoniumSulphate      4   2 85.97
+## 5       MineralOil      1   2 73.99
+## 6       MineralOil      2   4 92.97
+# EDA
+with(dataset, data.frame(Mean = tapply(Yield, Adjuvant, mean),
+                         SD = tapply(Yield, Adjuvant, sd)))
+##                      Mean       SD
+## AmmoniumSulphate  71.1425 21.40518
+## MineralOil       101.1475 23.00979
+## None              80.5525 30.51889
+## Surfactant       115.4250 20.69268
 ```
 
-## Definizione di un modello lineare
-
-In questo caso abbiamo un trattamento (metodo) e due effetti 'blocco' (tecnico e turno) da includere nel modello, che può essere così definito:
+In questo esempio, abbiamo un trattamento sperimentale e due effetti 'blocco' che debbono necessariamente essere inclusi nel modello (Jensen et al., 2018). Di conseguenza, il modello causa-effetto può essere così definito:
 
 $$Y_{ijk} = \mu + \gamma_k + \beta_j + \alpha_i + \varepsilon_{ijk}$$
 
-dove $\mu$ è l'intercetta, $\gamma$ è l'effetto del turno k, $\beta$ è l'effetto del tecnico j e $\alpha$ è l'effetto del metodo i. L'elemento $\varepsilon_{ijk}$ rappresenta la componente random individuale, di ogni osservazione e si assume normalmente distribuita, con media 0 e deviazione standard $\sigma$.
+dove $\mu$ è l'intercetta, $\gamma$ è l'effetto della k-esima riga, $\beta$ è l'effetto della j-esima colonna e $\alpha$ è l'effetto dell'i-esimo coadiuvante. L'elemento $\varepsilon_{ijk}$ rappresenta la componente random individuale, di ogni osservazione e si assume normalmente distribuita, con media 0 e deviazione standard $\sigma$.
 
-Avendo già illustrato il processo di stima dei parametri e di scomposizione della varianza, quindi utilizziamo subito R per il 'model fitting':
+Dopo il 'fitting', estraiamo i residui e li sottoponiamo ad analisi grafica, che non rivela problemi di alcun tipo (Figura \@ref(fig:figName122)), mentre il grafico di Box-Cox conferma che non è necessaria alcuna trasformazione (non mostrato). Pertanto, possiamo procedere all'ANOVA per testare la significatività di tutti i fattori sperimentali.
 
 
 ```r
-mod <- lm(Time ~ Method + Technician
-          + Shift, data = dataset)
+# Example 10.2 [continuation]
+
+# Fitting the model
+mod <- lm(Yield ~ Adjuvant + Row + Column, data = dataset)
+
+# checking the residuals (not run here)
+# plot(mod, which = 1)
+# plot(mod, which = 2)
+# boxcox(mod)
+
+# Variance partitioning
+anova(mod)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##           Df Sum Sq Mean Sq F value   Pr(>F)   
+## Adjuvant   3 4793.9 1597.96 14.9051 0.003458 **
+## Row        3  375.8  125.28  1.1685 0.396678   
+## Column     3 6022.6 2007.53 18.7253 0.001893 **
+## Residuals  6  643.3  107.21                    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-Verifichiamo il rispetto delle assunzioni di base, con l'analisi grafica dei residui, riportata in Figura \@ref(fig:figName122) (il codice è analogo a quello fornito più sopra).
 
 <div class="figure" style="text-align: center">
 <img src="_main_files/figure-html/figName122-1.png" alt="Analisi grafica dei residui per la prova di confronto tra metodi costruttivi" width="90%" />
 <p class="caption">(\#fig:figName122)Analisi grafica dei residui per la prova di confronto tra metodi costruttivi</p>
 </div>
 
-Non essendovi evidenti problemi, valutiamo la significatività degli effetti nel modello, analogamente a quanto abbiamo fatto nel caso dell'ANOVA a blocchi randomizzati. L'unica differenza sta nel fatto che, nei disegni a quadrato latino, vi sono tre effetti da testare, anche se l'unico ad avere una certa rilevanza è l'effetto del metodo di lavoro.
+La differenza tra i co-adiuvanti è significativa (valore P = 0,0035) e la procedura di confronto multiplo rivela che il tensioattivo ha migliorato significativamente le prestazioni dell'erbicida, rispetto a quando è stato utilizzato da solo, mentre la resa con olio minerale non è stata significativamente inferiore a quella ottenuta col tensioattivo.
 
 
 ```r
-anova(mod)
-## Analysis of Variance Table
+# Example 10.2 [continuation]
+
+# Multiple comparisons
+avgs <- emmeans(mod, ~Adjuvant)
+confint(contrast(avgs, method = "pairwise"))
+##  contrast                      estimate   SE df lower.CL upper.CL
+##  AmmoniumSulphate - MineralOil   -30.00 7.32  6   -55.35    -4.66
+##  AmmoniumSulphate - None          -9.41 7.32  6   -34.75    15.93
+##  AmmoniumSulphate - Surfactant   -44.28 7.32  6   -69.63   -18.94
+##  MineralOil - None                20.59 7.32  6    -4.75    45.94
+##  MineralOil - Surfactant         -14.28 7.32  6   -39.62    11.07
+##  None - Surfactant               -34.87 7.32  6   -60.22    -9.53
 ## 
-## Response: Time
-##            Df Sum Sq Mean Sq F value    Pr(>F)    
-## Method      3 145.69  48.563 12.7377 0.0051808 ** 
-## Technician  3  17.19   5.729  1.5027 0.3065491    
-## Shift       3 467.19 155.729 40.8470 0.0002185 ***
-## Residuals   6  22.87   3.812                      
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Results are averaged over the levels of: Row, Column 
+## Confidence level used: 0.95 
+## Conf-level adjustment: tukey method for comparing a family of 4 estimates
+cld(avgs, Letters = LETTERS, reversed = TRUE)
+##  Adjuvant         emmean   SE df lower.CL upper.CL .group
+##  Surfactant        115.4 5.18  6    102.8    128.1  A    
+##  MineralOil        101.1 5.18  6     88.5    113.8  AB   
+##  None               80.6 5.18  6     67.9     93.2   BC  
+##  AmmoniumSulphate   71.1 5.18  6     58.5     83.8    C  
+## 
+## Results are averaged over the levels of: Row, Column 
+## Confidence level used: 0.95 
+## P value adjustment: tukey method for comparing a family of 4 estimates 
+## significance level used: alpha = 0.05 
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.
 ```
 
-Vediamo che esiste una differenza significativa tra i metodi e l'ipotesi nulla può essere rifiutata con una bassissima probabilità di errore di prima specie.
+## Esempio 10.3: interazione tra genotipo e concimazione azotata
 
-Ovviamente, dopo aver eseguito un'ANOVA a blocchi randomizzati o a quadrato latino, andremo eventualmente ad eseguire un test di confronto multiplo, seguendo le raccomandazioni esposte nel capitolo precedente. Anche questa parte ve la lasciamo per esercizio.
+Quindici genotipi di frumento sono stati confrontati a due diversi livelli di fertilizzazione azotata, utilizzando un disegno a blocchi randomizzati con tre repliche. L'esperimento mirava a valutare se la raccomandazione varietale cambiasse al cambiare del livello di concimazione azotata. Il set di dati è stato generato tramite simulazione Monte Carlo, a partire dai risultati riportati in (Stagnari et al., 2003) ed è disponibile come 'NGenotypeFull' nel package `statforbiology`.
 
-<!--chapter:end:10-MultiWayANOVAModels.Rmd-->
+In questo esperimento, la resa è determinata da quattro effetti:
 
-# La regressione lineare semplice
+1. blocco
+2. genotipo
+3. livello di azoto
+4. interazione tra genotipo e livello di azoto
 
+Di conseguenza, il modello mostrato può essere codificato come nell'Esempio 4.4 (Capitolo 4), aggiungendo l'effetto blocco. Per stimare questo modello, possiamo caricare i dati e trasformare i predittori numerici in fattori. Per questa trasformazione, nel riquadro sottostante abbiamo utilizzato la funzione `lapply()` invece della funzione `transform()`, che avevamo utilizzato in un esempio precedente. Con `lapply()`, le variabili da trasformare vengono recuperate utilizzando gli indici di colonna, vengono trasformate utilizzando la funzione `factor()` (passata come secondo argomento) e riassegnate alle stesse posizioni che avevano in precedenza nel 'dataframe'.
 
-Nei capitoli precedenti abbiamo parlato di modelli basati su una fattori sperimentali in forma di categorie, ad esempio diversi erbicidi o diverse varietà. Abbiamo visto che, con questi fattori sperimentali, si utilizzano i cosiddetti modelli ANOVA.
-
-Nella sperimentazione agronomica e, in genere, biologica, la variabile indipendente (o le variabili indipendenti) può (possono) rappresentare una quantità, come, ad esempio, la dose di un farmaco, il tempo trascorso da un certo evento, la fittezza di semina e così via. In questa condizione, l'analisi dei dati richiede modelli diversi da qualli visti finora, di solito identificati con il nome di modelli di regressione. Questa classe di modelli è estremamente interessante e si presta a sviluppi potentissimi. In questo libro ci accontenteremo di trattare la regressione lineare semplice, cioè un modello lineare (retta) con una variabile dipendente ed un regressore. In un capitolo successivo estenderemo le considerazioni fatte ai modelli non-lineari.
-
-
-## Caso studio: effetto della concimazione azotata al frumento
-
-Per individuare la relazione tra la concimazione azotata e la produzione del frumento, è stato organizzato un esperimento a randomizzazione completa, con quattro dosi di azoto e quattro repliche. I risultati ottenuti sono riportati nella Tabella \@ref(tab:tabName141) e possono essere caricati direttamente da gitHub, con il codice sottostante. A differenza dei capitoli precedenti, in questo caso il dataset non è ottenuto da una prova vera, ma è stato generato, con il codice riportato nel capitolo 4. Pertanto, l'esempio, pur essendo efficace da un punto di vista didattico, potrebbe non essere totalmente realistico.
+Per brevità, saltiamo l'EDA e passiamo direttamente alla stima del modello; L'analisi grafica dei residui produce i risultati mostrati nella Figura \ref{fig:figName133}, dove non osserviamo deviazioni evidenti rispetto agli assunti di base per i modelli lineari; pertanto, procediamo con l'ANOVA.
 
 
 ```r
-fileName <- "https://www.casaonofri.it/_datasets/NWheat.csv"
-dataset <- read.csv(fileName, header=T)
-```
-
-
-
-Table: (\#tab:tabName141)Dataset relativo ad una prova di concimazione azotata su frumento
-
-| Dose|     1|     2|     3|     4|
-|----:|-----:|-----:|-----:|-----:|
-|    0| 21.98| 25.69| 27.71| 19.14|
-|   60| 35.07| 35.27| 32.56| 32.63|
-|  120| 41.59| 40.77| 41.81| 40.50|
-|  180| 50.06| 52.16| 54.40| 51.72|
-
-## Analisi preliminari
-
-Questo esperimento è replicato ed è totalmente analogo a quello presentato nel capitolo 7, con l'unica differenza che, in questo caso, la variabile indipendente è quantitativa. Tuttavia, è del tutto logico considerare la dose di azoto come un predittore qualitativo ('factor') ed utilizzare un modello descrittivo ANOVA ad una via. Eseguiamo il 'fitting' con R, che è preceduto dalla trasformazione della variabile 'dose' in un fattore (funzione `factor()`).
-
-
-```r
-dataset$DoseF <- factor(dataset$Dose)
-model <- lm(Yield ~ DoseF, data = dataset)
-anova(model)
-## Analysis of Variance Table
-## 
-## Response: Yield
-##           Df  Sum Sq Mean Sq F value    Pr(>F)    
-## DoseF      3 1725.96  575.32  112.77 4.668e-09 ***
-## Residuals 12   61.22    5.10                      
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-```
-
-Osserviamo che l'effetto del trattamento è significativo e il SEM è pari a $\sqrt{5.10/4} = 1.129$. Prima di proseguire, verifichiamo che non ci siano problemi relativi alle assunzioni parametriche di base e che, quindi, la trasformazione dei dati non sia necessaria. I grafici dei residui, riportati in Figura \@ref(fig:figName141), non mostrano  patologie rilevanti.
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName141-1.png" alt="Analisi grafica dei residui per una prova di concimazione azotata del frumento" width="90%" />
-<p class="caption">(\#fig:figName141)Analisi grafica dei residui per una prova di concimazione azotata del frumento</p>
-</div>
-
-Da questo momento in avanti, diversamente a quanto abbiamo visto nei capitoli precedenti, l'analisi non prosegue con un test di confronto multiplo, che in questa situazione, se non del tutto errato, sarebbe comunque da considerare 'improprio'. Infatti, quale senso avrebbe confrontare la risposta produttiva a 60 kg N ha^-1^ con quella a 120 kg N ha ^-1^? In realtà noi non siamo specificatamente interessati a queste due dosi, ma a qualunque altra dose nell'intervallo da 0 a 180 kg N ha^-1^. Abbiamo selezionato quattro dosi per organizzare l'esperimento, ma resta il fatto che siamo interessati a definire una funzione di risposta per tutto l'intervallo delle dosi, non a confrontare le risposte a due dosi in particolare.
-
-Per questo motivo, quando la variabile indipendente è una dose, l'analisi dei dati dovrebbe essere basata sull'impiego di un modello di regressione, in quanto ciò è più coerente con le finalità dell'esperimento, rispetto all'adozione di una procedura di confronto multiplo.
-
-## Definizione del modello lineare
-
-Immaginiamo che, almeno nell'intervallo di dosi incluso nell'esperimento, l'effetto della concimazione azotata sulla produzione sia lineare. In effetti, l'andamento dei dati conferma questa impressione e, pertanto, poniamo il modello lineare nei termini usuali:
-
-$$Y_i = b_0 + b_1 X_i + \varepsilon_i$$
-
-dove $Y$ è la produzione della parcella $i$, trattata con la dose $X_i$, $b_0$ è l'intercetta (produzione a dose di azoto pari a 0) e $b_1$ è la pendenza, cioè l'incremento di produzione per ogni incremento unitario della dose. La componente stocastica $\varepsilon$ viene assunta omoscedastica e normalmente distribuita, con media 0 e deviazione standard $\sigma$.
-
-
-## Stima dei parametri
-
-Dobbiamo a questo punto individuare i parametri $b_0$ e $b_1$ in modo tale che la retta ottenuta sia la più vicina ai dati, cioè in modo da minimizzare gli scostamenti tra i valori di produzione osservati e quelli stimati dal modello (soluzione dei minimi quadrati). La funzione dei minimi quadrati è:
-
-
-$$\begin{array}{l}
-Q = \sum\limits_{i = }^N {\left( {{Y_i} - \hat Y} \right)^2 = \sum\limits_{i = }^N {{{\left( {{Y_i} - {b_0} - {b_1}{X_i}} \right)}^2}}  = } \\
- = \sum\limits_{i = }^N {\left( {Y_i^2 + b_0^2 + b_1^2X_i^2 - 2{Y_i}{b_0} - 2{Y_i}{b_1}{X_i} + 2{b_0}{b_1}{X_i}} \right)}  = \\
- = \sum\limits_{i = }^N {Y_i^2 + Nb_0^2 + b_1^2\sum\limits_{i = }^N {X_i^2 - 2{b_0}\sum\limits_{i = }^N {Y_i^2 - 2{b_1}\sum\limits_{i = }^N {{X_i}{Y_i} + } } } } 2{b_0}{b_1}\sum\limits_{i = }^N {{X_i}} 
-\end{array}$$
-
-
-Calcolando le derivate parziali rispetto a $b_0$ e $b_1$ che, al momento, sono le nostre incognite, ed eguagliandole a 0 si ottengono le seguenti formule risolutive:
-
-
-$${b_1} = \frac{{\sum\limits_{i = 1}^N {\left[ {\left( {{X_i} - {\mu _X}} \right)\left( {{Y_i} - {\mu _Y}} \right)} \right]} }}{{\sum\limits_{i = 1}^N {{{\left( {{X_i} - {\mu _X}} \right)}^2}} }}$$
-
-e:
-
-$${b_0} = {\mu _Y} - {b_1}{\mu _X}$$
-
-Invece che svolgere i calcoli a mano, possiamo eseguire il fitting ai minimi quadrati con R; l'unica differenza tra questo modello di regressione e il modello ANOVA utilizzato poco sopra è che qui utilizziamo la variabile 'Dose' come tale, senza prima trasformarla in un 'factor'.
-
-
-```r
-modelReg <- lm(Yield ~ Dose, data = dataset)
-summary(modelReg)
-## 
-## Call:
-## lm(formula = Yield ~ Dose, data = dataset)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -4.6537 -1.5350 -0.4637  1.9250  3.9163 
-## 
-## Coefficients:
-##              Estimate Std. Error t value Pr(>|t|)    
-## (Intercept) 23.793750   0.937906   25.37 4.19e-13 ***
-## Dose         0.154417   0.008356   18.48 3.13e-11 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 2.242 on 14 degrees of freedom
-## Multiple R-squared:  0.9606,	Adjusted R-squared:  0.9578 
-## F-statistic: 341.5 on 1 and 14 DF,  p-value: 3.129e-11
-```
-
-Ora sappiamo che la relazione tra la dose di azoto e la risposta produttiva del frumento è:
-
-$$ Y_i = 23.111 + 0.1544 \times X_i $$
-
-L'elemento stocastico $\varepsilon_i$ è normalmente distribuito, con media 0 e deviazione standard 2.029 (vedi la voce 'Residual standard error' nell'output sovrastante).
-
-Come al solito, prima di qualunque altra considerazione, dobbiamo verificare la bontà del modello e il rispetto delle assunzioni di base, con una procedura che, per un modello di regressione, deve riguardare un maggior numero di aspetti rispetto ad un modello ANOVA.
-
-## Valutazione della bontà del modello
-
-In primo luogo, è necessario verificare il rispetto delle assunzioni di base di normalità e omoscedasticità dei residui. Per questo, possiamo utilizzare gli stessi metodi impiegati per i modelli ANOVA, vale a dire un grafico dei residui verso gli attesi ed un QQ-plot dei residui standardizzati. In realtà, abbiamo già eseguito questo controllo con il modello ANOVA corrispondente e non vi è la necessità di ripeterlo con questo modello.
-
-Dobbiamo invece assicurarci che i dati osservati siano ben descritti dal modello adottato, senza nessuna componente sistematica di mancanza d'adattamento. In altre parole, le osservazioni non debbono contraddire l'ipotesi che la risposta è lineare, salvo per le eventuali deviazioni casuali insite in qualunque esperimento. Per la verifica della **bontà di adattamento** possiamo utilizzare diverse procedure, che illustreremo di seguito.
-
-### Valutazione grafica
-
-Nel modo più semplice, la bontà di adattamento può essere valutata attraverso un grafico dei valori attesi e dei valori osservati, come quello in Figura \@ref(fig:figName142). Notiamo che non c'è alcun elemento che faccia pensare ad una sistematica deviazione rispetto alle previsioni fatte dal modello.
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName142-1.png" alt="Risposta produttiva del frumento alla concimazione azotata: dati osservati (simboli) e valori attesi (linea tratteggiata)." width="90%" />
-<p class="caption">(\#fig:figName142)Risposta produttiva del frumento alla concimazione azotata: dati osservati (simboli) e valori attesi (linea tratteggiata).</p>
-</div>
-
-### Errori standard dei parametri
-
-In secondo luogo, possiamo valutare gli errori standard delle stime dei parametri, che non debbono mai essere superiori alla metà del valore del parametro stimato, cosa che in questo caso è pienamente verificata. Se così non fosse, l'intervallo di confidenza del parametro, usualmente stimato utilizzando il doppio dell'errore standard, conterrebbe lo zero, il che equivarrebbe a dire che, ad esempio, la pendenza 'vera' (cioè quella della popolazione da cui il nostro campione è estratto) potrebbe essere nulla. In altre parole, la retta potrebbe essere 'piatta', dimostrando l'inesistenza di relazione tra la dose di concimazione e la produzione della coltura. Si può notare che, nell'esempio in studio, questo dubbio non sembra sussistere.
-
-
-### Test F per la mancanza d'adattamento
-
-In terzo luogo, possiamo analizzare i residui della regressione, cioè gli scostamenti dei punti rispetto alla retta e, in particolare, la somma dei loro quadrati. Possiamo vedere che questo valore è pari a 70.37, ed è più alto di quello del corrispondente modello ANOVA, impiegato in precedenza (61.22):
-
-
-```r
-anova(modelReg)
-## Analysis of Variance Table
-## 
-## Response: Yield
-##           Df  Sum Sq Mean Sq F value    Pr(>F)    
-## Dose       1 1716.80 1716.80  341.54 3.129e-11 ***
-## Residuals 14   70.37    5.03                      
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-```
-
-
-Il risultato è perfettamente normale, dato che il residuo del modello ANOVA contiene solo la misura dello scostamento di ogni dato rispetto alla media del suo gruppo, che si può considerare 'errore puro', mentre il residuo della regressione, oltre all'errore puro, contiene anche una componente detta 'mancanza d'adattamento' (*lack of fit*), misurabile con lo scostamento di ogni media dalla linea di regressione. In effetti, la regressione lineare è solo un'approssimazione della reale relazione biologica tra la concimazione e la produzione del frumento.
-
-Insomma, il modello di regressione è un modello che ha sempre minor capacità descrittiva rispetto ad un modello ANOVA. La differenza può essere quantificata utilizzando le devianze dei rispettivi residui:
-
-$$\textrm{Lack of fit} = 70.37 - 61.22 = 9.15$$
-
-Bisogna però anche dire che il modello di regressione è più parsimonioso, nel senso che ci ha costretto a stimare solo due parametri ($b_0$ e $b_1$), mentre il modello ANOVA ce ne ha fatti stimare quattro ($\mu$, $\alpha_2$, $\alpha_3$ e $\alpha_4$, considerando che $\alpha_1 = 0$). Quindi il residuo del modello di regressione ha 14 gradi di libertà (16 dati meno due parametri stimati), mentre il residuo del modello ANOVA ne ha 12 (16 - 4). La componente di lack of fit ha quindi 14 - 12 = 2 gradi di libertà. Ci chiediamo, questa componente di lack of fit è significativamente più grande dell'errore puro?
-
-L'ipotesi nulla di assenza di lack of fit può essere testata con un test di F, per il confronto di due varianze: se questo è significativo allora la componente di mancanza d'adattamento non è trascurabile, ed il modello di regressione dovrebbe essere rifiutato. L'espressione è:
-
-$$ F_{lack} = \frac{\frac{RSS_r - RSS_a}{DF_r-DF_a} } {\frac{RSS_a}{DF_a}} = \frac{MS_{lack}}{MSE_a}$$
-
-dove RSS~r~ è la devianza residua della regressione con i sui gradi di liberta DF~r~ e RSS~a~ è la devianza residua del modello ANOVA, con i suoi gradi di libertà DF~a~. In R, il test F per la mancanza d'adattamento può essere eseguito con la funzione `anova()`, confrontando i due modelli alternativi:
-
-
-```r
-anova(modelReg, model)
-## Analysis of Variance Table
-## 
-## Model 1: Yield ~ Dose
-## Model 2: Yield ~ DoseF
-##   Res.Df    RSS Df Sum of Sq      F Pr(>F)
-## 1     14 70.373                           
-## 2     12 61.219  2    9.1542 0.8972 0.4334
-```
-
-Vediamo che non otteniamo risultati significativi (P = 0.4334). Ciò supporta l'idea che non vi sia mancanza d'adattamento e quindi la regressione fornisca una descrizione altrettanto adeguata dei dati sperimentali rispetto al più 'complesso' modello ANOVA. Scegliamo quindi il modello di regressione, in quanto più semplice, nel rispetto del principio del rasoio di Occam.
-
-### Test F per la bontà di adattamento
-
-Abbiamo dimostrato che il modello di regressione non è significativamente peggiore del modello ANOVA corrispondente. Un approccio alternativo per dimostrare la bontà di adattamento è verificare se il modello di regressione è significativamente migliore di un modello 'nullo'. Ricordiamo che con il modello 'nullo' ($Y_i = \mu + \varepsilon_i$) si assume che la risposta sia costante e pari alla media di tutti i dati, escludendo così ogni effetto della dose di concimazione. La devianza del residuo di un modello nullo non è altro che la devianza totale dei dati, che risulta pari a 1787.178:
-
-
-```r
-modNull <- lm(Yield ~ 1, data = dataset)
-deviance(modNull)
-## [1] 1787.178
-```
-
-Abbiamo visto che la devianza del modello di regressione è pari a 70.37: la differenza (1716.81) rappresenta la 'bontà di adattamento', cioè una misura di quanto migliora il potere descrittivo del modello aggiungendo l'effetto 'dose'. Quindi, un test di F per la bontà di adattamento può essere costruito come:
-
-$$ F_{good} = \frac{\frac{RSS_t - RSS_r}{DF_t - DF_r} } {\frac{RSS_r}{DF_r}} = \frac{MS_{good}}{MSE_r}$$
-
-dove RSS~t~ è la devianza totale dei dati con i sui gradi di liberta DF~t~. In R, il test F per la bontà d'adattamento può essere eseguito con la funzione `anova()`, senza la necessità di includere come argomento il modello 'nullo':
-
-
-```r
-anova(modelReg)
-## Analysis of Variance Table
-## 
-## Response: Yield
-##           Df  Sum Sq Mean Sq F value    Pr(>F)    
-## Dose       1 1716.80 1716.80  341.54 3.129e-11 ***
-## Residuals 14   70.37    5.03                      
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-```
-
-Vediamo che in questo caso l'ipotesi nulla deve essere rifiutata: la varianza spiegata dalla regressione è significativamente maggiore di quella del residuo.
-
-### Coefficiente di determinazione
-
-Nella letteratura scientifica si è sempre sentita l'esigenza di una statistica che rappresentasse, in modo sintetico, la bontà della regressione. Per questo scopo si è sempre utilizzato il rapporto tra la devianza spiegata dalla regressione e la devianza totale, detto **coefficiente di determinazione** o R^2^:
-
-$$R^2 = \frac{SS_{reg}}{SS_{tot}} = \frac{1716.81}{1787.18} = 0.961$$
- 
-Questa statistica varia da 0 ad 1; in quest'ambito, più è alto il valore tanto migliore è la bontà della regressione. Il coefficiente di determinazione è visibile nell'output della funzione `summary()` applicata all'oggetto 'modelReg' (vedi più sopra).
-
-## Previsioni
-
-Dato che il modello ha mostrato di funzionare bene, con prudenza, possiamo utilizzarlo per effettuare due tipi di previsioni: diretta ed inversa. Nel primo caso, possiamo prevedere la risposta per una qualunque dose, nel secondo caso, possiamo prevedere la dose che ha indotto una data risposta (Figure \@ref(fig:figName143)).
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName143-1.png" alt="Esempio di previsioni: a destra, previsione della risposta per una data dose, a sinistra previsione della dose per ottenere una data risposta" width="90%" />
-<p class="caption">(\#fig:figName143)Esempio di previsioni: a destra, previsione della risposta per una data dose, a sinistra previsione della dose per ottenere una data risposta</p>
-</div>
-
-Per entrambi i tipi di previsione ci si dovrebbe mantenere entro i livelli di dosi e risposte massimi e minimi inclusi ed osservati in prova, per evitare pericolose estrapolazioni (la risposta ha mostrato di essere lineare solo nell'intervallo osservato, ma non sappiamo cosa potrebbe capitare fuori da questo).
-
-I parametri stimati possono essere facilmente utilizzati per fare previsioni dirette, come indicato nel box sottostante.
-
-
-```r
-23.793750 + 0.154417 * 30
-## [1] 28.42626
-23.793750 + 0.154417 * 80
-## [1] 36.14711
-```
-
-Anche queste stime, come tutte le altre, si riferiscono al campione in prova, mentre noi siamo interessati a fornire una previsione per l'intera popolazione da cui i nostri dati sono capionati. Per questo motivo, abbiamo la necessità di quantificare l'incertezza, attraverso un'opportuna stima dell'errore standard. In R, ciò è possibile utilizzando la funzione `predict()`, passando come argomento le dosi alle quali effettuare la previsione, organizzate in un data frame. Ad esempio, se si vuole prevedere la produzione a 30 e 80 kg N ha^-1^, il codice è:
-
-
-```r
-pred <- predict(modelReg, newdata=data.frame(Dose=c(30, 80)), se=T)
-pred
-## $fit
-##        1        2 
-## 28.42625 36.14708 
-## 
-## $se.fit
-##         1         2 
-## 0.7519981 0.5666999 
-## 
-## $df
-## [1] 14
-## 
-## $residual.scale
-## [1] 2.242025
-```
-
-E'anche possibile effettuare la previsione inversa, cioè chiedere ai dati qual è la dose a cui corrisponde una produzione di 45 q/ha. In questo caso dobbiamo tener presente che l'equazione inversa è:
-
-$$X = \frac{Y - b_0}{b_1}$$
-e la previsione corrispondente è:
-
-
-```r
-(45 - 23.793750)/0.154417
-## [1] 137.3311
-```
-
-Per determinare l'errore standard possiamo utilizzare la funzione `deltaMethod()`, nel package 'car', che ci calcola anche gli errori standard con il metodo della propagazione degli errori:
-
-
-```r
-car::deltaMethod(modelReg, "(45 - b0)/b1", 
-                 parameterNames=c("b0", "b1"))
-##              Estimate       SE    2.5 % 97.5 %
-## (45 - b0)/b1 137.3314   4.4424 128.6244 146.04
-```
-
-
-Il procedimento sopra descritto è molto comune, per esempio nei laboratori chimici, dove viene utilizzato nella fase di calibrazione di uno strumento. Una volta che la retta di calibrazione è stata individuate, essa viene utilizzata per determinare le concentrazioni incognite di campioni per i quali sia stata misurata la risposta.
-
-## Disegni a blocchi randomizzati
-
-Come abbiamo gà detto, la gran parte degli esperimenti agronomici, inclusi quelli in cui si organizzano per studiare l'effetto di una variabile quantitativa, sono disegnati a blocchi randomizzati. In questo caso, oltre all'effetto in studio, esiste anche l'effetto del blocco, che non può essere trascurato, altrimenti si viene ad inficiare l'indipendenza dei residui, come abbiamo evidenziato nel capitolo precedente.
-
-Per una banale esempio, potremmo immaginare che nel dataset 'NWheat, le quattro repliche di ogni dose siano state ottenute, nell'ordine, nei blocchi 1, 2, 3 e 4. Il modello lineare risulterebbe così modificato:
-
-$$Y_{ij} = b_0 + \gamma_j + b_1 X_{ij} + \varepsilon_{ij}$$
-vale a dire: la produzione per la i-esima dose di azoto nel j-esimo blocco è ottenuta attraverso un modello lineare, in cui l'effetto del blocco si ripercuote sull'intercetta, che, nei diversi blocchi è pari, rispettivamente, a $b_0 + \gamma_1$, $b_0 + \gamma_2$, $b_0 + \gamma_3$ e $b_0 + \gamma_4$. In questo modo l'effetto del blocco è fisso ed additivo; ovviamente si possono anche adottare approcci più complessi, che però esulano dagli scopi del nostro testo introduttivo.
-
-Il fitting di questo modello è semplice, utilizzando il codice seguente:
-
-
-
-```r
-# creazione della variabile blocco
-dataset$Block <- factor(rep(1:4, 4))
-model <- lm(Yield ~ Dose + Block, data = dataset)
-```
-
-Ovviamente, il riferimento per testare la mancanza di adattamento sarà il modello ANOVA corrispondente, a blocchi randomizzati; per il resto, non cambia nulla. Resta però la necessità di conoscere i parametri della curva dose-risposta media per i diversi blocchi, che sarà quella da utilizzare per fare previsioni. Utilizziamo quindi il metodo 'summary()' come abbiamo visto in precedenza.
-
-
-```r
-summary(model)
-## 
-## Call:
-## lm(formula = Yield ~ Dose + Block, data = dataset)
-## 
-## Residuals:
-##    Min     1Q Median     3Q    Max 
-## -2.960 -1.455 -0.170  1.394  2.527 
-## 
-## Coefficients:
-##              Estimate Std. Error t value Pr(>|t|)    
-## (Intercept) 23.277500   1.247516  18.659 1.12e-09 ***
-## Dose         0.154417   0.007722  19.997 5.35e-10 ***
-## Block2       1.297500   1.465133   0.886    0.395    
-## Block3       1.945000   1.465133   1.328    0.211    
-## Block4      -1.177500   1.465133  -0.804    0.439    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 2.072 on 11 degrees of freedom
-## Multiple R-squared:  0.9736,	Adjusted R-squared:  0.964 
-## F-statistic: 101.3 on 4 and 11 DF,  p-value: 1.331e-08
-```
-
-Vediamo che la pendenza è pari a 0.1544 ed è esattamente identica a quella stimata senza considerare l'effetto del blocco. L'intercetta, invece, cambia al cambiare del blocco. In particolare, R impiega una parametrizzazionecon vincolo sul trattamento e quindi il valore 23.2775, che vediamo identificato come intercetta, corrisponde al primo blocco (in quanto il vincolo è $\gamma_1 = 0$).
-
-Dobbiamo quindi calcolare un'intercetta media dei blocchi, ad esempio utilizzando la solita funzione 'emmeans()', che fornisce la risposta produttiva attesa (media) per un livello di concimazione pari a 0. Il codice è il seguente:
-
-
-```r
+# Example 10.3
+# Genotype by Nitrogen Interactions
+
+# Loading the packages
+library(statforbiology)
+library(MASS)
+library(car)
 library(emmeans)
-emmeans(model, ~1, at = list(Dose = 0))
-##  1       emmean    SE df lower.CL upper.CL
-##  overall   23.8 0.867 11     21.9     25.7
-## 
-## Results are averaged over the levels of: Block 
-## Confidence level used: 0.95
-```
+library(multcomp)
 
-Il valore è identico a quello ottenuto senza considerare l'effetto del blocco, anche se l'errore standard è diverso in quanto parte del residuo è stata spiegata appunto attraverso l'effetto del blocco.
-
-Prima di concludere, vorremmo menzionare un'approccio alternativo, che consiste nell'utilizzare una parametrizzazione con vincolo sulla somma, invece che sul trattamento. Con questo vincolo, analogamente a quanto abbiamo visto nel capitolo 7, l'intercetta stimata con la regressione rappresenta il valor medio e gli effetti dei blocchi sono stimati come scostamenti rispetto al valor medio. Per imporre un vincolo sulla somma basta modificare il codice di fitting nel modo indicato di seguito. Nell'output non è presente l'effetto del quarto blocco, in quanto, per il vincolo prescelto, deve essere tale che sommato agli altri tre restituisca 0.
-
-
-```r
-model <- lm(Yield ~ Dose + Block, data = dataset,
-            contrasts = list(Block = "contr.sum"))
-summary(model)
-## 
-## Call:
-## lm(formula = Yield ~ Dose + Block, data = dataset, contrasts = list(Block = "contr.sum"))
-## 
-## Residuals:
-##    Min     1Q Median     3Q    Max 
-## -2.960 -1.455 -0.170  1.394  2.527 
-## 
-## Coefficients:
-##              Estimate Std. Error t value Pr(>|t|)    
-## (Intercept) 23.793750   0.866785  27.451 1.75e-11 ***
-## Dose         0.154417   0.007722  19.997 5.35e-10 ***
-## Block1      -0.516250   0.897207  -0.575    0.577    
-## Block2       0.781250   0.897207   0.871    0.402    
-## Block3       1.428750   0.897207   1.592    0.140    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 2.072 on 11 degrees of freedom
-## Multiple R-squared:  0.9736,	Adjusted R-squared:  0.964 
-## F-statistic: 101.3 on 4 and 11 DF,  p-value: 1.331e-08
-```
-
-
----
-
-## Altre letture
-
-1. Draper, N.R., Smith, H., 1981. Applied Regression Analysis, in: Applied Regression. John Wiley & Sons, Inc., IDA, pp. 224–241.
-2. Faraway, J.J., 2002. Practical regression and Anova using R. http://cran.r-project.org/doc/contrib/Faraway-PRA.pdf, R.
-
-
-
-<!--chapter:end:11-LinearRegression.Rmd-->
-
-# Modelli ANOVA a due vie con interazione
-
-
-## Il concetto di ’interazione’
-
-In alcuni casi siamo interessati a valutare l’effetto combinato di due fattori sperimentali, ad esempio, la lavorazione del terreno ed il diserbo chimico, in modo da mettere in evidenza possibili "interazioni". Con questo termine, intendiamo il fenomeno per cui l’effetto di un fattore (ad es. la lavorazione) cambia a seconda del livello dell’altro fattore (il diserbo chimico).
-
-Per comprendere meglio il concetto, osserviamo la Figura \@ref(fig:figName131), dove sono mostrate le medie di quattro trattamenti, ottenuti dalla combinazione fattoriale di un trattamento A con due livelli (A1 e A2) e di un trattamento B con altrettanti livelli (B1 e B2). Nel grafico, ogni combinazione è rappresentata da un simbolo.
-
-Concentriamoci un attimo sul grafico di sinistra e consideriamo la prima combinazione in ordine alfabetico (A1B1): per questa, la media è pari a 10. Se passiamo da A1 ad A2, fermo restando B1, l'incremento è + 4. Se invece passiamo da B1 a B2, fermo restando A1, l'incremento è + 5. Si deduce che, se gli effetti fossero puramente additivi, la media di A2B2 dovrebbe essere pari a 10 + 4 + 5 = 19, in quanto vengono modificati entrambi i livelli, da A1 ad A2 e da B1 a B2. Vediamo che l'osservazione conferma questa aspettativa di additività degli effetti e di mancanza di interazione.
-
-Al contrario, nel grafico centrale vediamo che il risultato osservato di A2B2 non può essere ottenuto per semplice somma di effetti, perché, a fronte di un risultato atteso pari a 19 otteniamo invece 16. Evidentemente, vi è qualcosa in questa combinazione che altera l'effetto congiunto di A e B. Questo qualcosa può essere quantificato con il valore -3, così che la media A2B2 è pari a 10 + 4 + 5 - 3 = 16. Il valore -3 rappresenta la mancanza di additività o interazione; in questo caso si tratta di **interazione semplice**, in quanto la graduatoria dei trattamenti non cambia: A2 è sempre meglio di A1 e B2 è sempre meglio di B1, anche se gli effetti non sono quelli previsti.
-
-Nel grafico di sinistra la situazione è analoga, ma più estrema: l'effetto dell'interazione è -10 e comporta un'inversione della graduatoria, per cui parliamo di **interazione cross-over**.
-
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName131-1.png" alt="Esempi di interazione tra fattori sperimentali" width="90%" />
-<p class="caption">(\#fig:figName131)Esempi di interazione tra fattori sperimentali</p>
-</div>
-
-Perchè siamo così interessati all'interazione e, in particolare, all'interazione cross-over? Esaminiamo più da vicino i valori nel grafico a destra in Figura \@ref(fig:figName131), riportandoli nella tabella \@ref(tab:tabName131), insieme alle medie dei quattro livelli A1, A2, B1 e B2. Le medie delle combinazioni sono dette **medie di cella**, mentre le medie dei livelli principali sono dette **medie marginali**, perché si trovano al margine della tabella.
-
-
-Table: (\#tab:tabName131)Interazione cross-over tra fattori sperimentali
-
-|      |   B1|   B2| Media|
-|:-----|----:|----:|-----:|
-|A1    | 10.0| 15.0|  12.0|
-|A2    | 14.0|  9.0|  12.0|
-|Media | 12.5| 11.5|  12.0|
-
-Se guardassimo solo le medie marginali, avremmo l'impressione sbagliata che il fattore A, da solo, non ha alcun effetto (le medie A1 e A2 sono uguali) e che il fattore B ha solo un piccolissimo effetto. La realtà è invece che entrambi i fattori hanno un grande effetto, ma la presenza dell'interazione lo nasconde completamente, impedendoci di raggiungere conclusioni attendibili guardando ai due fattori, uno separatamente dall'altro. 
-
-## Effetti incrociati: interazione tra lavorazioni e diserbo chimico
-
-Un ricercatore ha organizzato un esperimento fattoriale a blocchi randomizzati, dove ha valutato l’effetto di tre tipi di lavorazione del terreno (lavorazione minima = MIN; aratura superficiale = SP; aratura profonda = DP) e di due tipi di diserbo chimico (a pieno campo = TOT; localizzato sulla fila della coltura = PART). L’ipotesi scientifica è che, in caso di diserbo localizzato, il rovesciamento del terreno prodotto dall’aratura sia fondamentale, in quanto sotterra i semi prodotti dalle piante infestanti, impedendone l’emergenza nella coltura successiva.
-
-L'esperimento è completamente incrociato ed include, in totale, sei tratatmenti (tutte e sei le possibili combinazioni tra i due fattori sperimentali) e quattro repliche per un totale di 24 parcelle. Come consuetudine in pieno campo, l’esperimento è organizzato a blocchi randomizzati e le sei tesi sperimentali sono allocate a caso all’interno di ciascun blocco.
-
-I risultati ottenuti con questo esperimento sono disponibili nel file 'beet.csv', che si trova nella solita repository online. Col codice sottostante possiamo caricare il file e trasformare tutte le variabili indipendenti in 'factors'.
-
-
-```r
-fileName <- "https://www.casaonofri.it/_datasets/beet.csv"
-dataset <- read.csv(fileName, header=T)
-dataset$Tillage <- as.factor(dataset$Tillage)
-dataset$WeedControl <- as.factor(dataset$WeedControl)
-dataset$Block <- as.factor(dataset$Block)
+# Loading and transforming the data
+dataset <- getAgroData("NGenotypeFull")
+dataset[,1:3] <- lapply(dataset[,1:3], factor)
 head(dataset)
-##   Tillage WeedControl Block  Yield
-## 1     MIN         TOT     1 11.614
-## 2     MIN         TOT     2  9.283
-## 3     MIN         TOT     3  7.019
-## 4     MIN         TOT     4  8.015
-## 5     MIN        PART     1  5.117
-## 6     MIN        PART     2  4.306
-```
-
-
-## Definizione del modello lineare
-
-I risultati di questo esperimento sono determinati da quattro elementi:
-
-1. l'effetto del blocco
-2. l'effetto della lavorazione
-3. l'effetto del diserbo chimico
-4. l'interazione 'lavorazione $\times$ diserbo'
-
-Un modello lineare con questi quattro effetti potrebbe essere scritto:
-
-$$Y_{ijk} = \mu + \gamma_k + \alpha_i + \beta_j + \alpha\beta_{ij} + \varepsilon_{ijk}$$
-dove $\gamma$ è l’effetto del blocco $k$, $\alpha$ è l’effetto della lavorazione $i$, $\beta$ è l’effetto del diserbo $j$, $\alpha\beta$ è l'effetto dell'interazione per la specifica combinazione della lavorazione $i$ e del diserbo $j$. Oltre a questi elementi 'deterministici', i risultati sono influenzati dall'elemento stocastico $\varepsilon$, associato ad ogni osservazione, che si assume normalmente distribuito con media 0 e deviazione standard pari a $\sigma$.
-
-## Calcoli manuali
-
-Per completezza d'informazione, illustriamo i calcoli necessari per la scomposizione 'manuale' della varianza. Il punto di partenza, come al solito, sono le medie per i livelli di ogni fattore sperimentale e per le loro combinazioni, che calcoliamo con l'usuale funzione `tapply()`.
-
-
-
-```r
-medieComb <- with(dataset, tapply(Yield, 
-                                  list(WeedControl, Tillage), 
-                                  mean))
-medieComb
-##            DP     MIN      SP
-## PART 10.62875 5.99500 8.47525
-## TOT   9.20675 8.98275 9.14125
-medieLav <- with(dataset, tapply(Yield, Tillage, 
-                                  mean))
-medieLav
-##       DP      MIN       SP 
-## 9.917750 7.488875 8.808250
-medieWC <- with(dataset, tapply(Yield, WeedControl, 
-                                  mean))
-medieWC
-##     PART      TOT 
-## 8.366333 9.110250
-medieB <- with(dataset, tapply(Yield, Block, 
-                                  mean))
-medieB
-##        1        2        3        4 
-## 9.385500 8.347500 8.557833 8.662333
-```
-
-La media generale è:
-
-
-```r
-mu <- mean(dataset$Yield)
-mu
-## [1] 8.738292
-```
-
-
-Per calcolare gli effetti principali (blocchi, lavorazioni e diserbi), sottraiamo da ogni media la media generale:
-
-
-```r
-gamma <- medieB - mu
-alpha <- medieLav - mu
-beta <- medieWC - mu
-gamma; alpha; beta
-##           1           2           3           4 
-##  0.64720833 -0.39079167 -0.18045833 -0.07595833
-##          DP         MIN          SP 
-##  1.17945833 -1.24941667  0.06995833
-##       PART        TOT 
-## -0.3719583  0.3719583
-```
-
-
-Per l'interazione, dobbiamo considerare che la media di ogni combinazione è pari a:
-
-$$ \mu_{ij.} = \mu + \alpha_i + \beta_j + \alpha\beta_{ij}$$
-
-e quindi:
-
-$$ \alpha\beta_{ij} = \mu_{ij.} - \mu - \alpha_i - \beta_j$$
-
-Ora, siccome 
-
-$$\alpha_i = \mu_{i..} - \mu$$
-
-e 
-
-$$\beta_j = \mu_{.j.} - \mu$$
-
-possiamo scrivere:
-
-$$ \alpha\beta_{ij} = \mu_{ij.} - \mu - \mu_{i..} + \mu - \mu_{.j.} + \mu = \mu_{ij.} - \mu_{i..} - \mu_{.j.} + \mu$$
-
-Ad esempio:
-
-$$ \alpha\beta_{sp,part} = 5.995 - 7.488875 - 8.366333 + 8.738292 = - 1.121916$$
-Completando i calcoli, gli effetti dell'interazione sono pari a:
-
-
-```r
-alphaBeta <- medieComb - rbind(medieLav, medieLav) - 
-  cbind(medieWC, medieWC, medieWC) + mu
-alphaBeta
-##             DP       MIN          SP
-## PART  1.082958 -1.121917  0.03895833
-## TOT  -1.082958  1.121917 -0.03895833
-```
-
-A questo punto possiamo calcolare i valori attesi e i residui, come scostamenti tra valori osservati e valori attesi, anche se questa parte ve la lasciamo per esercizio. 
-
-### Scomposizione della varianza
-
-Come abbiamo visto nei capitoli precedenti, le devianze di blocchi, lavorazioni e diserbo si calcolano come somme dei quadrati degli effetti, tenendo conto del numero di osservazioni per ogni blocco/lavorazione/diserbo. Ad esempio, in un blocco, abbiamo 6 osservazioni e quindi ognuno dei quattro effetti è ripetuto per sei volte; di conseguenza, la devianza dei blocchi è:
-
-
-```r
-SSb <- 6 * sum(gamma^2)
-SSb
-## [1] 3.65959
-```
-
-Le altre devianze si calcolano allo stesso modo:
-
-
-
-```r
-SStil <- 8 * sum(alpha^2)
-SStil
-## [1] 23.65647
-SSwc <- 12 * sum(beta^2)
-SSwc
-## [1] 3.320472
-SScomb <- 4 * sum(alphaBeta^2)
-SScomb
-## [1] 19.46411
-```
-
-Questi calcoli manuali possono essere utili per meglio comprendere il senso della scomposizione della varianza, ma sono da considerare obsoleti, in quanto, nell'uso comune, nessuno li esegue più senza l'aiuto di un computer.
-
-
-## Calcoli con R
-
-
-### Model fitting
-
-Nella pratica quotidiana, per la stima dei parametri ci affidiamo ad R e al metodo dei minimi quadrati. La definizione del modello è:
-
-```
-Yield ~ Block + Tillage + WeedControl + Tillage:WeedControl
-```
-
-e può essere abbreviata utilizzando l'operatore '*':
-
-```
-Yield ~ Block + Tillage * WeedControl
-```
-
-L'intero codice è mostrato nel box sottostante:
-
-
-
-```r
-mod <- lm(Yield ~ Block + Tillage * WeedControl,
-          data=dataset)
-```
-
-
-### Verifica delle assunzioni di base
-
-Prima di procedere, dobbiamo verificare il rispetto delle assunzioni di base, attraverso l'analisi grafica dei residui, come indicato in un capitolo precedente. Il grafico dei residui contro i valori attesi ed il QQ-plot sono riportati in Figura \@ref(fig:figName133).
-
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName133-1.png" alt="Analisi grafica dei residui con R" width="90%" />
-<p class="caption">(\#fig:figName133)Analisi grafica dei residui con R</p>
-</div>
-
-Il grafico dei residui mostra un sospetto outlier (il settimo dato). Tuttavia, non abbiamo memoria di errori durante la sperimentazione e a parte questo outlier, non paiono esserci problemi di omogeneità delle varianze. Pertanto, decidiamo di ignorare questo potenziale dato aberrante e proseguire nell’analisi, in quanto non sussistono particolare elementi che facciano sospettare qualche patologia dei dati più o meno rilevante.
-
-### Scomposizione della varianza
-
-Sfruttando le funzionalità di R e, in particolare, la funzione `anova()`, otteniamo il seguente risultato:
-
-\footnotesize
-
-
-```r
+##   Block Genotype N Yield
+## 1     1        A 1 2.146
+## 2     2        A 1 2.433
+## 3     3        A 1 2.579
+## 4     1        A 2 2.362
+## 5     2        A 2 2.919
+## 6     3        A 2 2.912
+# Model fitting
+mod <- lm(Yield ~ Block + Genotype * N, data=dataset)
+
+# Model checking (not run)
+# plot(mod, which = 1)
+# plot(mod, which = 2)
+# boxcox(mod)
+
+# Variance partitioning
 anova(mod)
 ## Analysis of Variance Table
 ## 
 ## Response: Yield
-##                     Df  Sum Sq Mean Sq F value  Pr(>F)  
-## Block                3  3.6596  1.2199  0.6521 0.59389  
-## Tillage              2 23.6565 11.8282  6.3228 0.01020 *
-## WeedControl          1  3.3205  3.3205  1.7750 0.20266  
-## Tillage:WeedControl  2 19.4641  9.7321  5.2023 0.01922 *
-## Residuals           15 28.0609  1.8707                  
+##            Df  Sum Sq Mean Sq F value    Pr(>F)    
+## Block       2  0.0944 0.04721  1.3310 0.2721536    
+## Genotype   14 10.5408 0.75291 21.2297 < 2.2e-16 ***
+## N           1  1.6246 1.62463 45.8092 7.175e-09 ***
+## Genotype:N 14  1.6061 0.11472  3.2349 0.0008204 ***
+## Residuals  58  2.0570 0.03547                      
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-\normalsize
 
-Come abbiamo visto nei capitoli precedenti, i gradi di libertà degli effetti principali sono pari al numero dei livelli di ogni trattamento meno uno; per quanto riguarda l'interazione, il numero dei gradi di libertà è pari al prodotto dei gradi di libertà degli effetti principali interessati dalla combinazione. In questo caso, l'interazione 'lavorazione x diserbo' ha $2 \times 1 = 2$ gradi di libertà. I gradi di libertà dei residui si ottengono invece per differenza tra i gradi di libertà totali (per 24 dati abbiamo 23 gradi libertà) e i gradi di libertà di tutti gli altri effetti in gioco.
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName133-1.png" alt="Analisi grafiche dei residui per l'esperimento fattoriale di confronto tra genotipi a due dosi di azoto (Esempio 10.3)." width="90%" />
+<p class="caption">(\#fig:figName133)Analisi grafiche dei residui per l'esperimento fattoriale di confronto tra genotipi a due dosi di azoto (Esempio 10.3).</p>
+</div>
 
-Nel leggere una tabella ANOVA a due (o più) vie, è **fondamentale procedere dal basso verso l’alto**, guardando subito se l'interazione sia significativa. Se fosse così, dovremmo considerare solo le medie per le combinazioni degli effetti in studio (medie di cella), trascurando invece le medie degli effetti principali (medie marginali), che potrebbero portare a una cattiva interpretazione dei risultati, come abbiamo visto all'inizio di questo capitolo. Se invece l'interazione fosse non significativa, allora potremmo considerare separatamente le medie marginali dei due fattori sperimentali, cosa che potrebbe semplificare notevolmente l'interpretazione.
 
+La lettura della tabella ANOVA per un esperimento a due vie richiede una certa attenzione ed è **fondamentale procedere dal basso verso l'alto**, considerando che un'interazione cross-over significativa potrebbe nascondere gli effetti dei fattori principali (vedere Capitolo 4). In generale, ogniqualvolta l'interazione sia significativa, dovremmo sempre riportare e commentare le medie delle combinazioni tra i livelli dei fattori sperimentali. D'altra parte, se l'interazione non fosse significativa, potremmo invece riassumere i risultati riportando e commentando solo le medie degli effetti principali.
 
+In questo esempio, l'interazione è significativa e la conclusione è che la raccomandazione varietale non può essere univoca, ma deve cambiare a seconda del livello di fertilizzazione azotata. Pertanto, è necessario riportare e separatamente le medie dei genotipi per ciascun livello di azoto; in questa situazione i confronti a coppie tra genotipi potrebbero essere effettuati in due modi:
 
-### Medie marginali attese e confronti multipli con R
+1. confrontando tutti i genotipi, anche se concimati in modo diverso;
+2. confrontando tra loro solo i genotipi concimati nello stesso modo.
 
-In questo caso, l'interazione è significativa e, di conseguenza, dobbiamo determinare e confrontare le medie delle sei combinazioni tra lavorazioni e diserbi. In R, possiamo utilizzare la funzione 'emmeans()', come abbiamo fatto nei capitoli precedenti. Il codice sottostante permette di calcolare le medie per le combinazioni 'lavorazione x diserbo' e confrontare i diserbi a parità di lavorazione (notare l'operatore '|').
+Il primo approccio è molto flessibile, ma implica un numero elevato di contrasti $(10 x 9) / 2 = 45$ contrasti); di conseguenza, implica anche un forte aggiustamento per la molteplicità, quindi una potenza ridotta e maggiori rischi di errori di II specie. Tale approccio è da raccomandare solo se strettamente necessario e, in questo caso, la codifica R per la funzione `emmeans()` deve utilizzare l'operatore `:` (ad esempio: `emmeans(mod, ~Genotype:N)`).
 
+Il secondo approccio implica invece un numero inferiore di confronti ($2 x [5 x 4)/2 = 20$ confronti] e, in questo caso, appare più logico e sensato, da un punto di vista agronomico. Nel riquadro sottostante questo approccio viene implementato utilizzando l'operatore di 'condizionamento' (`|`).
 
 
 ```r
-library(emmeans)
-medie <- emmeans(mod, ~WeedControl|Tillage)
-multcomp::cld(medie, Letters = LETTERS)
-## Tillage = DP:
-##  WeedControl emmean    SE df lower.CL upper.CL .group
-##  TOT           9.21 0.684 15     7.75    10.66  A    
-##  PART         10.63 0.684 15     9.17    12.09  A    
+# Example 10.3 [continuation]
+
+# Pairwise comparisons within Nitrogen levels
+GNmeans2 <- emmeans(mod, ~Genotype|N)
+cld(GNmeans2, Letters=LETTERS)
+## N = 1:
+##  Genotype emmean    SE df lower.CL upper.CL .group  
+##  A          2.39 0.109 58     2.17     2.60  A      
+##  M          2.43 0.109 58     2.21     2.65  AB     
+##  C          2.53 0.109 58     2.32     2.75  ABC    
+##  G          2.61 0.109 58     2.39     2.83  ABCD   
+##  H          2.69 0.109 58     2.47     2.91  ABCD   
+##  I          2.77 0.109 58     2.55     2.99  ABCDE  
+##  B          2.92 0.109 58     2.70     3.13  ABCDEF 
+##  D          2.96 0.109 58     2.74     3.17   BCDEF 
+##  N          2.99 0.109 58     2.77     3.21    CDEFG
+##  O          3.00 0.109 58     2.78     3.22    CDEFG
+##  F          3.06 0.109 58     2.85     3.28    CDEFG
+##  J          3.10 0.109 58     2.88     3.31     DEFG
+##  E          3.26 0.109 58     3.04     3.47      EFG
+##  K          3.40 0.109 58     3.18     3.61       FG
+##  L          3.52 0.109 58     3.31     3.74        G
 ## 
-## Tillage = MIN:
-##  WeedControl emmean    SE df lower.CL upper.CL .group
-##  PART          6.00 0.684 15     4.54     7.45  A    
-##  TOT           8.98 0.684 15     7.53    10.44   B   
-## 
-## Tillage = SP:
-##  WeedControl emmean    SE df lower.CL upper.CL .group
-##  PART          8.48 0.684 15     7.02     9.93  A    
-##  TOT           9.14 0.684 15     7.68    10.60  A    
+## N = 2:
+##  Genotype emmean    SE df lower.CL upper.CL .group  
+##  C          2.19 0.109 58     1.97     2.41  A      
+##  I          2.63 0.109 58     2.41     2.85  AB     
+##  A          2.73 0.109 58     2.51     2.95  ABC    
+##  M          2.99 0.109 58     2.77     3.21   BCD   
+##  H          3.02 0.109 58     2.80     3.24   BCD   
+##  F          3.11 0.109 58     2.90     3.33   BCDE  
+##  G          3.13 0.109 58     2.91     3.34   BCDEF 
+##  B          3.24 0.109 58     3.02     3.46    CDEF 
+##  D          3.35 0.109 58     3.13     3.56     DEF 
+##  O          3.35 0.109 58     3.13     3.57     DEF 
+##  E          3.47 0.109 58     3.25     3.68     DEF 
+##  L          3.53 0.109 58     3.32     3.75     DEF 
+##  J          3.62 0.109 58     3.40     3.83      EF 
+##  K          3.62 0.109 58     3.40     3.83      EF 
+##  N          3.67 0.109 58     3.45     3.89       F 
 ## 
 ## Results are averaged over the levels of: Block 
 ## Confidence level used: 0.95 
+## P value adjustment: tukey method for comparing a family of 15 estimates 
 ## significance level used: alpha = 0.05 
 ## NOTE: If two or more means share the same grouping symbol,
 ##       then we cannot show them to be different.
 ##       But we also did not show them to be the same.
 ```
 
-Se volessimo confrontare le lavorazioni a parità di diserbo o tutte le combinazioni dovremmo utilizzare una sintassi leggermente diversa:
+## Esempio 10.4: confronto tra incroci in un disegno fattoriale gerarchico
 
-
-```r
-medie <- emmeans(mod, ~Tillage|WeedControl)
-multcomp::cld(medie, Letters=LETTERS)
-## WeedControl = PART:
-##  Tillage emmean    SE df lower.CL upper.CL .group
-##  MIN       6.00 0.684 15     4.54     7.45  A    
-##  SP        8.48 0.684 15     7.02     9.93  AB   
-##  DP       10.63 0.684 15     9.17    12.09   B   
-## 
-## WeedControl = TOT:
-##  Tillage emmean    SE df lower.CL upper.CL .group
-##  MIN       8.98 0.684 15     7.53    10.44  A    
-##  SP        9.14 0.684 15     7.68    10.60  A    
-##  DP        9.21 0.684 15     7.75    10.66  A    
-## 
-## Results are averaged over the levels of: Block 
-## Confidence level used: 0.95 
-## P value adjustment: tukey method for comparing a family of 3 estimates 
-## significance level used: alpha = 0.05 
-## NOTE: If two or more means share the same grouping symbol,
-##       then we cannot show them to be different.
-##       But we also did not show them to be the same.
-medie <- emmeans(mod, ~Tillage:WeedControl)
-multcomp::cld(medie, Letters=LETTERS)
-##  Tillage WeedControl emmean    SE df lower.CL upper.CL .group
-##  MIN     PART          6.00 0.684 15     4.54     7.45  A    
-##  SP      PART          8.48 0.684 15     7.02     9.93  AB   
-##  MIN     TOT           8.98 0.684 15     7.53    10.44  AB   
-##  SP      TOT           9.14 0.684 15     7.68    10.60   B   
-##  DP      TOT           9.21 0.684 15     7.75    10.66   B   
-##  DP      PART         10.63 0.684 15     9.17    12.09   B   
-## 
-## Results are averaged over the levels of: Block 
-## Confidence level used: 0.95 
-## P value adjustment: tukey method for comparing a family of 6 estimates 
-## significance level used: alpha = 0.05 
-## NOTE: If two or more means share the same grouping symbol,
-##       then we cannot show them to be different.
-##       But we also did not show them to be the same.
-```
-
-Le tre analisi (contronti tra lavorazioni a parità di diserbo, tra diserbi a parità di lavorazione e tutti verso tutti) portano a risultati leggermente diversi per il diverso numero di confronti effettuati: tre nel primo caso, sei nel secondo e 15 nel terzo, che richiedono una diversa correzione per la molteplicità.
-
-Per completezza di informazioni mostriamo anche il codice necessario per calcolare le medie marginali per le lavorazioni e per il diserbo, anche se non eseguiamo il confronto multiplo, per il motivo indicato in precedenza.
-
-
-```r
-emmeans(mod, ~Tillage)
-##  Tillage emmean    SE df lower.CL upper.CL
-##  DP        9.92 0.484 15     8.89    10.95
-##  MIN       7.49 0.484 15     6.46     8.52
-##  SP        8.81 0.484 15     7.78     9.84
-## 
-## Results are averaged over the levels of: Block, WeedControl 
-## Confidence level used: 0.95
-emmeans(mod, ~WeedControl)
-##  WeedControl emmean    SE df lower.CL upper.CL
-##  PART          8.37 0.395 15     7.52     9.21
-##  TOT           9.11 0.395 15     8.27     9.95
-## 
-## Results are averaged over the levels of: Block, Tillage 
-## Confidence level used: 0.95
-```
-
-Ci soffermiamo un attimo sugli errori standard delle medie, che sono diversi per lavorazioni, i diserbi o le loro combinazioni. Infatti, nonostante la varianza dei residui sia la stessa, il numero di dati che concorrono a formare una medie è diverso. Più precisamente, le medie di ogni combinazione 'diserbo x lavorazione' hanno quattro repliche, mentre le medie delle lavorazioni hanno otto repliche, cioè quattro per il numero dei diserbi. Analogamente, Le medie dei diserbi hanno dodici repliche, cioè quattro per il numero delle lavorazioni.
-
-Le formula per il calcolo degli errori standard sono le seguenti:
-
-$$SEM_A = \sqrt{\frac{1.87}{4 \cdot 2}} = 0.483$$
-
-
-$$SEM_B = \sqrt{\frac{1.87}{4 \cdot 3}} = 0.395$$
-
-
-$$SEM_{AB} = \sqrt{\frac{1.87}{4}} = 0.684$$
-
-
-Possiamo notare che le medie degli effetti principali, grazie al numero di repliche più elevato, sono stimate con maggiore precisione rispetto alle medie delle combinazioni.
-
-
-## Effetti innestati: valutazione di ibridi di mais
-
-L'esempio precedente era relativo ad un disegno fattoriale completamente incrociato, dato che i livelli delle lavorazioni erano gli stessi per ogni livello di diserbo. In alcuni casi possiamo trovare disegni innestati, dove i livelli di un fattore cambiano al cambiare dei livelli dell'altro fattore. Nell'esempio seguente abbiamo considerato tre linee pure impollinanti di mais (A1, A2 ed A3), che abbiamo incrociato con tre linee pure portaseme, diverse per ogni impollinante (B1, B2, B3 per A1, B4, B5, B6 per A2 e B7, B8, B9 per A3). Alla fine abbiamo nove ibridi in tre gruppi, a seconda della linea impollinante.
-
-Il dataset 'crosses.csv' riporta i risultati ottenuti con un esperimento a blocchi randomizzati con quattro repliche  (36 dati in totale) e può essere caricato dalla solita repository online.
-
-
-
-
-
-
-```r
-fileName <- "https://www.casaonofri.it/_datasets/crosses.csv"
-dataset <- read.csv(fileName, header=T)
-head(dataset, 15)
-##    Male Female Block     Yield
-## 1    A1     B1     1  9.984718
-## 2    A1     B1     2 13.932663
-## 3    A1     B1     3 12.201312
-## 4    A1     B1     4  1.916661
-## 5    A1     B2     1  8.928465
-## 6    A1     B2     2 10.513908
-## 7    A1     B2     3 10.035964
-## 8    A1     B2     4  2.375822
-## 9    A1     B3     1 21.511028
-## 10   A1     B3     2 21.859852
-## 11   A1     B3     3 17.626284
-## 12   A1     B3     4 13.966646
-## 13   A2     B4     1 17.483089
-## 14   A2     B4     2 19.480893
-## 15   A2     B4     3 12.838792
-```
-
-
-## Definizione del modello lineare
+L'esempio precedente era relativo ad un disegno fattoriale completamente incrociato, dato che i livelli delle lavorazioni erano gli stessi per ogni livello di diserbo. In alcuni casi possiamo trovare disegni innestati, dove i livelli di un fattore cambiano al cambiare dei livelli dell'altro fattore. Nell'esempio seguente abbiamo considerato tre linee pure impollinanti di mais (A1, A2 ed A3), che abbiamo incrociato con tre linee pure portaseme, diverse per ogni impollinante (B1, B2, B3 per A1, B4, B5, B6 per A2 e B7, B8, B9 per A3). Alla fine abbiamo nove ibridi in tre gruppi, a seconda della linea impollinante. L'esperimento è stato disegnato in blocchi randomizzati completi con 4 repliche (36 osservazioni in totale) e i risultati sono disponibili come 'crosses' nel package `statforbiology`.
 
 In questo esperimento, la produzione del mais dipende dal blocco e dall'effetto paterno, mentre l'effetto materno può essere solo determinato entro ogni linea impollinante. Si dice che l'effetto materno è innestato entro l'effetto paterno, come mostrato in Figura \@ref(fig:figNameA3113). Pertanto, il modello lineare risulta così definito:
 
@@ -4892,7 +4879,11 @@ $$Y_{ijk} = \mu + \gamma_k + \alpha_i + \delta_{ij} + \varepsilon_{ijk}$$
 
 dove $\gamma_k$ è l'effetto del blocco $k$, $\alpha_i$ è l'effetto dell'impollinante $i$ e $\delta_{ij}$ è l'effetto del portaseme  $j$ entro ogni linea impollinante $i$. La componente random $\varepsilon$ viene assunta, come al solito, gaussiana e omoscedastica, con media 0 e deviazione standard uguale a $\sigma$.
 
-La differenza con un modello ANOVA completamente incrociato dovrebbe essere chiara: in quest'ultimo caso abbiamo due effetti, A, B e la loro interazione A:B, mentre in un modello innestato abbiamo solo l'effetto A e l'effetto B entro A (A/B), mentre l'effetto principale B manca, in quanto non esiste in pratica.
+La differenza con un modello ANOVA completamente incrociato dovrebbe essere chiara: in quest'ultimo caso abbiamo due effetti, A, B e la loro interazione A:B, mentre in un modello innestato abbiamo solo l'effetto A e l'effetto B entro A, mentre l'effetto principale B manca, in quanto non esiste in pratica.
+
+
+
+
 
 
 <div class="figure" style="text-align: center">
@@ -4901,1684 +4892,344 @@ La differenza con un modello ANOVA completamente incrociato dovrebbe essere chia
 </div>
 
 
-## Fitting del modello con R
-
-Il modello viene codificato senza l'effetto principale del portaseme, utilizando l'operatore '/'.
-
-\scriptsize
+In R, questo modello gerarchico può essere codificato utilizzando l'operatore di nesting `/`, come mostrato nel riquadro sottostante. Le analisi grafiche dei residui consentono di escludere qualsiasi deviazione significativa rispetto agli assunti di base (non mostrate) e la tabella ANOVA mostra che tutti gli effetti sono significativi e, pertanto, possiamo esaminare e confrontare le medie dei diversi ibridi, anche considerando che l'effetto paterno è relativamente poco importante, dato che le linee impollinanti sono incrociate con linee portaseme diverse. Il confronto multiplo viene lasciato al lettore come esercizio.
 
 
 ```r
-mod <- lm(Yield ~ factor(Block) + Male + Male/Female,
-          data = dataset)
-```
-\normalsize
+# Example 10.4
+# Comparing crosses in a nested factorial design
 
-L'ispezione dei residui viene fatta col metodo grafico usuale; la Figura \@ref(fig:figName137) non mostra problemi visibili e quindi si può procedere con la scomposizione della varianza.
+# Loading the packages
+library(statforbiology)
+library(MASS)
 
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName137-1.png" alt="Analisi grafica dei residui per un modello ANOVA a due vie, con effetti innestati" width="90%" />
-<p class="caption">(\#fig:figName137)Analisi grafica dei residui per un modello ANOVA a due vie, con effetti innestati</p>
-</div>
+# Loading the data and fitting a model with a nested effect
+dataset <- getAgroData("crosses")
+dataset[,1:3] <- lapply(dataset[,1:3], factor)
+head(dataset, 5)
+##   Male Female Block     Yield
+## 1   A1     B1     1  9.984718
+## 2   A1     B1     2 13.932663
+## 3   A1     B1     3 12.201312
+## 4   A1     B1     4  1.916661
+## 5   A1     B2     1  8.928465
+# Model fitting and parameter estimation
+mod <- lm(Yield ~ Block + Male/Female, data = dataset)
 
+# Analyses of residuals (not shown)
+# plot(mod, which = 1)
+# plot(mod, which = 2)
+# boxcox(mod)
 
-
-```r
+# Variance partitioning
 anova(mod)
 ## Analysis of Variance Table
 ## 
 ## Response: Yield
-##               Df Sum Sq Mean Sq F value    Pr(>F)    
-## factor(Block)  3 383.75 127.917  44.355 6.051e-10 ***
-## Male           2 134.76  67.378  23.363 2.331e-06 ***
-## Male:Female    6 575.16  95.860  33.239 1.742e-10 ***
-## Residuals     24  69.21   2.884                      
+##             Df Sum Sq Mean Sq F value    Pr(>F)    
+## Block        3 383.75 127.917  44.355 6.051e-10 ***
+## Male         2 134.76  67.378  23.363 2.331e-06 ***
+## Male:Female  6 575.16  95.860  33.239 1.742e-10 ***
+## Residuals   24  69.21   2.884                      
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-La tabella ANOVA mostra che tutti gli effetti sono significativi e, pertanto, possiamo esaminare e confrontare le medie dei diversi ibridi, anche considerando che l'effetto paterno è relativamente poco importante, dato che le linee impollinanti sono incrociate con linee portaseme diverse.
-
-
-
-```r
-library(emmeans)
-mfMeans <- emmeans(mod, ~Female|Male)
-multcomp::cld(mfMeans, Letters = LETTERS)
-## Male = A1:
-##  Female emmean    SE df lower.CL upper.CL .group
-##  B2       7.96 0.849 24     6.21     9.72  A    
-##  B1       9.51 0.849 24     7.76    11.26  A    
-##  B3      18.74 0.849 24    16.99    20.49   B   
-## 
-## Male = A2:
-##  Female emmean    SE df lower.CL upper.CL .group
-##  B6       8.72 0.849 24     6.97    10.47  A    
-##  B5      11.23 0.849 24     9.48    12.98  AB   
-##  B4      15.18 0.849 24    13.43    16.93   B   
-## 
-## Male = A3:
-##  Female emmean    SE df lower.CL upper.CL .group
-##  B9      10.11 0.849 24     8.35    11.86  A    
-##  B8      17.73 0.849 24    15.97    19.48   B   
-##  B7      20.12 0.849 24    18.36    21.87   B   
-## 
-## Results are averaged over the levels of: Block 
-## Confidence level used: 0.95 
-## Results are averaged over some or all of the levels of: Block 
-## P value adjustment: tukey method for comparing a family of 9 estimates 
-## significance level used: alpha = 0.05 
-## NOTE: If two or more means share the same grouping symbol,
-##       then we cannot show them to be different.
-##       But we also did not show them to be the same.
-```
 
 In conclusione, vediamo che l'analisi dei disegni con due fattori innestati è piuttosto simile a quella per due fattori incrociati, con l'unica eccezione che l'effetto principale per il fattore innestato non è incluso nel modello.
 
-<!--chapter:end:12-AnovaDueLivelli.Rmd-->
+## Esempio 10.5: un esperimento di germinazione ripetuto due volte 
 
-# Breve introduzione ai modelli misti
+Nonostante possano essere molto precisi e significativi, i risultati di un singolo esperimento in agricoltura sono solitamente considerati abbastanza deboli, se non sono confermati in altri esperimenti simili. Infatti, un singolo esperimento può essere influenzato da 'disturbi' di ogni tipo, errori di misurazione, eventi imprevisti o intrusioni; inoltre, un risultato anche significativo può essere valido solo nelle condizioni in cui è stato osservato, senza essere necessariamente riproducibile in altre condizioni (vedi Capitolo 1).
 
+Per queste ragioni, in agricoltura siamo soliti ripetere gli esperimenti in più anni e/o in più località, oppure, nel caso di esperimenti in condizioni controllate, con materiale vegetale diverso. Quando gli esperimenti vengono ripetuti, oltre ad analizzare i dati di ciascun esperimento separatamente, è molto utile tentare un'analisi finale aggregata, per saggiare l'ipotesi che le prove sperimentali non differiscano significativamente l'una dall'altra.
 
-In questo libro abbiamo affrontato le questioni più rilevanti in relazione all'attività di ricerca e sperimentazione, almeno quelle che dovrebbero far parte del bagaglio culturale di ogni laureato in agraria o altre discipline biologiche. La trattazione non è affatto esaustiva e quindi, se si avesse l'intenzioni intraprendere una carriera professionale nel mondo dell'analisi dei dati, non si potrebbe prescindere dalla lettura di altri testi di approfondimento, che sono stati via via segnalati. Ci sembra comunque opportuno, in questo capitolo e quello successivo, dare almeno alcune informazioni di base su altri modelli un po' più complessi, il cui impiego è abbastanza comune nella sperimentazione di pieno campo.
+Consideriamo un esperimento per confrontare la germinazione di tre genotipi di colza (Pace et al., 2012), organizzato in cella climatica, secondo uno schema a blocchi randomizzati con sei repliche. Le unità sperimentali erano piastre Petri da 50 semi ciascuna e i blocchi erano i diversi scaffali (variabile 'shelf') di una cella climatica, mantenuta a 20°C per l'intera durata dell'esperimento. Per confermare i risultati, l'esperimento è stato ripetuto indipendentemente in un altro forno alla stessa temperatura (variabile 'run'); in entrambi gli esperimenti, dopo 15 giorni dall'inizio, è stato contato il numero di semi germinati ed i conteggi sono stati espressi come proporzione rispetto al numero di semi posti a germinare (Final Germinated Proportion; FGP).
 
+I risultati di questi due esperimenti sono disponibili nel dataset 'FGP_rape', contenuto nel package `statforbiology`; dopo aver caricato i dati, è necessario trasformare i predittori numerici ('run' e 'shelf') in fattori (vedi il codice più sotto). In questa situazione, l'EDA dovrebbe includere le analisi separate per ogni esperimento, al fine di garantire che non vi siano outliers o violazioni degli assunti di base in nessuno degli esperimenti. Inoltre, è necessario assicurarsi che le varianze dei residui dei diversi esperimenti siano simili (omoschedasticità tra esperimenti).
 
-## Raggruppamenti tra parcelle
+Per effettuare le analisi separate, è possibile semplificare il codice utilizzando la strategia *split-apply-combine* (Wickham, 2011), basata sulle funzioni `by()` e `lapply()`. La prima opera sui sottoinsiemi del dataset selezionato, suddivisi in base a una variabile di classificazione (in questo caso la variabile `run`) e produce una lista con i risultati della funzione `lm()` applicata a ciascun sottoinsieme. Questa lista può essere analizzata con la funzione `lapply()`, che permette di applicare le funzioni `leveneTest()` e `shapiro.test()` a ciascun elemento della lista. Possiamo vedere che nessuno dei due test indica significative deviazioni rispetto agli assunti di base.
 
-Nel capitolo 2 abbiamo parlato dei disegni a split-plot o a strip-plot, caratterizzati da trattamenti che non sono allocati a caso, ma a gruppi di parcelle contigue.
-
-Ad esempio, nella Figura 2.9 abbiamo mostrato come, in un esperimento a split-plot, i livello del fattore principale vengano allocati alle *main-plots*, ognuna delle quali è poi suddivisa in tante *sub-plots*, alle quali vengono allocati i livelli del trattamento secondario.  Analogamente, in uno schema a strip-plot, il blocco viene diviso in righe e colonne, alle quali vengono rispettivamente allocati i livelli dei due fattori sperimentali.
-
-Questi gruppi di parcelle trattate in modo non indipendente costituiscono dei veri e propri *blocking factors*, che si aggiungono agli altri fattori sperimentali di cui abbiamo parlato finora. Trascurare questi elementi di raggruppamento nel corso dell'analisi dei dati è sbagliato, in quanto si viene a rompere l'indipendenza dei residui. Ad esempio, in un disegno a split-plot, se una *main-plot* è più fertile di un'altra, tutte le misurazioni effettuate su di essa condivideranno lo stesso effetto positivo e saranno quindi più simili tra di loro che le misurazioni effettuate su *main-plots* diverse. Insomma, con uno schema a split-plot, i dati ottenuti sulla stessa *main-plot* non sono indipendenti, ma sono in qualche modo 'apparentati'; più propriamente, si parla di **correlazione intra-classe**, un concetto simile, ma non totalmente coincidente con quello di correlazione di Pearson. Se l'effetto prodotto dalle *main-plots* o dagli altri *blocking factor* non viene incluso nel modello statistico descrittivo, esso rimane tra gli effetti non spiegati e, di conseguenza, viene incluso nei residui, che, pertanto, saranno correlati e quindi non indipendenti tra di loro.
-
-In generale, dobbiamo tener presente che, ogni volta in cui l'allocazione dei trattamenti comporta una qualche forma di raggruppamento tra parcelle, l'elemento di raggruppamento, o meglio, l'effetto da esso provocato, deve essere introdotto nel modello, in modo che nei residui rimangano solo effetti puramente stocastici ed ignoti.
-
-## Esperimenti a split-plot
-
-Consideriamo nuovamente l'esempio presentato nel capitolo 12, nel quale avevamo due fattori sperimentali a confronto: il diserbo, con due livelli (totale o localizzato sulla fila) e la lavorazione, con tre livelli (aratura profonda, aratura superficiale e *minimum tillage*). In precedenza abbiamo analizzato i dati come se l'esperimento fosse stato disegnato a blocchi randomizzati, secondo la mappa di campo riportata nel Capitolo 2, in Figura 2.8. In realtà, questo esperimento era stato disegnato seguendo uno schema a split-plot, come indicato in Figura 2.9; vediamo quindi come procedere all'analisi dei dati in modo corretto. 
+Per verificare l'omoschedasticità tra esperimenti, si può utilizzare il test F max di Hartely (Hartley, 1950), che consiste nel calcolare il rapporto tra la varianza residua massima e minima tra quelle osservate, che, in questo caso però, sono solo due. La significatività del test può essere ottenuta grazie alla distribuzione `pmaxFratio()`, che è contenuta nel package `SuppDists` (Wheeler, 2024). In questo caso, il P-value non è sufficientemente basso per il rifiuto dell'ipotesi nulla, il che conferma l'omoschedasticità tra esperimenti. Le analisi sono riportate nel riquadro sottostante
 
 
-### Definizione del modello lineare
 
-Il modello ANOVA per un disegno a split-plot è simile a quello dell'ANOVA fattoriale, fatta salva la presenza di un effetto aggiuntivo, cioè quello delle parcelle principali, che costituiscono un elemento di raggruppamento delle osservazioni:
-
-$$Y_{ijk} = \mu + \gamma_k + \alpha_i + \theta_{ik} + \beta_j + \alpha\beta_{ij} + \varepsilon_{ijk}$$
-
-
-dove $\gamma$ è l’effetto del blocco $k$, $\alpha$ è l’effetto della lavorazione $i$, $\beta$ è l’effetto del diserbo $j$, $\alpha\beta$ è l'effetto dell'interazione per la specifica combinazione della lavorazione $i$ e del diserbo $j$. Abbiamo incluso anche $\theta$ che è l'effetto della main-plot; dato che ogni parcella principale è identificata univocamente dal blocco $k$ a cui appartiene e dalla lavorazione $i$ in essa eseguita, abbiamo utilizzato i pedici corrispondenti.
-
-Concentriamoci per un attimo sulle *main-plots*: esiste una differenza sostanziale tra questo effetto e gli altri effetti in gioco. In particolare, mentre i livelli delle lavorazioni e del diserbo li abbiamo attentamente prescelti, perché eravamo specificatamente interessati ad essi, nel caso delle *main-plots* non abbiamo nessun interesse specifico, abbiamo operato una selezione casuale da un universo più grosso, quello di tutte le *main-plots* possibili nel nostro appezzamento. In altre parole, possiamo dire che le *main-plots* potrebbero essere cambiate a piacimento senza snaturare le finalità del nostro esperimento, cosa che non possiamo altrettanto dire dei livelli delle lavorazioni e del diserbo. In termini statistici diciamo che lavorazioni e diserbo sono **effetti fissi** mentre le *main-plots* sono un **effetto random**, che si aggiunge ad $\varepsilon$.
-
-Abbiamo quindi definito un modello che, a differenza di tutti quelli che abbiamo considerato finora, ha due effetti random, entrambi assunti come gaussiani, con media zero e deviazioni standard rispettivamente pari a $\sigma_{\theta}$ e $\sigma$. I modelli che hanno più di un effetto random si chiamano **modelli misti** e, di conseguenza, i dati provenienti da esperimenti a split-plot e, vedremo tra poco, a *strip-plot* debbono essere analizzati utilizzando un modello misto.
-
-La piattaforma dei modelli misti presenta molte differenze concettuali rispetto alla piattaforma dei modelli lineari, che abbiamo utilizzato finora. Data la complessità, l'argomento richiede un corso di livello più avanzato e non può essere introdotto qui, anche se ci sembra opportuno mostrare almeno come trattare i dati provenienti da questi esperimenti così comuni in ambito agrario.
-
-
-### Model fitting con R
-
-Come abbiamo visto, i risultati di questo esperimento sono disponibili nel file 'beet.csv', che può essere aperto direttamente dalla solita repository online, utilizzando il codice sottostante. Subito dopo aver caricato il file, trasformiamo le variabili indipendenti in 'factors', come al solito.
 
 
 ```r
-fileName <- "https://www.casaonofri.it/_datasets/beet.csv"
-dataset <- read.csv(fileName, header=T)
-dataset$Tillage <- as.factor(dataset$Tillage)
-dataset$WeedControl <- as.factor(dataset$WeedControl)
-dataset$Block <- as.factor(dataset$Block)
+# Example 10.5
+# A germination experiment in two runs
+
+# Loading packages
+library(statforbiology)
+library(car)
+library(SuppDists)
+library(MASS)
+library(emmeans)
+library(multcomp)
+
+# Loading and transforming the data
+dataset <- getAgroData("FGP_rape")
+dataset[,1:5] <- lapply(dataset[,1:5], factor)
 head(dataset)
-##   Tillage WeedControl Block  Yield
-## 1     MIN         TOT     1 11.614
-## 2     MIN         TOT     2  9.283
-## 3     MIN         TOT     3  7.019
-## 4     MIN         TOT     4  8.015
-## 5     MIN        PART     1  5.117
-## 6     MIN        PART     2  4.306
-```
+##   Dish Run Shelf     Species Genotype  FGP
+## 1    1   1     1 OilseedRape        A 0.81
+## 2   13   1     1 OilseedRape        B 0.81
+## 3   25   1     1 OilseedRape        C 0.74
+## 4    2   1     2 OilseedRape        A 0.91
+## 5   14   1     2 OilseedRape        B 0.92
+## 6   26   1     2 OilseedRape        C 0.76
+# Fitting linear models to the two runs, separately
+lmFits <- by(dataset, dataset$Run,  
+      function(df) lm(FGP ~ Genotype + Shelf, data = df) )
 
-
-Prima di tutto, dobbiamo creare una variabile che identifichi in modo univoco le *main-plots*. Per questo potremmo utilizzare una codifica numerica, oppure, più semplicemente, costruire un nuovo fattore combinando i livelli del blocco e della lavorazione, dato che ogni *main-plot* è identificata univocamente dal blocco di cui fa parte e dalla lavorazione che ha subito.
-
-
-
-```r
-dataset$mainPlot <- with(dataset, factor(Block:Tillage))
-```
-
-In secondo luogo, il model fitting non può essere effettuato con la funzione `lm()`, che ci permette di definire un solo effetto random. Dobbiamo invece utilizzare una delle funzioni di R per i modelli misti, tra le quali proponiamo `lmer()`, che richiede due packages aggiuntivi: 'lme4' e 'lmerTest', che dobbiamo installare, se non lo abbiamo già fatto, e caricare in memoria.
-
-```
-install.packages("lme4") #only at first time
-install.packages("lmerTest") #only at first time
-```
-La sintassi di `lmer()` è simile a quella di `lm()` e gli effetti random possono essere inseriti tra parentesi, utilizzando l'operatore '1|', come mostrato nel box sottostante.
-
-
-```r
-library(lme4)
-library(lmerTest)
-mod.split <- lmer(Yield ~ Block + Tillage * WeedControl +
-                  (1|mainPlot), data=dataset)
-```
-
-Per quanto riguarda le assunzioni di base, i modelli misti sono sempre e comunque modelli linear e quindi fanno le stesse assunzioni di moscedasticità e normalità dei residui. L'ispezione grafica di questi utlimi può essere condotta nel modo usuale, se non che la funzione `plot()` restituisce solo il grafico dei residui verso i valori attesi (quello corrispondente all'argomento 'which = 1' in `lm()`). D'altro canto, non c'è un modo veloce per ottenere un QQ-plot e, pertanto, per la valutazione della normalità dei residui, possiamo utilizzare il test di Shapiro-Wilks, già indicato nel capitolo 8.
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName141b-1.png" alt="Analisi grafica dei residui per un modello misto" width="90%" />
-<p class="caption">(\#fig:figName141b)Analisi grafica dei residui per un modello misto</p>
-</div>
-
-
-
-```r
-shapiro.test(residuals(mod.split))
+# Check for within-experiments homoscedasticity
+# Modified Levene's test for RCBDs (see Code box 10.2)
+levTest <- by(dataset, dataset$Run,  
+      function(df) 
+        leveneTest(abs(residuals(lm(FGP ~ Genotype + Shelf, data = df))),
+                        df$Genotype))
+levTest
+## dataset$Run: 1
+## Levene's Test for Homogeneity of Variance (center = median)
+##       Df F value Pr(>F)
+## group  2  0.2779 0.7612
+##       15               
+## ---------------------------------------------------- 
+## dataset$Run: 2
+## Levene's Test for Homogeneity of Variance (center = median)
+##       Df F value Pr(>F)
+## group  2  1.5841 0.2376
+##       15
+lapply(lmFits, function(mods) shapiro.test(residuals(mods)))
+## $`1`
 ## 
 ## 	Shapiro-Wilk normality test
 ## 
-## data:  residuals(mod.split)
-## W = 0.93838, p-value = 0.1501
-```
-
-Dopo esserci accertati della validità delle assunzioni di base, possiamo procedere con la scomposizione della varianza, utilizzando l'usuale funzione `anova()`, che fornisce però un output leggermente diverso dal solito. Come secondo argomento è necessario indicare il metodo prescelto per la stima dei gradi di libertà, che non è così semplice come nel caso dei modelli lineari generali. Consigliamo il metodo 'Kenward-Roger' che, pur fornendo comunque un'approssimazione, ha dimostrato ottima affidabilità.
-
-
-```r
-anova(mod.split, ddf="Kenward-Roger")
-## Type III Analysis of Variance Table with Kenward-Roger's method
-##                      Sum Sq Mean Sq NumDF DenDF F value  Pr(>F)  
-## Block                3.6596  1.2199     3     6  0.6521 0.61016  
-## Tillage             23.6565 11.8282     2     6  6.3228 0.03332 *
-## WeedControl          3.3205  3.3205     1     9  1.7750 0.21552  
-## Tillage:WeedControl 19.4641  9.7321     2     9  5.2023 0.03152 *
+## data:  residuals(mods)
+## W = 0.90201, p-value = 0.06229
+## 
+## 
+## $`2`
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  residuals(mods)
+## W = 0.93221, p-value = 0.2124
+# Check for homoscedasticity of errors across runs
+# by the Hartley Fmax test
+mses <- unlist(
+  lapply(lmFits, function(mods) summary(mods)$sigma^2))
+Fmax <- max(mses)/min(mses)
+pmaxFratio(Fmax, 15, 2, lower.tail = FALSE)
+## [1] 0.7404869
+# Variance partitioning
+lapply(lmFits, function(mods) anova(mods))
+## $`1`
+## Analysis of Variance Table
+## 
+## Response: FGP
+##           Df   Sum Sq   Mean Sq F value   Pr(>F)    
+## Genotype   2 0.033011 0.0165056 15.6864 0.000825 ***
+## Shelf      5 0.019911 0.0039822  3.7846 0.034871 *  
+## Residuals 10 0.010522 0.0010522                     
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## $`2`
+## Analysis of Variance Table
+## 
+## Response: FGP
+##           Df   Sum Sq   Mean Sq F value    Pr(>F)    
+## Genotype   2 0.042544 0.0212722 16.9876 0.0006081 ***
+## Shelf      5 0.001761 0.0003522  0.2813 0.9129498    
+## Residuals 10 0.012522 0.0012522                      
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-Da qui in avanti l'analisi procede con il metodo usuale, già spiegato nel capitolo 12, utilizzando la funzione `emmeans()` per il calcolo delle medie marginali e per i confronti multipli. Questa parte di lavoro viene lasciata per esercizio.
 
+L'EDA dimostra che non ci sono problemi con le assunzioni di base e che l'effetto del trattamento è stato significativo in entrambi gli esperimenti. Passando alle analisi del dataset aggregato, possiamo notare che esso è totalmente simile a quello derivante da un qualunque esperimento fattoriale a due vie, con l'unica differenza che l'effetto blocco non è incrociato, ma **'innestato' all'interno degli esperimento**, poiché i ripiani sono diversi nei diversi esperimenti, che sono stati eseguiti in celle climatiche diverse. Di conseguenza, il modello finale è:
 
-## Esperimenti a strip-plot
+$$y_{ijk} = \mu + \gamma_{ik} + \alpha_i + \beta_j + \alpha\beta_{ij} + \varepsilon_{ijk}$$
 
-In alcune circostanze, soprattutto nelle prove di diserbo chimico, potrebbe trovare applicazione un altro tipo di schema sperimentale, nel quale ogni blocco viene diviso in tante righe quanti sono i livelli di un fattore sperimentale e tante colonne quanti sono i livelli dell'altro. In questo modo, il primo trattamento sperimentale viene applicato a tutte le parcelle di una riga e l'altro trattamento a tutte le parcelle di una colonna. Ovviamente, l'allocazione alle righe e alle colonne è casuale e cambia in ogni blocco.
-
-Questo disegno è detto **strip-plot** ed è molto comodo perché consente di lavorare velocemente. Nel capitolo 2 abbiamo già presentato un esempio di come l'esperimento di cui stiamo parlando (interazione tra lavorazioni e diserbo chimico) avrebbe potuto essere pianificato, con uno schema a strip-plot (Figura 2.10).
-
-### Definizione del modello lineare
-
-Dalla mappa si può osservare che, entro ogni blocco, le osservazioni sono raggruppate per riga e per colonna. Di conseguenza, anche le righe e le colonne debbono essere incluse nel modello lineare, per ripristinare l'indipendenza dei residui. Il modello è quindi:
-
-
-$$Y_{ijk} = \mu + \gamma_k + \alpha_i + \theta_{ik} + \beta_j + \zeta_{jk} + \alpha\beta_{ij} + \varepsilon_{ijk}$$
-
-Analogamente a quanto abbiamo visto per lo split-plot, le 12 righe sono univocamente definite da un livello di lavorazione e un blocco e, per questo, l'effetto $\theta$ porta i pedici $i$ e $k$. D'altra parte, le 8 colonne sono definite da un livello di diserbo e un blocco, per cui l'effetto $\zeta$ porta i pedici $j$ e $k$. Entrambi gli effetti sono da considerare random, per cui anche questo è un modello 'misto', con tre effetti random.
-
-### Model fitting con R
-
-Il codice da utilizzare è analogo a quello precedentemente esposto per il disegno a split-plot e prevede l'introduzione degli effetti random 'riga' e 'colonna', che vengono inseriti tra parentesi e con l'operatore '1|', come indicato nel box sottostante.
+dove $y$ è la risposta per l'i-esimo esperimento, il j-esimo genotipo e il k-esimo scaffale, $\mu$ è l'intercetta, $\gamma_{ik}$ è l'effetto del k-esimo scaffale nell'i-esimo esperimento, $\alpha_i$ è l'effetto dell'i-esimo esperimento, $\beta_j$ è l'effetto del j-esimo genotipo, $\alpha\beta_{ij}$ è l'interazione 'genotipo per esperimento', mentre $\varepsilon_{ijk}$ è il residuo per ciascuna osservazione, che si presume distribuito normalmente e omoschedastico ($\epsilon_{ijk} \sim N(0, \sigma_{\varepsilon})$).
 
 
 ```r
-dataset$column <- with(dataset, factor(Block:Tillage))
-dataset$row <- with(dataset, factor(Block:WeedControl))
-mod.strip <- lmer(Yield ~ Block + Tillage * WeedControl +
-                  (1|column) + (1|row), data=dataset)
-anova(mod.strip, ddf = "Kenward-Roger")
-## Type III Analysis of Variance Table with Kenward-Roger's method
-##                      Sum Sq Mean Sq NumDF  DenDF F value  Pr(>F)  
-## Block                1.6323  0.5441     3 2.5022  0.3631 0.78795  
-## Tillage             23.6565 11.8282     2 6.0000  7.8934 0.02089 *
-## WeedControl          1.4810  1.4810     1 3.0000  0.9883 0.39343  
-## Tillage:WeedControl 19.4641  9.7321     2 6.0000  6.4946 0.03155 *
+# Example 10.5 [continuation]
+
+# Pooled analyses: model fitting
+mod <- lm(FGP ~ Genotype * Run + Run:Shelf, data = dataset)
+
+# model checking (not shown)
+# plot(mod, which = 1)
+# plot(mod, which = 2)
+# boxcox(mod)
+
+# Variance partitioning
+anova(mod)
+## Analysis of Variance Table
+## 
+## Response: FGP
+##              Df   Sum Sq  Mean Sq F value    Pr(>F)    
+## Genotype      2 0.074289 0.037144 32.2372 5.534e-07 ***
+## Run           1 0.003025 0.003025  2.6254    0.1208    
+## Genotype:Run  2 0.001267 0.000633  0.5497    0.5856    
+## Run:Shelf    10 0.021672 0.002167  1.8809    0.1100    
+## Residuals    20 0.023044 0.001152                      
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-Anche in questo caso, il calcolo delle medie e i confronti multipli vengono effettuati con la tecnica usuale, indicata nei capitoli precedenti.
 
+L'analisi della tabella ANOVA per un insieme di esperimenti ripetuti fornisce un'idea della riproducibilità dei risultati. È possibile riscontrare le seguenti situazioni:
+
+1. L'interazione "esperimento per trattamento" è significativa. In questo caso, dovremmo concludere che gli effetti dei trattamenti e, probabilmente, la loro graduatoria, sono cambiati nei diversi esperimenti. Di conseguenza, l'aggregazione dei risultati non è possibile e **dovremmo visualizzare e confrontare solo le medie dei trattamenti all'interno di ciascun esperimento**.
+2. L'interazione non è significativa, ma l'effetto principale del trattamento lo è. Dovremmo quindi concludere che gli effetti dei trattamenti e degli esperimenti sono stati indipendenti e additivi; di conseguenza, le medie dei trattamenti sono cambiate nei diversi esperimenti, ma la loro graduatoria (e quindi il giudizio di merito) è risultato pienamente riproducibile. Spetta al ricercatore decidere se sia appropriato calcolare e visualizzare le medie generali dei trattamenti o mantenerle separate per i diversi esperimenti.
+3. Né l'interazione né gli effetti principali sono significativi. La conclusione è che i risultati degli esperimenti ripetuti sono pienamente riproducibili e di solito è sufficiente riportare solo le medie generali dei trattamenti.
+
+Nel nostro esempio, osserviamo che è significativo solo l'effetto del genotipo, il che significa che i risultati sono stati pienamente riproducibili. Pertanto, calcoliamo le medie generali dei genotipi e le sottoponiamo a confronto multiplo.
+
+
+\vspace{12pt}
+\small
+
+```r
+# Example 10.5 [continuation]
+
+# Multiple comparisons for pooled data
+
+cld(emmeans(mod, ~ Genotype), Letters = LETTERS)
+## Genotype  emmean     SE df  lower.CL upper.CL .group
+##  C         0.781 0.0098 20    0.760    0.801  A    
+##  A         0.871 0.0098 20    0.850    0.891   B   
+##  B         0.882 0.0098 20    0.862    0.903   B 
+```
+\normalsize
+
+
+Prima di concludere, è necessario sottolineare che il metodo di analisi dei dati proposto per questo esempio è sempre appropriato, sebbene in alcuni casi, soprattutto quando il numero di esperimenti è molto elevato, potrebbe essere opportuno impiegare un altro metodo, di cui verrà fornito un esempio nel Capitolo 12.
+
+---
 
 ## Altre letture
 
-1. Bates, D., Mächler, M., Bolker, B., Walker, S., 2015. Fitting Linear Mixed-Effects Models Using lme4. Journal of Statistical Software 67. https://doi.org/10.18637/jss.v067.i01
-2. Gałecki, A., Burzykowski, T., 2013. Linear mixed-effects models using R: a step-by-step approach. Springer, Berlin.
-3. Kuznetsova, A., Brockhoff, P.B., Christensen, H.B., 2017. lmerTest Package: Tests in Linear Mixed Effects Models. Journal of Statistical Software 82, 1--26.
-
-
-<!--chapter:end:13-SplitStrip.Rmd-->
-
-# La regressione non-lineare
-
-
-I fenomeni biologici, come ad esempio la crescita di una coltura, la cinetica degradativa degli erbicidi nel terreno, la risposta produttiva delle colture a densità crescenti di malerbe o a dosi crescenti di concime, la risposta fitotossica di una specie infestante alla dose di un erbicida, hanno in genere andamenti curvilinei, posseggono punti di massimo o minimo, flessi e, soprattutto, hanno frequentemente asintoti. Pertanto, difficilmente possono essere descritti con funzioni lineari, a meno che non ci accontentiamo di approssimare localmente l'andamento dei dati, in un intervallo ristretto della variabile indipendente.
-
-Da un punto di vista pratico, è quindi fondamentale saper adattare ai dati funzioni curvilinee di ogni tipo. Introduciamo il problema con un esempio, per il quale avremo bisogno di un package aggiuntivo che potremo installare da github (la prima volta) e caricare con il codice riportato più sotto.
-
-
-```r
-# Solo la prima volta
-# install.packages("devtools")
-# devtools::install_github("onofriandreapg/aomisc")
-library(aomisc)
-```
-
-
-## Caso studio: degradazione di un erbicida nel terreno
-
-Un suolo è stato trattato con metamitron (un erbicida) alla concentrazione di 100 ng g^1^. Dopo essere stato opportunamente mescolato, è stato distribuito in 24 contenitori di alluminio e posto in cella climatica alla temperatura di 20 °C. In 8 tempi diversi dopo l'inizio del saggio, sono stati prelevati 3 contenitori e sottoposti ad analisi chimica per la determinazione della concentrazione residua dell'erbicida. I risultati sono disponibili nel file 'degradation.csv', nella solita repository online.
-
-
-```r
-fileName <- "https://www.casaonofri.it/_datasets/degradation.csv"
-degradation <- read.csv(fileName)
-head(degradation, 10)
-##    Time   Conc
-## 1     0  96.40
-## 2    10  46.30
-## 3    20  21.20
-## 4    30  17.89
-## 5    40  10.10
-## 6    50   6.90
-## 7    60   3.50
-## 8    70   1.90
-## 9     0 102.30
-## 10   10  49.20
-```
-
-Per prima cosa, plottiamo i dati osservati (Figura \@ref(fig:figName151)). Vediamo che l'andamento della concentrazione nel tempo è chiaramente curvilineo e, di conseguenza, non possiamo utilizzare la regressione lineare semplice, esposta nel capitolo precedente. 
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName151-1.png" alt="Degradazione di metamitron nel terreno" width="90%" />
-<p class="caption">(\#fig:figName151)Degradazione di metamitron nel terreno</p>
-</div>
-
-In realtà, possiamo ancora utilizzare la stessa equazione generale che abbiamo introdotto nel capitolo 4, cioè:
-
-
-$$ Y_i = f(X_i, \theta) + \varepsilon_i $$
-
-In questa funzione, $X$ è il tempo, $Y$ la concentrazione, $\theta$ sono i parametri del modello (da stimare) ed $\varepsilon$ sono i residui, che si assumono omoscedastici e normalmente distribuiti. La differenza sta nel fatto che $f$ è non lineare.
-
-
-## Scelta della funzione
-
-Uno dei criteri fondamentali, seppur empirico, per la selezione di una funzione $f$ non-lineare  è quello di considerarne la forma, in relazione al fenomeno biologico in studio. Abbiamo dato informazioni più dettagliate altrove ([vedi questo link](https://www.statforbiology.com/2020/stat_nls_usefulfunctions/)) e, per brevità, possiamo considerare la Figura \@ref(fig:figName151b), dove si vedono gli andamenti delle funzioni non-lineari più diffuse in agricoltura. Distinguiamo andamenti:
-
-1. convesse/concave (es. parabola, curva di crescita/decadimento esponenziale, curva di crescita asintotica, curva di potenza, iperbole rettangolare)
-3. sigmoidali (es. crescita logistica, crescita di Gompertz, curva log-logistica dose-risposta)
-4. con massimi/minimi (curva di Braggs)
-
-Nella lista precedente, la parabola è un modello non-lineare nella risposta, ma lineare nei parametri, e quindi può essere adattato con la usuale funzione 'lm()', come vedremo tra poco.
-
-<div class="figure" style="text-align: center">
-<img src="_images/nonLinearCurves.png" alt="Curve più diffuse per la descrizione di fenomeni di interesse agrario" width="95%" />
-<p class="caption">(\#fig:figName151b)Curve più diffuse per la descrizione di fenomeni di interesse agrario</p>
-</div>
-
-Ad ognuna delle curve evidenziate in figura corrisponde un'equazione, come indicato nella Figura \@ref(fig:figName151bis) ).
-
-<div class="figure" style="text-align: center">
-<img src="_images/nonLinearEquations.png" alt="Lista delle funzioni per la regressione non-lineare con R (equazione e funzione da utilizzare in R)." width="95%" />
-<p class="caption">(\#fig:figName151bis)Lista delle funzioni per la regressione non-lineare con R (equazione e funzione da utilizzare in R).</p>
-</div>
-
-Per il nostro caso-studio, le conoscenze relative alla cinetica di degradazione dei composti chimici ci suggeriscono un'equazione di decadimento esponenziale (cinetica del primo ordine), così definita:
-
-$$Y_i = A e^{-k \,X_i} + \varepsilon_i$$ 
-
-dove $A$ è la concentrazione iniziale e $k$ e il tasso di degradazione (costante nel tempo). Come anticipato, la componente stocastica $\varepsilon$ si assume normalmente distribuita e omoscedastica.
-
-## Stima dei parametri
-
-Dopo aver definito $f$, dobbiamo stimare i parametri $A$ e $k$. In generale esistono tre tecniche fondamentali:
-
-1. linearizzazione della funzione tramite trasformazione delle variabili;
-2. approssimazione della vera funzione curvilinea con una polinomiale in X;
-3. adattamento ai dati sperimentali di funzioni curvilinee, tramite metodiche di regressione non-lineare.
-
-### Linearizzazione della funzione
-
-Nel caso specifico, prendendo il logaritmo di entrambe le parti dell'equazione esponenziale, otteniamo la seguente equazione:
-
-$$ log(Y) = log(A) - k \, X $$
-
-Quindi, se trasformiamo la Y (Concentrazione) nel suo logaritmo, possiamo utilizzare un modello di regressione lineare semplice per la stima dei parametri. Ovviamente, otterremo, come intercetta, il logaritmo della concentrazione iniziale e, come pendenza, otterremo un valore negativo per $k$, in quanto la retta è decrescente.
-
-
-```r
-mod <- lm(log(Conc) ~ Time, data=degradation)
-summary(mod)
-## 
-## Call:
-## lm(formula = log(Conc) ~ Time, data = degradation)
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -2.11738 -0.09583  0.05336  0.31166  1.01243 
-## 
-## Coefficients:
-##              Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)  4.662874   0.257325   18.12 1.04e-14 ***
-## Time        -0.071906   0.006151  -11.69 6.56e-11 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.6905 on 22 degrees of freedom
-## Multiple R-squared:  0.8613,	Adjusted R-squared:  0.855 
-## F-statistic: 136.6 on 1 and 22 DF,  p-value: 6.564e-11
-```
-
-Le funzioni non-lineari che possono essere trasformate in lineari sono dette *linearizzabili* e hanno il vantaggio di semplificare molto i calcoli richiesti per la stima dei parametri. Un grave svantaggio è dato dal fatto che, trasformando la risposta, si trasforma anche la distribuzione degli errori e quindi bisogna verificare che le assunzioni di base dei modelli lineari (omogeneità delle varianze e normalità dei residui) siano valide nella scala trasformata.
-
-
-
-```r
-par(mfrow = c(1,2))
-plot(mod, which = 1)
-plot(mod, which = 2)
-```
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName152-1.png" alt="Linearizzazione di una funzione esponenziale." width="90%" />
-<p class="caption">(\#fig:figName152)Linearizzazione di una funzione esponenziale.</p>
-</div>
-
-
-Il grafico dei residui (Figura \@ref(fig:figName152) ) suggerisce che questi sono  inversamente proporzionali ai valori attesi (più alto il logaritmo della concentrazione più bassi i residui). Questo fa sospettare che le varianze potrebbero essere omogenee sulla scala originale, impedendoci quindi di analizzare i dati nella scala trasformata.
-
-Per completezza, dobbiamo comunque dire che, qualora le assunzioni di base fossero rispettate nella scala trasformata, il metodo della linearizzazione rappresenterebbe una tecnica corretta ed affidabile per l'analisi dei dati.
-
-### Approssimazione della vera funzione tramite una polinomiale in X
-
-Molte andamenti non-lineari possono essere approssimati tramite funzioni polinomiali di ordine \textit{n}. Le funzioni polinomiali sono molto flessibili; contengono la funzione lineare come caso particolare (n = 1) e permettono di descrivere curvature anche molto complesse, semplicemente aumentando l' ordine della funzione. In questo modo, è possibile ottenere un adattamento ai dati sperimentali teoricamente anche perfetto.
-
-Le funzioni polinomiali sono un tipico esempio di funzioni curvilinee, ma lineari nei parametri; esse possono essere trattate ricorrendo alle metodiche di calcolo normalmente utilizzate per la regressione lineare.
-
-Gli svantaggi delle funzioni polinomiali sono relativi al fatto che queste presentano raramente giustificazione biologica. Per esempio, con le funzioni polinomiali non è possibile descrivere relazioni asintotiche, che sono invece molto comuni in biologia. Nel nostro esempio si potrebbe utilizzare una funzione polinomiale di II grado (parabola), che, con il suo braccio decrescente, potrebbe descrivere la degradazione di un erbicida in modo sufficientemente buono.
-
-Eseguiamo il fitting con R, utilizzando l'usuale funzione 'lm()'. Successivamente, utilizziamo la funzione 'predict()' per generare valori attesi per una sequenza temporale da 0 a 70 giorni e plottarli.
-
-
-```r
-mod2 <- lm(Conc ~ Time + I(Time^2), data=degradation)
-pred <- predict(mod2, newdata = data.frame(Time = seq(0, 70, by = 0.1)))
-plot(Conc ~ Time, data=degradation)
-lines(pred ~ seq(0, 70, by = 0.1), col = "red")
-```
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName153-1.png" alt="Approssimazione della cinetica di degradazione con una funzione polinomiale (parabola)" width="90%" />
-<p class="caption">(\#fig:figName153)Approssimazione della cinetica di degradazione con una funzione polinomiale (parabola)</p>
-</div>
-
-Vediamo come la funzione inserita, mentre approssima abbastanza bene i dati nell'intervallo da 0 a 40 giorni, successivamente mostra una ricrescita, che non ha alcun senso biologico (Figura \@ref(fig:figName153) ).
-
-In generale, le polinomiali sono utilizzate quando non si hanno conoscenze 'a priori' sul fenomeno in studio e sia necessario approssimarlo con una funzione curvilinea, in un intervallo della X molto ristretto, senza la necessità di estrapolare previsioni al di fuori di questo intervallo. Per questi motivi, il campo d'impiego delle funzioni polinomiale è abbastanza ristretto.
-
-### Minimi quadrati non-lineari
-
-La terza strada, quella più percorsa, è utilizzare metodiche di regressione non-lineare, basate su algoritmi numerici di ricerca delle stime dei minimi quadrati, come il metodo di Gauss-Newton. Nel principio, questo metodo funziona partendo da stime iniziali approssimate dei parametri, che vengono corrette in ogni iterazione successiva fino ad ottenere la convergenza sui valori che minimizzano lo scostamento tra i valori osservati e quelli previsti dalla funzione. Ovviamente, trattandosi di metodi iterativi, le stime ottenute sono solo un'approssimazione dei valori reali, ma più che accettabile per le nostre finalità.
-
-## La regressione non-lineare con R
-
-La funzione più comune in R per la parametrizzazione di funzioni non-lineari è `nls()`. Nella chiamata alla funzione dobbiamo anche fornire stime iniziali per i valori dei parametri. Ottenere queste stime è facile pensando al loro significato biologico: $A$ è la concentrazione iniziale e quindi una stima ragionevole è data dal valor medio osservato al tempo 0 (100). Il parametro $k$ è invece il tasso di degradazione relativo; possiamo notare che nei primi 10 giorni la concentrazione si riduce della metà circa, cioè si abbassa mediamente un po' più del 5% al giorno. Possiamo quindi assegnare a $k$ un valore iniziale pari a 0.05.
-
-
-```r
-modNlin <- nls(Conc ~ A*exp(-k*Time), 
-               start = list(A=100, k=0.05), 
-               data=degradation)
-summary(modNlin)
-## 
-## Formula: Conc ~ A * exp(-k * Time)
-## 
-## Parameters:
-##    Estimate Std. Error t value Pr(>|t|)    
-## A 99.634902   1.461047   68.19   <2e-16 ***
-## k  0.067039   0.001887   35.53   <2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 2.621 on 22 degrees of freedom
-## 
-## Number of iterations to convergence: 5 
-## Achieved convergence tolerance: 4.33e-07
-```
-
-Invece che codificare il modello non-lineare a mano, possiamo ricorrere ad una delle funzioni R indicate in Figura \@ref(fig:figName151bis), che sono associate ad appositi algoritmi di self-starting e non necessitano dell'individuazione di valori iniziali (almeno nella gran parte dei casi). Queste funzioni sono disponibili nel package 'aomisc' che deve quindi essere installato da 'github'. 
-
-
-```r
-modNlin2 <- nls(Conc ~ NLS.expoDecay(Time, a, k),
-               data = degradation)
-```
-
-## Verifica della bontà del modello
-
-Le assunzioni parametriche di base relative ai modelli non-lineari sono le stesse dei modelli lineari e, di conseguenza, gli strumenti diagnostici sono analoghi. Bisogna tuttavia menzionare il fatto che, dato l'impiego di metodi iterativi per la ricerca dei valori dei parametri, tutti i risultati a cui si perviene (stima dei parametri, della varianza residua e numero dei gradi di libertà relativi) sono solo una approssimazione di quelli reali. Per questo motivo, nel caso non-lineare i metodi grafici (analisi dei residui) sono largamente preferiti.
-
-### Analisi grafica dei residui
-
-L'analisi grafica dei residui viene eseguita in modo del tutto analogo a quanto visto per la regressione lineare. In primo luogo, verifichiamo le assunzioni di base di normalità e omoscedasticità, mediante il metodo `plot()` per l'oggetto 'nls', che è disponibile nel package 'aomisc', già caricato in precedenza.
-
-
-```r
-par(mfrow=c(1,2))
-plot(modNlin, which = 1)
-plot(modNlin, which = 2)
-```
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName154res-1.png" alt="Analisi grafica dei residui per la regressione non-lineare, relativa alla degradazione di metamitron nel suolo" width="90%" />
-<p class="caption">(\#fig:figName154res)Analisi grafica dei residui per la regressione non-lineare, relativa alla degradazione di metamitron nel suolo</p>
-</div>
-
-La Figura \@ref(fig:figName154res) non mostra deviazioni rispetto agli assunti di base. Pertanto, proseguiamo l'analisi grafica della bontà di adattamento, verificando il plot dei valori attesi e di quelli osservati (Figure \@ref(fig:figName155)). Questo grafico, per gli oggetti 'nls' può essere ottenuto velocemente utilizzando la funzione 'plotnls()', nel package 'aomisc'.
-
-
-
-```r
-plot(modNlin, type = "means", which = 3,
-        xlab = "Tempo (giorni)", ylab = "Concentrazione (ng/g)")
-```
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName155-1.png" alt="Cinetica di degradazione di metamitron nel suolo: i punti mostrano i valori osservati, la linea mostra i valori attesi con l'equazione esponziale." width="90%" />
-<p class="caption">(\#fig:figName155)Cinetica di degradazione di metamitron nel suolo: i punti mostrano i valori osservati, la linea mostra i valori attesi con l'equazione esponziale.</p>
-</div>
-
-### Test F per la mancanza di adattamento (approssimato)
-
-Se abbiamo le repliche (come nell'esempio in studio) possiamo effettuare il fitting di un modello ANOVA. Come abbiamo detto nel capitolo precedente, nel modello ANOVA i valori attesi sono costituiti dalle medie dei trattamenti (tempi e livelli di densità, rispettivamente per i due esempi) e lo scostamento di ogni dato rispetto alla 'sua' media è evidentemente dovuto solo all'errore sperimentale 'puro'. Nel modello di regressione, invece, esiste una componente aggiuntiva di errore, cioè lo scostamento di ogni media dalla curva di regressione. Questa componente si chiama mancanza d'adattamento e può essere stimata per differenza.
-
-
-```r
-modAov <- lm(Conc ~ factor(Time), data=degradation)
-anova(modAov)
-## Analysis of Variance Table
-## 
-## Response: Conc
-##              Df  Sum Sq Mean Sq F value    Pr(>F)    
-## factor(Time)  7 24698.4  3528.3  415.29 < 2.2e-16 ***
-## Residuals    16   135.9     8.5                      
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-SSa <- anova(modAov)[2,2]
-SSa
-## [1] 135.9387
-```
-
-Inseriamo il tempo come fattore (quindi variabile qualitativa, non quantitativa) e notiamo che la devianza del residuo è pari a 135.9. La varianza del residuo del modello di regressione si ottiene facendo la somma dei quadrati degli scarti dei dati rispetto ai valori attesi.
-
-
-```r
-SSr <- sum(residuals(modNlin)^2)
-SSr
-## [1] 151.1766
-```
-
-Come ci aspettavamo, il modello di regressione ha una devianza più alta, in quanto questa contiene la componente di mancanza d'adattamento, pari alla differenza tra SSa e SSr, cioè:
-
-
-```r
-SSl <- SSr - SSa
-SSl
-## [1] 15.23792
-```
-
-Mentre la devianza del residuo dell'ANOVA ha 16 gradi di libertà (24 dati meno 8 parametri stimati), quella del residuo della regression ha 22 gradi di libertà (24 dati meno 2 parametri stimati). La devianza del 'lack of fit' ha quindi 22 - 16 = 6 gradi di libertà. La varianza del lack of fit è quindi pari a:
-
-
-```r
-SSl/6
-## [1] 2.539654
-```
-
-Possiamo quindi confrontare formalmente, con un test di F, le due varianze dell'errore puro (dall'ANOVA: 8.5) e quella della mancanza di adattamento, per vedere se quest'ultima è significativamente più 'grande' di quella dell'errore puro. L'ipotesi nulla è che la mancanza d'adattamento non è rilevante ed il test di F è:
-
-
-```r
-(Fvalue <- (SSl/6) / anova(modAov)[2,3]) #F value
-## [1] 0.2989175
-pf(0.2989, 6, 16, lower.tail=F)
-## [1] 0.928442
-```
-
-Chiaramente il test è non significativo. A questo risultato si arriva facilmente utilizzando la funzione 'anova()' e passandole i due modelli da confrontare anche se uno dei due è un modello di regressione non-lineare.
-
-
-
-```r
-anova(modNlin, modAov)
-## Analysis of Variance Table
-## 
-## Model 1: Conc ~ A * exp(-k * Time)
-## Model 2: Conc ~ factor(Time)
-##   Res.Df Res.Sum Sq Df Sum Sq F value Pr(>F)
-## 1     22     151.18                         
-## 2     16     135.94  6 15.238  0.2989 0.9284
-```
-
-
-### Errori standard dei parametri
-
-Un'altra valutazione importante da fare è quella relativa agli errori standard delle stime dei parametri, che non debbono mai essere superiori alla metà del valore del parametro stimato, cosa che in questo caso è pienamente verificata. Abbiamo già spiegato come, se l'intervallo di confidenza del parametro contiene lo zero, evidentemente quel parametro potrebbe essere rimosso dal modello senza che il fitting peggiori significativamente. Nel nostro esempio, se il tasso di degradazione fosse stato non significativamente diverso da zero, avremmo avuto un'indicazione per sostenere che l'erbicida, di fatto, non mostra degradazione nel tempo.
-
-### Coefficiente di determinazione
-
-Come abbiamo visto per la regressione lineare, anche nella regressione non-lineare si sente l'esigenza di una statistica che rappresenti in modo sintetico la bontà di adattamento. L'argomento è molto dibattuto e molti autori sono contrari all'impiego del coefficiente di determinazione, prevalentemente per due motivi:
-
-1. i modelli di regressione non-lineare non hanno una vera e propria intercetta (almeno non nel senso usuale);
-2. la somma della devianza della regressione e della devianza del residuo non è necessariamente uguale alla devianza totale.
-
-Tuttavia, molti altri autori sono dell'opinione che, per la sua semplicità, una statistica analoga al coefficiente di determinazione possa risultare molto utile, purché utilizzata con la necessaria prudenza. In particolare viene suggerito l'impiego della statistica:
-
-$$\textrm{Pseudo-R}^2 = 1 - \frac{SSr}{SSt}$$
-
-che, nel caso della regressione lineare, sarebbe analoga alla formula già vista per l'R^2^ nel capitolo precedente, ma che, nel caso della regressione non-lineare, fornisce risultati diversi. In particolare, lo Pseudo-R^2^ può essere, al massimo, pari ad 1 per un modello con una bontà di adattamento perfetta, ma che, al contrario dell'$R^2$, può divenire negativo, anche se in situazioni nelle quali vi sono da sospettare gravi problemi con il modello prescelto per descrivere i dati.
-
-Nel caso in esempio, il residuo della regressione è pari a 151.2 con 16 gradi di libertà, mentre la devianza totale dei dati (somma dei quadrati degli scarti rispetto alla media generale) è:
-
-
-```r
-SSt <- deviance(lm(Conc ~ 1, data=degradation))
-```
-
-ed ha 23 gradi di libertà. Il valore di Pseudo-R^2^ è:
-
-
-```r
-1 - SSr/SSt
-## [1] 0.9939126
-```
-
-ed attesta un ottimo adattamento, in quanto è vicino ad 1. Bisogna ricordare che, pur essendo utilizzato in modo pressoché ubiquitario, il coefficiente di determinazione per i modelli non-lineari fornisce solo un'indicazione abbastanza grezza sulla bontà del modello, in quanto può rimanere alto anche quando vi sono sistematiche violazioni rispetto alla forma della funzione. Inoltre, al contrario del coefficiente di determinazione tradizionale, lo Pseudo-R^2^ non può (e non deve) essere interpretato come la quota di devianza spiegata dalla regressione.
-
-I due coefficienti di determinazione (tradizionale e corretto) possono essere ottenuti con la funzione 'R2nls()', disponibile nel package 'aomisc'.
-
-
-```r
-# library(aomisc)
-R2nls(modNlin)
-## $PseudoR2
-## [1] 0.9939126
-## 
-## $R2
-## [1] 1.001821
-```
-
-## Funzioni lineari e nonlineari dei parametri
-
-Gli studi di degradazione, in genere, richiedono la determinazione della semivita. E'facile vedere che questa può essere ricavata dalla funzione di degradazione in questo modo:
-
-$$\frac{A}{2} = A \exp ( - k \,\, t_{1/2})$$
-
-da cui:
-
-$$t_{1/2} = - \frac{ \log \left( {\frac{1}{2}} \right) }{k}$$
-
-Vediamo insomma che la semivita $t_{1/2}$ è una funzione non-lineare di $k$ e può essere ricavata facilmente come:
-
-
-```r
--log(1/2) / coef(modNlin)[2]
-##        k 
-## 10.33945
-```
-
-Si pone ora il problema di ricavare l'errore standard di questa stima e/o i suoi intervalli di confidenza. La legge di propagazione degli errori ci insegna a calcolare gli errori standard per le combinazioni lineari dei parametri e ne abbiamo parlato nel capitolo 9. Per le combinazioni non-lineari, come quella che abbiamo utilizzato per calcolare la semivita, esiste un'estensione chiamata 'metodo delta'. Non ne parleremo in dettaglio, in quanto si tratta di un argomento che richiede alcune conoscenza di analisi matematica; tuttavia, mostreremo un esempio del codice R da utilizzare per applicarlo.
-
-In particolare, possiamo utilizzare la funzione 'deltaMethod()' del package 'car'. Per evitare problemi, consiglio di estrarre le stime dei parametri dall'oggetto 'nls' ed assegnare a queste nomi corrispondenti a quelli utilizzati nella definizione della funzione di trasformazione, che deve essere fornita come stringa. 
-
-
-```r
-library(car)
-coefs <- coef(modNlin) 
-names(coefs) <- c("A", "k")
-strFun <- "-log(0.5)/k"
-deltaMethod(object=coefs, g=strFun, vcov.=vcov(modNlin))
-##             Estimate       SE    2.5 % 97.5 %
-## -log(0.5)/k 10.33945  0.29102  9.76907  10.91
-```
-
-
-## Previsioni		 
-
-In taluni casi, abbastanza frequenti per la verità, l' analisi di regressione viene eseguita per stimare o predire il valore della Y corrispondente ad una data X (calibrazione), oppure della X corrispondente ad un dato Y (esempio: determinazione delle dosi efficaci). Normalmente il problema si riduce alla definizione di un'equazione predittiva; nel caso della calibrazione essa coincide con l'equazione originale, nell'altro caso con la sua inversa. Utilizzando queste equazioni è possibile ottenere il valore cercato e il suo errore standard, tramite il metodo delta.
-
-Analogamente alla regressione lineare, per la calibrazione possiamo utilizzare il metodo 'predict()'; ad esempio, per calcolare la concentrazione dell'erbicida ai tempi 10, 15 e 20 giorni utilizziamo il codice sottostante, ricordando che i valori del tempo debbono essere forniti sotto forma di data frame, con una sola colonna, dal nome corrispondente a quello del regressore nel dataset originale
-
-
-```r
-predict(modNlin, newdata=data.frame(Time=c(10, 15, 20)) )
-## [1] 50.96413 36.44947 26.06860
-```
-
-Come abbiamo visto, l'output non fornisce gli errori standard di queste stime. Tuttavia, dato che la calibrazione non è altro che una combinazione dei parametri del modello, possiamo ottenere lo stesso risultato utilizzando il metodo delta.
-
-
-```r
-strFun <- "A*exp(-k*10)"
-deltaMethod(object=coefs, g=strFun, vcov.=vcov(modNlin))
-##                  Estimate       SE    2.5 % 97.5 %
-## A * exp(-k * 10) 50.96413  0.91006 49.18044 52.748
-strFun <- "A*exp(-k*15)"
-deltaMethod(object=coefs, g=strFun, vcov.=vcov(modNlin))
-##                  Estimate       SE    2.5 % 97.5 %
-## A * exp(-k * 15) 36.44947  0.92053 34.64526 38.254
-strFun <- "A*exp(-k*20)"
-deltaMethod(object=coefs, g=strFun, vcov.=vcov(modNlin))
-##                  Estimate       SE    2.5 % 97.5 %
-## A * exp(-k * 20) 26.06860  0.87816 24.34744  27.79
-```
-
-La funzione inversa è:
-
-$$X = - \frac{log \left( \frac{Y}{A} \right)}{k} $$
-
-Per calcolare il tempo necessario a raggiungere una certa concentrazione (es. 10 mg/g), possiamo ancora utilizzare il metodo delta.
-
-
-```r
-strFun <- "-(log(10/A)/k)"
-deltaMethod(object=coefs, g=strFun, vcov.=vcov(modNlin))
-##                Estimate       SE    2.5 % 97.5 %
-## -(log(10/A)/k) 34.29237  0.88714 32.55360 36.031
-```
-
-
-## Gestione delle situazioni 'patologiche'
-
-In alcuni casi la verifica della bontà del modello mette in luce situazioni patologiche. In particolare, potrebbe capitare che il modello non sia adatto ai dati, o, al contrario, che i dati non siano adatti al modello. Nel primo caso è necessario trasformare il modello, mentre nel secondo caso l'azione più comune è quella di trasformare i dati. Vediamo queste due operazioni un po' più nel dettaglio.
-
-### Trasformazione del modello
-
-A volte può capitare che il modello non si adatti ai dati. Ad esempio, perché la cinetica degradativa non è del primo ordine ma è lineare, oppure più concava di quello che il modello esponenziale riesca a prevedere. In una situazione del genere, la cosa migliore è cambiare equazione, utilizzandone una che mostri un miglior adattamento ai dati sperimentali.
-
-### Trasformazione dei dati
-
-Se non è il modello ad essere mal definito, ma sono invece i dati a non conformarsi alle assunzioni di base della regressione, è necessario valutare l'esigenza di una trasformazione stabilizzante.
-
-Nelle regressioni non-lineari, come in quelle lineari, è possibile utilizzare la trasformazione di Box e Cox, facendo attenzione, però, al fatto che la sola trasformazione della variabile dipendente comporta anche la modifica della scala sulla quale vengono stimati i parametri, che quindi non conservano il loro valore biologico. Ad esempio, nel modello esponenziale, il parametro $A$ rappresenta la concentrazione inziale e, se i dati vengono trasformati in logaritmo, l'unità di misura di $A$ risulta anch'essa trasformata nella nuova scala logaritmica.
-
-Per questo motivo, dato che le regressioni non-lineari vengono spesso eseguite perchè si è interessati alle stime dei parametri nella loro unità di misura originale, si preferisce adottare la cosiddetta tecnica della "trasformazione di entrambe le parti", o metodo TBS ("Transform Both Sides"). Con questo metodo, vengono trasformati sia i dati osservati per la variabile dipendente, sia il modello:
-
-$$Y^\lambda  = f(X)^\lambda$$
-
-
-Con questa tecnica, le stime dei parametri sono nella loro scala originale, come se la trasformazione non fosse stata eseguita per niente.
-
-Con un oggetto 'nls', possiamo utilizzare la funzione 'boxcox' nel package 'aomisc', che trova il valore ottimale di $\lambda$ ed esegue la trasformazione. La funzione 'summary()' restituisce la stima dei parametri dopo la trasformazione.
-
-
-```r
-modNlin2 <- boxcox(modNlin, plotit = F)
-summary(modNlin2)
-## 
-## Estimated lambda: 0.8 
-## Confidence interval for lambda: [0.56,0.96]
-## 
-## Formula: newRes ~ eval(parse(text = newFormula), df)
-## 
-## Parameters:
-##    Estimate Std. Error t value Pr(>|t|)    
-## A 99.418732   2.091374   47.54   <2e-16 ***
-## k  0.066654   0.002042   32.65   <2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 1.536 on 22 degrees of freedom
-## 
-## Number of iterations to convergence: 2 
-## Achieved convergence tolerance: 7.511e-06
-```
-
-Invece che far scegliere alla funzione 'boxcox' il valore di $\lambda$ ottimale, possiamo imporlo noi, con l'argomento 'lambda'.
-
-
-
-```r
-modNlin3 <- boxcox(modNlin, lambda = 0.5, plotit = F)
-summary(modNlin3)
-## 
-## Estimated lambda: 0.5 
-## Confidence interval for lambda: [NA,NA]
-## 
-## Formula: newRes ~ eval(parse(text = newFormula), df)
-## 
-## Parameters:
-##    Estimate Std. Error t value Pr(>|t|)    
-## A 99.532761   4.625343   21.52 2.87e-16 ***
-## k  0.067068   0.002749   24.40  < 2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.9196 on 22 degrees of freedom
-## 
-## Number of iterations to convergence: 1 
-## Achieved convergence tolerance: 7.541e-06
-```
-
-Gli outputs mostrano che, nonostante la trasformazione, i parametri hanno conservato la loro scala originale e, di conseguenza, il loro significato biologico.
-
----
-
-## Per approfondire un po'...
-
-### Riparametrizzazione delle funzioni non-lineari
-
-In alcuni casi abbiamo a disposizione modelli matamatici che non sono immediatamente utili per la regressione non-lineare, in quanto non si adattano alla tipologia di dati in nostro possesso o non sono adeguati alle nostre finalità. Per questo motivo, essi debbono essere opportunamente riparametrizzati, cioè posti in una differente forma algebrica. Illustriamo meglio questo aspetto con un esempio, relativo ad un esperimento nel quale è stata valutata la produzione del girasole a densità crescenti di piante infestanti, da 0 a 100 piante per metro quadrato. I risultati ottenuti sono riportati nel dataset 'competition', che è disponibile nel package 'aomisc'. L'esperimento è stato organizzato a randomizzazione completa.
-
-
-```r
-data(competition)
-head(competition)
-##   Dens    Yield
-## 1    0 29.58587
-## 2   10 20.16776
-## 3   20 17.82846
-## 4   30  9.02289
-## 5   40 13.41521
-## 6   50 12.80159
-```
-
-Secondo la letteratura, la relazione tra perdite produttive e densità delle piante infestanti può essere descritta con una funzione iperbolica di questo tipo (Cousens, 1985):
-
-$$YL = \frac{iD}{1 + \frac{iD}{A}}$$
-
- 
-Dove $YL$ sta per perdite produttive (Yield Loss) percentuali, $D$ è la densità delle piante infestanti, $i$ è la pendenza nel punto iniziale (D = 0) ed $A$ è la perdita produttiva percentuale massima asintotica. Il grafico è mostrato qui sotto.
-
-<div class="figure" style="text-align: center">
-<img src="_main_files/figure-html/figName25131-1.png" alt="Relazione iperbolica tra fittezza delle piante infestanti e perdite produttive. È  visualizzata la pendenza iniziale (i) e la perdita produttiva massima asintotica (A)." width="90%" />
-<p class="caption">(\#fig:figName25131)Relazione iperbolica tra fittezza delle piante infestanti e perdite produttive. È  visualizzata la pendenza iniziale (i) e la perdita produttiva massima asintotica (A).</p>
-</div>
-
-Normalmente, in campo non vengono determinate le perdite produttive, bensì le produzioni, come nel caso dell'esperimento relativo al dataset d'esempio. Di conseguenza, il modello iperbolico presentato più sopra non è adatto ai nostri dati, in quanto rappresenta una funzione crescente, mentre i nostri dati mostrano una variabile dipendente (produzione) che decresce al crescera della variabile indipendente (fittezza dell piante infestanti). Pertanto, abbiamo due possibilità:
-
-1. modificare il dataset, esprimendo i dati in termini di perdite produttive percentuali;
-2. modificare il modello, per utilizzare la produzione come variabile dipendente, al posto della perdita produttiva.
-
-La prima strada è più agevole, ma ha un problema importante. Infatti, per calcolare la perdita produttiva percentuale nella parcella $i$, possiamo utilizzare la seguente equazione:
-
-$$YL_i = \frac{YWF - Y_i}{YWF} \times 100$$
-
-dove $YWF$ è la produzione nel testimone non infestato e $Y_i$ è la produzione nella parcella $i$. Trattandosi di una prova replicata, abbiamo quattro valori di produzione corrispondenti a YWF; quale usiamo? La scelta più logica è quella di utilizzare il valore medio, cioè;
-
-
-```r
-YWF <- mean(competition$Yield[competition$Dens==0])
-YWF
-## [1] 30.42637
-```
-
-Operando la trasformazione otteniamo una nuova variabile (YL), che possiamo sottoporre a regressione non-lineare, con il modello iperbolico precedentemente indicato. Per ottenere i valori iniziali, possiamo considerare che, con 10 piante per metro quadrato, la perdita produttiva è del 30-35%. Quindi si può immaginare che la prima pianta infestante aggiunta possa (quella che fa più danni) possa causare perdite produttive del 6-7% circa. Vediamo inoltre che la perdita produttiva massima osservata è del 70% circa, quindi possiamo immaginare una perdita produttiva massima asintotica del 75%.  
-
-
-```r
-YL <- (YWF - competition$Yield)/YWF * 100
-mod1 <- nls(YL ~ i * Dens / (1 + i * Dens / A),
-            start = list(i = 6.5, A = 75),
-            data = competition)
-summary(mod1)
-## 
-## Formula: YL ~ i * Dens/(1 + i * Dens/A)
-## 
-## Parameters:
-##   Estimate Std. Error t value Pr(>|t|)    
-## i    8.207      1.187   6.914 1.93e-08 ***
-## A   75.049      2.353  31.894  < 2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 6.061 on 42 degrees of freedom
-## 
-## Number of iterations to convergence: 3 
-## Achieved convergence tolerance: 7.497e-06
-```
-
-Qual è il problema di questo approccio? Se ci facciamo caso, questo modello prevede che, quando la fittezza delle piante infestanti è 0 (testimone non infestato), la perdita produttiva è 0. Di conseguenza la produzione osservata deve essere pari alla media del testimone non infestato. Insomma, abbiamo involontariamente imposto il vincolo YWF = 30.42637, anche se sappiamo che questo vincolo non ha alcuna giustificazione, dato che la media della popolazione da cui le nostre quattro osservazioni non inerbite derivano, difficilmente coincide con la media osservata.
-
-Invece che riorganizzare i dati perché si adattino al modello, potremmo forse tentare di riorganizzare il modello, affinchè si adatti meglio ai dati. 
-
-Dalla precedente funzione si ricava che:
-
-$$Y_i = YWF - \frac{YL \times YWF}{100} = YWF\left( {1 - \frac{YL}{100}} \right)$$
-
-che mostra come la produzione in una qualunque parcella ($Y_i$) può essere ottenuta in funzione della perdita produttiva e di YWF. Considerando l'equazione precedente e il modello delle perdite produttive, possiamo scrivere:
-
-$$Y_i = YWF\left( {1 - \frac{iD}{100\left( {1 + \frac{iD}{A}} \right)}} \right)$$
-
-Questa equazione consente di utilizzare i dati produttivi osservati come variabile dipendente e di stimare i parametri competitivi $i$ ed $A$, insieme alla produzione stimata in asssenza di competizione.
-
-
-```r
-modComp <- nls(Yield ~ YWF * (1 - (i*Dens)/(100 * (1 + i * Dens/A))),
-               list(YWF = 30.4, i = 6.5, A = 75),
-               data=competition)
-summary(modComp)
-## 
-## Formula: Yield ~ YWF * (1 - (i * Dens)/(100 * (1 + i * Dens/A)))
-## 
-## Parameters:
-##     Estimate Std. Error t value Pr(>|t|)    
-## YWF   30.472      0.930  32.765  < 2e-16 ***
-## i      8.240      1.387   5.943 5.22e-07 ***
-## A     75.073      2.422  30.998  < 2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 1.866 on 41 degrees of freedom
-## 
-## Number of iterations to convergence: 3 
-## Achieved convergence tolerance: 9.819e-06
-```
-
-Vediamo che, in questo caso, la produzione nel testimone non infestato non è più fissata al valor medio osservato, ma è stimata utilizzando tutti i dati sperimentali ed è, pertanto, più precisa.
-
-Pur essendo entrambi gli approcci corretti, il secondo è certamente più elegante e attendibile.
-
-### Altre letture
-
-1. Bates, D.M., Watts, D.G., 1988. Nonlinear regression analysis & its applications. John Wiley & Sons, Inc., Books.
-2. Bolker, B.M., 2008. Ecological models and data in R. Princeton University Press, Books.
-3. Carroll, R.J., Ruppert, D., 1988. Transformation and weighting in regression. Chapman and Hall, Books.
-4. Ratkowsky, D.A., 1990. Handbook of nonlinear regression models. Marcel Dekker Inc., Books.
-5. Ritz, C., Streibig, J.C., 2008. Nonlinear regression with R. Springer-Verlag New York Inc., Books.
-
-
-<!--chapter:end:14-NonLineare.Rmd-->
-
-# Esercizi
-
-Questo libro non è finalizzato alla costruzione di una solida formazione teorica in biometria, ma è finalizzato a fornire gli strumenti necessari per organizzare esperimenti validi ed analizzarne i dati in modo attendibile.
-Per questo motivo, vi proponiamo una lista di esercizi e di casi-studio, coi quali mettere in pratica e verificare la chiarezza dei concetti proposti. Gli esercizi sono orgnizzati in sezioni ed ognuna di esse corrisponde ad uno o più capitoli del libro; per alcuni di essi è necessario caricare dei *datasets*, che si trovano su *repository* esterne, che verranno via via indicate.
-
-## Il disegno degli esperimenti (Cap. 1 e 2)
-
-### Domanda 1
-
-Quali sono le caratteristiche fondamentali di un esperimento scientifico, perché possa essere ritenuto valido?
-
-### Domanda 2
-
-Illustrare brevemente il metodo scientifico 'galileiano'.
-
-### Domanda 3
-
-Illustrare brevemente la differenza tra errori casuali e sistematici. In presenza di quale dei due è possibile ottenere risultati scientifici validi?
-
-### Domanda 4
-
-Qual è la differenza tra repliche vere e pseudo-repliche?
-
-### Domanda 5
-
-Cosa è il confounding e come può rendere distorti i risultati di un esperimento scientifico?
-
-### Domanda 6
-
-Quali sono gli elementi comuni a tutti gli esperimenti scientifici?
-
-### Domanda 7
-
-Quali tipi di variabili conoscete e quali sono le loro caratteristiche?
-
-### Domanda 8
-
-Qual è la differenza tra un esperimento fattoriale innestato ed uno incrociato
-
-### Domanda 9
-
-Quali sono le caratteristiche principali degli esperimenti a randomizzazione completa, blocchi randomizzati e quadrato latino?
-
-### Domanda 10
-
-Come è fatto e quando si utilizza uno schema sperimentale a split-plot?
-
-### Domanda 12
-
-Cosa è l'effetto di bordo e come si può controllare?
-
-### Domanda 13
-
-Illustrare e discutere le caratteristiche fondamentali delle 'parcelle' (forma, dimensioni, numero ...)
-
-
-### Esercizio 1
-
-Vi è stata affidata una prova sperimentale per la taratura agronomica di un nuovo diserbante appartenente al gruppo chimico delle solfoniluree (AGRISULFURON), utilizzabile alla dose presumibile di 20 g/ha, per il diserbo di post-emergenza del mais. Gli obiettivi della prova sono:
-
-1.  Valutare se è opportuno un certo aggiustamento della dose (incremento/diminuzione)
-2.  Valutare se è opportuna l'aggiunta di un bagnante non-ionico
-3.  Valutare se è opportuno splittare la dose di 20 g/ha in due distribuzioni
-4.  Valutare l'efficacia del nuovo diserbante con gli opportuni controlli (testimoni)
-
-Coerentemente con questi obiettivi, scrivere un protocollo sperimentale sufficientemente dettagliato (una pagina) ed aggiungere la mappa di campo della prova
-
-### Esercizio 2
-
-Dovete progettare una prova sperimentale per valutare i possibili effetti dell'epoca di semina (autunnale oppure primaverile) su sette varietà di favino (che etichetteremo con le lettere da A a G). Progettare un esperimento di pieno campo, decidendo il numero di repliche ed il lay-out sperimentale. Redigere la mappa di campo ed allocare i trattamenti, in base al lay-out prescelto. Aggiungere alla mappa di campo tutti i dettagli necessari (dimensioni delle parcelle, localizzazione ed orientamento dell'esperimento).
-
-### Esercizio 3
-
-Illustrate il disegno sperimentale che adottereste per organizzare una prova sperimentale che metta a confronto quattro concimi azotati (urea, solfato ammonico, nitrato di calcio e nitrato di sodio) e un testimone non concimato su barbabietola da zucchero. Motivate opportunamente le vostre scelte.
-
-### Esercizio 4
-
-Descrivete lo schema sperimentale che adottereste per organizzare un esperimento di confronto tra quattro dosi di un diserbate per il frumento, utilizzato con e senza un coadiuvante. Motivate opportunamente le vostre scelte.
-
-### Esercizio 5
-
-Descrivete lo schema sperimentale che utilizzereste per organizzare una prova su pomodoro da industria, per la valutazione dell'effetto di tre livelli di concimazione azotata (0, 80 e 160 kg/ha) e tre tipologie di interventi irrigui (asciutto, basso volume irriguo, alto volume irriguo). Motivate opportunamente le vostre scelte.
-
----
-
-## Statistica descrittiva (Cap. 3)
-
-### Domanda 1
-
-Illustrare e discutere i principali indici di tendenza centrale per le variabili quantitative
-
-### Domanda 2
-
-Illustrare e discutere i principali indici di variabilità per le variabili quantitative
-
-### Domanda 3
-
-Illustrare e discutere il coefficiente di correlazione di Pearson
-
-### Domanda 4
-
-Quali statistiche descrittive possono essere utilizzate con le variabili categoriche e ordinali? Illustrare brevemente e discutere
-
-
-### Esercizio 1
-
-Un'analisi chimica è stata eseguita in triplicato e i risultati sono stati i seguenti: 125, 169 and 142 ng/g. Calcolate la media e tutti gli indicatori di variabilità che conoscete. In che modo può essere espressa l'incertezza assoluta della misura?
-
-### Esercizio 2
-
-Un ricercatore ha confrontato il rapporto tra maschi e femmine in una popolazione di insetti sottoposta a due trattamenti sperimentali diversi e si chiede se maschi e femmine manifestino una diversa sensibilità al trattamento in studio. Considerando la tabella sottostante, valutare il grado di dipendenza tra i due caratteri (sesso e sensibilità), in rapporto al valore minimo e massimo possibile per l'indicatore prescelto.
-
-
-|   | Male| Female|
-|:--|----:|------:|
-|A  |  275|    175|
-|B  |  326|    297|
-
-### Esercizio 3
-
-Un ricercatore ha misurato l'altezza di quattro alberi ed il loro diametro (entrambi in metri). I risultati ottenuti sono i seguenti:
-
-
-```r
-Altezza <- c(2.3, 2.7, 3.1, 3.5)
-Diametro <- c(0.46, 0.51, 0.59, 0.64)
-```
-
-Calcolare il coefficiente di correlazione di Pearson e valutare l'entità della correlazione in base ai valori massimi e minimi ammissibili per questa statistica.
-
-### Esercizio 4
-
-Considerate il file EXCEL 'rimsulfuron.csv', che potete trovare in questo percorso: [https://www.casaonofri.it/_datasets/rimsulfuron.csv](https://www.casaonofri.it/_datasets/rimsulfuron.csv). In questo file sono riportati i risultati di un esperimento con 16 trattamenti e 4 repliche, nel quale sono stati posti a confronti diversi erbicidi e/o dosi per il diserbo nel mais. Calcolare le medie produttive ottenute con le diverse tesi sperimentali e riportarle su un grafico, includendo anche un'indicazione di variabilità. Verificare se la produzione è correlata con il ricoprimento (WeedCover) delle piante infestanti.
-
-### Esercizio 5
-
-Caricare il datasets 'students' disponibile al link: 'https://www.casaonofri.it/_datasets/students.csv'. In questo file potete trovare una database relativo alla valutazione degli studenti in alcune materie del primo anno di Agraria. Ogni record rappresenta un esame, con il relativo voto, la materia e la scuola di provenienza dello studente.
-
-1. Determinare la frequenza assoluta e relativa dei diversi voti (da 18 a 30). È possibile calcolare le frequenze cumulate?
-2. Con un uso appropriato delle tabelle di contingenza e del chi quadro, valutare se il voto dipende dalla materia e dalla scuola di provenienza dello studente.
-
----
-
-## Modelli statistici (Cap. 4)
-
-### Esercizio 1
-
-Un ricercatore sta studiando una popolazione di insetti ed ha valutato che la loro lunghezza è distribuita normalmente, con $\mu = 23 \, \textrm{mm}$ e $\sigma = 1.6$. Calcolare la probabilità di estrarre individui con lunghezza:
-
-1.  maggiore di 25
-2.  minore di 21
-3.  compresa tra 21 e 25
-
-### Esercizio 2
-
-Una macchina confezionatrice riempe automaticamente delle confezioni di seme. Il peso dichiarato sulla confezione è 12.5 kg, ma la precisione della macchina è $\pm$ 1 kg. Calcolare la probabilità che una confezione contenga:
-
-1. meno del peso dichiarato
-2. meno di 12 kg
-3. più di 13 Kg
-
-In questa condizione, si vuole regolare la macchina in modo che non più del 5% dei sacchi contenga un peso inferiore a quello dichiarato. Su quale peso dovrebbe essere regolata la macchina di riempimento? (SUGGERIMENTO: se io regolo la macchina a 12.5 kg, la quantità effettivamente erogata è normalmente distribuita, con media 12.5 e deviazione standard 1. In questo caso, c'è un 5% di probabilità di erogare meno di _____ kg; di conseguenza, devo alzare la media di ____ kg per far si che la quantità erogata non sia inferiore a 12.5 kg, se non nel 5% dei casi)
-
-
-
-
-### Esercizio 3
-
-Uno strumento di analisi ha un coefficiente di variabilità pari al 10\%. Ammettendo di utilizzare quello strumento su una matrice la cui concentrazione è 10 ng/g, calcolare la probabilità di ottenere una misura:
-1. inferiore a 9 ng/g
-2. superiore a 11 ng/g
-3. compresa tra 9 e 11 ng/g
-
-
-### Esercizio 4
-
-Un erbicida si degrada nel terreno seguendo una cinetica del primo ordine:
-
-$$Y = 100 \, e^{-0.07 \, t}$$
-
-dove Y è la concentrazione al tempo t. Dopo aver spruzzato questo erbicida, che probabilità abbiamo di osservare, dopo 50 giorni, una concentrazione che risulti erroneamente al disotto della soglia di tossicità per i mammiferi (2 ng/g)? Tenere conto che lo strumento di misura produce un coefficiente di variabilità del 20%
-
-
-
-### Esercizio 5
-
-Una sostanza xenobiotica si degrada nell'acqua a 20°C seguendo una cinetica del primo ordine:
-
-$$Y = C_0 \, e^{-0.06 \, t}$$
-
-dove Y è la concentrazione al tempo t. Simulare i risultati di un esperimento in cui, dopo la somministrazione di questa sostanza alla dose $C_0 = 63$ ng/mL, facciamo dodici prelievi settimanali e misuriamo la concentrazione del residuo. Considerare che (1) l'errore sperimentale è gaussiano e omoscedastico sul logaritmo della concentrazione, con media 0 e deviazione standard pari a 0.25; (2) l'esperimento è a randomizzazione completa con tre repliche.
-
-
-
-
-### Esercizio 6
-
-Una coltura produce in funzione della sua fittezza, secondo la seguente relazione:
-
-$$ Y = 0.8 + 0.8 \, X - 0.07 \, X^2$$
-
-
-
-Stabilire la fittezza necessaria per ottenere il massimo produttivo (graficamente o analiticamente). Valutare la probabilità di ottenere una produzione compresa tra 2.5 e 3 t/ha, seminando alla fittezza ottimale. Considerare che la variabilità stocastica è del 12%.
-
-
-
-### Esercizio 7
-
-La tossicità di un insetticida varia con la dose, secondo la legge log-logistica:
-
-$$ Y = \frac{1}{1 + exp\left\{ -2 \, \left[log(X) - log(15)\right] \right\}}$$
-
-dove Y è la proporzione di animali morti e X è la dose. Se trattiamo 150 insetti con una dose pari a 35 g, qual è la probabilità di trovare più di 120 morti? Considerare che la risposta è variabile da individuo ad individuo nella popolazione e questa variabilità può essere approssimata utilizzando una distribuzione gaussiana con una deviazione standard pari a 0.10.
-
-
-
-### Esercizio 8
-
-Simulare i risultati di un esperimento varietale, con sette varietà di frumento e quattro repliche. Considerare che il modello deterministico è un modello ANOVA, nel quale vengono definite le medie delle sette varietà (valori attesi). Decidere autonomamente sui parametri da impiegare per la simulazione (da $\mu_1$ a $\mu_7$ e $\sigma$)
-
-### Esercizio 9
-
-Considerando il testo dell'esercizio 6, simulare un esperimento in cui la coltura viene seminata a fittezze di 2, 4, 6, 8 piante per metro quadrato, con quattro repliche.
-
-
-### Esercizio 10
-
-Considerando il testo dell'esercizio 7, simulare un esperimento in cui l'insetticida viene utilizzato a cinque dosi crescenti (a vostra scelta), con quattro repliche.
-
-
----
-
-## Stima dei parametri (Cap. 5)
-
-### Esercizio 1
-
-In un campo di frumento sono state campionate trenta aree di saggio di un metro quadrato ciascuna, sulle quali è stata determinata la produzione. La media delle trenta aree è stata di 6.2 t/ha, con una varianza pari a 0.9. Stimare la produzione dell'intero appezzamento.
-
-### Esercizio 2
-
-Siamo interessati a conoscere il contenuto medio di nitrati dei pozzi della media valle del Tevere. Per questo organizziamo un esperimento, durante il quale campioniamo 20 pozzi rappresentativi, riscontrando  le seguenti concentrazioni:
-
-```
-38.3 38.6 38.1 39.9 36.3 41.6 37.0 39.8 39.1     
-35.0 38.1 37.4 38.3 34.8 40.4 39.3 37.0 38.7    
-38.2 38.4    
-```
-
-Stimare la concentrazione media per l'intera valle del Tevere
-
-### Esercizio 3
-
-E'stata impostata una prova sperimentale per confrontare due varietà di mais, con uno schema sperimentale a blocchi randomizzati con tre repliche. La prima varietà ha mostrato produzioni di 14, 12, 15 e 13 t/ha, mentre la seconda varietà ha mostrato produzioni pari a 12, 11, 10.5 e 13 t/ha. Stimare le produzioni medie delle due varietà, nell'ambiente di studio.
-
-### Esercizio 4
-
-Un campione di 400 insetti a cui è stato somministrato un certo insetticida mostra che 136 di essi sono sopravvissuti. Determinare un intervallo di confidenza con grado di fiducia del 95% per la proporzione della popolazione insensibile al trattamento.
-
-### Esercizio 5
-
-È stata studiata la risposta produttiva del sorgo alla concimazione azotata. I dati ottenuti sono:
-
-| Dose | Yield |
-|:----:|:----:|
-| 0   | 1.26 |
-| 30  | 2.50 |
-| 60  | 3.25 |
-| 90  | 4.31 |
-|120  | 5.50 |
-
-Assumendo che la relazione sia lineare (retta), stimare la pendenza e l'intercetta della popolazione di riferimento, dalla quale è stato estratto il campione in studio. Utilizzare la funzione `lm(Yield ~ Dose)` ed estrarre gli errori standard con il metodo `summary()`.
-
-### Esercizio 6
-
-Utilizzando una simulazione Monte Carlo opportunamente pianificata, mostrare che la varianza del campione (uguale alla devianza divisa per il numero di individui meno uno) fornisce una stima più accurata della varianza della popolazione, rispetto allo scarto quadratico medio (devianza divisa per il numero di soggetti) che è invece uno stimatore distorto. Suggerimento: ricordare che uno stimatore accurato ha una distribuzione campionaria (*sampling distribution*) il cui valore atteso coincide con il valore da stimare.
-
----
-
-## Test d'ipotesi (Cap. 6)
-
-### Esercizio 1
-
-La nostra miglior stima puntuale del parametro $\gamma$ di un modello statistico è $g = -7.2$, con un errore standard pari a 2.8, con 16 gradi di libertà. E'possibile che, in realtà, sia $\gamma = 0$? Qual è il P-level per l'ipotesi nulla? Devo accettarla o posso rifiutarla?
-
-
-
-### Esercizio 2
-
-La nostra miglior stima puntuale del parametro $\delta$ di un modello statistico è $d = 13.5$, con un errore standard pari a 8.4, ma non è disponibile, per questo errore standard, una stima accurata dei gradi di libertà. E'possibile che, in realtà, sia $\delta = 0$? Qual è il P-level per l'ipotesi nulla? Devo accettarla o posso rifiutarla?
-
-
-
-### Esercizio 3
-
-Uno sperimentatore ha impostato un esperimento per confrontare due tesi sperimentali (A, B). I risultati sono i seguenti (in q/ha):
-
-|  A   |  B   |
-|:----:|:----:|
-| 9.3  | 12.6 |
-| 10.2 | 12.3 |
-| 9.7  | 12.5 |
-
-Stabilire se i risultati per le due tesi sperimentali possono essere considerati significativamente diversi, per un livello di probabilità di errore di I specie del 5%.
-
-
-
-### Esercizio 4
-
-Uno sperimentatore ha impostato un esperimento per confrontare se l'effetto di un fungicida è significativo, in un disegno sperimentale con tre ripetizioni. Con ognuna delle due opzioni di trattamento i risultati produttivi sono i seguenti (in t/ha):
-
-|  A  | NT  |
-|:---:|:---:|
-| 6.5  | 54  |
-| 7.1  | 48  |
-| 6.8  | 63  |
-
-E'significativo l'effetto del trattamento fungicida sulla produzione, per un livello di probabilità del 5%?. SUGGERIMENTO: prestare attenzione all'omogeneità delle varianze.
-
-
-
-### Esercizio 5
-
-Con un esperimento in laboratorio, abbiamo stimato che il tasso di degradazione di una sostanza xenobiotica in acqua è $k_1 = -0.071 \pm 0.012$ (7 gradi di libertà). Per una sostanza affine il tasso di degradazione è pari a $k_2 = -0.153 \pm 0.024$ (7 gradi di lbertà); possiamo concludere che il tasso di degradazione delle due sostanze, in realtà, non è significativamente diverso?
-
-
-
-
-### Esercizio 6
-
-In un ospedale, è stata misurata la concentrazione di colesterolo nel sangue di otto pazienti, prima e dopo un trattamento medico. Per ogni paziente, sono stati analizzati due campioni, ottenendo le seguenti concentrazioni:
-
-| Paziente | Prima | Dopo  |
-|---------:|------:|:-----:|
-|        1 | 167.3 | 166.7 |
-|        2 | 186.7 | 184.2 |
-|        3 | 107.0 | 104.9 |
-|        4 | 214.5 | 205.3 |
-|        5 | 149.5 | 148.5 |
-|        6 | 171.5 | 157.3 |
-|        7 | 161.5 | 149.4 |
-|        8 | 243.6 | 241.5 |
-
-Si può concludere che il trattamento medico è stato efficace?
-
-
-
-
-### Esercizio 7
-
-Un veterinario ha organizzato un esperimento per valutare l'effetto di una dieta innovativa, sulla pressione arteriosa sistolica di cavalli da corsa. Le informazioni preliminari mostrano con chiarezza che questa dieta innovativa non può avere effetti negativi, ma, eventualmente, solo positivi. Il ricercatore ha selezionato a caso 16 animali, ne ha misurato la pressione arteriosa a riposo ed ha ripetuto la stessa misurazione dopo sei mesi di questa dieta. I risultati ottenuti sono i seguenti:
-
-
-```r
-prima <- c(113.5, 116.5, 118.1, 111.3, 116.8, 117.0, 114.8, 114.9, 
-           114.8, 114.2, 115.0, 114.0, 114.4, 116.1, 117.9, 115.7)
-dopo <- c(110.9, 110.1, 110.3, 116.8, 112.2, 111.0, 111.1, 112.9, 
-          110.6, 109.1, 113.1, 109.9, 111.9, 110.1, 114.2, 111.0)
-```
-
-
-Stabilire se la dieta è efficace, con una probabilità di errore P < 0.05. SUGGERIMENTO: ricordare che la l'effetto atteso della dieta, per le informazioni preliminari disponibili, può, eventualmente, essere solo quello di abbassare la pressione, mai quello di alzarla.
-
-
-
-
-### Esercizio 8
-
-Uno sperimentatore ha impostato un esperimento per verificare l'effetto di un fungicida (A) in confronto al testimone non trattato (B), in base al numero di colonie fungine sopravvissute. Il numero delle colonie trattate è di 200, mentre il numero di quelle non trattate è di 100. Le risposte (frequenze) sono come segue:
-
-|     | Morte | Sopravvissute |
-|-----|:-----:|:-------------:|
-| A   |  180  |      20       |
-| B   |  50   |      50       |
-
-Stabilire se i risultati possono essere considerati significativamente diversi, per un livello di probabilità del 5%.
-
-### Esercizio 9
-
-Immaginate di aver riscontrato che, in determinate condizioni ambientali, 60 olive su 75 sono attaccate da *Daucus olee* (mosca dell'olivo). Nelle stesse condizioni ambientali, diffondendo in campo un insetto predatore siamo riusciti a ridurre il numero di olive attaccate a 12 su 75. Si tratta di una oscillazione casuale del livello di attacco o possiamo concludere che l'insetto predatore è stato un mezzo efficace di lotta biologica alla mosca dell'olivo?
-
-
-### Esercizio 10
-
-I Q.I. di 16 studenti provenienti da un quartiere di una certa città sono risultati pari a:
-
-
-```r
-QI1 <- c(90.31, 112.63, 101.93, 121.47, 111.37, 100.37, 106.80,
-         101.57, 113.25, 120.76,  88.58, 107.53, 102.62, 104.26,
-         95.06, 104.88)
-```
-
-Gli studenti provenienti da un altro quartiere della stessa città hanno invece mostrato i seguenti Q.I.:
-
-
-```r
-QI2 <- c(90.66, 101.41, 104.61,  91.77, 107.06,  89.51,  87.91,
-         92.31, 112.96,  90.33,  99.86,  88.99,  98.97,  97.92)
-```
-
-Esiste una differenza significativa tra i Q.I. nei due quartieri della città?
-
-### Esercizio 11
-
-Viene estratto un campione di rondelle da una macchina in perfette condizioni di funzionamento. Lo spessore delle rondelle misurate è:
-
-
-```r
-S1 <- c(0.0451, 0.0511, 0.0478, 0.0477, 0.0458, 0.0509, 0.0446,
-        0.0516, 0.0458, 0.0490)
-```
-
-Dopo alcuni giorni, per determinare se la macchina sia ancora a punto, viene estratto un campione di 10 rondelle, il cui spessore medio risulta:
-
-
-```r
-S2 <- c(0.0502, 0.0528, 0.0492, 0.0556, 0.0501, 0.0500, 0.0498,
-        0.0526, 0.0517, 0.0550)
-```
-
-
-Verificare se la macchina sia ancora ben tarata, oppure necessiti di revisione.
-
-### Esercizio 12
-
-Le varianze di due campioni composti da 30 unità sono risultate pari, rispettivamente a 115.3 e 356.4; stabilire se il secondo campione ha una varianza significativamente più alta del primo. SUGGERIMENTO: considerare che il rapporto tra due varianze di campioni estratti dalla stessa popolazione gaussiana segue la distribuzione F di Fisher. Considerare anche che, in R, la funzione `pf(x, n1, n2, lower.tail = F)` restituisce la probabilità di ottenere valori pari o superiori ad $x$, da una distribuzione $F$ di Fisher con $n1$ ed $n2$ gradi di libertà. Considerare anche che il rapporto di due varianze può solo essere positivo.
-
-
-
-
-
-### Esercizio 13
-
-Sono stati osservati 153 calciatori registrando la dominanza della mano e quella del piede, ottenendo la tabella riportata qui di seguito.
-
-
-|         | piede.sx    | piede.dx    |
-|:-------:|:----:|:----:|
-| mano sx | 26  | 11 |
-| mano dx | 21  | 95 |
-
-
-Esiste dipendenza tra la dominanza della mano e del piede?
-
-### Esercizio 14
-
-Un agronomo ha organizzato un esperimento varietale, per confrontare tre varietà di frumento, cioè GUERCINO, ARNOVA e BOLOGNA. Per far questo ha individuato, in un campo uniforme dell'areale umbro, trenta parcelle da 18 m^2^ e ne ha selezionate dieci a caso, da coltivare con GUERCINO, altre dieci a caso sono state coltivate con ARNOVA e le ultime dieci sono state coltivate con BOLOGNA.
-
-Al termine dell'esperimento, le produttività osservate erano le seguenti:
-
-
-| guercino | arnova | bologna |
-|:--------:|:------:|:-------:|
-|   53.2   |  53.1  |  43.5   |
-|   59.1   |  51.0  |  41.0   |
-|   62.3   |  51.9  |  41.2   |
-|   48.6   |  55.3  |  44.8   |
-|   59.7   |  58.8  |  40.2   |
-|   60.0   |  54.6  |  37.2   |
-|   55.7   |  53.0  |  45.3   |
-|   55.8   |  51.4  |  38.9   |
-|   55.7   |  51.7  |  42.9   |
-|   54.4   |  64.7  |  39.3   |
-
-1. Descrivere i tre campioni, utilizzando opportunamente un indicatore di tendenza centrale ed un indicatore di variabilità
-2. Inferire le medie delle tre popolazioni (cioè quelle che hanno generato i tre campioni), utilizzando opportunamente un intervallo di incertezza
-3. Per ognuna delle tre coppie (guercino vs arnova, guercino vs bologna, arnova vs bologna), valutare la differenza tra le medie e il suo errore standard. Valutare la significatività della differenza tra le medie delle tre popolazioni, esplicitando l'ipotesi nulla e calcolando il livello di probabilità di errore nel rifiuto dell'ipotesi nulla.
-
-
-
-### Esercizio 15
-
-Un botanico ha valutato il numero di semi germinati per colza sottoposto a due diversi regimi termici dopo l'imbibizione (15 e 25°C). Per la temperatura più bassa, su 400 semi posti in prova, ne sono germinati 358. Alla temperatura più alta, su 380 semi in prova, ne sono germinati 286.
-
-1. Descrivere i due campioni, in termini di proporzione di semi germinati
-2. Inferire la proporzione di germinati nell'intera popolazione di semi da cui è stato estratto il nostro campione casuale di 780 semi. Utilizzare opportunamente un intervallo di incertezza, sapendo che la varianza di una proporzione è una quantità fissa, che si calcola come $p ( 1- p)$ (dove 'p' è la proporzione osservata.
-3. Esiste una differenza significativa tra le proporzioni delle due popolazioni? Esplicitare l'ipotesi nulla e calcolare la probabilità di errore relativa al suo rifiuto.
-
-
-
-
----
-
-## Fitting di modelli nella sperimentazione agraria
-
-Nelle sezioni seguenti riporteremo diversi datasets ottenuti da esperimenti nelle scienze agraria e che si prestano per il fitting di modelli statistici descrittivi di vario tipo. La stima dei parametri di questi modelli e il test d'ipotesi permettono di rispondere a semplici domande sui processi biologici coinvolti. Indipendentemente dal dataset, il processo di lavoro dovrà essere il seguente.
-
-1. Caricare i dati ed eseguire le eventuali trasformazioni che si rendano necessarie (ad es. le trasformazioni delle variabili numeriche in 'factors' oppure le trasformazioni stabilizzanti).
-2. Descrivere i dati, calcolando almeno un indicatore di tendenza centrale (media) e un indicatore di variabilità (deviazione standard) come indicato nel Capitolo 3.
-3. Specificare il modello descrittivo più opportuno a stimarne i parametri con R.
-4. Controllare il fitting per il rispetto delle assunzioni di base. Se necessario, trasformare i dati e ripetere il fitting
-5. Testare la significanza di tutti gli effetti inclusi nel modello, attraverso l'ANOVA.
-6. Se necessario, confrontare le medie con un test di confronto multiplo
-7. Presentare i risultati e commentarli.
-
-I dataset degli esempi che seguono sono riportati in un file Excel, che potete scaricare dal seguente link:  [https://www.casaonofri.it/_datasets/BookExercises.xlsx](https://www.casaonofri.it/_datasets/BookExercises.xlsx). Ogni dataset è su un diverso foglio di lavoro all'interno dello stesso file; il nome del foglio di lavoro è riportato in fondo ad ogni esercizio. Utilizzare la funzione 'readxl()' function, per la lettura del dataset.
-
-Per facilitarvi la vita, alleghiamo una tabella che riassume i modelli descritti in questo libro ed utilizzabili per gli esercizi che seguono.
-
-
-Table: (\#tab:unnamed-chunk-221)Sommario dei principali modelli per descrivere i principali esperimenti nelle scienze agrarie
-
-|Modello                      |Disegno.sperimentale                  |Funzione.R  |Specifiche                                    |
-|:----------------------------|:-------------------------------------|:-----------|:---------------------------------------------|
-|ANOVA ad una via             |CRD                                   |lm()        |Y ~ F1                                        |
-|ANOVA ad una via             |CRBD                                  |lm()        |Y ~ F1 + BL                                   |
-|ANOVA a due vie              |CRD                                   |lm()        |Y ~ F1 * F2                                   |
-|ANOVA a due vie              |CRBD                                  |lm()        |Y ~ F1 * F2 + BL                              |
-|ANOVA a due vie              |Split-plot CRD                        |lmer()      |Y ~ F1 * F2 + (1&#124;MAIN)                   |
-|ANOVA a due vie              |Split-plot CRBD                       |lmer()      |Y ~ F1 * F2 + BL + (1&#124;MAIN)              |
-|ANOVA a due vie              |Strip-plot CRD                        |lmer()      |Y ~ F1 * F2 + (1&#124;ROW) + (1&#124;COL)     |
-|ANOVA a due vie              |Strip-plot CRBD                       |lmer()      |Y ~ F1 * F2 + BL + (1&#124;ROW + (1&#124;COL) |
-|ANOVA ad una via             |ANOVA ad una via (CRD), due ambienti  |lm()/lmer() |Y ~ F1 * ENV                                  |
-|ANOVA ad una via             |ANOVA ad una via (CRBD), due ambienti |lm()/lmer() |Y ~ F1 * ENV + BL&#124;ENV                    |
-|Regressione Lineare semplice |CRD                                   |lm()        |Y ~ X1                                        |
-|Simple Linear Regression     |CRBD                                  |lm()        |Y ~ BL + X1                                   |
-
-Nella tabella precedente, Y è la risposta, sempre rappresentata da una variabile continua, F1 ed F2  sono due fattori sperimentali (variabili nominali), X1 è una covariata (variabile continua), BL è la variabile che identifica i blocchi (variabile nominale), ENVè la variabile che identifica gli ambienti (variabile nominale) e MAIN, ROW, COL sono le variabili che identificano le main-plots nello split-plot e le righe/colonne nello strip-plot (variabili nominali).
-
-
-## Modelli ANOVA ad una via (Cap. da 7 a 9)
-
-
-### Esercizio 1 
-
-Un esperimento a randomizzazione completa relativo ad una prova varietale di frumento ha l'obiettivo di porre a confronto la produzione di 5 varietà. Le produzioni (in bushels per acre) osservate siano le seguenti:
-
-| Variety |  1   |  2   |  3   |
-|:-------:|:----:|:----:|:----:|
-|    A    | 32.4 | 34.3 | 37.3 |
-|    B    | 20.2 | 27.5 | 25.9 |
-|    C    | 29.2 | 27.8 | 30.2 |
-|    D    | 12.8 | 12.3 | 14.8 |
-|    E    | 21.7 | 24.5 | 23.4 |
-
-Eseguire l'ANOVA, presentare i risultati e commentarli (esempio tratto da Le Clerg *et al*., 1962)
-[Sheet: 7.1]
-
-### Esercizio 2
-
-Colture di tessuto di pomodoro sono state allevate su capsule Petri trattate con una diversa concentrazione di zuccheri, utilizzando cinque repliche. La crescita colturale è riportata in tabella
-
-| Control | Glucose | Fructose | Sucrose |
-|:-------:|:-------:|:--------:|:-------:|
-|   45    |   25    |    28    |   31    |
-|   39    |   28    |    31    |   37    |
-|   40    |   30    |    24    |   35    |
-|   45    |   29    |    28    |   33    |
-|   42    |   33    |    27    |   34    |
-
-Calcolare le medie ed eseguire l'ANOVA. Eseguire i test di confronto multiplo. Commentare i risultati.
-[Sheet: 7.2]
-
-### Esercizio 3
-
-E'stato impostato un test di durata su un impianto di riscaldamento, per verificare come la temperatura di esercizio influenza la durata del riscaldatore. Sono state testate 4 temperature, con sei repliche e, per ciascun riscaldatore, è stato rilevato il numero di ore prima della rottura. I risultati sono i seguenti:
-
-| Temp. | Hours to failure |
-|------:|-----------------:|
-|  1520 |             1953 |
-|  1520 |             2135 |
-|  1520 |             2471 |
-|  1520 |             4727 |
-|  1520 |             6134 |
-|  1520 |             6314 |
-|  1620 |             1190 |
-|  1620 |             1286 |
-|  1620 |             1550 |
-|  1620 |             2125 |
-|  1620 |             2557 |
-|  1620 |             2845 |
-|  1660 |              651 |
-|  1660 |              837 |
-|  1660 |              848 |
-|  1660 |             1038 |
-|  1660 |             1361 |
-|  1660 |             1543 |
-|  1708 |              511 |
-|  1708 |              651 |
-|  1708 |              651 |
-|  1708 |              652 |
-|  1708 |              688 |
-|  1708 |              729 |
-
-Valutare se la temperatura di esercizio infleunza significativamente la durata del riscaldatore. Quale/i temperatura/e consentono la maggior durata?
-[Sheet: 7.3] *SUGGERIMENTO: in questo esercizio è necessaria una trasformazione stabilizzante che non è automaticamente riconosciuta da 'emmeans()'. Pertanto, per la retrotrasformazione, sarà necessario utilizzare la procedura descritta alla fine del paragrafo 9.8.*
-
-### Esercizio 4
-
-Un entomologo ha contato il numero di uova deposte da un lepidottero sulle foglie di tre varietà di tabacco, valutando 15 femmine per varietà. I risultati sono i seguenti:
-
-| Female | Field | Resistant | USDA |
-|-------:|------:|----------:|-----:|
-|      1 |   211 |         0 |  448 |
-|      2 |   276 |         9 |  906 |
-|      3 |   415 |       143 |   28 |
-|      4 |   787 |         1 |  277 |
-|      5 |    18 |        26 |  634 |
-|      6 |   118 |       127 |   48 |
-|      7 |     1 |       161 |  369 |
-|      8 |   151 |       294 |  137 |
-|      9 |     0 |         0 |   29 |
-|     10 |   253 |       348 |  522 |
-|     11 |    61 |         0 |  319 |
-|     12 |     0 |        14 |  242 |
-|     13 |   275 |        21 |  261 |
-|     14 |     0 |         0 |  566 |
-|     15 |   153 |       218 |  734 |
-
-Eseguite l'ANOVA. Quali sono le assunzioni necessarie per l'ANOVA? Sono rispettate? Vi sono outliers? Calcolate SEM e SED in modo attendibile. *SUGGERIMENTO: in questo esercizio è necessaria una trasformazione stabilizzante che non è automaticamente riconosciuta da 'emmeans()'. Pertanto, per la retrotrasformazione, sarà necessario utilizzare la procedura descritta alla fine del paragrafo 9.8.*
-[Sheet: 7.4]
-
----
-
-## ANOVA a due vie (Cap. 10)
-
-### Esercizio 1
-
-E' stato impostanto un esperimento a blocchi randomizzati per confrontare sei tipi di irrigazione, in un aranceto della Spagna. I risultati sono i seguenti (in pounds per parcella):
-
-|            Metodo |   1 |   2 |   3 |   4 |   5 |
-|------------------:|----:|----:|----:|----:|----:|
-|            Goccia | 438 | 413 | 375 | 127 | 320 |
-|            Conche | 413 | 398 | 348 | 112 | 297 |
-|        Aspersione | 346 | 334 | 281 |  43 | 231 |
-| Aspersione+goccia | 335 | 321 | 267 |  33 | 219 |
-|       Sommersione | 403 | 380 | 336 | 101 | 293 |
-
-Eseguire l'ANOVA. Quali sono le assunzioni necessarie per l'ANOVA? Sono rispettate? Calcolate SEM e SED ed eseguite il confronto multiplo. Qual è il metodo di irrigazione migliore?
-[Sheet: 10.1]
-
-### Esercizio 2
-
-E' stato impostato un esperimento di fertilizzazione secondo uno schema a blocchi randomizzati. I dati ottenuti sono i contenuti percentuali (moltiplicati per 100) in fosforo, in un campione di tessuti vegetali prelevato per parcella:
-
-|           Trattamento |    1 |    2 |   3 |    4 |    5 |
-|----------------------:|-----:|-----:|----:|-----:|-----:|
-|      Non fertilizzato |  5.6 |  6.1 | 5.3 |  5.9 |  7.4 |
-|               50 lb N |  7.3 |   NA | 7.7 |  7.7 |  7.0 |
-|              100 lb N |  6.9 |    6 | 5.6 |  7.4 |  8.2 |
-|  50 lb N + 75 lb P2O5 | 10.8 | 11.2 | 8.8 | 12.9 | 10.4 |
-| 100 lb N + 75 lb P205 |  9.6 |  9.3 |  12 | 10.6 | 11.6 |
-
-Eseguire l'ANOVA, considerando il dato mancante. Calcolare SEM e SED. Qual è il trattamento migliore? Aumentare il dosaggio di N senza P~2~ O~5~ è conveniente? E in presenza di P~2~ O~5~?
-[Sheet: 10.2] *SUGGERIMENTO: in questo dataset vi è un dato mancante, contrassegnato con NA (Not Available). Al contrario della funzione 'read.csv()', la funzione 'read_xlsx()' non è in grado di riconoscere autometicamente questo dato mancante e, pertanto, sarà necessario utilizzare largomento `na = "NA"`, all'interno del comando di lettura file.*
-
-### Esercizio 3
-
-È stato condotto un esperimento a quadrato latino per valutare l'effetto di quattro diversi metodi di fertilizzazione. Sono stati osservati i seguenti risultati:
-
-| Fertiliser | Row | Column | Yield |
-|-----------:|:---:|:------:|:-----:|
-|          A |  1  |   1    |  104  |
-|          B |  1  |   2    |  114  |
-|          C |  1  |   3    |  90   |
-|          D |  1  |   4    |  140  |
-|          A |  2  |   4    |  134  |
-|          B |  2  |   3    |  130  |
-|          C |  2  |   1    |  144  |
-|          D |  2  |   2    |  174  |
-|          A |  3  |   3    |  146  |
-|          B |  3  |   4    |  142  |
-|          C |  3  |   2    |  152  |
-|          D |  3  |   1    |  156  |
-|          A |  4  |   2    |  147  |
-|          B |  4  |   1    |  160  |
-|          C |  4  |   4    |  160  |
-|          D |  4  |   3    |  163  |
-
-Analizzate i dati e commentate i risultati ottenuti
-[Sheet: 10.3] *SUGGERIMENTO: l'esperimento è a quadrato latino e, di conseguenza, vi sono tre fonti di variazione additive: il fertilizzante, la riga e la colonna (riguardare il display dei disegni a quadrato latino al capitolo 2, se necessario).*
-
----
-
-## Regressione (Cap. 11)
-
-Quando la variabile indipendente è continua, potremmo essere interessati a valutare l'esistenza di una possibile relazione funzionale tra la X e la Y (curva dose-risposta). La relazione più semplice è la 'retta' $Y = b_0 + b_1 \, X$; il fitting di questo modello implica la stima di $b_0$ (intercetta) e $b_1$ (pendenza), in modo che la retta stimata sia quella che passa 'più vicina' possibile ai dati osservati. Quando facciamo il fitting di un modello come questo, lo schema di lavoro presentato all'inizio di questo capitolo cambia, nel senso che, oltre agli usuali controlli sull'omogeneità delle varianze e sulla normalità dei residui, dobbiamo anche controllare la bontà di adattamento. Ciò può essere fatto attraverso un grafico nel quale vengano contemporaneamente mostrati i valori osservati e quelli predetti dal modello, con il codice seguente:
-
-
-```
-model <- lm(Y ~ X1, data = dataset) # fitting del modello
-summary(model) # stima dei parametri
-b0 <- 10 # valore dell'intercetta, ottenuto più sopra
-b1 <- 0.5 # valore della pendenza ottenuto più sopra
-plot(Y ~ X1, data = dataset) # grafico dei dati osservati
-curve(B0 + B1 * x, add = T) # retta stimata; 'x' deve essere scritto così come è, in lettera piccola
-```
-
-Ovviamente, nel caso della regressione lineare non dobbiamo eseguire il test di confronto multiplo: se la risposta giace su una retta ogni valore del predittore X produce una risposta diversa dall'altro. 
-
-I modelli di regressione possono essere adattati anche a dati da prove non replicate. Se però abbiamo le repliche, allora ci sono due possibili modelli: un modello ANOVA, nel quale la variabile X viene trasformata in una variabile nominale ed un modello di regressione, nel quale la variabile X resta numerica. Il primo modello è certamente più vicino ai dati (più basso residuo) perché non pone alcun vincolo sulla forma della risposta, mentre il secondo modello è più semplice (meno parametri da stimare), ma meno preciso, perché impone che le risposte siano allineate a carattterizzate da una crescita/decrescita monotona. Possiamo confrontare i due modelli per valutare se il fitting è altrettanto buono con il codice che segue.
-
-```
-anova(model1, model2)
-```
-
-Se il P-level è maggiore di 0.05 posso accettare la nulla, concludere che i due modelli sono ugualmente buoni e, di conseguenza, scegliere quello più semplice, seguendo il principio del rasio di Occam. Ciò equivale a dire che il modello di regressione non ha alcuna mancanza di adattamento ai dati osservati.
-
-Quando gli esperimenti sono replicati abbiamo però una difficoltà aggiuntiva, nel senso che il codice sottostante:
-
-```
-model <- lm(Y ~ BL + X1, data = dataset) # fits the model
-summary(model)
-```
-
-produce una sola pendenza e tante intercette quanti sono i blocchi. Per trovare l'intercetta media posso utilizzare la usuale funzione 'emmeans()', come indicato più sotto (X1 è da sostituire col nome della variabile indipendente).
-
-
-
-
-```
-emmeans(model, ~1, at = list(X1 = 0))
-```
-
-
-### Esercizio 1
-
-È stato condotto uno studio per verificare l'effetto della concimazione azotata (in kg/ha) sulla produzione (in quintali per ettaro) della lattuga, utilizzando uno schema a blocchi randomizzati. I risultati sono i seguenti:
-
-| N level | B1  | B2  | B3  | B4  |
-|:-------:|:---:|:---:|:---:|:---:|
-|    0    | 124 | 114 | 109 | 124 |
-|   50    | 134 | 120 | 114 | 134 |
-|   100   | 146 | 132 | 122 | 146 |
-|   150   | 157 | 150 | 140 | 163 |
-|   200   | 163 | 156 | 156 | 171 |
-
-Analizzare i dati, adattare un modello di regressione, verificarne la bontà di adattamento e commentare i risultati
-[Sheet: 11.1]
-
-### Esercizio 2
-
-Per valutare la soglia economica d'intervento, è necessario definire la relazione tra la densità di una pianta infestante (*Sinapis arvensis*) e la produzione della coltura. Ipotizziamo che, nel range di densità osservato, il modello di competizione sia una retta. Per parametrizzare questo modello e verificarne la validità, è stato organizzato un esperimento a blocchi randomizzati, dove sono stati inclusi sette diversi livelli di infestazione di *Sinapis arvensis* , (in piante per metro quadrato) ed è stata rilevata la produzione di acheni del girasole (in quintali per ettaro). I risultati sono:
-
-| density | Block | Yield  |
-|:-------:|------:|:-------|
-|    0    |     1 | 36.63  |
-|   14    |     1 | 29.73  |
-|   19    |     1 | 32.12  |
-|   28    |     1 | 30.61  |
-|   32    |     1 | 27.7   |
-|   38    |     1 | 27.43  |
-|   54    |     1 | 24.79  |
-|    0    |     2 | 36.11  |
-|   14    |     2 | 34.72  |
-|   19    |     2 | 30.12  |
-|   28    |     2 | 30.8   |
-|   32    |     2 | 26.53  |
-|   38    |     2 | 27.6   |
-|   54    |     2 | 23.31  |
-|    0    |     3 | 38.35  |
-|   14    |     3 | 32.16  |
-|   19    |     3 | 31.72  |
-|   28    |     3 | 28.69  |
-|   32    |     3 | 25.88  |
-|   38    |     3 | 28.43  |
-|   54    |     3 | 30.26  |
-|    0    |     4 | 36.74  |
-|   14    |     4 | 32.566 |
-|   19    |     4 | 29.57  |
-|   28    |     4 | 33.663 |
-|   32    |     4 | 28.751 |
-|   38    |     4 | 27.114 |
-|   54    |     4 | 24.664 |
-
-Eseguire l'ANOVA e verificare il rispetto delle assunzioni di base. E'corretto eseguire un test di confronto multiplo e perchè? Eseguire l'analisi di regressione lineare, verificando la bontà di adattamento del modello. Definire il modello parametrizzato. Stabilire la soglia d'intervento, ipotizzando il costo del prodotto e dell'intervento diserbante.
-[Sheet: 11.2]
-
----
-
-## ANOVA a due vie con interazione (Cap. 12 e 13)
-
-Alcuni dei dataset che seguono sono stati ottenuti da esperimenti a split-plot. Se non avete letto il Capitolo 13, potete anlizzare questi dataset facendo attenzione a quanto segue.
-
-Per i disegni a split-plot e a strip-plot, invece delione 'lm()', dobbiamo utilizzare la funzione 'lmer()' che necessita dell'istallazione dei packages 'lme4' e 'lmerTest'. Prima del fitting, dobbiamo identificare in modo univoco le main-plots (per i disegni a split-plot) e le righe/colonne (per i disegni a strip-plot). Le main-plots possono essere identificate incrociando la variabile del fattore principale con i blocchi, come indicato più sotto per la variabile 'Tillage' nel dataframe 'dataset':
-
-```
-dataset$mainPlot <- with(dataset, factor(Block:Tillage))
-```
-
-Analogamente per un disgno a strip-plot, possiamo operare come segue:
-
-```
-dataset$Rows <- factor(dataset$Crop:dataset$Block)
-dataset$Columns <- factor(dataset$Herbicide:dataset$Block)
-```
-
-Il codice per il fitting è riportato nella tabella sovrastante. L'uso del metodo plot() applicato al risultato del fitting restituisce solo il grafico dei residui verso i valori attesi e quindi il controllo dell'assunzione di normalità può essere evitato, per semplicità. L'esigenza di eventuali trasformazioni stabilizzanti potrà essere valutata facendo un fitting preliminare di un modello lineare nel quale vengano trascurati i fattori di blocco (main-plot, righe e colonne).
-
-### Esercizio 1
-
-La biologia di *Sorghum halepense* da rizoma mostra che il peso dei rizomi raggiunge un minimo intorno alla quarta foglia. Di conseguenza, eseguire un trattamento in quest'epoca dovrebbe minimizzare le possibilità di ripresa degli individui trattati, portando anche ad un certo risanamento del terreno. Tuttavia, ci si attende che gli effetti siano maggiori quando le piante provengono da rizomi più piccoli, con un minor contenuto di sostanze di riserva. Per affrontare questi argomenti è stata organizzata una prova in vaso, secondo un disegno a randomizzazione completa con quattro repliche. I risultati sono i seguenti:
+1. Belocchi A, Fornara M, Ciriciofolo E, Biancolatte V, Gosparini E, Piccioni C, Desiderio E (2003) Grano duro: Risultati 2002–03 della Rete Nazionale. Lazio e Umbria. L’Informatore Agrario 19(Suppl.1):41–44
+2. Bhandary M, Dai H (2013) An alternative test for the equality of variances for several populations in randomised complete block design. Stat Methodol 11:22–35. https://doi.org/10.1016/j. stamet.2012.08.002. https://linkinghub.elsevier.com/retrieve/pii/S1572312712000482
+3. Hartley HO (1950) The Maximum F-ratio as a short-cut test for heterogeneity of vari- ance. Biometrika 37(3/4):308. https://doi.org/10.2307/2332383. https://www.jstor.org/stable/ 2332383?origin=crossref
+4. Jensen SM, Schaarschmidt F, Onofri A, Ritz C (2018) Experimental design matters for statistical analysis: how to handle blocking: experimental design matters for statistical analysis. Pest Manag Sci 74(3):523–534. https://doi.org/10.1002/ps.4773. http://doi.wiley.com/10.1002/ps. 4773
+5. Kuehl RO (2000) Design of Experiments: Statistical Principles of Research Design and Analysis. Duxbury Press, Pacific Grove
+6. Le Clerg EL, Leonard WH, Clark AG (1962) Field Plot Technique. Burgess Publishing Company, Minneapolis
+7. Onofri A, Tei F (1994) Influence of application timing on the effectiveness of rimsulfuron against rhizome Sorghum halepense (L.) Pers. In: Tei F, Onofri A (eds) Weed Control in Sustainable Agriculture in the Mediterranean Area. Proceedings 5th EWRS Mediterranean Symposium, Università degli Studi di Perugia, Reprints, pp 105–111
+8. Pace R, Benincasa P, Ghanem ME, Quinet M, Lutts S (2012) Germination of untreated and primed seeds in rapeseed (brassica napus var oleifera del.) under salinity and low matric potential. Exp Agricul 48(02):238–251. https://doi.org/10.1017/S0014479711001189. http:// www.journals.cambridge.org/abstract_S0014479711001189
+9. Stagnari F, Onofri A, Codianni P, Pisante M (2013) Durum wheat varieties in N-deficient environments and organic farming: a comparison of yield, quality and stability performances. Plant Breed 132:266–275
+10. Wheeler B (2024) SuppDists: Supplementary Distributions. https://CRAN.R-project.org/package= SuppDists, r package version 1.1-9.8
+11. White JW, Boote KJ, Kimball BA, Porter C, Salmeron M, Shelia V, Thorp KR, Hoogenboom G (2025) From field to analysis: strengthening reproducibility and confirmation in research for sustainable agriculture. npj Sustain Agricul 3(1):27. https://doi.org/10.1038/s44264-025- 00067-z. https://www.nature.com/articles/s44264-025-00067-z
+12. Wickham H (2011) The split-apply-combine strategy for data analysis. J Stat Softw 40(1):1–29. https://doi.org/10.18637/jss.v040.i01. http://www.jstatsoft.org/v40/i01/
+
+## Esercizi
+
+Per tutti gli esercizi che seguono, utilizzate il piano di lavoro proposto all'inizio di questo capitolo e cercate di giungere a conclusioni attendibili. Tutti i dataset sono disponibili nel package `statforbiology` e sono accessibili tramite la funzione `getAgroData()`. Il nome del dataset è specificato per ogni esercizio.
+
+1. È stato condotto un esperimento con un disegno completamente randomizzato per confrontare la resa di 5 genotipi di grano. I risultati (in bushel per acro) sono riportati nella tabella seguente: determinare il genotipo migliore e trarre conclusioni attendibili. L'esempio è tratto da Le Clerg (1962) e il dataset è disponibile come "LeClerg".
+
+    
+    Variety       1      2      3
+    --------  -----  -----  -----
+    A          32.4   34.3   37.3
+    B          20.2   27.5   25.9
+    C          29.2   27.8   30.2
+    D          12.8   12.3   14.8
+    E          21.7   24.5   23.4
+
+2. Colture cellulari di pomodoro sono state allevate su tre tipi di substrato, ottenuti aggiungendo al testimone una certa quantità di glucosio, fruttosio o saccarosio. L'esperimento è stato condotto con un disegno completamente randomizzato con 5 repliche, osservando la crescita delle cellule su ogni unità sperimentale. Determinare quale substrato ha prodotto la crescita cellulare più elevata e commentare i risultati. Il dataset è mostrato nella tabella sottostante ed è disponibile come "sugarsMedia".
+
+    
+     Control   Glucose   Fructose   Sucrose
+    --------  --------  ---------  --------
+       5.285     4.020      3.705     4.776
+       5.737     3.648      3.714     3.771
+       5.320     3.861      3.110     4.742
+       6.050     4.098      3.522     4.246
+       5.705     3.919      3.957     4.212
+
+3. È stata valutata la durata di un impianto di riscaldamento (in ore prima del guasto), a seconda della temperatura di esercizio. L'esperimento è stato organizzato includendo quattro diverse temperature ed è stato disegnato con randomizzazione completa e 6 repliche. Considerare la temperatura come un fattore e determinare la temperatura di esercizio ottimale per massimizzare la durata dell'impianto. I risultati sono mostrati di seguito e sono disponibili come 'failureTimes'. *SUGGERIMENTO: in questo esercizio è necessaria una trasformazione stabilizzante, che non viene riconosciuta automaticamente dalla funzione `emmeans()`. Pertanto, la retro-trasformazione richiederà il processo descritto alla fine della Sezione 9.6.*
+
+    
+     Temp      1      2      3      4      5      6
+    -----  -----  -----  -----  -----  -----  -----
+     1520   1953   2135   2471   4727   6134   6314
+     1620   1190   1286   1550   2125   2557   2845
+     1660    651    837    848   1038   1361   1543
+     1708    511    651    651    652    688    729
+
+4. Un entomologo ha contato il numero di uova deposte da un lepidottero su tre substrati diversi, in un esperimento a randomizzazione completa 15 repliche. Identificare il substrato con la più bassa ovideposizione. I risultati sono riportati di seguito e sono disponibili come 'lepidopteraEggs'. 
+
+    
+     Rep     A     B    C
+    ----  ----  ----  ---
+       1   456   118   72
+       2   411   213   99
+       3   594    74   24
+       4   280    26   20
+       5   664   163   89
+       6   379    76   47
+       7   444   240   32
+       8   436    75   29
+       9   294   108    1
+      10   431    68   33
+      11   476   108   20
+      12   382   153   22
+      13   413    98   27
+      14   485   120   39
+      15   440   126   12
+
+5. È stato condotto un esperimento in un aranceto nel Sud Italia, comprendente 5 sistemi di irrigazione in 5 blocchi completi. Le rese osservate (in tonnellate per ettaro) sono riportate nella tabella sottostante e sono disponibili come 'orangeIrrigation'. Qual è il sistema di irrigazione che ha offerto le migliori prestazioni?
+
+    
+    Method                   1      2      3      4      5
+    -------------------  -----  -----  -----  -----  -----
+    Localised             26.7   27.9   51.2   29.0   34.8
+    Surface               46.4   47.7   33.9   32.7   21.7
+    Sprinkler             38.5   29.1   33.6   11.8   27.6
+    Sprinker+localised    41.3   33.9   31.3    5.8   12.1
+    Submersion            35.2   46.9   19.8   27.9   26.7
+
+6. È stata condotta una prova di fertilizzazione, con cinque trattamenti e un disegno a blocchi randomizzati con cinque repliche. Per circostanze casuali impreviste, è venuto a mancare un dato per il trattamento "50N" nel secondo blocco. I dati osservati sono i contenuti percentuali di P~2~O~5~ nei campioni di foglie raccolte in ogni parcella e sono disponibili come 'missingVal'. Analizzando i dati rispondete alle seguenti domande. È conveniente fertilizzare? È conveniente arrivare a 100 kg/ha con fertilizzazione azotata? L'aggiunta di P~2~O~5~ è una pratica conveniente? *SUGGERIMENTO: considerare il valore mancante e assicurarsi che l'approccio utilizzato per l'ANOVA sia corretto*
+
+    
+    Fert               1     2      3      4      5
+    -------------  -----  ----  -----  -----  -----
+    100N             6.9   9.6    5.6    7.4    8.2
+    100N+75P         9.6   9.3   12.0   10.6   11.6
+    50N              7.3    NA    7.7    7.7    7.0
+    50N+75P         10.8   9.2    8.8    9.9    9.4
+    Unfertilised     5.6   6.1    5.3    5.9    7.4
+
+7. È stato eseguito un esperimento a quadrato latino, per valutare l'effetto di quattro diversi fertilizzanti sulla resa della lattuga. I dati osservati sono disponibili come 'lettuceLS' e sono riportati nella tabella seguente. Qual è il fertilizzante migliore?
+
+    
+    Fertiliser    Row   Column   Yield
+    -----------  ----  -------  ------
+    A               1        1   155.5
+    B               1        2   128.4
+    C               1        3   105.5
+    D               1        4   182.4
+    A               2        4   185.4
+    B               2        3   163.8
+    C               2        1   178.4
+    D               2        2   238.3
+    A               3        3   173.1
+    B               3        4   170.0
+    C               3        2   198.6
+    D               3        1   213.3
+    A               4        2   185.7
+    B               4        1   198.9
+    C               4        4   191.7
+    D               4        3   231.6
+
+8. È stato eseguito un esperimento in vaso per valutare il momento migliore per l'applicazione di un erbicida (rimsulfuron) contro *Sorghum halepense* da rizoma. Sono state confrontate cinque epoche d'intervento (2-3, 4-5, 6-7 e 8-9 foglie, oltre ad un intervento doppio a 3-4 e 8-9 foglie) e il controllo non trattato. Per comprendere se l'applicazione sia efficace contro piante provenienti da rizomi di diverse dimensioni, è stato incluso nell'esperimento un secondo fattore sperimentale, ovvero la dimensione del rizoma (2, 4, 6 nodi). Il disegno sperimentale era un fattoriale a due vie, completamente incrociato, con trattamenti completamente randomizzati con quattro repliche. I risultati (peso delle piante tre settimane dopo l'applicazione dell'erbicida) sono tratti da (Onofri, 1994b} e sono disponibili come 'johnsongrass'. In quale momento l'erbicida è più efficace? Il doppio trattamento risulta più efficace dei trattamenti singoli? La raccomandazione per gli agricoltori può essere considerata univoca ed indipendente dalla dimensione del rizoma?
 
 | Sizes / Timings | 2-3   | 4-5   | 6-7   | 8-9   | 3-4/8-9 | Untreated|
 |:--------------|:-----:|:-----:|:-----:|:-----:|:-------:|:----:|
@@ -6595,284 +5246,759 @@ La biologia di *Sorghum halepense* da rizoma mostra che il peso dei rizomi raggi
 |               | 35.24 | 14.17 | 21.81 | 39.55 | 1.42    | 34.11|
 |               | 13.32 | 23.93 | 60.72 | 48.37 | 6.83    | 32.21|
 
-Eseguite l'ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente.
-[Sheet: 12-13.1]
 
-### Esercizio 2
 
-Un agronomo ha organizzato un confronto varietale in favino, considerando due epoche di semina: autunnale e primaverile. E' stato utilizzato un disegno a blocchi randomizzati e a parcella suddivisa, con le epoche di semina nelle parcelle principali e le varietà nelle sub-parcelle. I risultati sono i seguenti:
+<!--chapter:end:10-MettereTuttiInsieme.Rmd-->
 
-| Sowing Time |  Genotype |  1   |  2   |  3   |  4   |
-|:------------|----------:|:----:|:----:|:----:|:----:|
-| Autum       |    Chiaro | 4.36 | 4.00 | 4.23 | 3.83 |
-|             | Collameno | 3.01 | 3.32 | 3.27 | 3.40 |
-|             | Palombino | 3.85 | 3.85 | 3.68 | 3.98 |
-|             |     Scuro | 4.97 | 3.98 | 4.39 | 4.14 |
-|             |   Sicania | 4.38 | 4.01 | 3.94 | 2.99 |
-|             |   Vesuvio | 3.94 | 4.47 | 3.93 | 4.21 |
-| Spring      |    Chiaro | 2.76 | 2.64 | 2.25 | 2.38 |
-|             | Collameno | 2.50 | 1.79 | 1.57 | 1.77 |
-|             | Palombino | 2.24 | 2.21 | 2.50 | 2.05 |
-|             |     Scuro | 3.45 | 2.94 | 3.12 | 2.69 |
-|             |   Sicania | 3.24 | 3.60 | 3.16 | 3.08 |
-|             |   Vesuvio | 2.34 | 2.44 | 1.71 | 2.00 |
+# Modelli di regressione 'avanzati'
 
-Eseguite l'ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente.
-[Sheet: 12-13.2]
+Da fare ....
 
-### Esercizio 3
+<!--chapter:end:11-ExtendingRegression.Rmd-->
 
-Gli erbicidi mostrano sempre un certo grado di persistenza nel terreno. Di conseguenza, se la coltura fallisce subito dopo il diserbo, la scelta delle colture di sostituzione può essere condizionata dal diserbo già eseguito. Per questo motivo, è stato impostato un esperimento di pieno campo volto a valutare se tre erbicidi del mais (rimsulfuron, imazethapyr and primisulfuron) erano in grado di danneggiare quattro colture (soia, girasole, rapa e sorgo) seminate 20 giorni dopo il trattamento. Gli erbicidi sono stati distribuiti su terreno nudo, seguendo un disegno a blocchi randomizzati, su parcelle di elevate dimensioni. Per ogni blocco, la semina è stata eseguita su strisce trasversali, perpendicolari ai trattamenti eseguiti (schema a strip-plot). I risultati sono i seguenti:
+# Breve introduzione ai modelli misti
 
-| Herbidicide   | Block | sorghum | rape | soyabean | sunflower |
-|:--------------|:-----:|:-------:|:----:|:--------:|:---------:|
-| Untreated     |   1   |   180   | 157  |   199    |    201    |
-|               |   2   |   236   | 111  |   257    |    358    |
-|               |   3   |   287   | 217  |   346    |    435    |
-|               |   4   |   350   | 170  |   211    |    327    |
-| Imazethapyr   |   1   |   47    |  10  |   193    |    51     |
-|               |   2   |   43    |  1   |   113    |     4     |
-|               |   3   |    0    |  20  |   187    |    13     |
-|               |   4   |    3    |  21  |   122    |    15     |
-| primisulfuron |   1   |   271   |  8   |   335    |    379    |
-|               |   2   |   182   |  0   |   201    |    201    |
-|               |   3   |   283   |  22  |   206    |    307    |
-|               |   4   |   147   |  24  |   240    |    337    |
-| rimsulfuron   |   1   |   403   | 238  |   226    |    290    |
-|               |   2   |   227   | 169  |   195    |    494    |
-|               |   3   |   400   | 364  |   257    |    397    |
-|               |   4   |   171   | 134  |   137    |    180    |
 
-Eseguite l'ANOVA. Verificate il rispetto delle assunzioni parametriche di base e, se necessario, trasformate i dati. Preparate una tabella per le medie marginali e le medie di cella ed aggiungete i rispettivi errori standard (SEMs). Ha senso considerare le medie marginali? Impostate un test di confronto multiplo per gli effetti significativi, coerentemente con la risposta alla domanda precedente. *SUGGERIMENTO: in questo esercizio è necessaria una trasformazione stabilizzante, che dovrà essere valutata preventivamente. Siccome la funzione 'boxcox()' non supporta i modelli misti, sarà necessario trascurare inizialmente i fattori di raggruppamento e considerare il disegno come se fosse un semplice fattoriale a blocchi randomizzati. In questo modo si potrà procedere al 'fitting' con la funzione 'lm()' e, successivamente, si potrà individuare la trasformazione migliore con l'usuale funzione 'boxcox()'. Una volta individuato il valore di $\lambda$ più opportuno, si potrà procedere al fitting con 'lmer()', utilizzando la trasformazione individuata in precedenza ed inserendo i fattori di raggruppamento necessari per un disegno a strip-plot.*
-[Sheet: 12-13.3]
+In questo libro abbiamo affrontato le questioni più rilevanti in relazione all'attività di ricerca e sperimentazione, almeno quelle che dovrebbero far parte del bagaglio culturale di ogni laureato in agraria o altre discipline biologiche. La trattazione non è affatto esaustiva e quindi, se si avesse l'intenzioni intraprendere una carriera professionale nel mondo dell'analisi dei dati, non si potrebbe prescindere dalla lettura di altri testi di approfondimento, che sono stati via via segnalati. Ci sembra comunque opportuno, in questo capitolo e quello successivo, dare almeno alcune informazioni di base su altri modelli un po' più complessi, il cui impiego è abbastanza comune nella sperimentazione di pieno campo.
 
-### Esercizio 4
+In particolare, in questo libro abbiamo finora considerato i cosidetti **modelli fissi**, cioè contenenti solo *fattori fissi* oltre al residuo stocastico. I fattori fissi, identificabili per le seguenti caratteristiche:
 
-E' stato condotto un esperimento parcellare per valutare l'interazione tra il momento dell'applicazione dell'azoto al terreno (early, optimum, late) e due livelli di un inibitore della nitrificazione (none, 5 lb/acre). L'inibitore ritarda la nitrificazione e riduce le perdite per lisciviazione profonda. L'azoto è stato somministrato in forma marcata ($^{15}$N) e i dati raccolti riguardano la percentuale di azoto assorbito dalla pianta.
+1. i livelli sono selezionati appositamente (non campionati);
+2. i livelli sono ripetibili (potremmo effettuare un nuovo esperimento con gli stessi livelli);
+3. gli effetti attesi sono deterministici ed espressi come differenze (aumenti o diminuzioni) rispetto ad un valore di base.
 
-| Genotype | Block | Early | Med  | Late |
-|:---------|:-----:|:-----:|:----:|:----:|
-| A        |   1   | 21.4  | 50.8 | 53.2 |
-|          |   2   | 11.3  | 42.7 | 44.8 |
-|          |   3   | 34.9  | 61.8 | 57.8 |
-| B        |   1   | 54.8  | 56.9 | 57.7 |
-|          |   2   | 47.9  | 46.8 | 54.0 |
-|          |   3   | 40.1  | 57.9 | 62.0 |
+Esempi di fattore fisso sono il genotipo, le ferrtilizzazioni, le epoche di semina, ecc.
 
-Analizzare i dati e commentare i risultati
-[Sheet: 12-13.4]
+Oltre ai fattori fissi, i modelli in agricoltura e biologia possono richiedere l'inclusione di **fattori random** che presentano le seguenti caratteristiche:
 
-### Esercizio 5
+1. i livelli non sono interessanti di per sé, ma sono campionati da una popolazione più ampia di possibili livelli;
+2. i livelli non sono ripetibili, nel senso che se l'esperimento venisse ripetuto, è molto probabile che sarebbero scelti altri livelli, senza che l'esperimento perda il suo significato biologico;
+3. gli effetti attesi sono casuali e cambiano ad ogni  campionamento;
+4. i livelli rappresentano unità di randomizzazione a cui vengono assegnati i livelli del trattamento, attraverso un processo di randomizzazione (ad esempio, le parcelle).
 
-E' stato organizzato un esperimento per valutare l'effetto della temperatura di lavaggio sulla riduzione di lunghezza di alcuni tessuti. I risultati sono espressi in percentuale di riduzione e sono stati ottenuti in un disegno sperimentale a randomizzazione completa, con quattro tessuti e altrettante temperature.
+Come conseguenza di quanto detto sopra, l'interesse primario per i fattori casuali non è stimare gli effetti di ciascun livello incluso nell'esperimento, ma stimare la quantità complessiva di varianza (componente di varianza) che inducono nella risposta sperimentale.
 
-| Fabric | 210 °F | 215 °F | 220 °F | 225 °F |
-|:------:|:------:|:------:|:------:|:------:|
-|   A    |  1.8   |  2.0   |  4.6   |  7.5   |
-|        |  2.1   |  2.1   |  5.0   |  7.9   |
-|   B    |  2.2   |  4.2   |  5.4   |  9.8   |
-|        |  2.4   |  4.0   |  5.6   |  9.2   |
-|   C    |  2.8   |  4.4   |  8.7   |  13.2  |
-|        |  3.2   |  4.8   |  8.4   |  13.0  |
-|   D    |  3.2   |  3.3   |  5.7   |  10.9  |
-|        |  3.6   |  3.5   |  5.8   |  11.1  |
+Ad esempio, nel caso dell'elemento casuale $\varepsilon$ che abbiamo trovato in tutti i modelli fin qui trattati, non vi è alcun interesse nel valore esatto di ciascun residuo, poiché questi valori si verificano casualmente e, ripetendo l'esperimento, si otterrebbero valori diversi. Invece, i residui sono stati determinati solo per poterne calcolare la relativa varianza, che è l'unico elemento di nostro interesse, da utilizzare per diversi scopi, come, ad esempio, al denominatore del test F. Oltre ai residui, per comprendere meglio cosa è un fattore random, possiamo considerare un esperimento di confronto tra genotipi, che viene ripetuto in diversi campi scelti a caso all'interno di un certo macroambiente. In questo caso, i 'campi' non sono, di per se', interessanti, ma vengono campionati per quantificare la variabilità della resa all'interno dell'intero macroambiente.
 
-Analizzare i dati e commentare i risultati
-[Sheet: 12-13.5]
+Il fattore 'campo' nell'esempio precedente costituisce un tipico esempio di **grouping factor** (fattore di raggruppamento; vedi Capitolo 2); altri esempi includono i blocchi nei disegni a blocchi completi randomizzati, le righe e le colonne nei disegni a quadrato latino e le main-plots nei disegni a split-plot. Tutti questi fattori di raggruppamento creano spesso problemi perché raramente sono interessanti di per sé e quindi vengono spesso trascurati in fase di analisi dei dati. Si tratta di un grave errore, poichè l'effetto di questi fattori di raggruppamento, se trascurato, finisce per essere incluso nei residui, che risulteranno quindi non indipendenti, ma saranno invece accomunati dalla eventuale cappartenenza allo stesso gruppo e dalla conseguente condisione dello stesso effetto di gruppo.
 
-### Esercizio 6
+Ad esempio, in un disegno a split-plot, se una *main-plot* è più fertile di un'altra, tutte le misurazioni effettuate su di essa condivideranno lo stesso effetto positivo e saranno quindi più simili tra di loro che non le misurazioni effettuate su *main-plots* diverse. Insomma, con uno schema a split-plot, i dati ottenuti sulla stessa *main-plot* non sono indipendenti, ma sono in qualche modo 'apparentati'; più propriamente, si parla di **correlazione intra-classe**, un concetto simile, ma non totalmente coincidente con quello di correlazione di Pearson. Insomma, se l'effetto prodotto dalle *main-plots* o dagli altri *grouping factors* non viene incluso nel modello statistico descrittivo, esso rimane tra gli effetti non spiegati e, di conseguenza, viene incluso nei residui, che, pertanto, saranno correlati e quindi non indipendenti tra di loro.
 
-Un processo di sintesi chimica prevede due reazioni, la prima richiede un alcool e la seconda richiede una base. Viene impostato un esperimento fattoriale 3 x 2, con tre alcools e due basi, con uno schema sperimentale completamente randomizzato a quattro repliche. Quali sono le vostre raccomandazioni per la prima e la seconda reazione, sulla base dei risultati dell'esperimento. La variabile rilevata mostra la produzione percentuale del processo.
+Posto che i *grouping factors* debbano essere inclusi nel modello, la domanda è: dobbiamo considerare questi fattori come fissi o random? Nella maggior parte dei casi, la decisione spetta al ricercatore, che dovrebbe fornire motivazioni convincenti a sostegno della sua scelta; in altri casi, come accennato in precedenza per il fattore 'campo', un fattore di raggruppamento deve obbnligatoriamente essere random, ovvero quando i suoi livelli diventano unità di randomizzazione e ricevono l'allocazione dei livelli di un fattore o di una combinazione di fattori, tramite un processo di randomizzazione (Piepho et al., 2003). Si considerino i seguenti esempi:
 
-| Base | Alcohol 1 | Alcohol 2 | Alcohol 3 |
-|:----:|:---------:|:---------:|:---------:|
-|  A   |   91.3    |   89.9    |   89.3    |
-|      |   88.1    |   89.5    |   87.6    |
-|      |   90.7    |   91.4    |   90.4    |
-|      |   91.4    |   88.3    |   90.3    |
-|  B   |   87.3    |   89.4    |   92.3    |
-|      |   91.5    |   93.1    |   90.7    |
-|      |   91.5    |   88.3    |   90.6    |
-|      |   94.7    |   91.5    |   89.8    |
 
-Analizzare i dati e commentare i risultati
-[Sheet: 12-13.6]
+1. in un disegno a blocchi randomizzati, i blocchi raggruppano le unità in base al loro posizionamento rispetto al 'gradiente' di fertilità; tuttavia, non sono unità di randomizzazione nel senso che i livelli di trattamento sono allocati alle parcelle all'interno di ciascun blocco, non ai blocchi stessi. Di conseguenza, il fattore blocco può essere considerato random o fisso, a seconda delle circostanze;
+2. in un disegno a split-plot, le main-plots raggruppano le sub-plots e sono anche unità di randomizzazione perché ricevono l'llocazione dei livelli del fattore principale. Di conseguenza, il fattore main-plot deve essere necessariamente random.
+
+Il motivo per cui le main-plots e le altre unità di randomizzazione devono essere considerate fattori random è legato al loro ruolo nell'esperimento: secondo Ronald Fisher, la differenza tra le unità sperimentali trattate allo stesso modo è la misura più appropriata dell'errore sperimentale e, di conseguenza, la differenza tra, ad esempio, le main-plots trattate allo stesso modo diviene una misura dell'errore sperimentale, il che significa che l'effetto delle main-plots  è, in effetti, random.
+
+Considerando le premesse precedenti, ne consegue che diversi esperimenti comuni in agricoltura, come i disegni split-plot, strip-plot, misure ripetute e sottocampionamento, contengono fattori di raggruppamento e potrebbero richiedere l'inclusione di effetti random nel modello, oltre al residuo. I modelli che contengono più di un effetto random oltre agli eventuali effetti fissi sono chiamati **modelli misti** e, a partire dagli anni '80, sono diventati una classe di modelli molto diffusa.
+
+Fornire dettagli sui modelli misti va ben oltre lo scopo di questo libro e i lettori interessati sono invitati a consultare il libro di (Galecki e Burzicoski, 2013). Per tutti gli altri lettori, i seguenti esempi concreti dimostrano come i modelli misti possano essere applicati per analizzare i dati provenienti da esperimenti split-plot, strip-plot e altri tipi comuni nella ricerca agricola.
+
+## Esempio 12.1: un esperimento di lavorazione a split-plot
+
+Consideriamo nuovamente l'esempio presentato nel capitolo 2, nel quale avevamo due fattori sperimentali a confronto: il diserbo, con due livelli (totale o localizzato sulla fila) e la lavorazione, con tre livelli (aratura profonda, aratura superficiale e *minimum tillage*). Questo esperimento è stato disegnato a split-plot, come indicato in Figura 2.9, ovvero con le lavorazioni allocate a random alle main-plots e il diserbo allocato a caso alle sub-plot, all'interno di ogni main-plot. I risultati di questo esperimento sono disponibili nel dataset 'beet', all'interno del *package* `statforbiology`.
+
+
+Il modello ANOVA per un disegno a split-plot è simile a quello dell'ANOVA fattoriale, fatta salva la presenza di un effetto aggiuntivo, cioè quello delle parcelle principali, che costituiscono un elemento di raggruppamento delle osservazioni:
+
+$$Y_{ijk} = \mu + \gamma_k + \alpha_i + \theta_{ik} + \beta_j + \alpha\beta_{ij} + \varepsilon_{ijk}$$
+
+
+dove $\gamma$ è l’effetto del blocco $k$, $\alpha$ è l’effetto della lavorazione $i$, $\beta$ è l’effetto del diserbo $j$, $\alpha\beta$ è l'effetto dell'interazione per la specifica combinazione della lavorazione $i$ e del diserbo $j$. Abbiamo incluso anche $\theta$ che è l'effetto della main-plot; dato che ogni parcella principale è identificata univocamente dal blocco $k$ a cui appartiene e dalla lavorazione $i$ in essa eseguita, abbiamo utilizzato i pedici corrispondenti.
+
+Nel precedente modello vi sono due fattori di raggruppamento, cioè il blocco e la main-plot. Mentre il blocco non costituisce un'unità di randomizzazione e quindi il suo effetto potrebbe essere considerato o fisso o casuale (ma lo considereremo fisso, come abbiamo sempre fatto finora), le main-plots costituiscono delle unità di randomizzazione e quindi gli effetti che producono debbono essere considerati random, con distribuzione normale, media pari a 0 e deviazione standard pari a $\sigma_{\theta}$. Allo stesso modo, il residuo $\varepsilon$ è casuale, con distribuzione normale, media 0 a deviazione standard pari a $\sigma$. 
+
+
+Stimare un modello misto in R non è molto diverso dallo stimare un modello a effetti fissi. Innanzitutto, dobbiamo creare una nuova variabile per identificare in modo univoco le main-plots, il che può essere fatto creando un nuovo fattore che combini i livelli di blocco e lavorazione, come accennato in precedenza. Successivamente, è necessario abbandonare la funzione `lm()`, che non permette di inserire effetti random, ed utilizzare un'altra funzione che abbia questa capacità. Tra quelle disponibili, in questo libro proporremo la funzione `lmer()`, che si trova all'interno del *package* `lme4` (Bates et al. 2015), da utilizzare assieme al package `lmerTest` (Kuznetsova et al. 2017), che fornisce alcune utili funzionalità aggiuntive ed, in particolare, consente di migliorare la leggibilità della tabella ANOVA.
+`
+La sintassi della funzione `lmer()` è simile a quella della funzione `lm()`; l'effetto random deve essere inserito utilizzando l'operatore `1|` e posto tra parentesi, per distinguerlo meglio dagli effetti fissi (riquadro sottostante). In questo capitolo, introduciamo anche  l'uso dell'operatore "pipe" (`|>`), che serve a scrivere codice più chiaro e riceve il valore restituito dalla funzione precedente, passandolo alla successiva come primo argomento (riquadro sottostante; vedi anche l'Appendice A).
+
+
+
+```r
+# Example 12.1
+# A split-plot tillage experiment
+
+# Loading the packages
+library(statforbiology)
+library(lme4)
+library(lmerTest)
+
+# Loading and transforming the data
+dataset <- getAgroData("beet") |>
+  transform(Tillage = factor(Tillage),
+            WeedControl = factor(WeedControl),
+            Block = factor(Block),
+            mainPlot = factor(Block):factor(Tillage))
+
+# Mixed-Model fitting
+mod.split <- lmer(Yield ~ Block + Tillage * WeedControl +
+                  (1|mainPlot), data=dataset)
+## boundary (singular) fit: see help('isSingular')
+```
+
+
+Per quanto riguarda le assunzioni di base, i modelli misti sono sempre e comunque modelli linear e quindi fanno le stesse assunzioni di moscedasticità e normalità dei residui. L'ispezione grafica di questi ultimi può essere condotta nel modo usuale, se non che la funzione `plot()` restituisce solo il grafico dei residui verso i valori attesi (quello corrispondente all'argomento 'which = 1' in `lm()`), mentre l'argomento 'which' non funziona. Pertanto, il QQ-plot dovrebbe essere prodotto utilizzando le funzioni generiche `qqnorm()` e `qqline()`, come mostrato nel riquadro sottostante. Questi due grafici presentano alcune lievi deviazioni rispetto agli assunti di normalità ed omoschedasticità (Fig. \@ref(fig:figName133one)), ma il test di Shapiro-Wilk non sembra sollevare particolari preoccupazioni, per cui possiamo procedere con le operazioni di inferenza statistica. 
+
+
+```r
+# Example 12.1 [continuation]
+
+# Check for the basic assumptions for the 'beet' data
+
+# Graphical analyses (not run)
+# plot(mod.split) # Analogous to 'which = 1' for linear models
+# qqnorm(resid(mod.split)) # QQ-plot
+# qqline(resid(mod.split), lty = 2)
+
+# Shapiro-Wilk's test
+shapiro.test(residuals(mod.split))
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  residuals(mod.split)
+## W = 0.93838, p-value = 0.1501
+```
+
+
+<div class="figure" style="text-align: center">
+<img src="_main_files/figure-html/figName133one-1.png" alt="Analisi grafiche dei residui per l'esperimento a split-plot relativo all'esempio 12.1, ove il model fitting è stato eseguito con la funzione `lmer()`" width="90%" />
+<p class="caption">(\#fig:figName133one)Analisi grafiche dei residui per l'esperimento a split-plot relativo all'esempio 12.1, ove il model fitting è stato eseguito con la funzione `lmer()`</p>
+</div>
+
+L'oggetto che risulta dalla stima del modello misto può essere esplorato con i metodi usuali, anche se è necessario ricordare che le stime dei parametri debbono essere ottenuto con la funzione `fixef()` al posto di `coef()`. L'ANOVA viene sempre prodotta con l'usuale funzione `anova()`, che fornisce però un output leggermente diverso dal solito. Come secondo argomento è necessario indicare il metodo prescelto per la stima dei gradi di libertà, che non è così semplice come nel caso dei modelli lineari generali. Consigliamo il metodo 'Kenward-Roger' che, pur fornendo comunque un'approssimazione, ha dimostrato ottima affidabilità, superiore a quella del metodo 'Sattertwhaite', che verrebbe utilizzato di default (Kuznetsova et al. 2017).
+
+
+```r
+# Example 12.1 [continuation]
+
+# Variance partitioning for the ’beet’ data
+
+anova(mod.split, ddf="Kenward-Roger")
+## Type III Analysis of Variance Table with Kenward-Roger's method
+##                      Sum Sq Mean Sq NumDF DenDF F value  Pr(>F)  
+## Block                3.6596  1.2199     3     6  0.6521 0.61016  
+## Tillage             23.6565 11.8282     2     6  6.3228 0.03332 *
+## WeedControl          3.3205  3.3205     1     9  1.7750 0.21552  
+## Tillage:WeedControl 19.4641  9.7321     2     9  5.2023 0.03152 *
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+L'interazione tra lavorazione del terreno e controllo delle erbe infestanti è significativa; pertanto, possiamo esplorare e confrontare le medie relative alle combinazioni 'lavorazione $\times$ diserbo', utilizzando l'usuale funzione `emmeans()`. Questa parte di lavoro viene lasciata al lettore come esercizio.
+
+
+## Esempio 12.2: un esperimento di 'recropping' a strip-plot
+
+In alcune circostanze, soprattutto nelle prove di diserbo chimico, potrebbe trovare applicazione un altro tipo di schema sperimentale, nel quale ogni blocco viene diviso in tante righe quanti sono i livelli di un fattore sperimentale e tante colonne quanti sono i livelli dell'altro. In questo modo, i livelli del primo fattore sperimentale vengono applicati ad ognuna delle righe, mentre i livelli dell'altro trattamento ad ognuna delle colonne, in ordine casuale, che cambia per ogni blocco (esperimento a **strip-plot**).
+
+Consideriamo l'esperimento fattoriale a due vie descritto nel Capitolo 2 e finalizzato a determinare l'intervallo di risemina per un erbicida sulfonilureico. In questo esperimento, sono stati considerati due tesi di diserbo, cioè: rimsulfuron applicato alla dose raccomandata su terreno nudo e testimone non diserbato. Quaranta giorni dopo il trattamento, sono state seminate tre colture, cioè barbabietola da zucchero, colza e soia, sia sulle parcelle trattate che su quelle non trattate e, quattro settimane dopo la semina, è stato determinato il peso delle piante su un metro quadrato di ogni parcella. L'esperimento è stato disegnato a strip-plot, in quattro blocchi completi (Fig. 2.10); in ogni blocco, i trattamenti erbicidi (rimsulfuron e controllo non trattato) sono stati assegnati casualmente a ciascuna di due colonne, mentre le tre colture sono state assegnate casualmente a ciascuna di tre righe (Onofri, dati non pubblicati). Il dataset relativo ai risultati di questo esperimento è disponibile come "recropS" nel *package* `statforbiology`.
+
+In questo esperimento, ci sono tre fattori di raggruppamento
+
+1. I blocchi
+2. Le righe all'interno di ciascun blocco (tre righe per blocco)
+3. Le colonne all'interno di ciascun blocco (due colonne per blocco)
+
+Le righe e le colonne sono anche unità di randomizzazione, poiché hanno ricevuto i
+trattamenti sperimentali attraverso un processo di randomizzazione, analogo alle main-plots nell'Esempio 12.1. Di conseguenza, entrambi gli effetti sono da considerare random.
+
+Analogamente a quanto abbiamo visto per lo split-plot, le 12 righe sono univocamente definite da un livello di lavorazione e un blocco, mentre le 8 colonne sono definite da un livello di diserbo e un blocco, per cui l'effetto $\zeta$ porta i pedici $j$ e $k$.  per cui anche questo è un modello 'misto', con tre effetti random.
+
+Iniziamo le analisi caricando il dataset e operando le necessarie trasformazioni dei dati, come abbiamo visto negli esempi precedenti.
+
+
+```r
+# Example 12.2
+# A strip-plot recropping experiment
+
+# Loading packages
+library(statforbiology)
+library(lme4)
+library(lmerTest)
+
+# Loading and transforming the data
+dataset <- getAgroData("recropS") |>
+  transform(Herbicide = factor(Herbicide),
+            Crop = factor(Crop),
+            Block = factor(Block),
+            Rows = factor(Crop):factor(Block),
+            Columns = factor(Herbicide):factor(Block))
+```
+
+Un modello adatto a descrivere i risultati di questo esperimento è il seguente:
+
+$$Y_{ijk} = \mu + \gamma_k + \alpha_i + \theta_{ik} + \beta_j + \zeta_{jk} + \alpha\beta_{ij} + \varepsilon_{ijk}$$
+
+In questo modello, $\mu$ è l'intercetta, $\gamma_k$ sono gli effetti blocco, $\alpha_i$ sono gli effetti delle colture, $\theta_ik$ sono gli effetti 'riga', $\beta_j$ sono gli effetti degli erbicidi/testimone, $\zeta_{jk}$ sono gli effetti 'colonna', $\alpha\beta_{ij}$ sono gli effetti di interazione 'coltura-erbicida' e $\varepsilon_ijk$ è residuo casuale. I tre effetti random ('riga', 'colonna' e residuo) sono assunti come gaussiani, con media pari a zero e deviazioni standard rispettivamente pari a $\sigma_{\theta}$, $\sigma_{\zeta}$ e $\sigma$.
+  
+Il codice da utilizzare è analogo a quello precedentemente esposto per il disegno a split-plot e prevede l'introduzione degli effetti random 'riga' e 'colonna', che vengono inseriti tra parentesi e con l'operatore '1|', come indicato nel box sottostante. L'analisi grafica dei residui può essere eseguita con la stessa tecnica illustrata per l'Esempio 12.1 e viene lasciata al lettore per esercizio.
+
+
+
+```r
+# Example 12.2 [continuation]
+
+# Model fitting
+
+mod.strip <- lmer(CropBiomass ~ Block + Herbicide*Crop + 
+    (1|Rows) + (1|Columns), data = dataset)
+
+# Variance partitioning
+anova(mod.strip, ddf = "Kenward-Roger")
+## Type III Analysis of Variance Table with Kenward-Roger's method
+##                Sum Sq Mean Sq NumDF  DenDF F value  Pr(>F)  
+## Block           21451  7150.3     3 4.1367  2.5076 0.19387  
+## Herbicide         148   147.9     1 3.0000  0.0519 0.83450  
+## Crop            43874 21936.9     2 6.0000  7.6932 0.02208 *
+## Herbicide:Crop  12549  6274.4     2 6.0000  2.2004 0.19198  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+La tabella ANOVA mostra che solo l'effetto della coltura è significativo, mentre non vi è alcuna differenza tra i trattamenti erbicidi (trattato vs. non trattato) all'interno di ciascuna coltura. Pertanto, gli effetti fitotossici possono essere considerati negligibili. Il calcolo delle medie e i confronti multipli possono essere eseguiti con la tecnica usuale, indicata nei capitoli precedenti e sono lasciati al lettore per esercizio.
+
+
+## Esempio 12.3: confronto varietale con blocchi 'random'
+
+Riconsideriamo l'Esempio 10.1, che descrive un esperimento di campo con otto genotipi di frumento in tre blocchi completi, eseguito sulle colline dell'Italia centrale nel 2002 (Belocchi et al. 2003). Sebbene i blocchi non rappresentino unità di randomizzazione, a volte si suggerisce di considerare il loro effetto come random, cosa che è molto conveniente per recuperare le informazioni inter-blocco, nei disegni a blocchi incompleti (Dixon 2016). In questo caso, trattandosi di un disegno a blocchi completi, considerare l'effetto del blocco come random non è conveniente, perchè non vi sono informazioni inter-blocco da recuperare. Tuttavia, ci è sembrato utile mostrare qual è il codice R da utilizzare quando si vogliono considerare i blocchi come effetti casuali.
+
+
+```r
+# Example 12.3
+# A genotype experiment with random blocks
+
+# Loading the packages
+library(statforbiology)
+library(lme4)
+library(emmeans)
+library(multcomp)
+
+# Loading and transforming the data
+dataset <- getAgroData("WinterWheat2002") |>
+  transform(Block = factor(Block),
+            Genotype = factor(Genotype))
+
+# Model fitting (with random blocks)
+modmix <- lmer(Yield ~ (1|Block) + Genotype, data = dataset)
+meds <- emmeans(modmix, ~Genotype)
+multcomp::cld(meds, Letters = LETTERS, reverse = T)
+##  Genotype emmean    SE   df lower.CL upper.CL .group
+##  IRIDE      4.96 0.216 10.8     4.49     5.44  A    
+##  COLOSSEO   4.89 0.216 10.8     4.42     5.37  A    
+##  SOLEX      4.79 0.216 10.8     4.31     5.27  A    
+##  SANCARLO   4.50 0.216 10.8     4.03     4.98  A    
+##  GRAZIA     4.34 0.216 10.8     3.86     4.82  A    
+##  CRESO      4.33 0.216 10.8     3.85     4.80  A    
+##  DUILIO     4.24 0.216 10.8     3.76     4.72  AB   
+##  SIMETO     3.34 0.216 10.8     2.86     3.82   B   
+## 
+## Degrees-of-freedom method: kenward-roger 
+## Confidence level used: 0.95 
+## P value adjustment: tukey method for comparing a family of 8 estimates 
+## significance level used: alpha = 0.05 
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.
+```
+
+
+## Esempio 12.4: blocchi randomizzati con sub-campionamento
+
+Il sub-campionamento può verificarsi ogni qual volta in cui vengano prese, in ogni parcella, due o più misure casuali, che non possono essere considerate repliche vere, poiché non hanno ricevuto il trattamento sperimentale in modo indipendente l'una dall'altra.
+
+Consideriamo ad esempio i dati nel dataset 'TKW', disponibile nel *package* `statforbiology`. Questi dati derivano da un esperimento con 30 genotipi di frumento in tre blocchi, nel quale è stato determinato il peso di mille semi (Thousand Kernel Weight; TKW), in tre sub-campioni di granella per parcella (Ciriciofolo, dati non pubblicati).
+
+Dopo aver caricato i dati, è necessario trasformare tutti i predittori in fattori nominali ('Genotype', 'Block' e 'Plot'); è importante notare che questo dataset include anche la variabile 'Plot', che identifica in modo univoco tutte le parcelle e funge da variabile di raggruppamento per i tre sub-campioni di ciascuna parcella. A scopo di confronto, nel riquadro sottostante, mostriamo la stima di un modello errato, che non fa alcuna distinzione tra repliche vere e sub-repliche (pseudo-repliche) e, di conseguenza, considera l'esperimento come se avesse 9 repliche vere. La deviazione standard dei residui è 2.71, il test F per il genotipo è altamente significativo e ci sono 225 confronti a coppie significativi tra i 30 genotipi.
+
+
+```r
+# Example 12.4
+# A RCBD with sub-sampling
+
+# Loading the packages
+library(statforbiology)
+library(nlme)
+library(car)
+library(emmeans)
+library(lme4)
+library(lmerTest)
+
+# Loading and transforming the data
+TKW <- getAgroData("TKW") |>
+  transform(Plot = factor(Plot),
+            Block = factor(Block),
+            Genotype = factor(Genotype))
+head(TKW)
+##   Plot Block  Genotype Sample  TKW
+## 1    1     1 Meridiano      1 28.6
+## 2    2     1     Solex      1 33.3
+## 3    3     1  Liberdur      1 22.3
+## 4    4     1  Virgilio      1 28.1
+## 5    5     1   PR22D40      1 26.7
+## 6    6     1    Ciccio      1 34.2
+# WRONG ANALYSIS!!!!
+# no distinction is made between true replicates and sub-replicates
+
+# Fitting a 'naive' model
+mod <- lm(TKW ~ Block + Genotype, data=TKW)
+anova(mod)
+## Analysis of Variance Table
+## 
+## Response: TKW
+##            Df Sum Sq Mean Sq F value    Pr(>F)    
+## Block       2  110.3  55.169   7.510 0.0006875 ***
+## Genotype   29 7224.7 249.129  33.913 < 2.2e-16 ***
+## Residuals 238 1748.4   7.346                      
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+# Residual standard deviation
+summary(mod)$sigma
+## [1] 2.710373
+## [1] 2.710373
+
+# Number of significant pairwise comparisons between genotype means
+pairwise <- as.data.frame(pairs(emmeans(mod, ~Genotype)))
+sum(pairwise$p.value < 0.05)
+## [1] 225
+```
+
+L'analisi illustrata qui sopra è semplice e allettante, ma è anche **totalmente sbagliata**: mettere sullo stesso piano repliche vere e pseudo-repliche trascura il fatto che le 270 osservazioni sono raggruppate per parcella e che le osservazioni nella stessa parcella sono più simili che quelle in pacelle diverse, poiché condividono la stessa 'origine' (mancanza di indipendenza dei residui). Inoltre, il grado di precisione è troppo elevato: i tre sottocampioni sono correlati e non forniscono tre 'pezzi' di informazione completi.
+
+Un modello corretto per questa circostanza dovrebbe includere un termine aggiuntivo per le parcelle, che sono unità di "raggruppamento" e sono anche unità di randomizzazione:
+
+$$Y_{ijs} = \mu + \alpha_i + \gamma_j + \delta_{ij} + \varepsilon_{ijs}$$
+
+In questo modello, $Y_{ijs}$ è il peso di mille semi per l'i-esimo genotipo, il j-esimo blocco, la k-esima pacella e il s-esimo sub-campione, $\alpha_i$ è l'effetto dell'i-esimo genotipo, $\gamma_j$ è l'effetto del j-esimo blocco, $\delta_{ij}$ è l'effetto della parcella identificata dall'i-esimo genotipo e dal j-esimo blocco e $\varepsilon_{ijs}$ è l'effetto del s-esimo sottocampione, nella parcella identificata come precedentemente menzionato. La presenza dell'elemento $\delta$ spiega le differenze tra le parcelle, in modo da ripristinare l'indipendenza dei residui del modello.
+
+Dato che la parcella  anche un'unità di randomizzazione, perchè riceve i livelli del trattamento in modo randomizzato, deve essere considerata come effetto random. Di conseguenza, si tratta di un modello misto: le due componenti della varianza sono $\sigma^2_{\delta}$ e $\sigma^2_{\varepsilon}$, e la seconda dovrebbe essere molto più piccola, in quanto non contiene importanti fonti di errore sperimentale, come la variabilità dovuta al suolo o alle pratiche colturali. Ovviamente, alla prima componente deve essere assegnato il peso appropriato quando si costruisce il termine di errore corretto per testare l'effetto del genotipo.
+
+Questo modello misto può essere stimato utilizzando la funzione `lmer()` nel pacchetto `lme4` (Codice 12.8). La verifica delle assunzioni di base, effettuata come spiegato per gli esempi precedenti, non fornisce alcun sospetto di possibili deviazioni e, pertanto, è possibile visualizzare le componenti della varianza e la tabella ANOVA. Si può confermare che l'effetto del genotipo è significativo, sebbene gli errori standard delle medie siano molto più alti rispetto all'analisi errata mostrata in precedenza (1.75 contro 0.903) e il numero di confronti significativi sia sceso a 91. Per brevità, non vengono mostrati i risultati completi dei confronti a coppie.
+
+
+```r
+# Example 12.4 [continuation]
+
+# CORRECT ANALYSES!!!
+# True replicates and sub-replicates are parted
+
+
+# Fitting a mixed model with the random 'plot' term
+mod.mix <- lmer(TKW ~ Block + Genotype + (1|Plot), data=TKW)
+
+# Check for basic assumptions (not run)
+# plot(mod.mix)
+# qqnorm(resid(mod.mix)) # QQ-plot
+# qqline(resid(mod.mix), lty = 2)
+
+leveneTest(lm(residuals(mod.mix) ~ Genotype, data=TKW))
+## Levene's Test for Homogeneity of Variance (center = median)
+##        Df F value Pr(>F)
+## group  29  1.0143 0.4507
+##       240
+shapiro.test(residuals(mod.mix))
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  residuals(mod.mix)
+## W = 0.99277, p-value = 0.2141
+# Printing the variance components 
+print(VarCorr(mod.mix), comp = "Variance")
+##  Groups   Name        Variance
+##  Plot     (Intercept) 8.89201 
+##  Residual             0.84526
+# Variance partitioning
+anova(mod.mix, ddf = "Kenward-Roger")
+## Type III Analysis of Variance Table with Kenward-Roger's method
+##           Sum Sq Mean Sq NumDF DenDF F value    Pr(>F)    
+## Block      3.389  1.6944     2    58  2.0046    0.1439    
+## Genotype 221.892  7.6515    29    58  9.0522 9.944e-13 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+# Number of significant pairwise comparisons between genotype means
+pairwise <- as.data.frame(pairs(emmeans(mod.mix, ~Genotype)))
+sum(pairwise$p.value < 0.05)
+## [1] 91
+```
+
+Il metodo di analisi dei dati illustrato nel riquadro sovrastante è fortemente raccomandato, sebbene, qualora il numero di sub-campioni sia lo stesso per tutte le parcelle, possiamo ottenere risultati corretti anche con un'analisi in due fasi: nella prima fase, calcoliamo le medie dei sub-campioni per ciascuna parcella e, nella seconda fase, utilizziamo queste medie per stimare un modello che include il genotipo e il blocco come fattori fissi. Il riquadro sottostante mostra che questa tecnica in due fasi produce gli stessi risultati, senza la necessità di disporre di un software avanzato per la stima di un modello misto.
+
+
+
+```r
+# Example 12.4 [continuation]
+
+# Fitting in two-steps without a mixed model
+# Only correct when the number of sub-samples is the
+# same for all plots!
+
+# First step
+TKWm <- aggregate(TKW ~ Block + Genotype, data = TKW, mean)
+
+# Second step
+mod2step <- lm(TKW ~ Genotype + Block, data = TKWm)
+anova(mod2step)
+## Analysis of Variance Table
+## 
+## Response: TKW
+##           Df  Sum Sq Mean Sq F value    Pr(>F)    
+## Genotype  29 2408.24  83.043  9.0522 9.943e-13 ***
+## Block      2   36.78  18.390  2.0046    0.1439    
+## Residuals 58  532.08   9.174                      
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+
+## Esempio 12.5: confronto varietale ripetuto in più anni
+
+In questo libro, abbiamo più volte menzionato l'importanza di ripetere più volte gli esperimenti, cosa che è del tutto assodata per le prove varietali, che coinvolgono spesso ampie reti di istituti di ricerca, in molte regioni e/o paesi. In genere, le reti varietali utilizzano un nucleo di genotipi comuni e lo stesso disegno sperimentale (ad esempio, blocchi completi randomizzati con 3-4 repliche), mentr, nel corso del tempo,  vengono via via inseriti i genotipi più innovativi , mentre quelli obsoleti sono progressivamente abbandonati (Annichiarico 2002).
+
+Consideriamo un esperimento varietale con otto genotipi di frumento, in tre blocchi completi, ripetuto per 7 anni e finalizzato a fornire raccomandazioni varietali agli agricoltori. I risultati sono tratti da Onofri e Ciriciofolo (2007) e sono disponibili nel dataset 'WinterWheat', all'interno del package `statforbiology`.
+
+Per questo dataset è possibile utilizzare il modello seguente:
+
+$$y_{ijk} = \mu + \gamma_{ik} + \alpha_i + \beta_j + \alpha\beta_{ij} + \varepsilon_{ijk}$$
+
+In questo modello, $y$ è la produzione nell'iesimo anno, j-esimo genotipo e k-esimo blocco, $\mu$ è l'intercetta, $\gamma_{ik}$ è l'effetto del k-esimo blocco nell'i-esimo anno, $\alpha_i$ è l'effetto dell'i-esimo anno, $\beta_j$ è l'effetto del j-esimo genotipo, $\alpha\beta_{ij}$ è l'effetto dell'interazione 'genotipo x anno' e $\varepsilon_{ijk}$ è il residuo, che assumiamo sia distribuito normalmente e omoschedastico ($\epsilon_{ijk} \sim N(0, \sigma_{\varepsilon})$).
+
+Con gli esperimenti ripetuti, di qualunque genere essi siano, è necessario prendere una decisione sulla natura dell'effetto di ripetizione, cioè l'anno (in questo caso), la località oppure, in genere, la 'serie'. In particolare, è necessario decidere se considerare questo effetto "fisso" o "random". Tale decisione è specifica per ogni esperimento e spetta al ricercatore, che dovrebbe fornire solide motivazioni a supporto. Come regola generale, si possono dare i seguenti suggerimenti:
+
+1. ogni volta che l'esperimento viene ripetuto un numero limitato di volte (ad esempio 2 o 3), l'effetto "ripetizione" potrebbe essere preferibilmente considerato fisso, come abbiamo mostrato nella Sezione 10.5; infatti, una stima affidabile delle componenti della varianza richiede che il numero di livelli per il fattore random sia sufficientemente elevato (almeno 4, approssimativamente).
+2. Con esperimenti di campo ripetuti in un numero relativamente elevato di anni, quest'ultimo effetto potrebbe essere ragionevolmente considerato casuale, per almeno una buona ragione: sebbene gli anni non siano campionati (non possiamo campionare gli anni, possiamo solo prenderli nelll'ordine in cui si presentano), gli effetti che producono non sono ripetibili e sono chiaramente di natura casuale.
+3. Con esperimenti sul campo ripetuti in un numero relativamente elevato di località, la natura di quest'ultimo effetto è più dubbia: in alcuni casi, le località sono scelte appositamente e sono interessanti di per sè, senza rappresentare nessun macro-ambiente. In questo caso, l'effetto 'località' può essere ragionevolmente preso come fisso. In altri casi, le località sono campionate per rappresentare un macroambiente e, pertanto, il loro effetto è da considerare random.
+
+Quando gli 'anni/località/ambienti' sono considerati random, essi costituiscono una sorta di "super-repliche", che inducono un'ulteriore fonte di variabilità (la variabilità tra prove), che si aggiunge alla consueta variabilità entro prova. Separare queste due fonti di variabilità è estremamente rilevante, ad esempio, per scopi di selezione varietale.
+
+Nel dataset 'WinterWheat', il numero di anni è relativamente elevato e, poiché l'effetto anno è intrinsecamente di natura casuale e irripetibile, non avrebbe senso condizionare la raccomandazione varietale ad uno specifico anno; pertanto, l'effetto anno può essere preferibilmente considerato come random, con distribuzione gaussiana, media pari a 0 e deviazione standard pari a $\sigma_E$:
+
+$$\alpha_i \sim N(0, \sigma_E)$$
+
+L'elemento $\sigma^2_E$ è la cosiddetta "componente di varianza" per l'effetto anno. Se l'anno è random, anche gli effetti "genotipo x anno" e "blocco entro anno" sono casuali e sono definiti come:
+
+$$\alpha\beta_{ij} \sim N(0, \sigma_{GE})$$
+
+$$\gamma_{ik} \sim N(0, \sigma_{EB})$$
+
+Una volta caricato il dataset e aver eseguito le trasformazioni necessarie (ovvero, le variabili "Block", "Year" e "Genotype" devono essere trasformate in fattori), è necessaria un'attenta analisi EDA, che implica un esame approfondito di ogni singolo esperimento, per assicurarsi che i dati di tutti gli anni siano validi e che le varianze dei residui dei diversi anni siano simili (vedere anche Sezione 10.5). Il riquadro sottostante non evidenzia problemi rilevanti, sebbene i risultati non siano mostrati per brevità.
+
+
+```r
+# Example 12.5
+# A multi-year winter wheat experiment
+
+# Loading the packages
+library(statforbiology)
+library(nlme)
+library(car)
+library(emmeans)
+library(multcomp)
+library(lme4)
+library(lmerTest)
+library(SuppDists)
+
+# Loading and transforming the data
+WinterWheat <- getAgroData("WinterWheat") |>
+  transform(Block = factor(Block),
+            Year = factor(Year),
+            Genotype = factor(Genotype))
+
+# Model fitting for each year
+fits <- by(WinterWheat, WinterWheat$Year,
+   function(group) lm(Yield ~ Block + Genotype,
+                      data = group))
+
+# Levene's test for each year: fit a reduced model with 
+# only the Genotype in each year and use the 'leveneTest' function
+fits2 <- by(WinterWheat, WinterWheat$Year,
+   function(group) leveneTest(residuals(lm(Yield ~ Block + Genotype,
+                      data = group)) ~ Genotype, data = group ))
+lev.test <- unlist( lapply(fits2, function(mod) mod$`Pr(>F)`[1] ))
+lev.test
+##      1996      1997      1998      1999      2000      2001      2002 
+## 0.9606223 0.9227674 0.8272382 0.7615624 0.9400817 0.8875930 0.7361952
+# Shapiro-Wilks' test for each year
+norm.tests <- unlist( lapply(fits, function(mod)
+  shapiro.test(residuals(mod))$p.value ))
+norm.tests
+##       1996       1997       1998       1999       2000       2001 
+## 0.43238842 0.24363110 0.70103762 0.98820729 0.85707740 0.46985800 
+##       2002 
+## 0.03322886
+# Retrieve the residual variance for each year
+mses <- unlist( lapply(fits, function(mod) summary(mod)$sigma^2) )
+mses
+##       1996       1997       1998       1999       2000       2001 
+## 0.16178095 0.20184048 0.07198333 0.10116845 0.12620893 0.27505952 
+##       2002 
+## 0.10358631
+# Hartley's Fmax test
+Fmax <- max(mses)/min(mses)
+pmaxFratio(Fmax, 15, 7, lower.tail = F)
+## [1] 0.1573404
+```
+
+Prima di stimare un modello misto, potrebbe essere una buona idea adattare un modello fisso, per una valutazione preliminare dei residui e per confrontare i risultati con quelli del un modello misto (riquadro sottostante).
+
+
+```r
+# Example 12.5 [continuation]
+
+# Pooled analyses: fitting a preliminary fixed model
+modfix <- lm(sqrt(Yield) ~ Year/Block + Genotype * Year,
+             data = WinterWheat)
+
+# Checking the residuals (not run)
+# plot(modfix, which= 1)
+# plot(modfix, which = 2)
+# boxcox(modfix)
+
+# No problems with the assumptions, thus proceed to ANOVA
+anova(modfix)
+## Analysis of Variance Table
+## 
+## Response: sqrt(Yield)
+##               Df Sum Sq Mean Sq  F value    Pr(>F)    
+## Year           6 6.8527 1.14212 192.5546 < 2.2e-16 ***
+## Genotype       7 0.4760 0.06799  11.4633 1.488e-10 ***
+## Year:Block    14 0.1657 0.01183   1.9949   0.02568 *  
+## Year:Genotype 42 1.1627 0.02768   4.6671 1.804e-10 ***
+## Residuals     98 0.5813 0.00593                       
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+Il riquadro precedente conferma l'assenza di problemi con le assunzioni di base e la tabella ANOVA mostra che l'interazione "genotipo per anno" è significativa, il che consentirebbe solo raccomandazioni varietali specifiche per anno (e, quindi, piuttosto inutili). È chiaro che le raccomandazioni per un determinato sito dovrebbero essere formulate tenendo conto dell'intera gamma di condizioni meteorologiche che potrebbero verificarsi. In quest'ottica, possiamo stimare un modello misto con anni random tramite la funzione `lmer()`; le stime delle componenti della varianza vengono prodotte utilizzando il metodo REML (Restricted Maximum Likelyhood) (Pinheiro e Bates, 2000) e possono essere visualizzate utilizzando la funzione `VarCorr()` (riquadro sottostante).
+
+Queste componenti della varianza mostrano che la variabilità complessiva della produzione è dovuta principalmente all'effetto anno (variabilità tra anni: $\sigma^2_E = 1,07$), seguito dall'interazione genotipo-anno ($\sigma^2_{GE} = 0,170$), dalla variabilità tra parcelle entro anno (termine di errore residuo $\sigma^2 = 0,149$) e, infine, dalla variabilità tra blocchi entro anno ($\sigma^2_{EB} = 0,016$). Queste componenti vengono utilizzate per costruire test F ed errori standard.
+
+
+```r
+# Example 12.5 [continuation]
+
+# Pooled analyses: fitting a mixed model with random years
+modmix <- lmer(Yield ~ (1|Year) + (1|Year:Block) + Genotype +
+               (1|Year:Genotype),
+             data = WinterWheat)
+
+# Variance components
+print( VarCorr(modmix), comp=c("Variance", "Std.Dev.") )
+##  Groups        Name        Variance Std.Dev.
+##  Year:Genotype (Intercept) 0.170341 0.41272 
+##  Year:Block    (Intercept) 0.016418 0.12813 
+##  Year          (Intercept) 1.073146 1.03593 
+##  Residual                  0.148804 0.38575
+# ANOVA table
+anova(modmix, ddf = "Kenward-Roger")
+## Type III Analysis of Variance Table with Kenward-Roger's method
+##          Sum Sq Mean Sq NumDF DenDF F value  Pr(>F)  
+## Genotype 2.6033  0.3719     7    42  2.4993 0.03058 *
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+
+The ANOVA table shows that the F-ratio is still significant, but it is smaller than that of the fixed model fit. Indeed, at the denominator, apart from the residual error term, it is necessary to also consider the specific variability of each genotype across years (i.e., the genotype-by-year interaction).
+
+Infine, vengono derivate e confrontate le medie complessive dei genotipi, ma non vengono evidenziate differenze significative tra i genotipi. Infatti, i modelli misti consentono di considerare tutte le possibili fonti di variabilità della resa (all'interno degli anni e tra gli anni), consentendo inferenze sull'intera popolazione di possibili anni (inferenza 'broad space').
+
+
+```r
+# Example 12.5 [continuation]
+
+# Multiple comparisons for a mixed model with random years
+cld(emmeans(modmix, ~Genotype), Letters = letters)
+##  Genotype emmean    SE   df lower.CL upper.CL .group
+##  SIMETO     5.93 0.431 8.23     4.94     6.91  a    
+##  CRESO      5.97 0.431 8.23     4.99     6.96  a    
+##  GRAZIA     6.08 0.431 8.23     5.09     7.07  a    
+##  SANCARLO   6.22 0.431 8.23     5.23     7.21  a    
+##  SOLEX      6.23 0.431 8.23     5.24     7.22  a    
+##  COLOSSEO   6.41 0.431 8.23     5.43     7.40  a    
+##  DUILIO     6.59 0.431 8.23     5.60     7.58  a    
+##  IRIDE      6.70 0.431 8.23     5.71     7.68  a    
+## 
+## Degrees-of-freedom method: kenward-roger 
+## Confidence level used: 0.95 
+## P value adjustment: tukey method for comparing a family of 8 estimates 
+## significance level used: alpha = 0.05 
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.
+```
+
+
+
+## Esempio 12.6: misure ripetute nelle colture poliennali
+
+Con le colture poliennali, le misure vengono effettuate ripetutamente nelle stesse parcelle nel corso degli anni. Per questo motivo, sebbene il dataset assomigli molto a quello dell'esperimento precedente su frumento ripetuto in diversi anni, deve essere analizzato in modo completamente diverso.
+
+In particolare, non dobbiamo trascurare che, a differenza dell'Esempio 12.5, le osservazioni non sono indipendenti, ma sono raggruppate all'interno delle stesse parcelle. La situazione appare simile a quella di un esperimento con sub-campionamento (vedi Sezione 12.4), con un'importante differenza: mentre i sub-campioni sono scelti casualmente all'interno di ciascuna parcella, con l'unico scopo di valutare la loro variabilità, le misure ripetute vengono eseguite specificamente per valutare l'andamento temporale della risposta.
+
+Consideriamo un set di dati relativo alla resa di diversi genotipi di erba medica in tre anni consecutivi, prelevati dalle stesse parcelle in un singolo esperimento della durata di tre anni. Nel riquadro sottostante, il set di dati viene caricato e vengono eseguite alcune trasformazioni necessarie. Abbiamo anche creato una nuova variabile per identificare in modo univoco ogni parcella, il che è semplice, considerando che i valori di resa presi per lo stesso genotipo nello stesso blocco devono essere stati presi nella stessa parcella.
+
+
+
+```r
+# Example 12.6
+# Repeated measures in a perennial crop
+
+# Loading the packages
+library(statforbiology)
+library(lme4)
+library(lmerTest)
+library(emmeans)
+library(multcomp)
+
+# Loading and transforming the data
+dataset <- getAgroData("alfalfa3years") |>
+  transform(Block = factor(Block),
+            Genotype = factor(Genotype),
+            Year = factor(Year))
+head(dataset)
+##   Plot Block Genotype Year    Yield
+## 1    1     1 4cascine 2006 6.631775
+## 2   25     2 4cascine 2006 6.705397
+## 3   60     3 4cascine 2006 6.499588
+## 4   63     4 4cascine 2006 7.087686
+## 5    7     1 casalina 2006 8.033558
+## 6   33     2 casalina 2006 8.265165
+# Reference the plots (not necessary in this instance)
+# dataset$Plot <- dataset$Block:dataset$Genotype
+```
+
+
+Per i disegni a misure ripetute, i modelli possono essere costruiti utilizzando le regole di Piepho et al. (2004):
+
+1. Considerare un singolo anno e costruire il modello per i trattamenti
+2. Considerare un singolo anno e costruire il modello per i fattori di raggruppamento
+3. Includere il fattore anno nel modello e combinare l'anno con tutti gli effetti nel modello dei trattamento, incrociando o annidando a seconda dei casi.
+4. Considerare che il fattore "plot" nel modello dei fattori di raggruppamento fa riferimento alle unità di randomizzazione, ovvero quelle unità che hanno ricevuto i genotipi tramite un processo di randomizzazione. Assegnare quindi a questo fattore 'plot' un effetto casuale.
+5. Escludendo i termini per le unità di randomizzazione, annidare l'anno in tutti gli altri termini del modello dei fattori di raggruppamento.
+6. Combinare gli effetti casuali per le unità di randomizzazione con il fattore ripetuto, utilizzando l'operatore due punti, al fine di derivare i termini di errore corretti per gestire le strutture di correlazione.
+
+I modelli nelle diverse fasi sono i seguenti (con notazione R):
+
+1. modello dei trattamenti: RESA ~ GENOTIPO
+2. modello dei fattori di raggruppamento: RESA ~ BLOCCO + BLOCCO:PLOT
+3. modello di trattamento: RESA ~ GENOTIPO * ANNO
+4. modello a blocchi: RESA ~ BLOCCO + (1|BLOCCO:GRAFICO)
+5. modello a blocchi: RESA ~ BLOCCO + BLOCCO:ANNO + (1|BLOCCO:GRAFICO)
+6. modello a blocchi: RESA ~ BLOCCO + BLOCCO:ANNO + (1|BLOCCO:GRAFICO) + (1|BLOCCO:GRAFICO:ANNO)
+
+In questo caso, considerando che l'erba medica dura in media tre anni e segue uno specifico schema di resa in questi anni, si è deciso che gli effetti di blocco, anno e genotipo siano fissi e, quindi, il modello finale, con notazione R, è:
+
+RESA ~ BLOCCO + BLOCCO:ANNO + GENOTIPO * ANNO + (1|BLOCK:PLOT) + (1|BLOCK:PLOT:YEAR)
+
+dove l'ultimo termine (i residui) non deve essere inserito, poiché viene inserito di default. 
+
+
+```r
+# Example 12.6 [continuation]
+
+# Mixed model analysis for the 'alfalfa3years' dataset
+mod <- lmer(Yield ~ Block + Block:Year + Genotype*Year +
+            (1|Block:Plot),
+           data = dataset)
+anova(mod, ddf = "Kenward-Roger")
+## Type III Analysis of Variance Table with Kenward-Roger's method
+##                Sum Sq Mean Sq NumDF DenDF   F value    Pr(>F)    
+## Block            3.96    1.32     3    57    2.1389  0.105316    
+## Genotype        54.00    2.84    19    57    4.6024  3.75e-06 ***
+## Year          2602.53 1301.27     2   114 2107.3223 < 2.2e-16 ***
+## Block:Year      14.14    2.36     6   114    3.8176  0.001667 ** 
+## Year:Genotype   31.83    0.84    38   114    1.3563  0.111546    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+# Multiple comparisons
+cld(emmeans(mod, ~Genotype), Letters = LETTERS, reverse = TRUE)
+## NOTE: Results may be misleading due to involvement in interactions
+##  Genotype          emmean    SE df lower.CL upper.CL .group
+##  casalina           12.46 0.315 57    11.83     13.1  A    
+##  FDL0101            12.22 0.315 57    11.59     12.9  A    
+##  LaBellaCampagnola  12.17 0.315 57    11.54     12.8  A    
+##  PicenaGR           12.12 0.315 57    11.49     12.8  A    
+##  Selene             12.11 0.315 57    11.48     12.7  A    
+##  robot              12.11 0.315 57    11.48     12.7  A    
+##  Zenith             11.94 0.315 57    11.31     12.6  A    
+##  prosementi         11.79 0.315 57    11.15     12.4  A    
+##  marina             11.76 0.315 57    11.13     12.4  A    
+##  garisenda          11.76 0.315 57    11.13     12.4  A    
+##  dimitra            11.75 0.315 57    11.12     12.4  A    
+##  PR57Q53            11.70 0.315 57    11.07     12.3  A    
+##  classe             11.59 0.315 57    10.96     12.2  AB   
+##  4cascine           11.59 0.315 57    10.96     12.2  AB   
+##  PR56S82            11.56 0.315 57    10.93     12.2  AB   
+##  LaTorre            11.36 0.315 57    10.73     12.0  ABC  
+##  linfa              11.23 0.315 57    10.60     11.9  ABC  
+##  Palladiana         10.89 0.315 57    10.26     11.5  ABC  
+##  RivieraVicentina    9.98 0.315 57     9.35     10.6   BC  
+##  costanza            9.89 0.315 57     9.26     10.5    C  
+## 
+## Results are averaged over the levels of: Block, Year 
+## Degrees-of-freedom method: kenward-roger 
+## Confidence level used: 0.95 
+## P value adjustment: tukey method for comparing a family of 20 estimates 
+## significance level used: alpha = 0.05 
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.
+```
+
+Si dimostra che l'interazione "genotipo x anno" non è significativa, quindi è possibile derivare e confrontare le medie complessive dei genotipi negli anni. Il gruppo dei migliori, in media sui tre anni, contiene tutti i genotipi tranne Riviera Vicentina e Costanza.
+
+Prima di concludere, è necessario ribadire l'idea che se questo set di dati venisse analizzato come nell'Esempio 12.5, tutte le inferenze e i test di ipotesi sarebbero invalidi perché l'assunto di base di indipendenza dei residui verrebbe violato, come accade quando i fattori di raggruppamento non sono inclusi nel modello.
+
+Un'altra avvertenza è che l'analisi del modello misto proposta in precedenza nel riquadro precedente considera il disegno come uno "split-plot nel tempo", il che non è necessariamente corretto. Infatti, tale analisi presuppone che la correlazione entro parcella rimanga la stessa per tutte le coppie di osservazioni, indipendentemente dalla loro distanza temporale. In effetti, sarebbe ragionevole aspettarsi che la correlazione sia maggiore per misure molto vicine nel tempo e diminuisca per misure prese a distanze temporali elevate. Pertanto, soprattutto quando il numero di anni è elevato, potrebbero essere necessarie ulteriori analisi per valutare se l'adozione di strutture di correlazione seriale sia giustificata (Piepho et al., 2004). Tuttavia, questo aspetto esula dallo scopo di questo libro introduttivo; informazioni utili sono reperibili in Littel et al. (2006).
+
+Infine, vale la pena notare che si possono trovare disegni in cui le misurazioni non vengono ripetute nel tempo ma piuttosto nello spazio, ad esempio in posizioni diverse (vedi Capitolo 2) o a profondità variabili. Sebbene il termine "split-plot nel tempo" possa non essere appropriato per queste situazioni, il set di dati risultante può comunque essere analizzato utilizzando gli stessi metodi mostrati in questo esempio.
+
+## Fattori di raggruppamento nei modelli di regressione
+
+Si prevedeva (Capitolo 11) che i fattori di raggruppamento dovessero sempre essere adeguatamente referenziati nel modello, il che vale anche per i modelli di regressione. Per questi ultimi modelli, in particolare per i modelli non lineari, è spesso preferibile considerare l'effetto del fattore di raggruppamento come casuale, supponendo che tutti i parametri del modello (o parte di essi) cambino casualmente da un gruppo all'altro. Di conseguenza, ad esempio, per i modelli di regressione lineare semplici, è possibile definire modelli con intercetta casuale o modelli con pendenza casuale o modelli con intercetta e pendenza casuali.
+
+Questo è un aspetto spesso trascurato e, pertanto, è sembrato opportuno menzionarlo qui, sebbene sia troppo avanzato per un libro introduttivo. I lettori interessati possono consultare \citet{pinheiro_2000} per ulteriori informazioni. Inoltre, diversi post sono dedicati a questo aspetto nel blog allegato a questo libro.
 
 ---
 
-## Regressione non-lineare (Cap. 14)
+## Altre letture
 
-### Esercizio 1
-
-Due campioni di terreno sono stati trattati con due erbicidi diversi e sono stati posti in cella climatica alle medesime condizioni di temperatura ed umidità. In tempi diversi dopo l'inizio dell'esperimento sono state prelevate aliquote di ciascun terreno e ne è stata determinata la concentrazione residua di erbicida. I risultati ottenuti sono i seguenti:
-
-| Time | Herbicide A | Herbicide B |
-|:----:|:-----------:|:-----------:|
-|  0   |   100.00    |   100.00    |
-|  10  |    50.00    |    60.00    |
-|  20  |    25.00    |    40.00    |
-|  30  |    15.00    |    23.00    |
-|  40  |    7.00     |    19.00    |
-|  50  |    3.50     |    11.00    |
-|  60  |    2.00     |    5.10     |
-|  70  |    1.00     |    3.00     |
-
-Ipotizzando che la degradazione dei due erbicidi segue una cinetica di decadimento esponenziale del primo ordine (vale a dire: $y = a \exp \left\{ - bx \right\}$), parametrizzare la relativa equazione e determinare la semivita dei due erbicidi. Quale sostanza degrada più velocemente?
-[Sheet: 14.1]
-
-### Esercizio 2
-
-Un popolazione microbica in condizioni non-limitanti di substrato cresce seguendo un ritmo esponenziale. Un esperimento da i seguenti risultati:
-
-| Time | Cells |
-|:----:|:-----:|
-|  0   |   2   |
-|  10  |   3   |
-|  20  |   5   |
-|  30  |   9   |
-|  40  |  17   |
-|  50  |  39   |
-|  60  |  94   |
-|  70  |  201  |
-
-Parametrizzare un modello di crescita esponenziale e valutarne la bontà di adattamento.
-[Sheet: 14.2]
-
-### Esercizio 3
-
-E' stato organizzato un esperimento per valutare il tasso di assorbimento radicale di azoto da parte di *Lemna minor* allevata in coltura idroponica. I risultati medi ottenuti sono i seguenti:
-
-|  conc  |  rate  |
-|:------:|:------:|
-|  2.86  | 14.58  |
-|  5.00  | 24.74  |
-|  7.52  | 31.34  |
-| 22.10  | 72.97  |
-| 27.77  | 77.50  |
-| 39.20  | 96.09  |
-| 45.48  | 96.97  |
-| 203.78 | 108.88 |
-
-Parametrizzare il modello iperbolico di Michaelis-Menten:
-
-$$y = \frac{a x} {b + x}$$
-
-Valutarne la bontà di adattamento.
-[Sheet: 14.3]
-
-### Esercizio 4
-
-E' stato organizzato un esperimento di competizione per valutare l'effetto di densità crescenti di *Ammi majus* sulla produttività del girasole. I risultati ottenuti sono i seguenti:
-
-| Weed density | Yield |
-|:------------:|:-----:|
-|      0       | 3.52  |
-|      23      | 2.89  |
-|      31      | 2.76  |
-|      39      | 2.75  |
-|      61      | 2.48  |
-
-Parametrizzare l'iperbole di Cousens:
-
-$$Y_W  = Y_{WF} \left( 1 - \frac{i \cdot x}{100\left( 1 + \frac{i \cdot x}{a} \right)} \right)$$
-
-Valutarne la bontà di adattamento. Determinare la soglia economica di intervento.
-[Sheet: 14.4]
-
-### Esercizio 5
-
-Uno degli aspetti fondamentali degli studi relativi alla diversità degli ambienti è la valutazione delle curve area-specie. E' stato considerato un aranceto siciliano, del quale è stata valutata con un apposito campionamento 'innestato' la curva area-specie.
-
-| Area | numSpecie |
-|:----:|:---------:|
-|  1   |     4     |
-|  2   |     5     |
-|  4   |     7     |
-|  8   |     8     |
-|  16  |    10     |
-|  32  |    14     |
-|  64  |    19     |
-| 128  |    22     |
-| 256  |    22     |
-
-Parametrizzare una curva 'di potenza' (power curve):
-
-$$y = a \cdot x^b$$
-
-Valutarne la bontà di adattamento. Determinare l'area minima di campionamento.
-[Sheet: 14.5]
-
-### Esercizio 6
-
-Si ritiene che la crescita di una coltura possa essere descritta accuratamente con un'equazione di Gompertz. Si ritiene inoltre che la presenza delle piante infestanti possa modificare la crescita della coltura, alterando i valori dei parametri del modello anzidetto. Per questo motivo viene organizzato un esperimento a randomizzazione completa con tre repliche, 6 tempi di prelievo (DAE) e 2 stati di infestazione (infestato e libero). In ogni tempo di prelievo, le tre repliche vengono raccolte e viene determinato il peso della coltura. I risultati ottenuti sono i seguenti:
-
-| DAE | Infested | Weed Free |
-|:---:|:--------:|:---------:|
-| 21  |   0.06   |   0.07    |
-| 21  |   0.06   |   0.07    |
-| 21  |   0.11   |   0.07    |
-| 27  |   0.20   |   0.34    |
-| 27  |   0.20   |   0.40    |
-| 27  |   0.21   |   0.25    |
-| 38  |   2.13   |   2.32    |
-| 38  |   3.03   |   1.72    |
-| 38  |   1.27   |   1.22    |
-| 49  |   6.13   |   11.78   |
-| 49  |   5.76   |   13.62   |
-| 49  |   7.78   |   12.15   |
-| 65  |  17.05   |   33.11   |
-| 65  |  22.48   |   24.96   |
-| 65  |  12.66   |   34.66   |
-| 186 |  21.51   |   38.83   |
-| 186 |  26.26   |   27.84   |
-| 186 |  27.68   |   37.72   |
-
-Parametrizzare il modello di Gompertz:
-
-$$y = a \cdot exp(-b \cdot exp(-c \cdot x))$$
-
-e verificarne la bontà di adattamento nelle due situazioni. Quali parametri del modello di Gompertz sono maggiormente influenzati dalle piante infestanti? Abbiamo elementi per ritenere che la crescita segua un'equazione di Gompertz piuttosto che una logistica simmetrica?
-[Sheet: 14.6]
-
-### Esercizio 7
-
-Piante di *Tripleuspermum inodorum* in vaso sono state trattate con erbicida sulfonilureico (tribenuron-methyl) a dosi crescenti. Tre settimano deopo il trattamento è stato registrato il peso delle piante sopravvissute, ottenendo i risulti riportati nella tabella seguente:
-
-| Dose (g/ha) | Fresh weight (g/pot) |
-|:-----------------------:|:----------------------------:|
-|            0            |            115.83            |
-|            0            |            102.90            |
-|            0            |            114.35            |
-|          0.25           |            91.60             |
-|          0.25           |            103.23            |
-|          0.25           |            133.97            |
-|           0.5           |            98.66             |
-|           0.5           |            92.51             |
-|           0.5           |            124.19            |
-|            1            |            93.92             |
-|            1            |            49.21             |
-|            1            |            49.24             |
-|            2            |            21.85             |
-|            2            |            23.77             |
-|            2            |            22.46             |
-
-Si ipotizza che la relazione dose-effetto possa essere descritta con un modello log-logistico:
-
-$$y = c + \frac{d - c}{1 + exp(b ( log (x) - log (a))}$$
-
-Parametrizzare questo modello e verificarne la bontà d'adattamento.
-[Sheet: 14.7]
-
-<!--chapter:end:15-Esercizi.Rmd-->
-
-# Appendice: breve introduzione ad R
+1. Annichiarico P (2002) Genotype x Environment Interactions - Challenges and Opportunities for Plant Breeding and Cultivar Recommendations, Plant Production and Protection Paper, vol 1. FAO, MET
+2. Bates D, Mächler M, Bolker B, Walker S (2015) Fitting linear mixed-effects models using lme4. J Stat Softw 67(1):1–48. https://doi.org/10.18637/jss.v067.i01
+3. Belocchi A, Fornara M, Ciriciofolo E, Biancolatte E, Del Puglia S, Olimpieri G, Vecchiarelli V, Gosparini E, Piccioni C, Desiderio E (2003) Grano duro: Risultati 2002-03 della Rete Nazionale. Lazio e Umbria. L’Informatore Agrario 19(Suppl. 1):41–44
+4. Dixon P (2016) Should blocks be fixed or random? In: Conference on Applied Statistics in Agri- culture. https://doi.org/10.4148/2475-7772.1474. https://newprairiepress.org/agstatconference/ 2016/proceedings/4
+4. Gałecki A, Burzykowski T (2013) Linear Mixed-Effects Models Using R: A Step-by-Step Approach. Springer, Berlin
+5. Gerhard D, Ritz C (2018) medrc: Mixed effect dose-response curves. https://github.com/doseResponse/medrc, r package version 1.1-0, commit bc36df514ad68d6e3f29ec4c740a563605231819
+6. Kuznetsova A, Brockhoff PB, Christensen RHB (2017) lmerTest package: Tests in linear mixed effects models. J Stat Softw 82(13):1–26. https://doi.org/10.18637/jss.v082.i13
+7. Ligabue M, Onofri A, Ruozzi F (2009) Le migliori varietà di erba medica da seme. Agricoltura 84:82–84
+8. Littell RC, Milliken GA, Stroup WW, Wolfinger RD, Schabanberger O (2006) SAS for Mixed Models, 2nd edn. Books. SAS Publishing, Cary
+9. Onofri A, Ciriciofolo E (2007) Using R to perform the AMMI analysis on agriculture variety trials. R News 7:14–19. http://www.r-project.org
+10. Piepho HP, Büchse A, Emrich K (2003) A Hitchhiker’s Guide to mixed models for randomized experiments. J Agron Crop Sci 189(5):310–322. https://doi.org/10.1046/j.1439-037X.2003. 00049.x
+11. Piepho HP, Büchse A, Richter C (2004) A mixed modelling approach for randomized experiments with repeated measures. J Agron Crop Sci 190(4):230–247. http://dx.doi.org/10.1111/j.1439- 037X.2004.00097.x
+12. Pinheiro JC, Bates DM (2000) Mixed-Effects Models in S and S-Plus. Springer-Verlag Inc. edn. Springer, New York
+13. Stagnari F, Onofri A, Jemison J, Monotti M (2007) Improved multivariate analyses to discriminate the behaviour of faba bean varieties. Agron Sustain Develop 27(4):387–397
 
 
-## Cosa è R?
+<!--chapter:end:12-IntroToMixed.Rmd-->
+
+# Appendice A: Breve introduzione ad R
+
+
+## Cosa è R? {-}
 
 R è un software cugino di S-PLUS, con il quale condivide la gran parte delle procedure ed una perfetta compatibilità. Rispetto al cugino più famoso, è completamente freeware (sotto la licenza GNU General Public Licence della Free Software Foundation) ed è nato proprio per mettere a disposizione degli utenti uno strumento gratuito, potente, che permette di lavorare in modo estremamente professionale, senza usare software di frodo. Inoltre, si tratta di un programma *Open Source*, cioè ognuno può avere accesso al suo codice interno ed, eventualmente, proporne modifiche o ampliarne le funzionalità programmando apposite librerie aggiuntive.
 
-A fronte di questi vantaggi, bisogna tuttavia considerare il fatto che R, almeno all'inizio, presenta alcune difficoltà legate al fatto che manca una vera e propria interfaccia grafica (Graphical User Interface: GUI) e, di conseguenza, ogni operazione deve essere eseguita digitando il codice necessario. Parte di queste difficoltà possono essere alleviate utilizzando R dall'interno di RStudio, un'interfaccia che garantisce una più facile digitazione del codice. Per questo motivo, dopo aver installato R [da questo link](https://cran.r-project.org), è opportuno installare anche RStudio, da [quest'altro link](https://posit.co). 
+A fronte di questi vantaggi, bisogna tuttavia considerare il fatto che R, almeno all'inizio, presenta alcune difficoltà legate al fatto che manca una vera e propria interfaccia grafica (Graphical User Interface: GUI) e, di conseguenza, ogni operazione deve essere eseguita digitando il codice necessario. Parte di queste difficoltà possono essere alleviate utilizzando R dall'interno di RStudio, un'interfaccia che garantisce una più facile digitazione del codice.
+
+## Installazione di R {-}
+
+Per iniziare, segui questi semplici passaggi:
+
+1. Installa R da: [https://cran.r-project.org](https://cran.r-project.org). Segui il link a CRAN (in alto a destra), seleziona uno dei mirror disponibili (puoi semplicemente selezionare il primo link in alto), seleziona il tuo sistema operativo (SO) e scarica la versione base. Installala utilizzando tutte le opzioni predefinite.
+2. Installa RStudio da: [https://posit.co/download/rstudio-desktop/](https://posit.co/download/rstudio-desktop/). Seleziona la versione desktop di RStudio, edizione open source e scaricala. Installala utilizzando tutte le opzioni predefinite.
+3. Avvia RStudio.
 
 ## Prima di iniziare
 
@@ -6882,11 +6008,12 @@ Ci sono alcune nozioni che è bene conoscere prima di mettersi al lavoro con R. 
 2. Spazi. Gli spazi possono essere aggiunti ovunque nel codice per renderlo più leggibile. Tuttavia, non si possono aggiungere spazi all'interno dei nomi delle funzioni, dei nomi degli oggetti e degli operatori composti da più di un carattere.
 3. Pannelli. In RStudio, ci sono quattro pannelli e noi ne utilizzeremo prevalentemente due, denominati, rispettivamente SOURCE e CONSOLE. Il codice si scrive nel pannello SOURCE, che è un semplice editor di testi, salvabili con l'estensione '.R'. Il codice composto nel pannello SOURCE *DEVE* essere inviato alla console, dove viene eseguito, utilizzando i tasti 'ctrl-r' (Windows) oppure 'ctrl-invio' (Windows) o 'cmd-invio' (Mac). **Se il codice non è inviato alla console non viene eseguito: è come scrivere un messaggio in Whattsapp**, senza inviarlo al destinatario!
 4. Operatori. In informatica e programmazione, un operatore è un simbolo che specifica quale operazione applicare ad uno o più operandi, per generare un risultato. Si distinguono in (1) aritmetici (+, -, * e /); (2) di assegnazione (<- oppure =); (3) logici (TRUE, FALSE, & e |); (4) Condizionali (if); (5) di relazione (<, <=, ==, >= e >)
-5. Tipi di dati. In R, abbamo dati (1) numerici a doppia precisione; (2) 'integer'; (3) carattere (con virgolette, ad es. "Germinato", "Non germinato") e (4) logici (TRUE o FALSE, T o F).
+
+
 
 ## Oggetti e assegnazioni
 
-In R, si lavora creando ed assegnando loro un nome, che identifica la porzione di memoria in cui questo oggetto viene collocato. Nel principio, questo è molto simile a quello che facciamo in un foglio elettronico, dove assegniamo un oggetto (lo memorizziamo) in una determinata cella. Ad esempio, il comando:
+In R, si lavora creando 'oggetti' ed assegnando loro un nome, che identifica la porzione di memoria in cui questo oggetto viene collocato. Nel principio, questo è molto simile a quello che facciamo in un foglio elettronico, dove assegniamo un oggetto (lo memorizziamo) in una determinata cella. Ad esempio, il comando:
 
 
 ```r
@@ -6901,6 +6028,17 @@ x  <-  "Biondo"
 ```
 
 assegna al testo "Biondo" il nome *x*.
+
+I dati che possiamo includere in un oggetto sono di diverso tipo:
+
+1. numerici a doppia precisione; 
+2. 'integer', cioè numeri senza parte decimale
+3. carattere (con virgolette, ad es. "Germinato", "Non germinato")
+4. valori logici (TRUE o FALSE, abbreviati in T o F).
+
+
+## Tipi di oggetti
+
 
 Gli oggetti che possiamo creare sono di diverso tipo, principalmente:
 
@@ -6963,8 +6101,12 @@ tabella  <-  data.frame("Parc" = parcelle, "Tesi" = tesi,
                         "Produzioni" = dati)
 ```
 
-Per visualizzare un oggetto basta invocare il suo nome:
 
+## Lavorare con gli oggetti
+
+### Visualizzazione
+
+Per visualizzare un oggetto basta invocare il suo nome:
 
 
 ```r
@@ -7023,7 +6165,9 @@ tabella[1,]
 ## 1    1    A         12
 ```
 
-Per un dataframe, si può accedere alle singole colonne utilizzando l'estrattore *$* seguito dal nome della colonna, ad esempio:
+### Estrazione di *slots*
+
+A volte gli oggetti contengono altri oggetti ai quali è possibile accedere con l'estrattore *$*. Per esempio, si può accedere alle singole colonne di un dataframe, oltre che con l'indicizzazione, anche utilizzando l'estrattore *$* seguito dal nome della colonna, ad esempio:
 
 
 ```r
@@ -7032,7 +6176,7 @@ tabella$Parc
 ```
 
 
-## Espressioni e funzioni
+## Espressioni, funzioni e argomenti
 
 Gli oggetti numerici possono essere creati e manipolati anche con opportune operazioni algebriche (espressioni), utilizzando gli operatori indicati in precedenza. Ad esempio:
 
@@ -7095,7 +6239,7 @@ perchè il primo restituisce il logaritmo di 100 in base 2, mentre il secondo re
 ?log
 ```
 
-A volte le funzioni restituiscono diversi risultati, che vengono messi in appositi 'slots'. Ad esempio, se vogliamo calcolare autovettori ed autovalori di una matrice, utilizziamo la funzione 'eigen()'. Questa funzione restituisce una lista che, al suo interno, contiene i due oggetti, denominati, rispettivamente, 'values' (autovalori) e 'vectors' (autovettori). Per recuperare l'uno o l'altro dei due oggetti (autovettori o autovalori) si usa l'estrattore '$', come abbiamo visto prima per le colonne dei dataframes:
+Come menzionato in precedenza, a volte le funzioni restituiscono diversi risultati, che vengono messi in appositi 'slots'. Ad esempio, se vogliamo calcolare autovettori ed autovalori di una matrice, utilizziamo la funzione 'eigen()'. Questa funzione restituisce una lista che, al suo interno, contiene i due oggetti, denominati, rispettivamente, 'values' (autovalori) e 'vectors' (autovettori). Per recuperare l'uno o l'altro dei due oggetti (autovettori o autovalori) si usa l'estrattore '$', come abbiamo visto prima per le colonne dei dataframes:
 
 
 ```r
@@ -7474,4 +6618,417 @@ pie(c(20,35,45),label=c("A", "B", "C"),
 2. Oscar Torres Reina, 2013. Introductio to RStudio (v. 1.3). [This homepage](https://dss.princeton.edu/training/RStudio101.pdf)
 
 <!--chapter:end:17-IntroduzioneR.Rmd-->
+
+# Appendice B: Statistica descrittiva per le variabili nominali
+
+
+Nel capitolo 2 abbiamo visto che le variabili qualitative sono ottenute assegnando ogni soggetto di un collettivo ad una classe scelta tra due o più possibili opzioni. Al termine di questo processo di classificazione, di solito calcoliamo le *frequenza assolute*, cioè il numero di individui assegnato ad ogni classe. Ad esempio, se abbiamo esaminato 500 insetti rilevando l'ordine a cui appartengono, le frequenze assolute potrebbero essere: 100 ditteri, 200  imenotteri e 150 ortotteri.
+
+Oltre alle frequenze assolute, possiamo calcolare anche le *frequenze relative*, dividendo le frequenze assolute per il numero totale degli individui del collettivo. Nel caso precedentemente menzionato, la frequenza relativa dei ditteri è pari a $100/500 = 0.2$.
+
+Se le classi possono essere logicamente ordinate, oltre alle frequenze assolute e relative, possiamo calcolare anche le cosiddette *frequenze cumulate*, che si ottengono cumulando le frequenze relative di una classe con quelle di tutte le classi precedenti.
+
+## Distribuzioni di frequenze e classamento
+
+Quando rappresentiamo, in un grafico o in una tabella, le frequenze (assolute, relative o cumulate) per tutte le classi e tutti gli individui del collettivo, otteniamo una *distribuzione di frequenze*.
+
+In R, il calcolo delle frequenze assolute può essere eseguito utilizzando la funzione `table()`, che può essere combinata con la funzione `length()` (restituisce il numero di elementi in un vettore) per il calcolo delle frequenze relative e con la funzione `cumsum()` per le frequenze cumulate. Ad esempio, se consideriamo il famoso database 'mtcars', relativo alle 32 auto storiche censite dalla rivista Motor Trends nel 1974, e analizziamo il numero delle marce, otteniamo la seguente distribuzione di frequenze assolute, relative e cumulate.
+
+
+```r
+abs <- table(mtcars$gear)
+rel <- table(mtcars$gear)/length(mtcars$gear)
+cum <- cumsum(rel)
+dfr <- data.frame(
+  "Gears" = 3:5,         
+  "Freq.ass" = as.numeric(abs),
+           "Freq.rel" = as.numeric(rel),
+           "Freq.cum" = as.numeric(cum))
+knitr::kable(dfr, digits = 32)
+```
+
+
+
+| Gears| Freq.ass| Freq.rel| Freq.cum|
+|-----:|--------:|--------:|--------:|
+|     3|       15|  0.46875|  0.46875|
+|     4|       12|  0.37500|  0.84375|
+|     5|        5|  0.15625|  1.00000|
+
+
+Le distribuzioni di frequenze possono essere costruite anche per le variabili quantitative, tramite un’operazione di *classamento*, che consiste nel suddividere il campo di variazione dei dati in una serie di intervalli (esempio, da 10 a 20, da 20 a 40 e così via) e contare i soggetti in ogni classe. In questo modo, se le osservazioni sono molto numerose, la lettura delle informazioni risulta più semplice e più completa che non elencando tutti i valori o, d'altra parte, riportando solo la loro media e la loro deviazione standard.
+
+Ad esempio, possiamo prendere 1000 numeri casuali da una distribuzione uniforme nell'intervallo da 130 a 200 ed esprimere questi mille valori tramite una distribuzione di frequenze nelle sei classi: <140, 140-150, 150-160, 160-170, 170-190, >190. Per questo compito si utilizza la funzione `cut()`, che con l'argomento `breaks()` consente di specificare gli estremi inferiori delle classi, inclusi per default nella classe successiva (intervalli aperti a sinistra e chiusi a destra). Ad esempio, se l'estremo inferiore della prima classe è 129 e quello della classe successiva è 140, i valori eventualmente inferiori o uguali a 129 sarebbero esclusi, quelli strettamente maggiori di 129 e minori o uguali a 140 sarebbero inclusi nella seconda classe.
+
+
+
+```r
+set.seed(1234)
+vals <- runif(1000, min = 130, max = 200)
+freq <- table( cut(vals, breaks = c(129, 140,150,160,170,190,200)) )
+freq
+## 
+## (129,140] (140,150] (150,160] (160,170] (170,190] 
+##       141       140       141       141       283 
+## (190,200] 
+##       154
+```
+
+
+## Statistiche descrittive per le distribuzioni di frequenze 
+
+Per una distribuzione di frequenze, il più semplice indicatore di tendenza centrale è la *moda*, cioè il valore della classe che presenta la maggior frequenza. Ovviamente, se la variabile è quantitativa ed è stata sottoposta a classamento, si considera come moda il punto centrale della classe con maggior frequenza. L’individuazione della moda è banale e non richiede calcoli di sorta.
+
+In alcune condizioni (distribuzioni di frequenze per caratteri qualitativi ordinabili o quantitativi sottoposti a classamento), oltre alla moda possiamo calcolare la *mediana* e gli altri percentili, nonché la media e le altre statistiche descrittive indicate per i caratteri quantitativi. Tuttavia, si tratta di una situazione più tipica delle scienze economiche e sociali che non delle scienze agrarie e biologiche e, per questo motivo, non la prenderemo in ulteriore considerazione.
+
+## Rappresentazione grafica delle distribuzioni di frequenza
+
+Una distribuzione di frequenze può essere rappresentata con un grafico a torta, che, in R, può essere disegnato con `ggplot`, producendo un grafico a barre, con segmenti sovrapposti e ruotando il sistema di coordinate, come mostrato nel box sottostante. In questo caso il grafico è banale, in quanto le classi sono più o meno di ampiezza equivalente, dato che abbiamo utilizzato un campionamento da una distribuzione uniforme.
+
+
+```r
+library(ggplot2)
+dfr <- data.frame("Class" = names(freq),
+                  "Freq" = as.numeric(freq))
+ggplot(data = dfr) +
+  geom_bar(aes(x = NA, y = Freq, fill = Class),
+           stat="identity", position = "fill") +
+  coord_polar("y", start=0) +
+  theme_void() # remove background, grid, numeric labels
+```
+
+![](_main_files/figure-html/unnamed-chunk-185-1.png)<!-- -->
+
+
+## Distribuzioni di frequenza bivariate: le tabelle di contingenze
+
+In alcuni casi, in ciascuna unità sperimentale del collettivo vengono studiati due (o più) caratteri qualitativi, che possiamo rappresentare in una *tabella di contingenze*. Si tratta di tabelle a due (o più) entrate, nelle quali ogni valore rappresenta la frequenza assoluta per una particolare combinazione dei caratteri rilevati.
+
+Ad esempio, potremmo aver valutato la germinabilità di cariossidi di frumento sottoposte a due tipi di illuminazione, rossa o blu. Per ogni cariosside abbiamo quindi due informazioni, il trattamento a cui è stata sottoposta (luce rossa o blu) e se è germinata oppure no, per un totale di quattro possibili combinazioni (Rosso-si, Rosso-no, Blu-si, Blu-no). Supponendo di aver osservato 95 cariossidi germinate su 110 testate con luce rossa e 67 germinate su 120 testate con luce blu, possiamo definire la tabella di contingenze riportata di seguito.
+
+
+|      | SI| NO|
+|:-----|--:|--:|
+|ROSSO | 95| 15|
+|BLU   | 67| 53|
+
+Ogni riga della tabella sovrastante costituisce una distribuzione di frequenze per la germinabilità, data una certa tipologia di luce (distribuzione di frequenze condizionate).
+
+
+## Connessione
+
+Se guardiamo le due distribuzioni condizionate per la luce rossa e blu, possiamo notare che esiste una certa differenza e che la germinabilità pare maggiore con luce rossa. Potremmo chiederci quindi se una certa modalità del carattere luce (rossa o blue) influenzi il presentarsi di una particolare modalità del carattere germinabilità (si o no). Se così fosse, potremmo parlare di dipendenza o connessione, mentre, nel caso contrario, si dovrebbe parlare di indipendenza dei caratteri.
+
+Come si fa a stabilire se i caratteri sono indipendenti o connessi? Il punto di partenza è pensare che, se i caratteri fossero indipendenti, la germinabilità dovrebbe essere la stessa con entrambi i trattamenti; in totale, abbiamo osservato 230 semi, di cui 162 sono germinati e 68 non lo sono e, di conseguenza, la  proporzione di semi germinati è stata pari a 162/230 = 0.704. Ebbene, questa proporzione la si dovrebbe riscontrare con entrambi i trattamenti. In cifre, il numero di semi germinati con luce rossa dovrebbe essere pari a $110 \times 0.704 = 77.44$, mentre il numero di semi germinati con luce blu dovrebbe essere pari a $120 \times 0.704 = 84.48$. Rispettando i totali marginali (cioè il numero totale di semi saggiati con luce rossa e blu dovrebbe essere pari, rispettivamente a 110 e 120), possiamo costruire la tabella delle frequenze assolute attese, nell'ipotesi di indipendenza completa tra i due caratteri.
+
+
+|      |    SI|    NO|
+|:-----|-----:|-----:|
+|ROSSO | 77.44| 32.56|
+|BLU   | 84.48| 35.52|
+
+A questo punto possiamo costruire un indice statistico di connessione, detto $\chi^2$, che misuri la discrepanzatra le due tabelle, quella delle frequenze osservate e quella delle frequenze teoriche che si sarebbero dovute osservare nell’ipotesi di indipendenza perfetta:
+
+$$\chi ^2  = \sum \left[ \frac{\left( {f_o  - f_a } \right)^2 }{f_a } \right]$$
+
+dove $f_o$ sta per frequenza osservata ed $f_a$ sta per frequenza attesa nel caso indipendenza. Questo indice assume valore pari a zero nel caso di indipendenza completa (le frequenze osservate sono uguali a quelle attese) ed assume un valore positivo tanto più alto quanto maggiore è la connessione tra i due caratteri.
+
+Nel nostro esempio:
+
+$$\chi^2  = \frac{\left( {95  - 77.44 } \right)^2 }{77.44 } + \frac{\left( {15  - 32.56 } \right)^2 }{32.56 } + \frac{\left( {67  - 84.48 } \right)^2 }{84.48 } + \frac{\left( {53  - 35.52 } \right)^2 }{35.52 } = 25.67$$
+
+
+Se i caratteri fossero veramente indipendenti, la tabella delle frequenze osservate dovrebbe essere uguale a quella delle frequenze atteso, il che implicherebbe $\chi^2 = 0$. Il valore da noi osservato è maggiore di 0 e quindi possiamo dire che esiste un certo grado di connessione, ma non sappiamo dire quanto questa sia elevata. Qual è il $\chi^2$ massimo possibile?
+
+Intuitivamente, possiamo immaginare che la connessione potrebbe essere la più elevata possibile quando con uno dei due trattamenti i semi sono tutti germinati, mentre con l'altro non ne è germinato nessuno, come indicato nella tabella seguente:
+
+
+|      |  SI|  NO|
+|:-----|---:|---:|
+|ROSSO | 110|   0|
+|BLU   |   0| 120|
+
+
+
+Se calcoliamo il valore di $\chi^2$ per la tabella sovrastante otteniamo 230, che è appunto il massimo valore possibile nella nostra condizione. Più in generale, il $\chi^2$ massimo è dato dal prodotto del numero degli individui per il valore minimo tra il numero di righe meno una e il numero di colonne meno una:
+
+$$\max \chi ^2  = n \cdot \min (r - 1,\,c - 1)$$
+
+Possiamo concludere che la connessione tra i due caratteri è pari all'11% circa di quello massima ($25.67/230 = 0.112$).
+
+
+## Il chi quadro con R
+
+
+Consideriamo il dataset 'HairEyeColor', disponibile nell'installazione di base di R e relativo al colore degli occhi e dei capelli di 520 studenti di statistica. La tabella delle contingenze, per le femmine, è la seguente:
+
+
+
+```r
+data(HairEyeColor)
+tab <- HairEyeColor[,,2]
+tab
+##        Eye
+## Hair    Brown Blue Hazel Green
+##   Black    36    9     5     2
+##   Brown    66   34    29    14
+##   Red      16    7     7     7
+##   Blond     4   64     5     8
+```
+
+
+Se vogliamo sapere se il colore degli occhi è legato a quello dei capelli, possiamo utilizzare la funzione `as.table()` per trasformare l'oggetto  `tab` in una tabella di contingenze (in questo caso non sarebbe necessario, visto che 'tab' è già una tabella di contingenze) ed applicare la funzione `summary()`. Oltre al chi quadro, l'output fornisce anche il P-value relativo all'ipotesi nulla che non vi sia connessione tra i due caratteri.
+
+
+
+```r
+summary(as.table (tab))
+## Number of cases in table: 313 
+## Number of factors: 2 
+## Test for independence of all factors:
+## 	Chisq = 106.66, df = 9, p-value = 7.014e-19
+## 	Chi-squared approximation may be incorrect
+```
+
+Nell'output si legge che l'approssimazione del chi quadro potrebbe non essere corretta in quanto, quando ci sono meno di 25-30 soggetti, l'impiego di una distribuzione continua come quella di chi quadro potrebbe non essere ottimale. Nelle tabelle '2 x 2' si preferisce utilizzare la funzione `chisq.test()`, che fornisce, per default, la correzione di Yates per la continuità. In questo caso, la stessa funzione permette di calcolare il P-value con una simulazione di Monte Carlo, evitando il problema della mancanza di continuità.
+
+
+```r
+chisq.test(tab, simulate.p.value = T)
+## 
+## 	Pearson's Chi-squared test with simulated
+## 	p-value (based on 2000 replicates)
+## 
+## data:  tab
+## X-squared = 106.66, df = NA, p-value = 0.0004998
+```
+
+
+---
+
+## Altre letture
+
+1. F. Crivellari (2006). Analisi statistica dei dati con R. Apogeo, Milano.
+2. G. Leti e L. Cerbara (2009). Elementi di statistica descrittiva. Il Mulino Editore, Bologna.
+
+## Esercizi
+
+1. Quali statistiche descrittive possono essere utilizzate con le variabili categoriche e ordinali? Illustrare brevemente e discutere
+2. Un ricercatore ha confrontato il rapporto tra maschi e femmine in una popolazione di insetti sottoposta a due trattamenti sperimentali diversi e si chiede se maschi e femmine manifestino una diversa sensibilità al trattamento in studio. Considerando che i maschi e le femmine osservati sono, rispettivamente 275 e 175 con il trattamento A e 326 e 297 con il trattamento B, valutare il grado di dipendenza tra i due caratteri (sesso e trattamento), in rapporto al valore minimo e massimo possibile per l'indicatore prescelto.
+3. Caricare il datasets 'students' disponibile al link: 'https://www.casaonofri.it/_datasets/students.csv'. In questo file potete trovare una database relativo alla valutazione degli studenti in alcune materie del primo anno di Agraria. Ogni record rappresenta un esame, con il relativo voto, la materia e la scuola di provenienza dello studente.
+ Determinare la frequenza assoluta e relativa dei diversi voti (da 18 a 30). È possibile calcolare le frequenze cumulate? Con un uso appropriato delle tabelle di contingenza e del chi quadro, valutare se il voto dipende dalla materia e dalla scuola di provenienza dello studente.
+
+
+## Soluzioni
+
+
+```
+## 
+## 	Pearson's Chi-squared test with Yates'
+## 	continuity correction
+## 
+## data:  tab
+## X-squared = 7.8289, df = 1, p-value = 0.005142
+```
+
+
+# Appendice C: Intervalli di confidenza per una proporzione
+
+## Popolazioni gaussiane e non 
+
+Nel capitolo 6 abbiamo imparato come costruire intervalli di confidenza per stime la cui *sampling distribution* è, almeno approssimativamente normale. Abbiamo anche visto che questa approssimazione è buona quando (1) gli errori sono gaussiani e quando (2) i soggetti sono molto numerosi. In altre circostanze 
+
+DA RIVEDERE
+
+casi potrebbe non essere così. Ad esempio, immaginiamo di avere una popolazione di insetti, nella quale il rapporto tra maschi e femmine è ignoto. Campioniamo 40 insetti e contiamo 14 femmine. Qual è la proporzione di femmine nella popolazione originaria?
+
+Stiamo studiando una grandezza che, almeno nel principio, non può essere gaussiana, ma, nonostante questo, grazie al teorema centrale del limite, possiamo utilizzare la stessa tecnica per la stima dell'intervallo di confidenza; basta sapere che la proporzione osservata è $p = 14/40 = 0.375$, mentre la deviazione standard di una proporzione (che non abbiamo finora incontrato) è pari a $\sigma = \sqrt{0.375 \times (1 - 0.375)} = 0.484$ (Snedecor e Cochran, 1989).  L'errore standard è $0.484 / \sqrt{40} = 0.077$ e l'intervallo di confidenza, considerando che il campione è molto numeroso, potrà essere approssimato come:
+
+
+```r
+0.375 - 2 * 0.077
+## [1] 0.221
+0.375 + 2 * 0.077
+## [1] 0.529
+```
+
+
+## Cosa fare se il teorema centrale del limite non funziona?
+
+Nel caso precedente, avevamo a che fare con una distribuzione non gaussiana, ma avevamo comunque un campione numeroso, oltre ad una formula per il calcolo dell'errore standard. In altri casi, non abbiamo nessuno di questi elementi e quindi non possiamo calcolare l'intervallo di confidenza classico, come suggerito da Neyman. L'esempio tipico è la varianza, per la quale non sappiamo come calcolare un errore standard attendibile (anche se sono disponibili in letteratura alcune formule di uso comune).
+
+Ad esempio, immaginiamo di avere un campione di 30 soggetti, la cui media è pari a 7.0 e la cui varianza è 0.5. Possiamo dire che la media della popolazione che ha generato il campione è presumibilmente compresa tra:
+
+
+```r
+7 - qt(0.975, 29) * sqrt(0.5)/sqrt(30)
+## [1] 6.735962
+```
+
+e
+
+
+```r
+7 + qt(0.975, 29) * sqrt(0.5)/sqrt(30)
+## [1] 7.264038
+```
+
+Invece, in relazione alla varianza della popolazione, possiamo solo dire che la stima puntuale è pari a 0.5, ma non abbiamo una formula attendibile per stimare l'errore standard e quindi per calcolare l'intervallo di confidenza. In questo caso, possiamo determinare una *sampling distribution* empirica, con una simulazione di Monte Carlo, come indicato nel codice sottostante:
+
+
+```r
+# Simulazione Monte Carlo - Varianza
+set.seed(1234)
+result <- rep(0, 100000)
+for (i in 1:100000){
+  sample <- rnorm(30, 7, sqrt(0.5))
+  result[i] <- var(sample)
+}
+mean(result)
+## [1] 0.5004283
+sd(result)
+## [1] 0.1313021
+```
+
+Vediamo che la *sampling distribution* empirica ha media pari a 0.5 circa (questo non ci sorprende) e che l'errore standard è pari a 0.131. Possiamo anche calcolare il 2.5-esimo e il 97.5-esimo percentile ed utilizzarli come margini dell'intervallo di confidenza, che comprende al suo interno il 95% dei valori:
+
+
+```r
+quantile(result, probs = c(0.025, 0.975))
+##      2.5%     97.5% 
+## 0.2770264 0.7871032
+```
+
+Questo intervallo di confidenza empirico funziona piuttosto bene ed ha campi di impiego abbastanza vasti, anche quando il teorema centrale del limite non vale; tuttavia, l'intervallo di confidenza così ottenuto può non essere simmetrico rispetto alla media, il che non dovrebbe stupire, dato che la *sampling distribution* non è gaussiana e può essere più o meno asimmetrica.
+
+# Appendice E: Confronto di due proporzioni
+
+Il test di t, con tutte le sue varianti, è fondamentalmente basato sul rapporto tra una stima ed il suo errore standard, la cui *sampling distribution* è approssimativamente gaussiana o, più precisamente, segue la distribuzione di 't di Student'. Tuttavia, io posso testare ipotesi di ogni tipo, mi basta avere una qualunque statistica che descriva l'andamento dell'esperimento e conoscere la sua *sampling distribution*, assumendo che l'ipotesi nulla sia vera. Questa *sampling distribution* può essere empirica (cioè ottenuta per simulazione Monte Carlo) o meglio teorica, scelta in base a considerazioni di natura statistico-matematica; su di essa, vado a cercare la probabilità di trovare valori per la statistica in studio che siano tanto estremi o più estremi di quello da noi riscontrato.
+
+## Il test di 'chi quadro' 
+
+Ad esempio, immaginiamo che io abbia una stima pari a 22 ed immaginiamo che la *sampling distribution* per questa stima, assumendo vera l'ipotesi nulla, segua la distribuzione di $\chi^2$ con 10 gradi di libertà (per menzionare una qualunque distribuzione che non conosciamo ancora). Allora io posso ottenere un P-level per l'ipotesi nulla andandomi a guardare la probabilità di osservare un valore altrettanto estremo o più estremo di 22 (test ad una coda), come indicato nel box sottostante.
+
+
+```r
+pchisq(22, 10, lower.tail = F)
+## [1] 0.0151046
+```
+
+Il test di $\chi^2$ funziona esattamente in questo modo ed è utilizzato per valutare la significatività della connessione tra due caratteri qualitativi, per i quali sia stata costruita una tabella delle contingenze (ricordate il Capitolo 3?). 
+
+Ad esempio, immaginiamo un esperimento per verificare se un coadiuvante aumenta l'efficacia di un insetticida. In questo esperimento, utilizziamo l'insetticida da solo e miscelato con il coadiuvante su due gruppi di insetti diversi. Nel primo gruppo (trattato con insetticida) contiamo 56 morti su 75 insetti trattate, mentre nel secondo gruppo (trattato con insetticida e coadiuvante) otteniamo 48 morti su 50 insetti trattati.
+
+Nel capitolo 3 abbiamo visto come costruire una tabella di contingenze e come calcolare il $\chi^2$ per misurare l'entità della connessione:
+
+
+```r
+counts <- c(56, 19, 48, 2)
+tab <- matrix(counts, 2, 2, byrow = T)
+row.names(tab) <- c("I", "IC")
+colnames(tab) <- c("M", "V")
+tab
+##     M  V
+## I  56 19
+## IC 48  2
+summary( as.table(tab) )
+## Number of cases in table: 125 
+## Number of factors: 2 
+## Test for independence of all factors:
+## 	Chisq = 9.768, df = 1, p-value = 0.001776
+```
+
+Il valore di $\chi^2$ osservato è pari a 9.768, il che indica un certo grado di connessione, in quanto è diverso dal valore atteso in assenza di connessione che sarebbe zero (Capitolo 3). Tuttavia, noi non siamo interessati solo ai 125 insetti osservati, ma siamo interessati a trarre conclusioni generali e valide per l'intera popolazione che ha generato il nostro campione. A questo fine abbiamo bisogno di un test d'ipotesi formale; se non esiste connessione, la proporzione di insetti controllati dal trattamento dovrebbe la stessa, indipendentemente dalla presenza del coadiuvante. Cioè:
+
+$$H_o :\pi_1  = \pi_2  = \pi$$
+
+Vediamo che, come negli altri esempio, l'ipotesi nulla riguarda i parametri delle popolazioni ($\pi_1$ e $\pi_2$), non quelli dei campioni ($p_1$ e $p_2$). Ci chiediamo: se l'ipotesi nulla fosse vera ($\pi_1 = \pi_2$), quale sarebbe la *sampling distribution* per $\chi^2$? E soprattutto, quanto sarebbe probabile ottenere un valore alto come il nostro o più alto? Karl Pearson ha dimostrato che il valore di $\chi^2$, quando l'ipotesi nulla è vera, segue la distribuzione di $\chi^2$, con un numero di gradi di libertà pari a quelli della tabelle delle contingenze (bisogna prendere il minimo valore tra il numero di righe meno una e il numero di colonne meno una; vedi il Capitolo 3). Il box sottostante mostra come utilizzare la funzione 'pchi()' per il calcolo del P-level (in questo caso il test è ad una coda, perché la connessione implica valori di $\chi^2$ alti e non bassi).
+
+
+```r
+pchisq(9.768, df = 1, lower.tail = F)
+## [1] 0.001775755
+```
+
+Vediamo che questo P-level era già disponibile nell'output della funzione `summary()`; essendo inferiore a 0.05, ci consente di rigettare l'ipotesi nulla, affermando che esiste una differenza significativa tra l'effetto dell'insetticida quando è utilizzato da solo e quando è utilizzando in abbinamento con un coadiuvante.
+
+Allo stesso risultato, ma in modo più semplice, è possibile pervenire utilizzando la funzione `chisq.test()`, applicata alla tabella di contingenza:
+
+
+```r
+chisq.test(tab, correct = F)
+## 
+## 	Pearson's Chi-squared test
+## 
+## data:  tab
+## X-squared = 9.768, df = 1, p-value = 0.001776
+```
+
+L'opzione 'correct = F' permette di evitare la correzione per la continuità (correzione di Yates), che è invece necessaria quando il numero dei soggetti è piccolo (minore di 30, grosso modo).
+
+
+## Confronto tra due proporzioni con simulazione di Monte Carlo
+
+Vi sono situazioni nelle quali non vi è una chiara indicazione su quale sia la distribuzione di probabilità/densità più opportuna per descrivere la *sampling distribution* di una statistica sotto l'ipotesi nulla. Ciò è vero anche per il test di $\chi^2$ appena esposto, per il quale la distribuzione di $\chi^2$ è cosniderata solo una buona approssimazione.
+
+In queste situazioni è possibile costruire una *sampling distribution* empirica analogamente a quanto abbiamo fatto in precedenza per il test di t di Student. Nel caso del test di $\chi^2$, possiamo utilizzare la funzione `r2dtable()`, che, partendo da una situazione in cui l'ipotesi nulla è vera (cioè $\pi_1 = \pi_2$) e quindi i due caratteri sono indipendenti, produce tante tabelle di contingenza (nel nostro caso 10'000), rispettando i totali marginali della nostra tabella di partenza. Le tabelle prodotte sono restituite come lista, quindi possiamo utilizzare la funzione `lapply()` per applicare ad ogni elemento della lista la funzione che restituisce il $\chi^2$ ('chiSim').
+
+
+```r
+chiSim <- function(x) summary(as.table(x))$stat
+set.seed(1234)
+tabs <- r2dtable(10000, apply(tab, 1, sum), apply(tab, 2, sum))
+chiVals <- as.numeric( lapply( tabs, chiSim) )
+length(chiVals[chiVals > 9.768])
+## [1] 19
+```
+
+Vediamo che vi sono 19 valori so 10'000 più alti di quello da noi osservato, quindi il P-value è 0.0019, molto simile a quello osservato con il test formale.
+
+## Esercizi
+
+1. Uno sperimentatore ha impostato un esperimento per verificare l'effetto di un fungicida (A) in confronto al testimone non trattato (B), in base al numero di colonie fungine sopravvissute. Il numero delle colonie trattate è di 200 con 20 sopravvissute, mentre il numero di quelle non trattate è di 100, con 50 sopravvissute. Stabilire se i risultati possono essere considerati significativamente diversi, per un livello di probabilità del 5%.
+2. Immaginate di aver riscontrato che, in determinate condizioni ambientali, 60 olive su 75 sono attaccate da *Daucus olee* (mosca dell'olivo). Nelle stesse condizioni ambientali, diffondendo in campo un insetto predatore siamo riusciti a ridurre il numero di olive attaccate a 12 su 75. Si tratta di una oscillazione casuale del livello di attacco o possiamo concludere che l'insetto predatore è stato un mezzo efficace di lotta biologica alla mosca dell'olivo?
+3. Sono stati osservati 153 calciatori registrando la dominanza della mano e quella del piede e sono state riscontrate le seguenti frequenze: 26 con dominanza di mano e piede sinistro, 11 con dominanza mano sinistra e piede destro, 21 con dominanza mano destra e piede sinistro e 95 con dominanza di mano e piede destro. Sulla base di questi dati, possiamo concludere che esiste una dipendenza tra la dominanza della mano e del piede?
+4. Un botanico ha valutato il numero di semi germinati per colza sottoposto a due diversi regimi termici dopo l'imbibizione (15 e 25°C). Per la temperatura più bassa, su 400 semi posti in prova, ne sono germinati 358. Alla temperatura più alta, su 380 semi in prova, ne sono germinati 286. Descrivere i due campioni, in termini di proporzione di semi germinati. Inferire la proporzione di germinati nell'intera popolazione di semi da cui è stato estratto il nostro campione casuale di 780 semi. Utilizzare opportunamente un intervallo di confidenza, sapendo che la varianza di una proporzione è una quantità fissa, che si calcola come $p ( 1- p)$ (dove 'p' è la proporzione osservata. Esiste una differenza significativa tra le proporzioni delle due popolazioni? Esplicitare l'ipotesi nulla e calcolare la probabilità di errore relativa al suo rifiuto.
+
+
+
+# Appendice F: Alcuni problemi collegati con le deviazioni rispetti agli assunti di base
+
+Nel codice sottostante abbiamo immaginato di campionare residui da distribuzioni normali con la stessa media, ma diverse deviazioni standard per ognuno dei quattro trattamenti sperimentali. Abbiamo quindi ottenuti 100'000 datasets nei quali l'ipotesi nulla è vera (nessuna differenza tra le medie), ma non sussiste l'omogeneità delle varianze. Sottoponendo questi datasets ad ANOVA, notiamo che la *sampling distribution* per F non può essere descritta con la curva di densità F di Fisher e, soprattutto, che quest'ultima funzione, nella coda destra, produce una chiara sottostima della probabilità reale e, quindi del P-value. In altre parole, quando non vi è omoscedasticità, si può incorrere in un incremento del rischio di rifiutare erroneamente l'ipotesi nulla, il che rende le nostre conclusioni molto meno attendibili.
+
+```
+Fvals <- c()
+set.seed(1234)
+Treat <- factor(rep(1:4, each = 4))
+for(i in 1:100000){
+  # Ysim <- rnorm(16, 14.48375, 3.9177) # Omoscedasticità
+  Ysim1 <- rnorm(4, 14.48375, 0.39177)
+  Ysim2 <- rnorm(4, 14.48375, 3.9177)
+  Ysim3 <- rnorm(4, 14.48375, 6.9177)
+  Ysim4 <- rnorm(4, 14.48375, 9.9177)
+  Ysim <- c(Ysim1, Ysim2, Ysim3, Ysim4)
+  mod <- lm(Ysim ~ Treat)
+  Fvals[i] <- anova(mod)$F[1]
+}
+```
+
+
+```r
+# b <- seq(0, 65, by=0.1)
+# hist(Fvals, breaks = b, xlim = c(0, 6), freq = F,
+#      xlab = "F", ylab = "Density", main = "")
+# curve(df(x, 3, 12), add=T, col="blue")
+knitr::include_graphics("_images/SamplingDistribF_false.png")
+```
+
+<div class="figure" style="text-align: center">
+<img src="_images/SamplingDistribF_false.png" alt="Sampling distribution empirica per F, in caso di disomogeneità delle varianze. Vediamo che, in questo caso, la funzione di densità F di Fisher non costituisce un buon riferimento per il calcolo del P-level." width="85%" />
+<p class="caption">(\#fig:figName101a)Sampling distribution empirica per F, in caso di disomogeneità delle varianze. Vediamo che, in questo caso, la funzione di densità F di Fisher non costituisce un buon riferimento per il calcolo del P-level.</p>
+</div>
+
+
+
+<!--chapter:end:18-Appendici.Rmd-->
 
