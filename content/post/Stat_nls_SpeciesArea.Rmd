@@ -1,7 +1,7 @@
 ---
 title: "Why are derivatives important in life? A case-study with nonlinear regression"
 author: "Andrea Onofri"
-date: 2021-06-09
+date: 2025-11-26
 slug: 'nonlinear_regression'
 categories:
   - R
@@ -11,7 +11,7 @@ tags:
   - 'nonlinear_regression'
   - 'nls'
   - 'drm'
-  - 'aomisc'
+  - 'statforbiology'
 archives:
   - 2021
 ---
@@ -21,7 +21,8 @@ archives:
 #Put at the beginning
 knitr::opts_chunk$set(echo = TRUE, message = F, warning = F)
 knitr::knit_hooks$set(document = function(x){ 
-  gsub("```\n*```r*\n*", "", x) 
+  gsub("```\n*```r*\n*", "", x)
+  # gsub("```\n*```\\sr*\n*", "", x)
 })
 ```
 
@@ -35,12 +36,12 @@ First of all, let's try to model the species-are relationship. In some instances
 
 $$Y = a \, X^b$$
 
-where $Y$ is the number of species, $X$ is the sampling area, $a$ and $b$ are regression parameters. In order to understand such a relationship, we can take the 'speciesArea' dataset in the 'aomisc' package, that comes from Cristaudo et al. (2015). We can fit a power curve to this dataset, by using the `drm()` function in the 'drc' package, together with the `DRC.powerCurve()` self-starter in the 'aomisc' package.
+where $Y$ is the number of species, $X$ is the sampling area, $a$ and $b$ are regression parameters. In order to understand such a relationship, we can take the 'speciesArea' dataset in the 'statforbiology' package, that comes from Cristaudo et al. (2015). We can load this dataset by using the `getAgroData()` function (which is specific to the dataset contained in the statforbiology package) and we can fit a power curve to this dataset, by using the `drm()` function in the 'drc' package, together with the `DRC.powerCurve()` self-starter in the 'statforbiology' package.
 
 
 ```{r message=FALSE, warning=FALSE}
-library(aomisc)
-data(speciesArea)
+library(statforbiology)
+speciesArea <- getAgroData("speciesArea")
 
 # drm fit
 model <- drm(numSpecies ~ Area, fct = DRC.powerCurve(),
@@ -63,6 +64,7 @@ In this respect, we see that every additional sampling effort gives a progressiv
 
 ```{r}
 predict(model, newdata = data.frame(Area = c(50)))
+#
 predict(model, newdata = data.frame(Area = c(250))) -
   predict(model, newdata = data.frame(Area = c(200))) 
 ```
@@ -80,7 +82,7 @@ X <- seq(1, 100, by = 10)
 eval(powerCurve.der)
 ```
 
-It confirms what we already knew, that is our payback decreases while our effort increases; it is also interesting to note that the function `deparse()` transforms the resulting expression into character strings, which we can pass to the `gnlht()` function in the 'aomisc' package, to calculate standard errors for the estimated derivatives.
+It confirms what we already knew, that is our payback decreases while our effort increases; it is also interesting to note that the function `deparse()` transforms the resulting expression into character strings, which we can pass to the `gnlht()` function in the 'statforbiology' package, to calculate standard errors for the estimated derivatives.
 
 ```{r}
 funList <- list(deparse(powerCurve.der))
@@ -95,7 +97,7 @@ The `deriv()` function is similar, but it takes a formula as an argument and, if
 ```{r}
 powerCurve.der2 <- deriv(~ a * X ^ b, "X",
               function.arg = c("a", "b", "X"))
-
+#
 curve(attr(powerCurve.der2(4.348, 0.32977, x), "gradient"), 
       from = 0, to = 250, ylab = "First derivative", 
       xlab = "Sampling area")
@@ -128,6 +130,9 @@ Andrea Onofri
 Department of Agricultural, Food and Environmental Sciences        
 University of Perugia (Italy)        
 [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)  
+
+<a href = "https://link.springer.com/book/10.1007/978-3-032-08199-5"><img src= "../../_Figures/Email_Signature_978-3-032-08199-5.png" align="center" alt="Book cover" class="cover" /></a>
+<br/>
 
 ---
 

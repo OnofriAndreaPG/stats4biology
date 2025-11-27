@@ -1,0 +1,129 @@
+---
+title: "Getting the Absolute/Relative Growth Rate from growth curves"
+author: "Andrea Onofri"
+date: 2025-11-27
+slug: 'nonlinear_regression'
+categories:
+  - R
+  - 'nonlinear_regression'
+tags:
+  - R
+  - 'nonlinear_regression'
+  - 'nls'
+  - 'drm'
+  - 'statforbiology'
+archives:
+  - 2025
+---
+
+
+
+<p>Yesterday, a colleague of mine pointed me to the article “How to fit nonlinear plant growth models and calculate growth rates: an update for ecologists” (Paine et al., 2012). It addresses a relevant topic: many plant scientists are involved in growth analyses and need to determine Absolute Growth Rates (AGRs) and Relative Growth Rates (RGRs).</p>
+<p>The main point made by Paine et al. is that we can use the observed data to fit a growth model via nonlinear regression and then calculate model-derived growth rates together with their standard errors. In principle, the process is straightforward: we select a suitable growth model to predict biomass at any given time <span class="math inline">\(t\)</span>; the AGR at time <span class="math inline">\(t\)</span> is the derivative of the selected growth function with respect to time, and the RGR is simply the AGR at time <span class="math inline">\(t\)</span> divided by the biomass at that same time point.</p>
+<p>In practice, however, implementing these calculations is not immediately clear from the manuscript—especially for us biologists. The main difficulty is that the calculations and the R code provided in the supplemental materials are algebra-based and specific to each growth model, making it hard to extract a general procedure that will always work with any dataset and any growth model.</p>
+<p>I was intrigued by the idea that I could develop such a general procedure, and so I decided to sit down and write this post.</p>
+<p>Before starting, I would like to offer the following suggestion: <strong>once we have a suitable growth model in mind (linear, exponential, logistic, or otherwise), we should select a parameterisation with good fitting properties (see Ratkowsky, 1990; Ritz, 2010) and that is already implemented for nonlinear regression in R, ideally with self-starting routines</strong>. The choice of parameterisation will not affect our estimates of AGRs and RGRs.</p>
+<p>Now, let’s move on to an example, using the growth data provided in the supplemental R code of Paine et al. (2012). These data are reported and loaded in the box below, together with the ‘statforbiology’ package (which also loads the ‘drc’ package).</p>
+<pre class="r"><code>library(statforbiology)
+dat_asymp &lt;-
+structure(list(X = c(14L, 14L, 14L, 35L, 35L, 35L, 70L, 133L, 
+70L, 161L, 98L, 161L, 133L, 98L, 189L, 189L, 189L, 98L, 133L, 
+161L), Y = c(0.031, 0.087, 0.09, 0.261, 0.291, 0.437, 2.104, 
+2.736, 2.814, 5.832, 2.979, 9, 6.309, 3.483, 6.103, 5.655, 5.889, 
+4.462, 8.392, 7.043)), .Names = c(&quot;X&quot;, &quot;Y&quot;), class = &quot;data.frame&quot;, row.names = c(NA, 
+-20L))
+head(dat_asymp)
+##    X     Y
+## 1 14 0.031
+## 2 14 0.087
+## 3 14 0.090
+## 4 35 0.261
+## 5 35 0.291
+## 6 35 0.437</code></pre>
+<p>Now, let’s imagine that we want to fit a logistic growth model. Among the available parameterisations—including the one provided in Paine et al. (2012)—we will select the following form, which has good fitting properties and is already implemented as the function <code>L.3()</code> in the ‘drc’ package:</p>
+<p><span class="math display">\[M = \frac{d}{1 + \exp\left[ b \left( X - e\right) \right]}\]</span></p>
+<p>In the above function, <span class="math inline">\(d\)</span> is the upper asymptote, <span class="math inline">\(b\)</span> is the slope at inflection point and <span class="math inline">\(e\)</span> is the abscissa of the inflection point. Once we have selected this function, all we need to do is write it in R as a character string (being careful to code it correctly), compute its derivative using the <code>D()</code> function (note the use of <code>parse()</code>, which transforms the text string into an expression for <code>D()</code>, and <code>deparse()</code>, which converts the resulting derivative expression back into a text string), and then construct the ratio between the derivative and the growth function—again as a text string (using the <code>paste()</code> function).</p>
+<pre class="r"><code>fun &lt;- &quot;d/(1 +exp(b*(X - e)))&quot;
+derFun &lt;- deparse(D(parse(text = fun), &quot;X&quot;))
+rgrFun &lt;- paste(&quot;(&quot;, derFun, &quot;)/(&quot;, fun, &quot;)&quot;)
+derFun
+## [1] &quot;-(d * (exp(b * (X - e)) * b)/(1 + exp(b * (X - e)))^2)&quot;
+rgrFun
+## [1] &quot;( -(d * (exp(b * (X - e)) * b)/(1 + exp(b * (X - e)))^2) )/( d/(1 +exp(b*(X - e))) )&quot;</code></pre>
+<p>We are ready to fit the model by using the <code>drm()</code> function, as shown below.</p>
+<pre class="r"><code>fit.logis.drm &lt;- drm(Y ~ X, fct = L.3(),
+                     data = dat_asymp)
+summary(fit.logis.drm)
+## 
+## Model fitted: Logistic (ED50 as parameter) with lower limit fixed at 0 (3 parms)
+## 
+## Parameter estimates:
+## 
+##                Estimate Std. Error t-value   p-value    
+## b:(Intercept) -0.046214   0.014877 -3.1065  0.006415 ** 
+## d:(Intercept)  6.652995   0.598588 11.1145 3.221e-09 ***
+## e:(Intercept) 89.621517   9.502619  9.4312 3.627e-08 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error:
+## 
+##  1.279088 (17 degrees of freedom)</code></pre>
+<p>At this point, we choose the time points at which we want to calculate the AGRs and RGRs, and we use the <code>gnlht()</code>function from the ‘statforbiology’ package (Onofri, 2026). This function takes a nonlinear combination of the model parameters (specified as a text string), evaluates it, and provides standard errors obtained via the ‘delta’ method (Fox, 2019).</p>
+<p>The calculations can be somewhat slow—<code>gnlht()</code>was not designed for such large numbers of evaluations—but if we restrict ourselves to a few hundred time points, the computation time remains acceptable. Please note the <code>parameterNames</code> argument, which matches the order of the parameters in the fitted model object with the names used in the nonlinear function <code>func</code>.</p>
+<pre class="r"><code># Time points to estimate
+nPoints &lt;- 100
+timePoints &lt;- data.frame(X = seq(min(dat_asymp$X), max(dat_asymp$X),
+                                       length = nPoints))
+# Get AGR
+AGRs &lt;- gnlht(fit.logis.drm,
+              func = list(derFun),
+              const = timePoints,
+              parameterNames = c(&quot;b&quot;, &quot;d&quot;, &quot;e&quot;))
+head(AGRs[,-1])
+##          X    Estimate          SE  t-value   p-value
+## 1 14.00000 0.008791161 0.006833979 1.286390 0.2155509
+## 2 15.76768 0.009491815 0.007122149 1.332718 0.2002126
+## 3 17.53535 0.010244087 0.007410021 1.382464 0.1847231
+## 4 19.30303 0.011051063 0.007695797 1.435987 0.1691525
+## 5 21.07071 0.011915887 0.007977492 1.493688 0.1535855
+## 6 22.83838 0.012841743 0.008252938 1.556021 0.1381226
+#
+# Get RGRs
+RGRs &lt;- gnlht(fit.logis.drm,
+              func = list(rgrFun),
+              const = timePoints,
+              parameterNames = c(&quot;b&quot;, &quot;d&quot;, &quot;e&quot;))
+head(RGRs[,-1])
+##          X   Estimate         SE  t-value    p-value
+## 1 14.00000 0.04485295 0.01580079 2.838652 0.01134277
+## 2 15.76768 0.04474076 0.01583658 2.825152 0.01167042
+## 3 17.53535 0.04461964 0.01587175 2.811261 0.01201709
+## 4 19.30303 0.04448896 0.01590596 2.797000 0.01238334
+## 5 21.07071 0.04434801 0.01593880 2.782393 0.01276959
+## 6 22.83838 0.04419608 0.01596984 2.767471 0.01317616</code></pre>
+<p>Here we go: the results match those obtained in the supplemental code of Paine et al. (2012). A few remarks before closing:</p>
+<ol style="list-style-type: decimal">
+<li><strong>This method is feasible with any growth model</strong>—we only need to change the name of the R fitting function. For example, we can replace the call to L.3() with any other function provided in drc or statforbiology. To obtain the corresponding equation to write as a text string, you can refer to my post <a href="https://www.statforbiology.com/2020/stat_nls_usefulfunctions/">on useful nonlinear regression functions at this link</a>. Or consult my new book, <a href="https://link.springer.com/book/10.1007/978-3-032-08199-5">available on the Springer website</a>.</li>
+<li><strong>As noted by Paine et al. (2012), do not forget to check the basic assumptions of nonlinear regression</strong>. For example, in this dataset there are clear signs of heteroscedasticity, which can be addressed using a Transform-Both-Sides approach (see Ritz et al., 2019) or by modelling the variance structure with a Generalised Nonlinear Least Squares method (Pinheiro &amp; Bates, 2000).</li>
+</ol>
+<p>Thanks for reading—and don’t forget to check out my new book below!</p>
+<p>Andrea Onofri<br />
+Department of Agricultural, Food and Environmental Sciences<br />
+University of Perugia (Italy)<br />
+Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<p><a href = "https://link.springer.com/book/10.1007/978-3-032-08199-5"><img src= "../../_Figures/Email_Signature_978-3-032-08199-5.png" align="center" alt="Book cover" class="cover" /></a>
+<br/></p>
+<hr />
+<div id="references" class="section level1">
+<h1>References</h1>
+<ol style="list-style-type: decimal">
+<li>Fox J, Weisberg S (2019). <em>An R Companion to Applied Regression</em>, Third edition. Sage, Thousand Oaks CA. <a href="https://www.john-fox.ca/Companion/" class="uri">https://www.john-fox.ca/Companion/</a>.</li>
+<li>Onofri, A., 2026. Field Research Methods in Agriculture: An Introduction with R. Springer Nature Switzerland, Cham. <a href="https://doi.org/10.1007/978-3-032-08199-5" class="uri">https://doi.org/10.1007/978-3-032-08199-5</a></li>
+<li>Paine, C.E.T., Marthews, T.R., Vogt, D.R., Purves, D., Rees, M., Hector, A., Turnbull, L.A., 2012. How to fit nonlinear plant growth models and calculate growth rates: an update for ecologists. Methods in Ecology and Evolution 3, 245–256. <a href="https://doi.org/10.1111/j.2041-210X.2011.00155.x" class="uri">https://doi.org/10.1111/j.2041-210X.2011.00155.x</a></li>
+<li>Pinheiro, J.C., Bates, D.M., 2000. Mixed-Effects Models in S and S-Plus, Springer-Verlag Inc. ed. Springer-Verlag Inc., New York.</li>
+<li>Ratkowsky, D.A., 1990. Handbook of nonlinear regression models. Marcel Dekker Inc., New York (USA).</li>
+<li>Ritz, C., 2010. Toward a unified approach to dose-response modeling in ecotoxicology. Environmental Toxicology and Chemistry 29, 220–229.</li>
+<li>Ritz, C., Jensen, S.M., Gerhard, D., Streibig, J.C., 2019. Dose-response analysis using R, CRC Press. ed. USA.</li>
+</ol>
+</div>

@@ -1,0 +1,130 @@
+---
+title: "Getting the Absolute/Relative Growth Rate from growth curves"
+author: "Andrea Onofri"
+date: 2025-11-27
+slug: 'nonlinear_regression'
+categories:
+  - R
+  - 'nonlinear_regression'
+tags:
+  - R
+  - 'nonlinear_regression'
+  - 'nls'
+  - 'drm'
+  - 'statforbiology'
+archives:
+  - 2025
+---
+
+
+```{r setup, cache = F, echo = F}
+#Put at the beginning
+knitr::opts_chunk$set(echo = TRUE, message = F, warning = F)
+knitr::knit_hooks$set(document = function(x){ 
+  gsub("```\n*```r*\n*", "", x)
+  # gsub("```\n*```\\sr*\n*", "", x)
+})
+```
+
+Yesterday, a colleague of mine pointed me to the article "How to fit nonlinear plant growth models and calculate growth rates: an update for ecologists" (Paine et al., 2012). It addresses a relevant topic: many plant scientists are involved in growth analyses and need to determine Absolute Growth Rates (AGRs) and Relative Growth Rates (RGRs).
+
+The main point made by Paine et al. is that we can use the observed data to fit a growth model via nonlinear regression and then calculate model-derived growth rates together with their standard errors. In principle, the process is straightforward: we select a suitable growth model to predict biomass at any given time $t$; the AGR at time $t$ is the derivative of the selected growth function with respect to time, and the RGR is simply the AGR at time $t$ divided by the biomass at that same time point.
+
+In practice, however, implementing these calculations is not immediately clear from the manuscript—especially for us biologists. The main difficulty is that the calculations and the R code provided in the supplemental materials are algebra-based and specific to each growth model, making it hard to extract a general procedure that will always work with any dataset and any growth model.
+
+I was intrigued by the idea that I could develop such a general procedure, and so I decided to sit down and write this post.
+
+Before starting, I would like to offer the following suggestion: **once we have a suitable growth model in mind (linear, exponential, logistic, or otherwise), we should select a parameterisation with good fitting properties (see Ratkowsky, 1990; Ritz, 2010) and that is already implemented for nonlinear regression in R, ideally with self-starting routines**. The choice of parameterisation will not affect our estimates of AGRs and RGRs.
+
+Now, let's move on to an example, using the growth data provided in the supplemental R code of Paine et al. (2012). These data are reported and loaded in the box below, together with the 'statforbiology' package (which also loads the 'drc' package).
+
+```{r}
+library(statforbiology)
+dat_asymp <-
+structure(list(X = c(14L, 14L, 14L, 35L, 35L, 35L, 70L, 133L, 
+70L, 161L, 98L, 161L, 133L, 98L, 189L, 189L, 189L, 98L, 133L, 
+161L), Y = c(0.031, 0.087, 0.09, 0.261, 0.291, 0.437, 2.104, 
+2.736, 2.814, 5.832, 2.979, 9, 6.309, 3.483, 6.103, 5.655, 5.889, 
+4.462, 8.392, 7.043)), .Names = c("X", "Y"), class = "data.frame", row.names = c(NA, 
+-20L))
+head(dat_asymp)
+```
+
+Now, let’s imagine that we want to fit a logistic growth model. Among the available parameterisations—including the one provided in Paine et al. (2012)—we will select the following form, which has good fitting properties and is already implemented as the function `L.3()` in the 'drc' package:
+
+$$M = \frac{d}{1 + \exp\left[ b \left( X - e\right) \right]}$$
+
+In the above function, $d$ is the upper asymptote, $b$ is the slope at inflection point and $e$ is the abscissa of the inflection point. Once we have selected this function, all we need to do is write it in R as a character string (being careful to code it correctly), compute its derivative using the `D()` function (note the use of `parse()`, which transforms the text string into an expression for `D()`, and `deparse()`, which converts the resulting derivative expression back into a text string), and then construct the ratio between the derivative and the growth function—again as a text string (using the `paste()` function).
+
+```{r}
+fun <- "d/(1 +exp(b*(X - e)))"
+derFun <- deparse(D(parse(text = fun), "X"))
+rgrFun <- paste("(", derFun, ")/(", fun, ")")
+derFun
+rgrFun
+```
+
+We are ready to fit the model by using the `drm()` function, as shown below.
+
+```{r}
+fit.logis.drm <- drm(Y ~ X, fct = L.3(),
+                     data = dat_asymp)
+summary(fit.logis.drm)
+```
+
+At this point, we choose the time points at which we want to calculate the AGRs and RGRs, and we use the `gnlht() `function from the 'statforbiology' package (Onofri, 2026). This function takes a nonlinear combination of the model parameters (specified as a text string), evaluates it, and provides standard errors obtained via the 'delta' method (Fox, 2019).
+
+The calculations can be somewhat slow—`gnlht() `was not designed for such large numbers of evaluations—but if we restrict ourselves to a few hundred time points, the computation time remains acceptable. Please note the `parameterNames` argument, which matches the order of the parameters in the fitted model object with the names used in the nonlinear function `func`.
+
+```{r}
+# Time points to estimate
+nPoints <- 100
+timePoints <- data.frame(X = seq(min(dat_asymp$X), max(dat_asymp$X),
+                                       length = nPoints))
+# Get AGR
+AGRs <- gnlht(fit.logis.drm,
+              func = list(derFun),
+              const = timePoints,
+              parameterNames = c("b", "d", "e"))
+head(AGRs[,-1])
+
+#
+# Get RGRs
+RGRs <- gnlht(fit.logis.drm,
+              func = list(rgrFun),
+              const = timePoints,
+              parameterNames = c("b", "d", "e"))
+head(RGRs[,-1])
+```
+
+
+Here we go: the results match those obtained in the supplemental code of Paine et al. (2012). A few remarks before closing:
+
+1. **This method is feasible with any growth model**—we only need to change the name of the R fitting function. For example, we can replace the call to L.3() with any other function provided in drc or statforbiology. To obtain the corresponding equation to write as a text string, you can refer to my post [on useful nonlinear regression functions at this link](https://www.statforbiology.com/2020/stat_nls_usefulfunctions/). Or consult my new book, [available on the Springer website](https://link.springer.com/book/10.1007/978-3-032-08199-5).
+2. **As noted by Paine et al. (2012), do not forget to check the basic assumptions of nonlinear regression**. For example, in this dataset there are clear signs of heteroscedasticity, which can be addressed using a Transform-Both-Sides approach (see Ritz et al., 2019) or by modelling the variance structure with a Generalised Nonlinear Least Squares method (Pinheiro & Bates, 2000).
+
+Thanks for reading—and don’t forget to check out my new book below!
+
+Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences        
+University of Perugia (Italy)        
+Send comments to: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)  
+
+<a href = "https://link.springer.com/book/10.1007/978-3-032-08199-5"><img src= "../../_Figures/Email_Signature_978-3-032-08199-5.png" align="center" alt="Book cover" class="cover" /></a>
+<br/>
+
+---
+
+# References
+
+1. Fox J, Weisberg S (2019). _An R Companion to Applied Regression_, Third edition. Sage, Thousand Oaks CA. <https://www.john-fox.ca/Companion/>.
+2. Onofri, A., 2026. Field Research Methods in Agriculture: An Introduction with R. Springer Nature Switzerland, Cham. https://doi.org/10.1007/978-3-032-08199-5
+3. Paine, C.E.T., Marthews, T.R., Vogt, D.R., Purves, D., Rees, M., Hector, A., Turnbull, L.A., 2012. How to fit nonlinear plant growth models and calculate growth rates: an update for ecologists. Methods in Ecology and Evolution 3, 245–256. https://doi.org/10.1111/j.2041-210X.2011.00155.x
+4. Pinheiro, J.C., Bates, D.M., 2000. Mixed-Effects Models in S and S-Plus, Springer-Verlag Inc. ed. Springer-Verlag Inc., New York.
+5. Ratkowsky, D.A., 1990. Handbook of nonlinear regression models. Marcel Dekker Inc., New York (USA).
+6. Ritz, C., 2010. Toward a unified approach to dose-response modeling in ecotoxicology. Environmental Toxicology and Chemistry 29, 220–229.
+7. Ritz, C., Jensen, S.M., Gerhard, D., Streibig, J.C., 2019. Dose-response analysis using R, CRC Press. ed. USA.
+
+
+
+

@@ -6,10 +6,241 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>Copyright © 2023, @AndreaOnofri</copyright>
-    <lastBuildDate>Fri, 23 Feb 2024 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 27 Nov 2025 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://www.statforbiology.com/tags/drm/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Getting the Absolute/Relative Growth Rate from growth curves</title>
+      <link>https://www.statforbiology.com/2025/stat_nls_agr_rgr/</link>
+      <pubDate>Thu, 27 Nov 2025 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.statforbiology.com/2025/stat_nls_agr_rgr/</guid>
+      <description>
+
+
+&lt;p&gt;Yesterday, a colleague of mine pointed me to the article “How to fit nonlinear plant growth models and calculate growth rates: an update for ecologists” (Paine et al., 2012). It addresses a relevant topic: many plant scientists are involved in growth analyses and need to determine Absolute Growth Rates (AGRs) and Relative Growth Rates (RGRs).&lt;/p&gt;
+&lt;p&gt;The main point made by Paine et al. is that we can use the observed data to fit a growth model via nonlinear regression and then calculate model-derived growth rates together with their standard errors. In principle, the process is straightforward: we select a suitable growth model to predict biomass at any given time &lt;span class=&#34;math inline&#34;&gt;\(t\)&lt;/span&gt;; the AGR at time &lt;span class=&#34;math inline&#34;&gt;\(t\)&lt;/span&gt; is the derivative of the selected growth function with respect to time, and the RGR is simply the AGR at time &lt;span class=&#34;math inline&#34;&gt;\(t\)&lt;/span&gt; divided by the biomass at that same time point.&lt;/p&gt;
+&lt;p&gt;In practice, however, implementing these calculations is not immediately clear from the manuscript—especially for us biologists. The main difficulty is that the calculations and the R code provided in the supplemental materials are algebra-based and specific to each growth model, making it hard to extract a general procedure that will always work with any dataset and any growth model.&lt;/p&gt;
+&lt;p&gt;I was intrigued by the idea that I could develop such a general procedure, and so I decided to sit down and write this post.&lt;/p&gt;
+&lt;p&gt;Before starting, I would like to offer the following suggestion: &lt;strong&gt;once we have a suitable growth model in mind (linear, exponential, logistic, or otherwise), we should select a parameterisation with good fitting properties (see Ratkowsky, 1990; Ritz, 2010) and that is already implemented for nonlinear regression in R, ideally with self-starting routines&lt;/strong&gt;. The choice of parameterisation will not affect our estimates of AGRs and RGRs.&lt;/p&gt;
+&lt;p&gt;Now, let’s move on to an example, using the growth data provided in the supplemental R code of Paine et al. (2012). These data are reported and loaded in the box below, together with the ‘statforbiology’ package (which also loads the ‘drc’ package).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(statforbiology)
+dat_asymp &amp;lt;-
+structure(list(X = c(14L, 14L, 14L, 35L, 35L, 35L, 70L, 133L, 
+70L, 161L, 98L, 161L, 133L, 98L, 189L, 189L, 189L, 98L, 133L, 
+161L), Y = c(0.031, 0.087, 0.09, 0.261, 0.291, 0.437, 2.104, 
+2.736, 2.814, 5.832, 2.979, 9, 6.309, 3.483, 6.103, 5.655, 5.889, 
+4.462, 8.392, 7.043)), .Names = c(&amp;quot;X&amp;quot;, &amp;quot;Y&amp;quot;), class = &amp;quot;data.frame&amp;quot;, row.names = c(NA, 
+-20L))
+head(dat_asymp)
+##    X     Y
+## 1 14 0.031
+## 2 14 0.087
+## 3 14 0.090
+## 4 35 0.261
+## 5 35 0.291
+## 6 35 0.437&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now, let’s imagine that we want to fit a logistic growth model. Among the available parameterisations—including the one provided in Paine et al. (2012)—we will select the following form, which has good fitting properties and is already implemented as the function &lt;code&gt;L.3()&lt;/code&gt; in the ‘drc’ package:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[M = \frac{d}{1 + \exp\left[ b \left( X - e\right) \right]}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;In the above function, &lt;span class=&#34;math inline&#34;&gt;\(d\)&lt;/span&gt; is the upper asymptote, &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; is the slope at inflection point and &lt;span class=&#34;math inline&#34;&gt;\(e\)&lt;/span&gt; is the abscissa of the inflection point. Once we have selected this function, all we need to do is write it in R as a character string (being careful to code it correctly), compute its derivative using the &lt;code&gt;D()&lt;/code&gt; function (note the use of &lt;code&gt;parse()&lt;/code&gt;, which transforms the text string into an expression for &lt;code&gt;D()&lt;/code&gt;, and &lt;code&gt;deparse()&lt;/code&gt;, which converts the resulting derivative expression back into a text string), and then construct the ratio between the derivative and the growth function—again as a text string (using the &lt;code&gt;paste()&lt;/code&gt; function).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;fun &amp;lt;- &amp;quot;d/(1 +exp(b*(X - e)))&amp;quot;
+derFun &amp;lt;- deparse(D(parse(text = fun), &amp;quot;X&amp;quot;))
+rgrFun &amp;lt;- paste(&amp;quot;(&amp;quot;, derFun, &amp;quot;)/(&amp;quot;, fun, &amp;quot;)&amp;quot;)
+derFun
+## [1] &amp;quot;-(d * (exp(b * (X - e)) * b)/(1 + exp(b * (X - e)))^2)&amp;quot;
+rgrFun
+## [1] &amp;quot;( -(d * (exp(b * (X - e)) * b)/(1 + exp(b * (X - e)))^2) )/( d/(1 +exp(b*(X - e))) )&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We are ready to fit the model by using the &lt;code&gt;drm()&lt;/code&gt; function, as shown below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;fit.logis.drm &amp;lt;- drm(Y ~ X, fct = L.3(),
+                     data = dat_asymp)
+summary(fit.logis.drm)
+## 
+## Model fitted: Logistic (ED50 as parameter) with lower limit fixed at 0 (3 parms)
+## 
+## Parameter estimates:
+## 
+##                Estimate Std. Error t-value   p-value    
+## b:(Intercept) -0.046214   0.014877 -3.1065  0.006415 ** 
+## d:(Intercept)  6.652995   0.598588 11.1145 3.221e-09 ***
+## e:(Intercept) 89.621517   9.502619  9.4312 3.627e-08 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error:
+## 
+##  1.279088 (17 degrees of freedom)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;At this point, we choose the time points at which we want to calculate the AGRs and RGRs, and we use the &lt;code&gt;gnlht()&lt;/code&gt;function from the ‘statforbiology’ package (Onofri, 2026). This function takes a nonlinear combination of the model parameters (specified as a text string), evaluates it, and provides standard errors obtained via the ‘delta’ method (Fox, 2019).&lt;/p&gt;
+&lt;p&gt;The calculations can be somewhat slow—&lt;code&gt;gnlht()&lt;/code&gt;was not designed for such large numbers of evaluations—but if we restrict ourselves to a few hundred time points, the computation time remains acceptable. Please note the &lt;code&gt;parameterNames&lt;/code&gt; argument, which matches the order of the parameters in the fitted model object with the names used in the nonlinear function &lt;code&gt;func&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Time points to estimate
+nPoints &amp;lt;- 100
+timePoints &amp;lt;- data.frame(X = seq(min(dat_asymp$X), max(dat_asymp$X),
+                                       length = nPoints))
+# Get AGR
+AGRs &amp;lt;- gnlht(fit.logis.drm,
+              func = list(derFun),
+              const = timePoints,
+              parameterNames = c(&amp;quot;b&amp;quot;, &amp;quot;d&amp;quot;, &amp;quot;e&amp;quot;))
+head(AGRs[,-1])
+##          X    Estimate          SE  t-value   p-value
+## 1 14.00000 0.008791161 0.006833979 1.286390 0.2155509
+## 2 15.76768 0.009491815 0.007122149 1.332718 0.2002126
+## 3 17.53535 0.010244087 0.007410021 1.382464 0.1847231
+## 4 19.30303 0.011051063 0.007695797 1.435987 0.1691525
+## 5 21.07071 0.011915887 0.007977492 1.493688 0.1535855
+## 6 22.83838 0.012841743 0.008252938 1.556021 0.1381226
+#
+# Get RGRs
+RGRs &amp;lt;- gnlht(fit.logis.drm,
+              func = list(rgrFun),
+              const = timePoints,
+              parameterNames = c(&amp;quot;b&amp;quot;, &amp;quot;d&amp;quot;, &amp;quot;e&amp;quot;))
+head(RGRs[,-1])
+##          X   Estimate         SE  t-value    p-value
+## 1 14.00000 0.04485295 0.01580079 2.838652 0.01134277
+## 2 15.76768 0.04474076 0.01583658 2.825152 0.01167042
+## 3 17.53535 0.04461964 0.01587175 2.811261 0.01201709
+## 4 19.30303 0.04448896 0.01590596 2.797000 0.01238334
+## 5 21.07071 0.04434801 0.01593880 2.782393 0.01276959
+## 6 22.83838 0.04419608 0.01596984 2.767471 0.01317616&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Here we go: the results match those obtained in the supplemental code of Paine et al. (2012). A few remarks before closing:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;&lt;strong&gt;This method is feasible with any growth model&lt;/strong&gt;—we only need to change the name of the R fitting function. For example, we can replace the call to L.3() with any other function provided in drc or statforbiology. To obtain the corresponding equation to write as a text string, you can refer to my post &lt;a href=&#34;https://www.statforbiology.com/2020/stat_nls_usefulfunctions/&#34;&gt;on useful nonlinear regression functions at this link&lt;/a&gt;. Or consult my new book, &lt;a href=&#34;https://link.springer.com/book/10.1007/978-3-032-08199-5&#34;&gt;available on the Springer website&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;As noted by Paine et al. (2012), do not forget to check the basic assumptions of nonlinear regression&lt;/strong&gt;. For example, in this dataset there are clear signs of heteroscedasticity, which can be addressed using a Transform-Both-Sides approach (see Ritz et al., 2019) or by modelling the variance structure with a Generalised Nonlinear Least Squares method (Pinheiro &amp;amp; Bates, 2000).&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Thanks for reading—and don’t forget to check out my new book below!&lt;/p&gt;
+&lt;p&gt;Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href = &#34;https://link.springer.com/book/10.1007/978-3-032-08199-5&#34;&gt;&lt;img src= &#34;../../_Figures/Email_Signature_978-3-032-08199-5.png&#34; align=&#34;center&#34; alt=&#34;Book cover&#34; class=&#34;cover&#34; /&gt;&lt;/a&gt;
+&lt;br/&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Fox J, Weisberg S (2019). &lt;em&gt;An R Companion to Applied Regression&lt;/em&gt;, Third edition. Sage, Thousand Oaks CA. &lt;a href=&#34;https://www.john-fox.ca/Companion/&#34; class=&#34;uri&#34;&gt;https://www.john-fox.ca/Companion/&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Onofri, A., 2026. Field Research Methods in Agriculture: An Introduction with R. Springer Nature Switzerland, Cham. &lt;a href=&#34;https://doi.org/10.1007/978-3-032-08199-5&#34; class=&#34;uri&#34;&gt;https://doi.org/10.1007/978-3-032-08199-5&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Paine, C.E.T., Marthews, T.R., Vogt, D.R., Purves, D., Rees, M., Hector, A., Turnbull, L.A., 2012. How to fit nonlinear plant growth models and calculate growth rates: an update for ecologists. Methods in Ecology and Evolution 3, 245–256. &lt;a href=&#34;https://doi.org/10.1111/j.2041-210X.2011.00155.x&#34; class=&#34;uri&#34;&gt;https://doi.org/10.1111/j.2041-210X.2011.00155.x&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Pinheiro, J.C., Bates, D.M., 2000. Mixed-Effects Models in S and S-Plus, Springer-Verlag Inc. ed. Springer-Verlag Inc., New York.&lt;/li&gt;
+&lt;li&gt;Ratkowsky, D.A., 1990. Handbook of nonlinear regression models. Marcel Dekker Inc., New York (USA).&lt;/li&gt;
+&lt;li&gt;Ritz, C., 2010. Toward a unified approach to dose-response modeling in ecotoxicology. Environmental Toxicology and Chemistry 29, 220–229.&lt;/li&gt;
+&lt;li&gt;Ritz, C., Jensen, S.M., Gerhard, D., Streibig, J.C., 2019. Dose-response analysis using R, CRC Press. ed. USA.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Why are derivatives important in life? A case-study with nonlinear regression</title>
+      <link>https://www.statforbiology.com/2025/stat_nls_speciesarea/</link>
+      <pubDate>Wed, 26 Nov 2025 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.statforbiology.com/2025/stat_nls_speciesarea/</guid>
+      <description>
+
+
+&lt;p&gt;In general, undergraduate students in biology/ecology courses tend to consider the derivatives as a very abstract entity, with no real usefulness in the everyday life. In my work as a teacher, I have often tried to fight against such an attitude, by providing convincing examples on how we can use the derivatives to get a better understanding about the changes on a given system.&lt;/p&gt;
+&lt;p&gt;In this post I’ll tell you about a recent situation where I was involved with derivatives. A few weeks ago, a colleague of mine wrote me to ask the following question (I’m changing it a little, to make it, hopefully, more interesting). He asked: &lt;em&gt;“I am using a power curve to model how the size of the sampling area affects species richness. How can I quantify my knowledge gain?”&lt;/em&gt;. This is an interesting question, indeed, although I feel I should provide you with some background information.&lt;/p&gt;
+&lt;p&gt;Ecologists and botanists are very often involved with field surveys, aimed at determining the richness of plant species in a given territory. In most cases, such territories are too big to conduct exhaustive samplings and, therefore, it is necessary to resort to sampling a smaller area. The problem is that it is clearly recognised that the wider the sampled area, the higher the number of plant species that we encounter. So, what is the minimum sampling area to conduct a reliable survey?&lt;/p&gt;
+&lt;p&gt;First of all, let’s try to model the species-are relationship. In some instances, this relationship can be described by using a power curve, that is coded as follows:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[Y = a \, X^b\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; is the number of species, &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt; is the sampling area, &lt;span class=&#34;math inline&#34;&gt;\(a\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; are regression parameters. In order to understand such a relationship, we can take the ‘speciesArea’ dataset in the ‘statforbiology’ package, that comes from Cristaudo et al. (2015). We can load this dataset by using the &lt;code&gt;getAgroData()&lt;/code&gt; function (which is specific to the dataset contained in the statforbiology package) and we can fit a power curve to this dataset, by using the &lt;code&gt;drm()&lt;/code&gt; function in the ‘drc’ package, together with the &lt;code&gt;DRC.powerCurve()&lt;/code&gt; self-starter in the ‘statforbiology’ package.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(statforbiology)
+speciesArea &amp;lt;- getAgroData(&amp;quot;speciesArea&amp;quot;)
+
+# drm fit
+model &amp;lt;- drm(numSpecies ~ Area, fct = DRC.powerCurve(),
+             data = speciesArea)
+summary(model)
+## 
+## Model fitted: Power curve (Freundlich equation) (2 parms)
+## 
+## Parameter estimates:
+## 
+##               Estimate Std. Error t-value   p-value    
+## a:(Intercept) 4.348404   0.337197  12.896 3.917e-06 ***
+## b:(Intercept) 0.329770   0.016723  19.719 2.155e-07 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error:
+## 
+##  0.9588598 (7 degrees of freedom)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It is very useful to look at the resulting graph: we clearly see that the harder we work, the higher is our knowledge gain, in terms of plant richness. We may not be experts of plant surveys, but we should keep in mind that this may be really hard work, especially if we have to survey citrus groves under the sunshine of an Italian summer in Sicily! Therefore, we’d better optimise our effort and enlarge our sampling area only if this gives us a relevant payback.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;../../../../../../../../../../../_Figures/Stat_nls_SpeciesArea.png&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
+&lt;p&gt;In this respect, we see that every additional sampling effort gives a progressively lower payback; for example, an increase of 50 m&lt;sup&gt;2&lt;/sup&gt; in sampling area let us discover almost 16 new species when we begin our survey, while, when we have already sampled 200 m&lt;sup&gt;2&lt;/sup&gt;, a similar increase of sampling area let us discover only 2 additional plant species.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;predict(model, newdata = data.frame(Area = c(50)))
+## Prediction 
+##    15.7979
+#
+predict(model, newdata = data.frame(Area = c(250))) -
+  predict(model, newdata = data.frame(Area = c(200))) 
+## Prediction 
+##    1.90552&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The above argument motivates my colleague’s question: how do we quantify the knowledge gain in relation to the effort it costs? This is a typical situation where the first derivative of the power function comes in handy. You might remember from high school that the first derivative represents the slope of the line tangent to the function at any point on the graph. Its value represents the ratio between the knowledge gain and the increase in sampling effort and it is a very good measure of how well our additional effort is paid back in terms of knowledge gain. In other words, the higher the derivative, the higher our convenience to increase our sampling effort.&lt;/p&gt;
+&lt;p&gt;But, how do we find a derivative? Years ago, it was a big relief for me to discover that R can efficiently help us with this task. In particular, we have two main functions available: &lt;code&gt;D()&lt;/code&gt; and &lt;code&gt;deriv()&lt;/code&gt;. The first one takes an expression as an argument and returns an expression, which can be evaluated to get the derivative value. For example, if we want to know the derivative value for a sampling area ranging from 1 to 100 m&lt;sup&gt;2&lt;/sup&gt;, we can use the following code:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;powerCurve.der &amp;lt;- D(expression(a * X ^ b), &amp;quot;X&amp;quot;)
+powerCurve.der
+## a * (X^(b - 1) * b)
+a &amp;lt;- coef(model)[1]
+b &amp;lt;- coef(model)[2]
+X &amp;lt;- seq(1, 100, by = 10)
+eval(powerCurve.der)
+##  [1] 1.43397379 0.28745425 0.18635899 0.14354434 0.11901599 0.10281978
+##  [7] 0.09119265 0.08237067 0.07540802 0.06974823&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It confirms what we already knew, that is our payback decreases while our effort increases; it is also interesting to note that the function &lt;code&gt;deparse()&lt;/code&gt; transforms the resulting expression into character strings, which we can pass to the &lt;code&gt;gnlht()&lt;/code&gt; function in the ‘statforbiology’ package, to calculate standard errors for the estimated derivatives.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;funList &amp;lt;- list(deparse(powerCurve.der))
+samplingAreas &amp;lt;- data.frame(X = seq(1, 100, by = 10))
+pred &amp;lt;- gnlht(model, funList, const = samplingAreas,
+              parameterNames = c(&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;))
+pred
+##                   Form  X   Estimate          SE  t-value      p-value
+## 1  a * (X^(b - 1) * b)  1 1.43397379 0.046072499 31.12429 9.127464e-09
+## 2  a * (X^(b - 1) * b) 11 0.28745425 0.007794058 36.88121 2.800293e-09
+## 3  a * (X^(b - 1) * b) 21 0.18635899 0.006470755 28.80019 1.565496e-08
+## 4  a * (X^(b - 1) * b) 31 0.14354434 0.005745031 24.98583 4.196158e-08
+## 5  a * (X^(b - 1) * b) 41 0.11901599 0.005240148 22.71233 8.123235e-08
+## 6  a * (X^(b - 1) * b) 51 0.10281978 0.004857404 21.16764 1.321660e-07
+## 7  a * (X^(b - 1) * b) 61 0.09119265 0.004552575 20.03100 1.934121e-07
+## 8  a * (X^(b - 1) * b) 71 0.08237067 0.004301572 19.14897 2.637561e-07
+## 9  a * (X^(b - 1) * b) 81 0.07540802 0.004089788 18.43813 3.421480e-07
+## 10 a * (X^(b - 1) * b) 91 0.06974823 0.003907714 17.84886 4.276907e-07&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The &lt;code&gt;deriv()&lt;/code&gt; function is similar, but it takes a formula as an argument and, if we provide the &lt;code&gt;function.arg()&lt;/code&gt; argument, it returns a function, which is very handy for further processing. For example, we can use such function for plotting purposes, as shown in the box below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;powerCurve.der2 &amp;lt;- deriv(~ a * X ^ b, &amp;quot;X&amp;quot;,
+              function.arg = c(&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;X&amp;quot;))
+#
+curve(attr(powerCurve.der2(4.348, 0.32977, x), &amp;quot;gradient&amp;quot;), 
+      from = 0, to = 250, ylab = &amp;quot;First derivative&amp;quot;, 
+      xlab = &amp;quot;Sampling area&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_nls_SpeciesArea_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;Now, how do we use the above information to decide how big our sampling area should be? According to Muller-Dumboise and Ellenberg (1974), the minimal sampling area should be selected so that an increase of 10% in sampling area yields an increase of 10% in the number of sampled species. In other words, the minimal sampling area should be selected so that the sampling effort in relative terms is equal to the gain in knowledge, also in relative terms.&lt;/p&gt;
+&lt;p&gt;Considering that the total sampling area was 256 m&lt;sup&gt;2&lt;/sup&gt; and the total number of species was 26, the minimum sampling area should correspond to the point on the graph where the first derivative is equal to 2.6/25.6 = 26/256 = 0.1015625. Graphically, we need to find a point along the x-axis where the tangent line to the graph is parallel to the line connecting the origin of axes and the point with co-ordinates &lt;span class=&#34;math inline&#34;&gt;\(x = 256\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(y = 26\)&lt;/span&gt; (see the graph below).&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_nls_SpeciesArea_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;In order to find this minimum sampling area, we solve the derivative function so that it returns a value of 0.1015625. We can do this by using the &lt;code&gt;uniroot()&lt;/code&gt; function as shown in the box below. The minimum sampling area is approximately equal to 52 m&lt;sup&gt;2&lt;/sup&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;solveFun &amp;lt;- function(x) attr(powerCurve.der2(4.348, 0.32977, x),
+                             &amp;quot;gradient&amp;quot;) - 0.1015625
+uniroot(solveFun, lower = 0, upper = 256)$root
+## [1] 51.93759&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I hope that I have put another brick to convince you that derivatives can help us to solve some problems in the everyday life! If you have comments, please drop me a line.&lt;/p&gt;
+&lt;p&gt;Thanks for reading!&lt;/p&gt;
+&lt;p&gt;Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+&lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href = &#34;https://link.springer.com/book/10.1007/978-3-032-08199-5&#34;&gt;&lt;img src= &#34;../../_Figures/Email_Signature_978-3-032-08199-5.png&#34; align=&#34;center&#34; alt=&#34;Book cover&#34; class=&#34;cover&#34; /&gt;&lt;/a&gt;
+&lt;br/&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Cristaudo, A., Restuccia, A., Onofri, A., Giudice, V.L., Gresta, F., 2015. Species-area relationships and minimum area in citrus grove weed communities. Plant Biosystems 149, 337–345.&lt;/li&gt;
+&lt;li&gt;Muller-Dumbois, D., Ellenberg, H., 1974. Community sampling: the relevè method., in: Aims and Methods of Vegetation Ecology. John Wiley &amp;amp; Sons, Inc., Species/Area curves, pp. 45–66.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Pairwise comparisons in nonlinear regression</title>
@@ -609,115 +840,6 @@ This reparameterised model is available as &lt;code&gt;GRT.Mb()&lt;/code&gt;.&lt
 &lt;p&gt;&lt;a href=&#34;#a-possibly-incomplete-list-of-threshold-models&#34;&gt;Go up&lt;/a&gt;&lt;/p&gt;
 &lt;hr /&gt;
 &lt;/div&gt;
-&lt;/div&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Why are derivatives important in life? A case-study with nonlinear regression</title>
-      <link>https://www.statforbiology.com/2021/stat_nls_speciesarea/</link>
-      <pubDate>Wed, 09 Jun 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.statforbiology.com/2021/stat_nls_speciesarea/</guid>
-      <description>
-
-
-&lt;p&gt;In general, undergraduate students in biology/ecology courses tend to consider the derivatives as a very abstract entity, with no real usefulness in the everyday life. In my work as a teacher, I have often tried to fight against such an attitude, by providing convincing examples on how we can use the derivatives to get a better understanding about the changes on a given system.&lt;/p&gt;
-&lt;p&gt;In this post I’ll tell you about a recent situation where I was involved with derivatives. A few weeks ago, a colleague of mine wrote me to ask the following question (I’m changing it a little, to make it, hopefully, more interesting). He asked: &lt;em&gt;“I am using a power curve to model how the size of the sampling area affects species richness. How can I quantify my knowledge gain?”&lt;/em&gt;. This is an interesting question, indeed, although I feel I should provide you with some background information.&lt;/p&gt;
-&lt;p&gt;Ecologists and botanists are very often involved with field surveys, aimed at determining the richness of plant species in a given territory. In most cases, such territories are too big to conduct exhaustive samplings and, therefore, it is necessary to resort to sampling a smaller area. The problem is that it is clearly recognised that the wider the sampled area, the higher the number of plant species that we encounter. So, what is the minimum sampling area to conduct a reliable survey?&lt;/p&gt;
-&lt;p&gt;First of all, let’s try to model the species-are relationship. In some instances, this relationship can be described by using a power curve, that is coded as follows:&lt;/p&gt;
-&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[Y = a \, X^b\]&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(Y\)&lt;/span&gt; is the number of species, &lt;span class=&#34;math inline&#34;&gt;\(X\)&lt;/span&gt; is the sampling area, &lt;span class=&#34;math inline&#34;&gt;\(a\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; are regression parameters. In order to understand such a relationship, we can take the ‘speciesArea’ dataset in the ‘aomisc’ package, that comes from Cristaudo et al. (2015). We can fit a power curve to this dataset, by using the &lt;code&gt;drm()&lt;/code&gt; function in the ‘drc’ package, together with the &lt;code&gt;DRC.powerCurve()&lt;/code&gt; self-starter in the ‘aomisc’ package.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(aomisc)
-data(speciesArea)
-
-# drm fit
-model &amp;lt;- drm(numSpecies ~ Area, fct = DRC.powerCurve(),
-             data = speciesArea)
-summary(model)
-## 
-## Model fitted: Power curve (Freundlich equation) (2 parms)
-## 
-## Parameter estimates:
-## 
-##               Estimate Std. Error t-value   p-value    
-## a:(Intercept) 4.348404   0.337197  12.896 3.917e-06 ***
-## b:(Intercept) 0.329770   0.016723  19.719 2.155e-07 ***
-## ---
-## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
-## 
-## Residual standard error:
-## 
-##  0.9588598 (7 degrees of freedom)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;It is very useful to look at the resulting graph: we clearly see that the harder we work, the higher is our knowledge gain, in terms of plant richness. We may not be experts of plant surveys, but we should keep in mind that this may be really hard work, especially if we have to survey citrus groves under the sunshine of an Italian summer in Sicily! Therefore, we’d better optimise our effort and enlarge our sampling area only if this gives us a relevant payback.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;../../../../../../../../../../../_Figures/Stat_nls_SpeciesArea.png&#34; /&gt;&lt;!-- --&gt;&lt;/p&gt;
-&lt;p&gt;In this respect, we see that every additional sampling effort gives a progressively lower payback; for example, an increase of 50 m&lt;sup&gt;2&lt;/sup&gt; in sampling area let us discover almost 16 new species when we begin our survey, while, when we have already sampled 200 m&lt;sup&gt;2&lt;/sup&gt;, a similar increase of sampling area let us discover only 2 additional plant species.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;predict(model, newdata = data.frame(Area = c(50)))
-## Prediction 
-##    15.7979
- r
-predict(model, newdata = data.frame(Area = c(250))) -
-  predict(model, newdata = data.frame(Area = c(200))) 
-## Prediction 
-##    1.90552&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;The above argument motivates my colleague’s question: how do we quantify the knowledge gain in relation to the effort it costs? This is a typical situation where the first derivative of the power function comes in handy. You might remember from high school that the first derivative represents the slope of the line tangent to the function at any point on the graph. Its value represents the ratio between the knowledge gain and the increase in sampling effort and it is a very good measure of how well our additional effort is paid back in terms of knowledge gain. In other words, the higher the derivative, the higher our convenience to increase our sampling effort.&lt;/p&gt;
-&lt;p&gt;But, how do we find a derivative? Years ago, it was a big relief for me to discover that R can efficiently help us with this task. In particular, we have two main functions available: &lt;code&gt;D()&lt;/code&gt; and &lt;code&gt;deriv()&lt;/code&gt;. The first one takes an expression as an argument and returns an expression, which can be evaluated to get the derivative value. For example, if we want to know the derivative value for a sampling area ranging from 1 to 100 m&lt;sup&gt;2&lt;/sup&gt;, we can use the following code:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;powerCurve.der &amp;lt;- D(expression(a * X ^ b), &amp;quot;X&amp;quot;)
-powerCurve.der
-## a * (X^(b - 1) * b)
- r
-a &amp;lt;- coef(model)[1]
-b &amp;lt;- coef(model)[2]
-X &amp;lt;- seq(1, 100, by = 10)
-eval(powerCurve.der)
-##  [1] 1.43397379 0.28745425 0.18635899 0.14354434 0.11901599 0.10281978
-##  [7] 0.09119265 0.08237067 0.07540802 0.06974823&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;It confirms what we already knew, that is our payback decreases while our effort increases; it is also interesting to note that the function &lt;code&gt;deparse()&lt;/code&gt; transforms the resulting expression into character strings, which we can pass to the &lt;code&gt;gnlht()&lt;/code&gt; function in the ‘aomisc’ package, to calculate standard errors for the estimated derivatives.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;funList &amp;lt;- list(deparse(powerCurve.der))
-samplingAreas &amp;lt;- data.frame(X = seq(1, 100, by = 10))
-pred &amp;lt;- gnlht(model, funList, const = samplingAreas,
-              parameterNames = c(&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;))
-pred
-##                   Form  X   Estimate          SE  t-value      p-value
-## 1  a * (X^(b - 1) * b)  1 1.43397379 0.046072499 31.12429 9.127464e-09
-## 2  a * (X^(b - 1) * b) 11 0.28745425 0.007794058 36.88121 2.800293e-09
-## 3  a * (X^(b - 1) * b) 21 0.18635899 0.006470755 28.80019 1.565496e-08
-## 4  a * (X^(b - 1) * b) 31 0.14354434 0.005745031 24.98583 4.196158e-08
-## 5  a * (X^(b - 1) * b) 41 0.11901599 0.005240148 22.71233 8.123235e-08
-## 6  a * (X^(b - 1) * b) 51 0.10281978 0.004857404 21.16764 1.321660e-07
-## 7  a * (X^(b - 1) * b) 61 0.09119265 0.004552575 20.03100 1.934121e-07
-## 8  a * (X^(b - 1) * b) 71 0.08237067 0.004301572 19.14897 2.637561e-07
-## 9  a * (X^(b - 1) * b) 81 0.07540802 0.004089788 18.43813 3.421480e-07
-## 10 a * (X^(b - 1) * b) 91 0.06974823 0.003907714 17.84886 4.276907e-07&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;The &lt;code&gt;deriv()&lt;/code&gt; function is similar, but it takes a formula as an argument and, if we provide the &lt;code&gt;function.arg()&lt;/code&gt; argument, it returns a function, which is very handy for further processing. For example, we can use such function for plotting purposes, as shown in the box below.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;powerCurve.der2 &amp;lt;- deriv(~ a * X ^ b, &amp;quot;X&amp;quot;,
-              function.arg = c(&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, &amp;quot;X&amp;quot;))
-
-curve(attr(powerCurve.der2(4.348, 0.32977, x), &amp;quot;gradient&amp;quot;), 
-      from = 0, to = 250, ylab = &amp;quot;First derivative&amp;quot;, 
-      xlab = &amp;quot;Sampling area&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_nls_SpeciesArea_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;Now, how do we use the above information to decide how big our sampling area should be? According to Muller-Dumboise and Ellenberg (1974), the minimal sampling area should be selected so that an increase of 10% in sampling area yields an increase of 10% in the number of sampled species. In other words, the minimal sampling area should be selected so that the sampling effort in relative terms is equal to the gain in knowledge, also in relative terms.&lt;/p&gt;
-&lt;p&gt;Considering that the total sampling area was 256 m&lt;sup&gt;2&lt;/sup&gt; and the total number of species was 26, the minimum sampling area should correspond to the point on the graph where the first derivative is equal to 2.6/25.6 = 26/256 = 0.1015625. Graphically, we need to find a point along the x-axis where the tangent line to the graph is parallel to the line connecting the origin of axes and the point with co-ordinates &lt;span class=&#34;math inline&#34;&gt;\(x = 256\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(y = 26\)&lt;/span&gt; (see the graph below).&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_nls_SpeciesArea_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;In order to find this minimum sampling area, we solve the derivative function so that it returns a value of 0.1015625. We can do this by using the &lt;code&gt;uniroot()&lt;/code&gt; function as shown in the box below. The minimum sampling area is approximately equal to 52 m&lt;sup&gt;2&lt;/sup&gt;.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;solveFun &amp;lt;- function(x) attr(powerCurve.der2(4.348, 0.32977, x),
-                             &amp;quot;gradient&amp;quot;) - 0.1015625
-uniroot(solveFun, lower = 0, upper = 256)$root
-## [1] 51.93759&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;I hope that I have put another brick to convince you that derivatives can help us to solve some problems in the everyday life! If you have comments, please drop me a line.&lt;/p&gt;
-&lt;p&gt;Thanks for reading!&lt;/p&gt;
-&lt;p&gt;Andrea Onofri&lt;br /&gt;
-Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
-University of Perugia (Italy)&lt;br /&gt;
-&lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
-&lt;hr /&gt;
-&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;References&lt;/h1&gt;
-&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
-&lt;li&gt;Cristaudo, A., Restuccia, A., Onofri, A., Giudice, V.L., Gresta, F., 2015. Species-area relationships and minimum area in citrus grove weed communities. Plant Biosystems 149, 337–345.&lt;/li&gt;
-&lt;li&gt;Muller-Dumbois, D., Ellenberg, H., 1974. Community sampling: the relevè method., in: Aims and Methods of Vegetation Ecology. John Wiley &amp;amp; Sons, Inc., Species/Area curves, pp. 45–66.&lt;/li&gt;
-&lt;/ol&gt;
 &lt;/div&gt;
 </description>
     </item>

@@ -1,7 +1,7 @@
 ---
 title: "Why are derivatives important in life? A case-study with nonlinear regression"
 author: "Andrea Onofri"
-date: 2021-06-09
+date: 2025-11-26
 slug: 'nonlinear_regression'
 categories:
   - R
@@ -11,7 +11,7 @@ tags:
   - 'nonlinear_regression'
   - 'nls'
   - 'drm'
-  - 'aomisc'
+  - 'statforbiology'
 archives:
   - 2021
 ---
@@ -23,9 +23,9 @@ archives:
 <p>Ecologists and botanists are very often involved with field surveys, aimed at determining the richness of plant species in a given territory. In most cases, such territories are too big to conduct exhaustive samplings and, therefore, it is necessary to resort to sampling a smaller area. The problem is that it is clearly recognised that the wider the sampled area, the higher the number of plant species that we encounter. So, what is the minimum sampling area to conduct a reliable survey?</p>
 <p>First of all, let’s try to model the species-are relationship. In some instances, this relationship can be described by using a power curve, that is coded as follows:</p>
 <p><span class="math display">\[Y = a \, X^b\]</span></p>
-<p>where <span class="math inline">\(Y\)</span> is the number of species, <span class="math inline">\(X\)</span> is the sampling area, <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> are regression parameters. In order to understand such a relationship, we can take the ‘speciesArea’ dataset in the ‘aomisc’ package, that comes from Cristaudo et al. (2015). We can fit a power curve to this dataset, by using the <code>drm()</code> function in the ‘drc’ package, together with the <code>DRC.powerCurve()</code> self-starter in the ‘aomisc’ package.</p>
-<pre class="r"><code>library(aomisc)
-data(speciesArea)
+<p>where <span class="math inline">\(Y\)</span> is the number of species, <span class="math inline">\(X\)</span> is the sampling area, <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> are regression parameters. In order to understand such a relationship, we can take the ‘speciesArea’ dataset in the ‘statforbiology’ package, that comes from Cristaudo et al. (2015). We can load this dataset by using the <code>getAgroData()</code> function (which is specific to the dataset contained in the statforbiology package) and we can fit a power curve to this dataset, by using the <code>drm()</code> function in the ‘drc’ package, together with the <code>DRC.powerCurve()</code> self-starter in the ‘statforbiology’ package.</p>
+<pre class="r"><code>library(statforbiology)
+speciesArea &lt;- getAgroData(&quot;speciesArea&quot;)
 
 # drm fit
 model &lt;- drm(numSpecies ~ Area, fct = DRC.powerCurve(),
@@ -51,7 +51,7 @@ summary(model)
 <pre class="r"><code>predict(model, newdata = data.frame(Area = c(50)))
 ## Prediction 
 ##    15.7979
- r
+#
 predict(model, newdata = data.frame(Area = c(250))) -
   predict(model, newdata = data.frame(Area = c(200))) 
 ## Prediction 
@@ -61,14 +61,13 @@ predict(model, newdata = data.frame(Area = c(250))) -
 <pre class="r"><code>powerCurve.der &lt;- D(expression(a * X ^ b), &quot;X&quot;)
 powerCurve.der
 ## a * (X^(b - 1) * b)
- r
 a &lt;- coef(model)[1]
 b &lt;- coef(model)[2]
 X &lt;- seq(1, 100, by = 10)
 eval(powerCurve.der)
 ##  [1] 1.43397379 0.28745425 0.18635899 0.14354434 0.11901599 0.10281978
 ##  [7] 0.09119265 0.08237067 0.07540802 0.06974823</code></pre>
-<p>It confirms what we already knew, that is our payback decreases while our effort increases; it is also interesting to note that the function <code>deparse()</code> transforms the resulting expression into character strings, which we can pass to the <code>gnlht()</code> function in the ‘aomisc’ package, to calculate standard errors for the estimated derivatives.</p>
+<p>It confirms what we already knew, that is our payback decreases while our effort increases; it is also interesting to note that the function <code>deparse()</code> transforms the resulting expression into character strings, which we can pass to the <code>gnlht()</code> function in the ‘statforbiology’ package, to calculate standard errors for the estimated derivatives.</p>
 <pre class="r"><code>funList &lt;- list(deparse(powerCurve.der))
 samplingAreas &lt;- data.frame(X = seq(1, 100, by = 10))
 pred &lt;- gnlht(model, funList, const = samplingAreas,
@@ -88,7 +87,7 @@ pred
 <p>The <code>deriv()</code> function is similar, but it takes a formula as an argument and, if we provide the <code>function.arg()</code> argument, it returns a function, which is very handy for further processing. For example, we can use such function for plotting purposes, as shown in the box below.</p>
 <pre class="r"><code>powerCurve.der2 &lt;- deriv(~ a * X ^ b, &quot;X&quot;,
               function.arg = c(&quot;a&quot;, &quot;b&quot;, &quot;X&quot;))
-
+#
 curve(attr(powerCurve.der2(4.348, 0.32977, x), &quot;gradient&quot;), 
       from = 0, to = 250, ylab = &quot;First derivative&quot;, 
       xlab = &quot;Sampling area&quot;)</code></pre>
@@ -107,6 +106,8 @@ uniroot(solveFun, lower = 0, upper = 256)$root
 Department of Agricultural, Food and Environmental Sciences<br />
 University of Perugia (Italy)<br />
 <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<p><a href = "https://link.springer.com/book/10.1007/978-3-032-08199-5"><img src= "../../_Figures/Email_Signature_978-3-032-08199-5.png" align="center" alt="Book cover" class="cover" /></a>
+<br/></p>
 <hr />
 <div id="references" class="section level1">
 <h1>References</h1>

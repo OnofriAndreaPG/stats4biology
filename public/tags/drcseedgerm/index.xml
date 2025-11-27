@@ -1568,7 +1568,7 @@ Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.o
     </item>
     
     <item>
-      <title>Analysing seed germination and emergence data with R: a tutorial. Part 5</title>
+      <title>Comparing germination/emergence for several seed lots</title>
       <link>https://www.statforbiology.com/2021/stat_drcte_5-comparinglots/</link>
       <pubDate>Thu, 23 Dec 2021 00:00:00 +0000</pubDate>
       
@@ -1577,13 +1577,10 @@ Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.o
 
 
 &lt;p&gt;This is a follow-up post. If you are interested in other posts of this series, please go to: &lt;a href=&#34;https://www.statforbiology.com/tags/drcte/&#34;&gt;https://www.statforbiology.com/tags/drcte/&lt;/a&gt;. All these posts exapand on a paper that we have recently published in the Journal ‘Weed Science’; please follow &lt;a href=&#34;https://doi.org/10.1017/wsc.2022.8&#34;&gt;this link&lt;/a&gt; to the paper.&lt;/p&gt;
-&lt;div id=&#34;comparing-germinationemergence-for-several-seed-lots&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;Comparing germination/emergence for several seed lots&lt;/h1&gt;
 &lt;p&gt;Very often, seed scientists need to compare the germination behavior of different seed populations, e.g., different plant species, or one single plant species submitted to different temperatures, light conditions, priming treatments and so on. How should such a comparison be performed? For example, if we have submitted several seed samples to different environmental conditions, how do we decide whether the germinative response is affected by those environmental conditions?&lt;/p&gt;
 &lt;p&gt;If the case that we have replicates for all experimental treatments, e.g. several Petri dishes, one possible line of attack is to take a summary measure for each dish and use that for further analyses, in a two-steps fashion. For example, we could take the total number of germinated seeds (Pmax) in each dish and use the resulting values to parameterise some sort of ANOVA-like model and test the significance of all effects.&lt;/p&gt;
 &lt;p&gt;This method of data analysis is known as ‘response feature analysis’ and it may be regarded as ‘very traditional’, in the sense that it is often found in literature; although it is not wrong, it is, undoubtedly, sub-optimal. Indeed, two seed lots submitted to different treatments may show the same total number of germinated seeds, but a different velocity or uniformity of germination. In other words, if we only consider, e.g., the Pmax, we can answer the question: “do the seed lots differ for their germination capability?”, but not the more general question: “are the seed lots different?”.&lt;/p&gt;
 &lt;p&gt;In order to answer this latter question, we should consider the entire time-course of germination and not only one single summary statistic. &lt;strong&gt;In other words, we need a method to fit and compare several time-to-event curves.&lt;/strong&gt;&lt;/p&gt;
-&lt;/div&gt;
 &lt;div id=&#34;a-motivating-example&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;A motivating example&lt;/h1&gt;
 &lt;p&gt;Let’s take a practical approach and start from an example: a few years ago, some colleagues of mine studied the germination behavior of a plant species (&lt;em&gt;Verbascum arcturus&lt;/em&gt;), in different conditions. In detail, they considered the factorial combination of two storage periods (LONG and SHORT storage) and two temperature regimes (FIX: constant daily temperature of 20°C; ALT: alternating daily temperature regime, with 25°C during daytime and 15°C during night time, with a 12:12h photoperiod). If you are a seed scientist and are interested in this experiment, you’ll find detail in Catara &lt;em&gt;et al.&lt;/em&gt; (2016).&lt;/p&gt;
@@ -1651,15 +1648,15 @@ summary(mod1)
 ##             Estimate Std. Error t-value   p-value    
 ## b:Fix:Low   4.974317   0.819632  6.0690 1.287e-09 ***
 ## b:Fix:High 11.476618   1.254439  9.1488 &amp;lt; 2.2e-16 ***
-## b:Alt:Low   7.854558   5.239783  1.4990    0.1339    
+## b:Alt:Low   7.854558   5.239825  1.4990    0.1339    
 ## b:Alt:High 10.600439   1.014061 10.4534 &amp;lt; 2.2e-16 ***
 ## d:Fix:Low   0.998474   0.150189  6.6481 2.968e-11 ***
 ## d:Fix:High  0.861711   0.038987 22.1027 &amp;lt; 2.2e-16 ***
-## d:Alt:Low   1.405930   5.607529  0.2507    0.8020    
+## d:Alt:Low   1.405930   5.607576  0.2507    0.8020    
 ## d:Alt:High  0.948113   0.024298 39.0208 &amp;lt; 2.2e-16 ***
 ## e:Fix:Low  12.009974   0.987039 12.1677 &amp;lt; 2.2e-16 ***
 ## e:Fix:High 10.906963   0.190532 57.2447 &amp;lt; 2.2e-16 ***
-## e:Alt:Low  17.014976  13.214403  1.2876    0.1979    
+## e:Alt:Low  17.014976  13.214513  1.2876    0.1979    
 ## e:Alt:High  9.585255   0.166937 57.4183 &amp;lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
@@ -1678,21 +1675,20 @@ summary(mod1)
 ## Parameter estimates:
 ## 
 ##             Estimate Std. Error t-value   p-value    
-## b:Fix:Low   4.979667   0.818408  6.0846 1.168e-09 ***
-## b:Fix:High 11.471633   1.254025  9.1478 &amp;lt; 2.2e-16 ***
-## b:Alt:Low   8.408185   2.232684  3.7660 0.0001659 ***
-## b:Alt:High 10.605820   1.014524 10.4540 &amp;lt; 2.2e-16 ***
-## d:Fix:Low   0.997283   0.149233  6.6827 2.345e-11 ***
+## b:Fix:Low   4.979665   0.818414  6.0845 1.168e-09 ***
+## b:Fix:High 11.471625   1.254025  9.1478 &amp;lt; 2.2e-16 ***
+## b:Alt:Low   8.408186   2.232712  3.7659 0.0001659 ***
+## b:Alt:High 10.605807   1.014523 10.4540 &amp;lt; 2.2e-16 ***
+## d:Fix:Low   0.997284   0.149235  6.6826 2.347e-11 ***
 ## d:Fix:High  0.861709   0.038999 22.0955 &amp;lt; 2.2e-16 ***
-## d:Alt:Low   1.000000   0.881619  1.1343 0.2566785    
-## d:Alt:High  0.948132   0.024282 39.0467 &amp;lt; 2.2e-16 ***
-## e:Fix:Low  12.004515   0.981265 12.2337 &amp;lt; 2.2e-16 ***
-## e:Fix:High 10.907108   0.190612 57.2214 &amp;lt; 2.2e-16 ***
-## e:Alt:Low  15.903084   2.872251  5.5368 3.080e-08 ***
-## e:Alt:High  9.585293   0.166873 57.4407 &amp;lt; 2.2e-16 ***
+## d:Alt:Low   1.000000   0.881644  1.1342 0.2566920    
+## d:Alt:High  0.948132   0.024282 39.0468 &amp;lt; 2.2e-16 ***
+## e:Fix:Low  12.004534   0.981279 12.2336 &amp;lt; 2.2e-16 ***
+## e:Fix:High 10.907108   0.190613 57.2213 &amp;lt; 2.2e-16 ***
+## e:Alt:Low  15.903079   2.872327  5.5367 3.083e-08 ***
+## e:Alt:High  9.585297   0.166873 57.4406 &amp;lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
- r
 plot(mod1, log = &amp;quot;&amp;quot;, legendPos = c(6, 1), xlab = &amp;quot;Time&amp;quot;,
      ylab = &amp;quot;Cumulative probability of germination&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_drcte_5-ComparingLots_files/figure-html/unnamed-chunk-4-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
@@ -1713,7 +1709,8 @@ plot(mod1, log = &amp;quot;&amp;quot;, legendPos = c(6, 1), xlab = &amp;quot;Tim
 &lt;p&gt;In this example, we got a very low p-level, which leaves us rather confident that the difference between time-to-event curves is significant. More generally, instead of relying on a chi-square approximation, we should better use a grouped-permutation approach. This technique is based on the idea that, when the difference between curves is not significant, we should be able to freely permute the labels (treatment level) among Petri dishes (clustering units) and, consequently, build an empirical distribution for the LR statistic under the null (permutation distribution). The p-level is related to the proportion of LR values in the permutation distribution that are higher than the observed value (i.e.: 202.8)&lt;/p&gt;
 &lt;p&gt;In the code below, we show how we can do this. The code is rather slow and, therefore, we should not use a very high number of permutation; the default is 199, that gives us a minimum p-value of 0.005. We see that we can confirm that the difference between curves is highly significant.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;compCDF(mod1, type = &amp;quot;permutation&amp;quot;, units = dataset$Dishes)
-## Likelihood ratio test (permutation based)
+## 
+Likelihood ratio test (permutation based)
 ## NULL: time-to-event curves are equal
 ## 
 ## Observed LR value:  202.8052
@@ -1751,7 +1748,8 @@ plot(modKD, log = &amp;quot;&amp;quot;, legendPos = c(6, 1))&lt;/code&gt;&lt;/pr
 &lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_drcte_5-ComparingLots_files/figure-html/unnamed-chunk-9-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;Second, we compare those curves, by using the &lt;code&gt;compCDF()&lt;/code&gt; function:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;compCDF(modKD, units = dataset$Units)
-## Permutation test based on a Cramer-von-Mises type distance (Barreiro-Ures et al., 2019)
+## 
+Permutation test based on a Cramer-von-Mises type distance (Barreiro-Ures et al., 2019)
 ## NULL HYPOTHESIS: time-to-event curves are equal
 ## 
 ##      level   n         D
