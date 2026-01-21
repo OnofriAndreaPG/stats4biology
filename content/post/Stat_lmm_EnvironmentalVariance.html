@@ -1,105 +1,153 @@
 ---
-title: "The 'Environmental Variance' model for Multi-Environment Experiments"
+title: "Using `lme()` to fit the Environmental Variance mixed model to genotype experiments"
 author: "Andrea Onofri"
-date: 2019-08-20
+date: 2025-12-04
 slug: 'Mixed models'
 categories:
-  - R
   - 'Mixed_models'
 tags:
   - R
   - 'Mixed_models'
   - 'Multi_environment_studies'
+  - 'lme'
+  - 'sommer'
 archives:
   - 2019
 ---
 
 
 
-<p>Fitting mixed models has become very common in biology and recent developments involve the manipulation of the variance-covariance matrix for random effects and residuals. To the best of my knowledge, within the frame of frequentist methods, the only freeware solution in R should be based on the ‘nlme’ package, as the ‘lmer’ package does not easily permit such manipulations. The ‘nlme’ package is fully described in Pinheiro and Bates (2000). Of course, the ‘asreml’ package can be used, but, unfortunately, this is not freeware.</p>
-<p>Coding mixed models in ‘nlme’ is not always easy, especially when we have crossed random effects, which is very common with agricultural experiments. I have been struggling with this issue very often in the last years and I thought it might be useful to publish a few examples in this blog, to save collegues from a few headaches. Please, note that I have already published other posts dealing with the use of the ‘lme()’ function in the ‘nlme’ package, for example <a href="https://www.statforbiology.com/2019/stat_general_correlationindependence2/">this post here</a> about the correlation in designed experiments and <a href="https://www.statforbiology.com/2019/stat_lmm_stabilityvariance/">this other post here</a>, about heteroscedastic multienvironment experiments.</p>
-<p>The first example in this series relates to a randomised complete block design with three replicates, comparing winter wheat genotypes. The experiment was repeated in seven years in the same location. The dataset (‘WinterWheat’) is available in the ‘aomisc’ package, which is the companion package for this blog and it is available on gitHub. Information on how to download and install the ‘aomisc’ package are given in <a href="https://www.statforbiology.com/rpackages/">this page</a>. Please, note that this dataset shows the data for eight genotypes, but the model that we want to fit requires that the number of environments is higher than the number of genotypes. Therefore, we have to make a subset, at the beginning, removing a couple of genotypes.</p>
-<p>The first code snippet loads the ‘aomisc’ package and other necessary packages. Afterwards, it loads the ‘WinterWheat’ dataset, subsets it and turns the ‘Genotype’, ‘Year’ and ‘Block’ variables into factors.</p>
-<pre class="r"><code>library(plyr)
-library(nlme)
-library(aomisc)
-data(WinterWheat)
-WinterWheat &lt;- WinterWheat[WinterWheat$Genotype != &quot;SIMETO&quot; &amp; WinterWheat$Genotype != &quot;SOLEX&quot;,]
-WinterWheat$Genotype &lt;- factor(WinterWheat$Genotype)
-WinterWheat$Year &lt;- factor(WinterWheat$Year)
-WinterWheat$Block &lt;- factor(WinterWheat$Block)
+<p>Yield stability is a key aspect in the selection of crop genotypes. Its definition is not entirely straightforward (see, for example, Annichiarico, 2002), but, in simple terms, it refers to the ability of a crop to maintain its yield potential across different environments, helping farmers safeguard their income. Several statistical indicators of stability have been proposed (see, e.g., Mohammadi, 2008). In this post, however, I will focus on the so-called environmental variance, which represents the portion of phenotypic variance attributable to environmental (non-genetic) factors and is measured as the overall variance across environments for each genotype.</p>
+<p>This index is usually considered a static measure of stability, meaning that low values are typical of genotypes whose yield levels are only slightly affected by changes in the environmental conditions.</p>
+<p>One possible way to calculate the environmental variance has been proposed by Piepho (1999), making use of mixed models with ‘unusual’ variance-covariance matrices. In developing this post, I will closely follow the coding proposed by the aforementioned author.</p>
+<p>As an example, let’s consider the data of a multi-environment study, wherein eight winter wheat genotypes were compared an a randomised complete block design with three replicates, which was repeated in seven years in Central Italy. The resulting dataset is available as ‘WinterWheat’ in ‘statforbiology’, which is the accompanying package for this blog. Information on how to download and install the ‘statforbiology’ package are given in <a href="https://www.statforbiology.com/rpackages/">this page</a>.</p>
+<p>The first code snippet loads the ‘statforbiology’ package and other necessary packages. Afterwards, it loads the ‘WinterWheat’ dataset by using the <code>getAgroData()</code> function and transforms the ‘Year’, ‘Genotype’ and ‘Block’ variables into factors. Please, note that this dataset shows the data for eight genotypes, but the model that we want to fit requires that the number of environments is higher than the number of genotypes. Therefore, we have to make a subset, removing some (e.g., three) genotypes.</p>
+<pre class="r"><code>library(nlme)
+library(statforbiology)
+library(dplyr)
+WinterWheat &lt;- getAgroData(&quot;WinterWheat&quot;)
+WinterWheat &lt;- WinterWheat[WinterWheat$Genotype != &quot;SIMETO&quot; &amp; 
+                             WinterWheat$Genotype != &quot;SOLEX&quot; &amp;
+                             WinterWheat$Genotype != &quot;SANCARLO&quot;,]
+WinterWheat[,c(1:3, 5)] &lt;- lapply(WinterWheat[,c(1:3,5)], factor)
 head(WinterWheat, 10)
-##    Year Plot Block Genotype Yield
-## 1  1996    2     1 COLOSSEO  6.73
-## 2  1996    1     1    CRESO  6.02
-## 3  1996   50     1   DUILIO  6.06
-## 4  1996   49     1   GRAZIA  6.24
-## 5  1996   63     1    IRIDE  6.23
-## 6  1996   32     1 SANCARLO  5.45
-## 9  1996  110     2 COLOSSEO  6.96
-## 10 1996  137     2    CRESO  5.34
-## 11 1996   91     2   DUILIO  5.57
-## 12 1996  138     2   GRAZIA  6.09</code></pre>
-<p>Dealing with the above dataset, a good candidate model for data analyses is the so-called ‘environmental variance model’. This model is often used in stability analyses for multi-environment experiments and I will closely follow the coding proposed in Piepho (1999):</p>
+##    Plot Block Genotype Yield Year
+## 1     2     1 COLOSSEO  6.73 1996
+## 2   110     2 COLOSSEO  6.96 1996
+## 3   181     3 COLOSSEO  5.35 1996
+## 4     2     1 COLOSSEO  6.26 1997
+## 5   110     2 COLOSSEO  7.01 1997
+## 6   181     3 COLOSSEO  6.11 1997
+## 7    17     1 COLOSSEO  6.75 1998
+## 8   110     2 COLOSSEO  6.82 1998
+## 9   256     3 COLOSSEO  6.52 1998
+## 10   18     1 COLOSSEO  7.18 1999</code></pre>
+<p>Dealing with the above dataset, a good candidate model for data analyses is the following:</p>
 <p><span class="math display">\[y_{ijk} = \mu + g_i + r_{jk}  +  h_{ij} + \varepsilon_{ijk}\]</span></p>
-<p>where <span class="math inline">\(y_{ijk}\)</span> is yield (or other trait) for the <span class="math inline">\(k\)</span>-th block, <span class="math inline">\(i\)</span>-th genotype and <span class="math inline">\(j\)</span>-th environment, <span class="math inline">\(\mu\)</span> is the intercept, <span class="math inline">\(g_i\)</span> is the effect for the i-th genotype, <span class="math inline">\(r_{jk}\)</span> is the effect for the <span class="math inline">\(k\)</span>-th block in the <span class="math inline">\(j\)</span>-th environment, <span class="math inline">\(h_{ij}\)</span> is a random deviation from the expected yield for the <span class="math inline">\(i\)</span>-th genotype in the <span class="math inline">\(j\)</span>-th environment and <span class="math inline">\(\varepsilon_{ijk}\)</span> is the residual variability of yield between plots, within each environment and block.</p>
-<p>We usually assume that <span class="math inline">\(r_{jk}\)</span> and <span class="math inline">\(\varepsilon_{ijk}\)</span> are independent and normally distributed, with variances equal to <span class="math inline">\(\sigma^2_r\)</span> and <span class="math inline">\(\sigma^2_e\)</span>, respectively. Such an assumption may be questioned, but we will not do it now, for the sake of simplicity.</p>
-<p>Let’s concentrate on <span class="math inline">\(h_{ij}\)</span>, which we will assume as normally distributed with variance-covariance matrix equal to <span class="math inline">\(\Omega\)</span>. In particular, it is reasonable to expect that the genotypes will have different variances across environments (heteroscedasticity), which can be interpreted as static stability measures (‘environmental variances’; hence the name ‘environmental variance model’). Furthermore, it is reasonable that, if an environment is good for one genotype, it may also be good for other genotypes, so that yields in each environment are correlated, although the correlations can be different for each couple of genotypes. To reflect our expectations, the <span class="math inline">\(\Omega\)</span> matrix needs to be totally unstructured, with the only constraint that it is positive definite.</p>
-<p>Piepho (1999) has shown how the above model can be coded by using SAS and I translated his code into R.</p>
+<p>where <span class="math inline">\(y_{ijk}\)</span> is yield (or other trait) for the <span class="math inline">\(k\)</span><sup>th</sup> block, <span class="math inline">\(i\)</span><sup>th</sup> genotype and <span class="math inline">\(j\)</span><sup>th</sup> environment, <span class="math inline">\(\mu\)</span> is the intercept, <span class="math inline">\(g_i\)</span> is the effect for the i<sup>th</sup> genotype, <span class="math inline">\(r_{jk}\)</span> is the effect for the <span class="math inline">\(k\)</span><sup>th</sup> block in the <span class="math inline">\(j\)</span><sup>th</sup> environment, <span class="math inline">\(h_{ij}\)</span> is a random deviation from the expected yield for the <span class="math inline">\(i\)</span>^th genotype in the <span class="math inline">\(j\)</span>^th environment and <span class="math inline">\(\varepsilon_{ijk}\)</span> is the residual variability of yield between plots, within each environment and block.</p>
+<p>We usually assume that <span class="math inline">\(r_{jk}\)</span> and <span class="math inline">\(\varepsilon_{ijk}\)</span> are independent and normally distributed, with variances equal to <span class="math inline">\(\sigma^2_r\)</span> and <span class="math inline">\(\sigma^2_e\)</span>, respectively. Such assumptions may be questioned, but we will not do it now, for the sake of simplicity.</p>
+<p>Let’s concentrate on <span class="math inline">\(h_{ij}\)</span>, which is the peculiar element of this model. Normally, a model for multi-environment experiments, in addition to the genotype effect, would contain the environmental effect (that is common to all genotypes) and the genotype by environment interaction (that is specific to each genotype by environment combination). In this environmental variance model, these two effects (environment plus interaction) are joined together, to obtain the random element <span class="math inline">\(h\)</span>, which represents the whole variability of genotype yields across environments. We assume this element as normally distributed with variance-covariance matrix equal to <span class="math inline">\(\Omega\)</span>.</p>
+<p>It is reasonable to expect that the genotypes will have different variances across environments (heteroscedasticity), which can be interpreted as static stability measures (‘environmental variances’; hence the name ‘environmental variance model’). Furthermore, it is reasonable that, if an environment is good for one genotype, it may also be good for other genotypes, so that yields in each environment are correlated, although the correlations can be different for each couple of genotypes. To reflect our expectations, the <span class="math inline">\(\Omega\)</span> matrix needs to be totally unstructured, with the only constraint that it is positive definite.</p>
+<div id="fitting-in-one-step" class="section level1">
+<h1>Fitting in one step</h1>
+<p>Piepho (1999) has shown how the above model can be coded by using SAS and I translated his code into R. Random effects should be specified as a list, by using the ‘Year’ as the nesting factor (Galecki and Burzykowski, 2013). In order to specify a totally unstructured variance-covariance matrix for the genotypes within years, I used the ‘pdMat’ construct <code>pdSymm()</code>. This model is rather complex and may take several minutes to converge, when the number of genotypes is very high.</p>
 <pre class="r"><code>EnvVarMod &lt;- lme(Yield ~ Genotype, 
   random = list(Year = pdSymm(~Genotype - 1), 
-              Year = pdIdent(~Block - 1)),
+                Block = ~ 1),
   control = list(opt = &quot;optim&quot;, maxIter = 100),
-  data=WinterWheat)
+  data=WinterWheat)</code></pre>
+<p>The environmental variances, together with the correlations, can be easily obtained by using the ‘VarCorr()’ function (see below). In practice, we have five variance components (one per genotype) showing that Colosseo was the most stable genotype, while Duilio was the least stable one. The yield levels of the genotypes in different environments are more or less correlated, with correlation coefficients ranging from 0.977 (Duilio vs Iride) to 0.840 (Creso vs Duilio).</p>
+<pre class="r"><code># Environmental Variances and correlations
 VarCorr(EnvVarMod)
 ##                  Variance             StdDev    Corr                       
 ## Year =           pdSymm(Genotype - 1)                                      
-## GenotypeCOLOSSEO 0.48876512           0.6991174 GCOLOS GCRESO GDUILI GGRAZI
-## GenotypeCRESO    0.70949309           0.8423141 0.969                      
-## GenotypeDUILIO   2.37438442           1.5409038 0.840  0.840               
-## GenotypeGRAZIA   1.18078525           1.0866394 0.844  0.763  0.942        
-## GenotypeIRIDE    1.23555205           1.1115539 0.857  0.885  0.970  0.896 
-## GenotypeSANCARLO 0.93335518           0.9661031 0.928  0.941  0.962  0.884 
-## Year =           pdIdent(Block - 1)                                        
-## Block1           0.02748257           0.1657787                            
-## Block2           0.02748257           0.1657787                            
-## Block3           0.02748257           0.1657787                            
-## Residual         0.12990355           0.3604214                            
-##                        
-## Year =                 
-## GenotypeCOLOSSEO GIRIDE
-## GenotypeCRESO          
-## GenotypeDUILIO         
-## GenotypeGRAZIA         
-## GenotypeIRIDE          
-## GenotypeSANCARLO 0.942 
-## Year =                 
-## Block1                 
-## Block2                 
-## Block3                 
-## Residual</code></pre>
-<p>I coded the random effects as a list, by using the ‘Year’ as the nesting factor (Galecki and Burzykowski, 2013). In order to specify a totally unstructured variance-covariance matrix for the genotypes within years, I used the ‘pdMat’ construct ‘pdSymm()’. This model is rather complex and may take long to converge.</p>
-<p>The environmental variances are retrieved by the following code:</p>
-<pre class="r"><code>envVar &lt;- as.numeric ( VarCorr(EnvVarMod)[2:7,1] )
-envVar
-## [1] 0.4887651 0.7094931 2.3743844 1.1807853 1.2355520 0.9333552</code></pre>
-<p>while the correlations are given by:</p>
-<pre class="r"><code>VarCorr(EnvVarMod)[2:7,3:7]
-##                  Corr                                        
-## GenotypeCOLOSSEO &quot;GCOLOS&quot; &quot;GCRESO&quot; &quot;GDUILI&quot; &quot;GGRAZI&quot; &quot;GIRIDE&quot;
-## GenotypeCRESO    &quot;0.969&quot;  &quot;&quot;       &quot;&quot;       &quot;&quot;       &quot;&quot;      
-## GenotypeDUILIO   &quot;0.840&quot;  &quot;0.840&quot;  &quot;&quot;       &quot;&quot;       &quot;&quot;      
-## GenotypeGRAZIA   &quot;0.844&quot;  &quot;0.763&quot;  &quot;0.942&quot;  &quot;&quot;       &quot;&quot;      
-## GenotypeIRIDE    &quot;0.857&quot;  &quot;0.885&quot;  &quot;0.970&quot;  &quot;0.896&quot;  &quot;&quot;      
-## GenotypeSANCARLO &quot;0.928&quot;  &quot;0.941&quot;  &quot;0.962&quot;  &quot;0.884&quot;  &quot;0.942&quot;</code></pre>
-<div id="unweighted-two-stage-fitting" class="section level1">
-<h1>Unweighted two-stage fitting</h1>
+## GenotypeCOLOSSEO 0.48863386           0.6990235 GCOLOS GCRESO GDUILI GGRAZI
+## GenotypeCRESO    0.70293687           0.8384133 0.969                      
+## GenotypeDUILIO   2.36529182           1.5379505 0.840  0.840               
+## GenotypeGRAZIA   1.17844507           1.0855621 0.843  0.767  0.945        
+## GenotypeIRIDE    1.23023386           1.1091591 0.859  0.893  0.977  0.896 
+## Block =          pdLogChol(1)                                              
+## (Intercept)      0.03231338           0.1797592                            
+## Residual         0.12952019           0.3598891</code></pre>
+<p>Unfortunately, the output of ‘lme()’ is rather difficult top read and standard errors are missing for variance parameters. The ‘lmeInfo’ package can be used to retrieve variance components estimates (via the <code>extract_varcomp()</code> function) and their variance-covariance matrix (via the <code>varcomp_vcov()</code> function). The standard errors can be retrieved as the square root of the diagonal elements of these latter variance-covariance matrix (see code box below).</p>
+<pre class="r"><code># Retrieving the variance components from the lme object
+library(lmeInfo)
+varcomp &lt;- extract_varcomp(EnvVarMod, vector = TRUE)
+vcovMat &lt;- varcomp_vcov(EnvVarMod)
+SEs &lt;- sqrt(diag(vcovMat))
+data.frame(varcomp, SEs)
+##                                                       varcomp        SEs
+## Tau.Year.Year.var(GenotypeCOLOSSEO)                0.48863386 0.31341161
+## Tau.Year.Year.cov(GenotypeCRESO,GenotypeCOLOSSEO)  0.56818152 0.35265479
+## Tau.Year.Year.var(GenotypeCRESO)                   0.70293687 0.43709597
+## Tau.Year.Year.cov(GenotypeDUILIO,GenotypeCOLOSSEO) 0.90313965 0.59835845
+## Tau.Year.Year.cov(GenotypeDUILIO,GenotypeCRESO)    1.08269708 0.71029178
+## Tau.Year.Year.var(GenotypeDUILIO)                  2.36529182 1.39678126
+## Tau.Year.Year.cov(GenotypeGRAZIA,GenotypeCOLOSSEO) 0.64007465 0.42673312
+## Tau.Year.Year.cov(GenotypeGRAZIA,GenotypeCRESO)    0.69825554 0.48918816
+## Tau.Year.Year.cov(GenotypeGRAZIA,GenotypeDUILIO)   1.57733378 0.95776281
+## Tau.Year.Year.var(GenotypeGRAZIA)                  1.17844507 0.71158820
+## Tau.Year.Year.cov(GenotypeIRIDE,GenotypeCOLOSSEO)  0.66615784 0.43881261
+## Tau.Year.Year.cov(GenotypeIRIDE,GenotypeCRESO)     0.83080714 0.52923899
+## Tau.Year.Year.cov(GenotypeIRIDE,GenotypeDUILIO)    1.66657461 0.99335782
+## Tau.Year.Year.cov(GenotypeIRIDE,GenotypeGRAZIA)    1.07884979 0.67948762
+## Tau.Year.Year.var(GenotypeIRIDE)                   1.23023386 0.74148575
+## Tau.Block.Block.var((Intercept))                   0.03231338 0.02254209
+## sigma_sq                                           0.12952019 0.02447701</code></pre>
+<p>If we want to inspect the full 5 <span class="math inline">\(\times\)</span> 5 variance–covariance matrix for the random effects, we cannot rely on the usual <code>getVarCov()</code> function, as it is not implemented for models with multiple levels of nesting. Instead, we need to reconstruct this matrix from the ‘varcomp’ object shown in the previous box, as illustrated in the box below.</p>
+<pre class="r"><code># Rebuilding the variance-covariance matrix 
+vals &lt;- varcomp[1:15]
+res &lt;- matrix(0, 5, 5)
+cont &lt;- 1
+for(i in 1:5){
+  for(j in 1:i){
+   res[i, j] &lt;- vals[cont]
+   cont &lt;- cont + 1
+  }
+} 
+res[upper.tri(res)] &lt;- res[lower.tri(res)]
+
+# Variance-covariance matrix
+res
+##           [,1]      [,2]      [,3]      [,4]      [,5]
+## [1,] 0.4886339 0.5681815 0.9031396 0.6661578 0.8308071
+## [2,] 0.5681815 0.7029369 0.6400747 1.0826971 1.5773338
+## [3,] 0.9031396 1.0826971 2.3652918 0.6982555 1.6665746
+## [4,] 0.6400747 0.6982555 1.5773338 1.1784451 1.0788498
+## [5,] 0.6661578 0.8308071 1.6665746 1.0788498 1.2302339
+ r
+# Correlation matrix
+cov2cor(res)
+##           [,1]      [,2]      [,3]      [,4]      [,5]
+## [1,] 1.0000000 0.9694762 0.8400802 0.8778710 1.0715553
+## [2,] 0.9694762 1.0000000 0.4963981 1.1895813 1.6961787
+## [3,] 0.8400802 0.8396658 1.0000000 0.4182321 0.9769865
+## [4,] 0.8434982 0.7671876 0.9447710 1.0000000 0.8960092
+## [5,] 0.8591946 0.8934047 0.9769865 0.8960092 1.0000000</code></pre>
+</div>
+<div id="fitting-in-two-steps" class="section level1">
+<h1>Fitting in two steps</h1>
 <p>In his original paper, Piepho (1999) also gave SAS code to analyse the means of the ‘genotype x environment’ combinations. Indeed, agronomists and plant breeders often adopt a two-steps fitting procedure: in the first step, the means across blocks are calculated for all genotypes in all environments. In the second step, these means are used to fit an environmental variance model. This two-step process is less demanding in terms of computer resources and it is correct whenever the experiments are equireplicated, with no missing ‘genotype x environment’ combinations. Furthermore, we need to be able to assume similar variances within all experiments.</p>
-<p>I would also like to give an example of this two-step analysis method. In the first step, we can use the ‘ddply()’ function in the package ‘plyr’:</p>
-<pre class="r"><code>#First step
-WinterWheatM &lt;- ddply(WinterWheat, c(&quot;Genotype&quot;, &quot;Year&quot;), 
-      function(df) c(Yield = mean(df$Yield)) )</code></pre>
-<p>Once we have retrieved the means for genotypes in all years, we can fit the following model:</p>
+<p>I would also like to give an example of this two-step analysis method. In the first step, we can use the <code>group_by()</code> and <code>summarise()</code> functions in ‘dplyr’:</p>
+<pre class="r"><code># First step: calcolate the means of replicates within environments
+WinterWheatM &lt;- WinterWheat |&gt;
+  group_by(Genotype, Year) |&gt;
+  summarise(Yield = mean(Yield))
+## `summarise()` has grouped output by &#39;Genotype&#39;. You can override using the
+## `.groups` argument.
+ r
+head(WinterWheatM)
+## # A tibble: 6 × 3
+## # Groups:   Genotype [1]
+##   Genotype Year  Yield
+##   &lt;fct&gt;    &lt;fct&gt; &lt;dbl&gt;
+## 1 COLOSSEO 1996   6.35
+## 2 COLOSSEO 1997   6.46
+## 3 COLOSSEO 1998   6.70
+## 4 COLOSSEO 1999   6.98
+## 5 COLOSSEO 2000   6.44
+## 6 COLOSSEO 2001   7.07</code></pre>
+<p>Once we have retrieved the means for genotypes in all years, we can fit a simplified model:</p>
 <p><span class="math display">\[y_{ij} = \mu + g_i + a_{ij}\]</span></p>
 <p>where <span class="math inline">\(y_{ij}\)</span> is the mean yield for the <span class="math inline">\(i\)</span>-th genotype in the <span class="math inline">\(j\)</span>-th environment and <span class="math inline">\(a_{ij}\)</span> is the residual term, which includes the genotype x environment random interaction, the block x environment random interaction and the residual error term.</p>
 <p>In this model we have only one random effect (<span class="math inline">\(a_{ij}\)</span>) and, therefore, this is a fixed linear model. However, we need to model the variance-covariance matrix of residuals (<span class="math inline">\(R\)</span>), by adopting a totally unstructured form. Please, note that, when working with raw data, we have modelled <span class="math inline">\(\Omega\)</span>, i.e. the variance-covariance matrix for the random effects. I have used the ‘gls()’ function, together with the ‘weights’ and ‘correlation’ arguments. See the code below.</p>
@@ -112,96 +160,81 @@ summary(envVarModM)
 ## Generalized least squares fit by REML
 ##   Model: Yield ~ Genotype 
 ##   Data: WinterWheatM 
-##       AIC      BIC   logLik
-##   80.6022 123.3572 -13.3011
+##        AIC      BIC    logLik
+##   84.36176 112.3857 -22.18088
 ## 
 ## Correlation Structure: General
 ##  Formula: ~1 | Year 
 ##  Parameter estimate(s):
 ##  Correlation: 
-##   1     2     3     4     5    
-## 2 0.947                        
-## 3 0.809 0.815                  
-## 4 0.816 0.736 0.921            
-## 5 0.817 0.866 0.952 0.869      
-## 6 0.888 0.925 0.949 0.856 0.907
+##   1     2     3     4    
+## 2 0.947                  
+## 3 0.809 0.815            
+## 4 0.816 0.736 0.921      
+## 5 0.817 0.866 0.952 0.869
 ## Variance function:
 ##  Structure: Different standard deviations per stratum
 ##  Formula: ~1 | Genotype 
 ##  Parameter estimates:
-## COLOSSEO    CRESO   DUILIO   GRAZIA    IRIDE SANCARLO 
-## 1.000000 1.189654 2.143712 1.528848 1.560621 1.356423 
+## COLOSSEO    CRESO   DUILIO   GRAZIA    IRIDE 
+## 1.000000 1.189654 2.143715 1.528849 1.560622 
 ## 
 ## Coefficients:
-##                      Value Std.Error   t-value p-value
-## (Intercept)       6.413333 0.2742310 23.386607  0.0000
-## GenotypeCRESO    -0.439524 0.1107464 -3.968740  0.0003
-## GenotypeDUILIO    0.178571 0.3999787  0.446452  0.6579
-## GenotypeGRAZIA   -0.330952 0.2518266 -1.314207  0.1971
-## GenotypeIRIDE     0.281905 0.2580722  1.092348  0.2819
-## GenotypeSANCARLO -0.192857 0.1802545 -1.069916  0.2918
+##                    Value Std.Error   t-value p-value
+## (Intercept)     6.413333 0.2742310 23.386613  0.0000
+## GenotypeCRESO  -0.439524 0.1107465 -3.968739  0.0004
+## GenotypeDUILIO  0.178571 0.3999795  0.446451  0.6585
+## GenotypeGRAZIA -0.330952 0.2518269 -1.314206  0.1987
+## GenotypeIRIDE   0.281905 0.2580727  1.092346  0.2834
 ## 
 ##  Correlation: 
-##                  (Intr) GCRESO GDUILI GGRAZI GIRIDE
-## GenotypeCRESO     0.312                            
-## GenotypeDUILIO    0.503  0.371                     
-## GenotypeGRAZIA    0.269 -0.095  0.774              
-## GenotypeIRIDE     0.292  0.545  0.857  0.638       
-## GenotypeSANCARLO  0.310  0.612  0.856  0.537  0.713
+##                (Intr) GCRESO GDUILI GGRAZI
+## GenotypeCRESO   0.312                     
+## GenotypeDUILIO  0.503  0.371              
+## GenotypeGRAZIA  0.269 -0.095  0.774       
+## GenotypeIRIDE   0.292  0.545  0.857  0.638
 ## 
 ## Standardized residuals:
 ##        Min         Q1        Med         Q3        Max 
-## -2.0949708 -0.5680664  0.1735447  0.7599607  1.3395016 
+## -2.0949714 -0.5742607  0.1661351  0.8068883  1.3395017 
 ## 
-## Residual standard error: 0.7255471 
-## Degrees of freedom: 42 total; 36 residual</code></pre>
-<p>The variance-covariance matrix for residuals can be obtained using the ‘getVarCov()’ function in the ‘nlme’ package.</p>
+## Residual standard error: 0.7255469 
+## Degrees of freedom: 35 total; 30 residual</code></pre>
+<p>The variance-covariance matrix for residuals can be obtained using the usual <code>getVarCov()</code> function in the ‘nlme’ package.</p>
 <pre class="r"><code>R &lt;- getVarCov(envVarModM)
 R
 ## Marginal variance covariance matrix
-##         [,1]    [,2]    [,3]    [,4]    [,5]    [,6]
-## [1,] 0.52642 0.59280 0.91285 0.65647 0.67116 0.63376
-## [2,] 0.59280 0.74503 1.09440 0.70421 0.84652 0.78560
-## [3,] 0.91285 1.09440 2.41920 1.58850 1.67700 1.45230
-## [4,] 0.65647 0.70421 1.58850 1.23040 1.09160 0.93442
-## [5,] 0.67116 0.84652 1.67700 1.09160 1.28210 1.01070
-## [6,] 0.63376 0.78560 1.45230 0.93442 1.01070 0.96855
-##   Standard Deviations: 0.72555 0.86315 1.5554 1.1093 1.1323 0.98415</code></pre>
+##         [,1]    [,2]    [,3]    [,4]    [,5]
+## [1,] 0.52642 0.59280 0.91285 0.65647 0.67116
+## [2,] 0.59280 0.74503 1.09440 0.70421 0.84652
+## [3,] 0.91285 1.09440 2.41920 1.58850 1.67700
+## [4,] 0.65647 0.70421 1.58850 1.23040 1.09160
+## [5,] 0.67116 0.84652 1.67700 1.09160 1.28210
+##   Standard Deviations: 0.72555 0.86315 1.5554 1.1093 1.1323</code></pre>
 <p>As the design is perfectly balanced, the diagonal elements of the above matrix correspond to the variances of genotypes across environments:</p>
 <pre class="r"><code>tapply(WinterWheatM$Yield, WinterWheatM$Genotype, var)
-##  COLOSSEO     CRESO    DUILIO    GRAZIA     IRIDE  SANCARLO 
-## 0.5264185 0.7450275 2.4191624 1.2304397 1.2821143 0.9685497</code></pre>
-<p>which can also be retreived by the ‘stability’ package:</p>
-<pre class="r"><code>library(stability)
-envVarStab &lt;-
-  stab_measures(
-    .data = WinterWheatM,
-    .y = Yield,
-    .gen = Genotype,
-    .env = Year
-  )
-
-envVarStab$StabMeasures
-## # A tibble: 6 × 7
-##   Genotype  Mean GenSS   Var    CV  Ecov ShuklaVar
-##   &lt;fct&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
-## 1 COLOSSEO  6.41  3.16 0.526  11.3 1.25     0.258 
-## 2 CRESO     5.97  4.47 0.745  14.4 1.01     0.198 
-## 3 DUILIO    6.59 14.5  2.42   23.6 2.31     0.522 
-## 4 GRAZIA    6.08  7.38 1.23   18.2 1.05     0.208 
-## 5 IRIDE     6.70  7.69 1.28   16.9 0.614    0.0989
-## 6 SANCARLO  6.22  5.81 0.969  15.8 0.320    0.0254</code></pre>
-<p>Strictly speaking, those variances are not the environmental variances, as they also contain the within-experiment and within block random variability, which needs to be separately estimated during the first step.</p>
-<p>Thanks for reading!</p>
-<hr />
+##  COLOSSEO     CRESO    DUILIO    GRAZIA     IRIDE 
+## 0.5264185 0.7450275 2.4191624 1.2304397 1.2821143</code></pre>
+<p>Strictly speaking, the diagonal elements of the above matrix do not correspond to the environmental variances as calculated with one-step analyses, as they also contain the within-experiment and within block random variability, which would need to be separately estimated during the first step.</p>
+<p>Thanks for reading—and don’t forget to check out my new book below!</p>
+<p>Andrea Onofri<br />
+Department of Agricultural, Food and Environmental Sciences<br />
+University of Perugia (Italy)<br />
+Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<p><a href = "https://www.awin1.com/cread.php?awinmid=26429&awinaffid=2675822&ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src= "../../_Figures/Email_Signature_978-3-032-08199-5.png" align="center" alt="Book cover" class="cover" /></a>
+<br/></p>
 <p>Andrea Onofri<br />
 Department of Agricultural, Food and Environmental Sciences<br />
 University of Perugia (Italy)</p>
-<p>#References</p>
-<ul>
+</div>
+<div id="references" class="section level1">
+<h1>References</h1>
+<ol style="list-style-type: decimal">
 <li>Gałecki, A., Burzykowski, T., 2013. Linear mixed-effects models using R: a step-by-step approach. Springer, Berlin.</li>
 <li>Muhammad Yaseen, Kent M. Eskridge and Ghulam Murtaza (2018). stability: Stability Analysis of Genotype by Environment Interaction (GEI). R package version 0.5.0. <a href="https://CRAN.R-project.org/package=stability" class="uri">https://CRAN.R-project.org/package=stability</a></li>
 <li>Piepho, H.-P., 1999. Stability Analysis Using the SAS System. Agronomy Journal 91, 154–160.</li>
 <li>Pinheiro, J.C., Bates, D.M., 2000. Mixed-Effects Models in S and S-Plus, Springer-Verlag Inc. ed. Springer-Verlag Inc., New York.</li>
-</ul>
+</ol>
+<hr />
+<p>This post was originally written on 20 August 2019; revised on December 2025</p>
 </div>

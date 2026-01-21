@@ -1,0 +1,116 @@
+---
+title: "Correcting for multiplicity in the 'emmeans' package"
+author: "Andrea Onofri"
+date: 2026-01-21
+slug: 'Mixed models'
+categories:
+  - R
+  - 'MCP'
+tags:
+  - R
+  - 'MCP'
+  - 'Multiple_comparisons'
+  - 'emmeans'
+archives:
+  - 2026
+---
+
+```{r setup, cache = F, echo = F}
+#Put at the beginning
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+knitr::knit_hooks$set(document = function(x){ 
+  # gsub("```\n*```r*\n*", "", x) 
+  gsub("```\n*```\\sr*\n*", "", x)
+})
+```
+
+In my recent book (see below), on page 166 and earlier, I made the point that, with pairwise comparisons and, more generally, whenever simultaneous statistical tests are performed, it is necessary to provide P-values that account for the familywise error rate, i.e. the probability of committing at least one incorrect rejection within the whole family of simultaneous tests (i.e. adjusted P-values). In this respect, it may be useful to recall that, for a single non-significant test, the comparison-wise error rate $E_c$  is the probability of a wrong rejection for that single test (based on a non-adjusted P-value), whereas the probability of at least one wrong rejection within a family of $k$ comparisons is much higher.
+
+With pairwise comparisons, a single test is usually based on the ratio between a difference and its standard error (a t-test), which is assumed to follow a univariate t-distribution when the null hypothesis is true. When several simultaneous t-tests are performed, the vector of all t-ratios can be assumed to follow a multivariate t-distribution under the hypothesis that the null is true for all simultaneous tests (Bretz et al., 2011). Therefore, adjusted P-values can be obtained by using the probability function of a multivariate t-distribution in place of the simple univariate t-distribution.
+
+As an example, let us reconsider the 'mixture' data used in Chapter 9 of the main book. Three herbicide mixtures and an untreated control were tested for their weed-control ability against an important weed in tomato, namely *Solanum nigrum*. In the code below, we load the data and fit a one-way ANOVA model, using the weight of weed plants per pot as the response variable and the herbicide treatment as the explanatory factor. For the sake of simplicity, we omit the usual checks of the basic assumptions (see the main book). The ANOVA table shows that the treatment effect is significant and, therefore, we proceed to compare treatment means in a pairwise fashion. The P-values shown below do not account for the familywise error rate but only for the comparison-wise error rate; these P-values can be reproduced by using the probability function of a univariate Student’s t-distribution (`pt()` function in R).
+
+
+```{r}
+library(statforbiology)
+library(emmeans)
+library(multcomp)
+dataset <- getAgroData("mixture")
+dataset$Treat <- factor(dataset$Treat)
+model <- lm(Weight ~ Treat, data = dataset)
+anova(model)
+groupMeans <- emmeans(model, ~Treat)
+tab <- contrast(groupMeans, method = "pairwise", adjust = "none")
+tab
+#
+# The P-value is obtained from the univariate t distribution (two-tails test)
+abst <- abs(as.data.frame(tab)$t.ratio)
+2 * pt(abst, 12, lower.tail = FALSE)
+```
+
+In order to obtain familywise error rates, we should switch from the univariate to the multivariate t-distribution. For example, let's consider the first t-ratio in the previous Code Box (t = 1.461). We should ask ourselves: "what is the probability of obtaining a t-ratio as extreme as, or more extreme than, 1.461 from a multivariate t-distribution with six dimensions (i.e., the number of simoultaneous tests)?". In this calculation, we must also consider that the 6 tests are correlated, at least to some extent, because they share some common elements, for example, the same error term in the denominator. In the simplest case (homoscedasticity and balanced data), this correlation is equal to 0.5 for all pairwise comparisons.
+
+In earlier times, when the computing power was limited, calculating probabilities from the multivariate t-distribution was a daunting task. However, for some specific cases (e.g., linear models with homoscedastic and balanced data), adjusted P-values could be obtained by exploiting the distribution of the Studentised Range (the so-called 'tukey' method), which is the default option in the `contrast()` function of the `emmeans` package, as shown in the following Code box.
+
+
+```{r}
+tab <- contrast(groupMeans, method = "pairwise")
+# tab <- contrast(groupMeans, method = "pairwise", adjust = "tukey") # same as above
+tab
+
+# The P-value is obtained from the Studentised Range Distribution (two-tails test)
+abst <- abs(as.data.frame(tab)$t.ratio)
+ptukey(sqrt(2) * abst, 4, 12, lower.tail = FALSE)
+```
+
+This simple method yields exact familywise error rates with balanced data—which represent the vast majority of designed field experiments in agriculture—and performs reasonably well in the presence of small degrees of imbalance. Within the framework of traditional multiple-comparison testing procedures, the approach described above leads to the same results as Tukey’s HSD for balanced data and the Tukey–Kramer test for unbalanced data.
+
+More recently, it has become possible to directly calculate probabilities from the multivariate t-distribution, which is particularly convenient because it provides a more general approach to obtaining familywise error rates. This distribution is implemented in the 'mvtnorm' package through the `pmvt()` function. To perform the calculation, we must specify, for each dimension, the interval over which the probability is to be computed (in this case, for the first t-ratio, the interval is $\pm 1.461081$), the number of degrees of freedom (12), and the correlation matrix of the linear combinations, which can be directly retrieved from the 'emmGrid' object. The code below illustrates these calculations. The quantity 'plev' represents the probability of sampling within the interval (i.e. none of the six null hypotheses is wrongly rejected), whereas the familywise error rate corresponds to the probability of sampling outside the interval (i.e. at least one null hypothesis is wrongly rejected), which is obtained by subtraction.
+
+
+```{r}
+library(mvtnorm)
+t1 <- abs(as.data.frame(tab)$t.ratio)[1]
+ncontr <- 6
+corMat <- cov2cor(vcov(tab))
+plev <- pmvt(lower = rep(-t1, ncontr), upper=rep(t1, ncontr), df = 12,
+     corr = corMat)[1]
+1 - plev
+```
+
+```{r eval=FALSE, include=FALSE}
+# May be similar to sidak? Not completely
+plev2 <- pmvt(lower = rep(-t1, ncontr), upper=rep(t1, ncontr), df = Inf,
+     corr = diag(6))[1]
+1 - plev2
+contrast(groupMeans, method = "pairwise", adjust = "sidak")
+```
+
+In R, such an approach can be obtained by using the `adjust = "mvt"` argument.
+
+```{r}
+tab <- contrast(groupMeans, method = "pairwise", adjust = "mvt")
+tab
+```
+
+The above function employs numerical integration methods and is based on simulation; consequently, the results are not fully reproducible. However, it is easy to see that these results are asymptotically equivalent to those obtained with the Tukey adjustment method shown above. Owing to this intrinsic complexity, the use of the `adjust = "mvt"` argument is not recommended for pairwise comparisons in balanced experiments, whereas it may prove useful in other situations, for example in the presence of strongly unbalanced data.
+
+
+Thanks for reading—and don't forget to check out my new book below!
+
+Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences        
+University of Perugia (Italy)        
+Send comments to: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)  
+
+<a href = "https://www.awin1.com/cread.php?awinmid=26429&awinaffid=2675822&ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src= "../../_Figures/Email_Signature_978-3-032-08199-5.png" align="center" alt="Book cover" class="cover" /></a>
+<br/>
+
+
+# References
+
+1. Bretz, F., Hothorn, T., Westfall, P., 2011. Multiple comparisons using R. CRC Press, Boca Raton, FL.
+
+
+
+

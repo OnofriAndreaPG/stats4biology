@@ -1,26 +1,29 @@
 ---
-title: "The 'Environmental Variance' model for Multi-Environment Experiments"
+title: "Using `lme()` to fit the Environmental Variance mixed model to genotype experiments"
 author: "Andrea Onofri"
-date: 2019-08-20
+date: 2025-12-04
 slug: 'Mixed models'
 categories:
-  - R
   - 'Mixed_models'
 tags:
   - R
   - 'Mixed_models'
   - 'Multi_environment_studies'
+  - 'lme'
+  - 'sommer'
 archives:
   - 2019
 ---
 
-Fitting mixed models has become very common in biology and recent developments involve the manipulation of the variance-covariance matrix for random effects and residuals. To the best of my knowledge, within the frame of frequentist methods, the only freeware solution in R should be based on the 'nlme' package, as the 'lmer' package does not easily permit such manipulations. The 'nlme' package is fully described in Pinheiro and Bates (2000). Of course, the 'asreml' package can be used, but, unfortunately, this is not freeware.
+Yield stability is a key aspect in the selection of crop genotypes. Its definition is not entirely straightforward (see, for example, Annichiarico, 2002), but, in simple terms, it refers to the ability of a crop to maintain its yield potential across different environments, helping farmers safeguard their income. Several statistical indicators of stability have been proposed (see, e.g., Mohammadi, 2008). In this post, however, I will focus on the so-called environmental variance, which represents the portion of phenotypic variance attributable to environmental (non-genetic) factors and is measured as the overall variance across environments for each genotype. 
 
-Coding mixed models in 'nlme' is not always easy, especially when we have crossed random effects, which is very common with agricultural experiments. I have been struggling with this issue very often in the last years and I thought it might be useful to publish a few examples in this blog, to save collegues from a few headaches. Please, note that I have already published other posts dealing with the use of the 'lme()' function in the 'nlme' package, for example [this post here](https://www.statforbiology.com/2019/stat_general_correlationindependence2/) about the correlation in designed experiments and [this other post here](https://www.statforbiology.com/2019/stat_lmm_stabilityvariance/), about heteroscedastic multienvironment experiments.
+This index is usually considered a static measure of stability, meaning that low values are typical of genotypes whose yield levels are only slightly affected by changes in the environmental conditions.
 
-The first example in this series relates to a randomised complete block design with three replicates, comparing winter wheat genotypes. The experiment was repeated in seven years in the same location. The dataset ('WinterWheat') is available in the 'aomisc' package, which is the companion package for this blog and it is available on gitHub. Information on how to download and install the 'aomisc' package are given in [this page](https://www.statforbiology.com/rpackages/). Please, note that this dataset shows the data for eight genotypes, but the model that we want to fit requires that the number of environments is higher than the number of genotypes. Therefore, we have to make a subset, at the beginning, removing a couple of genotypes.
+One possible way to calculate the environmental variance has been proposed by Piepho (1999), making use of mixed models with 'unusual' variance-covariance matrices. In developing this post, I will closely follow the coding proposed by the aforementioned author.
 
-The first code snippet loads the 'aomisc' package and other necessary packages. Afterwards, it loads the 'WinterWheat' dataset, subsets it and turns the 'Genotype', 'Year' and 'Block' variables into factors.
+As an example, let's consider the data of a multi-environment study, wherein eight winter wheat genotypes were compared an a randomised complete block design with three replicates, which was repeated in seven years in Central Italy. The resulting dataset is available as 'WinterWheat' in 'statforbiology', which is the accompanying package for this blog. Information on how to download and install the 'statforbiology' package are given in [this page](https://www.statforbiology.com/rpackages/).
+
+The first code snippet loads the 'statforbiology' package and other necessary packages. Afterwards, it loads the 'WinterWheat' dataset by using the  `getAgroData()` function and transforms the 'Year', 'Genotype' and 'Block' variables into factors. Please, note that this dataset shows the data for eight genotypes, but the model that we want to fit requires that the number of environments is higher than the number of genotypes. Therefore, we have to make a subset, removing some (e.g., three) genotypes.
 
 ```{r setup, cache = F, echo = F}
 #Put at the beginning
@@ -30,68 +33,174 @@ knitr::knit_hooks$set(document = function(x){
 ```
 
 
-```{r message=FALSE, warning=FALSE, paged.print=FALSE}
-library(plyr)
+```{r message=FALSE, warning=FALSE}
 library(nlme)
-library(aomisc)
-data(WinterWheat)
-WinterWheat <- WinterWheat[WinterWheat$Genotype != "SIMETO" & WinterWheat$Genotype != "SOLEX",]
-WinterWheat$Genotype <- factor(WinterWheat$Genotype)
-WinterWheat$Year <- factor(WinterWheat$Year)
-WinterWheat$Block <- factor(WinterWheat$Block)
+library(statforbiology)
+library(dplyr)
+WinterWheat <- getAgroData("WinterWheat")
+WinterWheat <- WinterWheat[WinterWheat$Genotype != "SIMETO" & 
+                             WinterWheat$Genotype != "SOLEX" &
+                             WinterWheat$Genotype != "SANCARLO",]
+WinterWheat[,c(1:3, 5)] <- lapply(WinterWheat[,c(1:3,5)], factor)
 head(WinterWheat, 10)
 ```
  
-Dealing with the above dataset, a good candidate model for data analyses is the so-called 'environmental variance model'. This model is often used in stability analyses for multi-environment experiments and I will closely follow the coding proposed in Piepho (1999):
-
+Dealing with the above dataset, a good candidate model for data analyses is the following:
 
 $$y_{ijk} = \mu + g_i + r_{jk}  +  h_{ij} + \varepsilon_{ijk}$$
 
-where $y_{ijk}$ is yield (or other trait) for the $k$-th block, $i$-th genotype and $j$-th environment, $\mu$ is the intercept, $g_i$ is the effect for the i-th genotype, $r_{jk}$ is the effect for the $k$-th block in the $j$-th environment, $h_{ij}$ is a random deviation from the expected yield for the $i$-th genotype in the $j$-th environment and $\varepsilon_{ijk}$ is the residual variability of yield between plots, within each environment and block.
+where $y_{ijk}$ is yield (or other trait) for the $k$^th^ block, $i$^th^ genotype and $j$^th^ environment, $\mu$ is the intercept, $g_i$ is the effect for the i^th^ genotype, $r_{jk}$ is the effect for the $k$^th^ block in the $j$^th^ environment, $h_{ij}$ is a random deviation from the expected yield for the $i$^th genotype in the $j$^th environment and $\varepsilon_{ijk}$ is the residual variability of yield between plots, within each environment and block.
 
-We usually assume that $r_{jk}$ and $\varepsilon_{ijk}$ are independent and normally distributed, with variances equal to $\sigma^2_r$ and $\sigma^2_e$, respectively. Such an assumption may be questioned, but we will not do it now, for the sake of simplicity.
+We usually assume that $r_{jk}$ and $\varepsilon_{ijk}$ are independent and normally distributed, with variances equal to $\sigma^2_r$ and $\sigma^2_e$, respectively. Such assumptions may be questioned, but we will not do it now, for the sake of simplicity.
 
-Let's concentrate on $h_{ij}$, which we will assume as normally distributed with variance-covariance matrix equal to $\Omega$. In particular, it is reasonable to expect that the genotypes will have different variances across environments (heteroscedasticity), which can be interpreted as static stability measures ('environmental variances'; hence the name 'environmental variance model'). Furthermore, it is reasonable that, if an environment is good for one genotype, it may also be good for other genotypes, so that yields in each environment are correlated, although the correlations can be different for each couple of genotypes. To reflect our expectations, the $\Omega$ matrix needs to be totally unstructured, with the only constraint that it is positive definite.
+Let's concentrate on $h_{ij}$, which is the peculiar element of this model. Normally, a model for multi-environment experiments, in addition to the genotype effect, would contain the environmental effect (that is common to all genotypes) and the genotype by environment interaction (that is specific to each genotype by environment combination). In this environmental variance model, these two effects (environment plus interaction) are joined together, to obtain the random element $h$, which represents the whole variability of genotype yields across environments. We assume this element as normally distributed with variance-covariance matrix equal to $\Omega$.
 
-Piepho (1999) has shown how the above model can be coded by using SAS and I translated his code into R.
+It is reasonable to expect that the genotypes will have different variances across environments (heteroscedasticity), which can be interpreted as static stability measures ('environmental variances'; hence the name 'environmental variance model'). Furthermore, it is reasonable that, if an environment is good for one genotype, it may also be good for other genotypes, so that yields in each environment are correlated, although the correlations can be different for each couple of genotypes. To reflect our expectations, the $\Omega$ matrix needs to be totally unstructured, with the only constraint that it is positive definite.
+
+# Fitting in one step
+
+Piepho (1999) has shown how the above model can be coded by using SAS and I translated his code into R. Random effects should be specified as a list, by using the 'Year' as the nesting factor (Galecki and Burzykowski, 2013). In order to specify a totally unstructured variance-covariance matrix for the genotypes within years, I used the 'pdMat' construct `pdSymm()`. This model is rather complex and may take several minutes to converge, when the number of genotypes is very high. 
 
 ```{r}
 EnvVarMod <- lme(Yield ~ Genotype, 
   random = list(Year = pdSymm(~Genotype - 1), 
-              Year = pdIdent(~Block - 1)),
+                Block = ~ 1),
   control = list(opt = "optim", maxIter = 100),
   data=WinterWheat)
+```
+
+```{r eval=FALSE, include=FALSE}
+# alternative, working
+EnvVarMod <- lme(Yield ~ Genotype, 
+  random = list(Year = pdSymm(~Genotype - 1), 
+                Block = pdIdent(~Block - 1)),
+  control = list(opt = "optim", maxIter = 100),
+  data=WinterWheat)
+
+# Alternative, not working!
+EnvVarMod <- lme(Yield ~ Genotype, 
+  random = list(Year = pdBlocked(list(pdSymm(~Genotype - 1),
+                                      pdIdent(~Block - 1)))),
+  control = list(opt = "optim", maxIter = 100),
+  data=WinterWheat)
+
+# Considering the whole lot of variability
+EnvVarModB <- lme(Yield ~ Genotype, 
+  random = ~ Year/Block,
+  weights = varIdent(form=~1|Genotype),
+  correlation = corSymm(form = ~1|Year),
+  control = list(opt = "optim", maxIter = 100),
+  data=WinterWheat)
+
+```
+
+The environmental variances, together with the correlations, can be easily obtained by using the 'VarCorr()' function (see below). In practice, we have five variance components (one per genotype) showing that Colosseo was the most stable genotype, while Duilio was the least stable one. The yield levels of the genotypes in different environments are more or less correlated, with correlation coefficients ranging from 0.977 (Duilio vs Iride) to 0.840 (Creso vs Duilio).
+
+```{r}
+# Environmental Variances and correlations
 VarCorr(EnvVarMod)
 ```
 
-I coded the random effects as a list, by using the 'Year' as the nesting factor (Galecki and Burzykowski, 2013). In order to specify a totally unstructured variance-covariance matrix for the genotypes within years, I used the 'pdMat' construct 'pdSymm()'. This model is rather complex and may take long to converge. 
-
-The environmental variances are retrieved by the following code:
-
-```{r}
-envVar <- as.numeric ( VarCorr(EnvVarMod)[2:7,1] )
-envVar
+```{r eval=FALSE, include=FALSE}
+# Retrieving the correlations
+VarCorr(EnvVarMod)[2:6,3:6]
+getVarCov(EnvVarMod)
 ```
 
-while the correlations are given by:
+Unfortunately, the output of 'lme()' is rather difficult top read and standard errors are missing for variance parameters. The 'lmeInfo' package can be used to retrieve variance components estimates (via the `extract_varcomp()` function) and their variance-covariance matrix (via the `varcomp_vcov()` function). The standard errors can be retrieved as the square root of the diagonal elements of these latter variance-covariance matrix (see code box below).
 
-```{r}
-VarCorr(EnvVarMod)[2:7,3:7]
+```{r message=FALSE, warning=FALSE}
+# Retrieving the variance components from the lme object
+library(lmeInfo)
+varcomp <- extract_varcomp(EnvVarMod, vector = TRUE)
+vcovMat <- varcomp_vcov(EnvVarMod)
+SEs <- sqrt(diag(vcovMat))
+data.frame(varcomp, SEs)
 ```
 
-# Unweighted two-stage fitting
+If we want to inspect the full 5 $\times$ 5 variance–covariance matrix for the random effects, we cannot rely on the usual `getVarCov()` function, as it is not implemented for models with multiple levels of nesting. Instead, we need to reconstruct this matrix from the 'varcomp' object shown in the previous box, as illustrated in the box below.
+
+```{r}
+# Rebuilding the variance-covariance matrix 
+vals <- varcomp[1:15]
+res <- matrix(0, 5, 5)
+cont <- 1
+for(i in 1:5){
+  for(j in 1:i){
+   res[i, j] <- vals[cont]
+   cont <- cont + 1
+  }
+} 
+res[upper.tri(res)] <- res[lower.tri(res)]
+
+# Variance-covariance matrix
+res
+
+# Correlation matrix
+cov2cor(res)
+```
+
+
+
+```{r eval=FALSE, include=FALSE}
+# Experimenting with SOMMER (it fails to converge!)
+library(sommer)
+mix <- mmes(Yield ~ Genotype, 
+            random= ~ vsm(usm(Year), ism(Genotype)),
+            rcov = ~ vsm(ism(units)),
+            data=WinterWheat)
+summary(mix)$varcomp
+
+#           [,1]      [,2]      [,3]      [,4]      [,5]
+# [1,] 0.4886339 0.5681815 0.9031396 0.6661578 0.8308071
+# [2,] 0.5681815 0.7029369 0.6400747 1.0826971 1.5773338
+# [3,] 0.9031396 1.0826971 2.3652918 0.6982555 1.6665746
+# [4,] 0.6400747 0.6982555 1.5773338 1.1784451 1.0788498
+# [5,] 0.6661578 0.8308071 1.6665746 1.0788498 1.2302339
+# > # Correlation matrix
+# > cov2cor(res)
+#           [,1]      [,2]      [,3]      [,4]      [,5]
+# [1,] 1.0000000 0.9694762 0.8400802 0.8778710 1.0715553
+# [2,] 0.9694762 1.0000000 0.4963981 1.1895813 1.6961787
+# [3,] 0.8400802 0.8396658 1.0000000 0.4182321 0.9769865
+# [4,] 0.8434982 0.7671876 0.9447710 1.0000000 0.8960092
+# [5,] 0.8591946 0.8934047 0.9769865 0.8960092 1.0000000
+
+#                                                       varcomp        SEs
+# Tau.Year.Year.var(GenotypeCOLOSSEO)                0.48863386 0.31341161
+# Tau.Year.Year.cov(GenotypeCRESO,GenotypeCOLOSSEO)  0.56818152 0.35265479
+# Tau.Year.Year.var(GenotypeCRESO)                   0.70293687 0.43709597
+# Tau.Year.Year.cov(GenotypeDUILIO,GenotypeCOLOSSEO) 0.90313965 0.59835845
+# Tau.Year.Year.cov(GenotypeDUILIO,GenotypeCRESO)    1.08269708 0.71029178
+# Tau.Year.Year.var(GenotypeDUILIO)                  2.36529182 1.39678126
+# Tau.Year.Year.cov(GenotypeGRAZIA,GenotypeCOLOSSEO) 0.64007465 0.42673312
+# Tau.Year.Year.cov(GenotypeGRAZIA,GenotypeCRESO)    0.69825554 0.48918816
+# Tau.Year.Year.cov(GenotypeGRAZIA,GenotypeDUILIO)   1.57733378 0.95776281
+# Tau.Year.Year.var(GenotypeGRAZIA)                  1.17844507 0.71158820
+# Tau.Year.Year.cov(GenotypeIRIDE,GenotypeCOLOSSEO)  0.66615784 0.43881261
+# Tau.Year.Year.cov(GenotypeIRIDE,GenotypeCRESO)     0.83080714 0.52923899
+# Tau.Year.Year.cov(GenotypeIRIDE,GenotypeDUILIO)    1.66657461 0.99335782
+# Tau.Year.Year.cov(GenotypeIRIDE,GenotypeGRAZIA)    1.07884979 0.67948762
+# Tau.Year.Year.var(GenotypeIRIDE)                   1.23023386 0.74148575
+# Tau.Block.Block.var((Intercept))                   0.03231338 0.02254209
+# sigma_sq                                           0.12952019 0.02447701
+```
+
+# Fitting in two steps
 
 In his original paper, Piepho (1999) also gave SAS code to analyse the means of the 'genotype x environment' combinations. Indeed, agronomists and plant breeders often adopt a two-steps fitting procedure: in the first step, the means across blocks are calculated for all genotypes in all environments. In the second step, these means are used to fit an environmental variance model. This two-step process is less demanding in terms of computer resources and it is correct whenever the experiments are equireplicated, with no missing 'genotype x environment' combinations. Furthermore, we need to be able to assume similar variances within all experiments.
 
-I would also like to give an example of this two-step analysis method. In the first step, we can use the 'ddply()' function in the package 'plyr':
+I would also like to give an example of this two-step analysis method. In the first step, we can use the `group_by()` and `summarise()` functions in 'dplyr':
 
 ```{r}
-#First step
-WinterWheatM <- ddply(WinterWheat, c("Genotype", "Year"), 
-      function(df) c(Yield = mean(df$Yield)) )
+# First step: calcolate the means of replicates within environments
+WinterWheatM <- WinterWheat |>
+  group_by(Genotype, Year) |>
+  summarise(Yield = mean(Yield))
+head(WinterWheatM)
 ```
 
-Once we have retrieved the means for genotypes in all years, we can fit the following model:
+Once we have retrieved the means for genotypes in all years, we can fit a simplified model:
 
 $$y_{ij} = \mu + g_i + a_{ij}$$
 
@@ -109,7 +218,7 @@ envVarModM <- gls(Yield ~ Genotype,
 summary(envVarModM)
 ```
 
-The variance-covariance matrix for residuals can be obtained using the 'getVarCov()' function in the 'nlme' package.
+The variance-covariance matrix for residuals can be obtained using the usual `getVarCov()` function in the 'nlme' package.
 
 ```{r}
 R <- getVarCov(envVarModM)
@@ -122,39 +231,34 @@ As the design is perfectly balanced, the diagonal elements of the above matrix c
 tapply(WinterWheatM$Yield, WinterWheatM$Genotype, var)
 ```
 
-which can also be retreived by the 'stability' package:
 
-```{r}
-library(stability)
-envVarStab <-
-  stab_measures(
-    .data = WinterWheatM,
-    .y = Yield,
-    .gen = Genotype,
-    .env = Year
-  )
+Strictly speaking, the diagonal elements of the above matrix do not correspond to the environmental variances as calculated with one-step analyses, as they also contain the within-experiment and within block random variability, which would need to be separately estimated during the first step.
 
-envVarStab$StabMeasures
-```
+Thanks for reading—and don’t forget to check out my new book below!
 
-Strictly speaking, those variances are not the environmental variances, as they also contain the within-experiment and within block random variability, which needs to be separately estimated during the first step.
+Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences        
+University of Perugia (Italy)        
+Send comments to: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)  
 
+<a href = "https://www.awin1.com/cread.php?awinmid=26429&awinaffid=2675822&ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src= "../../_Figures/Email_Signature_978-3-032-08199-5.png" align="center" alt="Book cover" class="cover" /></a>
+<br/>
 
-Thanks for reading!
-
----
 Andrea Onofri   
 Department of Agricultural, Food and Environmental Sciences   
 University of Perugia (Italy)   
 
 
-#References
+# References
 
-- Gałecki, A., Burzykowski, T., 2013. Linear mixed-effects models using R: a step-by-step approach. Springer, Berlin.
-- Muhammad Yaseen, Kent M. Eskridge and Ghulam Murtaza (2018). stability: Stability Analysis of Genotype by Environment Interaction (GEI). R package version 0.5.0. https://CRAN.R-project.org/package=stability
-- Piepho, H.-P., 1999. Stability Analysis Using the SAS System. Agronomy Journal 91, 154–160.
-- Pinheiro, J.C., Bates, D.M., 2000. Mixed-Effects Models in S and S-Plus, Springer-Verlag Inc. ed. Springer-Verlag Inc., New York.
+1. Gałecki, A., Burzykowski, T., 2013. Linear mixed-effects models using R: a step-by-step approach. Springer, Berlin.
+2. Muhammad Yaseen, Kent M. Eskridge and Ghulam Murtaza (2018). stability: Stability Analysis of Genotype by Environment Interaction (GEI). R package version 0.5.0. https://CRAN.R-project.org/package=stability
+3. Piepho, H.-P., 1999. Stability Analysis Using the SAS System. Agronomy Journal 91, 154–160.
+4. Pinheiro, J.C., Bates, D.M., 2000. Mixed-Effects Models in S and S-Plus, Springer-Verlag Inc. ed. Springer-Verlag Inc., New York.
 
+
+---
+This post was originally written on 20 August 2019; revised on December 2025
 
 
 

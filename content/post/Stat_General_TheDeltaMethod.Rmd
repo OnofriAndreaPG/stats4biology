@@ -1,7 +1,7 @@
 ---
 title: "How do we combine errors, in biology? The delta method"
 author: "Andrea Onofri"
-date: "2019-05-25"
+date: "2025-12-12"
 categories:
 - R
 - delta_method
@@ -13,49 +13,66 @@ tags:
 archives: 2019
 ---
 
-In a recent post I have shown that we can build linear combinations of model parameters ([see here](https://www.statforbiology.com/2019/stat_general_errorpropagation/) ). For example, if we have two parameter estimates, say Q and W, with standard errors respectively equal to \(\sigma_Q\) and $\sigma_W$, we can build a linear combination as follows:
 
-$$ Z = AQ + BW + C$$
-
-where A, B and C are three coefficients. The standard error for this combination can be obtained as:
-
-$$ \sigma_Z = \sqrt{ A^2 \sigma^2_Q + B^2 \sigma^2_W + 2AB \sigma_{QW} }$$
-
-In biology, nonlinear transformations are much more frequent than linear transformations. Nonlinear transformations are, e.g., $Z = exp(Q + W)$, or, $Z = 1/(Q + W)$. What is the standard error for these nonlinear transformations? This is not a complex problem, but the solution may be beyond biologists with an average level of statistical proficiency. It is named the 'delta method' and it provides the so called 'delta standard errors'. I thought it might be useful to talk about it, by using a very simple language and a few examples.
-
-# Example 1: getting the half-life of a herbicide
-
-A herbicide has proven to follow a first order degradation kinetic in soil, with constant degradation rate $k = -0.035$ and standard error equal to $0.00195$. What is the half-life ($T_{1/2}$) of this herbicide and its standard error?
-
-Every pesticide chemist knows that the half-life ($T_{1/2}$) is derived by the degradation rate, according to the following equation:
-
-$$ T_{1/2} = \frac{\log(0.5)}{k}$$
-
-Therefore, the half-life for our herbicide is:
-
-```{r}
-Thalf <- log(0.5)/-0.035
-Thalf
+```{r setup, cache = F, echo = F}
+#Put at the beginning
+knitr::opts_chunk$set(echo = TRUE)
+knitr::knit_hooks$set(document = function(x){ 
+  gsub("```\n*```r*\n*", "", x) 
+})
 ```
 
-But ... what is the standard error of this half-life? There is some uncertainty around the estimate of $k$ and it is clear that such an uncertainty should propagate to the estimate of $T_{1/2}$; unfortunately, the transformation is nonlinear and we cannot use the expression given above for linear transformations.
+```{r include=FALSE}
+rm(list = ls())
+```
 
-## The basic idea
 
-The basic idea behind the delta method is that most of the simple nonlinear functions, which we use in biology, can be locally approximated by the tangent line through a point of interest. For example, our nonlinear half-life function is $Y  = \log(0.5)/X$ and, obviously, we are interested in the point where $X = k = -0.035$. In the graph below, we have represented our nonlinear function (in black) and its tangent line (in red) through the above point: we can see that the approximation is fairly good in the close vicinity of $X = -0.035$.
+In a recent post I have shown that we can build linear combinations of model parameters ([see here](https://www.statforbiology.com/2024/stat_general_errorpropagation/) ). For example, if we have two parameter estimates, say $X$ and $Z$, with standard errors respectively equal to $\sigma_X$ and $\sigma_Z$ and a covariance of $\sigma_{XZ}$ we can build a linear combination as follows:
+
+$$ Y = f(X,Z) = aX + bZ + c$$
+
+where $a$, $b$ and $c$ are three numeric constants. The standard error for this combination can be obtained as:
+
+$$ \sigma_Y = \sqrt{ a^2 \sigma^2_X + b^2 \sigma^2_Z + 2ab \, \sigma_{XZ} }$$
+
+In biology, nonlinear transformations are much more frequent than linear transformations. Nonlinear transformations are, e.g., $Y = f(X,Z) = exp(X, Z)$, or, $Y = 1/(X + Z)$; we may wonder: what is the standard error for these nonlinear transformations? The solution to this problem is named the 'delta method' and may be beyond biologists with an average level of statistical proficiency. I thought it might be useful to talk about it, by using a very simple language and a few examples.
+
+Let's start with the transformation of a single variable $Y = f(X)$.
+
+# Example 1: The half-life of a herbicide
+
+A herbicide has proven to follow a first order degradation kinetic in soil, with constant degradation rate $X = -0.035$ and standard error equal $\sigma_X = 0.00195$. What is the half-life of this herbicide and its standard error?
+
+Every pesticide chemist knows that the half-life is derived by the degradation rate, according to the following equation:
+
+$$ y = \frac{\log(0.5)}{x}$$
+
+Therefore, if we plug-in x = X, the half-life of our herbicide is:
+
+```{r}
+Y <- log(0.5)/-0.035
+Y
+```
+
+But ... what is the standard error of this half-life? There is some uncertainty around the estimate of $Y$ and it is clear that such an uncertainty should propagate to the estimate of $Z = f(Q)$; unfortunately, the transformation is nonlinear and we cannot use the expression given above for linear transformations.
+
+### The basic idea beyond the delta method
+
+The basic idea behind the delta method is that most of the simple nonlinear functions, which we use in biology, can be locally approximated by the tangent line through a point of interest. For example, our nonlinear half-life function is $y  = f(x) = \frac{\log(0.5)}{x}$ and, obviously, we are interested in the point where $x = X = -0.035$. In the graph below, we have represented our nonlinear function (in black) and its tangent line (in red) through the above point: we can see that the approximation is fairly good in the close vicinity of $Q = -0.035$.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
-curve(log(0.5)/x, from=-0.05, to = -0.01, ylim=c(10,80))
+curve(log(0.5)/x, from=-0.05, to = -0.01, ylim=c(10,80),
+      xlab = "X", ylab = "Y = log(0.5)/X")
 curve(log(0.5)/-0.035 -(log(0.5)/((-0.035)^2)) * (x + 0.035), add=T, col="red")
 ```
 
-What is the equation of the tangent line? In general, if the nonlinear function is $G(X)$, you may remember from high school that the slope $m$ of the tangent line is equal to the first derivative of $G(X)$, that is $G'(X)$. You may also remember that the equation of a line with slope $m$ through the point $P(X_1, Y_1)$ is $Y - Y_1 = m(X - X_1)$. As $Y_1 = G(X_1)$, the tangent line has equation:
+What is the equation of the tangent line? In general, if the nonlinear function is $f(x)$, you may remember from high school that the slope $m$ of the tangent line is equal to the first derivative of $f(x)$, that is $f'(x)$. You may also remember that the equation of a line with slope $m$ through the point $P(X, Y)$ is $y - Y = m(x - X)$. As $Y = f(X)$, the tangent line has equation:
 
-$$Y = G(X_1) + G'(X_1)(X - X_1)$$
+$$y = f(X) + f'(Y)(x - X)$$
 
-## We need the derivative!
+### We need the derivative!
 
-In order to write the equation of the red line in the Figure above, we need to consider that $X_1 = -0.035$ and we need to be able to calculate the first derivative of our nonlinear half-life fuction. I am not able to derive the expression of the first derivative for all nonlinear functions and it was a relief for me to discover that R can handle this task in simple ways, e.g. by using the function 'D()'. For our case, it is:
+In order to write the equation of the red line in the Figure above, we need to consider that $X = -0.035$ and we need to be able to calculate the first derivative of our nonlinear half-life fuction. I am not able to derive the expression of the first derivative for all nonlinear functions and it was a relief for me to discover that R can handle this task in simple ways, e.g. by using the function `D()`. For our case, it is:
 
 ```{r}
 D(expression(log(0.5)/X), "X")
@@ -69,20 +86,20 @@ m <- eval( D(expression(log(0.5)/X), "X") )
 m
 ```
 
-We already know that $G(-0.035) = 19.80421$. Therefore, we can write the equation of the tangent line (red line in the graph above):
+We already know that $f(-0.035) = 19.80421$. Therefore, we can write the equation of the tangent line (red line in the graph above):
 
-$$Y = 19.80421 + 565.8344 \, (X + 0.035)$$
+$$y = 19.80421 + 565.8344 \, (x + 0.035)$$
 
 that is:
 
-$$Y = 19.80421 + 565.8344 \, X + 565.8344 \cdot 0.035 = 39.60841 + 565.8344 \, X$$
+$$y = 19.80421 + 565.8344 \, x + 565.8344 \cdot 0.035 = 39.60841 + 565.8344 \, x$$
 
-## Replacing a curve with a line
+### Replacing a curve with a line
 
 Now, we have two functions:
 
-1. the original nonlinear half-life function $Y = \log(0.5)/X$$
-2. a new linear function ($Y = 39.60841 + 565.8344 \, X$), that is a very close approximation to the previous one, at least near to the point $X = -0.035$, which we are interested in.
+1. the original nonlinear half-life function $y = \log(0.5)/x$$
+2. a new linear function ($y = 39.60841 + 565.8344 \, x$), that is a very close approximation to the previous one, at least near to the point $X = -0.035$, which we are interested in.
 
 Therefore, we can approximate the former with the latter! If we use the linear function, we see that the half-life is:
 
@@ -104,13 +121,13 @@ sqrt( m^2 * (0.00195 ^ 2) )
 
 ## In general...
 
-If we have a nonlinear transformation $G(X)$, the standard error for this transformation is approximated by knowing the first derivative $G'(X)$ and the standard error of $X$:
+If we have a nonlinear transformation $f(X)$, the standard error for this transformation is approximated by knowing the first derivative $f'(X)$ and the standard error of $X$:
 
-$$\sigma_{G(X)}  \simeq \sqrt{ [G'(X)]^2 \, \sigma^2_X }$$
+$$\sigma_{G(X)}  \simeq \sqrt{ [f'(X)]^2 \, \sigma^2_X }$$
 
-#Example 2: a back-transformed count
+# Example 2: a back-transformed count
 
-A paper reports that the mean number of microorganisms in a substrate, on a logarithmic scale, was $X_1 = 5$ with standard error $\sigma = 0.84$. It is easy to derive that the actual number of micro-organisms was $\exp{5} = 148.4132$; what is the standard error of the back-transformed mean?
+A paper reports that the mean number of microorganisms in a substrate, on a logarithmic scale, was $X = 5$ with standard error $\sigma = 0.84$. It is easy to derive that the actual number of micro-organisms was $\exp{5} = 148.4132$; what is the standard error of the back-transformed mean?
 
 The first derivative of our nonlinear function is:
 
@@ -136,38 +153,46 @@ sqrt( m^2 * sigma^2 )
 
 # Example 3: Selenium concentration in olive drupes
 
+When the combination is nonlinear and involves two parameters, such as:
+
+$$Y = \frac{X}{Z} \quad \textrm{or} \quad Y = X \, Z$$
+
+the delta method requires a slightly more complex formula, which we will see by using another example.
+
 The concentration of selenium in olive drupes was found to be $3.1 \, \mu g \,\, g^{-1}$ with standard error equal to 0.8. What is the intake of selenium when eating one drupe? Please, consider that one drupe weights, on average, 3.4 g (SE = 0.31) and that selenium concentration and drupe weight show a covariance of 0.55.
 
 The amount of selenium is easily calculated as:
 
 ```{r}
-X <- 3.1; W = 3.4
-X * W
+X <- 3.1; Z = 3.4
+Y <- X * Z
+Y
 ```
 
-Delta standard errors can be obtained by considering the partial derivatives for each of the two variables:
+Delta standard errors can be obtained by considering the partial derivatives for each of the two variables and combining them as follows:
 
 ```{r}
-mX <- eval( D(expression(X*W), "X") )
-mW <- eval( D(expression(X*W), "W") )
+dX <- eval( D(expression(X * Z), "X") )
+dZ <- eval( D(expression(X * Z), "Z") )
+
+sigmaX <- 0.8; sigmaZ <- 0.31; sigmaXZ <- 0.55
+sqrt( (dX^2) * sigmaX^2 + (dZ^2) * sigmaZ^2 + 2 * dX * dZ * sigmaXZ )
 ```
 
-and combining them as follows:
+In general terms, when $y = f(x, z)$ and it is nonlinear, it is:
 
-```{r}
-sigmaX <- 0.8; sigmaW <- 0.31; sigmaXW <- 0.55
-sqrt( (mX^2)*sigmaX^2 + (mW^2)*sigmaW^2 + 2*X*W*sigmaXW )
-```
+$$ \sigma_y = \sqrt{ (f'_x)^2 \, \sigma^2_x + (f'_z)^2 \, \sigma^2_z + 2f'_x\,f'_z \, \sigma_{xz} }$$
+
 
 For those of you who would like to get involved with matrix notation: we can reach the same result via matrix multiplication (see below). This might be easier when we have more than two variables to combine.
 
 ```{r}
-der <- matrix(c(mX, mW), 1, 2)
-sigma <- matrix(c(sigmaX^2, sigmaXW, sigmaXW, sigmaW^2), 2, 2, byrow = T)
+der <- matrix(c(dX, dZ), 1, 2)
+sigma <- matrix(c(sigmaX^2, sigmaXZ, sigmaXZ, sigmaZ^2), 2, 2, byrow = T)
 sqrt( der %*% sigma %*% t(der) )
 ```
 
-#The delta method with R
+# The delta method with R
 
 In R there is a shortcut function to calculate delta standard errors, that is available in the 'car' package. In order to use it, we need to have:
 
@@ -178,27 +203,27 @@ In R there is a shortcut function to calculate delta standard errors, that is av
 For the first example, we have:
 
 ```{r}
-obj <- c("k" = -0.035)
+obj <- c("X" = -0.035)
 sigma <- matrix(c(0.00195^2), 1, 1)
 
 library(car)
-deltaMethod(object = obj, g="log(0.5)/k", vcov = sigma)
+deltaMethod(object = obj, g="log(0.5)/X", vcov = sigma)
 ```
 
 For the second example:
 
 ```{r}
-obj <- c("X1" = 5)
+obj <- c("X" = 5)
 sigma <- matrix(c(0.84^2), 1, 1)
-deltaMethod(object = obj, g="exp(X1)", vcov = sigma)
+deltaMethod(object = obj, g="exp(X)", vcov = sigma)
 ```
 
 For the third example:
 
 ```{r}
-obj <- c("X" = 3.1, "W" = 3.4)
+obj <- c("X" = 3.1, "Z" = 3.4)
 sigma <- matrix(c(0.8^2, 0.55, 0.55, 0.31^2), 2, 2, byrow = T)
-deltaMethod(object = obj, g="X * W", vcov = sigma)
+deltaMethod(object = obj, g="X * Z", vcov = sigma)
 ```
 
 
@@ -209,6 +234,21 @@ However, two final notes relating to the delta method need to be pointed out her
 1. the delta standard error is always approximate;
 2. if the original variables are gaussian, the transformed variable, usually, is not gaussian.
 
-Thanks for reading!
+Thanks for reading—and don’t forget to check out my new book below!
+
+Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences        
+University of Perugia (Italy)        
+Send comments to: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)  
+
+<a href = "https://www.awin1.com/cread.php?awinmid=26429&awinaffid=2675822&ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src= "../../_Figures/Email_Signature_978-3-032-08199-5.png" align="center" alt="Book cover" class="cover" /></a>
+<br/>
 
 
+# Reference
+
+1. Beyene, J., Moineddin, R., 2005. Methods for confidence interval estimation of a ratio parameter with application to location quotients. BMC Med Res Methodol 5, 32. https://doi.org/10.1186/1471-2288-5-32
+
+
+---
+Post written on 25/5/2019 and edited on 22/11/2024, 12/12/2025
