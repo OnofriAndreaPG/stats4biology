@@ -1,7 +1,7 @@
 ---
-title: 'Analysing seed germination and emergence data with R (a tutorial). Part 6'
+title: 'Fitting time-to-event models with an environmental covariate'
 author: "Andrea Onofri"
-date: 2022-01-18
+date: 2026-02-12
 slug: 'Time_to_event_models'
 categories:
   - R
@@ -10,22 +10,19 @@ tags:
   - R
   - 'Time_to_event_models'
   - 'Seed_germination'
-  - drcte
-  - drcSeedGerm
+  - 'drcte'
+  - 'drcSeedGerm'
 archives:
-  - 2022
+  - 2026
 ---
 
 
 
 <p>This is a follow-up post. If you are interested in other posts of this series, please go to: <a href="https://www.statforbiology.com/tags/drcte/">https://www.statforbiology.com/tags/drcte/</a>. All these posts exapand on a paper that we have recently published in the Journal ‘Weed Science’; please follow <a href="https://doi.org/10.1017/wsc.2022.8">this link</a> to the paper.</p>
-<div id="fitting-time-to-event-models-with-environmental-covariates" class="section level1">
-<h1>Fitting time-to-event models with environmental covariates</h1>
-<p>In the previous post we have shown that time-to-event curves (e.g., germination or emergence curves) can be used to describe the time course of germinations/emergences for a seed lot (<a href="https://www.statforbiology.com/2021/stat_drcte_4-time-to-eventcurves/">this post</a>). We have also seen that the effects of experimental factors on seed germination can be accounted for by coding a different time-to-event curve for each factor level (<a href="https://www.statforbiology.com/2021/stat_drcte_5-comparinglots/">this post</a>).</p>
+<p>In a previous post we have shown that we can use time-to-event curves to describe the time course of germinations/emergences for a seed lot (<a href="https://www.statforbiology.com/2021/stat_drcte_4-time-to-eventcurves/">this post</a>). We have also seen that the effects of experimental factors on seed germination can be accounted for by coding a different time-to-event curve for each factor level (<a href="https://www.statforbiology.com/2021/stat_drcte_5-comparinglots/">this post</a>).</p>
 <p>In this post, we would like to consider the environmental variables, that are, perhaps, the most important factors to trigger germination/emergence. For example, let’s consider either humidity content in the substrate, or temperature, or oxygen availability; it is clear that these variables play a fundamental role in determining germination extent and velocity and, therefore, they are very much studied by seed scientists. In principle, germination assays with environmental variables are straightforward to set up: several Petri dishes are submitted to different environmental conditions and germinations are inspected over time. What is the best method to analyse the resulting data and retrieve some important parameters, such as threshold temperatures (base, optimal or ceiling temperature) or base water potential?</p>
 <p>It is important to anticipate that most environmental variables can be expressed on a quantitative scale; obviously when we make an experiment we are forced into selecting a subset of all possible, e.g., temperatures, such as 15, 20, 30°C, but that does not mean that we are not interested to what happens at, e.g., 18 or 22°C. From this point of view, quantitative variables are very different from qualitative variables, such as the different plant species that we have compared in <a href="https://www.statforbiology.com/2021/stat_drcte_5-comparinglots/">our previous post</a>.</p>
 <p>In this post we will see an example of how we can account for the effects of water content in the substrate and include it in our time-to-event models. Of course, the same approach can be followed also with other types of environmental variables and, more generally, quantitative variables.</p>
-</div>
 <div id="fitting-hydro-time-to-event-models" class="section level1">
 <h1>Fitting hydro-time-to-event models</h1>
 <p>Let’s consider the following example: the germination of rapeseed (<em>Brassica napus</em> L. var. <em>oleifera</em>, cv. Excalibur) was tested at fourteen different water potential levels (0, -0.03, -0.15, -0.3, -0.4, -0.5, -0.6, -0.7, -0.8, -0.9, -1, -1.1, -1.2, -1.5 MPa), which were created by using a polyethylene glycol solution (PEG 6000). For each water potential level, three replicated Petri dishes with 50 seeds each were incubated at 20°C. Germinated seeds were counted every 2-3 days for 14 days and they were removed from the dishes after germination.</p>
@@ -45,13 +42,14 @@ head(rape)
 ## 4   0    1       5      7      0   49    0.98
 ## 5   0    1       7     10      0   49    0.98
 ## 6   0    1      10     14      0   49    0.98</code></pre>
-<p>In the above data.frame, ‘timeAf’ represents the moment when germinated seeds were counted, while ’timeBef’ represents the previous inspection time (or the beginning of the assay). The column ’nSeeds’ is the number of seeds that germinated during the time interval between ‘timeBef’ and ‘timeAf. The ’propCum’ column contains the cumulative proportions of germinated seeds and it is not necessary for time-to-event model fitting, although we can use it for plotting purposes.</p>
+<p>In the above data.frame, ‘timeAf’ represents the moment when germinated seeds were counted, while ’timeBef’ represents the previous inspection time (or the beginning of the assay). The column ’nSeeds’ is the number of seeds that germinated during the time interval between ‘timeBef’ and ‘timeAf. The ’propCum’ column contains the cumulative proportions of germinated seeds and it is not necessary for time-to-event model fitting, although we can use it for plotting purposes (see code and output below).</p>
 <pre class="r"><code>ggplot(rape, aes(timeAf, propCum)) +
   geom_point() +
   facet_wrap(~Psi) +
   scale_x_continuous(name = &quot;Time (d)&quot;) +
-  scale_y_continuous(name = &quot;Cumulative proportion of germinated seeds&quot;)</code></pre>
-<p><img src="/post/Stat_drcte_6-HT1step_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+  scale_y_continuous(name = &quot;Cumulative proportion of germinated seeds&quot;) +
+  theme_bw()</code></pre>
+<p><img src="/post/Stat_drcte_6-HT1step_files/figure-html/unnamed-chunk-2-1.png" width="768" /></p>
 <p>The germination time-course is strongly affected by the water potential in the substrate, as this determines the ability of seeds to absorb water and, consequently, trigger the germination and emergence processes. Therefore, our obvious interest is to understand how the environmental factor affects the time-course of germination.</p>
 <p>We have shown that a parametric time-to-event curve is defined as a cumulative probability function (<span class="math inline">\(\Phi\)</span>), with three parameters:</p>
 <p><span class="math display">\[P(t) = \Phi \left( b, d, e \right)\]</span>
@@ -62,39 +60,20 @@ Considering <a href="https://www.statforbiology.com/2021/stat_drcte_5-comparingl
 <pre class="r"><code># Not run
 # mod0 &lt;- drmte(nSeeds ~ timeBef + timeAf, data = rape,
 #              curveid = Psi, fct = loglogistic())</code></pre>
-<p>This problem can be circumvented by using the <code>separate = TRUE</code> argument; in this case, the different curves are fitted independent of one another and we are not tied to fitting the same model for all water potential levels. Errors are raised when trying to fit parametric time-to-event models, but they do not stop the execution in R.</p>
+<p>This problem can be circumvented by using the <code>separate = TRUE</code> argument; in this case, the different curves are fitted independent of one another and we are not tied to fitting the same model for all water potential levels.</p>
 <pre class="r"><code>mod1 &lt;- drmte(nSeeds ~ timeBef + timeAf, data = rape,
              curveid = Psi, fct = loglogistic(),
              separate = TRUE)
-## Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
-##   non-finite finite-difference value [3]
-## Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
-##   non-finite finite-difference value [2]
-## Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
-##   non-finite finite-difference value [3]
-## Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
-##   non-finite finite-difference value [2]
-## Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
-##   non-finite finite-difference value [3]
-## Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
-##   non-finite finite-difference value [2]
-## Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
-##   non-finite value supplied by optim
-## Error in optim(startVec, opfct, hessian = TRUE, method = optMethod, control = list(maxit = maxIt,  : 
-##   non-finite value supplied by optim
- r
 coef(mod1)
-##      d:-1.5      d:-1.2      d:-1.1        b:-1        d:-1        e:-1 
-##  0.00000000  0.00000000  0.00000000 64.39202308  0.04666194  8.36474946 
-##      b:-0.9      d:-0.9      e:-0.9      b:-0.8      d:-0.8      e:-0.8 
-##  5.83290900  0.55010281  5.87022056  3.73294999  0.87889318  4.47105672 
-##      b:-0.7      d:-0.7      e:-0.7      b:-0.6      e:-0.6      b:-0.5 
-##  3.59940891  0.93592886  2.73025095  1.46592984  0.73866435  0.59257691 
-##      e:-0.5      d:-0.4      d:-0.3     b:-0.15     e:-0.15     d:-0.03 
-##  0.05876917  0.98444444  0.94333333  0.55872202  0.02997354  0.88666667 
-##         d:0 
-##  0.97333333</code></pre>
-<p>In particular, for the cases where a time-course of events cannot be estimated, the <code>drmte()</code> function resorts to fitting a simpler model, where only the <span class="math inline">\(d\)</span> parameter is estimated (that is the maximum fraction of germinated seeds). In the box above, we can see the estimated parameters but no standard errors, which can be obtained by using the <code>summary()</code> method, although there are some statistical issues that we will consider in a following post.</p>
+ #    d:-1.5      d:-1.2      d:-1.1        b:-1        d:-1        e:-1      b:-0.9 
+ # 0.00000000  0.00000000  0.00000000 64.39202307  0.04666194  8.36474946  5.83290900 
+ #     d:-0.9      e:-0.9      b:-0.8      d:-0.8      e:-0.8      b:-0.7      d:-0.7 
+ # 0.55010281  5.87022056  3.73294999  0.87889318  4.47105672  3.59940891  0.93592886 
+ #     e:-0.7      b:-0.6      e:-0.6      b:-0.5      e:-0.5      d:-0.4      d:-0.3 
+ # 2.73025095  1.46592984  0.73866435  0.59257691  0.05876917  0.98444444  0.94333333 
+ #    b:-0.15     e:-0.15     d:-0.03         d:0 
+ # 0.55872202  0.02997354  0.88666667  0.97333333 </code></pre>
+<p>In particular, for the cases where a time-course of events cannot be estimated, an error message is shown, but the execution of codes is not stopped and the <code>drmte()</code> function resorts to fitting a simpler model, where only the <span class="math inline">\(d\)</span> parameter is estimated (that is the maximum fraction of germinated seeds). In the box above, we can see the estimated parameters but no standard errors, which can be obtained by using the <code>summary()</code> method, although there are some statistical issues that we will consider in a following post.</p>
 </div>
 <div id="a-better-modelling-approach" class="section level1">
 <h1>A better modelling approach</h1>
@@ -178,20 +157,30 @@ mod6 &lt;- drmte(nSeeds ~ timeBef + timeAf + Psi,
 tab &lt;- plotData(modHTE)
 
 ggplot() +
-  geom_point(data = rape, mapping = aes(x = timeAf, y = propCum),
+  geom_point(data = rape, mapping = aes(x = timeAf, y = propCum)) +
+  geom_line(data = tab$plotFits, mapping = aes(x = timeAf, y = CDF),
             col = &quot;red&quot;) +
-  geom_line(data = tab$plotFits, mapping = aes(x = timeAf, y = CDF)) +
   facet_wrap(~ Psi) +
   scale_x_continuous(name = &quot;Time (d)&quot;) +
-  scale_y_continuous(name = &quot;Cumulative proportion of germinated seeds&quot;)</code></pre>
-<p><img src="/post/Stat_drcte_6-HT1step_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
-<p>Thank you for reading!</p>
+  scale_y_continuous(name = &quot;Cumulative proportion of germinated seeds&quot;) +
+  theme_bw()</code></pre>
+<p><img src="/post/Stat_drcte_6-HT1step_files/figure-html/unnamed-chunk-9-1.png" width="768" /></p>
+<p>Quantiles for germination times can also be retrieved by using the usual <code>quantile()</code> function, although a single value for base water potential needs to be provided.</p>
+<pre class="r"><code>quantile(modHTE, probs = c(0.25, 0.50, 0.75), Psi = -0.8)
+## 
+## Estimated quantiles
+## 
+##       Estimate       SE
+## 1:25%   3.0445 0.091608
+## 1:50%   4.1372 0.099117
+## 1:75%   6.2726 0.287407</code></pre>
+<p>Thanks for reading—and don’t forget to check out my new book below!</p>
 <p>Prof. Andrea Onofri<br />
 Department of Agricultural, Food and Environmental Sciences<br />
 University of Perugia (Italy)<br />
 Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
-<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow <span class="citation">@onofriandreapg</span></a>
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<p><a href = "https://www.awin1.com/cread.php?awinmid=26429&awinaffid=2675822&ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src= "../../_Figures/Email_Signature_978-3-032-08199-5.png" align="center" alt="Book cover" class="cover" /></a>
+<br/></p>
 <hr />
 </div>
 <div id="references" class="section level1">
@@ -228,5 +217,7 @@ Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it
 <div id="htw2" class="section level2">
 <h2><code>HTW2()</code></h2>
 <p><span class="math display">\[ G(t, \Psi) = 1 - exp \left\{ - \exp \left[ \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b} + \delta)  }{\sigma}\right] \right\}\]</span></p>
+<hr />
+<p>Originally written on 18 January 2022; revised on February 2025</p>
 </div>
 </div>

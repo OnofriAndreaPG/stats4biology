@@ -1,7 +1,7 @@
 ---
-title: 'Analysing seed germination and emergence data with R (a tutorial). Part 6'
+title: 'Fitting time-to-event models with an environmental covariate'
 author: "Andrea Onofri"
-date: 2022-01-18
+date: 2026-02-12
 slug: 'Time_to_event_models'
 categories:
   - R
@@ -10,10 +10,10 @@ tags:
   - R
   - 'Time_to_event_models'
   - 'Seed_germination'
-  - drcte
-  - drcSeedGerm
+  - 'drcte'
+  - 'drcSeedGerm'
 archives:
-  - 2022
+  - 2026
 ---
 
 ```{r setup, cache = F, echo = F}
@@ -26,9 +26,8 @@ knitr::knit_hooks$set(document = function(x){
 
 This is a follow-up post. If you are interested in other posts of this series, please go to: [https://www.statforbiology.com/tags/drcte/](https://www.statforbiology.com/tags/drcte/). All these posts exapand on a paper that we have recently published in the Journal 'Weed Science'; please follow [this link](https://doi.org/10.1017/wsc.2022.8) to the paper.
 
-# Fitting time-to-event models with environmental covariates
 
-In the previous post we have shown that time-to-event curves (e.g., germination or emergence curves) can be used to describe the time course of germinations/emergences for a seed lot ([this post](https://www.statforbiology.com/2021/stat_drcte_4-time-to-eventcurves/)). We have also seen that the effects of experimental factors on seed germination can be accounted for by coding a different time-to-event curve for each factor level ([this post](https://www.statforbiology.com/2021/stat_drcte_5-comparinglots/)).
+In a previous post we have shown that we can use time-to-event curves to describe the time course of germinations/emergences for a seed lot ([this post](https://www.statforbiology.com/2021/stat_drcte_4-time-to-eventcurves/)). We have also seen that the effects of experimental factors on seed germination can be accounted for by coding a different time-to-event curve for each factor level ([this post](https://www.statforbiology.com/2021/stat_drcte_5-comparinglots/)).
 
 In this post, we would like to consider the environmental variables, that are, perhaps, the most important factors to trigger germination/emergence. For example, let's consider either humidity content in the substrate, or temperature, or oxygen availability; it is clear that these variables play a fundamental role in determining germination extent and velocity and, therefore, they are very much studied by seed scientists. In principle, germination assays with environmental variables are straightforward to set up: several Petri dishes are submitted to different environmental conditions and germinations are inspected over time. What is the best method to analyse the resulting data and retrieve some important parameters, such as threshold temperatures (base, optimal or ceiling temperature) or base water potential?
 
@@ -54,14 +53,15 @@ data(rape)
 head(rape)
 ```
 
-In the above data.frame, 'timeAf' represents the moment when germinated seeds were counted, while ’timeBef’ represents the previous inspection time (or the beginning of the assay). The column ’nSeeds’ is the number of seeds that germinated during the time interval  between 'timeBef' and 'timeAf. The ’propCum’ column contains the cumulative proportions of germinated seeds and it is not necessary for time-to-event model fitting, although we can use it for plotting purposes.
+In the above data.frame, 'timeAf' represents the moment when germinated seeds were counted, while ’timeBef’ represents the previous inspection time (or the beginning of the assay). The column ’nSeeds’ is the number of seeds that germinated during the time interval  between 'timeBef' and 'timeAf. The ’propCum’ column contains the cumulative proportions of germinated seeds and it is not necessary for time-to-event model fitting, although we can use it for plotting purposes (see code and output below).
 
-```{r message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE, fig.dim = c(8,8)}
 ggplot(rape, aes(timeAf, propCum)) +
   geom_point() +
   facet_wrap(~Psi) +
   scale_x_continuous(name = "Time (d)") +
-  scale_y_continuous(name = "Cumulative proportion of germinated seeds")
+  scale_y_continuous(name = "Cumulative proportion of germinated seeds") +
+  theme_bw()
 ```
 
 The germination time-course is strongly affected by the water potential in the substrate, as this determines the ability of seeds to absorb water and, consequently, trigger the germination and emergence processes. Therefore, our obvious interest is to understand how the environmental factor affects the time-course of germination.
@@ -83,16 +83,33 @@ If we fit those curves by using the 'curveid' argument, we are forced into fitti
 #              curveid = Psi, fct = loglogistic())
 ```
 
-This problem can be circumvented by using the `separate = TRUE` argument; in this case, the different curves are fitted independent of one another and we are not tied to fitting the same model for all water potential levels. Errors are raised when trying to fit parametric time-to-event models, but they do not stop the execution in R.
+This problem can be circumvented by using the `separate = TRUE` argument; in this case, the different curves are fitted independent of one another and we are not tied to fitting the same model for all water potential levels.
 
-```{r}
+```{r message=FALSE, warning=FALSE, include=FALSE}
 mod1 <- drmte(nSeeds ~ timeBef + timeAf, data = rape,
              curveid = Psi, fct = loglogistic(),
              separate = TRUE)
 coef(mod1)
 ```
 
-In particular, for the cases where a time-course of events cannot be estimated, the `drmte()` function resorts to fitting a simpler model, where only the $d$ parameter is estimated (that is the maximum fraction of germinated seeds). In the box above, we can see the estimated parameters but no standard errors, which can be obtained by using the `summary()` method, although there are some statistical issues that we will consider in a following post.
+
+```{r eval=FALSE, include=TRUE}
+mod1 <- drmte(nSeeds ~ timeBef + timeAf, data = rape,
+             curveid = Psi, fct = loglogistic(),
+             separate = TRUE)
+coef(mod1)
+ #    d:-1.5      d:-1.2      d:-1.1        b:-1        d:-1        e:-1      b:-0.9 
+ # 0.00000000  0.00000000  0.00000000 64.39202307  0.04666194  8.36474946  5.83290900 
+ #     d:-0.9      e:-0.9      b:-0.8      d:-0.8      e:-0.8      b:-0.7      d:-0.7 
+ # 0.55010281  5.87022056  3.73294999  0.87889318  4.47105672  3.59940891  0.93592886 
+ #     e:-0.7      b:-0.6      e:-0.6      b:-0.5      e:-0.5      d:-0.4      d:-0.3 
+ # 2.73025095  1.46592984  0.73866435  0.59257691  0.05876917  0.98444444  0.94333333 
+ #    b:-0.15     e:-0.15     d:-0.03         d:0 
+ # 0.55872202  0.02997354  0.88666667  0.97333333 
+ 
+```
+
+In particular, for the cases where a time-course of events cannot be estimated, an error message is shown, but the execution of codes is not stopped and the `drmte()` function resorts to fitting a simpler model, where only the $d$ parameter is estimated (that is the maximum fraction of germinated seeds). In the box above, we can see the estimated parameters but no standard errors, which can be obtained by using the `summary()` method, although there are some statistical issues that we will consider in a following post.
 
 
 # A better modelling approach
@@ -186,21 +203,28 @@ AIC(mod1, mod2, mod3, mod4, mod5, mod6, modHTE)
 
 It is important not to neglect a graphical inspection of model fit. The `plot()` method does not work with time-to-event curves with additional covariates (apart from time). However, we can retrieve the fitted data by using the `plotData()` function and use those predictions within the `ggplot()` function. The box below shows the appropriate coding.
 
-```{r}
+```{r fig.dim = c(8,8)}
 library(ggplot2)
 tab <- plotData(modHTE)
 
 ggplot() +
-  geom_point(data = rape, mapping = aes(x = timeAf, y = propCum),
+  geom_point(data = rape, mapping = aes(x = timeAf, y = propCum)) +
+  geom_line(data = tab$plotFits, mapping = aes(x = timeAf, y = CDF),
             col = "red") +
-  geom_line(data = tab$plotFits, mapping = aes(x = timeAf, y = CDF)) +
   facet_wrap(~ Psi) +
   scale_x_continuous(name = "Time (d)") +
-  scale_y_continuous(name = "Cumulative proportion of germinated seeds")
+  scale_y_continuous(name = "Cumulative proportion of germinated seeds") +
+  theme_bw()
+```
+
+Quantiles for germination times can also be retrieved by using the usual `quantile()` function, although a single value for base water potential needs to be provided.
+
+```{r}
+quantile(modHTE, probs = c(0.25, 0.50, 0.75), Psi = -0.8)
 ```
 
 
-Thank you for reading!
+Thanks for reading—and don't forget to check out my new book below!
 
 
 Prof. Andrea Onofri   
@@ -208,8 +232,8 @@ Department of Agricultural, Food and Environmental Sciences
 University of Perugia (Italy)    
 Send comments to: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)
 
-<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow @onofriandreapg</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
+<a href = "https://www.awin1.com/cread.php?awinmid=26429&awinaffid=2675822&ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src= "../../_Figures/Email_Signature_978-3-032-08199-5.png" align="center" alt="Book cover" class="cover" /></a>
+<br/>
 
 ---
 
@@ -253,4 +277,5 @@ $$ G(t, \Psi) = exp \left\{ - \exp \left[ - \frac{ \log \left[ \Psi  - \left( \f
 
 $$ G(t, \Psi) = 1 - exp \left\{ - \exp \left[ \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b} + \delta)  }{\sigma}\right] \right\}$$
 
-
+---
+Originally written on 18 January 2022; revised on February 2025
