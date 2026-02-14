@@ -1,7 +1,7 @@
 ---
 title: "Testing for interactions in nonlinear regression"
 author: "Andrea Onofri"
-date: 2019-09-13
+date: 2026-02-14
 slug: 'Mixed models'
 categories:
   - R
@@ -18,7 +18,7 @@ archives:
 ```{r setup, cache = F, echo = F}
 #Put at the beginning
 knitr::knit_hooks$set(document = function(x){
-  gsub("```\n*```r*\n*", "", x)
+  gsub("```\n*```\\sr*\n*", "", x)
 })
 ```
 
@@ -92,7 +92,9 @@ We will not pursue this two-steps technique here and we will concentrate on one-
 
 If the observations were independent (i.e. no blocks and no repeated measures), this model could be fit by using conventional nonlinear regression. My preference goes to the `drm()` function in the 'drc' package (Ritz et al., 2015).
 
-The coding is reported below: 'Yield' is a function of ($\sim$) DAS, by way of a three-parameters logistic function ('fct = L.3()'). Different curves have to be fitted for different combinations of genotype and nitrogen levels ('curveid = N:GEN'), although these curves should be partly based on common parameter values ('pmodels = ...). The 'pmodels' argument requires a few additional comments. It must be a vector with as many element as there are parameters in the model (three, in this case: $b$, $d$ and $e$). Each element represents a linear function of variables and refers to the parameters in alphabetical order, i.e. the first element refers  to $b$, the second refers to $d$ and the third to $e$. The parameter $b$ is not dependent on any variable ('~ 1') and thus a constant value is fitted across curves; $d$ and $e$ depend on a fully factorial combination of genotype and nitrogen level (~ N*GEN = ~N + GEN + N:GEN). Finally, we used the argument 'bcVal = 0.5' to specify that we intend to use a Transform-Both-Sides technique, where a logarithmic transformation is performed for both sides of the equations. This is necessary to account for heteroscedasticity, but it does not affect the scale of parameter estimates.
+The coding is reported below: 'Yield' is a function of ($\sim$) DAS, by way of a three-parameters logistic function ('fct = L.3()'). Different curves have to be fitted for different combinations of genotype and nitrogen levels ('curveid = N:GEN'), although these curves should be partly based on common parameter values ('pmodels = ...).
+
+The 'pmodels' argument requires a few additional comments. It must be a vector with as many element as there are parameters in the model (three, in this case: $b$, $d$ and $e$). Each element represents a linear function of variables and refers to the parameters in alphabetical order, i.e. the first element refers  to $b$, the second refers to $d$ and the third to $e$. The parameter $b$ is not dependent on any variable ('~ 1') and thus a constant value is fitted across curves; $d$ and $e$ depend on a fully factorial combination of genotype and nitrogen level (~ N*GEN = ~N + GEN + N:GEN). Finally, we used the argument 'bcVal = 0.5' to specify that we intend to use a Transform-Both-Sides technique, where a logarithmic transformation is performed for both sides of the equations. This is necessary to account for heteroscedasticity, but it does not affect the scale of parameter estimates.
 
 
 ```{r}
@@ -142,12 +144,14 @@ plot(modnlme1)
 modnlme1bis <- nlme(Yield ~ NLS.L3(DAS, b, d, e), data = dataset,
                     random = d + e ~ 1|Block/Plot,
                     fixed = list(b ~ 1, d ~ I(N:GEN), e ~ I(N:GEN)),
-                    start = coef(modNaive1), control = list(msMaxIter = 200))
+                    start = coef(modNaive1), 
+                    control = list(msMaxIter = 200))
 
 #Creare parametri via matriciale!!!!!
 b <- rep(fixef(modnlme1bis)[1], 6)
 d <- fixef(modnlme1bis)[2] + c(0, fixef(modnlme1bis)[3:7])
 e <- fixef(modnlme1bis)[8] + c(0, fixef(modnlme1bis)[9:13])
+
 
 #Predictions
 X <- seq(min(dataset$DAS), max(dataset$DAS), by = 1)
@@ -158,31 +162,36 @@ p4 <- NLS.L3(X, b[4], d[4], e[4])
 p5 <- NLS.L3(X, b[5], d[5], e[5])
 p6 <- NLS.L3(X, b[6], d[6], e[6])
 
-library(latticeExtra)
-g <- xyplot(Yield ~ DAS|N:GEN, data = dataset, 
-  strip = T, aspect = "xy", pch = 16, col = "blue",
- xlab = "DAS", ylab = "Yield")
-g1 <- xyplot(p1 ~ X, type = "l", col = "black")
-g2 <- xyplot(p2 ~ X, type = "l", col = "black")
-g3 <- xyplot(p3 ~ X, type = "l", col = "black")
-g4 <- xyplot(p4 ~ X, type = "l", col = "black")
-g5 <- xyplot(p5 ~ X, type = "l", col = "black")
-g6 <- xyplot(p6 ~ X, type = "l", col = "black")
-g + as.layer(g1, packets = 1) + as.layer(g2, packets = 2) +
-as.layer(g3, packets = 3) +
-as.layer(g4, packets = 4) +
-as.layer(g5, packets = 5) +
-as.layer(g6, packets = 6)
+# Create data.frame
+df <- expand.grid(DAS=X, GEN=LETTERS[1:3], N=c("High", "Low"))
+df$Yield <- c(p1,p2,p3,p4,p5,p6)
+
+# Plot everything
+ggplot(dataset) +
+  geom_point(aes(y = Yield, x = DAS)) +
+  geom_line(data = df, mapping = aes(y = Yield, x = DAS),
+            col = "red") +
+  facet_grid(N~GEN) +
+  theme_bw()
 ```
 
 ```{r eval=FALSE, include=FALSE}
-# DA RIFARE CON GGPLOT
-# Use ggplot
-ggplot(data = dataset) +
-  geom_point(aes(x = DAS, y = Yield), col = "blue") +
-  
-  facet_grid(N ~ GEN) +
-  theme_bw()
+# Old graph with lattice
+# library(latticeExtra)
+# g <- xyplot(Yield ~ DAS|N:GEN, data = dataset, 
+#   strip = T, aspect = "xy", pch = 16, col = "blue",
+#  xlab = "DAS", ylab = "Yield")
+# g1 <- xyplot(p1 ~ X, type = "l", col = "black")
+# g2 <- xyplot(p2 ~ X, type = "l", col = "black")
+# g3 <- xyplot(p3 ~ X, type = "l", col = "black")
+# g4 <- xyplot(p4 ~ X, type = "l", col = "black")
+# g5 <- xyplot(p5 ~ X, type = "l", col = "black")
+# g6 <- xyplot(p6 ~ X, type = "l", col = "black")
+# g + as.layer(g1, packets = 1) + as.layer(g2, packets = 2) +
+# as.layer(g3, packets = 3) +
+# as.layer(g4, packets = 4) +
+# as.layer(g5, packets = 5) +
+# as.layer(g6, packets = 6)
 ```
 
 
@@ -190,7 +199,7 @@ From the plots above, we see that the overall fit is good. Fixed effects and var
 
 ```{r}
 summary(modnlme1)$tTable
-
+#
 VarCorr(modnlme1)
 ```
 
@@ -241,19 +250,25 @@ In this second test, the lack of significance for the 'genotype x nitrogen' inte
 
 I would like to conclude by drawing your attention to the 'medrm' function in the 'medrc' package, which can also be used to fit this type of nonlinear mixed-effects models.
 
-Happy coding with R!
+Happy coding with R! ... and ... don't forget to check out my new book!
 
+
+Prof. Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences    
+University of Perugia (Italy)    
+Send comments to: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)
+
+<a href = "https://www.awin1.com/cread.php?awinmid=26429&awinaffid=2675822&ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src= "../../_Figures/Email_Signature_978-3-032-08199-5.png" align="center" alt="Book cover" class="cover" /></a>
+<br/>
 
 --- 
 
-Andrea Onofri   
-Department of Agricultural, Food and Environmental Sciences   
-University of Perugia (Italy)   
-Borgo XX Giugno 74   
-I-06121 - PERUGIA
 
 # References
 
 1. Pinheiro, J.C., Bates, D.M., 2000. Mixed-Effects Models in S and S-Plus, Springer-Verlag Inc. ed. Springer-Verlag Inc., New York.
 1. Ritz, C., Baty, F., Streibig, J.C., Gerhard, D., 2015. Dose-Response Analysis Using R. PLOS ONE 10, e0146021. https://doi.org/10.1371/journal.pone.0146021
+
+---
+Originally written on 13 September 2019; revised on February 2025
 

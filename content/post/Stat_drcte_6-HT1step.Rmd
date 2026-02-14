@@ -13,7 +13,7 @@ tags:
   - 'drcte'
   - 'drcSeedGerm'
 archives:
-  - 2026
+  - 2022
 ---
 
 ```{r setup, cache = F, echo = F}
@@ -24,14 +24,16 @@ knitr::knit_hooks$set(document = function(x){
 })
 ```
 
-This is a follow-up post. If you are interested in other posts of this series, please go to: [https://www.statforbiology.com/tags/drcte/](https://www.statforbiology.com/tags/drcte/). All these posts exapand on a paper that we have recently published in the Journal 'Weed Science'; please follow [this link](https://doi.org/10.1017/wsc.2022.8) to the paper.
+This is a follow-up post. If you are interested in other posts of this series, please go to: [https://www.statforbiology.com/tags/drcte/](https://www.statforbiology.com/tags/drcte/). All these posts exapand on a paper that we have published in the Journal 'Weed Science'; please follow [this link](https://doi.org/10.1017/wsc.2022.8) to the paper.
 
 
 In a previous post we have shown that we can use time-to-event curves to describe the time course of germinations/emergences for a seed lot ([this post](https://www.statforbiology.com/2021/stat_drcte_4-time-to-eventcurves/)). We have also seen that the effects of experimental factors on seed germination can be accounted for by coding a different time-to-event curve for each factor level ([this post](https://www.statforbiology.com/2021/stat_drcte_5-comparinglots/)).
 
-In this post, we would like to consider the environmental variables, that are, perhaps, the most important factors to trigger germination/emergence. For example, let's consider either humidity content in the substrate, or temperature, or oxygen availability; it is clear that these variables play a fundamental role in determining germination extent and velocity and, therefore, they are very much studied by seed scientists. In principle, germination assays with environmental variables are straightforward to set up: several Petri dishes are submitted to different environmental conditions and germinations are inspected over time. What is the best method to analyse the resulting data and retrieve some important parameters, such as threshold temperatures (base, optimal or ceiling temperature) or base water potential?
+In this post, we consider the environmental variables that are, perhaps, the most important factors triggering germination and seedling emergence. For example, let us consider substrate water content (or water potential), temperature, and oxygen availability; it is clear that these variables play a fundamental role in determining both the extent and the rate of germination and, therefore, they are extensively studied by seed scientists.
 
-It is important to anticipate that most environmental variables can be expressed on a quantitative scale; obviously when we make an experiment we are forced into selecting a subset of all possible, e.g., temperatures, such as 15, 20, 30°C, but that does not mean that we are not interested to what happens at, e.g., 18  or 22°C. From this point of view, quantitative variables are very different from qualitative variables, such as the different plant species that we have compared in [our previous post](https://www.statforbiology.com/2021/stat_drcte_5-comparinglots/).
+In principle, germination assays involving environmental variables are straightforward to set up: several Petri dishes are subjected to different environmental conditions, and germination is monitored over time. However, what is the most appropriate method to analyse the resulting data and extract meaningful parameters, such as threshold temperatures (base, optimal, and ceiling temperatures) or base water potential?
+
+It is important to note that most environmental variables can be expressed on a quantitative scale. Although in an experiment we are necessarily limited to selecting a subset of possible values (e.g. temperatures such as 15, 20, and 30°C), this does not mean that we are not interested in what happens at intermediate values (e.g. 18 or 22°C). From this perspective, quantitative variables differ substantially from qualitative variables, such as the plant species compared in our previous post.
 
 In this post we will see an example of how we can account for the effects of water content in the substrate and include it in our time-to-event models. Of course, the same approach can be followed also with other types of environmental variables and, more generally, quantitative variables.
 
@@ -43,17 +45,17 @@ Let's consider the following example: the germination of rapeseed (*Brassica nap
 The dataset was published by Pace et al. (2012) and it is available as `rape` in the `drcSeedGerm` package, which needs to be installed from github (see below). Furthermore, the package `drcte` is necessary to fit time-to-event models and it should also be installed from gitHub. The following code loads the necessary packages, loads the dataset `rape` and shows the first six lines.
 
 ```{r message=FALSE, warning=FALSE}
-# library(devtools)
-# install_github("OnofriAndreaPG/drcSeedGerm")
-# install_github("OnofriAndreaPG/drcte")
-library(drcSeedGerm)
+# install.packages("drcte")
+# install.packages("drcSeedGerm")
 library(drcte)
+library(drcSeedGerm)
 library(ggplot2)
 data(rape)
 head(rape)
 ```
 
 In the above data.frame, 'timeAf' represents the moment when germinated seeds were counted, while ’timeBef’ represents the previous inspection time (or the beginning of the assay). The column ’nSeeds’ is the number of seeds that germinated during the time interval  between 'timeBef' and 'timeAf. The ’propCum’ column contains the cumulative proportions of germinated seeds and it is not necessary for time-to-event model fitting, although we can use it for plotting purposes (see code and output below).
+
 
 ```{r message=FALSE, warning=FALSE, fig.dim = c(8,8)}
 ggplot(rape, aes(timeAf, propCum)) +
@@ -64,18 +66,22 @@ ggplot(rape, aes(timeAf, propCum)) +
   theme_bw()
 ```
 
-The germination time-course is strongly affected by the water potential in the substrate, as this determines the ability of seeds to absorb water and, consequently, trigger the germination and emergence processes. Therefore, our obvious interest is to understand how the environmental factor affects the time-course of germination.
+The germination time course is strongly influenced by substrate water potential, which regulates seed water uptake and thus the initiation of germination and emergence. Our goal is therefore to quantify how this environmental factor shapes germination dynamics over time.
 
 We have shown that a parametric time-to-event curve is defined as a cumulative probability function ($\Phi$), with three parameters:
 
 $$P(t) = \Phi \left( b, d, e \right)$$
+Let's see how we can incorporate an environmental covariate in this curve.
+
+# Suboptimal approach
+
 Considering [our previous post](https://www.statforbiology.com/2021/stat_drcte_5-comparinglots/), the most obvious extension of the above model is to allow for different $b$, $d$ and $e$ value for each water potential level:
 
 $$P(t, \Psi_i) = \Phi \left( b_i, d_i, e_i \right)$$
 
-The first problem is that, for some water potential levels, germination did not occur and, for other levels, it occurred very quickly, so that no time-course of events could be observed (e.g., see the graph at 0 or -0.03 MPa). We say that we have 'degenerated' time-to-event curves.
+The first issue is that, at some water potential levels, germination did not occur at all, whereas at other levels it occurred so rapidly that no meaningful time course could be observed (e.g. see the graph at 0 or −0.03 MPa). We refer to these as degenerated time-to-event curves.
 
-If we fit those curves by using the 'curveid' argument, we are forced into fitting the same time-to-event model to all water potential levels (as shown in our previous post), and, therefore, the presence of degenerated curves provokes an error.
+The presence of such degenerated curves prevents successful model fitting, as the curveid argument imposes a common time-to-event structure across all water potential levels, which is not appropriate in this case.
 
 ```{r}
 # Not run
@@ -163,13 +169,13 @@ As we said before, we are also interested in standard errors for model parameter
 
 # Another modelling approach
 
-Another type of hydro-time model was proposed by Bradford (2002) and later extended by Mesgaran et al., (2013). These authors, instead of modifying a traditional log-logistic distribution to include the environmental covariate, wrote a totally new cumulative distribution function, based on theoretical underpinnings relating to the distribution of base water potential within a seed population. Their model is: 
+Another hydro-time model was proposed by Bradford (2002) and later extended by Mesgaran et al. (2013). Rather than modifying a traditional log-logistic distribution to incorporate the environmental covariate, these authors formulated a new cumulative distribution function based on theoretical considerations regarding the distribution of base water potential within a seed population. Their model is:
 
-$$ P(t, \Psi) = \Phi \left\{ \frac{\Psi - (\theta_H / t) -\Psi_b }{\sigma_{\Psi_b}} \right\}$$
+$$P(t, \Psi) = \Phi \left\{ \frac{\Psi - (\theta_H / t) -\Psi_b }{\sigma_{\Psi_b}} \right\}$$
 
-where $\Phi$ is a gaussian cumulative distribution function for base water potential. More information on how this model can be obtained from the original papers; it is, however, important to highlight that it is assumed that base water potential changes from seed to seeds within the population, according to a gaussian distribution function. The cumulative distribution function of event times is indirectly modelled, but it is not, in itself, gaussian (you see that $t$ is at the denominator).
+For a detailed derivation, the reader is referred to the original papers. It is important to emphasize, however, that the model assumes that base water potential varies among seeds within the population according to a Gaussian distribution. The cumulative distribution function of event times is therefore modelled only indirectly and is not, in itself, Gaussian (note that $t$ appears in the denominator).
 
-Mesgaran et al (2013) suggested that $\Phi$ may not be gaussian and proposed several alternatives, so that, in all, we have six possible hydro-time-to-event models, which we have implemented within the `drcSeedGerm` package:
+Mesgaran et al (2013) suggested that $\Phi$ may not be gaussian and proposed several alternative hydro-time-to-event models, which we have implemented within the `drcSeedGerm` package:
 
 1. gaussian (function `HTnorm()`)
 2. logistic (function `HTL()`)
@@ -223,8 +229,7 @@ Quantiles for germination times can also be retrieved by using the usual `quanti
 quantile(modHTE, probs = c(0.25, 0.50, 0.75), Psi = -0.8)
 ```
 
-
-Thanks for reading—and don't forget to check out my new book below!
+For those who are interested, I give further detail below. Thanks for reading—and don't forget to check out my new book!
 
 
 Prof. Andrea Onofri   
@@ -250,32 +255,114 @@ Send comments to: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)
 
 # Further detail
 
-Let us conclude this page by giving some detail on all other models in Mesgaran et al (2913; slightly reparameterised). In same cases $\Psi_b$ has been replaced by $\mu$, that is the location parameter of the cumulative distribution function of base water potential, but it is not the median value. On the other hand, $\delta$ is the shifting parameter for all logarithm based distributions; indeed, logarithm based distribution are only defined for strictly positive variables, while we know that water potential usually assumes negative values. The shifting parameters is used to shift the cumulative distribution function to the right, so that negative values are allowed. 
+Let us conclude this page by briefly describing the remaining models presented by Mesgaran et al. (2013; slightly reparameterised here). For all logarithm-based distributions, $\delta$ denotes the shifting parameter; indeed, logarithmic distributions are defined only for strictly positive values, whereas water potential typically assumes negative values. The shifting parameter is therefore introduced to translate the cumulative distribution function to the right, allowing negative values of water potential to be accommodated.
+
+Furthermore, for the asymmetric distributions (Gumbel and Weibull distributions), $\Psi_b$ is replaced by $\mu$, which represents the location parameter, although it does not necessarily coincide with the median. For all the following distributions, the equations required to derive percentiles of base water potential, such as $\Psi_{b(25)}$, $\Psi_{b(50)}$, or $\Psi_{b(75)}$, are provided below, together with a couple of practical examples of their use.
+
+## `HTnorm()`
+
+Normal cumulative distribution function:
+
+$$P(t, \Psi) = \Phi \left\{ \frac{\Psi - (\theta_H / t) -\Psi_b }{\sigma_{\Psi_b}} \right\}$$
+
+Percentiles of base water potential:
+
+(P is the desired percentile and $\Phi^{-1}$ is the gaussian quantile function (`qnorm()`, in R):
+
+$$\Psi_{b(P)} = \Psi_{b(50)} + \sigma_{\Psi_b} \Phi^{-1}(P)$$
 
 
 ## `HTL()`
 
-$$ G(t, \Psi) = \frac{1}{1 + exp \left[ - \frac{  \Psi  - \left( \theta _H/t \right) - \Psi_{b} } {\sigma}  \right] }$$
+Logistic distribution function:
+
+$$G(t, \Psi) = \frac{1}{1 + exp \left[ - \frac{  \Psi  - \left( \theta _H/t \right) - \Psi_{b(50)} } {\sigma}  \right] }$$
+
+Percentiles of base water potential:
+
+$$\Psi_{b(P)} = \Psi_{b(50)} - \sigma \, \log\left(\frac{1 - P}{P}\right)$$
 
 
 ## `HTG()`
 
-$$ G(t, \Psi) = \exp \left\{ { - \exp \left[ { - \left( {\frac{{\Psi - (\theta _H / t ) - \mu }}{\sigma }} \right)} \right]} \right\} $$
+Gumbel distribution function:
 
+$$G(t, \Psi) = \exp \left\{ { - \exp \left[ { - \left( {\frac{{\Psi - (\theta _H / t ) - \mu }}{\sigma }} \right)} \right]} \right\}$$
+
+Percentiles of base water potential:
+
+$$\Psi_{b(P)} = \sigma \, \left\{ -\log \left[ - \log \left(P\right)\right] \right\} + \mu$$
 
 ## `HTLL()`
 
-$$ G(t, \Psi) = \frac{1}{1 + \exp \left\{ \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b} + \delta)  }{\sigma}\right\} }$$
+Log-logistic distribution function:
 
+$$ G(t, \Psi) = \frac{1}{1 + \exp \left\{ \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b(50)} + \delta)  }{\sigma}\right\} }$$
+
+Percentiles of base water potential:
+
+$$\Psi_{b(P)} = \exp \left\{ \sigma \, \log\left(\frac{1 - P}{P}\right) + \log \left[ \Psi_{b(50)} + \delta\right] \right\} - \delta$$
 
 
 ## `HTW1()`
 
-$$ G(t, \Psi) = exp \left\{ - \exp \left[ - \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b} + \delta)  }{\sigma}\right] \right\}$$
+Weibull-type I distribution function:
+
+$$ G(t, \Psi) = exp \left\{ - \exp \left[ - \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\mu + \delta)  }{\sigma}\right] \right\}$$
+Percentiles of base water potential:
+
+$$\Psi_{b(P)} = \exp \left\{- \sigma \, \log \left[ - \log \left(P\right)\right] + \log \left[ \mu + \delta\right]\right\} - \delta$$
 
 ## `HTW2()`
 
-$$ G(t, \Psi) = 1 - exp \left\{ - \exp \left[ \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b} + \delta)  }{\sigma}\right] \right\}$$
+Weibull-type II distribution function:
+
+$$ G(t, \Psi) = 1 - exp \left\{ - \exp \left[ \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\mu + \delta)  }{\sigma}\right] \right\}$$
+
+Percentiles of base water potential:
+
+$$\Psi_{b(P)} = \exp \left\{\sigma \, \log \left[ - \log \left(1 - P\right)\right] + \log \left[ \mu + \delta\right]\right\} - \delta$$
+
+## Example of calculations with R
+
+We give an example of how to calculate the percentiles for base water potentitial in R. Let's consider the object 'mod3', that contains the results of fitting a Gumbel distribution function to the 'rape' data (see above). Considering the equation reported above, the values of $\Psi_{b(25)}$, $\Psi_{b(50)}$, and $\Psi_{b(75)}$,together with standard errors, can be obtained as:
+
+```{r}
+p <- c(0.25, 0.50, 0.75)
+psibs <- coef(mod3)[3] * (-log(-log(p))) + coef(mod3)[2] 
+psibs
+```
+
+As expected, $\Psi_{b(50)}$ is not equal to the estimate of $\mu$; we can get a sense that the above estimates are right by predicting the proportions of germinated seeds at infinite time with environmental water potential equal to the previously determined percentiles:
+
+```{r}
+predict(mod3, newdata=data.frame(timeAf = Inf, Psi = psibs))
+```
+
+In case standard errors are sought, the 'gnlht()' function in the 'statforbiology' package (that is the accompanying package for this blog) can be used:
+
+```{r}
+funList <- list(~ sigma * (-log(-log(p))) + mu)
+tab <- statforbiology::gnlht(mod3,
+                      funList,
+                      const = data.frame(p),
+                      parameterNames = c("ThetaH", "mu", "sigma"))
+tab[,1:4]
+```
+
+We can give another example for the `HTW1()` function:
+
+```{r}
+psibs <- exp(-0.347537 * log(-log(p)) + log(-0.985613 + 1.239402)) - 1.239402 
+
+funList <- list(~ exp(-sigma * log(-log(p)) + log(mu + delta)) - delta)
+tab <- statforbiology::gnlht(mod5,
+                      funList,
+                      const = data.frame(p),
+                      parameterNames = c("ThetaH", "delta", "mu", "sigma"))
+tab[,1:4]
+```
+
 
 ---
 Originally written on 18 January 2022; revised on February 2025
