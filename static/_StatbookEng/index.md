@@ -2,7 +2,7 @@
 title: "Field Research Methods in Agriculture"
 subtitle: "Supplemental material"
 author: "Andrea Onofri"
-date: "Update: v. 0.99 (1 November 2025), compil. 2025-11-17"
+date: "Update: v. 0.99 (1 November 2025), compil. 2026-03-18"
 #site: bookdown::bookdown_site
 documentclass: book
 fontsize: 12pt
@@ -21,7 +21,9 @@ url: 'http\://www.casaonofri.it/images'
 
 # Preface {-}
 
+
 <a href = "https://link.springer.com/book/10.1007/978-3-032-08199-5"><img src= "_images/coverSpringer.jpg" width="350" align="right" alt="Book cover" class="cover" /></a>
+
 
 This website is associated to the book 'Experimental methods in agriculture: an introduction with R', published by Springer Nature in 2025, which is a simple, 'non-mathematical' introduction to the experimental design and basic data analyses for field experiments in agriculture and related disciplines. It focuses on small-plot experiments, which are the fundamental foundations of scientific progress in agriculture. Indeed, these experiments are used to evaluate and compare, e.g., innovative genotypes, agronomic practices, pesticides and other plant protection methods. You can [visit the Springer publication website for the table of contents and sample chapters or to buy the whole book or any of its individual Chapters](https://link.springer.com/book/10.1007/978-3-032-08199-5).
 
@@ -51,23 +53,66 @@ Last but not least, I am deeply indebted to the R Core development team for the 
 
 <!--chapter:end:index.Rmd-->
 
-# Suggestions to lay out field experiments (Chapter 2)
+# Science, data, and experiments
 
-The first task for researchers and technicians is to draw a correct map for the experiment to be laid out in the field, which is also important to answer the questions from 7 to 9 in Chapter 2. It is necessary to consider:
+Nothing to add, yet
+
+<!--chapter:end:01-ScienceData.Rmd-->
+
+# The design of field experiments
+
+## Suggestions to lay out proper field experiments
+
+In order to lay-out a proper design and draw a correct map for a field experiment, it is necessary to consider the following items:
 
 1. Length and width of the available space in the field
-2. Sowing direction
+2. Sowing/working direction
 3. Presence of fertility gradients of any kinds
 
-Accordingly, do the following tasks
+Let's consider, for example, the experiment described in the Exercise 7 of Chapter 2. The text of such an Exercise is as follows: *You have been requested to design a breeding experiment with 16 wheat genotypes coded by using letters of the Roman alphabet. The aim is to determine which genotype is the best in a given environment. Write the experimental protocol, where you specify all the main elements of your project (subjects, variables, replicates, experimental design), and draw the field map. Consider a field measuring 400 m in length, 20 m in width and with the longer side aligned north-south. Sowing is carried out longitudinally, along the north-south axis, with a 2.5 m wide machine. The field is uniform along its longitudinal axis, although there is a significant transversal fertility gradient*.
 
-1. Project the size of a plot, by considering the type of crop and its sowing density. Set the width, by considering the available sowing machine and its working width. 
+How should we design such an experiment? I'll propose a stepwise solution (which is not at all the only possible solution!).
 
-TO BE DONE!
+### Step 1
+
+Let's start by projecting the size of a plot: wheat is to be regarded as a high-density crop (350-400 plants per square meter, in central Italy) and, thus, a plot of 20 m^2^ should be regarded as big enogh to obtain reliable yield data. Considering that the available sowing machine has a working width of 2.5 m, the most appropriate plot size should be 2.5 m in width and, consequently, 8 m in length.
+
+### Step 2
+
+Secondly, we should project the size of the grid. Considering that the field is usually worked and sown along its longitudinal axis and that it is relatively uniform along this axis, it would be appropriate to lay out the plot with its long side along the working direction. A 16 $\times$ 4 grid would be appropriate, with four 'vertical' blocks (one beside the other, along the fertility gradient), so that all the plots in one block are located in the very same position along the fertility gradient. Such a grid should fit with no problem in the available space. The surrounding space could be used to sow winter wheat, to avoid border effects along the edges of the experiment.
+
+### Step 3
+
+Allocate the genotypes to the plots, according to a Randomized Complete Block Design, so that there is one and only one replicate per genotype per block. In order to ease your mind, the package `agricolae` may provide significant help to randomised the genotypes and avoid errors (see code below). The final map could be as shown in the following Figure (the four blocks are in different colors). 
+
+
+```r
+library(agricolae)
+des <- design.rcbd(LETTERS[1:16], r = 4, seed = 1234)
+des$sketch
+##      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]
+## [1,] "G"  "O"  "P"  "C"  "J"  "K"  "H"  "D"  "N"  "F"  
+## [2,] "C"  "A"  "J"  "F"  "B"  "M"  "P"  "E"  "D"  "K"  
+## [3,] "L"  "B"  "E"  "A"  "N"  "J"  "G"  "D"  "M"  "C"  
+## [4,] "E"  "I"  "B"  "A"  "K"  "P"  "O"  "G"  "D"  "M"  
+##      [,11] [,12] [,13] [,14] [,15] [,16]
+## [1,] "E"   "M"   "L"   "A"   "I"   "B"  
+## [2,] "I"   "O"   "G"   "N"   "H"   "L"  
+## [3,] "F"   "O"   "H"   "P"   "I"   "K"  
+## [4,] "L"   "H"   "J"   "N"   "F"   "C"
+```
+
+
+<div class="figure" style="text-align: center">
+<img src="_images/Esercizio2.7.xls.png" alt="Randomised Complete Blocks Design (see Exercise 2.7)" width="30%" />
+<p class="caption">(\#fig:Exercise27)Randomised Complete Blocks Design (see Exercise 2.7)</p>
+</div>
 
 
 
-<!--chapter:end:01-ExperimentalLayOut.Rmd-->
+'agricolae'
+
+<!--chapter:end:02-ExperimentalLayOut.Rmd-->
 
 # Describing nominal data
 
@@ -79,7 +124,7 @@ As an example of nominal data we can take the 'mtcars' dataset, that was extract
 
 
 
-Table: (\#tab:unnamed-chunk-1)Part of the dataset 'mtcars' in R, representing the characteristics of 32 old automobiles; 'vs' is the type of engine (0 for V-shaped and 1 for straight engine) and 'gear' is the number of forward gears. More detail is given in the text.
+Table: (\#tab:unnamed-chunk-2)Part of the dataset 'mtcars' in R, representing the characteristics of 32 old automobiles; 'vs' is the type of engine (0 for V-shaped and 1 for straight engine) and 'gear' is the number of forward gears. More detail is given in the text.
 
 |                    | vs| gear|
 |:-------------------|--:|----:|
@@ -196,7 +241,7 @@ With interval data (binned data), descriptive statistics should be calculated by
 $$\frac{7.5 \times 1 + 12.5 \times 4 + 17.5 \times 3 + 22.5 \times 2}{10} = 15.5$$
 
 
-Table: (\#tab:unnamed-chunk-6)Distribution of frequency for the time (in minutes) taken to complete a statistic assignment for a group of students in biotechnology
+Table: (\#tab:unnamed-chunk-7)Distribution of frequency for the time (in minutes) taken to complete a statistic assignment for a group of students in biotechnology
 
 | Time interval | Central value | Count |
 |:-------------:|:-------------:|:-----:|
@@ -225,7 +270,7 @@ ggplot(data = dfr) +
   theme_void() # remove background, grid, numeric labels
 ```
 
-![](_main_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+![](_main_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
 
 
 ## Contingency tables
@@ -245,7 +290,7 @@ Another interesting table is contained in the 'datasets' package and is named  '
 
 
 
-Table: (\#tab:unnamed-chunk-9)Distribution of hair and eye color for 313 female statistics students, augmented with row and column sums. Dataset taken from R package 'datasets'
+Table: (\#tab:unnamed-chunk-10)Distribution of hair and eye color for 313 female statistics students, augmented with row and column sums. Dataset taken from R package 'datasets'
 
 |            | Brown eye | Blue eye | Hazel eye | Green eye | ROW SUMS |
 |:-----------|:---------:|:--------:|:---------:|:---------:|:--------:|
@@ -267,7 +312,7 @@ As the first step, we need to calculate the *marginal frequencies*, i.e. the sum
 Let's consider black hair: in total there are 52 women with black air, that is $52/313 \times 100 = 16.6$% of the total. If the two characters were independent, the above proportion should not change, depending on the color of eyes. For example, we have 122 women with brown eyes and 16.6% of those should be black haired, which makes up an expected value of 20.26837 black haired and brown eyed women (much lower than the observed 36). Another example: the expected value of blue eyed and black haired women is $114 \times 0.166 = 18.9$ (much higher than the observed). A third example may be useful: in total, there is $143/313 = 45.7$% of brown haired women and, in case of independence, we would expect $46 \times 0.457 =  21.02$ brown haired and hazel eyed woman. Keeping on with the calculations, we could derive a table of expected frequency, in the case of complete independence between the two characters. All the expected values in case of independency are reported in the Table below.
 
 
-Table: (\#tab:unnamed-chunk-11)Expected values of hair and eye color for 313 female statistics students, augmented with row and column sums. Expectations assume total lack of dependency between the two variables.
+Table: (\#tab:unnamed-chunk-12)Expected values of hair and eye color for 313 female statistics students, augmented with row and column sums. Expectations assume total lack of dependency between the two variables.
 
 |            | Brown eye | Blue eye  | Hazel eye | Green eye | ROW SUMS |
 |:-----------|:---------:|:---------:|:---------:|:---------:|:--------:|
@@ -325,4 +370,568 @@ Vcram
 
 
 <!--chapter:end:03-DescriptiveStats.Rmd-->
+
+# Cause-effect Relationships
+
+Nothing to add, yet
+
+<!--chapter:end:04-CauseEffect.Rmd-->
+
+# Stochastic models
+
+Nothing to add, yet
+
+<!--chapter:end:05-StochasticModels.Rmd-->
+
+# Statistical Inference
+
+Nothing to add, yet
+
+<!--chapter:end:06-Inference.Rmd-->
+
+# Linear/nonlinear combinations of model parameters
+
+## Multiplicity corrections in 'emmeans'
+
+In the main book, at page 166 and earlier I have made the point that, with pairwise comparisons and, more generally, whenever simoultanous statistical tests are performed, it is necessary to provide P-values that account for the familywise error rate, i.e., the probability of committing at least one wrong rejection within the whole family of simuoltaneous tests (i.e., adjusted P-values).
+
+With linear/nonlinear combinations of model parameters, a single test is usually based on the ratio between the combination (e.g., the difference between two means) and its standard error (t-test), which is supposed to follow a univariate t-distribution, when the null hypothesis is true. Consequently, when we have several simoultaneous t-tests, the vector of all the t-ratios can be supposed to follow a multivariate t-distribution, under the hypothesis that the null is true for all simoultaneous tests (Bretz et al., 2011). Therefore, adjusted P-values can be obtained by using the probability function of a multivariate t-distribution, although the calculations can be rather difficult.
+
+As an example, let's reconsider the 'mixture' data, which we have used in Chapter 9 of the main book: three herbicide mixtures and the untreated control were tested for their weed control ability against an important weed in tomato, i.e. *Solanum nigrum*. In the code below, we load the data, fit a one-way ANOVA model, using the weight of weed plants per pot as the response variable and the herbicide treatment as the explanatory factor. For the sake of simplicity, we omit the usual check for basic assumptions (see the main book); the ANOVA table shows that the treatment effect is significant and, thus, we proceed to comparing the means of treatments in a pairwise fashion. The P-values shown below do not account for the familiwise error rate, but only for the comparisonwise error rate; those P-values can be reproduced by using the probability function of a univariate Student's t-distribution.
+
+
+
+```r
+library(statforbiology)
+## Loading required package: drc
+## Loading required package: MASS
+## Loading required package: drcData
+## 
+## 'drc' has been loaded.
+## Please cite R and 'drc' if used for a publication,
+## for references type 'citation()' and 'citation('drc')'.
+## 
+## Attaching package: 'drc'
+## The following objects are masked from 'package:stats':
+## 
+##     gaussian, getInitial
+## 
+## Attaching package: 'statforbiology'
+## The following object is masked from 'package:agricolae':
+## 
+##     AMMI
+library(emmeans)
+library(multcomp)
+## Loading required package: mvtnorm
+## Loading required package: survival
+## Loading required package: TH.data
+## 
+## Attaching package: 'TH.data'
+## The following object is masked from 'package:MASS':
+## 
+##     geyser
+dataset <- getAgroData("mixture")
+dataset$Treat <- factor(dataset$Treat)
+model <- lm(Weight ~ Treat, data = dataset)
+anova(model)
+## Analysis of Variance Table
+## 
+## Response: Weight
+##           Df  Sum Sq Mean Sq F value    Pr(>F)    
+## Treat      3 1089.53  363.18  23.663 2.509e-05 ***
+## Residuals 12  184.18   15.35                      
+## ---
+## Signif. codes:  
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+groupMeans <- emmeans(model, ~Treat)
+tab <- contrast(groupMeans, method = "pairwise", adjust = "none")
+tab
+##  contrast                         estimate   SE df t.ratio
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578
+##  p.value
+##   0.1697
+##   0.0168
+##   <.0001
+##   0.0012
+##   <.0001
+##   0.0038
+# The P-value is obtained from the univariate t distribution (two-tails test)
+abst <- abs(as.data.frame(tab)$t.ratio)
+2 * pt(abst, 12, lower.tail = FALSE)
+## [1] 1.696785e-01 1.683167e-02 3.651239e-05 1.157189e-03
+## [5] 4.782986e-06 3.794451e-03
+```
+
+In order to obtain familywise error rates, we should switch from the univariate to the multivariate t-distribution. For example, let's consider the first t-ratio in the previous Code Box (t = 1.461); we should ask ourselves: "what is the probability of obtaining a t-ratio as extreme or more extreme than 1.461 from a multivariate t-distribution with 6 dimensions (i.e., the number of simoultaneous tests)?". In this calculation we should also consider that the 6 tests are correlated, at least to some extent, due to fact the they, e.g., use the same error term at the denominator. In the simplest case (homoscedasticity and balanced data), the correlation is equal to 0.5 for all pairwise comparisons.
+
+In formers time, when the computing power used to be limiting, calculating probabilities from the multivariate t-distribution was a daunting task. However, for some specific cases (e.g., linear models with homoscedastic and balanced data), adjusted P-values could be calculated by exploiting the distribution of the Studentised Range (so called 'tukey' method), which is the default method in the `contrast()` function of the `emmeans` package, as shown in the following Code box.
+
+
+
+```r
+tab <- contrast(groupMeans, method = "pairwise")
+# tab <- contrast(groupMeans, method = "pairwise", adjust = "tukey") # same as above
+tab
+##  contrast                         estimate   SE df t.ratio
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578
+##  p.value
+##   0.4885
+##   0.0698
+##   0.0002
+##   0.0055
+##   <.0001
+##   0.0173
+## 
+## P value adjustment: tukey method for comparing a family of 4 estimates
+# The P-value is obtained from the Studentised Range Distribution (two-tails test)
+abst <- abs(as.data.frame(tab)$t.ratio)
+ptukey(sqrt(2) * abst, 4, 12, lower.tail = FALSE)
+## [1] 4.884620e-01 6.981178e-02 1.853807e-04 5.501451e-03
+## [5] 2.473776e-05 1.725725e-02
+```
+
+This simple method gives exact familywise error rates with balanced data (which is the vast majority in designed field experiments in agriculture) and works fairly well with some small degree of unbalance. Considering the traditional Multiple Comparison Testing procedures, the previous approach leads to the same results as the Tukey's HSD (for balanced data) and to the Tukey-Kramer test (for unbalanced data).
+
+In more recent times, it has become possible to directly calculate probabilities from the multivariate t-distribution, which is handy, as it provides a more general approach to obtaining familywise error rates. Such a distribution is available in the 'mvtnorm' package as the `pmvt()` function: we need to define, for each dimension, the interval for which we want to calculate the probability (in this case, for the first t-ratio such an interval is: $\pm 1.461081$), the number of degrees of freedom (12) and the correlation matrix for the linear combinations, that can be directly retrieved from the 'emmGrid' object. The code below shows the calculations; the amount 'plev' represents the probability of sampling within the interval (none of the six nulls is wrongly rejected), while the familywise error rate corresponds to the probability of sampling outside the interval (at least one null is wrongly rejected), that is obtained by subtraction.
+
+
+```r
+library(mvtnorm)
+t1 <- abs(as.data.frame(tab)$t.ratio)[1]
+ncontr <- 6
+corMat <- cov2cor(vcov(tab))
+plev <- pmvt(lower = rep(-t1, ncontr), upper=rep(t1, ncontr), df = 12,
+     corr = corMat)[1]
+1 - plev
+## [1] 0.4884376
+```
+
+The above function emplyes numerical calculation methods and, thus, the results are not fully reproducible. However, it is easy to see that they are asymptotically equivalent to theose obtained with the 'tukey' adjustment method. In R, such an approach can be obtained by using the `adjust = "mvt"` argument.
+
+
+```r
+tab <- contrast(groupMeans, method = "pairwise", adjust = "mvt")
+tab
+##  contrast                         estimate   SE df t.ratio
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578
+##  p.value
+##   0.4885
+##   0.0697
+##   0.0001
+##   0.0058
+##   <.0001
+##   0.0172
+## 
+## P value adjustment: mvt method for 6 tests
+```
+
+Due to its complexity, this method is not recommended for pairwise comparisons with balanced experiments, while it can turn out useful in other cases, for example with strongly unbalanced data.
+
+
+<!--chapter:end:09-MCP.Rmd-->
+
+# Updated list of datasets
+
+Apart from those listed in the book, the package `statforbiology` contains many other dataset and the list is continuously updated. In this section you will find the full list of available datasets.
+
+
+## `adjuvantsLS` {#adjuvantsls .unnumbered}
+
+An experiment to compare three adjuvants (ammonium sulfate, mineral oil, non-ionic surfactant, and a control with no adjuvant) for rimsulfuron, which is a herbicide for weed control in maize. The experiment was designed as a Latin square with five replicates (Onofri, unpublished data), and the resulting dataset was slightly modified to make it more suitable for teaching purposes.
+
+1. Herbicide (character): herbicide name
+2. Adjuvant (character): adjuvant name
+3. Dose (character): dose of the herbicide + adjuvant
+4. Code (character): code for the adjuvants
+5. Plot (numerical coding): code for the plots
+6. Column (numerical coding): code for the column in the Latin square grid
+7. Row (numerical coding): code for the row in the Latin square grid
+8. Columns 8 to 23 (character): each column is a weed (identified by the respective Bayer code), and the values represent the abundances (Braun-Blanquet codes)
+9. Yield (numeric): crop yield (100 kg per hectare)
+10. Height (numeric): crop height (cm)
+
+## `alfalfa3years` {#alfalfa3years .unnumbered}
+
+A genotype experiment in alfalfa [@ligabue_2009] to compare 20 genotypes in central Italy (medium Tiber Valley). The experiment was laid out as an RCBD with four replicates and the total yearly forage yield (sum of 3-4 cuts per year) was measured in each plot over a 3 years (from 2006 to 2008).
+
+1. Plot (numeric): code for the plot
+2. Block (numeric): code for the block
+3. Genotype (character): name of the genotype
+4. Year (numeric): year when yield was measured
+5. Yield (numeric): total yearly forage yield (sum of 3-4 cuts per year; in tons per hectare of dry matter)
+
+## `Ammi94` {#ammi94 .unnumbered}
+
+A field experiment to evaluate the effect of different densities of *Ammi majus* on the achene yield of sunflower [@onofri_1994]. The values represent the means of 4 replicates.
+
+1. Density (numeric): number of weed plants per square meter
+2. Yield (numeric): sunflower yield in tons per hectare
+
+## `beet` {#beet .unnumbered}
+
+A split-plot tillage experiment in sugarbeet, where three types of tillage (minimum tillage = MIN; shallow plowing = SP; deep plowing = DP) and two types of chemical weed control methods (broadcast = TOT; in-furrow = PART) were compared in four complete blocks with three main-plots per block, split into two sub-plots per main-plot; the three types of tillage were randomly allocated to the main-plots in each block, while the two weed control treatments were randomly allocated to the sub-plots within each main-plot (Bianchi, 1992; unpublished data).
+
+1. Tillage (character): tillage method
+2. WeedControl (character): weed control method
+3. Block (numeric): code for the block
+4. Yield (numeric): sugarbeet root yield in tons per hectare
+
+## `beetGrowth` {#beetgrowth .unnumbered}
+
+An experiment in which sugarbeet was grown either weed-free, or weed-infested [@covarelli_1998]. Crop weight per unit area (in kg/ha) was measured at six different timings (in Days After Emergence; DAE), using destructive methods from independent plots. The experiment was conducted using a completely randomized design with three replicates.
+
+1. DAE (numeric): Day After Emergence
+2. Infested (numeric): Crop Dry Weight in weed-infested plots (kg/ha)
+3. WeedFree (numeric): Crop Dry Weight in weed-free plots (kg/ha)
+
+## `citrusGrove` or `speciesArea` {#citrusgrove-or-speciesarea .unnumbered}
+
+An experiment was conducted in a citrus grove in Sicily (Southern Italy) to determine the species-area relationship for the local weed community. In this study, a nested-plot survey was employed [@muller-dumbois_1974] where the number of weed species was counted in a plot of 1 m^2^ surface and the sampling area was progressively doubled in size. At each step, the number of new weed species was counted. The dataset is taken from @cristaudo_2015.
+
+1. Area (numeric): sampled area (in square meters)
+2. numSpecies (numeric): count of the number of species
+
+## `crosses` {#crosses .unnumbered}
+
+An experiment to compare nine maize hybrids, obtained from three pollinating inbred lines (A1, A2, and A3), each one crossed with three different female inbred lines (A1 was crossed with B1, B2, and B3, A2 was crossed with B4, B5, and B6, while A3 was crossed B7, B8, and B9). The experiment was laid out as complete blocks with four replicates (36 subjects in total). The dataset was generated through Monte Carlo simulation.
+
+1. Male (character): pollinating line
+2. Female (character): female line
+3. Block (numeric): code for the blocks
+4. Yield (numeric): maize yield (in tons per hectare)
+
+## `failureTimes` {#failuretimes .unnumbered}
+
+An experiment to record the failure time of heating systems as affected by four different operating temperatures. The design was completely randomized with six replicates, and the number of hours before failure was measured. The dataset is taken from @nelson_72.
+
+1. Temp (numeric): testing temperature (in $^{\circ}$F)
+2. Hours_to_failure (numeric): number of hours before failure
+
+## `FertilizationTiming` {#fertilizationtiming .unnumbered}
+
+A field experiment to evaluate the effect of fertilization timing (early, optimal, late) on two genotypes (A and B). The experiment was laid out as an RCBD, and the response represents the amount of absorbed nitrogen by the plant (simulated data).
+
+1. Timing (character): timing of fertilization (early, optimal, late)
+2. Genotype (character): genotype
+3. Block (numeric): code for the block
+4. Nabs (numeric): amount of absorbed nitrogen
+
+## `FGP_rape` {#fgp_rape .unnumbered}
+
+An experiment where the germination of three genotypes of oilseed rape was assessed in controlled conditions, at 20 $^{\circ}$C, according to an RCBD with six replicates. One replicate per genotype, consisting of a Petri dish with 50 seeds, was put in each of six shelves inside the oven. The number of germinated seeds was counted 15 days after the start of the assay and expressed as the Final Proportion of Germinated seeds (FGP). The assay was repeated twice in different and independent ovens with the same experimental design. The dataset is taken from @pace_2012.
+
+1. Dish (numeric): code for the Petri dish
+2. Run (numeric coding): code for the run
+3. Shelf (numeric): code for the shelf
+4. Species (character): plant species
+5. Genotype (character): genotype
+6. FGP (numeric): Final Germinated Proportion in each dish
+
+## `floristicData1` {#floristicData1 .unnumbered}
+
+An experiment where the weed flora composed by 8 weed species was recorded in 120 plots, included in a three-factor factorial experiment in a randomised blocks design. The counts of weeds are reported and the dataset was modified from Scavo et al (2020).
+
+1. F1 to F3 (character): the three experimental factors, respectively with 5, 2 and 3 levels
+2. Rep (character): the blocks 
+3. SP1 to SP8 (numeric): the counts for the eight weed species
+
+## `heights` {#heights .unnumbered}
+
+Highly unbalanced dataset, containing the height (cm) and yield (t/ha) of 20 maize plants belonging to 4 different genotypes. The dataset was generated through Monte Carlo simulation.
+
+1. Id (numeric): code for the plot
+2. var (character): code for the genotype
+3. height (numeric): crop height (cm)
+4. yield (numeric): crop yield (t/ha)
+
+## `insects` {#insects .unnumbered}
+
+An experiment in which tobacco plants were treated with three different insecticides was conducted using a completely randomized design with five replicates (resulting in a total of fifteen plants). The number of insects over the surface of leaves in each plant was counted three weeks after the treatments.
+
+1. Insecticide (character): code for the insecticide
+2. Rep (numeric): code for the replicate (not blocks)
+3. Count (numeric). count of insects
+
+## `johnsongrass` {#johnsongrass .unnumbered}
+
+A pot experiment to evaluate the best timing for herbicide application against *Sorghum halepense* originated by rhizomes. Five timings were compared including a split treatment (2-3, 4-5, 6-7, 8-9, and 3-4/8-9 leaves), and an untreated check was added for comparison. Treatments were repeated on plants originating from rhizomes of different lengths (2, 4, and 6 nodes). The design was a fully crossed two-way factorial, laid out as completely randomized with four replicates. The dataset is taken from @onofri_1994b.
+
+1. Length (character): length of rhizomes at the beginning of the experiment
+2. Timing (character): crop stage at spraying
+3. RizomeWeight (numeric): weight of rhizomes four weeks after spraying (in grams per pot)
+
+## `LeClerg` {#leclerg .unnumbered}
+
+A genotype experiment in a completely randomized design, with five genotypes and four replicates. The dataset is modified from [@leclerg_1962].
+
+1. Variety (character): code for the genotype
+2. Yield (numeric): crop yield in bushels per acre
+
+## `LepidopteraEggs` {#lepidopteraeggs .unnumbered}
+
+An entomologist counted the number of eggs laid by a species of moth, on three different substrates using a completely randomized design with 15 replicates. This dataset was modified from @kuehl_2000.
+
+1. Substrate (character): code for the substrate
+2. No_of_eggs (numeric): count of the number of eggs
+
+## `lettuceLS` {#lettucels .unnumbered}
+
+An experiment to assess the effect of four different fertilizers on lettuce yield. The experiment was laid out as a Latin square with four replicates. The dataset was generated through Monte Carlo simulation.
+
+1. Fertilizer (character): code for the fertilizer
+2. Row (numeric): code for the row in the Latin square grid
+3. Column (numeric): code for the column in the Latin square grid
+4. Yield (numeric): lettuce yield (in kg per hectare $\times$ 100)
+
+## `maizeMET` {#maizeMET .unnumbered}
+
+A multi-environment experiment in mazie, with four genotypes and 14 environments. The data represent the average yields for each genotype in each environment. This dataset is presented in @piepho_1998 and it can be used to reproduce the analyses presented there.
+
+1. Env (numeric coding): code for the environment
+2. Gen (character): code for the genotype
+3. Yield (numeric): maize yield in tons per hectar
+
+## `metamitron` {#metamitron .unnumbered}
+
+An experiment to study the degradation of the herbicide metamitron (M) in soil, either alone or in the presence of two co-applied herbicides, i.e. phenmedipham (P) and chloridazon (C). Ninety-six independent soil samples were treated with four herbicide combinations (i.e., M, M+P, M+C, and M+P+C, 32 samples per combination) and stored in a climatic chamber at 20$^{\circ}$C. Three random soil samples were collected for each herbicide combination at eight different time points (0, 7, 14, 21, 32, 42, 55 and 67 days after treatment). Theu were stored in a refrigerator until chemical analyses. At the end of the experiment, all soil samples were analyzed to determine the residual concentration of metamitron. This dataset is taken from @vischetti_1996, and it has been modified through Monte Carlo simulation, to make it more suitable for teaching purposes.
+
+1. Time (numeric): the time at sampling (in Days after the treatment)
+2. Herbicide (character): code for the herbicide combination
+3. Rep (numeric): code for the replicate (not blocks; the experiment was fully randomized)
+4. Conc (numeric): the concentration of metamitron in % of the initial value
+
+## `missingVal` {#missingval .unnumbered}
+
+A fertilization trial was conducted according to a randomized complete block design with five replicates; however, due to unforeseen circumstances, one value is missing for the '50N' treatment in the second block.
+
+1. Fert (character): fertilization treatment
+2. Block (numeric): code for the block
+3. P2O5 (numeric): content of P~2~O~5~ in leaves (%)
+
+## `mixture` {#mixture .unnumbered}
+
+A pot experiment to compare weed control efficacy of two herbicides used alone and in a mixture. A control was also added as a reference, and thus, the four treatments were (i) Metribuzin, (ii) Rimsulfuron, (iii) Metribuzin + rimsulfuron, and (iv) the untreated control. Sixteen uniform pots were prepared and sown with *Solanum nigrum*. When the plants reached the 4-true-leaf stage, the pots were sprayed with the above herbicide solution following a completely randomized design with four replicates. Three weeks after the treatment, the plants in each pot were harvested and weighed: the lower the weight, the higher the efficacy of herbicides. The dataset is taken from [@onofri_1995].
+
+1. Treat (character): herbicide treatment
+2. Weight (numeric): dry weight of weed plants (grams per pot)
+
+## `NGenotype` and `NGenotypeFull` {#ngenotype-and-ngenotypefull .unnumbered}
+
+Fifteen genotypes of durum wheat were compared under two different N fertilization strategies (in the dataset 'NGenotype' the number of genotypes has been reduced to 5). The dataset was generated through Monte Carlo simulation that started from the original data in @stagnari_2013.
+
+1. Block (numeric): code for the block
+2. Genotype (character): code for the genotype
+3. Nitrogen (numeric): code for the fertilization strategy
+4. Yield (numeric): wheat yield in tons per hectare
+
+## `NWheat` {#nwheat .unnumbered}
+
+A N fertilization experiment was conducted in wheat using a randomized complete block design, with four N doses and four replicates. The dataset was generated through Monte Carlo simulation.
+
+1. Dose (numeric): N fertilization rate (Kg/ha)
+2. Block (numeric): code for the block
+3. Yield (numeric): crop yield in tons per hectare
+
+## `Oat1L` {#oat1l .unnumbered}
+
+A field experiment was laid out as a CRD with three replicates to compare five genotypes of oat in one location. The data was generated through Monte Carlo simulation.
+
+1. Genotype (character): code for the genotype
+2. Yield (numeric): oat yield in tons per hectare
+
+## `Oat2L` {#oat2l .unnumbered}
+
+The same experiment as for 'Oat1L' was repeated in a second location, also with a completely randomized layout. Also the data for the second location were generated through Monte Carlo simulation.
+
+1. Location (character): code for the location
+2. Genotype (character): code for the genotype
+3. Yield (numeric): oat yield in tons per hectare
+
+## `orangeIrrigation` {#orangeirrigation .unnumbered}
+
+An irrigation experiment was conducted in an orange grove in Southern Italy, comprising five irrigation systems in five complete blocks. The dataset was simulated by Monte Carlo methods.
+
+1. Method (character): irrigation systems
+2. Block (numeric): code for the block
+3. Yield (numeric): orange yield in tons per hectare
+
+## `pea_MultiLoc` {#pea_multiloc .unnumbered}
+
+A multi-location genotype experiment in field pea, to compare 17 genotypes in 12 locations. In each location, the experiment was laid out as an RCBD, with four blocks. The dataset was generated through Monte Carlo simulation, starting from the data in @monotti_2009.
+
+1. Id (numeric): code for the plot
+2. Loc (character): code for the location
+3. Var (character): code for the genotype
+4. Block (character): code for the block
+5. Yield (numeric): pea yield in tons per hectare
+
+## `Rainfall2022` {#rainfall2022 .unnumbered}
+
+Daily rainfall amounts (mm) in central Italy in 2022 from a local meteorological station.
+
+1. DOY (numeric): Day Of the Year
+2. PRP (numeric): amount of daily rainfall (mm per day)
+
+## `recropS` {#recrops .unnumbered}
+
+Rimsulfuron was applied at the recommended rate on bare soil, and untreated plots were included for comparison. Forty days after the treatment, sugarbeet, rape and soybean were sown on treated and untreated plots, and the weight of the plants was determined four weeks after sowing. The experiment was laid down as a strip-plot in complete blocks: in each block, the herbicide treatments (rimsulfuron and the untreated control) were randomly allocated to each of two columns, while the three crops were randomly allocated to each of three rows (Onofri, unpublished data).
+
+1. Herbicide (Character): name of the herbicide treatment
+2. Crop (character): name of the crop
+3. Block (numeric): code for the block
+4. CropBiomass (numeric): weight of crop biomass four weeks after sowing
+
+## `rimsulfuron` {#rimsulfuron .unnumbered}
+
+A herbicide experiment where rimsulfuron was used with different timings and in different mixtures and compared to several other herbicide solutions for weed control in maize. At the end of the crop cycle, herbicide efficacy was assessed by measuring the coverage of weeds (%) and the yield of maize (in 100 kg per hectare).
+
+1. Herbicide (character): name of the herbicide treatment
+2. Plot (numeric): code for the plot
+3. Code (numeric): code for the herbicide
+4. Block (numeric): code for the block
+5. Column (numeric): code for the column within each block
+6. WeedCover (numeric): coverage of weeds (in %)
+7. Yield (numeric): maize yield (in 100 kg per hectare)
+
+## `sadocchi_man` {#sadocchi_man .unnumbered}
+
+Exemplary and simple dataset for multivariate analyses, such as MANOVA. It refers to a completely randomised, two-factor factorial experiment, with two numeric responses. The dataset was taken from Sadocchi (1987).
+
+1. a (numerical coding): levels for the experimental factor 'a'
+2. b (numerical coding): levels for the experimental factor 'b'
+3. y1 (numeric): 1st quantitative response variable
+4. y2 (numeric): 2nd quantitative response variable
+
+## `Sinapis` {#sinapis .unnumbered}
+
+A study was conducted to evaluate the effect of increasing densities of a weed (*Sinapis arvensis*) on sunflower yield (tons per hectare). The dataset was taken from @onofri_1994.
+
+1. density (numeric): weed density in plants per square meter
+2. block (numeric): code for the block
+3. yield (numeric): sunflower grain yield in tons per hectare
+
+## `SowingTime` {#sowingtime .unnumbered}
+
+Six faba bean genotypes were tested at two sowing times using a split-plot design in four complete blocks. Sowing times were randomized to main-plots within blocks, and genotypes were randomized to sub-plots within main-plots and blocks. The dataset was taken from @stagnari_2007.
+
+1. Plot (numeric): code for the plot
+2. SowingTime (character): sowing season
+3. Genotype (character): name of the genotype
+4. Block (numeric): code for the block
+5. Yield (numeric): crop grain yield in tons per hectare
+
+## `starchGrain_g` {#StarchGrain_g .unnumbered}
+
+This dataset refers to an experiment which aimed to compare the diameters of starch grains from tubers of two potato producers. Starch grains were sampled from tubers collected from the production fields of the producers. The dataset shows the counts of starch grains assigned to one of five diameter classes (<4, [4−8[, [8−12[, [12−16[,≥16 $\mu m$). For each producer, the diameters were measured from twelve photos taken with a microscope. The original dataset is in a grouped form and one record represents a photo (12 photos per each producer). The dataset was taken from @onofri_2019
+
+1. Group (character): the producer
+2. Photo (numeric): code for each photo
+3. c1-c5 (numeric): the counts of individual in each class
+
+## `starchGrain_u` {#StarchGrain_u .unnumbered}
+
+Same dataset as 'StarchGrain_g', but in ungrouped form (one row for each starch grain).
+
+1. Photo (numeric): code for each photo
+2. Group (character): the producer
+3. Class (character): the diameter class to which each grain belongs (c1 to c5)
+
+## `starchGrain_s` {#StarchGrain_s .unnumbered}
+
+Same dataset as 'StarchGrain_g', but in censored 'long' form (one row for each starch grain), where the class is represented by using the lower and upper diameter values whithin which the real diameter value is comprised.
+
+1. Photo (numeric): code for each photo
+2. Group (character): the producer
+3. sizeLow (numeric): the lower limit for the diameter class
+4. sizeUp (numeric): the upper limit for the diameter class
+5. Class (character): the diameter class to which each grain belongs (c1 to c5)
+
+## `sugarsMedia` {#sugarsmedia .unnumbered}
+
+Plant tissues of tomato were grown in tissue cultures using three types of media, each based on the addition of a specific amount of either glucose, fructose, or sucrose to the control. The experiment was conducted using a completely randomized design with five replicates, and the growth of cells was recorded for each subject. The dataset was generated through Monte Carlo simulation, starting from the original data in @kuehl_2000.
+
+1. Sugar (character): type of substrate
+2. Growth (numeric): tissue growth in mm
+
+## `Sunflower` {#Sunflower .unnumbered}
+
+Water extracts of two sunflower varieties were compared in terms of phytotoxicity to the same test-plant (*Sinapis alba*). Several lots of 50 seeds of *S. alba* were put in Petri dishes and moistened with water extracts at increasing concentrations (three replicated Petri dishes for each of four concentration levels, including the untreated control). Radicle lengths were determined seven days after the treatment. The experiment was planned with a CRD.
+
+1. Dose (numeric): concentration of extracts (g d.m. in 100 mL of water)
+2. Rep (numeric): code for the replicate
+3. Var (character): name of sunflower varieties
+4. Length (numeric): root lengths in mm
+
+## `Timings_77490` {#timings_77490 .unnumbered}
+
+A field experiment with maize in which rimsulfuron was used post-emergence in maize at 4 different timings and compared to the untreated unweeded control. The aim was to assess the selectivity of the herbicide for the crop, depending on the moment of intervention. One value is missing due to an unforeseen event. The dataset is taken from Onofri (unpublished data).
+
+1. Plot (numeric): code for the plot
+2. Timing (character): timing of weed control as the number of maize leaves
+3. Block (numeric): code for the the block
+4. Height_30 (numeric): height of maize (cm) on 30 June (cm)
+5. Weight_30 (numeric): average weight of maize plants (g per plant) on 30 June
+6. FinalYield (numeric): grain yield of maize in kg/ha $\times$ 100
+
+## `TKW` {#tkw .unnumbered}
+
+An experiment with 30 genotypes in three blocks, where the Weight of Thousand Kernels (TKW) was recorded in three sub-samples per plot (Ciriciofolo, unpublished data)
+
+1. Plot (numeric): code for the plot
+2. Block (numeric): code for the block
+3. Genotype (character): name of the genotype
+4. Sample (numeric): code for the subsample in each plot
+5. TKW (numeric): weight of 1000 wheat kernels (g)
+
+## `Tripleuspermum` {#tripleuspermum .unnumbered}
+
+Plants of *Tripleuspermum inodorum* were treated with a sulphonylurea herbicide (tribenuron-methyl) at increasing doses, and the fresh weight of the treated plants per pot was recorded 3 weeks after treatment. The experiment was completely randomized with three replicates and conducted at the Department of Integrated Pest Management, University of Aarhus, Denmark [@pannacci_2013].
+
+1. Dose (numeric): Dose of tribenuron-methyl (in g/ha)
+2. FreshWeight (numeric): weight of plants 3 weeks after the treatment (in grams per pot)
+
+## `WeedCounts` {#weedcounts .unnumbered}
+
+Counts of three weed species (CHEAL: *Chenopodium album*, CHEHY: *C. hybridum*, and CHEPO: *C. polyspermum*) in twenty random quadrats in a field of central Italy (Onofri, unpublished data).
+
+1. Species (character): the weed species, identified by its Bayer code
+2. Rep (numeric): code for the quadrat
+3. Count (numeric): count of the number of plants per quadrat
+
+## `WeedCover` {#weedcover .unnumbered}
+
+Results of a survey, where the yield of maize was determined, as affected by the early determined covering of weeds. The dataset was simulated by Monte Carlo methods.
+
+1. WeedCover (numeric): ground covering of weeds (%)
+2. Yield (numeric): yield of maize in tons per hectare
+
+## `WinterWheat` and `WinterWheat2002` {#winterwheat-and-winterwheat2002 .unnumbered}
+
+A multi-year experiment was conducted to compare eight winter wheat genotypes, with an RCBD with three replicates in the hills of central Italy and repeated for seven years [@onofri_2007]. The dataset 'WinterWheat2022' only contains the data from the 2002 season.
+
+1. Plot (numeric): code for the plot
+2. Block (numeric): code for the block within each year
+3. Genotype (character): name of the genotypes
+4. Yield (numeric): grain yield in tons per hectare
+5. Year (numeric): the year in which the yield was measured
+
+
+
+
+<!--chapter:end:13-DatasetList.Rmd-->
 

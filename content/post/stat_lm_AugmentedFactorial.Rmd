@@ -66,6 +66,22 @@ model2 <- lm(Yield ~ CvT/(Herbicide*DoseF*Adjuvant), data = dataset)
 anova(model2)
 ```
 
+```{r eval=FALSE, include=FALSE}
+# Parametrizzazione (prova, ma errore)
+dataset$Herbicide
+dataset$Adjuvant
+dataset$DoseF
+Xmat <- model.matrix(model2)
+coef(model2)
+dataset$Herbicide2 <- factor(ifelse(dataset$Herbicide == "HandWeeded" | dataset$Herbicide == "Unweeded", NA, dataset$Herbicide))
+dataset$DoseF2 <- factor(ifelse(dataset$DoseF == "NONE", NA, dataset$DoseF))
+dataset$Adjuvant2 <- factor(ifelse(dataset$Adjuvant == "None", NA, dataset$Adjuvant))
+model3 <- lm(Yield ~ CvT/(Herbicide2*DoseF2*Adjuvant2),
+             data = dataset)
+anova(model2)
+```
+
+
 The 'CvT' effects represents the contrast between the two controls and the treated plots and it has three levels (untreated, hand-weeded and treated). We see that this effect is significant, as well as the 'Herbicide:Adjuvant' interaction within treated plots. On the other hand, the 'Dose' effect within treated plots, is not significant. We can use the `emmeans()` function to extract the relevant marginal means and compare them.
 
 ```{r message=FALSE, warning=FALSE}

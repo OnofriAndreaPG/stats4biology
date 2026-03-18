@@ -347,8 +347,25 @@ Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.o
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rm(list=ls())
 library(nlme)
 library(lattice)
-dataset &amp;lt;- read.csv(&amp;quot;https://raw.githubusercontent.com/OnofriAndreaPG/agroBioData/master/yieldDensityB.csv&amp;quot;,
-  header=T)
+library(statforbiology)
+## Loading required package: drc
+## Loading required package: MASS
+## Loading required package: drcData
+## 
+## Attaching package: &amp;#39;drcData&amp;#39;
+## The following object is masked from &amp;#39;package:lattice&amp;#39;:
+## 
+##     barley
+## 
+## &amp;#39;drc&amp;#39; has been loaded.
+## Please cite R and &amp;#39;drc&amp;#39; if used for a publication,
+## for references type &amp;#39;citation()&amp;#39; and &amp;#39;citation(&amp;#39;drc&amp;#39;)&amp;#39;.
+## 
+## Attaching package: &amp;#39;drc&amp;#39;
+## The following objects are masked from &amp;#39;package:stats&amp;#39;:
+## 
+##     gaussian, getInitial
+dataset &amp;lt;- getAgroData(&amp;quot;yieldDensityB&amp;quot;)
 dataset$block &amp;lt;- factor(dataset$block)
 head(dataset)
 ##   block density yield
@@ -358,7 +375,6 @@ head(dataset)
 ## 4     4       0 26.37
 ## 5     5       0 34.48
 ## 6     6       0 33.70
- r
 plot(yield ~ density, data = dataset)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_nlmm_DesignConstraints_files/figure-html/unnamed-chunk-1-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;We might be tempted to neglect the block effect and run a linear regression analysis of yield against density. This is clearly wrong (I am violating the independence assumption) and inefficient, as any block-to-block variability goes into the residual error term, which is, therefore, inflated.&lt;/p&gt;
@@ -451,23 +467,22 @@ summary(modMix.2)
 ##  Formula: ~density | block
 ##  Structure: Diagonal
 ##         (Intercept)    density Residual
-## StdDev:    3.198263 0.02293222 1.387148
+## StdDev:    3.198267 0.02293222 1.387148
 ## 
 ## Fixed effects:  yield ~ density 
 ##                Value Std.Error DF   t-value p-value
-## (Intercept) 31.78987 1.0460272 69  30.39105       0
-## density     -0.26744 0.0097463 69 -27.44019       0
+## (Intercept) 31.78987 1.0460282 69  30.39102       0
+## density     -0.26744 0.0097463 69 -27.44020       0
 ##  Correlation: 
 ##         (Intr)
 ## density -0.139
 ## 
 ## Standardized Within-Group Residuals:
 ##        Min         Q1        Med         Q3        Max 
-## -1.9991173 -0.5451478 -0.1970267  0.4925090  2.6700386 
+## -1.9991174 -0.5451478 -0.1970267  0.4925092  2.6700388 
 ## 
 ## Number of Observations: 80
 ## Number of Groups: 10
- r
 anova(modMix.1, modMix.2)
 ##          Model df      AIC      BIC    logLik   Test    L.Ratio p-value
 ## modMix.1     1  6 340.9166 355.0569 -164.4583                          
@@ -489,8 +504,7 @@ modMix.4 &amp;lt;- lme(yield ~ density, random = list(block = ~ density - 1), da
 &lt;h1&gt;An example with nonlinear regression&lt;/h1&gt;
 &lt;p&gt;The problem may become trickier if we have a nonlinear relationship. Let’s have a look at another similar dataset (‘YieldLossB.csv’), that is also available on gitHub. It represents another experiment where sunflower was grown with the same increasing densities of another weed (0, 14, 19, 28, 32, 38, 54, 82 plants per &lt;span class=&#34;math inline&#34;&gt;\(m^2\)&lt;/span&gt;), on a randomised complete block design, with 8 blocks. In this case, the yield loss was recorded and analysed.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rm(list=ls())
-dataset &amp;lt;- read.csv(&amp;quot;https://raw.githubusercontent.com/OnofriAndreaPG/agroBioData/master/YieldLossB.csv&amp;quot;,
-  header=T)
+dataset &amp;lt;- getAgroData(&amp;quot;YieldLossB&amp;quot;)
 dataset$block &amp;lt;- factor(dataset$block)
 head(dataset)
 ##   block density yieldLoss
@@ -500,15 +514,13 @@ head(dataset)
 ## 4     4       0    -0.697
 ## 5     5       0    -2.264
 ## 6     6       0    -1.623
- r
 plot(yieldLoss ~ density, data = dataset)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_nlmm_DesignConstraints_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;A swift plot shows that the relationship between density and yield loss is not linear. Literature references (Cousens, 1985) show that this could be modelled by using a rectangular hyperbola:&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[YL = \frac{i \, D}{1 + \frac{i \, D}{a}}\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(YL\)&lt;/span&gt; is the yield loss, &lt;span class=&#34;math inline&#34;&gt;\(D\)&lt;/span&gt; is weed density, &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt; is the slope at the origin of axes and &lt;span class=&#34;math inline&#34;&gt;\(a\)&lt;/span&gt; is the maximum asymptotic yield loss. This function, together with self-starters, is available in the ‘NLS.YL()’ function in the ‘aomisc’ package, which is the accompanying package for this blog. If you do not have this package, please refer to &lt;a href=&#34;https://www.statforbiology.com/rpackages/&#34;&gt;this link&lt;/a&gt; to download it.&lt;/p&gt;
 &lt;p&gt;The problem is the very same as above: the block effect may produce random fluctuations for both model parameters. The only difference is that we need to use the ‘nlme()’ function instead of ‘lme()’. With nonlinear mixed models, I strongly suggest you use a ‘groupedData’ object, which permits to avoid several problems. The second line below shows how to turn a data frame into a ‘groupedData’ object.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(aomisc)
-datasetG &amp;lt;- groupedData(yieldLoss ~ 1|block, dataset)
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;datasetG &amp;lt;- groupedData(yieldLoss ~ 1|block, dataset)
 nlin.mix &amp;lt;- nlme(yieldLoss ~ NLS.YL(density, i, A), data=datasetG, 
 						fixed = list(i ~ 1, A ~ 1),
             random = i + A ~ 1|block)
@@ -524,21 +536,21 @@ summary(nlin.mix)
 ##  Level: block
 ##  Structure: General positive-definite, Log-Cholesky parametrization
 ##          StdDev    Corr 
-## i        0.1112841 i    
-## A        4.0444816 0.195
-## Residual 1.4142267      
+## i        0.1112839 i    
+## A        4.0444538 0.195
+## Residual 1.4142272      
 ## 
 ## Fixed effects:  list(i ~ 1, A ~ 1) 
 ##      Value Std.Error  DF  t-value p-value
-## i  1.23238 0.0382246 104 32.24035       0
-## A 68.52305 1.9449780 104 35.23076       0
+## i  1.23238 0.0382246 104 32.24038       0
+## A 68.52305 1.9449745 104 35.23082       0
 ##  Correlation: 
 ##   i     
 ## A -0.408
 ## 
 ## Standardized Within-Group Residuals:
 ##        Min         Q1        Med         Q3        Max 
-## -2.4416777 -0.7049390 -0.1805691  0.3385459  2.8788990 
+## -2.4416770 -0.7049388 -0.1805690  0.3385458  2.8788981 
 ## 
 ## Number of Observations: 120
 ## Number of Groups: 15&lt;/code&gt;&lt;/pre&gt;
@@ -551,28 +563,28 @@ summary(nlin.mix2)
 ##   Model: yieldLoss ~ NLS.YL(density, i, A) 
 ##   Data: datasetG 
 ##        AIC      BIC    logLik
-##   474.8225 491.5474 -231.4112
+##   474.8225 491.5475 -231.4113
 ## 
 ## Random effects:
 ##  Formula: list(i ~ 1, A ~ 1)
 ##  Level: block
 ##  Structure: General positive-definite
 ##          StdDev    Corr 
-## i        0.1112837 i    
-## A        4.0468443 0.194
-## Residual 1.4141993      
+## i        0.1112839 i    
+## A        4.0466971 0.194
+## Residual 1.4142009      
 ## 
 ## Fixed effects:  list(i ~ 1, A ~ 1) 
 ##      Value Std.Error  DF  t-value p-value
-## i  1.23242  0.038225 104 32.24114       0
-## A 68.52050  1.945186 104 35.22568       0
+## i  1.23242  0.038225 104 32.24107       0
+## A 68.52068  1.945173 104 35.22600       0
 ##  Correlation: 
 ##   i     
 ## A -0.409
 ## 
 ## Standardized Within-Group Residuals:
 ##        Min         Q1        Med         Q3        Max 
-## -2.4413852 -0.7049358 -0.1805300  0.3385252  2.8787256 
+## -2.4414051 -0.7049356 -0.1805322  0.3385275  2.8787362 
 ## 
 ## Number of Observations: 120
 ## Number of Groups: 15&lt;/code&gt;&lt;/pre&gt;
@@ -604,7 +616,7 @@ summary(nlin.mix3)
 ## 
 ## Standardized Within-Group Residuals:
 ##        Min         Q1        Med         Q3        Max 
-## -2.3577292 -0.6849962 -0.1785860  0.3255925  2.8592764 
+## -2.3577291 -0.6849962 -0.1785860  0.3255925  2.8592764 
 ## 
 ## Number of Observations: 120
 ## Number of Groups: 15&lt;/code&gt;&lt;/pre&gt;
