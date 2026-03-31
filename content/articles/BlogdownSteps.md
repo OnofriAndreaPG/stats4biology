@@ -12,7 +12,11 @@ archives:
 
 This is my first day at work with blogdown. I must admit it is pretty overwhelming at the beginning ... 
 
-I worked with R Studio and installed the library 'blogdown'. I followed the instructions and used the 'NEW PROJECT' menu and added a 'NEW BLOGDOWN SITE' to my file system. I selected the 'hugo-blog-jeffprod' theme. This created a bunch of directories in my working directory. If I use the 'serve_site()' function in console, the Hugo server is called and the site is continuously updated, as soon as I make changes and save them. When the server is started, a message appears, saying: "Serving the directory PROJECTDIR at http://127.0.0.1:7958". I copied the http address on Safari (I am working on Mac OS...), so that I can check my changes there.
+I worked with R Studio and installed the library 'blogdown'. I followed the instructions and used the 'NEW PROJECT' menu and added a 'NEW BLOGDOWN SITE' to my file system. I selected the 'hugo-blog-jeffprod' theme. This created a bunch of directories in my working directory.
+
+[NOTE: 29/3/2026. I have discovered that it is more convenient to create a folder in my hard-disk and create a new RStudio project in that existing folder. Next, use the ]
+
+If I use the 'serve_site()' function in console, the Hugo server is called and the site is continuously updated, as soon as I make changes and save them. When the server is started, a message appears, saying: "Serving the directory PROJECTDIR at http://127.0.0.1:7958". I copied the http address on Safari (I am working on Mac OS...), so that I can check my changes there.
 
 Here are my steps to the learning the process.
 
