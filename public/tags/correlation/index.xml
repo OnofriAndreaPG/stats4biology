@@ -7,17 +7,228 @@
     <language>en</language>
     <managingEditor>andrea.onofri@unipg.it (Andrea Onofri)</managingEditor>
     <webMaster>andrea.onofri@unipg.it (Andrea Onofri)</webMaster>
-    <lastBuildDate>Mon, 10 Feb 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 15 Apr 2026 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://www.statforbiology.com/tags/correlation/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>Dealing with correlation in designed field experiments: part II</title>
-      <link>https://www.statforbiology.com/2025/stat_general_correlationindependence2/</link>
-      <pubDate>Mon, 10 Feb 2025 00:00:00 +0000</pubDate>
+      <title>Dealing with correlation in designed field experiments: part I</title>
+      <link>https://www.statforbiology.com/2026/stat_general_correlationindependence1/</link>
+      <pubDate>Wed, 15 Apr 2026 00:00:00 +0000</pubDate>
       <author>andrea.onofri@unipg.it (Andrea Onofri)</author>
-      <guid>https://www.statforbiology.com/2025/stat_general_correlationindependence2/</guid>
+      <guid>https://www.statforbiology.com/2026/stat_general_correlationindependence1/</guid>
+      <description>
+
+
+&lt;p&gt;When we have recorded two traits in different subjects, we can be interested in describing their joint variability, by using the Pearson’s correlation coefficient. That’s ok, altough we have to respect some basic assumptions (e.g. linearity) that have been detailed elsewhere (&lt;a href=&#34;https://www.statforbiology.com/2019/stat_general_correlation_alookat/&#34;&gt;see here&lt;/a&gt;). Problems may arise when we need to test the hypothesis that the correlation coefficient is equal to 0. In this case, we need to make sure that all the couples of observations are taken on independent subjects.&lt;/p&gt;
+&lt;p&gt;Unfortunately, this is most often false whenever measures are taken from designed field experiments. In this case, observations may be grouped by one or more treatment/blocking factors. This has been clearly described by Bland and Altman (1994); we would like to give an example that is more closely related to plant/crop science. Think about a genotype experiment, where we compare the behaviour of several genotypes in a randomised blocks design. Usually, we do not only measure yield. We also measure other traits, such as crop height. At the end of the experiment, we might be interested in reporting the correlation between yield and height. How should we proceed? It would seem an easy task, but it is not.&lt;/p&gt;
+&lt;div id=&#34;data-come-in-groups&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Data come in groups&lt;/h1&gt;
+&lt;p&gt;Let’s assume that we have a randomised blocks design, with 27 genotypes and 3 replicates. For each plot, we recorded two traits, i.e. yield and the weight of thousand kernels (TKW). In the end, we have 81 plots and just as many couples of measures in all. We will use the dataset ‘WheatQuality’, that is available on the ‘statforbiology’ package.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(statforbiology)
+library(Hmisc)
+library(knitr)
+dataset &amp;lt;- getAgroData(&amp;quot;WheatQuality&amp;quot;)
+head(dataset)
+##     Genotype Block Height  TKW Whectol Yield
+## 1 arcobaleno     1     90 44.5    83.2 64.40
+## 2 arcobaleno     2     90 42.8    82.2 60.58
+## 3 arcobaleno     3     88 42.7    83.1 59.42
+## 4       baio     1     80 40.6    81.8 51.93
+## 5       baio     2     75 42.7    81.3 51.34
+## 6       baio     3     76 41.1    81.1 47.78&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;how-many-correlations&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;How many correlations?&lt;/h1&gt;
+&lt;p&gt;It may be tempting to consider the whole lot of measures and calculate the correlation coefficient between yield and TKW. This is the result:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ra &amp;lt;- with(dataset, rcorr(Yield, TKW) )
+# 
+# Correlation coefficient
+ra$r[1,2] 
+## [1] 0.540957
+#
+# P-level
+ra$P[1,2] 
+## [1] 1.850931e-07&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We observe a positive correlation, and &lt;span class=&#34;math inline&#34;&gt;\(r\)&lt;/span&gt; seems to be significantly different from 0. Therefore, we would be encouraged to conclude that plots with a high value on yield tend to have a high value on TKW, as well. Unfortunately, such an inference is not supported by the data.&lt;/p&gt;
+&lt;p&gt;Indeed, the test of significance is clearly invalid, as the 81 plots are not independent; they are grouped by block and genotype and we are totally neglecting these two effects. Are we sure that the same correlation holds for all genotypes/blocks? Let’s check this.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;wCor &amp;lt;- function(x) cor(x$Yield, x$TKW)
+wgCors &amp;lt;- by(dataset, dataset$Genotype, wCor)
+wgCors
+## dataset$Genotype: arcobaleno
+## [1] 0.9847228
+## ------------------------------------------------------------ 
+## dataset$Genotype: baio
+## [1] 0.1611952
+## ------------------------------------------------------------ 
+## dataset$Genotype: claudio
+## [1] -0.9993872
+## ------------------------------------------------------------ 
+## dataset$Genotype: colorado
+## [1] 0.9837293
+## ------------------------------------------------------------ 
+## dataset$Genotype: colosseo
+## [1] 0.4564855
+## ------------------------------------------------------------ 
+## dataset$Genotype: creso
+## [1] -0.5910193
+## ------------------------------------------------------------ 
+## dataset$Genotype: duilio
+## [1] -0.988233
+## ------------------------------------------------------------ 
+## dataset$Genotype: gianni
+## [1] -0.7603802
+## ------------------------------------------------------------ 
+## dataset$Genotype: giotto
+## [1] 0.9520211
+## ------------------------------------------------------------ 
+## dataset$Genotype: grazia
+## [1] 0.4980828
+## ------------------------------------------------------------ 
+## dataset$Genotype: iride
+## [1] 0.7563338
+## ------------------------------------------------------------ 
+## dataset$Genotype: meridano
+## [1] 0.1174342
+## ------------------------------------------------------------ 
+## dataset$Genotype: neodur
+## [1] 0.4805871
+## ------------------------------------------------------------ 
+## dataset$Genotype: orobel
+## [1] 0.8907754
+## ------------------------------------------------------------ 
+## dataset$Genotype: pietrafitta
+## [1] -0.9633891
+## ------------------------------------------------------------ 
+## dataset$Genotype: portobello
+## [1] 0.9210135
+## ------------------------------------------------------------ 
+## dataset$Genotype: portofino
+## [1] -0.9900764
+## ------------------------------------------------------------ 
+## dataset$Genotype: portorico
+## [1] 0.1394211
+## ------------------------------------------------------------ 
+## dataset$Genotype: preco
+## [1] 0.9007067
+## ------------------------------------------------------------ 
+## dataset$Genotype: quadrato
+## [1] -0.5840238
+## ------------------------------------------------------------ 
+## dataset$Genotype: sancarlo
+## [1] -0.646067
+## ------------------------------------------------------------ 
+## dataset$Genotype: simeto
+## [1] -0.4051779
+## ------------------------------------------------------------ 
+## dataset$Genotype: solex
+## [1] -0.6066363
+## ------------------------------------------------------------ 
+## dataset$Genotype: terrabianca
+## [1] -0.4076416
+## ------------------------------------------------------------ 
+## dataset$Genotype: verdi
+## [1] 0.5801404
+## ------------------------------------------------------------ 
+## dataset$Genotype: vesuvio
+## [1] -0.7797493
+## ------------------------------------------------------------ 
+## dataset$Genotype: vitromax
+## [1] -0.8056514
+wbCors &amp;lt;- by(dataset, dataset$Block, wCor)
+wbCors
+## dataset$Block: 1
+## [1] 0.5998137
+## ------------------------------------------------------------ 
+## dataset$Block: 2
+## [1] 0.539999
+## ------------------------------------------------------------ 
+## dataset$Block: 3
+## [1] 0.5370398&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;As for the genotypes, we have 27 correlation coefficients, ranging from -0.999 to 0.985. We only have three couples of measurements per genotype and it is clear that this is not much, to reliably estimate a correlation coefficient. However, it is enough to be suspicious about the extent of correlation between yield and TKW, as such an extent clearly depends on the genotype.&lt;/p&gt;
+&lt;p&gt;On the other hand, the correlation within blocks is more constant, independent on the block and similar to the correlation between plots.&lt;/p&gt;
+&lt;p&gt;It may be interesting to get an estimate of the average within-group correlation. To this aim, we can perform two separate ANOVAs (one per trait), including all relevant effects (blocks and genotypes) and calculate the correlation between the residuals:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod1 &amp;lt;- lm(Yield ~ factor(Block) + Genotype, data = dataset)
+mod2 &amp;lt;- lm(TKW ~ factor(Block) + Genotype, data = dataset)
+wCor &amp;lt;- rcorr(residuals(mod1), residuals(mod2))
+wCor$r
+##            x          y
+## x 1.00000000 0.03133109
+## y 0.03133109 1.00000000
+wCor$P
+##           x         y
+## x        NA 0.7812693
+## y 0.7812693        NA&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The average within-group correlation is very small and unsignificant. Let’s think about this correlation: residuals represent yield and TKW values for all plots, once the effects of blocks and genotypes have been removed. A high correlation of residuals would mean that, letting aside the effects of the block and genotype to which it belongs, a plot with a high value on yield also shows a high value on TKW. The existence of such correlation is clearly unsopported by our dataset.&lt;/p&gt;
+&lt;p&gt;As the next step, we could consider the means for genotypes/blocks and see whether they are correlated. Blocks and genotypes are independent and, in principle, significance testing is permitted. However, this is not recommended with block means, as three data are too few to make tests.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;means &amp;lt;- aggregate(dataset[,c(&amp;quot;Yield&amp;quot;, &amp;quot;TKW&amp;quot;)],
+                   list(dataset$Genotype), 
+                   mean)
+rgPear &amp;lt;- rcorr( as.matrix(means[,2:3]) )
+rgPear$r
+##           Yield       TKW
+## Yield 1.0000000 0.5855966
+## TKW   0.5855966 1.0000000
+rgPear$P
+##            Yield        TKW
+## Yield         NA 0.00133149
+## TKW   0.00133149         NA
+means &amp;lt;- aggregate(dataset[,c(&amp;quot;Yield&amp;quot;, &amp;quot;TKW&amp;quot;)],
+                   list(dataset$Block), 
+                   mean)
+rbPear &amp;lt;- cor( as.matrix(means[,2:3]) )
+rbPear
+##             Yield         TKW
+## Yield  1.00000000 -0.08812544
+## TKW   -0.08812544  1.00000000&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We note that the correlation between genotype means is high and significant. On the contrary, the correlation between block means is near to 0.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;and-so-what&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;And so what?&lt;/h1&gt;
+&lt;p&gt;At this stage, you may be confused… Let’s try to clear the fog.&lt;/p&gt;
+&lt;p&gt;Obtaining a reliable measure of correlation from designed experiments is not obvious. Indeed, in every designed field experiment we have groups of subjects and there are several possible types of correlation:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;correlation between plot measurements&lt;/li&gt;
+&lt;li&gt;correlation between the residuals&lt;/li&gt;
+&lt;li&gt;correlation between treatment/block means&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;All these correlations should be investigated and used for interpretation.&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;The ‘naive’ correlation between the plot measurements is very easily calculated, but it is grossy misleading. Indeed, it disregards the treatment/block effects and it does not permit hypotheses testing, as the subjects are not independent. In this example, looking at the ‘naive’ correlation coefficient, we would wrongly conclude that plots with high yield also have high TKW, while further analyses show that this is not true, in general. We would reasonably suggest that the ‘naive’ correlation coefficient is never used for interpretation.&lt;/li&gt;
+&lt;li&gt;The correlation between the residuals is a reliable measure of joint variation, because the experimental design is adequately referenced, by removing the effects of tratments/blocks. In this example, residuals are not correlated. Further analyses show that the correlation between yield and TKW, if any, may depend on the genotype, while it does not depend on the block.&lt;/li&gt;
+&lt;li&gt;The correlation between treatment/block means permits to assess whether the treatment/block effects on the two traits are correlated. In this case, while we are not allowed to conclude that yield and TKW are, in general, correlated, we can conclude that the genotypes with a high level of yield also show a high level of TKW.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;div id=&#34;take-home-message&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Take-home message&lt;/h1&gt;
+&lt;p&gt;Whenever we have data from designed field experiments, our correlation analyses should never be limited to the calculation of the ‘naive’ correlation coefficient between the observed values. This may not be meaningful! On the contrary, our interpretation should be mainly focused on the correlation between residuals and on the correlation between the effects of treatments/blocks.&lt;/p&gt;
+&lt;p&gt;An elegant and advanced method to perform sound correlation analyses on data from designed field experiments has been put forward by Piepho (2018), within the frame of mixed models. Such an approach will be described in another post.&lt;/p&gt;
+&lt;p&gt;Happy coding with R! … and … don’t forget to check out my new book!&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href = &#34;https://www.awin1.com/cread.php?awinmid=26429&amp;awinaffid=2675822&amp;ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5&#34;&gt;&lt;img src= &#34;../../_Figures/Email_Signature_978-3-032-08199-5.png&#34; align=&#34;center&#34; alt=&#34;Book cover&#34; class=&#34;cover&#34; /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Bland, J.M., Altman, D.G., 1994. Statistics Notes: Correlation, regression, and repeated data. BMJ 308, 896–896.&lt;/li&gt;
+&lt;li&gt;Piepho, H.-P., 2018. Allowing for the structure of a designed experiment when estimating and testing trait correlations. The Journal of Agricultural Science 156, 59–70.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;hr /&gt;
+&lt;p&gt;This post was originally written on 2019-04-30 and updated on 2026-04-15&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Dealing with correlation in designed field experiments: part II</title>
+      <link>https://www.statforbiology.com/2026/stat_general_correlationindependence2/</link>
+      <pubDate>Wed, 15 Apr 2026 00:00:00 +0000</pubDate>
+      <author>andrea.onofri@unipg.it (Andrea Onofri)</author>
+      <guid>https://www.statforbiology.com/2026/stat_general_correlationindependence2/</guid>
       <description>
 
 
@@ -28,15 +239,18 @@
 &lt;/ol&gt;
 &lt;p&gt;I have dealt with these two problems (particularly the first one) &lt;a href=&#34;https://www.statforbiology.com/2019/stat_general_correlationindependence1/&#34;&gt;in a previous post&lt;/a&gt;, where I gave a solution based on traditional methods of data analyses.&lt;/p&gt;
 &lt;p&gt;In this post, I would like to present a more advanced solution, that was advocated by Hans-Peter Piepho in a relatively recent manuscript (Piepho, 2018). Such a solution is based on mixed models and it was implemented in SAS, by using PROC MIXED. I spent a few hours ‘transporting’ those models in R, which turned out to be a difficult task, although, in the end, I seem to have came to an acceptable solution, which I would like to share here.&lt;/p&gt;
-&lt;p&gt;First of all, we can load the ‘WheatQuality.csv’ dataset, that is available is available on an Internet repository; it consists of 81 records (plots) of 6 variables, i.e. the Genotype and Block factors, as well as the four responses height, TKW, weight per hectolitre and yield. The code below loads the necessary packages, the data and transforms the numeric variable ‘Block’ into a factor.&lt;/p&gt;
+&lt;p&gt;First of all, we can load the ‘WheatQuality’ dataset, that is available in the ‘statforbiology’ package; it consists of 81 records (plots) of 6 variables, i.e. the Genotype and Block factors, as well as the four responses height, TKW, weight per hectolitre and yield. The code below loads the necessary packages, the data and transforms the numeric variable ‘Block’ into a factor.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rm(list = ls())
+library(statforbiology)
 library(dplyr)
+library(tidyr)
 library(sommer)
 library(nlme)
 #
 # Loading data
-dataset &amp;lt;- read.csv(&amp;quot;https://www.casaonofri.it/_datasets/WheatQuality.csv&amp;quot;) |&amp;gt;
-  mutate(Block = factor(Block))
+dataset &amp;lt;- getAgroData(&amp;quot;WheatQuality&amp;quot;) |&amp;gt;
+  mutate(Block = factor(Block),
+         Genotype = factor(Genotype))
 head(dataset)
 ##     Genotype Block Height  TKW Whectol Yield
 ## 1 arcobaleno     1     90 44.5    83.2 64.40
@@ -63,6 +277,7 @@ head(dataset)
 &lt;p&gt;The model call is:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod.bimix &amp;lt;- mmer(cbind(Yield, TKW) ~ 1,
                    random = ~ vsr(usr(Genotype)) + vsr(usr(Block)),
+                   rcov = ~ vsr(units),  
                    data = dataset,
                   verbose = FALSE, dateWarning = FALSE)
 bimix.obj &amp;lt;- summary(mod.bimix)
@@ -75,97 +290,64 @@ coefs
 ## u:Block.Yield-Yield     3.7104682  3.9363372  0.9426195   Positive
 ## u:Block.Yield-TKW      -0.2428322  1.9074202 -0.1273092   Unconstr
 ## u:Block.TKW-TKW         1.6684549  1.8343512  0.9095613   Positive
-## units.Yield-Yield       6.0939217  1.1951482  5.0988836   Positive
-## units.Yield-TKW         0.1635821  0.7242898  0.2258518   Unconstr
-## units.TKW-TKW           4.4718011  0.8770118  5.0989065   Positive&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;The box above shows the results about the variance-covariance parameters. In order to get the correlations, I used the function &lt;code&gt;vpredict()&lt;/code&gt; and specified the necessary combinations of variance-covariance parameters. It is necessary to remember that estimates, in ‘sommer’, are named as V1, V2, … Vn, according to their ordering in model output.&lt;/p&gt;
+## u:units.Yield-Yield     6.0939217  1.1951482  5.0988836   Positive
+## u:units.Yield-TKW       0.1635821  0.7242898  0.2258518   Unconstr
+## u:units.TKW-TKW         4.4718011  0.8770118  5.0989065   Positive&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The box above shows the results about the variance-covariance parameters. In order to get the correlations, I used the delta method, as implemented in the &lt;code&gt;gnlht()&lt;/code&gt; function of the ‘statforbiology’ package (the accompanying package for this blog). First of all I extracted the variance parameters together with the covariance matrix for the variance parameters from the mixed model object. For simplicity, I assigned simple names to the coefficients (V1, V2, … Vn), according to their ordering in model output.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Correlation between genotype means
-vpredict(mod.bimix, rg ~ V2 / (sqrt(V1)*sqrt(V3) ))
-##     Estimate        SE
-## rg 0.6005174 0.1306699&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Correlation between block means
-vpredict(mod.bimix, rt ~ V5 / (sqrt(V4)*sqrt(V6) ))
-##       Estimate        SE
-## rt -0.09759658 0.7571256&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;vpredict(mod.bimix, rt ~ V8 / (sqrt(V7)*sqrt(V9) ))
-##      Estimate        SE
-## rt 0.03133619 0.1385421&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;We see that the estimates are very close to those obtained by using the Pearson’s correlation coefficients (see my previous post). The advantage of this mixed model solution is that we can also test hypotheses in a relatively reliable way. For example, I tested the hypothesis that residuals are not correlated by:&lt;/p&gt;
-&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
-&lt;li&gt;coding a reduced model where residuals are heteroscedastic and independent, and&lt;/li&gt;
-&lt;li&gt;comparing this reduced model with the complete model by way of a REML-based Likelihood Ratio Test (LRT).&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Removing the correlation of residuals is easily done, by using the code below.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod.bimix2 &amp;lt;- mmer(cbind(Yield, TKW) ~ 1,
-                   random = ~ vsr(usr(Genotype)) + vsr(usr(Block)),
-                   rcov = ~ vsr(units, Gtc = diag(2)),
-                   data = dataset,
-                  verbose = FALSE, dateWarning = FALSE)
-# Likelihood ratio test
-LRT &amp;lt;- anova(mod.bimix, mod.bimix2)
-## Likelihood ratio test for mixed models
-## ==============================================================
-##      Df       AIC       BIC    loLik   Chisq ChiDf PrChisq
-## mod1 15 -62.41068 -56.23549 33.20534                      
-## mod2 14 -62.35960 -56.18441 33.17980 0.05108     1 0.8212 
-## ==============================================================
-## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Likewise, I tried to further reduce the model to test the significance of the correlation between block means and genotype means.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Removing correlation between block means
-mod.bimix3 &amp;lt;- mmer(cbind(Yield, TKW) ~ 1,
-                   random = ~ vsr(usr(Genotype)) + vsr(Block, Gtc = diag(2)),
-                   rcov = ~ vsr(units, Gtc = diag(2)),
-                   data = dataset,
-                  verbose = FALSE, dateWarning = FALSE)
-# Likelihood ratio test
-LRT &amp;lt;- anova(mod.bimix, mod.bimix3)
-## Likelihood ratio test for mixed models
-## ==============================================================
-##      Df       AIC       BIC    loLik   Chisq ChiDf  PrChisq
-## mod1 15 -62.41068 -56.23549 33.20534                       
-## mod2 13 -62.34401 -56.16882 33.17200 0.06667     2 0.96722 
-## ==============================================================
-## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Removing correlation between genotype means
-mod.bimix4 &amp;lt;- mmer(cbind(Yield, TKW) ~ 1,
-                   random = ~ vsr(Genotype, Gtc = diag(2)) + vsr(Block, Gtc = diag(2)),
-                   rcov = ~ vsr(units, Gtc = diag(2)),
-                   data = dataset,
-                  verbose = FALSE, dateWarning = FALSE)
-# Likelihood ratio test
-LRT &amp;lt;- anova(mod.bimix, mod.bimix4)
-## Likelihood ratio test for mixed models
-## ==============================================================
-##      Df       AIC       BIC    loLik    Chisq ChiDf  PrChisq
-## mod1 15 -62.41068 -56.23549 33.20534                        
-## mod2 12 -51.42519 -45.25000 27.71260 10.98549     3 0.0118 *
-## ==============================================================
-## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;We see that only the genotype means are significantly correlated to one another.&lt;/p&gt;
+coefsVec &amp;lt;- coefs[,1]
+vcovMat &amp;lt;- mod.bimix$sigmaSE # Variance-covariance for varcomp
+names(coefsVec) &amp;lt;- paste(&amp;quot;V&amp;quot;, 1:9, sep = &amp;quot;&amp;quot;)
+gnlht(coefsVec, func = list(~ V2 / (sqrt(V1)*sqrt(V3) )),
+      vcov. = as.matrix(vcovMat),
+      parameterNames = paste(&amp;quot;V&amp;quot;, 1:9, sep = &amp;quot;&amp;quot;))
+##                       Form  Estimate        SE  Z-value      p-value
+## 1 V2/(sqrt(V1) * sqrt(V3)) 0.6005174 0.1306699 4.595684 4.313326e-06
+#
+# Correlation between block means
+gnlht(coefsVec, func = list(~ V5 / (sqrt(V4)*sqrt(V6) ) ),
+      vcov. = as.matrix(vcovMat),
+      parameterNames = paste(&amp;quot;V&amp;quot;, 1:9, sep = &amp;quot;&amp;quot;))
+##                       Form    Estimate        SE   Z-value   p-value
+## 1 V5/(sqrt(V4) * sqrt(V6)) -0.09759658 0.7571256 0.1289041 0.8974335
+#
+# Correlation of residuals
+gnlht(coefsVec, func = list(~ V8 / (sqrt(V7)*sqrt(V9) )),
+      vcov. = as.matrix(vcovMat),
+      parameterNames = paste(&amp;quot;V&amp;quot;, 1:9, sep = &amp;quot;&amp;quot;))
+##                       Form   Estimate        SE   Z-value   p-value
+## 1 V8/(sqrt(V7) * sqrt(V9)) 0.03133619 0.1385421 0.2261854 0.8210572&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We see that the estimates are very close to those obtained by using the Pearson’s correlation coefficients (see my previous post). The advantage of this mixed model solution is that we can also test hypotheses in a relatively reliable way. For example, we can look at the Wald tests in the output above to judge about the significance of correlations and conclude that only the genotype means are significantly correlated to one another.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;a-solution-with-lme&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;A solution with ‘lme()’&lt;/h1&gt;
-&lt;p&gt;Considering that the block means are not correlated, if we were willing to take the ‘block’ effect as fixed, we could fit a bivariate mixed model also with the ‘nlme’ package and the function &lt;code&gt;lme()&lt;/code&gt; (Pinheiro and Bates, 2000). However, we should cast the model as a univariate model.&lt;/p&gt;
-&lt;p&gt;To this aim, the two variables (Yield and TKW) need to be piled up and a new factor (‘Trait’) needs to be introduced to identify the observations for the two traits. Another factor is also necessary to identify the different plots, i.e. the observational units. To perform such a restructuring, I used the &lt;code&gt;melt()&lt;/code&gt; function in the ‘reshape2’ package (Wickham, 2007) and assigned the name ‘Y’ to the response variable, that is now composed by the two original variables Yield and TKW, one on top of the other.&lt;/p&gt;
+&lt;p&gt;Considering that the block means are not correlated, if we were willing to take the ‘block’ effect as fixed, we could fit a bivariate mixed model also with the ‘nlme’ package and the function &lt;code&gt;lme()&lt;/code&gt; (Pinheiro and Bates, 2000). However, we should cast the model as a ‘univariate’ model.&lt;/p&gt;
+&lt;p&gt;To this aim, the two variables (Yield and TKW) need to be piled up and a new factor (‘Trait’) needs to be introduced to identify the observations for the two traits. Another factor is also necessary to identify the different plots, i.e. the observational units. To perform such a restructuring, I used the &lt;code&gt;pivot_longer()&lt;/code&gt; function in the ‘tidyr’ package (Wickham et al., 2024) and assigned the name ‘Y’ to the response variable, that is now composed by the two original variables Yield and TKW, one on top of the other.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dataset$Plot &amp;lt;- 1:81
-mdataset &amp;lt;- reshape2::melt(dataset[,c(-3,-5)], variable.name= &amp;quot;Trait&amp;quot;, value.name=&amp;quot;Y&amp;quot;, id=c(&amp;quot;Genotype&amp;quot;, &amp;quot;Block&amp;quot;, &amp;quot;Plot&amp;quot;))
-mdataset$Block &amp;lt;- factor(mdataset$Block)
+mdataset &amp;lt;- dataset |&amp;gt;
+  select(-Whectol, -Height) |&amp;gt;
+  pivot_longer(names_to = &amp;quot;Trait&amp;quot;, values_to = &amp;quot;Y&amp;quot;, cols = c(&amp;quot;Yield&amp;quot;, &amp;quot;TKW&amp;quot;)) |&amp;gt;
+  mutate(Trait = factor(Trait))
 head(mdataset)
-##     Genotype Block Plot Trait    Y
-## 1 arcobaleno     1    1   TKW 44.5
-## 2 arcobaleno     2    2   TKW 42.8
-## 3 arcobaleno     3    3   TKW 42.7
-## 4       baio     1    4   TKW 40.6
-## 5       baio     2    5   TKW 42.7
-## 6       baio     3    6   TKW 41.1
+## # A tibble: 6 × 5
+##   Genotype   Block  Plot Trait     Y
+##   &amp;lt;fct&amp;gt;      &amp;lt;fct&amp;gt; &amp;lt;int&amp;gt; &amp;lt;fct&amp;gt; &amp;lt;dbl&amp;gt;
+## 1 arcobaleno 1         1 Yield  64.4
+## 2 arcobaleno 1         1 TKW    44.5
+## 3 arcobaleno 2         2 Yield  60.6
+## 4 arcobaleno 2         2 TKW    42.8
+## 5 arcobaleno 3         3 Yield  59.4
+## 6 arcobaleno 3         3 TKW    42.7
 tail(mdataset)
-##     Genotype Block Plot Trait     Y
-## 157  vesuvio     1   76 Yield 54.37
-## 158  vesuvio     2   77 Yield 55.02
-## 159  vesuvio     3   78 Yield 53.41
-## 160 vitromax     1   79 Yield 54.39
-## 161 vitromax     2   80 Yield 50.97
-## 162 vitromax     3   81 Yield 48.83&lt;/code&gt;&lt;/pre&gt;
+## # A tibble: 6 × 5
+##   Genotype Block  Plot Trait     Y
+##   &amp;lt;fct&amp;gt;    &amp;lt;fct&amp;gt; &amp;lt;int&amp;gt; &amp;lt;fct&amp;gt; &amp;lt;dbl&amp;gt;
+## 1 vitromax 1        79 Yield  54.4
+## 2 vitromax 1        79 TKW    41.6
+## 3 vitromax 2        80 Yield  51.0
+## 4 vitromax 2        80 TKW    43.6
+## 5 vitromax 3        81 Yield  48.8
+## 6 vitromax 3        81 TKW    43.1&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The fixed model is:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;Y ~ Trait*Block&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;In order to introduce a totally unstructured variance-covariance matrix for the random effect, I used the ‘pdMat’ construct:&lt;/p&gt;
@@ -186,12 +368,12 @@ obj &amp;lt;- mod
 G &amp;lt;- matrix( as.numeric(getVarCov(obj)), 2, 2 )
 G
 ##          [,1]     [,2]
-## [1,] 53.86081 38.83246
-## [2,] 38.83246 77.63485
+## [1,] 53.86053 38.83124
+## [2,] 38.83124 77.63402
 cov2cor(G)
 ##           [,1]      [,2]
-## [1,] 1.0000000 0.6005237
-## [2,] 0.6005237 1.0000000&lt;/code&gt;&lt;/pre&gt;
+## [1,] 1.0000000 0.6005096
+## [2,] 0.6005096 1.0000000&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Second, we can retrieve the ‘conditional’ variance-covariance matrix (R), that describes the correlation of errors:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#Conditional variance-covariance matrix (residual error)
 V &amp;lt;- corMatrix(obj$modelStruct$corStruct)[[1]] #Correlation for residuals
@@ -200,18 +382,18 @@ sds &amp;lt;- obj$sigma * sds #Standard deviations for residuals (one per trait)
 R &amp;lt;- t(V * sds) * sds #Going from correlation to covariance
 R
 ##           [,1]      [,2]
-## [1,] 4.4718234 0.1635375
-## [2,] 0.1635375 6.0939251
+## [1,] 6.0939152 0.1634968
+## [2,] 0.1634968 4.4718077
 cov2cor(R)
 ##            [,1]       [,2]
-## [1,] 1.00000000 0.03132756
-## [2,] 0.03132756 1.00000000&lt;/code&gt;&lt;/pre&gt;
+## [1,] 1.00000000 0.03131984
+## [2,] 0.03131984 1.00000000&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The total correlation matrix is simply obtained as the sum of G and R:&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Tr &amp;lt;- G + R
 cov2cor(Tr)
-##           [,1]      [,2]
-## [1,] 1.0000000 0.5579906
-## [2,] 0.5579906 1.0000000&lt;/code&gt;&lt;/pre&gt;
+##          [,1]     [,2]
+## [1,] 1.000000 0.555787
+## [2,] 0.555787 1.000000&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;We see that the same results can be obtained by using ‘sommer’ and regarding the block effect as fixed, although the coding is below is much neater!&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod.bimix5 &amp;lt;- mmer(cbind(Yield, TKW) ~ Block,
                    random = ~ vsr(usr(Genotype)),
@@ -228,23 +410,25 @@ mod.bimix5$sigma
 ## Yield 6.0939217 0.1635824
 ## TKW   0.1635824 4.4718011&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Hope this was useful… should you have any better solutions, I’d be happy to learn them; please, drop me a line at the address below. Thanks for reading and happy coding!&lt;/p&gt;
-&lt;p&gt;Andrea Onofri&lt;br /&gt;
+&lt;p&gt;And … don’t forget to check out my new book!&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
 Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
 University of Perugia (Italy)&lt;br /&gt;
-&lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
-&lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
-&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href = &#34;https://www.awin1.com/cread.php?awinmid=26429&amp;awinaffid=2675822&amp;ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5&#34;&gt;&lt;img src= &#34;../../_Figures/Email_Signature_978-3-032-08199-5.png&#34; align=&#34;center&#34; alt=&#34;Book cover&#34; class=&#34;cover&#34; /&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;hr /&gt;
 &lt;/div&gt;
 &lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;References&lt;/h1&gt;
-&lt;ul&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
 &lt;li&gt;Butler, D., Cullis, B.R., Gilmour, A., Gogel, B., Thomson, R., 2018. ASReml-r reference manual - version 4. UK.&lt;/li&gt;
 &lt;li&gt;Covarrubias-Pazaran, G., 2016. Genome-Assisted Prediction of Quantitative Traits Using the R Package sommer. PLOS ONE 11, e0156744. &lt;a href=&#34;https://doi.org/10.1371/journal.pone.0156744&#34; class=&#34;uri&#34;&gt;https://doi.org/10.1371/journal.pone.0156744&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;Piepho, H.-P., 2018. Allowing for the structure of a designed experiment when estimating and testing trait correlations. The Journal of Agricultural Science 156, 59–70.&lt;/li&gt;
 &lt;li&gt;Pinheiro, J.C., Bates, D.M., 2000. Mixed-effects models in s and s-plus. Springer-Verlag Inc., New York.&lt;/li&gt;
-&lt;li&gt;Wickham, H., 2007. Reshaping data with the reshape package. Journal of Statistical Software 21.&lt;/li&gt;
-&lt;/ul&gt;
+&lt;li&gt;Wickham H, Vaughan D, Girlich M (2024). &lt;em&gt;tidyr: Tidy Messy Data&lt;/em&gt;.doi:10.32614/CRAN.package.tidyr &lt;a href=&#34;https://doi.org/10.32614/CRAN.package.tidyr&#34; class=&#34;uri&#34;&gt;https://doi.org/10.32614/CRAN.package.tidyr&lt;/a&gt;, R package version 1.3.1, &lt;a href=&#34;https://CRAN.R-project.org/package=tidyr&#34; class=&#34;uri&#34;&gt;https://CRAN.R-project.org/package=tidyr&lt;/a&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;hr /&gt;
+&lt;p&gt;This post was originally on 2025-02-10 and updated on 2026-04-15&lt;/p&gt;
 &lt;/div&gt;
 </description>
     </item>
@@ -1004,149 +1188,6 @@ cov2cor(Tr)&lt;/code&gt;&lt;/pre&gt;
     </item>
     
     <item>
-      <title>Dealing with correlation in designed field experiments: part I</title>
-      <link>https://www.statforbiology.com/2019/stat_general_correlationindependence1/</link>
-      <pubDate>Tue, 30 Apr 2019 00:00:00 +0000</pubDate>
-      <author>andrea.onofri@unipg.it (Andrea Onofri)</author>
-      <guid>https://www.statforbiology.com/2019/stat_general_correlationindependence1/</guid>
-      <description>
-
-
-&lt;p&gt;When we have recorded two traits in different subjects, we can be interested in describing their joint variability, by using the Pearson’s correlation coefficient. That’s ok, altough we have to respect some basic assumptions (e.g. linearity) that have been detailed elsewhere (&lt;a href=&#34;https://www.statforbiology.com/2019/stat_general_correlation_alookat/&#34;&gt;see here&lt;/a&gt;). Problems may arise when we need to test the hypothesis that the correlation coefficient is equal to 0. In this case, we need to make sure that all the couples of observations are taken on independent subjects.&lt;/p&gt;
-&lt;p&gt;Unfortunately, this is most often false whenever measures are taken from designed field experiments. In this case, observations may be grouped by one or more treatment/blocking factors. This has been clearly described by Bland and Altman (1994); we would like to give an example that is more closely related to plant/crop science. Think about a genotype experiment, where we compare the behaviour of several genotypes in a randomised blocks design. Usually, we do not only measure yield. We also measure other traits, such as crop height. At the end of the experiment, we might be interested in reporting the correlation between yield and height. How should we proceed? It would seem an easy task, but it is not.&lt;/p&gt;
-&lt;div id=&#34;data-come-in-groups&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;Data come in groups&lt;/h1&gt;
-&lt;p&gt;Let’s assume that we have a randomised blocks design, with 27 genotypes and 3 replicates. For each plot, we recorded two traits, i.e. yield and the weight of thousand kernels (TKW). In the end, we have 81 plots and just as many couples of measures in all. We will use the dataset ‘WheatQuality.csv’, that is available on ‘gitHub’.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(Hmisc)
-library(knitr)
-library(plyr)
-dataset &amp;lt;- read.csv(&amp;quot;https://www.casaonofri.it/_datasets/WheatQuality.csv&amp;quot;)
-head(dataset)
-##     Genotype Block Height  TKW Whectol Yield
-## 1 arcobaleno     1     90 44.5    83.2 64.40
-## 2 arcobaleno     2     90 42.8    82.2 60.58
-## 3 arcobaleno     3     88 42.7    83.1 59.42
-## 4       baio     1     80 40.6    81.8 51.93
-## 5       baio     2     75 42.7    81.3 51.34
-## 6       baio     3     76 41.1    81.1 47.78&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;div id=&#34;how-many-correlations&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;How many correlations?&lt;/h1&gt;
-&lt;p&gt;It may be tempting to consider the whole lot of measures and calculate the correlation coefficient between yield and TKW. This is the result:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ra &amp;lt;- with(dataset, rcorr(Yield, TKW) )
-# 
-# Correlation coefficient
-ra$r[1,2] 
-## [1] 0.540957
-#
-# P-level
-ra$P[1,2] 
-## [1] 1.850931e-07&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;We observe a positive correlation, and &lt;span class=&#34;math inline&#34;&gt;\(r\)&lt;/span&gt; seems to be significantly different from 0. Therefore, we would be encouraged to conclude that plots with a high value on yield tend to have a high value on TKW, as well. Unfortunately, such a conclusion is not supported by the data.&lt;/p&gt;
-&lt;p&gt;Indeed, the test of significance is clearly invalid, as the 81 plots are not independent; they are grouped by block and genotype and we are totally neglecting these two effects. Are we sure that the same correlation holds for all genotypes/blocks? Let’s check this.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;wCor &amp;lt;- function(x) cor(x$Yield, x$TKW)
-wgCors &amp;lt;- ddply(dataset, ~Genotype, wCor)
-wgCors
-##       Genotype         V1
-## 1   arcobaleno  0.9847228
-## 2         baio  0.1611952
-## 3      claudio -0.9993872
-## 4     colorado  0.9837293
-## 5     colosseo  0.4564855
-## 6        creso -0.5910193
-## 7       duilio -0.9882330
-## 8       gianni -0.7603802
-## 9       giotto  0.9520211
-## 10      grazia  0.4980828
-## 11       iride  0.7563338
-## 12    meridano  0.1174342
-## 13      neodur  0.4805871
-## 14      orobel  0.8907754
-## 15 pietrafitta -0.9633891
-## 16  portobello  0.9210135
-## 17   portofino -0.9900764
-## 18   portorico  0.1394211
-## 19       preco  0.9007067
-## 20    quadrato -0.5840238
-## 21    sancarlo -0.6460670
-## 22      simeto -0.4051779
-## 23       solex -0.6066363
-## 24 terrabianca -0.4076416
-## 25       verdi  0.5801404
-## 26     vesuvio -0.7797493
-## 27    vitromax -0.8056514
-wbCors &amp;lt;- ddply(dataset, ~Block, wCor)
-wbCors
-##   Block        V1
-## 1     1 0.5998137
-## 2     2 0.5399990
-## 3     3 0.5370398&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;As for the genotypes, we have 27 correlation coefficients, ranging from -0.999 to 0.985. We only have three couples of measurements per genotype and it is clear that this is not much, to reliably estimate a correlation coefficient. However, it is enough to be suspicious about the extent of correlation between yield and TKW, as it may depend on the genotype.&lt;/p&gt;
-&lt;p&gt;On the other hand, the correlation within blocks is more constant, independent on the block and similar to the correlation between plots.&lt;/p&gt;
-&lt;p&gt;It may be interesting to get an estimate of the average within-group correlation. To this aim, we can perform two separate ANOVAs (one per trait), including all relevant effects (blocks and genotypes) and calculate the correlation between the residuals:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod1 &amp;lt;- lm(Yield ~ factor(Block) + Genotype, data = dataset)
-mod2 &amp;lt;- lm(TKW ~ factor(Block) + Genotype, data = dataset)
-wCor &amp;lt;- rcorr(residuals(mod1), residuals(mod2))
-wCor$r
-##            x          y
-## x 1.00000000 0.03133109
-## y 0.03133109 1.00000000
-wCor$P
-##           x         y
-## x        NA 0.7812693
-## y 0.7812693        NA&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;The average within-group correlation is very small and unsignificant. Let’s think about this correlation: residuals represent yield and TKW values for all plots, once the effects of blocks and genotypes have been removed. A high correlation of residuals would mean that, letting aside the effects of the block and genotype to which it belongs, a plot with a high value on yield also shows a high value on TKW. The existence of such correlation is clearly unsopported by our dataset.&lt;/p&gt;
-&lt;p&gt;As the next step, we could consider the means for genotypes/blocks and see whether they are correlated. Blocks and genotypes are independent and, in principle, significance testing is permitted. However, this is not recommended with block means, as three data are too few to make tests.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;means &amp;lt;- ddply(dataset, ~Genotype, summarise, Mu1=mean(Yield), Mu2 = mean(TKW))
-rgPear &amp;lt;- rcorr( as.matrix(means[,2:3]) )
-rgPear$r
-##           Mu1       Mu2
-## Mu1 1.0000000 0.5855966
-## Mu2 0.5855966 1.0000000
-rgPear$P
-##            Mu1        Mu2
-## Mu1         NA 0.00133149
-## Mu2 0.00133149         NA
-means &amp;lt;- ddply(dataset, ~Block, summarise, Mu1=mean(Yield), Mu2 = mean(TKW))
-rbPear &amp;lt;- cor( as.matrix(means[,2:3]) )
-rbPear
-##             Mu1         Mu2
-## Mu1  1.00000000 -0.08812544
-## Mu2 -0.08812544  1.00000000&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;We note that the correlation between genotype means is high and significant. On the contrary, the correlation between block means is near to 0.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div id=&#34;and-so-what&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;And so what?&lt;/h1&gt;
-&lt;p&gt;At this stage, you may be confused… Let’s try to clear the fog.&lt;/p&gt;
-&lt;p&gt;Obtaining a reliable measure of correlation from designed experiments is not obvious. Indeed, in every designed field experiment we have groups of subjects and there are several possible types of correlation:&lt;/p&gt;
-&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
-&lt;li&gt;correlation between plot measurements&lt;/li&gt;
-&lt;li&gt;correlation between the residuals&lt;/li&gt;
-&lt;li&gt;correlation between treatment/block means&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;All these correlations should be investigated and used for interpretation.&lt;/p&gt;
-&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
-&lt;li&gt;The ‘naive’ correlation between the plot measurements is very easily calculated, but it is grossy misleading. Indeed, it disregards the treatment/block effects and it does not permit hypotheses testing, as the subjects are not independent. In this example, looking at the ‘naive’ correlation coefficient, we would wrongly conclude that plots with high yield also have high TKW, while further analyses show that this is not true, in general. We would reasonably suggest that the ‘naive’ correlation coefficient is never used for interpretation.&lt;/li&gt;
-&lt;li&gt;The correlation between the residuals is a reliable measure of joint variation, because the experimental design is adequately referenced, by removing the effects of tratments/blocks. In this example, residuals are not correlated. Further analyses show that the correlation between yield and TKW, if any, may depend on the genotype, while it does not depend on the block.&lt;/li&gt;
-&lt;li&gt;The correlation between treatment/block means permits to assess whether the treatment/block effects on the two traits are correlated. In this case, while we are not allowed to conclude that yield and TKW are, in general, correlated, we can conclude that the genotypes with a high level of yield also show a high level of TKW.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/div&gt;
-&lt;div id=&#34;take-home-message&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;Take-home message&lt;/h1&gt;
-&lt;p&gt;Whenever we have data from designed field experiments, our correlation analyses should never be limited to the calculation of the ‘naive’ correlation coefficient between the observed values. This may not be meaningful! On the contrary, our interpretation should be mainly focused on the correlation between residuals and on the correlation between the effects of treatments/blocks.&lt;/p&gt;
-&lt;p&gt;An elegant and advanced method to perform sound correlation analyses on data from designed field experiments has been put forward by Piepho (2018), within the frame of mixed models. Such an approach will be described in another post.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;References&lt;/h1&gt;
-&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
-&lt;li&gt;Bland, J.M., Altman, D.G., 1994. Statistics Notes: Correlation, regression, and repeated data. BMJ 308, 896–896.&lt;/li&gt;
-&lt;li&gt;Piepho, H.-P., 2018. Allowing for the structure of a designed experiment when estimating and testing trait correlations. The Journal of Agricultural Science 156, 59–70.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/div&gt;
-</description>
-    </item>
-    
-    <item>
       <title>Going back to the basics: the correlation coefficient</title>
       <link>https://www.statforbiology.com/2019/stat_general_correlation_alookat/</link>
       <pubDate>Thu, 07 Feb 2019 00:00:00 +0000</pubDate>
@@ -1186,7 +1227,9 @@ T
 ## [1] 0.004173297&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;which is clearly highly significant. The null can be rejected.&lt;/p&gt;
 &lt;p&gt;As for hypothesis testing, it should be considered that the individuals where couple of measurements were taken should be independent. If they are not, the t test is invalid. I am dealing with this aspect somewhere else in my blog.&lt;/p&gt;
-&lt;p&gt;#Correlation in R&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;correlation-in-r&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Correlation in R&lt;/h1&gt;
 &lt;p&gt;We have already seen that we can use the usual function ‘cor(matrix, method=)’. In order to obtain the significance, we can use the ‘rcorr()’ function in the Hmisc package&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Correlations with significance levels
 library(Hmisc)
@@ -1299,9 +1342,9 @@ summary( lm(Yst ~ I(scale(X, scale = T) ), data = dataset) )
 ## -0.082006 -0.067143 -0.036850  0.009214  0.237923 
 ## 
 ## Coefficients:
-##                          Estimate Std. Error t value Pr(&amp;gt;|t|)  
-## (Intercept)            -5.633e-18  3.478e-02   0.000   1.0000  
-## I(scale(X, scale = T))  1.785e-01  7.633e-02   2.339   0.0475 *
+##                         Estimate Std. Error t value Pr(&amp;gt;|t|)  
+## (Intercept)            2.087e-17  3.478e-02   0.000   1.0000  
+## I(scale(X, scale = T)) 1.785e-01  7.633e-02   2.339   0.0475 *
 ## ---
 ## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
 ## 
@@ -1314,8 +1357,15 @@ summary( lm(Yst ~ I(scale(X, scale = T) ), data = dataset) )
 &lt;p&gt;It describes how strongly units in the same group resemble each other. While it is viewed as a type of correlation, unlike most other correlation measures it operates on data structured as groups, rather than data structured as paired observations. The intra-class correlation coefficient is:&lt;/p&gt;
 &lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[IC = {\displaystyle {\frac {\sigma _{\alpha }^{2}}{\sigma _{\alpha }^{2}+\sigma _{\varepsilon }^{2}}}.}\]&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(\sigma _{\alpha }^{2}\)&lt;/span&gt; is the variance between groups and &lt;span class=&#34;math inline&#34;&gt;\(\sigma _{\varepsilon }^{2}\)&lt;/span&gt; is the variance within a group (better, the variance of one observation within a group). The sum of those two variances is the total variance of observations. In words, the intra-class correlation coefficient measures the joint variability of subjects in the same group (that relates on how groups are different from one another), with respect to the total variability of observations. If subjects in one group are very similar to one another (small &lt;span class=&#34;math inline&#34;&gt;\(\sigma_{\varepsilon}\)&lt;/span&gt;) but groups are very different (high &lt;span class=&#34;math inline&#34;&gt;\(\sigma_{\alpha}\)&lt;/span&gt;), the ICC is very high.&lt;/p&gt;
-&lt;p&gt;The existence of grouping of residuals is very important in ANOVA, as it means that independence is violated, which calls for the use of mixed models.&lt;/p&gt;
-&lt;p&gt;But … this is a totally different story …&lt;/p&gt;
+&lt;p&gt;The existence of grouping in model residuals is very important in ANOVA, as it means that independence is violated, which calls for the use of mixed models.&lt;/p&gt;
+&lt;p&gt;But, … this is a totally different story … Happy coding with R!&lt;/p&gt;
+&lt;p&gt;… and … don’t forget to check out my new book!&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href = &#34;https://www.awin1.com/cread.php?awinmid=26429&amp;awinaffid=2675822&amp;ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5&#34;&gt;&lt;img src= &#34;../../_Figures/Email_Signature_978-3-032-08199-5.png&#34; align=&#34;center&#34; alt=&#34;Book cover&#34; class=&#34;cover&#34; /&gt;&lt;/a&gt;
+&lt;br/&gt;&lt;/p&gt;
 &lt;/div&gt;
 </description>
     </item>

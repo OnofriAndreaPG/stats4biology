@@ -1,7 +1,7 @@
 ---
 title: 'Dealing with correlation in designed field experiments: part II'
 author: "Andrea Onofri"
-date: '2025-02-10'
+date: '2026-04-15'
 output:
   html_document:
 categories: R
@@ -24,15 +24,18 @@ archives:
 </ol>
 <p>I have dealt with these two problems (particularly the first one) <a href="https://www.statforbiology.com/2019/stat_general_correlationindependence1/">in a previous post</a>, where I gave a solution based on traditional methods of data analyses.</p>
 <p>In this post, I would like to present a more advanced solution, that was advocated by Hans-Peter Piepho in a relatively recent manuscript (Piepho, 2018). Such a solution is based on mixed models and it was implemented in SAS, by using PROC MIXED. I spent a few hours ‘transporting’ those models in R, which turned out to be a difficult task, although, in the end, I seem to have came to an acceptable solution, which I would like to share here.</p>
-<p>First of all, we can load the ‘WheatQuality.csv’ dataset, that is available is available on an Internet repository; it consists of 81 records (plots) of 6 variables, i.e. the Genotype and Block factors, as well as the four responses height, TKW, weight per hectolitre and yield. The code below loads the necessary packages, the data and transforms the numeric variable ‘Block’ into a factor.</p>
+<p>First of all, we can load the ‘WheatQuality’ dataset, that is available in the ‘statforbiology’ package; it consists of 81 records (plots) of 6 variables, i.e. the Genotype and Block factors, as well as the four responses height, TKW, weight per hectolitre and yield. The code below loads the necessary packages, the data and transforms the numeric variable ‘Block’ into a factor.</p>
 <pre class="r"><code>rm(list = ls())
+library(statforbiology)
 library(dplyr)
+library(tidyr)
 library(sommer)
 library(nlme)
 #
 # Loading data
-dataset &lt;- read.csv(&quot;https://www.casaonofri.it/_datasets/WheatQuality.csv&quot;) |&gt;
-  mutate(Block = factor(Block))
+dataset &lt;- getAgroData(&quot;WheatQuality&quot;) |&gt;
+  mutate(Block = factor(Block),
+         Genotype = factor(Genotype))
 head(dataset)
 ##     Genotype Block Height  TKW Whectol Yield
 ## 1 arcobaleno     1     90 44.5    83.2 64.40
@@ -59,6 +62,7 @@ head(dataset)
 <p>The model call is:</p>
 <pre class="r"><code>mod.bimix &lt;- mmer(cbind(Yield, TKW) ~ 1,
                    random = ~ vsr(usr(Genotype)) + vsr(usr(Block)),
+                   rcov = ~ vsr(units),  
                    data = dataset,
                   verbose = FALSE, dateWarning = FALSE)
 bimix.obj &lt;- summary(mod.bimix)
@@ -71,97 +75,64 @@ coefs
 ## u:Block.Yield-Yield     3.7104682  3.9363372  0.9426195   Positive
 ## u:Block.Yield-TKW      -0.2428322  1.9074202 -0.1273092   Unconstr
 ## u:Block.TKW-TKW         1.6684549  1.8343512  0.9095613   Positive
-## units.Yield-Yield       6.0939217  1.1951482  5.0988836   Positive
-## units.Yield-TKW         0.1635821  0.7242898  0.2258518   Unconstr
-## units.TKW-TKW           4.4718011  0.8770118  5.0989065   Positive</code></pre>
-<p>The box above shows the results about the variance-covariance parameters. In order to get the correlations, I used the function <code>vpredict()</code> and specified the necessary combinations of variance-covariance parameters. It is necessary to remember that estimates, in ‘sommer’, are named as V1, V2, … Vn, according to their ordering in model output.</p>
+## u:units.Yield-Yield     6.0939217  1.1951482  5.0988836   Positive
+## u:units.Yield-TKW       0.1635821  0.7242898  0.2258518   Unconstr
+## u:units.TKW-TKW         4.4718011  0.8770118  5.0989065   Positive</code></pre>
+<p>The box above shows the results about the variance-covariance parameters. In order to get the correlations, I used the delta method, as implemented in the <code>gnlht()</code> function of the ‘statforbiology’ package (the accompanying package for this blog). First of all I extracted the variance parameters together with the covariance matrix for the variance parameters from the mixed model object. For simplicity, I assigned simple names to the coefficients (V1, V2, … Vn), according to their ordering in model output.</p>
 <pre class="r"><code># Correlation between genotype means
-vpredict(mod.bimix, rg ~ V2 / (sqrt(V1)*sqrt(V3) ))
-##     Estimate        SE
-## rg 0.6005174 0.1306699</code></pre>
-<pre class="r"><code># Correlation between block means
-vpredict(mod.bimix, rt ~ V5 / (sqrt(V4)*sqrt(V6) ))
-##       Estimate        SE
-## rt -0.09759658 0.7571256</code></pre>
-<pre class="r"><code>vpredict(mod.bimix, rt ~ V8 / (sqrt(V7)*sqrt(V9) ))
-##      Estimate        SE
-## rt 0.03133619 0.1385421</code></pre>
-<p>We see that the estimates are very close to those obtained by using the Pearson’s correlation coefficients (see my previous post). The advantage of this mixed model solution is that we can also test hypotheses in a relatively reliable way. For example, I tested the hypothesis that residuals are not correlated by:</p>
-<ol style="list-style-type: decimal">
-<li>coding a reduced model where residuals are heteroscedastic and independent, and</li>
-<li>comparing this reduced model with the complete model by way of a REML-based Likelihood Ratio Test (LRT).</li>
-</ol>
-<p>Removing the correlation of residuals is easily done, by using the code below.</p>
-<pre class="r"><code>mod.bimix2 &lt;- mmer(cbind(Yield, TKW) ~ 1,
-                   random = ~ vsr(usr(Genotype)) + vsr(usr(Block)),
-                   rcov = ~ vsr(units, Gtc = diag(2)),
-                   data = dataset,
-                  verbose = FALSE, dateWarning = FALSE)
-# Likelihood ratio test
-LRT &lt;- anova(mod.bimix, mod.bimix2)
-## Likelihood ratio test for mixed models
-## ==============================================================
-##      Df       AIC       BIC    loLik   Chisq ChiDf PrChisq
-## mod1 15 -62.41068 -56.23549 33.20534                      
-## mod2 14 -62.35960 -56.18441 33.17980 0.05108     1 0.8212 
-## ==============================================================
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<p>Likewise, I tried to further reduce the model to test the significance of the correlation between block means and genotype means.</p>
-<pre class="r"><code># Removing correlation between block means
-mod.bimix3 &lt;- mmer(cbind(Yield, TKW) ~ 1,
-                   random = ~ vsr(usr(Genotype)) + vsr(Block, Gtc = diag(2)),
-                   rcov = ~ vsr(units, Gtc = diag(2)),
-                   data = dataset,
-                  verbose = FALSE, dateWarning = FALSE)
-# Likelihood ratio test
-LRT &lt;- anova(mod.bimix, mod.bimix3)
-## Likelihood ratio test for mixed models
-## ==============================================================
-##      Df       AIC       BIC    loLik   Chisq ChiDf  PrChisq
-## mod1 15 -62.41068 -56.23549 33.20534                       
-## mod2 13 -62.34401 -56.16882 33.17200 0.06667     2 0.96722 
-## ==============================================================
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<pre class="r"><code># Removing correlation between genotype means
-mod.bimix4 &lt;- mmer(cbind(Yield, TKW) ~ 1,
-                   random = ~ vsr(Genotype, Gtc = diag(2)) + vsr(Block, Gtc = diag(2)),
-                   rcov = ~ vsr(units, Gtc = diag(2)),
-                   data = dataset,
-                  verbose = FALSE, dateWarning = FALSE)
-# Likelihood ratio test
-LRT &lt;- anova(mod.bimix, mod.bimix4)
-## Likelihood ratio test for mixed models
-## ==============================================================
-##      Df       AIC       BIC    loLik    Chisq ChiDf  PrChisq
-## mod1 15 -62.41068 -56.23549 33.20534                        
-## mod2 12 -51.42519 -45.25000 27.71260 10.98549     3 0.0118 *
-## ==============================================================
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<p>We see that only the genotype means are significantly correlated to one another.</p>
+coefsVec &lt;- coefs[,1]
+vcovMat &lt;- mod.bimix$sigmaSE # Variance-covariance for varcomp
+names(coefsVec) &lt;- paste(&quot;V&quot;, 1:9, sep = &quot;&quot;)
+gnlht(coefsVec, func = list(~ V2 / (sqrt(V1)*sqrt(V3) )),
+      vcov. = as.matrix(vcovMat),
+      parameterNames = paste(&quot;V&quot;, 1:9, sep = &quot;&quot;))
+##                       Form  Estimate        SE  Z-value      p-value
+## 1 V2/(sqrt(V1) * sqrt(V3)) 0.6005174 0.1306699 4.595684 4.313326e-06
+#
+# Correlation between block means
+gnlht(coefsVec, func = list(~ V5 / (sqrt(V4)*sqrt(V6) ) ),
+      vcov. = as.matrix(vcovMat),
+      parameterNames = paste(&quot;V&quot;, 1:9, sep = &quot;&quot;))
+##                       Form    Estimate        SE   Z-value   p-value
+## 1 V5/(sqrt(V4) * sqrt(V6)) -0.09759658 0.7571256 0.1289041 0.8974335
+#
+# Correlation of residuals
+gnlht(coefsVec, func = list(~ V8 / (sqrt(V7)*sqrt(V9) )),
+      vcov. = as.matrix(vcovMat),
+      parameterNames = paste(&quot;V&quot;, 1:9, sep = &quot;&quot;))
+##                       Form   Estimate        SE   Z-value   p-value
+## 1 V8/(sqrt(V7) * sqrt(V9)) 0.03133619 0.1385421 0.2261854 0.8210572</code></pre>
+<p>We see that the estimates are very close to those obtained by using the Pearson’s correlation coefficients (see my previous post). The advantage of this mixed model solution is that we can also test hypotheses in a relatively reliable way. For example, we can look at the Wald tests in the output above to judge about the significance of correlations and conclude that only the genotype means are significantly correlated to one another.</p>
 </div>
 <div id="a-solution-with-lme" class="section level1">
 <h1>A solution with ‘lme()’</h1>
-<p>Considering that the block means are not correlated, if we were willing to take the ‘block’ effect as fixed, we could fit a bivariate mixed model also with the ‘nlme’ package and the function <code>lme()</code> (Pinheiro and Bates, 2000). However, we should cast the model as a univariate model.</p>
-<p>To this aim, the two variables (Yield and TKW) need to be piled up and a new factor (‘Trait’) needs to be introduced to identify the observations for the two traits. Another factor is also necessary to identify the different plots, i.e. the observational units. To perform such a restructuring, I used the <code>melt()</code> function in the ‘reshape2’ package (Wickham, 2007) and assigned the name ‘Y’ to the response variable, that is now composed by the two original variables Yield and TKW, one on top of the other.</p>
+<p>Considering that the block means are not correlated, if we were willing to take the ‘block’ effect as fixed, we could fit a bivariate mixed model also with the ‘nlme’ package and the function <code>lme()</code> (Pinheiro and Bates, 2000). However, we should cast the model as a ‘univariate’ model.</p>
+<p>To this aim, the two variables (Yield and TKW) need to be piled up and a new factor (‘Trait’) needs to be introduced to identify the observations for the two traits. Another factor is also necessary to identify the different plots, i.e. the observational units. To perform such a restructuring, I used the <code>pivot_longer()</code> function in the ‘tidyr’ package (Wickham et al., 2024) and assigned the name ‘Y’ to the response variable, that is now composed by the two original variables Yield and TKW, one on top of the other.</p>
 <pre class="r"><code>dataset$Plot &lt;- 1:81
-mdataset &lt;- reshape2::melt(dataset[,c(-3,-5)], variable.name= &quot;Trait&quot;, value.name=&quot;Y&quot;, id=c(&quot;Genotype&quot;, &quot;Block&quot;, &quot;Plot&quot;))
-mdataset$Block &lt;- factor(mdataset$Block)
+mdataset &lt;- dataset |&gt;
+  select(-Whectol, -Height) |&gt;
+  pivot_longer(names_to = &quot;Trait&quot;, values_to = &quot;Y&quot;, cols = c(&quot;Yield&quot;, &quot;TKW&quot;)) |&gt;
+  mutate(Trait = factor(Trait))
 head(mdataset)
-##     Genotype Block Plot Trait    Y
-## 1 arcobaleno     1    1   TKW 44.5
-## 2 arcobaleno     2    2   TKW 42.8
-## 3 arcobaleno     3    3   TKW 42.7
-## 4       baio     1    4   TKW 40.6
-## 5       baio     2    5   TKW 42.7
-## 6       baio     3    6   TKW 41.1
+## # A tibble: 6 × 5
+##   Genotype   Block  Plot Trait     Y
+##   &lt;fct&gt;      &lt;fct&gt; &lt;int&gt; &lt;fct&gt; &lt;dbl&gt;
+## 1 arcobaleno 1         1 Yield  64.4
+## 2 arcobaleno 1         1 TKW    44.5
+## 3 arcobaleno 2         2 Yield  60.6
+## 4 arcobaleno 2         2 TKW    42.8
+## 5 arcobaleno 3         3 Yield  59.4
+## 6 arcobaleno 3         3 TKW    42.7
 tail(mdataset)
-##     Genotype Block Plot Trait     Y
-## 157  vesuvio     1   76 Yield 54.37
-## 158  vesuvio     2   77 Yield 55.02
-## 159  vesuvio     3   78 Yield 53.41
-## 160 vitromax     1   79 Yield 54.39
-## 161 vitromax     2   80 Yield 50.97
-## 162 vitromax     3   81 Yield 48.83</code></pre>
+## # A tibble: 6 × 5
+##   Genotype Block  Plot Trait     Y
+##   &lt;fct&gt;    &lt;fct&gt; &lt;int&gt; &lt;fct&gt; &lt;dbl&gt;
+## 1 vitromax 1        79 Yield  54.4
+## 2 vitromax 1        79 TKW    41.6
+## 3 vitromax 2        80 Yield  51.0
+## 4 vitromax 2        80 TKW    43.6
+## 5 vitromax 3        81 Yield  48.8
+## 6 vitromax 3        81 TKW    43.1</code></pre>
 <p>The fixed model is:</p>
 <pre><code>Y ~ Trait*Block</code></pre>
 <p>In order to introduce a totally unstructured variance-covariance matrix for the random effect, I used the ‘pdMat’ construct:</p>
@@ -182,12 +153,12 @@ obj &lt;- mod
 G &lt;- matrix( as.numeric(getVarCov(obj)), 2, 2 )
 G
 ##          [,1]     [,2]
-## [1,] 53.86081 38.83246
-## [2,] 38.83246 77.63485
+## [1,] 53.86053 38.83124
+## [2,] 38.83124 77.63402
 cov2cor(G)
 ##           [,1]      [,2]
-## [1,] 1.0000000 0.6005237
-## [2,] 0.6005237 1.0000000</code></pre>
+## [1,] 1.0000000 0.6005096
+## [2,] 0.6005096 1.0000000</code></pre>
 <p>Second, we can retrieve the ‘conditional’ variance-covariance matrix (R), that describes the correlation of errors:</p>
 <pre class="r"><code>#Conditional variance-covariance matrix (residual error)
 V &lt;- corMatrix(obj$modelStruct$corStruct)[[1]] #Correlation for residuals
@@ -196,18 +167,18 @@ sds &lt;- obj$sigma * sds #Standard deviations for residuals (one per trait)
 R &lt;- t(V * sds) * sds #Going from correlation to covariance
 R
 ##           [,1]      [,2]
-## [1,] 4.4718234 0.1635375
-## [2,] 0.1635375 6.0939251
+## [1,] 6.0939152 0.1634968
+## [2,] 0.1634968 4.4718077
 cov2cor(R)
 ##            [,1]       [,2]
-## [1,] 1.00000000 0.03132756
-## [2,] 0.03132756 1.00000000</code></pre>
+## [1,] 1.00000000 0.03131984
+## [2,] 0.03131984 1.00000000</code></pre>
 <p>The total correlation matrix is simply obtained as the sum of G and R:</p>
 <pre class="r"><code>Tr &lt;- G + R
 cov2cor(Tr)
-##           [,1]      [,2]
-## [1,] 1.0000000 0.5579906
-## [2,] 0.5579906 1.0000000</code></pre>
+##          [,1]     [,2]
+## [1,] 1.000000 0.555787
+## [2,] 0.555787 1.000000</code></pre>
 <p>We see that the same results can be obtained by using ‘sommer’ and regarding the block effect as fixed, although the coding is below is much neater!</p>
 <pre class="r"><code>mod.bimix5 &lt;- mmer(cbind(Yield, TKW) ~ Block,
                    random = ~ vsr(usr(Genotype)),
@@ -224,21 +195,23 @@ mod.bimix5$sigma
 ## Yield 6.0939217 0.1635824
 ## TKW   0.1635824 4.4718011</code></pre>
 <p>Hope this was useful… should you have any better solutions, I’d be happy to learn them; please, drop me a line at the address below. Thanks for reading and happy coding!</p>
-<p>Andrea Onofri<br />
+<p>And … don’t forget to check out my new book!</p>
+<p>Prof. Andrea Onofri<br />
 Department of Agricultural, Food and Environmental Sciences<br />
 University of Perugia (Italy)<br />
-<a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
-<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow <span class="citation">@onofriandreapg</span></a>
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<p><a href = "https://www.awin1.com/cread.php?awinmid=26429&awinaffid=2675822&ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src= "../../_Figures/Email_Signature_978-3-032-08199-5.png" align="center" alt="Book cover" class="cover" /></a></p>
 <hr />
 </div>
 <div id="references" class="section level1">
 <h1>References</h1>
-<ul>
+<ol style="list-style-type: decimal">
 <li>Butler, D., Cullis, B.R., Gilmour, A., Gogel, B., Thomson, R., 2018. ASReml-r reference manual - version 4. UK.</li>
 <li>Covarrubias-Pazaran, G., 2016. Genome-Assisted Prediction of Quantitative Traits Using the R Package sommer. PLOS ONE 11, e0156744. <a href="https://doi.org/10.1371/journal.pone.0156744" class="uri">https://doi.org/10.1371/journal.pone.0156744</a></li>
 <li>Piepho, H.-P., 2018. Allowing for the structure of a designed experiment when estimating and testing trait correlations. The Journal of Agricultural Science 156, 59–70.</li>
 <li>Pinheiro, J.C., Bates, D.M., 2000. Mixed-effects models in s and s-plus. Springer-Verlag Inc., New York.</li>
-<li>Wickham, H., 2007. Reshaping data with the reshape package. Journal of Statistical Software 21.</li>
-</ul>
+<li>Wickham H, Vaughan D, Girlich M (2024). <em>tidyr: Tidy Messy Data</em>.doi:10.32614/CRAN.package.tidyr <a href="https://doi.org/10.32614/CRAN.package.tidyr" class="uri">https://doi.org/10.32614/CRAN.package.tidyr</a>, R package version 1.3.1, <a href="https://CRAN.R-project.org/package=tidyr" class="uri">https://CRAN.R-project.org/package=tidyr</a>.</li>
+</ol>
+<hr />
+<p>This post was originally on 2025-02-10 and updated on 2026-04-15</p>
 </div>

@@ -1,7 +1,7 @@
 ---
 title: 'Dealing with correlation in designed field experiments: part II'
 author: "Andrea Onofri"
-date: '2025-02-10'
+date: '2026-04-15'
 output:
   html_document:
 categories: R
@@ -20,7 +20,7 @@ archives:
 #Put at the beginning
 knitr::opts_chunk$set(echo = TRUE, message = F, warning = F)
 knitr::knit_hooks$set(document = function(x){ 
-  gsub("```\n*```r*\n*", "", x) 
+  gsub("```\n*```\\sr*\n*", "", x)
 })
 ```
 
@@ -34,17 +34,20 @@ I have dealt with these two problems (particularly the first one) [in a previous
 
 In this post, I would like to present a more advanced solution, that was advocated by Hans-Peter Piepho in a relatively recent manuscript (Piepho, 2018). Such a solution is based on mixed models and it was implemented in SAS, by using PROC MIXED. I spent a few hours 'transporting' those models in R, which turned out to be a difficult task, although, in the end, I seem to have came to an acceptable solution, which I would like to share here.
 
-First of all, we can load the 'WheatQuality.csv' dataset, that is available is available on an Internet repository; it consists of 81 records (plots) of 6 variables, i.e. the Genotype and Block factors, as well as the four responses height, TKW, weight per hectolitre and yield. The code below loads the necessary packages, the data and transforms the numeric variable 'Block' into a factor.
+First of all, we can load the 'WheatQuality' dataset, that is available in the 'statforbiology' package; it consists of 81 records (plots) of 6 variables, i.e. the Genotype and Block factors, as well as the four responses height, TKW, weight per hectolitre and yield. The code below loads the necessary packages, the data and transforms the numeric variable 'Block' into a factor.
 
 ```{r message=FALSE, warning=FALSE, paged.print=FALSE}
 rm(list = ls())
+library(statforbiology)
 library(dplyr)
+library(tidyr)
 library(sommer)
 library(nlme)
 #
 # Loading data
-dataset <- read.csv("https://www.casaonofri.it/_datasets/WheatQuality.csv") |>
-  mutate(Block = factor(Block))
+dataset <- getAgroData("WheatQuality") |>
+  mutate(Block = factor(Block),
+         Genotype = factor(Genotype))
 head(dataset)
 ```
 
@@ -74,6 +77,7 @@ The model call is:
 ```{r message=FALSE, warning=FALSE, paged.print=FALSE}
 mod.bimix <- mmer(cbind(Yield, TKW) ~ 1,
                    random = ~ vsr(usr(Genotype)) + vsr(usr(Block)),
+                   rcov = ~ vsr(units),  
                    data = dataset,
                   verbose = FALSE, dateWarning = FALSE)
 bimix.obj <- summary(mod.bimix)
@@ -81,45 +85,83 @@ coefs <- bimix.obj$varcomp
 coefs
 ```
 
-The box above shows the results about the variance-covariance parameters. In order to get the correlations, I used the function `vpredict()` and specified the necessary combinations of variance-covariance parameters. It is necessary to remember that estimates, in ‘sommer’, are named as V1, V2, … Vn, according to their ordering in model output.
 
-```{r}
-# Correlation between genotype means
-vpredict(mod.bimix, rg ~ V2 / (sqrt(V1)*sqrt(V3) ))
+```{r eval=FALSE, include=FALSE}
+# Still not able to fit with mmes!
+#                           VarComp  VarCompSE     Zratio Constraint
+# u:Genotype.Yield-Yield 77.6342608 22.0978545  3.5132035   Positive
+# u:Genotype.Yield-TKW   38.8320973 15.0930429  2.5728475   Unconstr
+# u:Genotype.TKW-TKW     53.8613303 15.3539585  3.5079768   Positive
+# u:Block.Yield-Yield     3.7104682  3.9363372  0.9426195   Positive
+# u:Block.Yield-TKW      -0.2428322  1.9074202 -0.1273092   Unconstr
+# u:Block.TKW-TKW         1.6684549  1.8343512  0.9095613   Positive
+# u:units.Yield-Yield     6.0939217  1.1951482  5.0988836   Positive
+# u:units.Yield-TKW       0.1635821  0.7242898  0.2258518   Unconstr
+# u:units.TKW-TKW         4.4718011  0.8770118  5.0989065   Positive
+
+dataset$Plot <- 1:81
+mdataset <- dataset |>
+  select(-Whectol, -Height) |>
+  pivot_longer(names_to = "Trait", values_to = "Y", cols = c("Yield", "TKW")) |>
+  mutate(Trait = factor(Trait))
+head(mdataset)
+tail(mdataset)
+
+mdataset <- as.data.frame(mdataset)
+head(mdataset)
+mod.bimix2 <- mmes(Y ~ Trait,
+                   random = ~ vsr(Trait:Genotype, Gtc = unsm(2)) + vsr(Trait:Block,    Gtc = unsm(2)),
+                   rcov   = ~ vsr(Trait:units, Gtc = unsm(2)),
+                   data = mdataset,
+                   verbose = FALSE, dateWarning = FALSE)
+bimix.obj2 <- summary(mod.bimix2)
+coefs2 <- bimix.obj2$varcomp
+coefs2
+
 ```
 
 
-```{r eval=FALSE, include=FALSE}
-#I used the delta method, as implemented in the `gnlht()` function of the 'statforbiology' package (the accompanying package for this blog). First of all I extracted the variance parameters together with the covariance matrix for the variance parameters from the mixed model object. For simplicity, I assigned simple names to the coefficients (V1, V2, ... Vn), according to their ordering in model output.
+The box above shows the results about the variance-covariance parameters. In order to get the correlations, I used the delta method, as implemented in the `gnlht()` function of the 'statforbiology' package (the accompanying package for this blog). First of all I extracted the variance parameters together with the covariance matrix for the variance parameters from the mixed model object. For simplicity, I assigned simple names to the coefficients (V1, V2, ... Vn), according to their ordering in model output.
 
+```{r eval=FALSE, warning=FALSE, include=FALSE}
+# Correlation between genotype means (no longer working!)
+# I used the function `vpredict()` and specified the necessary combinations of variance-covariance parameters. It is necessary to remember that estimates, in ‘sommer’, are named as V1, V2, … Vn, according to their ordering in model output.
+vpredict(mod.bimix, rg ~ V2 / (sqrt(V1)*sqrt(V3) ))
+vpredict(mod.bimix, rt ~ V5 / (sqrt(V4)*sqrt(V6) ))
+vpredict(mod.bimix, rt ~ V8 / (sqrt(V7)*sqrt(V9) ))
+```
+
+
+```{r echo=TRUE}
+# Correlation between genotype means
 coefsVec <- coefs[,1]
 vcovMat <- mod.bimix$sigmaSE # Variance-covariance for varcomp
 names(coefsVec) <- paste("V", 1:9, sep = "")
 gnlht(coefsVec, func = list(~ V2 / (sqrt(V1)*sqrt(V3) )),
       vcov. = as.matrix(vcovMat),
       parameterNames = paste("V", 1:9, sep = ""))
-```
-
-
-```{r}
+#
 # Correlation between block means
-vpredict(mod.bimix, rt ~ V5 / (sqrt(V4)*sqrt(V6) ))
+gnlht(coefsVec, func = list(~ V5 / (sqrt(V4)*sqrt(V6) ) ),
+      vcov. = as.matrix(vcovMat),
+      parameterNames = paste("V", 1:9, sep = ""))
+#
+# Correlation of residuals
+gnlht(coefsVec, func = list(~ V8 / (sqrt(V7)*sqrt(V9) )),
+      vcov. = as.matrix(vcovMat),
+      parameterNames = paste("V", 1:9, sep = ""))
 ```
 
 
-```{r}
-vpredict(mod.bimix, rt ~ V8 / (sqrt(V7)*sqrt(V9) ))
-```
+We see that the estimates are very close to those obtained by using the Pearson's correlation coefficients (see my previous post). The advantage of this mixed model solution is that we can also test hypotheses in a relatively reliable way. For example, we can look at the Wald tests in the output above to judge about the significance of correlations and conclude that only the genotype means are significantly correlated to one another.
 
+```{r eval=FALSE, message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
+# This no longer works.....
+# 1. coding a reduced model where residuals are heteroscedastic and independent, and
+# 2. comparing this reduced model with the complete model by way of a REML-based Likelihood Ratio Test (LRT).
 
-We see that the estimates are very close to those obtained by using the Pearson's correlation coefficients (see my previous post). The advantage of this mixed model solution is that we can also test hypotheses in a relatively reliable way. For example, I tested the hypothesis that residuals are not correlated by:
+# Removing the correlation of residuals is easily done, by using the code below.
 
-1. coding a reduced model where residuals are heteroscedastic and independent, and
-2. comparing this reduced model with the complete model by way of a REML-based Likelihood Ratio Test (LRT).
-
-Removing the correlation of residuals is easily done, by using the code below.
-
-```{r message=FALSE, warning=FALSE, paged.print=FALSE}
 mod.bimix2 <- mmer(cbind(Yield, TKW) ~ 1,
                    random = ~ vsr(usr(Genotype)) + vsr(usr(Block)),
                    rcov = ~ vsr(units, Gtc = diag(2)),
@@ -127,45 +169,48 @@ mod.bimix2 <- mmer(cbind(Yield, TKW) ~ 1,
                   verbose = FALSE, dateWarning = FALSE)
 # Likelihood ratio test
 LRT <- anova(mod.bimix, mod.bimix2)
-```
+AIC(mod.bimix, mod.bimix2)
 
-Likewise, I tried to further reduce the model to test the significance of the correlation between block means and genotype means.
 
-```{r message=FALSE, warning=FALSE}
 # Removing correlation between block means
 mod.bimix3 <- mmer(cbind(Yield, TKW) ~ 1,
                    random = ~ vsr(usr(Genotype)) + vsr(Block, Gtc = diag(2)),
-                   rcov = ~ vsr(units, Gtc = diag(2)),
+                   rcov = ~ vsr(units),
                    data = dataset,
                   verbose = FALSE, dateWarning = FALSE)
+summary(mod.bimix3)$varcomp
 # Likelihood ratio test
-LRT <- anova(mod.bimix, mod.bimix3)
-```
+logLikFull <- summary(mod.bimix)$logo$logLik
+logLikReduced <- summary(mod.bimix3)$logo$logLik
+LRT <- -2*(logLikFull-logLikReduced)
+LRT
 
-```{r message=FALSE, warning=FALSE}
 # Removing correlation between genotype means
 mod.bimix4 <- mmer(cbind(Yield, TKW) ~ 1,
                    random = ~ vsr(Genotype, Gtc = diag(2)) + vsr(Block, Gtc = diag(2)),
-                   rcov = ~ vsr(units, Gtc = diag(2)),
+                   rcov = ~ vsr(units),
                    data = dataset,
                   verbose = FALSE, dateWarning = FALSE)
 # Likelihood ratio test
+logLikFull <- summary(mod.bimix)$logo$logLik
+logLikReduced <- summary(mod.bimix4)$logo$logLik
+
 LRT <- anova(mod.bimix, mod.bimix4)
 ```
-
-We see that only the genotype means are significantly correlated to one another.
 
 
 # A solution with 'lme()'
 
-Considering that the block means are not correlated, if we were willing to take the 'block' effect as fixed, we could fit a bivariate mixed model also with the 'nlme' package and the function `lme()` (Pinheiro and Bates, 2000). However, we should cast the model as a univariate model.
+Considering that the block means are not correlated, if we were willing to take the 'block' effect as fixed, we could fit a bivariate mixed model also with the 'nlme' package and the function `lme()` (Pinheiro and Bates, 2000). However, we should cast the model as a 'univariate' model.
 
-To this aim, the two variables (Yield and TKW) need to be piled up and a new factor ('Trait') needs to be introduced to identify the observations for the two traits. Another factor is also necessary to identify the different plots, i.e. the observational units. To perform such a restructuring, I used the `melt()` function in the 'reshape2' package (Wickham, 2007) and assigned the name 'Y' to the response variable, that is now composed by the two original variables Yield and TKW, one on top of the other. 
+To this aim, the two variables (Yield and TKW) need to be piled up and a new factor ('Trait') needs to be introduced to identify the observations for the two traits. Another factor is also necessary to identify the different plots, i.e. the observational units. To perform such a restructuring, I used the `pivot_longer()` function in the 'tidyr' package (Wickham et al., 2024) and assigned the name 'Y' to the response variable, that is now composed by the two original variables Yield and TKW, one on top of the other. 
 
 ```{r}
 dataset$Plot <- 1:81
-mdataset <- reshape2::melt(dataset[,c(-3,-5)], variable.name= "Trait", value.name="Y", id=c("Genotype", "Block", "Plot"))
-mdataset$Block <- factor(mdataset$Block)
+mdataset <- dataset |>
+  select(-Whectol, -Height) |>
+  pivot_longer(names_to = "Trait", values_to = "Y", cols = c("Yield", "TKW")) |>
+  mutate(Trait = factor(Trait))
 head(mdataset)
 tail(mdataset)
 ```
@@ -267,20 +312,27 @@ mod.bay <- MCMCglmm(cbind(Yield, TKW) ~ trait - 1,
 
 Hope this was useful... should you have any better solutions, I'd be happy to learn them; please, drop me a line at the address below. Thanks for reading and happy coding!
 
-Andrea Onofri   
-Department of Agricultural, Food and Environmental Sciences        
-University of Perugia (Italy)        
-[andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)  
+And ... don't forget to check out my new book!
 
-<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow @onofriandreapg</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+Prof. Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences    
+University of Perugia (Italy)    
+Send comments to: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)
+
+
+<a href = "https://www.awin1.com/cread.php?awinmid=26429&awinaffid=2675822&ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src= "../../_Figures/Email_Signature_978-3-032-08199-5.png" align="center" alt="Book cover" class="cover" /></a>
 
 ---
 
 # References
 
-* Butler, D., Cullis, B.R., Gilmour, A., Gogel, B., Thomson, R., 2018. ASReml-r reference manual - version 4. UK.
-* Covarrubias-Pazaran, G., 2016. Genome-Assisted Prediction of Quantitative Traits Using the R Package sommer. PLOS ONE 11, e0156744. https://doi.org/10.1371/journal.pone.0156744
-* Piepho, H.-P., 2018. Allowing for the structure of a designed experiment when estimating and testing trait correlations. The Journal of Agricultural Science 156, 59–70.
-* Pinheiro, J.C., Bates, D.M., 2000. Mixed-effects models in s and s-plus. Springer-Verlag Inc., New York.
-* Wickham, H., 2007. Reshaping data with the reshape package. Journal of Statistical Software 21.
+1. Butler, D., Cullis, B.R., Gilmour, A., Gogel, B., Thomson, R., 2018. ASReml-r reference manual - version 4. UK.
+2. Covarrubias-Pazaran, G., 2016. Genome-Assisted Prediction of Quantitative Traits Using the R Package sommer. PLOS ONE 11, e0156744. https://doi.org/10.1371/journal.pone.0156744
+3. Piepho, H.-P., 2018. Allowing for the structure of a designed experiment when estimating and testing trait correlations. The Journal of Agricultural Science 156, 59–70.
+4. Pinheiro, J.C., Bates, D.M., 2000. Mixed-effects models in s and s-plus. Springer-Verlag Inc., New York.
+5. Wickham H, Vaughan D, Girlich M (2024). _tidyr: Tidy Messy Data_.doi:10.32614/CRAN.package.tidyr <https://doi.org/10.32614/CRAN.package.tidyr>, R package version 1.3.1, <https://CRAN.R-project.org/package=tidyr>.
 
+--- 
+
+This post was originally on 2025-02-10 and updated on 2026-04-15

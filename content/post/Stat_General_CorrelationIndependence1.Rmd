@@ -1,7 +1,7 @@
 ---
 title: 'Dealing with correlation in designed field experiments: part I'
 author: "Andrea Onofri"
-date: '2019-04-30'
+date: '2026-04-15'
 categories: R
 slug: correlation
 tags:
@@ -15,7 +15,7 @@ archives:
 #Put at the beginning
 knitr::opts_chunk$set(echo = TRUE, message = F, warning = F)
 knitr::knit_hooks$set(document = function(x){ 
-  gsub("```\n*```r*\n*", "", x) 
+  gsub("```\n*```\\sr*\n*", "", x)
 })
 ```
 
@@ -25,13 +25,13 @@ Unfortunately, this is most often false whenever measures are taken from designe
 
 # Data come in groups
 
-Let's assume that we have a randomised blocks design, with 27 genotypes and 3 replicates. For each plot, we recorded two traits, i.e. yield and the weight of thousand kernels (TKW). In the end, we have 81 plots and just as many couples of measures in all. We will use the dataset 'WheatQuality.csv', that is available on  'gitHub'.
+Let's assume that we have a randomised blocks design, with 27 genotypes and 3 replicates. For each plot, we recorded two traits, i.e. yield and the weight of thousand kernels (TKW). In the end, we have 81 plots and just as many couples of measures in all. We will use the dataset 'WheatQuality', that is available on  the 'statforbiology' package.
 
 ```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+library(statforbiology)
 library(Hmisc)
 library(knitr)
-library(plyr)
-dataset <- read.csv("https://www.casaonofri.it/_datasets/WheatQuality.csv")
+dataset <- getAgroData("WheatQuality")
 head(dataset)
 ```
 
@@ -50,21 +50,21 @@ ra$r[1,2]
 ra$P[1,2] 
 ```
 
-We observe a positive correlation, and $r$ seems to be significantly different from 0. Therefore, we would be encouraged to conclude that plots with a high value on yield tend to have a high value on TKW, as well. Unfortunately, such a conclusion is not supported by the data.
+We observe a positive correlation, and $r$ seems to be significantly different from 0. Therefore, we would be encouraged to conclude that plots with a high value on yield tend to have a high value on TKW, as well. Unfortunately, such an inference is not supported by the data.
 
 Indeed, the test of significance is clearly invalid, as the 81 plots are not independent; they are grouped by block and genotype and we are totally neglecting these two effects. Are we sure that the same correlation holds for all genotypes/blocks? Let's check this.
 
 
 ```{r}
 wCor <- function(x) cor(x$Yield, x$TKW)
-wgCors <- ddply(dataset, ~Genotype, wCor)
+wgCors <- by(dataset, dataset$Genotype, wCor)
 wgCors
 
-wbCors <- ddply(dataset, ~Block, wCor)
+wbCors <- by(dataset, dataset$Block, wCor)
 wbCors
 ```
 
-As for the genotypes, we have 27 correlation coefficients, ranging from -0.999 to 0.985. We only have three couples of measurements per genotype and it is clear that this is not much, to reliably estimate a correlation coefficient. However, it is enough to be suspicious about the extent of correlation between yield and TKW, as it may depend on the genotype.
+As for the genotypes, we have 27 correlation coefficients, ranging from -0.999 to 0.985. We only have three couples of measurements per genotype and it is clear that this is not much, to reliably estimate a correlation coefficient. However, it is enough to be suspicious about the extent of correlation between yield and TKW, as such an extent clearly depends on the genotype.
 
 On the other hand, the correlation within blocks is more constant, independent on the block and similar to the correlation between plots.
 
@@ -84,12 +84,16 @@ As the next step, we could consider the means for genotypes/blocks and see wheth
 
 
 ```{r}
-means <- ddply(dataset, ~Genotype, summarise, Mu1=mean(Yield), Mu2 = mean(TKW))
+means <- aggregate(dataset[,c("Yield", "TKW")],
+                   list(dataset$Genotype), 
+                   mean)
 rgPear <- rcorr( as.matrix(means[,2:3]) )
 rgPear$r
 rgPear$P
 
-means <- ddply(dataset, ~Block, summarise, Mu1=mean(Yield), Mu2 = mean(TKW))
+means <- aggregate(dataset[,c("Yield", "TKW")],
+                   list(dataset$Block), 
+                   mean)
 rbPear <- cor( as.matrix(means[,2:3]) )
 rbPear
 ```
@@ -120,10 +124,22 @@ Whenever we have data from designed field experiments, our correlation analyses 
 
 An elegant and advanced method to perform sound correlation analyses on data from designed field experiments has been put forward by Piepho (2018), within the frame of mixed models. Such an approach will be described in another post.
 
+Happy coding with R! ... and ... don't forget to check out my new book!
+
+
+Prof. Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences    
+University of Perugia (Italy)    
+Send comments to: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)
+
+<a href = "https://www.awin1.com/cread.php?awinmid=26429&awinaffid=2675822&ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src= "../../_Figures/Email_Signature_978-3-032-08199-5.png" align="center" alt="Book cover" class="cover" /></a>
+
 # References
 
 1. Bland, J.M., Altman, D.G., 1994. Statistics Notes: Correlation, regression, and repeated data. BMJ 308, 896–896.
 2. Piepho, H.-P., 2018. Allowing for the structure of a designed experiment when estimating and testing trait correlations. The Journal of Agricultural Science 156, 59–70.
 
+---
 
+This post was originally written on 2019-04-30 and updated on 2026-04-15 
 
