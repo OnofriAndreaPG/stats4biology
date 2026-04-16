@@ -19,5 +19,5 @@ University of Perugia (Italy)
 Borgo XX Giugno 74  
 I-06121 - PERUGIA  
 Email: [andrea.onofri\@unipg.it](mailto:andrea.onofri@unipg.it)  
-My ORCID: <https://orcid.org/0000-0002-6603-329X>  
-SCOPUS preview: <https://www.scopus.com/authid/detail.uri?authorId=57193769604>
+My ORCID: [https://orcid.org/0000-0002-6603-329X](https://orcid.org/0000-0002-6603-329X) 
+SCOPUS preview: [https://www.scopus.com/authid/detail.uri?authorId=57193769604](https://www.scopus.com/authid/detail.uri?authorId=57193769604)
