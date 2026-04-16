@@ -29,7 +29,6 @@ With field experiments, studying the correlation between the observed traits may
 1. the concept of correlation in such a setting is not unique, as we might either consider the correlation between the plot measurements, or the correlation between the residuals or the correlation between genotype means or the correlation between block means;
 2. the experimental units are not independent, but they are grouped by genotype and block, which invalidate all inferences based on the independence assumption.
 
-
 I have dealt with these two problems (particularly the first one) [in a previous post](https://www.statforbiology.com/2019/stat_general_correlationindependence1/), where I gave a solution based on traditional methods of data analyses.
 
 In this post, I would like to present a more advanced solution, that was advocated by Hans-Peter Piepho in a relatively recent manuscript (Piepho, 2018). Such a solution is based on mixed models and it was implemented in SAS, by using PROC MIXED. I spent a few hours 'transporting' those models in R, which turned out to be a difficult task, although, in the end, I seem to have came to an acceptable solution, which I would like to share here.
@@ -99,6 +98,16 @@ coefs
 # u:units.Yield-TKW       0.1635821  0.7242898  0.2258518   Unconstr
 # u:units.TKW-TKW         4.4718011  0.8770118  5.0989065   Positive
 
+# Fit as bivariate (it does not work?)
+mod.bimix2 <- mmes(cbind(Yield, TKW) ~ 1,
+                   # random = ~ Genotype + Block,
+                   # rcov = ~ units,  
+                   data = dataset)
+bimix.obj <- summary(mod.bimix)
+coefs <- bimix.obj$varcomp
+coefs
+
+# Fit as univariate (better, but cannot fit unstructured residuals)
 dataset$Plot <- 1:81
 mdataset <- dataset |>
   select(-Whectol, -Height) |>
@@ -109,15 +118,17 @@ tail(mdataset)
 
 mdataset <- as.data.frame(mdataset)
 head(mdataset)
-mod.bimix2 <- mmes(Y ~ Trait,
-                   random = ~ vsr(Trait:Genotype, Gtc = unsm(2)) + vsr(Trait:Block,    Gtc = unsm(2)),
-                   rcov   = ~ vsr(Trait:units, Gtc = unsm(2)),
+mdataset <- arrange(mdataset, Trait)
+mdataset$un <- factor(1:162)
+mod.bimix2 <- mmes(Y ~ Trait - 1,
+                   random = ~vsm(usm(Trait), ism(Genotype)) +
+                     vsm(usm(Trait), ism(Block)),
+                   rcov   = ~ dsm(usm(Trait), ism(units)),
                    data = mdataset,
                    verbose = FALSE, dateWarning = FALSE)
 bimix.obj2 <- summary(mod.bimix2)
 coefs2 <- bimix.obj2$varcomp
 coefs2
-
 ```
 
 
@@ -167,6 +178,7 @@ mod.bimix2 <- mmer(cbind(Yield, TKW) ~ 1,
                    rcov = ~ vsr(units, Gtc = diag(2)),
                    data = dataset,
                   verbose = FALSE, dateWarning = FALSE)
+summary(mod.bimix2)$varcomp
 # Likelihood ratio test
 LRT <- anova(mod.bimix, mod.bimix2)
 AIC(mod.bimix, mod.bimix2)
