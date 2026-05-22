@@ -2,7 +2,6 @@
 title: "Comparing germination/emergence for several seed lots"
 author: "Andrea Onofri"
 date: 2021-12-23
-slug: 'Time_to_event_models'
 categories:
   - R
   - 'Time_to_event_models'
@@ -91,15 +90,15 @@ summary(mod1)
 ##             Estimate Std. Error t-value   p-value    
 ## b:Fix:Low   4.974317   0.819632  6.0690 1.287e-09 ***
 ## b:Fix:High 11.476618   1.254439  9.1488 &lt; 2.2e-16 ***
-## b:Alt:Low   7.854558   5.239825  1.4990    0.1339    
+## b:Alt:Low   7.854558   5.239812  1.4990    0.1339    
 ## b:Alt:High 10.600439   1.014061 10.4534 &lt; 2.2e-16 ***
 ## d:Fix:Low   0.998474   0.150189  6.6481 2.968e-11 ***
 ## d:Fix:High  0.861711   0.038987 22.1027 &lt; 2.2e-16 ***
-## d:Alt:Low   1.405930   5.607576  0.2507    0.8020    
+## d:Alt:Low   1.405930   5.607561  0.2507    0.8020    
 ## d:Alt:High  0.948113   0.024298 39.0208 &lt; 2.2e-16 ***
 ## e:Fix:Low  12.009974   0.987039 12.1677 &lt; 2.2e-16 ***
 ## e:Fix:High 10.906963   0.190532 57.2447 &lt; 2.2e-16 ***
-## e:Alt:Low  17.014976  13.214513  1.2876    0.1979    
+## e:Alt:Low  17.014976  13.214479  1.2876    0.1979    
 ## e:Alt:High  9.585255   0.166937 57.4183 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
@@ -118,20 +117,21 @@ summary(mod1)
 ## Parameter estimates:
 ## 
 ##             Estimate Std. Error t-value   p-value    
-## b:Fix:Low   4.979665   0.818414  6.0845 1.168e-09 ***
-## b:Fix:High 11.471625   1.254025  9.1478 &lt; 2.2e-16 ***
-## b:Alt:Low   8.408186   2.232712  3.7659 0.0001659 ***
-## b:Alt:High 10.605807   1.014523 10.4540 &lt; 2.2e-16 ***
-## d:Fix:Low   0.997284   0.149235  6.6826 2.347e-11 ***
+## b:Fix:Low   4.979670   0.818400  6.0846 1.168e-09 ***
+## b:Fix:High 11.471649   1.254026  9.1479 &lt; 2.2e-16 ***
+## b:Alt:Low   8.408184   2.232665  3.7660 0.0001659 ***
+## b:Alt:High 10.605835   1.014524 10.4540 &lt; 2.2e-16 ***
+## d:Fix:Low   0.997281   0.149230  6.6828 2.343e-11 ***
 ## d:Fix:High  0.861709   0.038999 22.0955 &lt; 2.2e-16 ***
-## d:Alt:Low   1.000000   0.881644  1.1342 0.2566920    
-## d:Alt:High  0.948132   0.024282 39.0468 &lt; 2.2e-16 ***
-## e:Fix:Low  12.004534   0.981279 12.2336 &lt; 2.2e-16 ***
-## e:Fix:High 10.907108   0.190613 57.2213 &lt; 2.2e-16 ***
-## e:Alt:Low  15.903079   2.872327  5.5367 3.083e-08 ***
-## e:Alt:High  9.585297   0.166873 57.4406 &lt; 2.2e-16 ***
+## d:Alt:Low   1.000000   0.881603  1.1343 0.2566701    
+## d:Alt:High  0.948131   0.024282 39.0466 &lt; 2.2e-16 ***
+## e:Fix:Low  12.004492   0.981246 12.2339 &lt; 2.2e-16 ***
+## e:Fix:High 10.907108   0.190612 57.2215 &lt; 2.2e-16 ***
+## e:Alt:Low  15.903087   2.872203  5.5369 3.079e-08 ***
+## e:Alt:High  9.585291   0.166873 57.4408 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+ r
 plot(mod1, log = &quot;&quot;, legendPos = c(6, 1), xlab = &quot;Time&quot;,
      ylab = &quot;Cumulative probability of germination&quot;)</code></pre>
 <p><img src="/post/Stat_drcte_5-ComparingLots_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
@@ -152,8 +152,7 @@ plot(mod1, log = &quot;&quot;, legendPos = c(6, 1), xlab = &quot;Time&quot;,
 <p>In this example, we got a very low p-level, which leaves us rather confident that the difference between time-to-event curves is significant. More generally, instead of relying on a chi-square approximation, we should better use a grouped-permutation approach. This technique is based on the idea that, when the difference between curves is not significant, we should be able to freely permute the labels (treatment level) among Petri dishes (clustering units) and, consequently, build an empirical distribution for the LR statistic under the null (permutation distribution). The p-level is related to the proportion of LR values in the permutation distribution that are higher than the observed value (i.e.: 202.8)</p>
 <p>In the code below, we show how we can do this. The code is rather slow and, therefore, we should not use a very high number of permutation; the default is 199, that gives us a minimum p-value of 0.005. We see that we can confirm that the difference between curves is highly significant.</p>
 <pre class="r"><code>compCDF(mod1, type = &quot;permutation&quot;, units = dataset$Dishes)
-## 
-Likelihood ratio test (permutation based)
+## Likelihood ratio test (permutation based)
 ## NULL: time-to-event curves are equal
 ## 
 ## Observed LR value:  202.8052
@@ -187,12 +186,27 @@ plot(modNP, log = &quot;&quot;, legendPos = c(6, 1))</code></pre>
 <pre class="r"><code>modKD &lt;- drmte(count ~ timeBef + timeAf, fct = KDE(),
             data = dataset, 
             curveid = Temp:Storage)
-plot(modKD, log = &quot;&quot;, legendPos = c(6, 1))</code></pre>
+plot(modKD, log = &quot;&quot;, legendPos = c(6, 1))
+## Warning in plot.xy(xy.coords(x, y), type = type, ...): &quot;log&quot; is not a graphical
+## parameter
+## Warning in plot.xy(xy.coords(x, y), type = type, ...): &quot;legendPos&quot; is not a
+## graphical parameter
+## Warning in plot.xy(xy.coords(x, y), type = type, ...): &quot;log&quot; is not a graphical
+## parameter
+## Warning in plot.xy(xy.coords(x, y), type = type, ...): &quot;legendPos&quot; is not a
+## graphical parameter
+## Warning in plot.xy(xy.coords(x, y), type = type, ...): &quot;log&quot; is not a graphical
+## parameter
+## Warning in plot.xy(xy.coords(x, y), type = type, ...): &quot;legendPos&quot; is not a
+## graphical parameter
+## Warning in plot.xy(xy.coords(x, y), type = type, ...): &quot;log&quot; is not a graphical
+## parameter
+## Warning in plot.xy(xy.coords(x, y), type = type, ...): &quot;legendPos&quot; is not a
+## graphical parameter</code></pre>
 <p><img src="/post/Stat_drcte_5-ComparingLots_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
 <p>Second, we compare those curves, by using the <code>compCDF()</code> function:</p>
 <pre class="r"><code>compCDF(modKD, units = dataset$Units)
-## 
-Permutation test based on a Cramer-von-Mises type distance (Barreiro-Ures et al., 2019)
+## Permutation test based on a Cramer-von-Mises type distance (Barreiro-Ures et al., 2019)
 ## NULL HYPOTHESIS: time-to-event curves are equal
 ## 
 ##      level   n         D
@@ -207,12 +221,12 @@ Permutation test based on a Cramer-von-Mises type distance (Barreiro-Ures et al.
 <p>We do hope that this post helps you test your hypotheses about seed germination/emergence in a reliable way.</p>
 <p>Thanks for reading and, please, accept my best:</p>
 <p><img src="https://www.casaonofri.it/_Figures/greetings.png" /><!-- --></p>
+<p>And … don’t forget to check out my new book!</p>
 <p>Prof. Andrea Onofri<br />
 Department of Agricultural, Food and Environmental Sciences<br />
 University of Perugia (Italy)<br />
 Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
-<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow <span class="citation">@onofriandreapg</span></a>
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<p><a href = "https://www.awin1.com/cread.php?awinmid=26429&awinaffid=2675822&ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src= "../../_Figures/Email_Signature_978-3-032-08199-5.png" align="center" alt="Book cover" class="cover" /></a></p>
 <hr />
 </div>
 <div id="references" class="section level1">

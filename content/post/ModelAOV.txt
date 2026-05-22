@@ -1,0 +1,29 @@
+
+data {
+n <- length(Y)
+np <- dim(X)
+nk <- dim(K)
+}
+
+model {
+# Model 
+for (i in 1:n) {
+   expected[i] <- inprod(X[i,], beta)
+   Y[i] ~ dnorm(expected[i], tau)
+  }
+
+# Priors
+beta[1] ~ dunif(0, 1000000)
+for (i in 2:np[2]){
+  beta[i] ~ dnorm(0, 0.000001)
+  }
+sigma ~ dunif(0, 100)
+
+# Derived quantities (model specific)
+tau <- 1 / ( sigma * sigma)
+
+# Contrasts of interest
+for (i in 1:nk[1]) {
+   mu[i] <- inprod(K[i,], beta)
+  }
+}

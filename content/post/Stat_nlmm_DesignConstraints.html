@@ -2,7 +2,6 @@
 title: "Accounting for the experimental design in linear/nonlinear regression analyses"
 author: "Andrea Onofri"
 date: 2020-12-04
-slug: 'Mixed models'
 categories:
   - R
   - 'Mixed_models'
@@ -29,12 +28,6 @@ library(lattice)
 library(statforbiology)
 ## Loading required package: drc
 ## Loading required package: MASS
-## Loading required package: drcData
-## 
-## Attaching package: &#39;drcData&#39;
-## The following object is masked from &#39;package:lattice&#39;:
-## 
-##     barley
 ## 
 ## &#39;drc&#39; has been loaded.
 ## Please cite R and &#39;drc&#39; if used for a publication,
@@ -44,6 +37,7 @@ library(statforbiology)
 ## The following objects are masked from &#39;package:stats&#39;:
 ## 
 ##     gaussian, getInitial
+ r
 dataset &lt;- getAgroData(&quot;yieldDensityB&quot;)
 dataset$block &lt;- factor(dataset$block)
 head(dataset)
@@ -54,6 +48,7 @@ head(dataset)
 ## 4     4       0 26.37
 ## 5     5       0 34.48
 ## 6     6       0 33.70
+ r
 plot(yield ~ density, data = dataset)</code></pre>
 <p><img src="/post/Stat_nlmm_DesignConstraints_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
 <p>We might be tempted to neglect the block effect and run a linear regression analysis of yield against density. This is clearly wrong (I am violating the independence assumption) and inefficient, as any block-to-block variability goes into the residual error term, which is, therefore, inflated.</p>
@@ -146,11 +141,11 @@ summary(modMix.2)
 ##  Formula: ~density | block
 ##  Structure: Diagonal
 ##         (Intercept)    density Residual
-## StdDev:    3.198267 0.02293222 1.387148
+## StdDev:    3.198277 0.02293222 1.387147
 ## 
 ## Fixed effects:  yield ~ density 
 ##                Value Std.Error DF   t-value p-value
-## (Intercept) 31.78987 1.0460282 69  30.39102       0
+## (Intercept) 31.78987 1.0460314 69  30.39093       0
 ## density     -0.26744 0.0097463 69 -27.44020       0
 ##  Correlation: 
 ##         (Intr)
@@ -158,10 +153,11 @@ summary(modMix.2)
 ## 
 ## Standardized Within-Group Residuals:
 ##        Min         Q1        Med         Q3        Max 
-## -1.9991174 -0.5451478 -0.1970267  0.4925092  2.6700388 
+## -1.9991181 -0.5451478 -0.1970266  0.4925097  2.6700397 
 ## 
 ## Number of Observations: 80
 ## Number of Groups: 10
+ r
 anova(modMix.1, modMix.2)
 ##          Model df      AIC      BIC    logLik   Test    L.Ratio p-value
 ## modMix.1     1  6 340.9166 355.0569 -164.4583                          
@@ -193,11 +189,12 @@ head(dataset)
 ## 4     4       0    -0.697
 ## 5     5       0    -2.264
 ## 6     6       0    -1.623
+ r
 plot(yieldLoss ~ density, data = dataset)</code></pre>
 <p><img src="/post/Stat_nlmm_DesignConstraints_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 <p>A swift plot shows that the relationship between density and yield loss is not linear. Literature references (Cousens, 1985) show that this could be modelled by using a rectangular hyperbola:</p>
 <p><span class="math display">\[YL = \frac{i \, D}{1 + \frac{i \, D}{a}}\]</span></p>
-<p>where <span class="math inline">\(YL\)</span> is the yield loss, <span class="math inline">\(D\)</span> is weed density, <span class="math inline">\(i\)</span> is the slope at the origin of axes and <span class="math inline">\(a\)</span> is the maximum asymptotic yield loss. This function, together with self-starters, is available in the ‘NLS.YL()’ function in the ‘aomisc’ package, which is the accompanying package for this blog. If you do not have this package, please refer to <a href="https://www.statforbiology.com/rpackages/">this link</a> to download it.</p>
+<p>where <span class="math inline">\(YL\)</span> is the yield loss, <span class="math inline">\(D\)</span> is weed density, <span class="math inline">\(i\)</span> is the slope at the origin of axes and <span class="math inline">\(a\)</span> is the maximum asymptotic yield loss. This function, together with self-starters, is available in the ‘NLS.YL()’ function in the ‘statforbiology’ package, which is the accompanying package for this blog. If you do not have this package, please refer to <a href="https://www.statforbiology.com/rpackages/">this link</a> to download it.</p>
 <p>The problem is the very same as above: the block effect may produce random fluctuations for both model parameters. The only difference is that we need to use the ‘nlme()’ function instead of ‘lme()’. With nonlinear mixed models, I strongly suggest you use a ‘groupedData’ object, which permits to avoid several problems. The second line below shows how to turn a data frame into a ‘groupedData’ object.</p>
 <pre class="r"><code>datasetG &lt;- groupedData(yieldLoss ~ 1|block, dataset)
 nlin.mix &lt;- nlme(yieldLoss ~ NLS.YL(density, i, A), data=datasetG, 
@@ -216,20 +213,20 @@ summary(nlin.mix)
 ##  Structure: General positive-definite, Log-Cholesky parametrization
 ##          StdDev    Corr 
 ## i        0.1112839 i    
-## A        4.0444538 0.195
-## Residual 1.4142272      
+## A        4.0444562 0.195
+## Residual 1.4142271      
 ## 
 ## Fixed effects:  list(i ~ 1, A ~ 1) 
 ##      Value Std.Error  DF  t-value p-value
 ## i  1.23238 0.0382246 104 32.24038       0
-## A 68.52305 1.9449745 104 35.23082       0
+## A 68.52305 1.9449748 104 35.23082       0
 ##  Correlation: 
 ##   i     
 ## A -0.408
 ## 
 ## Standardized Within-Group Residuals:
 ##        Min         Q1        Med         Q3        Max 
-## -2.4416770 -0.7049388 -0.1805690  0.3385458  2.8788981 
+## -2.4416770 -0.7049388 -0.1805691  0.3385457  2.8788982 
 ## 
 ## Number of Observations: 120
 ## Number of Groups: 15</code></pre>
@@ -242,28 +239,28 @@ summary(nlin.mix2)
 ##   Model: yieldLoss ~ NLS.YL(density, i, A) 
 ##   Data: datasetG 
 ##        AIC      BIC    logLik
-##   474.8225 491.5475 -231.4113
+##   474.8224 491.5474 -231.4112
 ## 
 ## Random effects:
 ##  Formula: list(i ~ 1, A ~ 1)
 ##  Level: block
 ##  Structure: General positive-definite
-##          StdDev    Corr 
-## i        0.1112839 i    
-## A        4.0466971 0.194
-## Residual 1.4142009      
+##          StdDev   Corr 
+## i        0.111282 i    
+## A        4.047419 0.194
+## Residual 1.414193      
 ## 
 ## Fixed effects:  list(i ~ 1, A ~ 1) 
 ##      Value Std.Error  DF  t-value p-value
-## i  1.23242  0.038225 104 32.24107       0
-## A 68.52068  1.945173 104 35.22600       0
+## i  1.23242 0.0382246 104 32.24144       0
+## A 68.52044 1.9452664 104 35.22419       0
 ##  Correlation: 
 ##   i     
 ## A -0.409
 ## 
 ## Standardized Within-Group Residuals:
 ##        Min         Q1        Med         Q3        Max 
-## -2.4414051 -0.7049356 -0.1805322  0.3385275  2.8787362 
+## -2.4418745 -0.7050012 -0.1805248  0.3385735  2.8788963 
 ## 
 ## Number of Observations: 120
 ## Number of Groups: 15</code></pre>
@@ -295,7 +292,7 @@ summary(nlin.mix3)
 ## 
 ## Standardized Within-Group Residuals:
 ##        Min         Q1        Med         Q3        Max 
-## -2.3577291 -0.6849962 -0.1785860  0.3255925  2.8592764 
+## -2.3577292 -0.6849962 -0.1785860  0.3255925  2.8592764 
 ## 
 ## Number of Observations: 120
 ## Number of Groups: 15</code></pre>

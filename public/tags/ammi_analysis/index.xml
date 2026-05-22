@@ -14,10 +14,10 @@
     
     <item>
       <title>AMMI analyses for multi-environment studies</title>
-      <link>https://www.statforbiology.com/2023/multi_environment_studies/</link>
+      <link>https://www.statforbiology.com/2023/ammi-analyses-for-multi-environment-studies/</link>
       <pubDate>Fri, 26 May 2023 00:00:00 +0000</pubDate>
       <author>andrea.onofri@unipg.it (Andrea Onofri)</author>
-      <guid>https://www.statforbiology.com/2023/multi_environment_studies/</guid>
+      <guid>https://www.statforbiology.com/2023/ammi-analyses-for-multi-environment-studies/</guid>
       <description>
 
 
@@ -27,15 +27,15 @@
 &lt;div id=&#34;a-met-with-faba-bean&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;A MET with faba bean&lt;/h1&gt;
 &lt;p&gt;This experiment consists of 12 faba bean genotypes (well, it was, indeed, 6 genotypes in two sowing dates; but, let’s disregard this detail from now on) in four blocks, two locations and three years (six environments, in all). The dataset is online available as ‘fabaBean.csv’ and it has been published by Stagnari et al. (2007).&lt;/p&gt;
-&lt;p&gt;First of all, let’s load the dataset and transform the block variable into a factor. Let’s also inspect the two-way table of means, together with the marginal means for genotypes and environments, which will be useful later. In this post, we will make use of the packages ‘dplyr’ (Wickham &lt;em&gt;et al&lt;/em&gt;., 2020), ‘emmeans’ (Lenth, 2020) and ‘aomisc’; this latter is the companion package for this website and must have been installed as detailed in this &lt;a href=&#34;https://www.statforbiology.com/rpackages/&#34;&gt;page here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;First of all, let’s load the dataset and transform the block variable into a factor. Let’s also inspect the two-way table of means, together with the marginal means for genotypes and environments, which will be useful later. In this post, we will make use of the packages ‘dplyr’ (Wickham &lt;em&gt;et al&lt;/em&gt;., 2020), ‘emmeans’ (Lenth, 2020) and ‘statforbiology’; this latter is the companion package for this website and must have been installed as detailed in this &lt;a href=&#34;https://www.statforbiology.com/rpackages/&#34;&gt;page here&lt;/a&gt;.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# options(width = 70)
 
 rm(list=ls())
 # library(devtools)
-# install_github(&amp;quot;OnofriAndreaPG/aomisc&amp;quot;)
+# install.packages(&amp;quot;statforbiology&amp;quot;)
 library(reshape)
 library(emmeans)
-library(aomisc)
+library(statforbiology)
 
 fileName &amp;lt;- &amp;quot;https://www.casaonofri.it/_datasets/fabaBean.csv&amp;quot;
 dataset &amp;lt;- read.csv(fileName, header=T)
@@ -43,14 +43,13 @@ dataset &amp;lt;- transform(dataset, Block = factor(Block),
                      Genotype = factor(Genotype),
                      Environment = factor(Environment))
 head(dataset)
-##      Genotype Block Environment Yield
-## 1    Chiaro_A     1       bad_1  4.36
-## 2    Chiaro_P     1       bad_1  2.76
-## 3 Collameno_A     1       bad_1  3.01
-## 4 Collameno_P     1       bad_1  2.50
-## 5    Palomb_A     1       bad_1  3.85
-## 6    Palomb_P     1       bad_1  2.21
- r
+##   Genotype Block Environment Location Year Yield
+## 1 Chiaro_A     1       bad_1      bad    1  4.36
+## 2 Chiaro_A     2       bad_1      bad    1  4.00
+## 3 Chiaro_A     3       bad_1      bad    1  4.23
+## 4 Chiaro_A     4       bad_1      bad    1  3.83
+## 5 Chiaro_P     1       bad_1      bad    1  2.76
+## 6 Chiaro_P     2       bad_1      bad    1  2.64
 #
 # Two-ways table of means
 GEmedie &amp;lt;- cast(Genotype ~ Environment, data = dataset,
@@ -69,7 +68,6 @@ GEmedie
 ## 10   Sicania_P 3.2700 0.9900 3.7300 4.0475 0.8225 3.8950
 ## 11   Vesuvio_A 4.1375 2.0175 4.0275 4.5025 2.2650 4.3225
 ## 12   Vesuvio_P 2.1225 1.1800 3.5250 3.0950 0.9375 3.6275
- r
 #
 # Marginal means for genotypes
 apply(GEmedie, 1, mean)
@@ -79,13 +77,11 @@ apply(GEmedie, 1, mean)
 ##    2.440833    3.637083    3.099583    3.450833    2.792500 
 ##   Vesuvio_A   Vesuvio_P 
 ##    3.545417    2.414583
- r
 #
 # Marginal means for environments
 apply(GEmedie, 2, mean)
 ##    bad_1    bad_2    bad_3    pap_1    pap_2    pap_3 
 ## 3.220000 1.629792 3.992292 3.902292 1.727917 4.147292
- r
 #
 # Overall mean
 mean(as.matrix(GEmedie))
@@ -122,10 +118,8 @@ print(round(GE, 3))
 &lt;p&gt;Please, note that the overall mean for all elements in ‘GE’ is zero and the sum of squares is equal to a fraction of the interaction sum of squares in ANOVA (that is &lt;span class=&#34;math inline&#34;&gt;\(RMSE/r\)&lt;/span&gt;; where &lt;span class=&#34;math inline&#34;&gt;\(r\)&lt;/span&gt; is the number of blocks).&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mean(unlist(GE))
 ## [1] -2.852656e-17
- r
 sum(GE^2)
 ## [1] 7.742996
- r
 mod &amp;lt;- lm(Yield ~ Environment/Block + Genotype*Environment, data = dataset)
 anova(mod)
 ## Analysis of Variance Table
@@ -139,7 +133,6 @@ anova(mod)
 ## Residuals            198  21.58   0.109                       
 ## ---
 ## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
- r
 30.97/4
 ## [1] 7.7425&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
@@ -193,7 +186,6 @@ round(Sg %*% t(Se), 3)
 ## Sicania_P   -0.214  0.683 -0.402  0.148  0.151   0
 ## Vesuvio_A   -0.438 -0.008  0.020 -0.300 -0.177   0
 ## Vesuvio_P    0.316 -0.058  0.063  0.405 -0.114   0
- r
 round(Se, 3)
 ##          PC1    PC2    PC3    PC4    PC5 PC6
 ## bad_1 -0.831  0.095 -0.467 -0.317 -0.151   0
@@ -288,7 +280,7 @@ sum(GE2^2)
 &lt;/div&gt;
 &lt;div id=&#34;simple-ammi-analysis-with-r&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Simple AMMI analysis with R&lt;/h1&gt;
-&lt;p&gt;We have seen that AMMI analysis, under the hood, is a sort of PCA. Therefore, it could be performed, in R by using one of the available packages for PCA. For the sake of simplicity, I have coded the simple &lt;code&gt;AMMI()&lt;/code&gt; function, that is available in the ‘aomisc’ package. I have described an earlier version of this function in an ‘R news’ paper (&lt;a href=&#34;https://www.researchgate.net/publication/289419258_Using_R_to_perform_the_AMMI_analysis_on_agriculture_variety_trials&#34;&gt;Onofri and Ciriciofolo, 2007&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;We have seen that AMMI analysis, under the hood, is a sort of PCA. Therefore, it could be performed, in R by using one of the available packages for PCA. For the sake of simplicity, I have coded the simple &lt;code&gt;AMMI()&lt;/code&gt; function, that is available in the ‘statforbiology’ package. I have described an earlier version of this function in an ‘R news’ paper (&lt;a href=&#34;https://www.researchgate.net/publication/289419258_Using_R_to_perform_the_AMMI_analysis_on_agriculture_variety_trials&#34;&gt;Onofri and Ciriciofolo, 2007&lt;/a&gt;).&lt;/p&gt;
 &lt;p&gt;Tha above function works equally well with raw MET data, containing all replicated values, or with the ‘genotype by environment’ average values. In this second case, the analyses proceed in two-steps, as I will describe below.&lt;/p&gt;
 &lt;div id=&#34;first-step-on-raw-data&#34; class=&#34;section level2&#34;&gt;
 &lt;h2&gt;First step on raw data&lt;/h2&gt;
@@ -321,7 +313,6 @@ AMMIobj$genotype_scores
 ## Sicania_P   -0.21433211  0.683296898
 ## Vesuvio_A   -0.43786742 -0.007914342
 ## Vesuvio_P    0.31605973 -0.058152890
- r
 #
 AMMIobj$environment_scores
 ##               PC1         PC2
@@ -331,7 +322,6 @@ AMMIobj$environment_scores
 ## pap_1 -0.66137357  0.51268429
 ## pap_2 -0.06863235 -0.62703224
 ## pap_3  0.84633965  0.56736492
- r
 #
 AMMIobj$mult_Interaction
 ##      Effect       SS DF        MS         F        Prob. Perc_of_Total_SS
@@ -343,18 +333,17 @@ AMMIobj$mult_Interaction
 &lt;pre&gt;&lt;code&gt;biplot(AMMIobj, xlab = &amp;quot;Yield&amp;quot;)
 biplot(AMMIobj, biplot = 2)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;You may also consider to explore other more comprehensive R packages, such as ‘agricolae’ (de Mendiburu, 2020).&lt;/p&gt;
-&lt;p&gt;Thank you for reading, so far, and… happy coding!&lt;/p&gt;
+&lt;p&gt;Thank you for reading, so far, and… happy coding! And … don’t forget to check out my new book!&lt;/p&gt;
 &lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
 Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
 University of Perugia (Italy)&lt;br /&gt;
 Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
-&lt;a href=&#34;https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw&#34; class=&#34;twitter-follow-button&#34; data-show-count=&#34;false&#34;&gt;Follow &lt;span class=&#34;citation&#34;&gt;@onofriandreapg&lt;/span&gt;&lt;/a&gt;
-&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;p&gt;&lt;a href = &#34;https://www.awin1.com/cread.php?awinmid=26429&amp;awinaffid=2675822&amp;ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5&#34;&gt;&lt;img src= &#34;../../_Figures/Email_Signature_978-3-032-08199-5.png&#34; align=&#34;center&#34; alt=&#34;Book cover&#34; class=&#34;cover&#34; /&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;hr /&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;div id=&#34;literature-references&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;Literature references&lt;/h1&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
 &lt;ol style=&#34;list-style-type: decimal&#34;&gt;
 &lt;li&gt;Annichiarico, P. (1997). Additive main effects and multiplicative interaction (AMMI) analysis of genotype-location interaction in variety trials repeated over years. Theoretical applied genetics, 94, 1072-1077.&lt;/li&gt;
 &lt;li&gt;Ariyo, O. J. (1998). Use of additive main effects and multiplicative interaction model to analyse multilocation soybean varietal trials. J. Genet. and Breed, 129-134.&lt;/li&gt;
@@ -374,10 +363,10 @@ Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.o
     
     <item>
       <title>Fitting complex mixed models with nlme. Example #5</title>
-      <link>https://www.statforbiology.com/2020/multi_environment_studies/</link>
+      <link>https://www.statforbiology.com/2020/fitting-complex-mixed-models-with-nlme.-example-%235/</link>
       <pubDate>Fri, 05 Jun 2020 00:00:00 +0000</pubDate>
       <author>andrea.onofri@unipg.it (Andrea Onofri)</author>
-      <guid>https://www.statforbiology.com/2020/multi_environment_studies/</guid>
+      <guid>https://www.statforbiology.com/2020/fitting-complex-mixed-models-with-nlme.-example-%235/</guid>
       <description>
 
 
@@ -396,6 +385,9 @@ Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.o
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rm(list=ls())
 library(nlme)
 library(emmeans)
+## Welcome to emmeans.
+## Caution: You lose important information if you filter this package&amp;#39;s results.
+## See &amp;#39;? untidy&amp;#39;
 Block &amp;lt;- factor(rep(c(1:3), 42))
 Var &amp;lt;- factor(rep(LETTERS[1:7],each=18))
 Loc &amp;lt;- factor(rep(rep(letters[1:6], each=3), 7))
@@ -489,7 +481,7 @@ summary(modFull1)$tTable
 ## VarA    63.1666667 2.4017164 107 26.3006350 1.624334e-48
 ## VarB    66.1666667 2.4017164 107 27.5497417 2.135264e-50
 ## VarC    31.8333333 2.4017164 107 13.2544097 2.599693e-24
-## VarD    47.1111111 2.4017164 107 19.6156012 3.170228e-37
+## VarD    47.1111111 2.4017164 107 19.6156011 3.170228e-37
 ## VarE    44.7222222 2.4017164 107 18.6209421 2.378452e-35
 ## VarF    34.2777778 2.4017164 107 14.2722004 1.614127e-26
 ## VarG    35.8888889 2.4017164 107 14.9430169 6.028635e-28
@@ -514,7 +506,7 @@ VarCorr(modFull1)
 ## Block1    0.4478291         0.6692003
 ## Block2    0.4478291         0.6692003
 ## Block3    0.4478291         0.6692003
-## Residual 20.8781458         4.5692610&lt;/code&gt;&lt;/pre&gt;
+## Residual 20.8781457         4.5692610&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;From the output, we see that the variance component &lt;span class=&#34;math inline&#34;&gt;\(\sigma_d\)&lt;/span&gt; (27.50) is the same for all genotypes; if we want to let a different value for each genotype (Eberarth-Russel model), we need to change the ‘pdMat’ construct for the ‘Loc:Var’ effect, turning from ‘pdIdent’ to ‘pdDiag’, as shown in the box below.&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Eberhart-Russel model
 modFull2 &amp;lt;- lme(Yield ~ Var/ej - 1, 
@@ -523,35 +515,35 @@ modFull2 &amp;lt;- lme(Yield ~ Var/ej - 1,
                 data=dataFull)
 summary(modFull2)$tTable
 ##              Value Std.Error  DF    t-value      p-value
-## VarA    63.1666667 3.0507629 107 20.7052032 3.221930e-39
-## VarB    66.1666667 2.7818326 107 23.7852798 1.604422e-44
-## VarC    31.8333333 1.7240721 107 18.4640387 4.753742e-35
-## VarD    47.1111111 2.3526521 107 20.0246824 5.564350e-38
-## VarE    44.7222222 2.4054296 107 18.5921974 2.699536e-35
-## VarF    34.2777778 1.9814442 107 17.2993906 8.947485e-33
-## VarG    35.8888889 2.2617501 107 15.8677515 7.076551e-30
-## VarA:ej  3.2249875 0.7948909 107  4.0571447 9.466174e-05
-## VarB:ej  4.7936139 0.7248198 107  6.6135249 1.522848e-09
-## VarC:ej  0.4771074 0.4492152 107  1.0620909 2.905857e-01
-## VarD:ej  0.3653064 0.6129948 107  0.5959372 5.524757e-01
-## VarE:ej  1.2369950 0.6267462 107  1.9736777 5.099652e-02
-## VarF:ej -2.4316943 0.5162748 107 -4.7100774 7.473942e-06
-## VarG:ej -0.6663160 0.5893098 107 -1.1306718 2.607213e-01
+## VarA    63.1666667 3.0507630 107 20.7052030 3.221933e-39
+## VarB    66.1666667 2.7818319 107 23.7852854 1.604388e-44
+## VarC    31.8333333 1.7240733 107 18.4640250 4.754032e-35
+## VarD    47.1111111 2.3526506 107 20.0246950 5.564052e-38
+## VarE    44.7222222 2.4054268 107 18.5922188 2.699281e-35
+## VarF    34.2777778 1.9814433 107 17.2993992 8.947133e-33
+## VarG    35.8888889 2.2617519 107 15.8677388 7.076978e-30
+## VarA:ej  3.2249875 0.7948909 107  4.0571447 9.466176e-05
+## VarB:ej  4.7936139 0.7248197 107  6.6135264 1.522837e-09
+## VarC:ej  0.4771074 0.4492156 107  1.0620901 2.905861e-01
+## VarD:ej  0.3653064 0.6129944 107  0.5959376 5.524755e-01
+## VarE:ej  1.2369950 0.6267455 107  1.9736800 5.099626e-02
+## VarF:ej -2.4316943 0.5162745 107 -4.7100797 7.473871e-06
+## VarG:ej -0.6663160 0.5893103 107 -1.1306709 2.607216e-01
 VarCorr(modFull2)
 ##          Variance           StdDev   
 ## Loc =    pdDiag(Var - 1)             
-## VarA     48.7341240         6.9809830
-## VarB     39.3227526         6.2707856
-## VarC     10.7257438         3.2750181
-## VarD     26.1010286         5.1089166
-## VarE     27.6077467         5.2543074
-## VarF     16.4479246         4.0556041
-## VarG     23.5842788         4.8563648
+## VarA     48.7341247         6.9809831
+## VarB     39.3227303         6.2707839
+## VarC     10.7257699         3.2750221
+## VarD     26.1009862         5.1089124
+## VarE     27.6076662         5.2542998
+## VarF     16.4479006         4.0556011
+## VarG     23.5843273         4.8563698
 ## Loc =    pdIdent(Block - 1)          
-## Block1    0.4520678         0.6723599
-## Block2    0.4520678         0.6723599
-## Block3    0.4520678         0.6723599
-## Residual 20.8743411         4.5688446&lt;/code&gt;&lt;/pre&gt;
+## Block1    0.4520648         0.6723576
+## Block2    0.4520648         0.6723576
+## Block3    0.4520648         0.6723576
+## Residual 20.8743457         4.5688451&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;From the regression slopes we see that the genotypes A and B are the most responsive to the environment (&lt;span class=&#34;math inline&#34;&gt;\(\beta_A = 3.22\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(\beta_B = 4.79\)&lt;/span&gt;, respectively), while the genotypes C and D are stable in a static sense, although their average yield is pretty low.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div id=&#34;fitting-a-joint-regression-model-in-two-steps-equation-2&#34; class=&#34;section level1&#34;&gt;
@@ -618,18 +610,18 @@ modEberarth &amp;lt;- gls(Yield ~ Var/ej - 1,
 coefs &amp;lt;- summary(modEberarth)$tTable
 coefs
 ##              Value Std.Error    t-value      p-value
-## VarA    63.1666667 3.0434527 20.7549360 1.531581e-18
+## VarA    63.1666667 3.0434527 20.7549359 1.531581e-18
 ## VarB    66.1666667 2.7653537 23.9270177 3.508778e-20
-## VarC    31.8333333 1.7165377 18.5450822 2.912238e-17
+## VarC    31.8333333 1.7165377 18.5450822 2.912237e-17
 ## VarD    47.1111111 2.3344802 20.1805574 3.204306e-18
-## VarE    44.7222222 2.3899219 18.7128381 2.304763e-17
+## VarE    44.7222222 2.3899219 18.7128382 2.304763e-17
 ## VarF    34.2777778 1.9783684 17.3262868 1.685683e-16
 ## VarG    35.8888889 2.2589244 15.8876005 1.537133e-15
-## VarA:ej  3.2249875 0.7929862  4.0668898 3.511248e-04
+## VarA:ej  3.2249875 0.7929862  4.0668897 3.511248e-04
 ## VarB:ej  4.7936139 0.7205262  6.6529352 3.218756e-07
 ## VarC:ej  0.4771074 0.4472521  1.0667527 2.951955e-01
 ## VarD:ej  0.3653064 0.6082600  0.6005761 5.529531e-01
-## VarE:ej  1.2369950 0.6227056  1.9864844 5.684599e-02
+## VarE:ej  1.2369950 0.6227056  1.9864845 5.684599e-02
 ## VarF:ej -2.4316943 0.5154734 -4.7174004 6.004832e-05
 ## VarG:ej -0.6663160 0.5885736 -1.1320862 2.672006e-01
 sigma &amp;lt;- summary(modEberarth)$sigma

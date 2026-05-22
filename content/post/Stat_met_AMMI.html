@@ -2,7 +2,6 @@
 title: "AMMI analyses for multi-environment studies"
 author: "Andrea Onofri"
 date: 2023-05-26
-slug: 'Multi_environment_studies'
 categories:
   - R
   - 'Multi_environment_studies'
@@ -10,7 +9,6 @@ tags:
   - R
   - 'AMMI_analysis'
   - 'Multi_environment_studies'
-  - 'aomisc'
   - 'PCA'
   - 'biplot'
 archives:
@@ -25,15 +23,15 @@ archives:
 <div id="a-met-with-faba-bean" class="section level1">
 <h1>A MET with faba bean</h1>
 <p>This experiment consists of 12 faba bean genotypes (well, it was, indeed, 6 genotypes in two sowing dates; but, let’s disregard this detail from now on) in four blocks, two locations and three years (six environments, in all). The dataset is online available as ‘fabaBean.csv’ and it has been published by Stagnari et al. (2007).</p>
-<p>First of all, let’s load the dataset and transform the block variable into a factor. Let’s also inspect the two-way table of means, together with the marginal means for genotypes and environments, which will be useful later. In this post, we will make use of the packages ‘dplyr’ (Wickham <em>et al</em>., 2020), ‘emmeans’ (Lenth, 2020) and ‘aomisc’; this latter is the companion package for this website and must have been installed as detailed in this <a href="https://www.statforbiology.com/rpackages/">page here</a>.</p>
+<p>First of all, let’s load the dataset and transform the block variable into a factor. Let’s also inspect the two-way table of means, together with the marginal means for genotypes and environments, which will be useful later. In this post, we will make use of the packages ‘dplyr’ (Wickham <em>et al</em>., 2020), ‘emmeans’ (Lenth, 2020) and ‘statforbiology’; this latter is the companion package for this website and must have been installed as detailed in this <a href="https://www.statforbiology.com/rpackages/">page here</a>.</p>
 <pre class="r"><code># options(width = 70)
 
 rm(list=ls())
 # library(devtools)
-# install_github(&quot;OnofriAndreaPG/aomisc&quot;)
+# install.packages(&quot;statforbiology&quot;)
 library(reshape)
 library(emmeans)
-library(aomisc)
+library(statforbiology)
 
 fileName &lt;- &quot;https://www.casaonofri.it/_datasets/fabaBean.csv&quot;
 dataset &lt;- read.csv(fileName, header=T)
@@ -41,14 +39,13 @@ dataset &lt;- transform(dataset, Block = factor(Block),
                      Genotype = factor(Genotype),
                      Environment = factor(Environment))
 head(dataset)
-##      Genotype Block Environment Yield
-## 1    Chiaro_A     1       bad_1  4.36
-## 2    Chiaro_P     1       bad_1  2.76
-## 3 Collameno_A     1       bad_1  3.01
-## 4 Collameno_P     1       bad_1  2.50
-## 5    Palomb_A     1       bad_1  3.85
-## 6    Palomb_P     1       bad_1  2.21
- r
+##   Genotype Block Environment Location Year Yield
+## 1 Chiaro_A     1       bad_1      bad    1  4.36
+## 2 Chiaro_A     2       bad_1      bad    1  4.00
+## 3 Chiaro_A     3       bad_1      bad    1  4.23
+## 4 Chiaro_A     4       bad_1      bad    1  3.83
+## 5 Chiaro_P     1       bad_1      bad    1  2.76
+## 6 Chiaro_P     2       bad_1      bad    1  2.64
 #
 # Two-ways table of means
 GEmedie &lt;- cast(Genotype ~ Environment, data = dataset,
@@ -67,7 +64,6 @@ GEmedie
 ## 10   Sicania_P 3.2700 0.9900 3.7300 4.0475 0.8225 3.8950
 ## 11   Vesuvio_A 4.1375 2.0175 4.0275 4.5025 2.2650 4.3225
 ## 12   Vesuvio_P 2.1225 1.1800 3.5250 3.0950 0.9375 3.6275
- r
 #
 # Marginal means for genotypes
 apply(GEmedie, 1, mean)
@@ -77,13 +73,11 @@ apply(GEmedie, 1, mean)
 ##    2.440833    3.637083    3.099583    3.450833    2.792500 
 ##   Vesuvio_A   Vesuvio_P 
 ##    3.545417    2.414583
- r
 #
 # Marginal means for environments
 apply(GEmedie, 2, mean)
 ##    bad_1    bad_2    bad_3    pap_1    pap_2    pap_3 
 ## 3.220000 1.629792 3.992292 3.902292 1.727917 4.147292
- r
 #
 # Overall mean
 mean(as.matrix(GEmedie))
@@ -120,10 +114,8 @@ print(round(GE, 3))
 <p>Please, note that the overall mean for all elements in ‘GE’ is zero and the sum of squares is equal to a fraction of the interaction sum of squares in ANOVA (that is <span class="math inline">\(RMSE/r\)</span>; where <span class="math inline">\(r\)</span> is the number of blocks).</p>
 <pre class="r"><code>mean(unlist(GE))
 ## [1] -2.852656e-17
- r
 sum(GE^2)
 ## [1] 7.742996
- r
 mod &lt;- lm(Yield ~ Environment/Block + Genotype*Environment, data = dataset)
 anova(mod)
 ## Analysis of Variance Table
@@ -137,7 +129,6 @@ anova(mod)
 ## Residuals            198  21.58   0.109                       
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
- r
 30.97/4
 ## [1] 7.7425</code></pre>
 </div>
@@ -191,7 +182,6 @@ round(Sg %*% t(Se), 3)
 ## Sicania_P   -0.214  0.683 -0.402  0.148  0.151   0
 ## Vesuvio_A   -0.438 -0.008  0.020 -0.300 -0.177   0
 ## Vesuvio_P    0.316 -0.058  0.063  0.405 -0.114   0
- r
 round(Se, 3)
 ##          PC1    PC2    PC3    PC4    PC5 PC6
 ## bad_1 -0.831  0.095 -0.467 -0.317 -0.151   0
@@ -286,7 +276,7 @@ sum(GE2^2)
 </div>
 <div id="simple-ammi-analysis-with-r" class="section level1">
 <h1>Simple AMMI analysis with R</h1>
-<p>We have seen that AMMI analysis, under the hood, is a sort of PCA. Therefore, it could be performed, in R by using one of the available packages for PCA. For the sake of simplicity, I have coded the simple <code>AMMI()</code> function, that is available in the ‘aomisc’ package. I have described an earlier version of this function in an ‘R news’ paper (<a href="https://www.researchgate.net/publication/289419258_Using_R_to_perform_the_AMMI_analysis_on_agriculture_variety_trials">Onofri and Ciriciofolo, 2007</a>).</p>
+<p>We have seen that AMMI analysis, under the hood, is a sort of PCA. Therefore, it could be performed, in R by using one of the available packages for PCA. For the sake of simplicity, I have coded the simple <code>AMMI()</code> function, that is available in the ‘statforbiology’ package. I have described an earlier version of this function in an ‘R news’ paper (<a href="https://www.researchgate.net/publication/289419258_Using_R_to_perform_the_AMMI_analysis_on_agriculture_variety_trials">Onofri and Ciriciofolo, 2007</a>).</p>
 <p>Tha above function works equally well with raw MET data, containing all replicated values, or with the ‘genotype by environment’ average values. In this second case, the analyses proceed in two-steps, as I will describe below.</p>
 <div id="first-step-on-raw-data" class="section level2">
 <h2>First step on raw data</h2>
@@ -319,7 +309,6 @@ AMMIobj$genotype_scores
 ## Sicania_P   -0.21433211  0.683296898
 ## Vesuvio_A   -0.43786742 -0.007914342
 ## Vesuvio_P    0.31605973 -0.058152890
- r
 #
 AMMIobj$environment_scores
 ##               PC1         PC2
@@ -329,7 +318,6 @@ AMMIobj$environment_scores
 ## pap_1 -0.66137357  0.51268429
 ## pap_2 -0.06863235 -0.62703224
 ## pap_3  0.84633965  0.56736492
- r
 #
 AMMIobj$mult_Interaction
 ##      Effect       SS DF        MS         F        Prob. Perc_of_Total_SS
@@ -341,18 +329,17 @@ AMMIobj$mult_Interaction
 <pre><code>biplot(AMMIobj, xlab = &quot;Yield&quot;)
 biplot(AMMIobj, biplot = 2)</code></pre>
 <p>You may also consider to explore other more comprehensive R packages, such as ‘agricolae’ (de Mendiburu, 2020).</p>
-<p>Thank you for reading, so far, and… happy coding!</p>
+<p>Thank you for reading, so far, and… happy coding! And … don’t forget to check out my new book!</p>
 <p>Prof. Andrea Onofri<br />
 Department of Agricultural, Food and Environmental Sciences<br />
 University of Perugia (Italy)<br />
 Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
-<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow <span class="citation">@onofriandreapg</span></a>
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<p><a href = "https://www.awin1.com/cread.php?awinmid=26429&awinaffid=2675822&ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src= "../../_Figures/Email_Signature_978-3-032-08199-5.png" align="center" alt="Book cover" class="cover" /></a></p>
 <hr />
 </div>
 </div>
-<div id="literature-references" class="section level1">
-<h1>Literature references</h1>
+<div id="references" class="section level1">
+<h1>References</h1>
 <ol style="list-style-type: decimal">
 <li>Annichiarico, P. (1997). Additive main effects and multiplicative interaction (AMMI) analysis of genotype-location interaction in variety trials repeated over years. Theoretical applied genetics, 94, 1072-1077.</li>
 <li>Ariyo, O. J. (1998). Use of additive main effects and multiplicative interaction model to analyse multilocation soybean varietal trials. J. Genet. and Breed, 129-134.</li>

@@ -2,7 +2,6 @@
 title: "Regression analyses with common checks in pesticide research"
 author: "Andrea Onofri"
 date: 2023-12-15
-slug: 'Linear_models'
 categories:
   - R
   - 'Linear_models'
@@ -31,7 +30,6 @@ head(dataset)
 ## 4    4     Dicamba MineralOil    1     1        16.35 14.22
 ## 5    5     Dicamba       None    1     1        45.00 14.69
 ## 6    6 Rimsulfuron MineralOil   60     1        16.65 12.01
- r
 dataset[,c(1:3,5)] &lt;- lapply(dataset[,c(1:3,5)], 
                              function(i) factor(i))</code></pre>
 <p>In the previous post we have taken the dose as a factor and fitted an augmented factorial model. More appropriately, in this post we would like to take the dose as a quantitative variable and fit a regression model. If we consider the common control (dose = 0), we have three available doses for each herbicide and, thus, we can fit a simple linear regression model. In particular, we should fit 8 regression lines, one per each adjuvant/herbicide combination and we should assume that these lines have a common intercept, as they share a common control. It will also be necessary to assume that the adjuvants have no effect on themselves, which may not be true in this case, but we are not attempting to draw any biological conclusions, we only want to give an example of the method.</p>
@@ -53,7 +51,6 @@ summary(model)$coef[,1:3]
 ## Dose:HerbicideRimsulfuron:AdjuvantNone        0.01283416 0.009489724  1.352427
 ## Dose:HerbicideDicamba:AdjuvantSurfactant      1.41081026 0.584247220  2.414749
 ## Dose:HerbicideRimsulfuron:AdjuvantSurfactant  0.04518031 0.009489724  4.760972
- r
 # Alternative
 # model &lt;- lm(Yield ~ Dose / (Herbicide:Adjuvant) - Herbicide
 #            - Adjuvant, data = dataset)</code></pre>
@@ -61,21 +58,20 @@ summary(model)$coef[,1:3]
 <pre class="r"><code>coefs &lt;- coef(model)[c(3,6,9,12)]</code></pre>
 <p>Second, we have to retrieve the variances-covariances for the selected parameters:</p>
 <pre class="r"><code>varCov &lt;- vcov(model)[c(3,6,9,12), c(3,6,9,12)]</code></pre>
-<p>Now, we can input these elements into the <code>pairComp()</code> function in the ‘aomisc’ package, considering that we have 63 degrees of freedom in the residuals (see above):</p>
-<pre class="r"><code>library(aomisc)
+<p>Now, we can input these elements into the <code>pairComp()</code> function in the ‘statforbiology’ package, considering that we have 63 degrees of freedom in the residuals (see above):</p>
+<pre class="r"><code>library(statforbiology)
 pairComp(coefs, vcovMat = varCov, dfr = 63)$Letters
 ##                                                    Mean          SE CLD
 ## Dose:HerbicideRimsulfuron:AdjuvantNone       0.01283416 0.009489724   a
 ## Dose:HerbicideRimsulfuron:AdjuvantMineralOil 0.03691108 0.009489724   b
 ## Dose:HerbicideRimsulfuron:AdjuvantFrigate    0.04480531 0.009489724   b
 ## Dose:HerbicideRimsulfuron:AdjuvantSurfactant 0.04518031 0.009489724   b</code></pre>
-<p>Thanks for reading and happy coding!</p>
-<p>Andrea Onofri<br />
+<p>Thanks for reading and happy coding! And … don’t forget to check out my new book!</p>
+<p>Prof. Andrea Onofri<br />
 Department of Agricultural, Food and Environmental Sciences<br />
 University of Perugia (Italy)<br />
-<a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
-<a href="https://twitter.com/onofriandreapg?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow <span class="citation">@onofriandreapg</span></a>
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<p><a href = "https://www.awin1.com/cread.php?awinmid=26429&awinaffid=2675822&ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src= "../../_Figures/Email_Signature_978-3-032-08199-5.png" align="center" alt="Book cover" class="cover" /></a></p>
 <hr />
 <div id="reference" class="section level1">
 <h1>Reference</h1>
