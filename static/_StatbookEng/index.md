@@ -2,7 +2,7 @@
 title: "Field Research Methods in Agriculture"
 subtitle: "Supplemental material"
 author: "Andrea Onofri"
-date: "Update: v. 0.99 (1 November 2025), compil. 2026-03-18"
+date: "Update: v. 0.99 (1 November 2025), compil. 2026-06-10"
 #site: bookdown::bookdown_site
 documentclass: book
 fontsize: 12pt
@@ -567,7 +567,7 @@ An experiment to compare three adjuvants (ammonium sulfate, mineral oil, non-ion
 
 ## `alfalfa3years` {#alfalfa3years .unnumbered}
 
-A genotype experiment in alfalfa [@ligabue_2009] to compare 20 genotypes in central Italy (medium Tiber Valley). The experiment was laid out as an RCBD with four replicates and the total yearly forage yield (sum of 3-4 cuts per year) was measured in each plot over a 3 years (from 2006 to 2008).
+A genotype experiment in alfalfa [@ligabue_2009] to compare 20 genotypes in central Italy (medium Tiber Valley). The experiment was laid out as an RCBD with four replicates and the total yearly forage yield (sum of 3-4 cuts per year) was measured in each plot over 3 years (from 2006 to 2008).
 
 1. Plot (numeric): code for the plot
 2. Block (numeric): code for the block
@@ -614,6 +614,18 @@ An experiment to compare nine maize hybrids, obtained from three pollinating inb
 2. Female (character): female line
 3. Block (numeric): code for the blocks
 4. Yield (numeric): maize yield (in tons per hectare)
+
+## `fabaBeanSplitMet` {#fabaBeanSplitMet .unnumbered}
+
+Six faba bean genotypes were tested at two sowing times using a split-plot design in four complete blocks. Sowing times were randomized to main-plots within blocks, and genotypes were randomized to sub-plots within main-plots and blocks. The experiment was repeated in three years and two locations of Central Italy. The dataset was taken from @stagnari_2007.
+
+1. Location (character): name of the location
+2. Season (numeric): year of harvest
+3. Sowing (character): sowing time
+4. Genotype (character): name of the genotype
+5. Block (numeric): code for the block in each experiment
+6. Yield (numeric): crop grain yield in tons per hectare
+
 
 ## `failureTimes` {#failuretimes .unnumbered}
 
@@ -912,6 +924,15 @@ Counts of three weed species (CHEAL: *Chenopodium album*, CHEHY: *C. hybridum*, 
 1. Species (character): the weed species, identified by its Bayer code
 2. Rep (numeric): code for the quadrat
 3. Count (numeric): count of the number of plants per quadrat
+
+## `WeedCountTrial` {#weedcountstrial .unnumbered}
+
+Counts of weeds (ECHCG: *Echinochloa crus-galli*, AMARE: *Amaranthus retroflexus*, CHEAL: *Chenopodium album*, OTHER: other weed species) in an herbicide trial performed in central Italy, to compare 13 herbicides for weed control in maize, the untreated and hand-weeded controls (Onofri, unpublished data). Counts are expressed as number of weeds per square meters
+
+1. Plot (numeric): coding for the field plots
+2. Herbicide (character): code for the herbicide used or type of control
+3. Block (numeric): code for the block in the RCBD
+4. Columns from 4 to 7 (numeric): counts of the number of plants per square meter
 
 ## `WeedCover` {#weedcover .unnumbered}
 
