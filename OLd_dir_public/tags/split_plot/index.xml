@@ -1,0 +1,803 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Split_plot on Fixing the bridge between biologists and statisticians</title>
+    <link>https://www.statforbiology.com/tags/split_plot/</link>
+    <description>Recent content in Split_plot on Fixing the bridge between biologists and statisticians</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <managingEditor>andrea.onofri@unipg.it (Andrea Onofri)</managingEditor>
+    <webMaster>andrea.onofri@unipg.it (Andrea Onofri)</webMaster>
+    <lastBuildDate>Tue, 13 Sep 2022 00:00:00 +0000</lastBuildDate>
+    
+        <atom:link href="https://www.statforbiology.com/tags/split_plot/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Multi-environment split-plot experiments</title>
+      <link>https://www.statforbiology.com/2022/multi-environment-split-plot-experiments/</link>
+      <pubDate>Tue, 13 Sep 2022 00:00:00 +0000</pubDate>
+      <author>andrea.onofri@unipg.it (Andrea Onofri)</author>
+      <guid>https://www.statforbiology.com/2022/multi-environment-split-plot-experiments/</guid>
+      <description>
+
+
+&lt;p&gt;Have you made a split-plot field experiment? Have you repeated such an experiment in two (or more) years/locations? Have you run into troubles, because the reviewer told you that your ANOVA model was invalid? If so, please, stop for awhile and read: this post might help you understand what was wrong with your analyses.&lt;/p&gt;
+&lt;p&gt;Let’s think of a field experiment, where 6 genotypes of faba bean were compared under two different sowing times (autumn and spring). For the ease of organisation, such an experiment was laid down as a &lt;strong&gt;split-plot&lt;/strong&gt;, in a randomised complete block design; sowing times were randomly allocated to main-plots, while genotypes were randomly allocated to sub-plots. Let’s stop for a moment… does this sound strange to you? Do you need further information about split-plot designs? You can get some general information &lt;a href=&#34;https://www.statforbiology.com/_statbookeng/designing-experiments.html#setting-up-a-field-experiment&#34;&gt;at this link&lt;/a&gt; and hints on how to analyse the results at this &lt;a href=&#34;https://www.statforbiology.com/_statbookeng/plots-of-different-sizes.html&#34;&gt;other link&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The above experiment was repeated in three years and two locations (six environments in all), in order to explore the environmental variability of results (we will not make any distinction between years and locations, for the sake of this post). In the end, we recorded crop yield and produced a dataset with 288 record (6 environments by 2 sowing times by 6 genotypes by 4 blocks). If you are interested in more detail about this experiment, you can find them in Stagnari et al., (2007).&lt;/p&gt;
+&lt;p&gt;The resulting dataset (‘fabaBeanSplitMet.csv’) is available in a public online repository and contains six columns, the ‘Location’, the ‘Year’, the ‘Sowing’ time, the ‘Genotype’, the ‘Block’ and the response variable, i.e. the ‘Yield’. After loading the dataset, we need to recode the independent variables into factors and create the new ‘Environment’ factor, as the combination of ‘Year’ and ‘Location’ levels. In the box below, we use the ‘dplyr’ package to accomplish this preliminary step (Wickham et al., 2022).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(tidyverse)
+rm(list=ls())
+fileName &amp;lt;- &amp;quot;https://www.casaonofri.it/_datasets/fabaBeanSplitMet.csv&amp;quot;
+dataset &amp;lt;- read.csv(fileName)
+dataset &amp;lt;- dataset %&amp;gt;% 
+  mutate(across(c(Location, Year, Sowing, Genotype, Block),
+                .fns = factor),
+         Environment = factor(Location:Year))
+head(dataset)
+##   Location      Year Sowing  Genotype Block Yield       Environment
+## 1  papiano 2002-2003 autumn    Chiaro     1  2.05 papiano:2002-2003
+## 2  papiano 2002-2003 autumn    Chiaro     2  2.50 papiano:2002-2003
+## 3  papiano 2002-2003 autumn    Chiaro     3  2.64 papiano:2002-2003
+## 4  papiano 2002-2003 autumn    Chiaro     4  2.45 papiano:2002-2003
+## 5  papiano 2002-2003 autumn Collameno     1  2.01 papiano:2002-2003
+## 6  papiano 2002-2003 autumn Collameno     2  2.19 papiano:2002-2003&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;building-a-valid-model&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Building a valid model&lt;/h1&gt;
+&lt;p&gt;A model is identified by listing all the effects which we need to explain the observed yield. In this case, considering the aims of our experiment, it is pretty easy to grasp the importance of the ‘sowing date’ effect, the ‘genotype’ effect and their interaction. These are the so-called treatment factors and we have no doubt that they should be included in our model. Furthermore, we should also be interested to know whether those treatment effects interact with the environment effect, so we should clearly add to the model the ‘sowing time by environment’, ‘genotype by environment’ and ‘sowing time by genotype by environment’ interactions.&lt;/p&gt;
+&lt;p&gt;At this step, it is possible that we have no specific interest in any other effects, apart from those we have just mentioned; however, if we stop now, our model is still incomplete and, therefore, invalid. Indeed, we should also think about possible grouping factors. You may wonder: what are the grouping factors? This aspect needs particular attention.&lt;/p&gt;
+&lt;p&gt;In split-plot and other very common types of designs, the experimental units are not completely randomised, but they are organised (‘grouped’, indeed) by way of some innate attribute, such as the environment or block or main-plot, which they belong to. These attributes are known as ‘grouping factors (see Piepho et al., 2003) and they introduce a sort of ’parenthood’, so that some observations are more alike than others, because they belong to the same ‘group’ (e.g., same block or same main-plot). If we neglect the effects of ‘grouping factors’, these ‘parenthood’ effects remain in the residuals, which will be correlated. The correlation of residuals represent an important violation of the basic assumptions for linear model fitting and, therefore, the model will be invalid and our paper will be rejected. One first conclusion: &lt;strong&gt;please, do never forget the grouping factors, if you want your paper to be accepted!&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;What are the grouping factors in this case? First of all we have the environments (six levels), then we have the blocks within each environment (24 levels in all) and, finally, we have the main-plots within each block and within each environment (48 levels, in all). In this latter respect, we can see that each main-plot can be uniquely identified by the combination of one environment, one block and one sowing time. Consequently, the final (valid) model is:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Yield ~ Environment + Sowing + Environment:Sowing + Genotype + 
+        Environment:Genotype + Environment:Sowing:Genotype + 
+        Environment:Block + Environment:Block:Sowing&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In R, we can abbreviate as:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Yield ~ Environment * Sowing * Genotype + 
+        Environment:Block + Environment:Block:Sowing&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Sorry, I know I am running the risk of being regarded as a boring professor; but, please, remember: &lt;strong&gt;failing to include any of the above mentioned effects in the model, unless they are clearly non-significant, leads to totally invalid results!&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Now, we need to take a very important decision: which factors are fixed and which factors are random? The rule is that all factors that reference randomisation units (to which treatments are allocated) NEED TO BE RANDOM, while, for the other factors, we can make our own subjective choice. Here, the main-plot factor, to which we allocated the sowing dates, needs to be taken as random. For the other factors, we make the most traditional choice of taking them as fixed, although we need to consider that, in other instances, it might be appropriate to regard the ‘environment’ and ‘block’ effects as random (relating to block effects, you may read Dixon, 2016, for interesting information).&lt;/p&gt;
+&lt;p&gt;If I were to suggest a simple package to fit the above model, I’d say that you should favour the &lt;code&gt;lmer()&lt;/code&gt; function in the &lt;code&gt;lme4&lt;/code&gt; package, where the random effects are coded by using the ‘(1|effect)’ notation, as shown in the box below; before fitting, we load the ‘lme4’ package, together with the ‘lmerTest’ package, which gives us extra-flexibility to produce an ANOVA table:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(lme4)
+library(lmerTest)
+modMix &amp;lt;- lmer(Yield ~ Environment * Sowing * Genotype +
+               Environment:Block + (1|Environment:Block:Sowing),
+               data = dataset)
+anova(modMix)
+## Type III Analysis of Variance Table with Satterthwaite&amp;#39;s method
+##                             Sum Sq Mean Sq NumDF DenDF  F value    Pr(&amp;gt;F)    
+## Environment                 71.084  14.217     5    18 125.4463 2.430e-13 ***
+## Sowing                      45.947  45.947     1    18 405.4282 8.574e-14 ***
+## Genotype                     8.030   1.606     5   180  14.1707 1.091e-11 ***
+## Environment:Sowing          11.022   2.204     5    18  19.4520 1.086e-06 ***
+## Environment:Genotype         9.468   0.379    25   180   3.3418 1.454e-06 ***
+## Sowing:Genotype              5.340   1.068     5   180   9.4231 5.388e-08 ***
+## Environment:Block            4.398   0.244    18    18   2.1560    0.0561 .  
+## Environment:Sowing:Genotype  7.912   0.316    25   180   2.7925 4.513e-05 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Obviously, multiple comparison testing can be done with the ‘emmeans’ package as we have shown elsewhere. Transforming the environment or block effects into random effects is pretty straightforward, by changing the R notation; please remember that, if you regard the environment as random, all its interactions should also be regarded most often regardes as well as random.&lt;/p&gt;
+&lt;p&gt;Did I menage to make myself clear? If not, drop me a line to the address below. Happy coding!&lt;/p&gt;
+&lt;p&gt;And … don’t forget to check out my new book!&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href = &#34;https://www.awin1.com/cread.php?awinmid=26429&amp;awinaffid=2675822&amp;ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5&#34;&gt;&lt;img src= &#34;../../_Figures/Email_Signature_978-3-032-08199-5.png&#34; align=&#34;center&#34; alt=&#34;Book cover&#34; class=&#34;cover&#34; /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Dixon, P., 2016. Should blocks be fixed or random? Conference on Applied Statistics in Agriculture. &lt;a href=&#34;https://doi.org/10.4148/2475-7772.1474&#34; class=&#34;uri&#34;&gt;https://doi.org/10.4148/2475-7772.1474&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Piepho, H.-P., Büchse, A., Emrich, K., 2003. A Hitchhiker’s Guide to Mixed Models for Randomized Experiments. Journal of Agronomy and Crop Science 189, 310–322.&lt;/li&gt;
+&lt;li&gt;Stagnari, F., Onofri, A., Jemison, J.J., Monotti, M., 2007. Improved multivariate analyses to discriminate the behaviour of faba bean varieties. Agronomy For Sustainable Development 27, 387–397.&lt;/li&gt;
+&lt;li&gt;Wickham H, François R, Henry L, Müller K (2022). Dplyr: A Grammar of Data Manipulation. R package version 1.0.9, &lt;a href=&#34;https://CRAN.R-project.org/package=dplyr&#34; class=&#34;uri&#34;&gt;https://CRAN.R-project.org/package=dplyr&lt;/a&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Split-plot designs: the transition to mixed models for a dinosaur</title>
+      <link>https://www.statforbiology.com/2021/mixed-models/</link>
+      <pubDate>Thu, 11 Feb 2021 00:00:00 +0000</pubDate>
+      <author>andrea.onofri@unipg.it (Andrea Onofri)</author>
+      <guid>https://www.statforbiology.com/2021/mixed-models/</guid>
+      <description>
+
+
+&lt;p&gt;&lt;em&gt;Those who long ago took courses in ‘analysis of variance’ or ‘experimental design’ … would have learned methods … based on observed and expected mean squares and methods of testing based on ‘error strata’ (if you weren’t forced to learn this, consider yourself lucky). (&lt;a href=&#34;https://stat.ethz.ch/pipermail/r-help/2006-May/094765.html&#34;&gt;Douglas Bates, 2006&lt;/a&gt;).&lt;/em&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;p&gt;In a previous post, I already mentioned that, due to my age, I see myself as a dinosaur within the R-users community. I already mentioned how difficult it is, for a dinosaur, to adjust to new concepts and paradigms in data analysis, after having done things differently for a long time ( &lt;a href=&#34;https://www.statforbiology.com/2020/stat_r_tidyverse_columnwise/&#34;&gt;see this post here&lt;/a&gt; ). Today, I decided to sit and write a second post, relating to data analyses for split-plot designs. Some years ago, when switching to R, this topic required some adjustments to my usual workflow, which gave me a few headaches.&lt;/p&gt;
+&lt;p&gt;Let’s start from a real-life example.&lt;/p&gt;
+&lt;div id=&#34;a-split-plot-experiment&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;A split-plot experiment&lt;/h1&gt;
+&lt;p&gt;The dataset ‘beet.csv’ is available in a web repository. It was obtained from a split-plot experiment with two experimental factors: three tillage methods (shallow ploughing, deep ploughing and minimum tillage) and two weed control methods (total and partial, meaning that the herbicide was sprayed broadcast or only along crop rows). Tillage methods were allocated to main-plots, while weed control methods were allocated to sub-plots and the experiment was designed in four complete blocks. A typical split-plot field experiment, indeed. The code below can be used to load the data.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(tidyverse)
+fileName &amp;lt;- &amp;quot;https://www.casaonofri.it/_datasets/beet.csv&amp;quot;
+dataset &amp;lt;- read_csv(fileName)
+dataset &amp;lt;- dataset %&amp;gt;% 
+  mutate(across(c(Tillage, WeedControl, Block), .fns = factor))
+dataset
+## # A tibble: 24 × 4
+##    Tillage WeedControl Block Yield
+##    &amp;lt;fct&amp;gt;   &amp;lt;fct&amp;gt;       &amp;lt;fct&amp;gt; &amp;lt;dbl&amp;gt;
+##  1 MIN     TOT         1     11.6 
+##  2 MIN     TOT         2      9.28
+##  3 MIN     TOT         3      7.02
+##  4 MIN     TOT         4      8.02
+##  5 MIN     PART        1      5.12
+##  6 MIN     PART        2      4.31
+##  7 MIN     PART        3      8.94
+##  8 MIN     PART        4      5.62
+##  9 SP      TOT         1     10.0 
+## 10 SP      TOT         2      8.69
+## # ℹ 14 more rows&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;the-traditional-approach&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;The traditional approach&lt;/h1&gt;
+&lt;p&gt;Split-plot designs are very commonly used in field experiments and they have been in fashion for (at least) eighty years, long before that the mixed model platform with REML estimation was largely available. Whoever has taken a course in ‘experimental design’ at the end of the 80s has studied how to perform a split-plot ANOVA by hand-calculations, based on the method of moments. For the youngest readers, it might be useful to give a few hints on what I used to do thirty years ago with the above dataset:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;calculate the overall mean and the means for the levels of blocks, tillage, weed control and for the combined levels of tillage and weed control.&lt;/li&gt;
+&lt;li&gt;Calculate the means for the combined levels of blocks and tillage, which would correspond to the means for the twelve main-plots.&lt;/li&gt;
+&lt;li&gt;With all those means, calculate the deviances for all effects and interactions, as the sums of squared residuals with respect to the overall mean.&lt;/li&gt;
+&lt;li&gt;Derive the related variance, by using the appropriate number of degrees of freedom for each effect.&lt;/li&gt;
+&lt;li&gt;Calculate F ratios, based on the appropriate error stratum, i.e. the mean square for the ‘blocks ⨉ tillage’ combinations (so called: error A) and the residual mean square.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The most relevant aspect in the approach outlined above is the ‘block by tillage’ interaction; the mean square for this effect was used as the denominator in the F ratio, to test for the significance of the tillage main effect.&lt;/p&gt;
+&lt;p&gt;The above process was simple to teach and simple to grasp and I used to see it as a totally correct approach to balanced (orthogonal) split-plot data. Those of you who are experienced with SAS should probably remember that, before the advent of PROC MIXED in 1992, split-plot designs were analysed with PROC GLM, using the very same approach as outlined above.&lt;/p&gt;
+&lt;p&gt;Considering the above background, let’s see what I did when I switched to R?&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;first-step-aov&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;First step: ‘aov()’&lt;/h1&gt;
+&lt;p&gt;Having the method of moments in mind, my first line of attack was to use the &lt;code&gt;aov()&lt;/code&gt; function, as suggested in Venables and Ripley (2002) at pag. 283. Those authors make use of the nesting operator in the expression &lt;code&gt;Error(Block/Tillage)&lt;/code&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod.aov &amp;lt;- aov(Yield ~ Tillage*WeedControl +
+                 Error(Block/Tillage), data = dataset)
+summary(mod.aov)
+## 
+## Error: Block
+##           Df Sum Sq Mean Sq F value Pr(&amp;gt;F)
+## Residuals  3   3.66    1.22               
+## 
+## Error: Block:Tillage
+##           Df Sum Sq Mean Sq F value Pr(&amp;gt;F)   
+## Tillage    2 23.656   11.83    19.4 0.0024 **
+## Residuals  6  3.658    0.61                  
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Error: Within
+##                     Df Sum Sq Mean Sq F value Pr(&amp;gt;F)  
+## WeedControl          1   3.32   3.320   1.225 0.2972  
+## Tillage:WeedControl  2  19.46   9.732   3.589 0.0714 .
+## Residuals            9  24.40   2.711                 
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In the above definition, the block effect is regarded as random, while, in the traditional approach, it is often regarded as fixed. Indeed, still today, there is no consensus among agricultural scientists on whether the block effect should be regarded as random or fixed (see Dixon, 2016); for the sake of this exercise, let me regard it as fixed. After a few attempts, I discovered that I could move the effect of blocks from the &lt;code&gt;Error()&lt;/code&gt; definition to the fixed effect formula and use the expression &lt;code&gt;Error(Block:Tillage)&lt;/code&gt; to specify the uppermost error stratum.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod.aov2 &amp;lt;- aov(Yield ~ Block + Tillage*WeedControl +
+                 Error(Block:Tillage), data = dataset)
+## Warning in aov(Yield ~ Block + Tillage * WeedControl + Error(Block:Tillage), :
+## Error() model is singular
+ r
+summary(mod.aov2)
+## 
+## Error: Block:Tillage
+##           Df Sum Sq Mean Sq F value Pr(&amp;gt;F)   
+## Block      3  3.660    1.22   2.001 0.2155   
+## Tillage    2 23.656   11.83  19.399 0.0024 **
+## Residuals  6  3.658    0.61                  
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Error: Within
+##                     Df Sum Sq Mean Sq F value Pr(&amp;gt;F)  
+## WeedControl          1   3.32   3.320   1.225 0.2972  
+## Tillage:WeedControl  2  19.46   9.732   3.589 0.0714 .
+## Residuals            9  24.40   2.711                 
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Although the above code produces a warning message, the result is totally the same as I would have obtained by hand-calculations.&lt;/p&gt;
+&lt;p&gt;For me, the &lt;code&gt;aov()&lt;/code&gt; function represented a safe harbour, mainly because the result was very much like what I would expect, considering my experience with mean squares and error strata. Unfortunately, I had to realise that there were several limitations to this approach and, finally, I had to switch to the mixed model platform.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;second-step-the-mixed-model-framework&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Second step: the mixed model framework&lt;/h1&gt;
+&lt;p&gt;When making this switch to mixed models, I had the expectation that I should be able to reproduce the results obtained with the &lt;code&gt;aov()&lt;/code&gt; function and, formerly, by hand-calculations.&lt;/p&gt;
+&lt;p&gt;I started with the &lt;code&gt;lme()&lt;/code&gt; function in the ‘nlme’ package (Pinheiro et al., 2018) and I had the idea that I could simply replace the &lt;code&gt;Error(Block:Tillage)&lt;/code&gt; statement with &lt;code&gt;random = ~1|Block:Tillage&lt;/code&gt;. Unfortunately, using the &lt;code&gt;:&lt;/code&gt; operator in the &lt;code&gt;lme()&lt;/code&gt; function is not possible and I had to resort to using the nesting operator &lt;code&gt;‘Block/Tillage’&lt;/code&gt;. Consequently, I noted that the F test for the block effect was wrong (of course: the specification was wrong…). I could have removed the block from the fixed effect model, but I was so stupidly determined to reproduce my hand-calculations.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(nlme)
+## 
+## Attaching package: &amp;#39;nlme&amp;#39;
+## The following object is masked from &amp;#39;package:dplyr&amp;#39;:
+## 
+##     collapse
+ r
+mod.lme &amp;lt;- lme(Yield ~ Block + Tillage*WeedControl,
+               random = ~1|Block/Tillage, data = dataset)
+anova(mod.lme)
+## Warning in pf(Fval[i], nDF[i], dDF[i]): NaNs produced
+##                     numDF denDF   F-value p-value
+## (Intercept)             1     9 120.80974  &amp;lt;.0001
+## Block                   3     0   0.08042     NaN
+## Tillage                 2     6   6.32281  0.0333
+## WeedControl             1     9   1.77497  0.2155
+## Tillage:WeedControl     2     9   5.20229  0.0315&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Therefore, I tried to switch to the &lt;code&gt;lmer()&lt;/code&gt; function in the ‘lme4’ package (Bates et al., 2015). With this platform, it was possible to include the ‘block by tillage’ interaction as a random effect, according to my usual workflow. Still, the results did not match to those obtained with the &lt;code&gt;aov()&lt;/code&gt; function: an error message was raised and F ratios were totally different. Furthermore, p-levels were not even displayed (yes, now I know that we can use the ‘lmerTest’ package, but, please, wait a few seconds).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(lme4)
+mod.lmer.split &amp;lt;- lmer(Yield ~ Block + WeedControl*Tillage +
+                     (1|Block:Tillage), 
+                     data=dataset)
+anova(mod.lmer.split)
+## Analysis of Variance Table
+##                     npar  Sum Sq Mean Sq F value
+## Block                  3  3.6596  1.2199  0.6521
+## WeedControl            1  3.3205  3.3205  1.7750
+## Tillage                2 23.6565 11.8282  6.3228
+## WeedControl:Tillage    2 19.4641  9.7321  5.2023&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;What’s wrong with that? Why was I not able to reproduce my hand-calculations with the mixed model platform?&lt;/p&gt;
+&lt;p&gt;I investigated this matter and I found a very enlightening post by Douglas Bates (the author of ‘nlme’ and ‘lme4’), which is available at &lt;a href=&#34;https://stat.ethz.ch/pipermail/r-help/2006-May/094765.html&#34;&gt;this link&lt;/a&gt;. From there, it was clear to me that F ratios in mixed models are “&lt;em&gt;not based on expected mean squares and error strata&lt;/em&gt;”; further ahead, it is said that there is “&lt;em&gt;a problem with the assumption that the reference distribution for these F statistics should be an F distribution with a known numerator of degrees of freedom but a variable denominator degrees of freedom&lt;/em&gt;”. In the end, it was clear to me that, according to Douglas Bates, the traditional approach of calculating p-values from F ratios based on expected mean squares and error strata was not necessarily correct.&lt;/p&gt;
+&lt;p&gt;I made some further research on this matter. Indeed, looking at the &lt;code&gt;aov()&lt;/code&gt; output above, I noted that the residual mean square was equal to 2.711, while the mean square for the ‘Block by Tillage’ interaction was 0.6097. My beloved method of moments brought me to a negative estimate of the variance component for the ‘block by tillage’ interaction, that is &lt;span class=&#34;math inline&#34;&gt;\((0.6097 - 2.711)/4 = -0.5254\)&lt;/span&gt;. I gasped: this was unreasonable and, at least, it would imply that the variance component for the ‘block by tillage’ random effect was not significantly different from zero. In other words, the mean square for the ‘block by tillage’ interaction and the mean square for the residuals were nothing but two separate estimates of the residual plot-to-plot error. I started being suspicious about my hand-calculations. Why did I use two estimates of the same amount as two different error strata?&lt;/p&gt;
+&lt;p&gt;I tried a different line of attack: considering that the ‘block by tillage’ interaction was not significant, I removed it from the model. Afterwards I fitted a linear fixed effect model, where the two error strata had been pooled into the residual error term. I obtained the very same F ratios as those obtained from the ‘lmer’ fit.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod.lm &amp;lt;- lm(Yield ~ Block + WeedControl*Tillage, data=dataset) 
+anova(mod.lm)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##                     Df  Sum Sq Mean Sq F value  Pr(&amp;gt;F)  
+## Block                3  3.6596  1.2199  0.6521 0.59389  
+## WeedControl          1  3.3205  3.3205  1.7750 0.20266  
+## Tillage              2 23.6565 11.8282  6.3228 0.01020 *
+## WeedControl:Tillage  2 19.4641  9.7321  5.2023 0.01922 *
+## Residuals           15 28.0609  1.8707                  
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In that precise moment when I noted such a result, it was clear to me that, even with simple and orthogonal split-plot designs, hand-calculations do not necessarily produce correct results and should never, ever be used as the reference to assess the validity of a mixed model fit.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;suggestions-for-dinosaurs&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Suggestions for dinosaurs&lt;/h1&gt;
+&lt;p&gt;If you are one of those who have never taken a lesson about expected mean squares and error strata, well, believe me, you are lucky! For us dinosaurs, switching to the mixed model platform may be a daunting task. We need to free up our minds and change our workflow; a few suggestions are following.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;rule-1-change-model-building-process&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Rule 1: change model building process&lt;/h1&gt;
+&lt;p&gt;In principle, do no insist on including the ‘block by tillage’ interaction in the model. With split-plot experiments, the main-plot is to be regarded as a &lt;em&gt;grouping structure&lt;/em&gt;, wherein we take repeated measures in different sub-plots. These measures are correlated, as they are more alike than measures taken in different sub-plots.&lt;/p&gt;
+&lt;p&gt;Therefore, for this grouping structure (and for all grouping structures in general) we need to code a &lt;em&gt;grouping factor&lt;/em&gt;, to uniquely identify the repeated measures in each main-plot. This factor must be included in the model, otherwise we violate the basic assumption of independence of model residuals. Consider that the main-plot represent the randomisation units to which the tillage treatments were allocated; therefore, the main plot factor needs to be included in the model as a random effect. Please refer to the good paper of Piepho et al. (2003) for further information on this model building approach.&lt;/p&gt;
+&lt;p&gt;In the box below I created the main-plot factor by using &lt;code&gt;dplyr()&lt;/code&gt; to combine the levels of blocks and tillage methods. The difference with the traditional approach of using the ‘block by tillage’ interaction in the model is subtle, but, in this case, the &lt;code&gt;lme()&lt;/code&gt; function returns no error. Please, note that, having no interest in the estimation of variance components, I have fitted this model by maximum likelihood estimation: it is confirmed that the main-plot random effect is zero (see the output of the &lt;code&gt;VarCorr()&lt;/code&gt; function).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dataset &amp;lt;- dataset %&amp;gt;% 
+  mutate(mainPlots = factor(Block:Tillage))
+mod.lme2 &amp;lt;- lme(Yield ~ Block + Tillage * WeedControl,
+               random = ~1|mainPlots, data = dataset,
+               method = &amp;quot;ML&amp;quot;)
+VarCorr(mod.lme2)
+## mainPlots = pdLogChol(1) 
+##             Variance     StdDev      
+## (Intercept) 4.463041e-10 2.112591e-05
+## Residual    1.169203e+00 1.081297e+00&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;rule-2-change-the-approach-to-hypotheses-testing&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Rule 2: change the approach to hypotheses testing&lt;/h1&gt;
+&lt;p&gt;In the agricultural sciences we have been very much familiar with ANOVA tables, showing all fixed effects along with their significance level. I am very much convinced that we should refrain from such a (possibly bad) habit. Indeed, there is no point in testing the significance of main effects before testing the significance of the ‘tillage by weed control’ interaction, as main effects are marginal to the interaction effect.&lt;/p&gt;
+&lt;p&gt;At first, we need to concentrate on the interaction effect. According to maximum likelihood theory, it is very logic to think of a Likelihood Ratio Test (LRT), which consists of comparing the likelihoods of two alternative and nested models. In this case, the model above (‘mod.lme2’) can be compared with a ‘reduced’ model without the ‘tillage by weed control’ interaction term: if the two likelihoods are similar, that would be a sign that the interaction effect is not significant. The reduced model fit is shown below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod.lme3 &amp;lt;- lme(Yield ~ Block + Tillage + WeedControl,
+               random = ~1|mainPlots, data = dataset,
+               method = &amp;quot;ML&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The logarithms of the two likelihoods show that the ‘full model’ (with the interaction term) is more ‘likely’ than the reduced model. The LRT is calculated as twice the difference between the two log-likelihoods (the logarithm of the ratio of two numbers is the difference of the logarithms, remember?).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ll2 &amp;lt;- logLik(mod.lme2)
+ll3 &amp;lt;- logLik(mod.lme3)
+ll2; ll3
+## &amp;#39;log Lik.&amp;#39; -35.93039 (df=11)
+## &amp;#39;log Lik.&amp;#39; -42.25294 (df=9)
+ r
+LRT &amp;lt;- - 2 * (as.numeric(ll3) - as.numeric(ll2))
+LRT
+## [1] 12.6451&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;For large samples and under the null hypothesis that the two models are not significantly different, the LRT is distributed according to a &lt;span class=&#34;math inline&#34;&gt;\(\chi^2\)&lt;/span&gt; with two degrees of freedom (i.e. the difference in the number of model parameters used by the two models). We could use such an assumption to obtain a p-level for the null, for example by way of the &lt;code&gt;anova()&lt;/code&gt; function, to which we pass the two model objects as arguments.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;anova(mod.lme2, mod.lme3)
+##          Model df       AIC      BIC    logLik   Test L.Ratio p-value
+## mod.lme2     1 11  93.86078 106.8194 -35.93039                       
+## mod.lme3     2  9 102.50589 113.1084 -42.25294 1 vs 2 12.6451  0.0018&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;However, our experiment consists of only 24 observations and the large sample theory should not hold. Therefore, instead of relying on the &lt;span class=&#34;math inline&#34;&gt;\(\chi^2\)&lt;/span&gt; distribution, we can build an empirical sampling distribution for the LRT with Monte Carlo simulation (parametric bootstrap). The process is as follows:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;simulate a new dataset under the reduced model, using the fitted parameter estimates and assuming normality for the errors and random effects;&lt;/li&gt;
+&lt;li&gt;fit to this dataset both the full and the reduced model;&lt;/li&gt;
+&lt;li&gt;compute the LRT statistic;&lt;/li&gt;
+&lt;li&gt;repeat steps 1 to 3 many times (e.g., 10000);&lt;/li&gt;
+&lt;li&gt;examine the distribution of the bootstrapped LRT values and compute the proportion of those exceeding 12.6451 (empirical p-value).&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;To this aim, we can use the &lt;code&gt;simulate()&lt;/code&gt; function in the ‘nlme’ package. We pass the reduced model object as the first argument, the full model as the argument ‘m2’, the number of simulations and the seed (if we intend to obtain reproducible results). The fit may take quite a few minutes.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;y &amp;lt;- simulate(mod.lme3, nsim = 10000, m2 = mod.lme2, method=&amp;quot;ML&amp;quot;,
+               set.seed = 1234)
+lrtSimT &amp;lt;- as.numeric(2*(y$alt$ML[,2] - y$null$ML[,2]))
+length(lrtSimT[lrtSimT &amp;gt; 12.6451])/length(lrtSimT)
+## [1] 0.0207&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We conclude that the interaction is significant and we can go ahead with further analyses.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;take-home-message&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Take-home message&lt;/h1&gt;
+&lt;p&gt;What is the take-home message for this post? When we have to analyse a dataset coming from a split-plot experiment, R forces us to use the mixed model platform. We should not necessarily expect to reproduce the approach and the results we were used to obtain when we made our hand-calculations based on least squares and the method of moments. On the contrary, we should adapt our model building and hypothesis testing process to such a very powerful platform, wherein the slit-plot is treated on equal footing to all other types of repeated measures designs.&lt;/p&gt;
+&lt;p&gt;Hope this was fun! If you have any comments, drop me a line to the email below.&lt;/p&gt;
+&lt;hr /&gt;
+&lt;p&gt;Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Douglas Bates, Martin Maechler, Ben Bolker, Steve Walker (2015). Fitting Linear Mixed-Effects Models Using lme4. Journal of Statistical Software, 67(1), 1-48. &lt;a href=&#34;doi:10.18637/jss.v067.i01&#34; class=&#34;uri&#34;&gt;doi:10.18637/jss.v067.i01&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Dixon, P., 2016. Should blocks be fixed or random? Conference on Applied Statistics in Agriculture. &lt;a href=&#34;https://doi.org/10.4148/2475-7772.1474&#34; class=&#34;uri&#34;&gt;https://doi.org/10.4148/2475-7772.1474&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Piepho, H.-P., Büchse, A., Emrich, K., 2003. A Hitchhiker’s Guide to Mixed Models for Randomized Experiments. Journal of Agronomy and Crop Science 189, 310–322.&lt;/li&gt;
+&lt;li&gt;Pinheiro J, Bates D, DebRoy S, Sarkar D, R Core Team (2018). nlme: Linear and Nonlinear Mixed Effects Models_. R package version 3.1-137, &amp;lt;URL: &lt;a href=&#34;https://CRAN.R-project.org/package=nlme&#34; class=&#34;uri&#34;&gt;https://CRAN.R-project.org/package=nlme&lt;/a&gt;&amp;gt;.&lt;/li&gt;
+&lt;li&gt;Venables, W.N., Ripley, B.D., Venables, W.N., 2002. Modern applied statistics with S, 4th ed. ed, Statistics and computing. Springer, New York.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Accounting for the experimental design in linear/nonlinear regression analyses</title>
+      <link>https://www.statforbiology.com/2020/accounting-for-the-experimental-design-in-linear/nonlinear-regression-analyses/</link>
+      <pubDate>Fri, 04 Dec 2020 00:00:00 +0000</pubDate>
+      <author>andrea.onofri@unipg.it (Andrea Onofri)</author>
+      <guid>https://www.statforbiology.com/2020/accounting-for-the-experimental-design-in-linear/nonlinear-regression-analyses/</guid>
+      <description>
+
+
+&lt;p&gt;In this post, I am going to talk about an issue that is often overlooked by agronomists and biologists. The point is that field experiments are very often laid down in blocks, using split-plot designs, strip-plot designs or other types of designs with grouping factors (blocks, main-plots, sub-plots). We know that these grouping factors should be appropriately accounted for in data analyses: ‘analyze them as you have randomized them’ is a common saying attributed to Ronald Fisher. Indeed, observations in the same group are correlated, as they are more alike than observations in different groups. What happens if we neglect the grouping factors? We break the independence assumption and our inferences are invalid (Onofri et al., 2010).&lt;/p&gt;
+&lt;p&gt;To my experience, field scientists are totally aware of this issue when they deal with ANOVA-type models (e.g., see Jensen et al., 2018). However, a brief survey of literature shows that there is not the same awareness, when field scientists deal with linear/nonlinear regression models. Therefore, I decided to sit down and write this post, in the hope that it may be useful to obtain more reliable data analyses.&lt;/p&gt;
+&lt;div id=&#34;an-example-with-linear-regression&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;An example with linear regression&lt;/h1&gt;
+&lt;p&gt;Let’s take a look at the ‘yieldDensity.csv’ dataset, that is available on gitHub. It represents an experiment where sunflower was tested with increasing weed densities (0, 14, 19, 28, 32, 38, 54, 82 plants per &lt;span class=&#34;math inline&#34;&gt;\(m^2\)&lt;/span&gt;), on a randomised complete block design, with 10 blocks. a swift plot shows that yield is linearly related to weed density, which calls for linear regression analysis.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rm(list=ls())
+library(nlme)
+library(lattice)
+library(statforbiology)
+## Loading required package: drc
+## Loading required package: MASS
+## 
+## &amp;#39;drc&amp;#39; has been loaded.
+## Please cite R and &amp;#39;drc&amp;#39; if used for a publication,
+## for references type &amp;#39;citation()&amp;#39; and &amp;#39;citation(&amp;#39;drc&amp;#39;)&amp;#39;.
+## 
+## Attaching package: &amp;#39;drc&amp;#39;
+## The following objects are masked from &amp;#39;package:stats&amp;#39;:
+## 
+##     gaussian, getInitial
+ r
+dataset &amp;lt;- getAgroData(&amp;quot;yieldDensityB&amp;quot;)
+dataset$block &amp;lt;- factor(dataset$block)
+head(dataset)
+##   block density yield
+## 1     1       0 29.90
+## 2     2       0 34.23
+## 3     3       0 37.12
+## 4     4       0 26.37
+## 5     5       0 34.48
+## 6     6       0 33.70
+ r
+plot(yield ~ density, data = dataset)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_nlmm_DesignConstraints_files/figure-html/unnamed-chunk-1-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;We might be tempted to neglect the block effect and run a linear regression analysis of yield against density. This is clearly wrong (I am violating the independence assumption) and inefficient, as any block-to-block variability goes into the residual error term, which is, therefore, inflated.&lt;/p&gt;
+&lt;p&gt;Some of my collegues would take the means for densities and use those to fit a linear regression model (two-steps analysis). By doing so, block-to-block variability is cancelled out and the analysis becomes more efficient. However, such a solution is not general, as it is not feasible, e.g., when we have unbalanced designs and heteroscedastic data. With the appropriate approach, sound analyses can also be made in two-steps (Damesa et al., 2017). From my point of view, it is reasonable to search for more general solutions to deal with one-step analyses.&lt;/p&gt;
+&lt;p&gt;Based on our experience with traditional ANOVA models, we might think of taking the block effect as fixed and fit it as and additive term. See the code below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod.reg &amp;lt;- lm(yield ~ block + density, data=dataset)
+summary(mod.reg)
+## 
+## Call:
+## lm(formula = yield ~ block + density, data = dataset)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -2.6062 -0.8242 -0.3315  0.7505  4.6244 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&amp;gt;|t|)    
+## (Intercept) 29.10462    0.57750  50.397  &amp;lt; 2e-16 ***
+## block2       4.57750    0.74668   6.130 4.81e-08 ***
+## block3       7.05875    0.74668   9.453 4.49e-14 ***
+## block4      -3.98000    0.74668  -5.330 1.17e-06 ***
+## block5       6.17625    0.74668   8.272 6.37e-12 ***
+## block6       5.92750    0.74668   7.938 2.59e-11 ***
+## block7       1.23750    0.74668   1.657  0.10199    
+## block8       1.25500    0.74668   1.681  0.09733 .  
+## block9       2.34875    0.74668   3.146  0.00245 ** 
+## block10      2.25125    0.74668   3.015  0.00359 ** 
+## density     -0.26744    0.00701 -38.149  &amp;lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error: 1.493 on 69 degrees of freedom
+## Multiple R-squared:  0.9635,	Adjusted R-squared:  0.9582 
+## F-statistic: 181.9 on 10 and 69 DF,  p-value: &amp;lt; 2.2e-16&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;With regression, this solution is not convincing. Indeed, the above model assumes that the blocks produce an effect only on the intercept of the regression line, while the slope is unaffected. Is this a reasonable assumption? I vote no.&lt;/p&gt;
+&lt;p&gt;Let’s check this by fitting a different regression model per block (ten different slopes + ten different intercepts):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod.reg2 &amp;lt;- lm(yield ~ block/density + block, data=dataset)
+anova(mod.reg, mod.reg2)
+## Analysis of Variance Table
+## 
+## Model 1: yield ~ block + density
+## Model 2: yield ~ block/density + block
+##   Res.Df    RSS Df Sum of Sq      F  Pr(&amp;gt;F)  
+## 1     69 153.88                              
+## 2     60 115.75  9    38.135 2.1965 0.03465 *
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The p-level confirms that the block had a significant effect both on the intercept and on the slope. To describe such an effect we need 20 parameters in the model, which is not very parsimonious. And above all: which regression line do we use for predictions? Taking the block effect as fixed is clearly sub-optimal with regression models.&lt;/p&gt;
+&lt;p&gt;The question is: can we fit a simpler and clearer model? The answer is: yes. Why don’t we take the block effect as random? This is perfectly reasonable. Let’s do it.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;modMix.1 &amp;lt;- lme(yield ~ density, random = ~ density|block, data=dataset)
+summary(modMix.1)
+## Linear mixed-effects model fit by REML
+##   Data: dataset 
+##        AIC      BIC    logLik
+##   340.9166 355.0569 -164.4583
+## 
+## Random effects:
+##  Formula: ~density | block
+##  Structure: General positive-definite, Log-Cholesky parametrization
+##             StdDev     Corr  
+## (Intercept) 3.16871858 (Intr)
+## density     0.02255249 0.09  
+## Residual    1.38891957       
+## 
+## Fixed effects:  yield ~ density 
+##                Value Std.Error DF   t-value p-value
+## (Intercept) 31.78987 1.0370844 69  30.65311       0
+## density     -0.26744 0.0096629 69 -27.67704       0
+##  Correlation: 
+##         (Intr)
+## density -0.078
+## 
+## Standardized Within-Group Residuals:
+##        Min         Q1        Med         Q3        Max 
+## -1.9923722 -0.5657555 -0.1997103  0.4961675  2.6699060 
+## 
+## Number of Observations: 80
+## Number of Groups: 10&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The above fit shows that the random effects (slope and intercept) are sligthly correlated (r = 0.091). We might like to try a simpler model, where random effects are independent. To do so, we need to consider that the above model is equivalent to the following model:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;modMix.1 &amp;lt;- lme(yield ~ density, random = list(block = pdSymm(~density)), data=dataset)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It’s just two different ways to code the very same model. However, this latter coding, based on a ‘pdMat’ structure, can be easily modified to remove the correlation. Indeed, ‘pdSymm’ specifies a totally unstructured variance-covariance matrix for random effects and it can be replaced by ‘pdDiag’, which specifies a diagonal matrix, where covariances (off-diagonal terms) are constrained to 0. The coding is as follows:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;modMix.2 &amp;lt;- lme(yield ~ density, random = list(block = pdDiag(~density)), data=dataset)
+summary(modMix.2)
+## Linear mixed-effects model fit by REML
+##   Data: dataset 
+##       AIC      BIC   logLik
+##   338.952 350.7355 -164.476
+## 
+## Random effects:
+##  Formula: ~density | block
+##  Structure: Diagonal
+##         (Intercept)    density Residual
+## StdDev:    3.198277 0.02293222 1.387147
+## 
+## Fixed effects:  yield ~ density 
+##                Value Std.Error DF   t-value p-value
+## (Intercept) 31.78987 1.0460314 69  30.39093       0
+## density     -0.26744 0.0097463 69 -27.44020       0
+##  Correlation: 
+##         (Intr)
+## density -0.139
+## 
+## Standardized Within-Group Residuals:
+##        Min         Q1        Med         Q3        Max 
+## -1.9991181 -0.5451478 -0.1970266  0.4925097  2.6700397 
+## 
+## Number of Observations: 80
+## Number of Groups: 10
+ r
+anova(modMix.1, modMix.2)
+##          Model df      AIC      BIC    logLik   Test    L.Ratio p-value
+## modMix.1     1  6 340.9166 355.0569 -164.4583                          
+## modMix.2     2  5 338.9520 350.7355 -164.4760 1 vs 2 0.03535079  0.8509&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The model could be further simplified. For example, the code below shows how we could fit models with either random intercept or random slope.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#Model with only random intercept
+modMix.3 &amp;lt;- lme(yield ~ density, random = list(block = ~1), data=dataset)
+
+#Alternative
+#random = ~ 1|block
+
+#Model with only random slope
+modMix.4 &amp;lt;- lme(yield ~ density, random = list(block = ~ density - 1), data=dataset)
+
+#Alternative
+#random = ~density - 1 | block&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;an-example-with-nonlinear-regression&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;An example with nonlinear regression&lt;/h1&gt;
+&lt;p&gt;The problem may become trickier if we have a nonlinear relationship. Let’s have a look at another similar dataset (‘YieldLossB.csv’), that is also available on gitHub. It represents another experiment where sunflower was grown with the same increasing densities of another weed (0, 14, 19, 28, 32, 38, 54, 82 plants per &lt;span class=&#34;math inline&#34;&gt;\(m^2\)&lt;/span&gt;), on a randomised complete block design, with 8 blocks. In this case, the yield loss was recorded and analysed.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rm(list=ls())
+dataset &amp;lt;- getAgroData(&amp;quot;YieldLossB&amp;quot;)
+dataset$block &amp;lt;- factor(dataset$block)
+head(dataset)
+##   block density yieldLoss
+## 1     1       0     1.532
+## 2     2       0    -0.661
+## 3     3       0    -0.986
+## 4     4       0    -0.697
+## 5     5       0    -2.264
+## 6     6       0    -1.623
+ r
+plot(yieldLoss ~ density, data = dataset)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_nlmm_DesignConstraints_files/figure-html/unnamed-chunk-7-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;A swift plot shows that the relationship between density and yield loss is not linear. Literature references (Cousens, 1985) show that this could be modelled by using a rectangular hyperbola:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[YL = \frac{i \, D}{1 + \frac{i \, D}{a}}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(YL\)&lt;/span&gt; is the yield loss, &lt;span class=&#34;math inline&#34;&gt;\(D\)&lt;/span&gt; is weed density, &lt;span class=&#34;math inline&#34;&gt;\(i\)&lt;/span&gt; is the slope at the origin of axes and &lt;span class=&#34;math inline&#34;&gt;\(a\)&lt;/span&gt; is the maximum asymptotic yield loss. This function, together with self-starters, is available in the ‘NLS.YL()’ function in the ‘statforbiology’ package, which is the accompanying package for this blog. If you do not have this package, please refer to &lt;a href=&#34;https://www.statforbiology.com/rpackages/&#34;&gt;this link&lt;/a&gt; to download it.&lt;/p&gt;
+&lt;p&gt;The problem is the very same as above: the block effect may produce random fluctuations for both model parameters. The only difference is that we need to use the ‘nlme()’ function instead of ‘lme()’. With nonlinear mixed models, I strongly suggest you use a ‘groupedData’ object, which permits to avoid several problems. The second line below shows how to turn a data frame into a ‘groupedData’ object.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;datasetG &amp;lt;- groupedData(yieldLoss ~ 1|block, dataset)
+nlin.mix &amp;lt;- nlme(yieldLoss ~ NLS.YL(density, i, A), data=datasetG, 
+						fixed = list(i ~ 1, A ~ 1),
+            random = i + A ~ 1|block)
+summary(nlin.mix)
+## Nonlinear mixed-effects model fit by maximum likelihood
+##   Model: yieldLoss ~ NLS.YL(density, i, A) 
+##   Data: datasetG 
+##        AIC      BIC    logLik
+##   474.8228 491.5478 -231.4114
+## 
+## Random effects:
+##  Formula: list(i ~ 1, A ~ 1)
+##  Level: block
+##  Structure: General positive-definite, Log-Cholesky parametrization
+##          StdDev    Corr 
+## i        0.1112839 i    
+## A        4.0444562 0.195
+## Residual 1.4142271      
+## 
+## Fixed effects:  list(i ~ 1, A ~ 1) 
+##      Value Std.Error  DF  t-value p-value
+## i  1.23238 0.0382246 104 32.24038       0
+## A 68.52305 1.9449748 104 35.23082       0
+##  Correlation: 
+##   i     
+## A -0.408
+## 
+## Standardized Within-Group Residuals:
+##        Min         Q1        Med         Q3        Max 
+## -2.4416770 -0.7049388 -0.1805691  0.3385457  2.8788982 
+## 
+## Number of Observations: 120
+## Number of Groups: 15&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Similarly to linear mixed models, the above coding implies correlated random effects (r = 0.194). Alternatively, the above model can be coded by using a ’pdMat construct, as follows:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;nlin.mix2 &amp;lt;- nlme(yieldLoss ~ NLS.YL(density, i, A), data=datasetG, 
+						      fixed = list(i ~ 1, A ~ 1),
+                  random = pdSymm(list(i ~ 1, A ~ 1)))
+summary(nlin.mix2)
+## Nonlinear mixed-effects model fit by maximum likelihood
+##   Model: yieldLoss ~ NLS.YL(density, i, A) 
+##   Data: datasetG 
+##        AIC      BIC    logLik
+##   474.8224 491.5474 -231.4112
+## 
+## Random effects:
+##  Formula: list(i ~ 1, A ~ 1)
+##  Level: block
+##  Structure: General positive-definite
+##          StdDev   Corr 
+## i        0.111282 i    
+## A        4.047419 0.194
+## Residual 1.414193      
+## 
+## Fixed effects:  list(i ~ 1, A ~ 1) 
+##      Value Std.Error  DF  t-value p-value
+## i  1.23242 0.0382246 104 32.24144       0
+## A 68.52044 1.9452664 104 35.22419       0
+##  Correlation: 
+##   i     
+## A -0.409
+## 
+## Standardized Within-Group Residuals:
+##        Min         Q1        Med         Q3        Max 
+## -2.4418745 -0.7050012 -0.1805248  0.3385735  2.8788963 
+## 
+## Number of Observations: 120
+## Number of Groups: 15&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now we can try to simplify the model, for example by excluding the correlation between random effects.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;nlin.mix3 &amp;lt;- nlme(yieldLoss ~ NLS.YL(density, i, A), data=datasetG, 
+						      fixed = list(i ~ 1, A ~ 1),
+                  random = pdDiag(list(i ~ 1, A ~ 1)))
+summary(nlin.mix3)
+## Nonlinear mixed-effects model fit by maximum likelihood
+##   Model: yieldLoss ~ NLS.YL(density, i, A) 
+##   Data: datasetG 
+##        AIC      BIC    logLik
+##   472.9076 486.8451 -231.4538
+## 
+## Random effects:
+##  Formula: list(i ~ 1, A ~ 1)
+##  Level: block
+##  Structure: Diagonal
+##                 i        A Residual
+## StdDev: 0.1172791 4.389173 1.408963
+## 
+## Fixed effects:  list(i ~ 1, A ~ 1) 
+##      Value Std.Error  DF  t-value p-value
+## i  1.23243 0.0393514 104 31.31852       0
+## A 68.57655 1.9905549 104 34.45097       0
+##  Correlation: 
+##   i     
+## A -0.459
+## 
+## Standardized Within-Group Residuals:
+##        Min         Q1        Med         Q3        Max 
+## -2.3577292 -0.6849962 -0.1785860  0.3255925  2.8592764 
+## 
+## Number of Observations: 120
+## Number of Groups: 15&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;With a little fantasy, we can easily code several alternative models to represent alternative hypotheses about the observed data. Obviously, the very same method can be used (and SHOULD be used) to account for other grouping factors, such as main-plots in split-plot designs or plots in repeated measure designs.&lt;/p&gt;
+&lt;p&gt;Happy coding!&lt;/p&gt;
+&lt;p&gt;Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Borgo XX Giugno 74&lt;br /&gt;
+I-06121 - PERUGIA&lt;/p&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Cousens, R., 1985. A simple model relating yield loss to weed density. Annals of Applied Biology 107, 239–252. &lt;a href=&#34;https://doi.org/10.1111/j.1744-7348.1985.tb01567.x&#34; class=&#34;uri&#34;&gt;https://doi.org/10.1111/j.1744-7348.1985.tb01567.x&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Jensen, S.M., Schaarschmidt, F., Onofri, A., Ritz, C., 2018. Experimental design matters for statistical analysis: how to handle blocking: Experimental design matters for statistical analysis. Pest Management Science 74, 523–534. &lt;a href=&#34;https://doi.org/10.1002/ps.4773&#34; class=&#34;uri&#34;&gt;https://doi.org/10.1002/ps.4773&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Onofri, A., Carbonell, E.A., Piepho, H.-P., Mortimer, A.M., Cousens, R.D., 2010. Current statistical issues in Weed Research. Weed Research 50, 5–24.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Fitting &#39;complex&#39; mixed models with &#39;nlme&#39;: Example 2</title>
+      <link>https://www.statforbiology.com/2019/fitting-complex-mixed-models-with-nlme-example-2/</link>
+      <pubDate>Fri, 13 Sep 2019 00:00:00 +0000</pubDate>
+      <author>andrea.onofri@unipg.it (Andrea Onofri)</author>
+      <guid>https://www.statforbiology.com/2019/fitting-complex-mixed-models-with-nlme-example-2/</guid>
+      <description>
+
+
+&lt;p&gt;In this post I am going to deal with a repeated split-plot experiment with heteroscedastic errors. Ready for this trip?&lt;/p&gt;
+&lt;p&gt;Let’s imagine a field experiment, where different genotypes of khorasan wheat are to be compared under different nitrogen (N) fertilisation systems. Genotypes require bigger plots, with respect to fertilisation treatments and, therefore, the most convenient choice would be to lay-out the experiment as a split-plot, in a randomised complete block design. Genotypes would be randomly allocated to main plots, while fertilisation systems would be randomly allocated to sub-plots. As usual in agricultural research, the experiment should be repeated in different years, in order to explore the environmental variability of results.&lt;/p&gt;
+&lt;p&gt;What could we expect from such an experiment?&lt;/p&gt;
+&lt;p&gt;Please, look at the dataset ‘kamut.csv’, which is available on github. It provides the results for a split-plot experiment with 15 genotypes and 2 N fertilisation treatments, laid-out in three blocks and repeated in four years (360 observations, in all).&lt;/p&gt;
+&lt;p&gt;The dataset has five columns, the ‘Year’, the ‘Genotype’, the fertilisation level (‘N’), the ‘Block’ and the response variable, i.e. ‘Yield’. The fifteen genotypes are coded by using the letters from A to O, while the levels of the other independent variables are coded by using numbers. The following snippets loads the file and recodes the numerical independent variables into factors.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rm(list=ls())
+dataset &amp;lt;- read.csv(&amp;quot;https://www.casaonofri.it/_datasets/kamutHet.csv&amp;quot;)
+dataset$Block &amp;lt;- factor(dataset$Block)
+dataset$Year &amp;lt;- factor(dataset$Year)
+dataset$N &amp;lt;- factor(dataset$N)
+dataset$Genotype &amp;lt;- factor(dataset$Genotype)
+head(dataset)
+##   Year Genotype N Block Yield
+## 1 2004        A 1     1 2.235
+## 2 2004        A 1     2 2.605
+## 3 2004        A 1     3 2.323
+## 4 2004        A 2     1 3.766
+## 5 2004        A 2     2 4.094
+## 6 2004        A 2     3 3.902&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Additionally, it may be useful to code some ‘helper’ factors, to represent the blocks (within years) and the main-plots. The first factors (‘YearBlock’) has 12 levels (4 years and 3 blocks per year) and the second factor (‘MainPlot’) has 180 levels (4 years, 3 blocks per year and 15 genotypes per block).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dataset$YearBlock &amp;lt;- with(dataset, factor(Year:Block))
+dataset$MainPlot &amp;lt;- with(dataset, factor(Year:Block:Genotype))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;For the analyses, we will make use of the ‘plyr’ (Wickham, 2011), ‘car’ (Fox and Weisberg, 2011) and ‘nlme’ (Pinheiro et al., 2018) packages, which we load now.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(plyr)
+library(car)
+library(nlme)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It is always useful to start by separately considering the results for each year. This gives us a feel for what happened in all experiments. What model do we have to fit to single-year split-plot data? In order to avoid mathematical notation, I will follow the notation proposed by Piepho (2003), by using the names of variables, as reported in the dataset. The treatment model for this split-plot design is:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Yield ~ Genotype * N&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;All treatment effects are fixed. The block model, referencing all grouping structures, is:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Yield ~ Block + Block:MainPlot + Block:MainPlot:Subplot&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The first element references the blocks, while the second element references the main-plots, to which the genotypes are randomly allocated (randomisation unit). The third element references the sub-plots, to which N treatments are randomly allocated (another randomisation unit); this latter element corresponds to the residual error and, therefore, it is fitted by default and needs not be explicitly included in the model. Main-plot and sub-plot effects need to be random, as they reference randomisation units (Piepho, 2003). The nature of the block effect is still under debate (Dixon, 2016), but I’ll take it as random (do not worry: I will also show how we can take it as fixed).&lt;/p&gt;
+&lt;p&gt;Coding a split-plot model in ‘lme’ is rather simple:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;lme(Yield ~ Genotype * N, random = ~1|Block/MainPlot&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;where the notation ‘Block/MainPlot’ is totally equivalent to ‘Block + Block:MainPlot’. Instead of manually fitting this model four times (one per year), we can ask R to do so by using the ‘ddply()’ function in the ‘plyr’ package. In the code below, I used this technique to retrieve the residual variance for each experiment.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;lmmFits &amp;lt;- ddply(dataset, c(&amp;quot;Year&amp;quot;),
+      function(df) summary( lme(Yield ~ Genotype * N,
+                 random = ~1|Block/MainPlot,
+                 data = df))$sigma^2 )
+lmmFits
+##   Year          V1
+## 1 2004 0.052761644
+## 2 2005 0.001423833
+## 3 2006 0.776028797
+## 4 2007 0.817594477&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We see great differences! The residual variance in 2005 is more that 500 times smaller than that observed in 2007. Clearly, if we pool the data and make an ANOVA, when we pool the data, we violate the homoscedasticity assumption. In general, this problem has an obvious solution: we can model the variance-covariance matrix of observations, allowing a different variance per year. In R, this is only possible by using the ‘lme()’ function (unless we want to use the ‘asreml-R’ package, which is not freeware, unfortunately). The question is: how do we code such a model?&lt;/p&gt;
+&lt;p&gt;First of all, let’s derive a correct mixed model. The treatment model is:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Yield ~ Genotype * N&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We have mentioned that the genotype and N effects are likely to be taken as fixed. The block model is:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt; ~ Year + Year:Block + Year:Block:MainPlot + Year:Block:MainPlot:Subplot&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The second element in the block model references the blocks within years, the second element references the main-plots, while the third element references the sub-plots and, as before, it is not needed. The year effect is likely to interact with both the treatment effects, so we need to add the following effects:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt; ~ Year + Year:Genotype + Year:N + Year:Genotype:N&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;which is equivalent to writing:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt; ~ Year*Genotype*N&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The year effect can be taken as either as random or as fixed. In this post, we will show both approaches&lt;/p&gt;
+&lt;div id=&#34;year-effect-is-fixed&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Year effect is fixed&lt;/h1&gt;
+&lt;p&gt;If we take the year effect as fixed and the block effect as random, we see that the random effects are nested (blocks within years and main-plots within blocks and within years). The function ‘lme()’ is specifically tailored to deal with nested random effects and, therefore, fitting the above model is rather easy. In the first snippet we fit a homoscedastic model:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;modMix1 &amp;lt;- lme(Yield ~ Year * Genotype * N,
+                 random = ~1|YearBlock/MainPlot,
+                 data = dataset)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We could also fit this model with the ‘lme4’ package and the ‘lmer()’; however, we are not happy with this, because we have seen clear signs of heteroscedastic within-year errors. Thus, let’s account for such an heteroscedasticity, by using the ‘weights()’ argument and the ‘varIdent()’ variance structure:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;modMix2 &amp;lt;- lme(Yield ~ Year * Genotype * N,
+                 random = ~1|YearBlock/MainPlot,
+                 data = dataset,
+               weights = varIdent(form = ~1|Year))
+AIC(modMix1, modMix2)
+##          df      AIC
+## modMix1 123 856.6704
+## modMix2 126 575.1967&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Based on the Akaike Information Criterion, we see that the second model is better than the first one, which supports the idea of heteroscedastic residuals. From this moment on, the analyses proceeds as usual, e.g. by testing for fixed effects and comparing means, as necessary. Just a few words about testing for fixed effects: Wald F tests can be obtained by using the ‘anova()’ function, although I usually avoid this with ‘lme’ objects, as there is no reliable approximation to degrees of freedom. With ‘lme’ objects, I suggest using the ‘Anova()’ function in the ‘car’ package, which shows the results of Wald chi square tests.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Anova(modMix2)
+## Analysis of Deviance Table (Type II tests)
+## 
+## Response: Yield
+##                    Chisq Df Pr(&amp;gt;Chisq)    
+## Year              51.072  3  4.722e-11 ***
+## Genotype         543.499 14  &amp;lt; 2.2e-16 ***
+## N               2289.524  1  &amp;lt; 2.2e-16 ***
+## Year:Genotype    123.847 42  5.281e-10 ***
+## Year:N            21.695  3  7.549e-05 ***
+## Genotype:N      1356.179 14  &amp;lt; 2.2e-16 ***
+## Year:Genotype:N  224.477 42  &amp;lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;One further aspect: do you prefer fixed blocks? Then you can fit the following model.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;modMix4 &amp;lt;- lme(Yield ~ Year * Genotype * N + Year:Block,
+                 random = ~1|MainPlot,
+                 data = dataset,
+               weights = varIdent(form = ~1|Year))&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;year-effect-is-random&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Year effect is random&lt;/h1&gt;
+&lt;p&gt;If we’d rather take the year effect as random, all the interactions therein are random as well (Year:Genotype, Year:N and Year:Genotype:N). Similarly, the block (within years) effect needs to be random. Therefore, we have several crossed random effects, which are not straightforward to code with ‘lme()’. First, I will show the code, second, I will comment it.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;modMix5 &amp;lt;- lme(Yield ~ Genotype * N,
+                  random = list(Year = pdIdent(~1),
+                                Year = pdIdent(~Block - 1),
+                                Year = pdIdent(~MainPlot - 1),
+                                Year = pdIdent(~Genotype - 1),
+                                Year = pdIdent(~N - 1),
+                                Genotype = pdIdent(~N - 1)),
+                  data=dataset,
+               weights = varIdent(form = ~1|Year))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We see that random effects are coded using a named list; each component of this list is a &lt;em&gt;pdMat&lt;/em&gt; object with name equal to a grouping factor. For example, the component ‘Year = pdIdent(~ 1)’ represents a random year effect, while ‘Year = pdIdent(~ Block - 1)’ represents a random year effect for each level of Block, i.e. a random ‘year x block’ interaction. This latter variance component is the same for all blocks (‘varIdent’), i.e. there is homoscedastic at this level.&lt;/p&gt;
+&lt;p&gt;It is important to remember that the grouping factors in the list are treated as nested; however, the grouping factor is only one (‘Year’), so that the nesting is irrelevant. The only exception is the genotype, which is regarded as nested within the year. As the consequence, the component ‘Genotype = pdIdent(~N - 1)’, specifies a random year:genotype effect for each level of N treatment, i.e. a random year:genotype:N interaction.&lt;/p&gt;
+&lt;p&gt;I agree, this is not straightforward to understand! If necessary, take a look at the good book of Gałecki and Burzykowski (2013). When fitting the above model, be patient; convergence may take a few seconds. I’d only like to reinforce the idea that, in case you need to test for fixed effects, you should not rely on the ‘anova()’ function, but you should prefer Wald chi square tests in the ‘Anova()’ function in the ‘car’ package.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Anova(modMix5, type = 2)
+## Warning in model.matrix.default(mod, data = structure(list(Year =
+## structure(c(1L, : variable &amp;#39;MainPlot&amp;#39; is absent, its contrast will be ignored
+## Warning in model.matrix.default(mod, data = structure(list(Year =
+## structure(c(1L, : variable &amp;#39;Block&amp;#39; is absent, its contrast will be ignored
+## Analysis of Deviance Table (Type II tests)
+## 
+## Response: Yield
+##              Chisq Df Pr(&amp;gt;Chisq)    
+## Genotype   68.6430 14  3.395e-09 ***
+## N           2.4682  1     0.1162    
+## Genotype:N 14.1153 14     0.4412    
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Another note: coding random effects as a named list is always possible. For example ‘modMix2’ can also be coded as:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;modMix2b &amp;lt;- lme(Yield ~ Year * Genotype * N,
+                 random = list(YearBlock = ~ 1, MainPlot = ~ 1),
+                 data = dataset,
+               weights = varIdent(form = ~1|Year))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Or, also as:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;modMix2c &amp;lt;- lme(Yield ~ Year * Genotype * N,
+                 random = list(YearBlock = pdIdent(~ 1), MainPlot = pdIdent(~ 1)),
+                 data = dataset,
+               weights = varIdent(form = ~1|Year))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Hope this is useful! Have fun with it. And … don’t forget to check out my new book!&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href = &#34;https://www.awin1.com/cread.php?awinmid=26429&amp;awinaffid=2675822&amp;ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5&#34;&gt;&lt;img src= &#34;../../_Figures/Email_Signature_978-3-032-08199-5.png&#34; align=&#34;center&#34; alt=&#34;Book cover&#34; class=&#34;cover&#34; /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Dixon, P., 2016. Should blocks be fixed or random? Conference on Applied Statistics in Agriculture. &lt;a href=&#34;https://doi.org/10.4148/2475-7772.1474&#34; class=&#34;uri&#34;&gt;https://doi.org/10.4148/2475-7772.1474&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Fox J. and Weisberg S. (2011). An {R} Companion to Applied Regression, Second Edition. Thousand Oaks CA: Sage. URL: &lt;a href=&#34;http://socserv.socsci.mcmaster.ca/jfox/Books/Companion&#34; class=&#34;uri&#34;&gt;http://socserv.socsci.mcmaster.ca/jfox/Books/Companion&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Gałecki, A., Burzykowski, T., 2013. Linear mixed-effects models using R: a step-by-step approach. Springer, Berlin.&lt;/li&gt;
+&lt;li&gt;Piepho, H.-P., Büchse, A., Emrich, K., 2003. A Hitchhiker’s Guide to Mixed Models for Randomized Experiments. Journal of Agronomy and Crop Science 189, 310–322.&lt;/li&gt;
+&lt;li&gt;Pinheiro J, Bates D, DebRoy S, Sarkar D, R Core Team (2018). nlme: Linear and Nonlinear Mixed Effects Models_. R package version 3.1-137, &amp;lt;URL: &lt;a href=&#34;https://CRAN.R-project.org/package=nlme&#34; class=&#34;uri&#34;&gt;https://CRAN.R-project.org/package=nlme&lt;/a&gt;&amp;gt;.&lt;/li&gt;
+&lt;li&gt;Hadley Wickham (2011). The Split-Apply-Combine Strategy for Data Analysis. Journal of Statistical Software, 40(1), 1-29. URL: &lt;a href=&#34;http://www.jstatsoft.org/v40/i01/&#34; class=&#34;uri&#34;&gt;http://www.jstatsoft.org/v40/i01/&lt;/a&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

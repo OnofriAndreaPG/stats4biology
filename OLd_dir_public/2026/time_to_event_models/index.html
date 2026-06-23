@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-131792052-1"></script>
+  
+  <script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  
+    gtag('config', 'UA-131792052-1');
+  </script>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Fixing the bridge between biologists and statisticians  | Fitting time-to-event models with an environmental covariate</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="https://www.statforbiology.com/css/blog.css" />
+       
+</head>
+<body>
+
+    
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="https://www.statforbiology.com/">Home</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/aboutthis" >About this site</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/tutorials" >Tutorials</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/_Statbook" >Book (Italian)</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/_StatbookEng" >Book (English)</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/rpackages" >R packages</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/recentcourses" >Stat Courses</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/links" >Links</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/about" >About me</a>
+        </div>
+    </nav>
+    
+
+    
+    <section class="hero is-info is-medium">
+        <div class="hero-body" style="background-image: url(https://www.statforbiology.com/img/bg-blog.jpg);">
+            <div class="container has-text-centered">
+                <br>
+                <h1 class="title is-size-1">
+                    
+                        Fitting time-to-event models with an environmental covariate
+                    
+                </h1>
+                
+            </div>
+        </div>
+    </section>
+
+
+
+<div class="container">
+    <div class="section">
+    
+
+<div class="columns">
+    <div class="column is-9">
+        <div class="tile is-child box">
+          <p class="subtitle is-size-6 has-text-grey-light">
+          Andrea Onofri &middot;&nbsp; Added on February 12, 2026 &middot;
+          <i class="far fa-clock"></i>&nbsp;15 min read 
+          </p><hr/>
+            <div class="content">
+                
+
+
+<p>This is a follow-up post. If you are interested in other posts of this series, please go to: <a href="https://www.statforbiology.com/tags/drcte/">https://www.statforbiology.com/tags/drcte/</a>. All these posts exapand on a paper that we have published in the Journal ‘Weed Science’; please follow <a href="https://doi.org/10.1017/wsc.2022.8">this link</a> to the paper.</p>
+<p>In a previous post we have shown that we can use time-to-event curves to describe the time course of germinations/emergences for a seed lot (<a href="https://www.statforbiology.com/2021/stat_drcte_4-time-to-eventcurves/">this post</a>). We have also seen that the effects of experimental factors on seed germination can be accounted for by coding a different time-to-event curve for each factor level (<a href="https://www.statforbiology.com/2021/stat_drcte_5-comparinglots/">this post</a>).</p>
+<p>In this post, we consider the environmental variables that are, perhaps, the most important factors triggering germination and seedling emergence. For example, let us consider substrate water content (or water potential), temperature, and oxygen availability; it is clear that these variables play a fundamental role in determining both the extent and the rate of germination and, therefore, they are extensively studied by seed scientists.</p>
+<p>In principle, germination assays involving environmental variables are straightforward to set up: several Petri dishes are subjected to different environmental conditions, and germination is monitored over time. However, what is the most appropriate method to analyse the resulting data and extract meaningful parameters, such as threshold temperatures (base, optimal, and ceiling temperatures) or base water potential?</p>
+<p>It is important to note that most environmental variables can be expressed on a quantitative scale. Although in an experiment we are necessarily limited to selecting a subset of possible values (e.g. temperatures such as 15, 20, and 30°C), this does not mean that we are not interested in what happens at intermediate values (e.g. 18 or 22°C). From this perspective, quantitative variables differ substantially from qualitative variables, such as the plant species compared in our previous post.</p>
+<p>In this post we will see an example of how we can account for the effects of water content in the substrate and include it in our time-to-event models. Of course, the same approach can be followed also with other types of environmental variables and, more generally, quantitative variables.</p>
+<div id="fitting-hydro-time-to-event-models" class="section level1">
+<h1>Fitting hydro-time-to-event models</h1>
+<p>Let’s consider the following example: the germination of rapeseed (<em>Brassica napus</em> L. var. <em>oleifera</em>, cv. Excalibur) was tested at fourteen different water potential levels (0, -0.03, -0.15, -0.3, -0.4, -0.5, -0.6, -0.7, -0.8, -0.9, -1, -1.1, -1.2, -1.5 MPa), which were created by using a polyethylene glycol solution (PEG 6000). For each water potential level, three replicated Petri dishes with 50 seeds each were incubated at 20°C. Germinated seeds were counted every 2-3 days for 14 days and they were removed from the dishes after germination.</p>
+<p>The dataset was published by Pace et al. (2012) and it is available as <code>rape</code> in the <code>drcSeedGerm</code> package, which needs to be installed from github (see below). Furthermore, the package <code>drcte</code> is necessary to fit time-to-event models and it should also be installed from gitHub. The following code loads the necessary packages, loads the dataset <code>rape</code> and shows the first six lines.</p>
+<pre class="r"><code># install.packages(&quot;drcte&quot;)
+# install.packages(&quot;drcSeedGerm&quot;)
+library(drcte)
+library(drcSeedGerm)
+library(ggplot2)
+data(rape)
+head(rape)
+##   Psi Dish timeBef timeAf nSeeds nCum propCum
+## 1   0    1       0      3     49   49    0.98
+## 2   0    1       3      4      0   49    0.98
+## 3   0    1       4      5      0   49    0.98
+## 4   0    1       5      7      0   49    0.98
+## 5   0    1       7     10      0   49    0.98
+## 6   0    1      10     14      0   49    0.98</code></pre>
+<p>In the above data.frame, ‘timeAf’ represents the moment when germinated seeds were counted, while ’timeBef’ represents the previous inspection time (or the beginning of the assay). The column ’nSeeds’ is the number of seeds that germinated during the time interval between ‘timeBef’ and ’timeAf. The ’propCum’ column contains the cumulative proportions of germinated seeds and it is not necessary for time-to-event model fitting, although we can use it for plotting purposes (see code and output below).</p>
+<pre class="r"><code>ggplot(rape, aes(timeAf, propCum)) +
+  geom_point() +
+  facet_wrap(~Psi) +
+  scale_x_continuous(name = &quot;Time (d)&quot;) +
+  scale_y_continuous(name = &quot;Cumulative proportion of germinated seeds&quot;) +
+  theme_bw()</code></pre>
+<p><img src="/post/Stat_drcte_6-HT1step_files/figure-html/unnamed-chunk-2-1.png" width="768" /></p>
+<p>The germination time course is strongly influenced by substrate water potential, which regulates seed water uptake and thus the initiation of germination and emergence. Our goal is therefore to quantify how this environmental factor shapes germination dynamics over time.</p>
+<p>We have shown that a parametric time-to-event curve is defined as a cumulative probability function (<span class="math inline">\(\Phi\)</span>), with three parameters:</p>
+<p><span class="math display">\[P(t) = \Phi \left( b, d, e \right)\]</span>
+Let’s see how we can incorporate an environmental covariate in this curve.</p>
+</div>
+<div id="suboptimal-approach" class="section level1">
+<h1>Suboptimal approach</h1>
+<p>Considering <a href="https://www.statforbiology.com/2021/stat_drcte_5-comparinglots/">our previous post</a>, the most obvious extension of the above model is to allow for different <span class="math inline">\(b\)</span>, <span class="math inline">\(d\)</span> and <span class="math inline">\(e\)</span> value for each water potential level:</p>
+<p><span class="math display">\[P(t, \Psi_i) = \Phi \left( b_i, d_i, e_i \right)\]</span></p>
+<p>The first issue is that, at some water potential levels, germination did not occur at all, whereas at other levels it occurred so rapidly that no meaningful time course could be observed (e.g. see the graph at 0 or −0.03 MPa). We refer to these as degenerated time-to-event curves.</p>
+<p>The presence of such degenerated curves prevents successful model fitting, as the curveid argument imposes a common time-to-event structure across all water potential levels, which is not appropriate in this case.</p>
+<pre class="r"><code># Not run
+# mod0 &lt;- drmte(nSeeds ~ timeBef + timeAf, data = rape,
+#              curveid = Psi, fct = loglogistic())</code></pre>
+<p>This problem can be circumvented by using the <code>separate = TRUE</code> argument; in this case, the different curves are fitted independent of one another and we are not tied to fitting the same model for all water potential levels.</p>
+<pre class="r"><code>mod1 &lt;- drmte(nSeeds ~ timeBef + timeAf, data = rape,
+             curveid = Psi, fct = loglogistic(),
+             separate = TRUE)
+coef(mod1)
+ #    d:-1.5      d:-1.2      d:-1.1        b:-1        d:-1        e:-1      b:-0.9 
+ # 0.00000000  0.00000000  0.00000000 64.39202307  0.04666194  8.36474946  5.83290900 
+ #     d:-0.9      e:-0.9      b:-0.8      d:-0.8      e:-0.8      b:-0.7      d:-0.7 
+ # 0.55010281  5.87022056  3.73294999  0.87889318  4.47105672  3.59940891  0.93592886 
+ #     e:-0.7      b:-0.6      e:-0.6      b:-0.5      e:-0.5      d:-0.4      d:-0.3 
+ # 2.73025095  1.46592984  0.73866435  0.59257691  0.05876917  0.98444444  0.94333333 
+ #    b:-0.15     e:-0.15     d:-0.03         d:0 
+ # 0.55872202  0.02997354  0.88666667  0.97333333 </code></pre>
+<p>In particular, for the cases where a time-course of events cannot be estimated, an error message is shown, but the execution of codes is not stopped and the <code>drmte()</code> function resorts to fitting a simpler model, where only the <span class="math inline">\(d\)</span> parameter is estimated (that is the maximum fraction of germinated seeds). In the box above, we can see the estimated parameters but no standard errors, which can be obtained by using the <code>summary()</code> method, although there are some statistical issues that we will consider in a following post.</p>
+</div>
+<div id="a-better-modelling-approach" class="section level1">
+<h1>A better modelling approach</h1>
+<p>The previous approach is clearly sub-optimal. First of all, the different water potential levels are assumed as independent, with no ordering and distances. In other words, we have a time-to-event curve for, e.g. -0.9 MPa and -0.8 MPa, but we have no information about the time-to-event curve for any water potential levels in between. Furthermore, we have no estimates of some relevant hydro-time parameters, such as the <em>base water potential</em>, that is fundamental to predict the germination/emergence in field conditions.</p>
+<p>In order to account for the very nature of the water potential variable, we could code a time-to-event model where the three parameters are continuous functions of <span class="math inline">\(\Psi\)</span>:</p>
+<p><span class="math display">\[P(t, \Psi) = \Phi \left( b(\Psi), d(\Psi), e(\Psi) \right)\]</span></p>
+<p>We followed such an approach in a relatively recent publication (Onofri et al., 2018) and we also spoke about this in a <a href="https://www.statforbiology.com/2020/stat_seedgermination_ht1step/">recent post</a>. In detail, we considered a log-logistic cumulative distribution function:</p>
+<p><span class="math display">\[P(t) = \frac{ d }{1 + \exp \left\{ b \left[ \log(t) - \log( e ) \right] \right\} }\]</span></p>
+<p>where <span class="math inline">\(e\)</span> is the median germination time, <span class="math inline">\(b\)</span> is the slope at the inflection point and <span class="math inline">\(d\)</span> is the maximum germinated proportion. Considering that the germination rate is the inverse of germination time, we replaced <span class="math inline">\(e = 1/GR_{50}\)</span> and wrote the three parameters as functions of <span class="math inline">\(\Psi\)</span>:</p>
+<p><span class="math display">\[P(t, \Psi) = \frac{ d(\Psi) }{1 + \exp \left\{ b(\Psi) \left[ \log(t) - \log(1 / \left[ GR_{50}(\Psi) \right] ) \right] \right\} }\]</span></p>
+<p>where:</p>
+<p><span class="math display">\[{\begin{array}{l}
+GR_{50}(\Psi) = \textrm{max} \left( \frac{\Psi - \Psi_{b}}{\theta_H}; 0 \right)\\
+d(\Psi ) = \textrm{max} \left\{ G \, \left[ 1 - \exp \left( \frac{ \Psi - \Psi_b }{\sigma_{\Psi_b}} \right) \right]; 0 \right\}\\
+b(\Psi) = b
+\end{array}}\]</span></p>
+<p>The parameters are:</p>
+<ol style="list-style-type: decimal">
+<li><span class="math inline">\(\Psi_{b}\)</span>, that is the median base water potential in the seed lot (in <em>MPa</em>),</li>
+<li><span class="math inline">\(\theta_H\)</span>, that is the hydro-time constant (in <em>MPa day</em> or <em>MPa hour</em>)</li>
+<li><span class="math inline">\(\sigma_{\Psi_b}\)</span>, that represents the variability of <span class="math inline">\(\Psi_b\)</span> within the population,</li>
+<li><span class="math inline">\(G\)</span>, that is the germinable fraction, accounting for the fact that <span class="math inline">\(d\)</span> may not reach 1, regardless of time and water potential.</li>
+<li><span class="math inline">\(b\)</span> (slope parameter) that is assumed to be constant and independent on <span class="math inline">\(\Psi\)</span>.</li>
+</ol>
+<p>In the end, our hydro-time model is composed by four sub-models:</p>
+<ol style="list-style-type: decimal">
+<li>a cumulative probability function (log-logistic, in our example), based on the three parameters <span class="math inline">\(d\)</span>, <span class="math inline">\(b\)</span> and <span class="math inline">\(e = 1/GR50\)</span>;</li>
+<li>a sub-model expressing <span class="math inline">\(d\)</span> as a function of <span class="math inline">\(\Psi\)</span>;</li>
+<li>a sub-model expressing <span class="math inline">\(GR50\)</span> as a function of <span class="math inline">\(\Psi\)</span>;</li>
+<li>a sub-model expressing <span class="math inline">\(b\)</span> as a function of <span class="math inline">\(\Psi\)</span>, although, this was indeed a simple identity model <span class="math inline">\(b(\Psi) = b\)</span>.</li>
+</ol>
+<p>This hydro-time-to-event model was implemented in R as the <code>HTE1()</code> function, and it is available within the <code>drcSeedGerm</code> package, together with the appropriate self-starting routine. It can be fitted by using the <code>drmte()</code> function in the <code>drcte</code> package and the <code>coef()</code> function can be used to retrieve the parameter estimates.</p>
+<pre class="r"><code>modHTE &lt;- drmte(nSeeds ~ timeBef + timeAf + Psi, 
+                data = rape, fct = HTE1())
+coef(modHTE)
+##         G:(Intercept)      Psib:(Intercept) sigmaPsib:(Intercept) 
+##             0.9577918            -1.0397239             0.1108891 
+##    thetaH:(Intercept)         b:(Intercept) 
+##             0.9061385             4.0273963</code></pre>
+<p>As we said before, we are also interested in standard errors for model parameters; we will address this issue in another post. It is important to note that this model gives us the ability of predicting germination at any water potential levels and it is not restrained to the values that we included in the experimental design. Furthermore, we have reliable estimates of <span class="math inline">\(\Psi_{b}\)</span> and <span class="math inline">\(\theta_H\)</span>, which we can use for prediction purposes in field conditions.</p>
+</div>
+<div id="another-modelling-approach" class="section level1">
+<h1>Another modelling approach</h1>
+<p>Another hydro-time model was proposed by Bradford (2002) and later extended by Mesgaran et al. (2013). Rather than modifying a traditional log-logistic distribution to incorporate the environmental covariate, these authors formulated a new cumulative distribution function based on theoretical considerations regarding the distribution of base water potential within a seed population. Their model is:</p>
+<p><span class="math display">\[P(t, \Psi) = \Phi \left\{ \frac{\Psi - (\theta_H / t) -\Psi_b }{\sigma_{\Psi_b}} \right\}\]</span></p>
+<p>For a detailed derivation, the reader is referred to the original papers. It is important to emphasize, however, that the model assumes that base water potential varies among seeds within the population according to a Gaussian distribution. The cumulative distribution function of event times is therefore modelled only indirectly and is not, in itself, Gaussian (note that <span class="math inline">\(t\)</span> appears in the denominator).</p>
+<p>Mesgaran et al (2013) suggested that <span class="math inline">\(\Phi\)</span> may not be gaussian and proposed several alternative hydro-time-to-event models, which we have implemented within the <code>drcSeedGerm</code> package:</p>
+<ol style="list-style-type: decimal">
+<li>gaussian (function <code>HTnorm()</code>)</li>
+<li>logistic (function <code>HTL()</code>)</li>
+<li>Gumbel (function <code>HTG()</code>)</li>
+<li>log-logistic (function <code>HTLL()</code>)</li>
+<li>Weibull (Type I) (function <code>HTW1()</code>)</li>
+<li>Weibull (Type II) (function <code>HTW2()</code>)</li>
+</ol>
+<p>These equations are given at the end of this post. The code to fit those models is given below:</p>
+<pre class="r"><code>mod1 &lt;- drmte(nSeeds ~ timeBef + timeAf + Psi, 
+              data = rape, fct = HTnorm())
+mod2 &lt;- drmte(nSeeds ~ timeBef + timeAf + Psi,
+              data = rape, fct = HTL())
+mod3 &lt;- drmte(nSeeds ~ timeBef + timeAf + Psi,
+              data = rape, fct = HTG())
+mod4 &lt;- drmte(nSeeds ~ timeBef + timeAf + Psi,
+            data = rape, fct = HTLL())
+mod5 &lt;- drmte(nSeeds ~ timeBef + timeAf + Psi,
+            data = rape, fct = HTW1())
+mod6 &lt;- drmte(nSeeds ~ timeBef + timeAf + Psi,
+            data = rape, fct = HTW2())</code></pre>
+<p>What is the best model for this dataset? Let’s use the Akaike’s Information Criterion (AIC: the lowest, the best) to decide; we see that <code>modHTE</code> was the best fitting one, followed by <code>mod4</code>.</p>
+<pre class="r"><code>AIC(mod1, mod2, mod3, mod4, mod5, mod6, modHTE)
+##         df      AIC
+## mod1   291 3516.914
+## mod2   291 3300.824
+## mod3   291 3097.775
+## mod4   290 2886.608
+## mod5   290 2889.306
+## mod6   290 3009.023
+## modHTE 289 2832.481</code></pre>
+<p>It is important not to neglect a graphical inspection of model fit. The <code>plot()</code> method does not work with time-to-event curves with additional covariates (apart from time). However, we can retrieve the fitted data by using the <code>plotData()</code> function and use those predictions within the <code>ggplot()</code> function. The box below shows the appropriate coding.</p>
+<pre class="r"><code>library(ggplot2)
+tab &lt;- plotData(modHTE)
+
+ggplot() +
+  geom_point(data = rape, mapping = aes(x = timeAf, y = propCum)) +
+  geom_line(data = tab$plotFits, mapping = aes(x = timeAf, y = CDF),
+            col = &quot;red&quot;) +
+  facet_wrap(~ Psi) +
+  scale_x_continuous(name = &quot;Time (d)&quot;) +
+  scale_y_continuous(name = &quot;Cumulative proportion of germinated seeds&quot;) +
+  theme_bw()</code></pre>
+<p><img src="/post/Stat_drcte_6-HT1step_files/figure-html/unnamed-chunk-9-1.png" width="768" /></p>
+<p>Quantiles for germination times can also be retrieved by using the usual <code>quantile()</code> function, although a single value for base water potential needs to be provided.</p>
+<pre class="r"><code>quantile(modHTE, probs = c(0.25, 0.50, 0.75), Psi = -0.8)
+## 
+## Estimated quantiles
+## 
+##       Estimate       SE
+## 1:25%   3.0445 0.091608
+## 1:50%   4.1372 0.099117
+## 1:75%   6.2726 0.287407</code></pre>
+<p>For those who are interested, I give further detail below. Thanks for reading—and don’t forget to check out my new book!</p>
+<p>Prof. Andrea Onofri<br />
+Department of Agricultural, Food and Environmental Sciences<br />
+University of Perugia (Italy)<br />
+Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<p><a href = "https://www.awin1.com/cread.php?awinmid=26429&awinaffid=2675822&ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src= "../../_Figures/Email_Signature_978-3-032-08199-5.png" align="center" alt="Book cover" class="cover" /></a>
+<br/></p>
+<hr />
+</div>
+<div id="references" class="section level1">
+<h1>References</h1>
+<ol style="list-style-type: decimal">
+<li>Bradford, K.J., 2002. Applications of hydrothermal time to quantifying and modeling seed germination and dormancy. Weed Science 50, 248–260.</li>
+<li>Mesgaran, M.B., Mashhadi, H.R., Alizadeh, H., Hunt, J., Young, K.R., Cousens, R.D., 2013. Importance of distribution function selection for hydrothermal time models of seed germination. Weed Research 53, 89–101. <a href="https://doi.org/10.1111/wre.12008" class="uri">https://doi.org/10.1111/wre.12008</a></li>
+<li>Onofri, A., Benincasa, P., Mesgaran, M.B., Ritz, C., 2018. Hydrothermal-time-to-event models for seed germination. European Journal of Agronomy 101, 129–139.</li>
+<li>Onofri, A., Mesgaran, M.B., Neve, P., Cousens, R.D., 2014. Experimental design and parameter estimation for threshold models in seed germination. Weed Research 54, 425–435. <a href="https://doi.org/10.1111/wre.12095" class="uri">https://doi.org/10.1111/wre.12095</a></li>
+<li>Pace, R., Benincasa, P., Ghanem, M.E., Quinet, M., Lutts, S., 2012. Germination of untreated and primed seeds in rapeseed (brassica napus var oleifera del.) under salinity and low matric potential. Experimental Agriculture 48, 238–251.</li>
+<li>Ritz, C., Jensen, S. M., Gerhard, D., Streibig, J. C. (2019) Dose-Response Analysis Using R CRC Press.</li>
+</ol>
+<hr />
+</div>
+<div id="further-detail" class="section level1">
+<h1>Further detail</h1>
+<p>Let us conclude this page by briefly describing the remaining models presented by Mesgaran et al. (2013; slightly reparameterised here). For all logarithm-based distributions, <span class="math inline">\(\delta\)</span> denotes the shifting parameter; indeed, logarithmic distributions are defined only for strictly positive values, whereas water potential typically assumes negative values. The shifting parameter is therefore introduced to translate the cumulative distribution function to the right, allowing negative values of water potential to be accommodated.</p>
+<p>Furthermore, for the asymmetric distributions (Gumbel and Weibull distributions), <span class="math inline">\(\Psi_b\)</span> is replaced by <span class="math inline">\(\mu\)</span>, which represents the location parameter, although it does not necessarily coincide with the median. For all the following distributions, the equations required to derive percentiles of base water potential, such as <span class="math inline">\(\Psi_{b(25)}\)</span>, <span class="math inline">\(\Psi_{b(50)}\)</span>, or <span class="math inline">\(\Psi_{b(75)}\)</span>, are provided below, together with a couple of practical examples of their use.</p>
+<div id="htnorm" class="section level2">
+<h2><code>HTnorm()</code></h2>
+<p>Normal cumulative distribution function:</p>
+<p><span class="math display">\[P(t, \Psi) = \Phi \left\{ \frac{\Psi - (\theta_H / t) -\Psi_b }{\sigma_{\Psi_b}} \right\}\]</span></p>
+<p>Percentiles of base water potential:</p>
+<p>(P is the desired percentile and <span class="math inline">\(\Phi^{-1}\)</span> is the gaussian quantile function (<code>qnorm()</code>, in R):</p>
+<p><span class="math display">\[\Psi_{b(P)} = \Psi_{b(50)} + \sigma_{\Psi_b} \Phi^{-1}(P)\]</span></p>
+</div>
+<div id="htl" class="section level2">
+<h2><code>HTL()</code></h2>
+<p>Logistic distribution function:</p>
+<p><span class="math display">\[G(t, \Psi) = \frac{1}{1 + exp \left[ - \frac{  \Psi  - \left( \theta _H/t \right) - \Psi_{b(50)} } {\sigma}  \right] }\]</span></p>
+<p>Percentiles of base water potential:</p>
+<p><span class="math display">\[\Psi_{b(P)} = \Psi_{b(50)} - \sigma \, \log\left(\frac{1 - P}{P}\right)\]</span></p>
+</div>
+<div id="htg" class="section level2">
+<h2><code>HTG()</code></h2>
+<p>Gumbel distribution function:</p>
+<p><span class="math display">\[G(t, \Psi) = \exp \left\{ { - \exp \left[ { - \left( {\frac{{\Psi - (\theta _H / t ) - \mu }}{\sigma }} \right)} \right]} \right\}\]</span></p>
+<p>Percentiles of base water potential:</p>
+<p><span class="math display">\[\Psi_{b(P)} = \sigma \, \left\{ -\log \left[ - \log \left(P\right)\right] \right\} + \mu\]</span></p>
+</div>
+<div id="htll" class="section level2">
+<h2><code>HTLL()</code></h2>
+<p>Log-logistic distribution function:</p>
+<p><span class="math display">\[ G(t, \Psi) = \frac{1}{1 + \exp \left\{ \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\Psi_{b(50)} + \delta)  }{\sigma}\right\} }\]</span></p>
+<p>Percentiles of base water potential:</p>
+<p><span class="math display">\[\Psi_{b(P)} = \exp \left\{ \sigma \, \log\left(\frac{1 - P}{P}\right) + \log \left[ \Psi_{b(50)} + \delta\right] \right\} - \delta\]</span></p>
+</div>
+<div id="htw1" class="section level2">
+<h2><code>HTW1()</code></h2>
+<p>Weibull-type I distribution function:</p>
+<p><span class="math display">\[ G(t, \Psi) = exp \left\{ - \exp \left[ - \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\mu + \delta)  }{\sigma}\right] \right\}\]</span>
+Percentiles of base water potential:</p>
+<p><span class="math display">\[\Psi_{b(P)} = \exp \left\{- \sigma \, \log \left[ - \log \left(P\right)\right] + \log \left[ \mu + \delta\right]\right\} - \delta\]</span></p>
+</div>
+<div id="htw2" class="section level2">
+<h2><code>HTW2()</code></h2>
+<p>Weibull-type II distribution function:</p>
+<p><span class="math display">\[ G(t, \Psi) = 1 - exp \left\{ - \exp \left[ \frac{ \log \left[ \Psi  - \left( \frac{\theta _H}{t} \right) + \delta \right] - \log(\mu + \delta)  }{\sigma}\right] \right\}\]</span></p>
+<p>Percentiles of base water potential:</p>
+<p><span class="math display">\[\Psi_{b(P)} = \exp \left\{\sigma \, \log \left[ - \log \left(1 - P\right)\right] + \log \left[ \mu + \delta\right]\right\} - \delta\]</span></p>
+</div>
+<div id="example-of-calculations-with-r" class="section level2">
+<h2>Example of calculations with R</h2>
+<p>We give an example of how to calculate the percentiles for base water potentitial in R. Let’s consider the object ‘mod3’, that contains the results of fitting a Gumbel distribution function to the ‘rape’ data (see above). Considering the equation reported above, the values of <span class="math inline">\(\Psi_{b(25)}\)</span>, <span class="math inline">\(\Psi_{b(50)}\)</span>, and <span class="math inline">\(\Psi_{b(75)}\)</span>,together with standard errors, can be obtained as:</p>
+<pre class="r"><code>p &lt;- c(0.25, 0.50, 0.75)
+psibs &lt;- coef(mod3)[3] * (-log(-log(p))) + coef(mod3)[2] 
+psibs
+## [1] -1.0162094 -0.9287760 -0.8178505</code></pre>
+<p>As expected, <span class="math inline">\(\Psi_{b(50)}\)</span> is not equal to the estimate of <span class="math inline">\(\mu\)</span>; we can get a sense that the above estimates are right by predicting the proportions of germinated seeds at infinite time with environmental water potential equal to the previously determined percentiles:</p>
+<pre class="r"><code>predict(mod3, newdata=data.frame(timeAf = Inf, Psi = psibs))
+##   timeAf        Psi Prediction
+## 1    Inf -1.0162094       0.25
+## 2    Inf -0.9287760       0.50
+## 3    Inf -0.8178505       0.75</code></pre>
+<p>In case standard errors are sought, the ‘gnlht()’ function in the ‘statforbiology’ package (that is the accompanying package for this blog) can be used:</p>
+<pre class="r"><code>funList &lt;- list(~ sigma * (-log(-log(p))) + mu)
+tab &lt;- statforbiology::gnlht(mod3,
+                      funList,
+                      const = data.frame(p),
+                      parameterNames = c(&quot;ThetaH&quot;, &quot;mu&quot;, &quot;sigma&quot;))
+tab[,1:4]
+##                           Form    p   Estimate          SE
+## 1 sigma * (-log(-log(p))) + mu 0.25 -1.0162094 0.009485627
+## 2 sigma * (-log(-log(p))) + mu 0.50 -0.9287760 0.008956758
+## 3 sigma * (-log(-log(p))) + mu 0.75 -0.8178505 0.009811609</code></pre>
+<p>We can give another example for the <code>HTW1()</code> function:</p>
+<pre class="r"><code>psibs &lt;- exp(-0.347537 * log(-log(p)) + log(-0.985613 + 1.239402)) - 1.239402 
+
+funList &lt;- list(~ exp(-sigma * log(-log(p)) + log(mu + delta)) - delta)
+tab &lt;- statforbiology::gnlht(mod5,
+                      funList,
+                      const = data.frame(p),
+                      parameterNames = c(&quot;ThetaH&quot;, &quot;delta&quot;, &quot;mu&quot;, &quot;sigma&quot;))
+tab[,1:4]
+##                                                   Form    p   Estimate
+## 1 exp(-sigma * log(-log(p)) + log(mu + delta)) - delta 0.25 -1.0128471
+## 2 exp(-sigma * log(-log(p)) + log(mu + delta)) - delta 0.50 -0.9511365
+## 3 exp(-sigma * log(-log(p)) + log(mu + delta)) - delta 0.75 -0.8480915
+##            SE
+## 1 0.007192216
+## 2 0.007274446
+## 3 0.009085069</code></pre>
+<hr />
+<p>Originally written on 18 January 2022; revised on February 2025</p>
+</div>
+</div>
+
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Tags</h1>
+        <div class="tags">
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/agricensdata">agricensdata</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/ammi_analysis">ammi_analysis</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/aomisc">aomisc</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/asreml">asreml</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/bayesian_stat">bayesian_stat</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/biplot">biplot</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/blogdown">blogdown</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/book">book</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/boxplot">boxplot</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/case_study">case_study</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/climate_data">climate_data</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/correlation">correlation</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/cva">cva</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/data_management">data_management</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/delta_method">delta_method</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/descriptive_statistics">descriptive_statistics</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/diallel_models">diallel_models</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/dplyr">dplyr</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/drcseedgerm">drcseedgerm</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/drcte">drcte</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/drm">drm</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/emmeans">emmeans</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/error_propagation">error_propagation</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/gge_analysis">gge_analysis</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/ggh4x">ggh4x</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/ggplot">ggplot</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/gls">gls</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/gnlht">gnlht</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/jags">jags</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/linear_models">linear_models</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/lm">lm</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/lmdiallel">lmdiallel</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/lme">lme</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/long_term_experiments">long_term_experiments</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/mcp">mcp</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/meta_analysis">meta_analysis</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/metafor">metafor</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/mixed_models">mixed_models</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/multi_environment_studies">multi_environment_studies</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/multiple_comparisons">multiple_comparisons</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/multivariate_stat">multivariate_stat</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/nlme">nlme</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/nls">nls</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/nonlinear_regression">nonlinear_regression</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/p-values">p-values</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/pca">pca</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/percentiles">percentiles</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/plot">plot</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/qq_plot">qq_plot</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/r">r</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/regression">regression</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/repeated_measures">repeated_measures</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/seed_germination">seed_germination</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/sommer">sommer</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/split_plot">split_plot</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/statforbiology">statforbiology</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/statistical_inference">statistical_inference</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/subsampling">subsampling</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/tidyverse">tidyverse</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/time_to_event_models">time_to_event_models</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/variance">variance</a></span>
+        
+        </div>          
+    </div>
+</div><br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Recent posts</h1>
+        
+            <h1><a href="https://www.statforbiology.com/2026/dealing-with-correlation-in-designed-field-experiments-part-ii/">Dealing with correlation in designed field experiments: part II</a></h1>
+            <time class="has-text-grey-light is-size-7">15 April 2026</time>
+        
+            <h1><a href="https://www.statforbiology.com/2026/dealing-with-correlation-in-designed-field-experiments-part-i/">Dealing with correlation in designed field experiments: part I</a></h1>
+            <time class="has-text-grey-light is-size-7">15 April 2026</time>
+        
+            <h1><a href="https://www.statforbiology.com/2026/mixed-models/">Testing for interactions in nonlinear regression</a></h1>
+            <time class="has-text-grey-light is-size-7">14 February 2026</time>
+        
+            <h1><a href="https://www.statforbiology.com/2026/time_to_event_models/">Fitting time-to-event models with an environmental covariate</a></h1>
+            <time class="has-text-grey-light is-size-7">12 February 2026</time>
+        
+            <h1><a href="https://www.statforbiology.com/2026/mixed-models/">Correcting for multiplicity in the &#39;emmeans&#39; package</a></h1>
+            <time class="has-text-grey-light is-size-7">21 January 2026</time>
+        
+    </div>
+</div>
+    <br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Archives</h1>
+        
+            <a href="https://www.statforbiology.com/archives/2026">2026</a> (5)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2025">2025</a> (7)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2024">2024</a> (4)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2023">2023</a> (12)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2022">2022</a> (7)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2021">2021</a> (15)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2020">2020</a> (13)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2019">2019</a> (7)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2018">2018</a> (2)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2014">2014</a> (1)<br>
+        
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+    </div>
+</div>
+<footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+        <p>
+             <span class="icon is-large"><a href="mailto:andrea.onofri@unipg.it" class="mysocial"><i class="far fa-envelope-open fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://github.com/OnofriAndreaPG/" class="mysocial"><i class="fab fa-github fa-3x"></i></a></span>&nbsp;&nbsp;
+           <span class="icon is-large"><a href="https://twitter.com/onofriandreapg" class="mysocial"><i class="fab fa-twitter fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://www.r-project.org/" class="mysocial"><i class="fab fa-r-project fa-3x"></i></a></span>&nbsp;&nbsp;
+ 
+<br>
+<p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/">Copyright &copy; <a property="dct:title" rel="cc:attributionURL" href="https://www.statforbiology.com/aboutthis/">Fixing the bridge between biologists and statisticians</a> by <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://www.statforbiology.com/about/">Andrea Onofri</a> is licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY-NC-SA 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/sa.svg?ref=chooser-v1"></a> - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a></p>
+            
+</div>
+</footer>
+
+<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+</body>
+</html>

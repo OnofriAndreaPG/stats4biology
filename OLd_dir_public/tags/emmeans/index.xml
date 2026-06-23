@@ -1,0 +1,117 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Emmeans on Fixing the bridge between biologists and statisticians</title>
+    <link>https://www.statforbiology.com/tags/emmeans/</link>
+    <description>Recent content in Emmeans on Fixing the bridge between biologists and statisticians</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <managingEditor>andrea.onofri@unipg.it (Andrea Onofri)</managingEditor>
+    <webMaster>andrea.onofri@unipg.it (Andrea Onofri)</webMaster>
+    <lastBuildDate>Wed, 21 Jan 2026 00:00:00 +0000</lastBuildDate>
+    
+        <atom:link href="https://www.statforbiology.com/tags/emmeans/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Correcting for multiplicity in the &#39;emmeans&#39; package</title>
+      <link>https://www.statforbiology.com/2026/mixed-models/</link>
+      <pubDate>Wed, 21 Jan 2026 00:00:00 +0000</pubDate>
+      <author>andrea.onofri@unipg.it (Andrea Onofri)</author>
+      <guid>https://www.statforbiology.com/2026/mixed-models/</guid>
+      <description>
+
+
+&lt;p&gt;In my recent book (see below), on page 166 and earlier, I made the point that, with pairwise comparisons and, more generally, whenever simultaneous statistical tests are performed, it is necessary to provide P-values that account for the familywise error rate, i.e. the probability of committing at least one incorrect rejection within the whole family of simultaneous tests (i.e. adjusted P-values). In this respect, it may be useful to recall that, for a single non-significant test, the comparison-wise error rate &lt;span class=&#34;math inline&#34;&gt;\(E_c\)&lt;/span&gt; is the probability of a wrong rejection for that single test (based on a non-adjusted P-value), whereas the probability of at least one wrong rejection within a family of &lt;span class=&#34;math inline&#34;&gt;\(k\)&lt;/span&gt; comparisons is much higher.&lt;/p&gt;
+&lt;p&gt;With pairwise comparisons, a single test is usually based on the ratio between a difference and its standard error (a t-test), which is assumed to follow a univariate t-distribution when the null hypothesis is true. When several simultaneous t-tests are performed, the vector of all t-ratios can be assumed to follow a multivariate t-distribution under the hypothesis that the null is true for all simultaneous tests (Bretz et al., 2011). Therefore, adjusted P-values can be obtained by using the probability function of a multivariate t-distribution in place of the simple univariate t-distribution.&lt;/p&gt;
+&lt;p&gt;As an example, let us reconsider the ‘mixture’ data used in Chapter 9 of the main book. Three herbicide mixtures and an untreated control were tested for their weed-control ability against an important weed in tomato, namely &lt;em&gt;Solanum nigrum&lt;/em&gt;. In the code below, we load the data and fit a one-way ANOVA model, using the weight of weed plants per pot as the response variable and the herbicide treatment as the explanatory factor. For the sake of simplicity, we omit the usual checks of the basic assumptions (see the main book). The ANOVA table shows that the treatment effect is significant and, therefore, we proceed to compare treatment means in a pairwise fashion. The P-values shown below do not account for the familywise error rate but only for the comparison-wise error rate; these P-values can be reproduced by using the probability function of a univariate Student’s t-distribution (&lt;code&gt;pt()&lt;/code&gt; function in R).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(statforbiology)
+library(emmeans)
+library(multcomp)
+dataset &amp;lt;- getAgroData(&amp;quot;mixture&amp;quot;)
+dataset$Treat &amp;lt;- factor(dataset$Treat)
+model &amp;lt;- lm(Weight ~ Treat, data = dataset)
+anova(model)
+## Analysis of Variance Table
+## 
+## Response: Weight
+##           Df  Sum Sq Mean Sq F value    Pr(&amp;gt;F)    
+## Treat      3 1089.53  363.18  23.663 2.509e-05 ***
+## Residuals 12  184.18   15.35                      
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+groupMeans &amp;lt;- emmeans(model, ~Treat)
+tab &amp;lt;- contrast(groupMeans, method = &amp;quot;pairwise&amp;quot;, adjust = &amp;quot;none&amp;quot;)
+tab
+##  contrast                         estimate   SE df t.ratio p.value
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  0.1697
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.0168
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  &amp;lt;.0001
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0012
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  &amp;lt;.0001
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0038
+#
+# The P-value is obtained from the univariate t distribution (two-tails test)
+abst &amp;lt;- abs(as.data.frame(tab)$t.ratio)
+2 * pt(abst, 12, lower.tail = FALSE)
+## [1] 1.696785e-01 1.683167e-02 3.651239e-05 1.157189e-03 4.782986e-06
+## [6] 3.794451e-03&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In order to obtain familywise error rates, we should switch from the univariate to the multivariate t-distribution. For example, let’s consider the first t-ratio in the previous Code Box (t = 1.461). We should ask ourselves: “what is the probability of obtaining a t-ratio as extreme as, or more extreme than, 1.461 from a multivariate t-distribution with six dimensions (i.e., the number of simoultaneous tests)?”. In this calculation, we must also consider that the 6 tests are correlated, at least to some extent, because they share some common elements, for example, the same error term in the denominator. In the simplest case (homoscedasticity and balanced data), this correlation is equal to 0.5 for all pairwise comparisons.&lt;/p&gt;
+&lt;p&gt;In earlier times, when the computing power was limited, calculating probabilities from the multivariate t-distribution was a daunting task. However, for some specific cases (e.g., linear models with homoscedastic and balanced data), adjusted P-values could be obtained by exploiting the distribution of the Studentised Range (the so-called ‘tukey’ method), which is the default option in the &lt;code&gt;contrast()&lt;/code&gt; function of the &lt;code&gt;emmeans&lt;/code&gt; package, as shown in the following Code box.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;tab &amp;lt;- contrast(groupMeans, method = &amp;quot;pairwise&amp;quot;)
+# tab &amp;lt;- contrast(groupMeans, method = &amp;quot;pairwise&amp;quot;, adjust = &amp;quot;tukey&amp;quot;) # same as above
+tab
+##  contrast                         estimate   SE df t.ratio p.value
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  0.4885
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.0698
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  0.0002
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0055
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  &amp;lt;.0001
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0173
+## 
+## P value adjustment: tukey method for comparing a family of 4 estimates
+# The P-value is obtained from the Studentised Range Distribution (two-tails test)
+abst &amp;lt;- abs(as.data.frame(tab)$t.ratio)
+ptukey(sqrt(2) * abst, 4, 12, lower.tail = FALSE)
+## [1] 4.884620e-01 6.981178e-02 1.853807e-04 5.501451e-03 2.473776e-05
+## [6] 1.725725e-02&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This simple method yields exact familywise error rates with balanced data—which represent the vast majority of designed field experiments in agriculture—and performs reasonably well in the presence of small degrees of imbalance. Within the framework of traditional multiple-comparison testing procedures, the approach described above leads to the same results as Tukey’s HSD for balanced data and the Tukey–Kramer test for unbalanced data.&lt;/p&gt;
+&lt;p&gt;More recently, it has become possible to directly calculate probabilities from the multivariate t-distribution, which is particularly convenient because it provides a more general approach to obtaining familywise error rates. This distribution is implemented in the ‘mvtnorm’ package through the &lt;code&gt;pmvt()&lt;/code&gt; function. To perform the calculation, we must specify, for each dimension, the interval over which the probability is to be computed (in this case, for the first t-ratio, the interval is &lt;span class=&#34;math inline&#34;&gt;\(\pm 1.461081\)&lt;/span&gt;), the number of degrees of freedom (12), and the correlation matrix of the linear combinations, which can be directly retrieved from the ‘emmGrid’ object. The code below illustrates these calculations. The quantity ‘plev’ represents the probability of sampling within the interval (i.e. none of the six null hypotheses is wrongly rejected), whereas the familywise error rate corresponds to the probability of sampling outside the interval (i.e. at least one null hypothesis is wrongly rejected), which is obtained by subtraction.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(mvtnorm)
+t1 &amp;lt;- abs(as.data.frame(tab)$t.ratio)[1]
+ncontr &amp;lt;- 6
+corMat &amp;lt;- cov2cor(vcov(tab))
+plev &amp;lt;- pmvt(lower = rep(-t1, ncontr), upper=rep(t1, ncontr), df = 12,
+     corr = corMat)[1]
+1 - plev
+## [1] 0.4883843&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In R, such an approach can be obtained by using the &lt;code&gt;adjust = &#34;mvt&#34;&lt;/code&gt; argument.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;tab &amp;lt;- contrast(groupMeans, method = &amp;quot;pairwise&amp;quot;, adjust = &amp;quot;mvt&amp;quot;)
+tab
+##  contrast                         estimate   SE df t.ratio p.value
+##  Metribuzin__348 - Mixture_378        4.05 2.77 12   1.461  0.4885
+##  Metribuzin__348 - Rimsulfuron_30    -7.68 2.77 12  -2.774  0.0698
+##  Metribuzin__348 - Unweeded         -17.60 2.77 12  -6.352  0.0002
+##  Mixture_378 - Rimsulfuron_30       -11.73 2.77 12  -4.235  0.0054
+##  Mixture_378 - Unweeded             -21.64 2.77 12  -7.813  &amp;lt;.0001
+##  Rimsulfuron_30 - Unweeded           -9.91 2.77 12  -3.578  0.0172
+## 
+## P value adjustment: mvt method for 6 tests&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The above function employs numerical integration methods and is based on simulation; consequently, the results are not fully reproducible. However, it is easy to see that these results are asymptotically equivalent to those obtained with the Tukey adjustment method shown above. Owing to this intrinsic complexity, the use of the &lt;code&gt;adjust = &#34;mvt&#34;&lt;/code&gt; argument is not recommended for pairwise comparisons in balanced experiments, whereas it may prove useful in other situations, for example in the presence of strongly unbalanced data.&lt;/p&gt;
+&lt;p&gt;Thanks for reading—and don’t forget to check out my new book below!&lt;/p&gt;
+&lt;p&gt;Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href = &#34;https://www.awin1.com/cread.php?awinmid=26429&amp;awinaffid=2675822&amp;ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5&#34;&gt;&lt;img src= &#34;../../_Figures/Email_Signature_978-3-032-08199-5.png&#34; align=&#34;center&#34; alt=&#34;Book cover&#34; class=&#34;cover&#34; /&gt;&lt;/a&gt;
+&lt;br/&gt;&lt;/p&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Bretz, F., Hothorn, T., Westfall, P., 2011. Multiple comparisons using R. CRC Press, Boca Raton, FL.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

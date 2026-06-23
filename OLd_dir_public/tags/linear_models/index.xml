@@ -1,0 +1,873 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Linear_models on Fixing the bridge between biologists and statisticians</title>
+    <link>https://www.statforbiology.com/tags/linear_models/</link>
+    <description>Recent content in Linear_models on Fixing the bridge between biologists and statisticians</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <managingEditor>andrea.onofri@unipg.it (Andrea Onofri)</managingEditor>
+    <webMaster>andrea.onofri@unipg.it (Andrea Onofri)</webMaster>
+    <lastBuildDate>Fri, 22 Nov 2024 00:00:00 +0000</lastBuildDate>
+    
+        <atom:link href="https://www.statforbiology.com/tags/linear_models/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>How do we combine errors? The linear case</title>
+      <link>https://www.statforbiology.com/2024/how-do-we-combine-errors-the-linear-case/</link>
+      <pubDate>Fri, 22 Nov 2024 00:00:00 +0000</pubDate>
+      <author>andrea.onofri@unipg.it (Andrea Onofri)</author>
+      <guid>https://www.statforbiology.com/2024/how-do-we-combine-errors-the-linear-case/</guid>
+      <description>
+
+
+&lt;p&gt;In our research work, we usually fit models to experimental data. Our aim is to estimate some biologically relevant parameters, together with their standard errors. Very often, these parameters are interesting in themselves, as they represent means, differences, rates or other important descriptors. In other cases, we use those estimates to derive further indices, by way of some appropriate calculations. For example, think that we have two parameter estimates, say Q and W, with standard errors respectively equal to &lt;span class=&#34;math inline&#34;&gt;\(\sigma_Q\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(\sigma_W\)&lt;/span&gt;: it might be relevant to calculate the amount:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[Z = aQ + bW + c\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(a\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(c\)&lt;/span&gt; are three coefficients. The above operation is named ‘linear combination’; it is a sort of a weighted sum of model parameters. The question is: what is the standard error of Z? I would like to show this by way of a simple biological example.&lt;/p&gt;
+&lt;div id=&#34;example&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Example&lt;/h1&gt;
+&lt;p&gt;We have measured the germination rate for seeds of &lt;em&gt;Brassica rapa&lt;/em&gt; at six levels of water potential in the substrate (-1, -0.9, -0.8, -0.7, -0.6 and -0.5 MPa). We would like to predict the germination rate for a water potential level of -0.75 MPa.&lt;/p&gt;
+&lt;p&gt;Literature references suggest that the relationship between germination rate and water potential in the substrate is linear. Therefore, as the first step, we fit a linear regression model to our observed data. If we are into R, the code to accomplish this task is shown below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;GR &amp;lt;- c(0.11, 0.20, 0.34, 0.46, 0.56, 0.68)
+Psi &amp;lt;- c(-1, -0.9, -0.8, -0.7, -0.6, -0.5)
+lMod &amp;lt;- lm(GR ~ Psi)
+summary(lMod)
+## 
+## Call:
+## lm(formula = GR ~ Psi)
+## 
+## Residuals:
+##          1          2          3          4          5          6 
+##  0.0076190 -0.0180952  0.0061905  0.0104762 -0.0052381 -0.0009524 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&amp;gt;|t|)    
+## (Intercept)  1.25952    0.02179   57.79 5.37e-07 ***
+## Psi          1.15714    0.02833   40.84 2.15e-06 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error: 0.01185 on 4 degrees of freedom
+## Multiple R-squared:  0.9976,	Adjusted R-squared:  0.997 
+## F-statistic:  1668 on 1 and 4 DF,  p-value: 2.148e-06&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It is clear that we can use the fitted model to calculate the GR-value at -0.75 MPa, as &lt;span class=&#34;math inline&#34;&gt;\(GR = 1.26 - 1.16 \times 0.75 = 0.39\)&lt;/span&gt;. This is indeed a linear combination of model parameters, as we have shown above. Q and W are the estimated model parameters, while &lt;span class=&#34;math inline&#34;&gt;\(a = 1\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(b = -0.75\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(c = 0\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;Of course, the derived response is also an estimate and we need to give a measure of uncertainty. For both model parameters we have standard errors; the question is: how does the uncertainty in parameter estimates propagates to their linear combination? In simpler words: it is easy to build a weighted sum of model parameters, but, how do we make a weighted sum of their standard errors?&lt;/p&gt;
+&lt;p&gt;Sokal and Rohlf (1981) at pag. 818 of their book, show that, in general, it is:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ \textrm{var}(a \, Q + b \, W) = a^2 \sigma^2_Q + b^2 \sigma^2_W + 2ab \sigma_{QW} \]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(\sigma_{QW}\)&lt;/span&gt; is the covariance of Q and W. I attach the proof below; it is pretty simple to understand and it is worth the effort. However, several students in biology are rather reluctant when they have to delve into maths. Therefore, I would also like to give an empirical ‘proof’, by using some simple R code.&lt;/p&gt;
+&lt;p&gt;Let’s take two samples (Q and W) and combine them by using two coefficients &lt;span class=&#34;math inline&#34;&gt;\(a\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt;. Let’s calculate the variance for the combination:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Q &amp;lt;- c(12, 14, 11, 9)
+W &amp;lt;- c(2, 4, 7, 8)
+a &amp;lt;- 2
+b &amp;lt;- 3
+c &amp;lt;- 4
+var(a * Q + b * W + c)
+## [1] 35.58333
+ r
+a^2 * var(Q) + b^2 * var(W) + 2 * a * b * cov(Q, W)
+## [1] 35.58333&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We see that the results match exactly! In our example, the variance and covariance of estimates are retrieved by using the ‘vcov()’ function:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;vcov(lMod)
+##              (Intercept)          Psi
+## (Intercept) 0.0004749433 0.0006020408
+## Psi         0.0006020408 0.0008027211
+ r
+sigma2Q &amp;lt;- vcov(lMod)[1,1]
+sigma2W &amp;lt;- vcov(lMod)[2,2]
+sigmaQW &amp;lt;- vcov(lMod)[1,2]&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The standard error for the prediction is simply obtained as:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sqrt( sigma2Q + 0.75^2 * sigma2W - 2 * 0.75 * sigmaQW )
+## [1] 0.004838667&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;the-functions-predict-and-glht&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;The functions ‘predict()’ and ‘glht()’&lt;/h1&gt;
+&lt;p&gt;Now that we have understood the concept, we can use R to make the calculations. For this example, the ‘predict()’ method represents the most logical approach. We only need to pass the model object and the X value which we have to make a prediction for. This latter value needs to be organised as a data frame, with column name(s) matching the name(s) of the X-variable(s) in the original dataset:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;predict(lMod, newdata = data.frame(Psi = -0.75), 
+        se.fit = T)
+## $fit
+##         1 
+## 0.3916667 
+## 
+## $se.fit
+## [1] 0.004838667
+## 
+## $df
+## [1] 4
+## 
+## $residual.scale
+## [1] 0.01185227&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Apart from the predict method, there is another function of more general interest, which can be used to build linear combinations of model parameters. It is the ‘glht()’ function in the ‘multcomp’ package. To use this function, we need a model object and we need to organise the coefficients for the transformation in a matrix, with as many rows as there are combinations to calculate. When writing the coefficients, we disregard C: we have seen that every constant value does not affect the variance of the transformation.&lt;/p&gt;
+&lt;p&gt;For example, just imagine that we want to predict the GR for two levels of water potential, i.e. -0.75 (as above) and -0.55 MPa. The coefficients (A, B) for the combinations are:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Z1 &amp;lt;- c(1, -0.75)
+Z2 &amp;lt;- c(1, -0.55)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We pile up the two vectors in one matrix with two rows:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;M &amp;lt;- matrix(c(Z1, Z2), 2, 2, byrow = T)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And now we pass that matrix to the ‘glht()’ function as an argument:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(multcomp)
+lcombs &amp;lt;- glht(lMod, linfct = M)
+summary(lcombs)
+## 
+## 	 Simultaneous Tests for General Linear Hypotheses
+## 
+## Fit: lm(formula = GR ~ Psi)
+## 
+## Linear Hypotheses:
+##        Estimate Std. Error t value Pr(&amp;gt;|t|)    
+## 1 == 0 0.391667   0.004839   80.94 2.30e-07 ***
+## 2 == 0 0.623095   0.007451   83.62 2.02e-07 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## (Adjusted p values reported -- single-step method)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The above method can be easily extended to other types of linear models and linear combinations of model parameters. The ‘adjust’ argument is useful whenever we want to obtain familywise confidence intervals, which can account for the multiplicity problem. But this is another story…&lt;/p&gt;
+&lt;p&gt;Happy work with these functions! And … don’t forget to check out my new book!&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href = &#34;https://www.awin1.com/cread.php?awinmid=26429&amp;awinaffid=2675822&amp;ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5&#34;&gt;&lt;img src= &#34;../../_Figures/Email_Signature_978-3-032-08199-5.png&#34; align=&#34;center&#34; alt=&#34;Book cover&#34; class=&#34;cover&#34; /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;appendix&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Appendix&lt;/h1&gt;
+&lt;p&gt;We know that the variance for a random variable is defined as:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[{\begin{array}{l}
+var(Z) = \frac{1}{n-1}\sum \left(Z - \hat{Z}\right)^2 = \\
+= \frac{1}{n-1}\sum \left(Z - \frac{1}{n} \sum{Z}\right)^2
+\end{array}}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;If &lt;span class=&#34;math inline&#34;&gt;\(Z = aQ + bW + c\)&lt;/span&gt;, where &lt;span class=&#34;math inline&#34;&gt;\(a\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(c\)&lt;/span&gt; are the coefficients and Q and W are two random variables, we have:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ {\begin{array}{l}
+var(Z) = \frac{1}{n-1}\sum \left[aQ + bW + c - \frac{1}{n} \sum{ \left(aQ + bW + c\right)}\right]^2 = \\
+= \frac{1}{n-1}\sum \left[aQ + bW + c - \frac{1}{n} \sum{ aQ} - \frac{1}{n} \sum{ bW} - \frac{1}{n} \sum{ c}\right]^2 =
+\end{array}}
+\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[{\begin{array}{l}
+= \frac{1}{n-1}\sum \left[aQ + bW + c - a \hat{Q} - b \hat{W} - c \right]^2 =\\
+= \frac{1}{n-1}\sum \left[\left( aQ - a \hat{Q}\right) + \left( aW - a\hat{W}\right) \right]^2 =
+\end{array}}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[{\begin{array}{l}
+=\frac{1}{n-1}\sum \left[a \left( Q - \hat{Q}\right) + b \left( W - \hat{W}\right) \right]^2 =\\
+= \frac{1}{n-1}\sum \left[a^2 \left( Q - \hat{Q}\right)^2 + b^2 \left( W - \hat{W}\right)^2 + 2ab \left( Q - \hat{Q}\right) \left( W - \hat{W}\right)\right] =
+\end{array}}
+\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ = a^2 \frac{1}{n-1} \sum{\left( Q - \hat{Q}\right)^2} + b^2 \frac{1}{n-1}\sum \left( W - \hat{W}\right)^2 + 2ab \frac{1}{n-1}\sum{\left[\left( Q - \hat{Q}\right) \left( W - \hat{W}\right)\right]}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Therefore:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ \textrm{var}(Z) = a^2 \sigma^2_Q + b^2 \sigma^2_W + 2ab \sigma_{Q,W}\]&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Here is why I don&#39;t care about the Levene&#39;s test</title>
+      <link>https://www.statforbiology.com/2024/here-is-why-i-dont-care-about-the-levenes-test/</link>
+      <pubDate>Fri, 15 Mar 2024 00:00:00 +0000</pubDate>
+      <author>andrea.onofri@unipg.it (Andrea Onofri)</author>
+      <guid>https://www.statforbiology.com/2024/here-is-why-i-dont-care-about-the-levenes-test/</guid>
+      <description>
+
+
+&lt;p&gt;During my stat courses, I never give my students any information about the Levene’s test (Levene and Howard, 1960), or other similar tests for homoscedasticity, unless I am specifically prompted to do so. It is not that I intend to underrate the tremendous importance of checking for the basic assumptions of linear model! On the contrary, I always show my students several methods for the graphical inspection of model residuals, but I do not share the same aching desire for a P-value, that most of my colleagues seem to possess.&lt;/p&gt;
+&lt;p&gt;I understand that the Levene’s test could have played an important role at the time when it was devised; at that time, biologists/agronomists used to only have ANOVA and regression at their disposal and the Levene’s or other formal tests were strictly necessary to assess whether those powerful techniques (ANOVA/regression) could be reliably used, in place of other less powerful non-parametric methods of data analyses. At that time, the only sensible question they could ask the data was: ‘are the variances homogeneous across the experimental groups?’. And the P-level from a Levene’s test provided the perfect answer.&lt;/p&gt;
+&lt;p&gt;Today, things have vastly changed: we have very powerful computers and we have the freeware statistical environment R, where an awful lot of advanced models are put at our disposal. There is nothing that prevents us from asking our body of data several interesting questions, such as:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;do the treatments affect the variances of the experimental groups?&lt;/li&gt;
+&lt;li&gt;Are the variances, somehow, related to the expected responses?&lt;/li&gt;
+&lt;li&gt;Is a heteroscedastic model more reasonable than a homoscedastic model?&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Nowadays, we can answer all these (and other) questions by an appropriate comparison of alternative models: for example, let’s consider a genotype experiment with kamut, resulting in the dataset ‘HetGenotypes.csv’, which is available in an external repository. It is a simple fully randomised experiment with three replicates, aimed at comparing the yield of 15 kamut genotypes.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(dplyr)
+fileName &amp;lt;- &amp;quot;https://www.casaonofri.it/_datasets/HetGenotypes.csv&amp;quot;
+dataset &amp;lt;- read.csv(fileName)
+dataset &amp;lt;- dataset |&amp;gt;
+  transform(Genotype, factor(Genotype))
+head(dataset)
+##   Genotype Yield
+## 1        A 8.129
+## 2        A 8.616
+## 3        A 7.932
+## 4        B 6.188
+## 5        B 6.767
+## 6        B 6.635&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It would be rather common to start the analyses by fitting a simple ‘ANOVA’ model, where the yield measurements (&lt;span class=&#34;math inline&#34;&gt;\(y_i\)&lt;/span&gt;) are regarded as functions of the ovarell mean (&lt;span class=&#34;math inline&#34;&gt;\(\mu\)&lt;/span&gt;) plus the genotype effects (&lt;span class=&#34;math inline&#34;&gt;\(\alpha_j\)&lt;/span&gt;), while errors (&lt;span class=&#34;math inline&#34;&gt;\(\varepsilon_i\)&lt;/span&gt;) are regarded as gaussian, independent and homoscedastic (a simple ANOVA model, indeed):&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[y_i = \mu + \alpha_j + \varepsilon_i; \quad \quad  \textrm{with:} \quad \quad\varepsilon_i  \sim N(0, \sigma)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;For reasons that will be clearer later on, we fit this model by using the &lt;code&gt;gls()&lt;/code&gt; function in the &lt;code&gt;nlme&lt;/code&gt; package (same syntax as with the usual &lt;code&gt;lm()&lt;/code&gt; function). Immediately afterwards, we plot the residuals, which reveals that there are strong differences of variability across groups, but residuals are not clearly related to yield level.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(nlme)
+library(ggplot2)
+mod.aov &amp;lt;- gls(Yield ~ Genotype, data = dataset)
+
+g1 &amp;lt;- ggplot(dataset) +
+  geom_boxplot(mapping = aes(y = residuals(mod.aov), x = Genotype)) +
+  theme_bw()
+g2 &amp;lt;- ggplot() +
+  geom_point(mapping = aes(y = residuals(mod.aov), x = fitted(mod.aov))) +
+  theme_bw()
+library(gridExtra)
+gridExtra::grid.arrange(g1, g2, nrow = 1) &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_lm_checkAssumptions_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;My question at this stage: is it sensible to ask whether the variances are the same across groups? Using Tukey’s word (Tukey, 1991), such a question appears to be ‘rather foolish’, as the answer is already clear from the previous figure. However, it is sensible to ask whether a more complex model, allowing for heteroscedastic of within group errors, is warranted. Such a model would be expressed as:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[y_i = \mu + \alpha_j + \varepsilon_i; \quad \quad  \textrm{with:} \quad \quad\varepsilon_i  \sim N(0, \sigma_j)\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where &lt;span class=&#34;math inline&#34;&gt;\(\sigma_i\)&lt;/span&gt; is allowed to assume a different value for each genotype; nowadays, fitting such a model is widely feasible, by using the same &lt;code&gt;gls()&lt;/code&gt; function as we have used before:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod.het &amp;lt;- gls(Yield ~ Genotype, data = dataset,
+               weights = varIdent(form = ~1|Genotype))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;You see it: no fitting difficulties of any kind. This second model, with respect to the first one, may be more respectful of what we observed in our experiment, but it has the cost of requiring 14 extra parameters, to estimate 15 variances, instead of just one. Is this extra-cost justified by the data at hand?&lt;/p&gt;
+&lt;p&gt;We can directly compare the two models by using the AIC (Akaike’s information criterion):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;anova(mod.aov, mod.het)
+##         Model df       AIC      BIC    logLik   Test  L.Ratio p-value
+## mod.aov     1 16 106.18435 128.6035 -37.09218                        
+## mod.het     2 30  97.44571 139.4816 -18.72285 1 vs 2 36.73865   8e-04&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We see that the AIC is lower for the heteroscedastic model and we also see that the Likelihood Ratio Test confirms that the more complex model is much more likely, in spite of the cost induced by the need for extra parameters. Thus I keep the most complex model and go ahead with that.&lt;/p&gt;
+&lt;p&gt;In conclusion, this is why I do not care about the Levene’s test: it provides a good answer to the wrong question (BTW: the Levene’s test in this circumstance turns out to be non-significant…)!&lt;/p&gt;
+&lt;p&gt;Thanks for reading and happy coding! And … don’t forget to check out my new book!&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href = &#34;https://www.awin1.com/cread.php?awinmid=26429&amp;awinaffid=2675822&amp;ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5&#34;&gt;&lt;img src= &#34;../../_Figures/Email_Signature_978-3-032-08199-5.png&#34; align=&#34;center&#34; alt=&#34;Book cover&#34; class=&#34;cover&#34; /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Akaike, H., 1974. A new look at the statistical model identification. IEEE Transactions on Automatic Control 19, 716–723. &lt;a href=&#34;https://doi.org/doi:10.1109/TAC.1974.1100705&#34; class=&#34;uri&#34;&gt;https://doi.org/doi:10.1109/TAC.1974.1100705&lt;/a&gt;, MR 0423716&lt;/li&gt;
+&lt;li&gt;Levene and Howard, 1960. Robust tests for equality of variances, In Ingram Olkin; Harold Hotelling; et al. (eds.), Contributions to Probability and Statistics: Essays in Honor of Harold Hotelling, Stanford University Press.&lt;/li&gt;
+&lt;li&gt;Tukey, J.W., 1991. The phylosophy of multiple comparisons. Statistical Science 6, 100–116.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Factorial designs with check in pesticide research</title>
+      <link>https://www.statforbiology.com/2023/factorial-designs-with-check-in-pesticide-research/</link>
+      <pubDate>Fri, 15 Dec 2023 00:00:00 +0000</pubDate>
+      <author>andrea.onofri@unipg.it (Andrea Onofri)</author>
+      <guid>https://www.statforbiology.com/2023/factorial-designs-with-check-in-pesticide-research/</guid>
+      <description>
+
+
+&lt;p&gt;In pesticide research or, in general, agriculture research, we very commonly encouter experiments with two/three crossed factors and some other treatment that is not included in the factorial structure. For example, let’s consider an experiment with two herbicides (rimsulfuron and dicamba) at two rates (40 and 60 g/ha for rimsulfuron and 0.6 and 1 kg/ha for dicamba) and with four adjuvant treatments (surfactant, frigate, mineral oil and no adjuvant). Apart from this fully crossed structure, we need to introduce, at least, an untreated control and a hand-weeded control. The design for such an experiment has been termed ‘augmented factorial’, because we are, indeed, including some extra treatment levels beyond the crossed factorial structure.&lt;/p&gt;
+&lt;p&gt;The dataset relating to the above example is named ‘adjuvants.csv’, it is available in an online repository and it can be loaded by using the code below. We have three predictors (Herbicide, Adjuvant and Dose) and two quantitative response variables (WeedCoverage and Yield). We need to transform the variables ‘Herbicide’ and ‘Adjuvant’ into factors, while we recode the two dose levels as ‘HIGH’ and ‘LOW’, in order to make the two herbicides comparable (we could also work with the original dose variable and fit a regression model, but I have made this point in another post, &lt;a href=&#34;https://www.statforbiology.com/2023/stat_lm_augmentedfactorial_regression/&#34;&gt;see here&lt;/a&gt;).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rm(list = ls())
+library(emmeans)
+library(multcomp)
+fileName &amp;lt;- &amp;quot;https://www.casaonofri.it/_datasets/adjuvants.csv&amp;quot;
+dataset &amp;lt;- read.csv(fileName)
+head(dataset)
+##   Plot   Herbicide   Adjuvant Dose Block WeedCoverage Yield
+## 1    1  HandWeeded       None    0     1         0.00 14.55
+## 2    2     Dicamba    Frigate    1     1        27.70 11.10
+## 3    3     Dicamba Surfactant    1     1        22.60 13.16
+## 4    4     Dicamba MineralOil    1     1        16.35 14.22
+## 5    5     Dicamba       None    1     1        45.00 14.69
+## 6    6 Rimsulfuron MineralOil   60     1        16.65 12.01
+dataset$DoseF &amp;lt;- with(dataset, factor(ifelse(Dose==60 | Dose == 1, &amp;quot;HIGH&amp;quot;,
+                               ifelse(Dose == 0, &amp;quot;NONE&amp;quot;, 
+                                      &amp;quot;LOW&amp;quot;))))
+dataset[,c(1:3,5)] &amp;lt;- lapply(dataset[,c(1:3,5)], function(i) factor(i))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;To my experience, such an augmented factorial design may give a few troubles at the data analysis stage. In particular, I have noted that many colleagues, in order to avoid problems, combine the three predictors into one and fit a simple one-way ANOVA model, as shown below, e.g., for the yield response&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;Comb &amp;lt;- with(dataset, factor(Herbicide:Adjuvant:DoseF))
+model1 &amp;lt;- lm(Yield ~ Comb, data = dataset)
+anova(model1)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##           Df Sum Sq Mean Sq F value    Pr(&amp;gt;F)    
+## Comb      17 72.604  4.2708  4.8402 2.143e-06 ***
+## Residuals 62 54.707  0.8824                      
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Such an analysis, to my opinion, is rather inefficient. Indeed, the aim of an experiment like this one is not only to compare the treatments with the control, but it is also to analyse the factorial structure, to assess the existence of possible interaction effects among the predictors. Therefore, it may be worth to take a minute to develop a more efficient model to describe our experimental data.&lt;/p&gt;
+&lt;p&gt;With R, it will be convenient to create a new ‘dummy’ variable to part the controls and the factorial structure, as shown in the box below. In this case, we have two controls, but, in other case, this dummy variable will be binary.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dataset$CvT &amp;lt;- with(dataset, factor(ifelse(Herbicide == &amp;quot;HandWeeded&amp;quot;, &amp;quot;chk1&amp;quot;,
+                      ifelse(Herbicide == &amp;quot;Unweeded&amp;quot;, &amp;quot;chk2&amp;quot;,&amp;quot;trt&amp;quot;))))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now, we code the model, by nesting the factorial structure within the newly created variable.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model2 &amp;lt;- lm(Yield ~ CvT/(Herbicide*DoseF*Adjuvant), data = dataset)
+anova(model2)
+## Analysis of Variance Table
+## 
+## Response: Yield
+##                              Df Sum Sq Mean Sq F value    Pr(&amp;gt;F)    
+## CvT                           2 46.251 23.1253 26.2080 5.637e-09 ***
+## CvT:Herbicide                 1  3.701  3.7008  4.1941  0.044805 *  
+## CvT:DoseF                     1  0.106  0.1064  0.1206  0.729531    
+## CvT:Adjuvant                  3  6.546  2.1820  2.4729  0.069918 .  
+## CvT:Herbicide:DoseF           1  0.220  0.2197  0.2490  0.619534    
+## CvT:Herbicide:Adjuvant        3 11.345  3.7815  4.2856  0.008193 ** 
+## CvT:DoseF:Adjuvant            3  2.211  0.7372  0.8354  0.479544    
+## CvT:Herbicide:DoseF:Adjuvant  3  2.225  0.7415  0.8404  0.476920    
+## Residuals                    62 54.707  0.8824                      
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The ‘CvT’ effects represents the contrast between the two controls and the treated plots and it has three levels (untreated, hand-weeded and treated). We see that this effect is significant, as well as the ‘Herbicide:Adjuvant’ interaction within treated plots. On the other hand, the ‘Dose’ effect within treated plots, is not significant. We can use the &lt;code&gt;emmeans()&lt;/code&gt; function to extract the relevant marginal means and compare them.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cld(emmeans(model2, ~CvT), Letters = LETTERS)
+##  CvT  emmean    SE df lower.CL upper.CL .group
+##  chk2   11.6 0.332 62     11.0     12.3  A    
+##  trt    13.9 0.117 62     13.6     14.1   B   
+##  chk1   14.8 0.332 62     14.1     15.5    C  
+## 
+## Results are averaged over the levels of: Adjuvant, DoseF, Herbicide 
+## Confidence level used: 0.95 
+## P value adjustment: tukey method for comparing a family of 3 estimates 
+## significance level used: alpha = 0.05 
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.
+cld(emmeans(model2, ~CvT:Herbicide:Adjuvant), Letters = LETTERS)
+##  Herbicide   Adjuvant   CvT  emmean    SE df lower.CL upper.CL .group
+##  Unweeded    None       chk2   11.6 0.332 62     11.0     12.3  A    
+##  Rimsulfuron None       trt    13.0 0.332 62     12.3     13.6  AB   
+##  Dicamba     Frigate    trt    13.3 0.332 62     12.6     13.9   BC  
+##  Dicamba     Surfactant trt    13.5 0.332 62     12.8     14.2   BCD 
+##  Dicamba     None       trt    13.7 0.332 62     13.1     14.4   BCD 
+##  Dicamba     MineralOil trt    14.1 0.332 62     13.4     14.8   BCD 
+##  Rimsulfuron MineralOil trt    14.3 0.332 62     13.6     15.0   BCD 
+##  Rimsulfuron Surfactant trt    14.6 0.332 62     13.9     15.2    CD 
+##  Rimsulfuron Frigate    trt    14.7 0.332 62     14.0     15.3    CD 
+##  HandWeeded  None       chk1   14.8 0.332 62     14.1     15.5     D 
+## 
+## Results are averaged over the levels of: DoseF 
+## Confidence level used: 0.95 
+## P value adjustment: tukey method for comparing a family of 10 estimates 
+## significance level used: alpha = 0.05 
+## NOTE: If two or more means share the same grouping symbol,
+##       then we cannot show them to be different.
+##       But we also did not show them to be the same.&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I suggest that this type of analysis is simple enough and makes better use of the information contained in our dataset. The full R code for this analysis can be found at &lt;a href=&#34;https://www.statforbiology.com/R_Codes/stat_lm_AugmentedFactorial.R&#34;&gt;this link&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Thanks for reading and happy coding! And … don’t forget to check out my new book!&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;div id=&#34;section&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;&lt;a href = &#34;https://www.awin1.com/cread.php?awinmid=26429&amp;awinaffid=2675822&amp;ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5&#34;&gt;&lt;img src= &#34;../../_Figures/Email_Signature_978-3-032-08199-5.png&#34; align=&#34;center&#34; alt=&#34;Book cover&#34; class=&#34;cover&#34; /&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;/div&gt;
+&lt;div id=&#34;reference&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Reference&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Piepho, H.P., Edmondson, R.N., 2018. A tutorial on the statistical analysis of factorial experiments with qualitative and quantitative treatment factor levels. J Agronomy Crop Science 204, 429–455. &lt;a href=&#34;https://doi.org/10.1111/jac.12267&#34; class=&#34;uri&#34;&gt;https://doi.org/10.1111/jac.12267&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Regression analyses with common checks in pesticide research</title>
+      <link>https://www.statforbiology.com/2023/regression-analyses-with-common-checks-in-pesticide-research/</link>
+      <pubDate>Fri, 15 Dec 2023 00:00:00 +0000</pubDate>
+      <author>andrea.onofri@unipg.it (Andrea Onofri)</author>
+      <guid>https://www.statforbiology.com/2023/regression-analyses-with-common-checks-in-pesticide-research/</guid>
+      <description>
+
+
+&lt;p&gt;In pesticide research or, in general, agriculture research, we very commonly encounter experiments with, e.g., several herbicides tested at different doses and in different conditions. For these experiments, the untreated control is always added and, of course, such control is common to all herbicides.&lt;/p&gt;
+&lt;p&gt;For example, in another post (&lt;a href=&#34;https://www.statforbiology.com/2023/stat_lm_augmentedfactorial/&#34;&gt;see here&lt;/a&gt;) we have considered an experiment with two herbicides (rimsulfuron and dicamba) at two rates (40 and 60 g/ha for rimsulfuron and 0.6 and 1 kg/ha for dicamba) and with four adjuvant treatments (surfactant, frigate, mineral oil and no adjuvant). The dataset is loaded in the box below: there are three predictors (Herbicide, Adjuvant and Dose) and two quantitative response variables (WeedCoverage and Yield).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;rm(list = ls())
+library(emmeans)
+library(multcomp)
+fileName &amp;lt;- &amp;quot;https://www.casaonofri.it/_datasets/adjuvants.csv&amp;quot;
+dataset &amp;lt;- read.csv(fileName)
+head(dataset)
+##   Plot   Herbicide   Adjuvant Dose Block WeedCoverage Yield
+## 1    1  HandWeeded       None    0     1         0.00 14.55
+## 2    2     Dicamba    Frigate    1     1        27.70 11.10
+## 3    3     Dicamba Surfactant    1     1        22.60 13.16
+## 4    4     Dicamba MineralOil    1     1        16.35 14.22
+## 5    5     Dicamba       None    1     1        45.00 14.69
+## 6    6 Rimsulfuron MineralOil   60     1        16.65 12.01
+dataset[,c(1:3,5)] &amp;lt;- lapply(dataset[,c(1:3,5)], 
+                             function(i) factor(i))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In the previous post we have taken the dose as a factor and fitted an augmented factorial model. More appropriately, in this post we would like to take the dose as a quantitative variable and fit a regression model. If we consider the common control (dose = 0), we have three available doses for each herbicide and, thus, we can fit a simple linear regression model. In particular, we should fit 8 regression lines, one per each adjuvant/herbicide combination and we should assume that these lines have a common intercept, as they share a common control. It will also be necessary to assume that the adjuvants have no effect on themselves, which may not be true in this case, but we are not attempting to draw any biological conclusions, we only want to give an example of the method.&lt;/p&gt;
+&lt;p&gt;First of all, we remove the hand weeded control, that plays no role in regression analysis, because it has no explicit or implicit dose value.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dataset &amp;lt;- subset(dataset, Herbicide != &amp;quot;HandWeeded&amp;quot;)
+dataset[,c(1:3,5)] &amp;lt;- lapply(dataset[,c(1:3,5)], 
+                             function(i) factor(i))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In order to code for a set of models with a common intercept, we have to remove the main effects of herbicide and adjuvant from the model, because they would imply an adjuvant/herbicide-specific intercept, which is inappropriate. Next, we can fit eight different slopes by nesting the regression effect within the ‘herbicide by adjuvant’ combination, by using the nesting operator ‘%in%’. We could also use the ‘/’ operator, although in this case we would have the slopes expressed as differences with respect to one of the ‘herbicide by adjuvant’ combinations (i.e.: Rimsulfuron:Surfactant).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model &amp;lt;- lm(Yield ~ Dose %in% (Herbicide:Adjuvant) - Herbicide
+            - Adjuvant, data = dataset)
+summary(model)$coef[,1:3]
+##                                                 Estimate  Std. Error   t value
+## (Intercept)                                  12.28612378 0.315604824 38.928821
+## Dose:HerbicideDicamba:AdjuvantFrigate         1.03544261 0.584247220  1.772268
+## Dose:HerbicideRimsulfuron:AdjuvantFrigate     0.04480531 0.009489724  4.721456
+## Dose:HerbicideDicamba:AdjuvantMineralOil      2.17845732 0.584247220  3.728657
+## Dose:HerbicideRimsulfuron:AdjuvantMineralOil  0.03691108 0.009489724  3.889584
+## Dose:HerbicideDicamba:AdjuvantNone            1.77478085 0.584247220  3.037722
+## Dose:HerbicideRimsulfuron:AdjuvantNone        0.01283416 0.009489724  1.352427
+## Dose:HerbicideDicamba:AdjuvantSurfactant      1.41081026 0.584247220  2.414749
+## Dose:HerbicideRimsulfuron:AdjuvantSurfactant  0.04518031 0.009489724  4.760972
+# Alternative
+# model &amp;lt;- lm(Yield ~ Dose / (Herbicide:Adjuvant) - Herbicide
+#            - Adjuvant, data = dataset)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Obviously, the slope for the herbicide ‘Unweeded’ (the control), is not estimable. With some further effort, we can compare the regression coefficients, within each herbicides. For example, with rimsulfuron, we need to retrieve the slopes from the model fit, that are, respectively, the coefficients in 3rd, 6th, 9th, and 12nd position.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;coefs &amp;lt;- coef(model)[c(3,6,9,12)]&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Second, we have to retrieve the variances-covariances for the selected parameters:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;varCov &amp;lt;- vcov(model)[c(3,6,9,12), c(3,6,9,12)]&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now, we can input these elements into the &lt;code&gt;pairComp()&lt;/code&gt; function in the ‘statforbiology’ package, considering that we have 63 degrees of freedom in the residuals (see above):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(statforbiology)
+pairComp(coefs, vcovMat = varCov, dfr = 63)$Letters
+##                                                    Mean          SE CLD
+## Dose:HerbicideRimsulfuron:AdjuvantNone       0.01283416 0.009489724   a
+## Dose:HerbicideRimsulfuron:AdjuvantMineralOil 0.03691108 0.009489724   b
+## Dose:HerbicideRimsulfuron:AdjuvantFrigate    0.04480531 0.009489724   b
+## Dose:HerbicideRimsulfuron:AdjuvantSurfactant 0.04518031 0.009489724   b&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Thanks for reading and happy coding! And … don’t forget to check out my new book!&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href = &#34;https://www.awin1.com/cread.php?awinmid=26429&amp;awinaffid=2675822&amp;ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5&#34;&gt;&lt;img src= &#34;../../_Figures/Email_Signature_978-3-032-08199-5.png&#34; align=&#34;center&#34; alt=&#34;Book cover&#34; class=&#34;cover&#34; /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;div id=&#34;reference&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Reference&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Piepho, H.P., Edmondson, R.N., 2018. A tutorial on the statistical analysis of factorial experiments with qualitative and quantitative treatment factor levels. J Agronomy Crop Science 204, 429–455. &lt;a href=&#34;https://doi.org/10.1111/jac.12267&#34; class=&#34;uri&#34;&gt;https://doi.org/10.1111/jac.12267&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Back-transformations with emmeans()</title>
+      <link>https://www.statforbiology.com/2023/back-transformations-with-emmeans/</link>
+      <pubDate>Thu, 30 Nov 2023 00:00:00 +0000</pubDate>
+      <author>andrea.onofri@unipg.it (Andrea Onofri)</author>
+      <guid>https://www.statforbiology.com/2023/back-transformations-with-emmeans/</guid>
+      <description>
+
+
+&lt;p&gt;I am one of those old guys who still uses the stabilising transformations, when the data do not conform to the basic assumptions for ANOVA. Indeed, apart from counts and proportions, where GLMs can be very useful, I have not yet found a simple way to deal with heteroscedasticity for continuous variables, such as yield, weight, height and so on. Yes, I know, Generalised Least Squares (GLS) can be useful to fit heteroscedastic models, but I would argue that stabilising transformations are, conceptually, very much simpler and they can be easily thought to PhD students and practitioners, with only a basic level of knowledge about statistics.&lt;/p&gt;
+&lt;p&gt;In the recent past, the package &lt;code&gt;emmeans&lt;/code&gt; gave me a big boost for its useful way to handle back-transformations. For example, in the box below, I have performed an ANOVA on log-transformed data and retrieved the back-transformed means on the original count scale.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(emmeans)
+fileName &amp;lt;- &amp;quot;http://www.casaonofri.it/_datasets/insects.csv&amp;quot;
+dataset &amp;lt;- read.csv(fileName)
+head(dataset)
+##   Insecticide Rep Count
+## 1          T1   1   448
+## 2          T1   2   906
+## 3          T1   3   484
+## 4          T1   4   477
+## 5          T1   5   634
+## 6          T2   1   211
+model &amp;lt;- lm(log(Count) ~ Insecticide, data = dataset)
+emmeans(model, ~Insecticide, type = &amp;quot;response&amp;quot;)
+##  Insecticide response     SE df lower.CL upper.CL
+##  T1             568.6 101.00 12    386.1    837.3
+##  T2             335.1  59.50 12    227.6    493.5
+##  T3              51.9   9.22 12     35.2     76.4
+## 
+## Confidence level used: 0.95 
+## Intervals are back-transformed from the log scale&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It is very simple: &lt;code&gt;emmeans&lt;/code&gt; auto-detects the transformation function (which is made inside the model specification) and automatically produces the back-transformation, when this is requested by using the ‘&lt;code&gt;type = &#34;response&#34;&lt;/code&gt;’ argument (we can also use the argument ‘&lt;code&gt;regrid = &#34;response&#34;&lt;/code&gt;’, with slight differences that I will discuss in a future post).&lt;/p&gt;
+&lt;p&gt;Unfortunately, not all transformations are auto-detected; for example, let’s consider the dataset ‘Hours_to_failure.csv’, where we have the time-to-failure (in hours) for a device, as affected by the operating temperature. If we regard the temperature as a factor, we can fit an ANOVA model; a check with the &lt;code&gt;boxcox()&lt;/code&gt; function in the MASS package suggests that this dataset might require a stabilising transformation into the inverse value.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(MASS)
+library(emmeans)
+fileName &amp;lt;- &amp;quot;http://www.casaonofri.it/_datasets/Hours_to_failure.csv&amp;quot;
+dataset &amp;lt;- read.csv(fileName)
+dataset$Temp &amp;lt;- factor(dataset$Temp)
+head(dataset)
+##   Temp Hours_to_failure
+## 1 1520             1953
+## 2 1520             2135
+## 3 1520             2471
+## 4 1520             4727
+## 5 1520             6134
+## 6 1520             6314
+model &amp;lt;- lm(Hours_to_failure ~ Temp, data = dataset)
+tp &amp;lt;- boxcox(model)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_emmeans_backTransform_files/figure-html/unnamed-chunk-2-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;As we see below, the inverse transformation is not auto-detected.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model2 &amp;lt;- lm(I(1/Hours_to_failure) ~ Temp, data = dataset)
+emmeans(model2, ~ Temp, type = &amp;quot;response&amp;quot;)
+##  Temp response       SE df lower.CL upper.CL
+##  1520 0.000320 9.52e-05 20 0.000121 0.000518
+##  1620 0.000579 9.52e-05 20 0.000381 0.000778
+##  1660 0.001043 9.52e-05 20 0.000844 0.001241
+##  1708 0.001565 9.52e-05 20 0.001366 0.001763
+## 
+## Confidence level used: 0.95 
+## Intervals are back-transformed from the identity scale&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In this situation, an alternative approach must be used. The transformation can be made prior to fitting the model; next, we need to update the ‘reference grid’ for the model, specifying what type of transformation we have made (&lt;code&gt;tran = &#34;inverse&#34;&lt;/code&gt;). Finally, we can pass the updated grid into the &lt;code&gt;emmeans()&lt;/code&gt; function. And … the back-transformation is served!&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dataset$invHours &amp;lt;- 1/dataset$Hours_to_failure
+model3 &amp;lt;- lm(invHours ~ Temp, data = dataset)
+updGrid &amp;lt;- update(ref_grid(model3), tran = &amp;quot;inverse&amp;quot;)
+emmeans(updGrid, ~Temp, type = &amp;quot;response&amp;quot;)
+##  Temp response    SE df lower.CL upper.CL
+##  1520     3128 932.0 20     1930     8258
+##  1620     1726 284.0 20     1285     2626
+##  1660      959  87.6 20      806     1185
+##  1708      639  38.9 20      567      732
+## 
+## Confidence level used: 0.95 
+## Intervals are back-transformed from the inverse scale&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I can use this method with several functions, such as: “identity”, “1/mu^2”, “inverse”, “reciprocal”, “log10”, “log2”, “asin.sqrt”, and “asinh.sqrt”.&lt;/p&gt;
+&lt;p&gt;Sometimes, I need extra-flexibility. For example, if we look at ‘boxcox’ graph above, we see that the inverse transformation, although acceptable (the value &lt;span class=&#34;math inline&#34;&gt;\(-1\)&lt;/span&gt; is within the confidence limits for &lt;span class=&#34;math inline&#34;&gt;\(\lambda\)&lt;/span&gt;) is not the best one. Indeed, the maximum likelihood value is -0.62:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;tp$x[which.max(tp$y)]
+## [1] -0.6262626&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Therefore, we might like to use the following transformation, that is within the ‘boxcox’ family:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[W = \frac{Y^{-0.62} - 1}{-0.62}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;This type of transformation is not manageable with the previous code and we need to use the &lt;code&gt;make.tran()&lt;/code&gt; function, specifying the value of &lt;span class=&#34;math inline&#34;&gt;\(\lambda\)&lt;/span&gt; (&lt;code&gt;alpha = -0.62&lt;/code&gt;) and the value of the displacement parameter (&lt;code&gt;beta = 1&lt;/code&gt;).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dataset$bcHours &amp;lt;- (dataset$Hours_to_failure^(-0.62) - 1)/(-0.62)
+model4 &amp;lt;- lm(bcHours ~ Temp, data = dataset)
+updGrid &amp;lt;- update(ref_grid(model4), 
+                  tran = make.tran(&amp;quot;boxcox&amp;quot;, alpha = -0.62,
+                                   beta = 1))
+emmeans(updGrid, ~Temp, type = &amp;quot;response&amp;quot;)
+##  Temp response    SE df lower.CL upper.CL
+##  1520     3265 709.0 20     2191     5556
+##  1620     1763 261.0 20     1329     2483
+##  1660      976 100.0 20      798     1227
+##  1708      642  50.7 20      549      764
+## 
+## Confidence level used: 0.95 
+## Intervals are back-transformed from the Box-Cox (lambda = -0.62) of (y - 1) scale&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The function &lt;code&gt;make.tran()&lt;/code&gt; can be used to specify several other transformation functions, such as the angular transformation that is often used for percentages and proportions. You can get a full list by searching help (‘?make.tran’) from inside R.&lt;/p&gt;
+&lt;p&gt;In conclusion, stabilising transformations, in spite of their age, can still be useful to fit heteroscedastic models; do not underrate them, just because they are no longer in fashion!&lt;/p&gt;
+&lt;p&gt;Thanks for reading! And … don’t forget to check out my new book!&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href = &#34;https://www.awin1.com/cread.php?awinmid=26429&amp;awinaffid=2675822&amp;ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5&#34;&gt;&lt;img src= &#34;../../_Figures/Email_Signature_978-3-032-08199-5.png&#34; align=&#34;center&#34; alt=&#34;Book cover&#34; class=&#34;cover&#34; /&gt;&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>The coefficient of determination: is it the R-squared or r-squared?</title>
+      <link>https://www.statforbiology.com/2022/the-coefficient-of-determination-is-it-the-r-squared-or-r-squared/</link>
+      <pubDate>Sat, 26 Nov 2022 00:00:00 +0000</pubDate>
+      <author>andrea.onofri@unipg.it (Andrea Onofri)</author>
+      <guid>https://www.statforbiology.com/2022/the-coefficient-of-determination-is-it-the-r-squared-or-r-squared/</guid>
+      <description>
+
+
+&lt;p&gt;We often use the &lt;strong&gt;coefficient of determination&lt;/strong&gt; as a swift ‘measure’ of goodness of fit for our regression models. Unfortunately, there is no unique symbol for such a coefficient and both &lt;span class=&#34;math inline&#34;&gt;\(R^2\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(r^2\)&lt;/span&gt; are used in literature, almost interchangeably. Such an interchangeability is also endorsed by the Wikipedia (see at: &lt;a href=&#34;https://en.wikipedia.org/wiki/Coefficient_of_determination&#34;&gt;https://en.wikipedia.org/wiki/Coefficient_of_determination&lt;/a&gt; ), where both symbols are reported as the abbreviations for this statistical index.&lt;/p&gt;
+&lt;p&gt;As an editor of several International Journals, I should not agree with such an approach; indeed, the two symbols &lt;span class=&#34;math inline&#34;&gt;\(R^2\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(r^2\)&lt;/span&gt; mean two different things, and they are not necessarily interchangeable, because, depending on the setting, either of the two may be wrong or ambiguous. Let’s pay a little attention to such an issue.&lt;/p&gt;
+&lt;div id=&#34;what-are-the-r-and-r-indices&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;What are the ‘r’ and ‘R’ indices?&lt;/h1&gt;
+&lt;p&gt;When studying the relationship between quantitative variables, we have two main statistical indices:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;the &lt;strong&gt;Pearson’s (simple linear) correlation coefficient&lt;/strong&gt;, that is almost always indicated as the &lt;span class=&#34;math inline&#34;&gt;\(r\)&lt;/span&gt; coefficient. Correlation is different from regression, as it does not assume any sort of dependency between two quantitative variables and it is only meant to express their joint variability;&lt;/li&gt;
+&lt;li&gt;the &lt;strong&gt;coefficient of multiple correlation&lt;/strong&gt;, that is usually indicated with &lt;span class=&#34;math inline&#34;&gt;\(R\)&lt;/span&gt; and represents (definition from Wikipedia) a &lt;em&gt;measure of how well a given variable can be predicted using a linear function of a set of other variables&lt;/em&gt;. Although &lt;span class=&#34;math inline&#34;&gt;\(R\)&lt;/span&gt; is based on correlation (it is the correlation between the observed values for the dependent variable and the predictions made by the model), it is used in the context of multiple regression, where we are studying a dependency relationship.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;And, what about the &lt;strong&gt;coefficient of determination&lt;/strong&gt;? It is yet another concept and another index, measuring (again from Wikipedia) the &lt;em&gt;proportion of the variation in the dependent variable that is predictable from the independent variable(s)&lt;/em&gt;. As you see, we are still in the context of regression and our aim is to describe the goodness of fit.&lt;/p&gt;
+&lt;p&gt;To start with, let’s abbreviate the coefficient of determination as &lt;span class=&#34;math inline&#34;&gt;\(CD\)&lt;/span&gt;, in order to avoid any confusion with &lt;span class=&#34;math inline&#34;&gt;\(r\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(R\)&lt;/span&gt;; this index can be be obtained as:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ CD_1 = \frac{SS_{reg}}{SS_{tot}}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;or as:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[ CD_2 = 1 - \frac{SS_{res}}{SS_{tot}}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;where: &lt;span class=&#34;math inline&#34;&gt;\(SS_{reg}\)&lt;/span&gt; is the regression sum of squares, &lt;span class=&#34;math inline&#34;&gt;\(SS_{tot}\)&lt;/span&gt; is the total sum of squares and &lt;span class=&#34;math inline&#34;&gt;\(SS_{res}\)&lt;/span&gt; is the residual sum of squares, after a linear regression fit. The second formula is preferable: sum of squares are always positive and, thus, we clearly see that &lt;span class=&#34;math inline&#34;&gt;\(CD_2\)&lt;/span&gt; may not be higher than 1 (this is less obvious, for &lt;span class=&#34;math inline&#34;&gt;\(CD_1\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;So far, so good; we have three different indices and three different symbols: &lt;span class=&#34;math inline&#34;&gt;\(r\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(R\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(CD\)&lt;/span&gt;. But, in practice, things did not go that smoothly! The early statisticians, instead of proposing a brand new symbol for the coefficient of determination, made the choice of highlighting the connections with &lt;span class=&#34;math inline&#34;&gt;\(r\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(R\)&lt;/span&gt;. For example, Sokal and Rohlf, in their very famous biometry book, at page 570 (2nd. Edition) demonstrated that the coefficient of determination could be obtained as the square of the coefficient of correlation and, thus, they used the symbol &lt;span class=&#34;math inline&#34;&gt;\(r^2\)&lt;/span&gt;. Later, in the same book (pag. 660), these same authors demonstrated that the coefficient of multiple correlation &lt;span class=&#34;math inline&#34;&gt;\(R\)&lt;/span&gt; was equal to the positive square root of the &lt;strong&gt;coefficient of multiple determination&lt;/strong&gt;, for which they used the symbol &lt;span class=&#34;math inline&#34;&gt;\(R^2\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;Obviously, Sokal and Rohlf (and other authors of other textbooks) meant to say that the coefficient of determination, depending on the context, can be obtained either as the square of the correlation coefficient, or as the square of the multiple correlation coefficient. An uncareful interpretation led to the idea that the coefficient of determination can be indicated either as the &lt;span class=&#34;math inline&#34;&gt;\(R^2\)&lt;/span&gt; or as the &lt;span class=&#34;math inline&#34;&gt;\(r^2\)&lt;/span&gt; and that the two symbols are always interchangeable. But, is this really true? No, it depends on the context.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;simple-linear-regression&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Simple linear regression&lt;/h1&gt;
+&lt;p&gt;Let’s have a look at the following example: we fit a simple linear regression model to a dataset and retrieve the coefficient of determination by using the &lt;code&gt;summary()&lt;/code&gt; method.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;X &amp;lt;- 1:20
+Y &amp;lt;- c(17.79, 18.81, 19.02, 14.14, 16.72, 16.05, 13.99, 13.26,
+       12.48, 11.33, 11.07, 9.68, 9.19, 9.44, 9.75, 7.71, 6.47, 
+       5.22, 4.55, 7.7)
+mod &amp;lt;- lm(Y ~ X)
+summary(mod)$r.squared # Coeff. determination with R
+## [1] 0.9270622&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It is very easy to see that &lt;span class=&#34;math inline&#34;&gt;\(R = |r|\)&lt;/span&gt; and it is also easy to demonstrate that &lt;span class=&#34;math inline&#34;&gt;\(r^2 = CD_1\)&lt;/span&gt; (look, e.g., at Sokal and Rohlf for a mathematical proof). Furthermore, due to the equality &lt;span class=&#34;math inline&#34;&gt;\(SS_{tot} = SS_{reg} + SS_{res}\)&lt;/span&gt;, it is also easy to see that &lt;span class=&#34;math inline&#34;&gt;\(CD_1 = CD_2\)&lt;/span&gt;. We are ready to draw our first conclusion.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;SSreg &amp;lt;- sum((predict(mod) - mean(Y))^2)
+SStot &amp;lt;- sum((Y - mean(Y))^2)
+SSres &amp;lt;- sum(residuals(mod)^2)
+CD1 &amp;lt;- SSreg/SStot
+
+# Alternative equation
+CD2 &amp;lt;- 1 - SSres/SStot
+
+CD1
+## [1] 0.9270622
+CD2
+## [1] 0.9270622&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;r.coef &amp;lt;- cor(X, Y)
+R.coef &amp;lt;- cor(Y, fitted(mod))
+
+r.coef^2
+## [1] 0.9270622
+R.coef^2
+## [1] 0.9270622&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;CONCLUSION 1. For simple linear regression, the coefficient of determination is always equal to &lt;span class=&#34;math inline&#34;&gt;\(R^2 = r^2\)&lt;/span&gt; and both symbols are acceptable (and correct).&lt;/strong&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;polynomial-regression-and-multiple-regression&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Polynomial regression and multiple regression&lt;/h1&gt;
+&lt;p&gt;Apart from simple linear regression, for all other types of linear models, provided that an intercept is fitted, it is not, in general, true that &lt;span class=&#34;math inline&#34;&gt;\(R = |r|\)&lt;/span&gt;, while it is, in general, true that that the coefficient of determination is equal to the squared coefficient of multiple correlation &lt;span class=&#34;math inline&#34;&gt;\(R^2\)&lt;/span&gt;. I’ll show a swift example with a polynomial regression in the box below.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# R and r coefficients
+mod2 &amp;lt;- lm(Y ~ X + I(X^2))
+cor.coef &amp;lt;- cor(X, Y)
+R.coef &amp;lt;- cor(Y, fitted(mod2))
+
+# R and r are not equal
+cor.coef
+## [1] -0.9628407
+R.coef
+## [1] 0.9652451
+#
+# The coefficient of determination is R2
+R.coef^2
+## [1] 0.931698
+summary(mod2)$r.squared
+## [1] 0.931698&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Furthermore, when we have several predictors (e.g., multiple regression), the correlation coefficient is not unique and we could calculate as many &lt;span class=&#34;math inline&#34;&gt;\(r\)&lt;/span&gt; values as there are predictors in the model.&lt;/p&gt;
+&lt;p&gt;In the box below I show another example where I analysed the ‘mtcars’ dataset by using multiple regression; we see that &lt;span class=&#34;math inline&#34;&gt;\(R^2 = CD_1 = CD_2\)&lt;/span&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;data(mtcars)
+mod &amp;lt;- lm(mpg ~ wt+disp+hp - 1, data = mtcars)  
+summary(mod)$r.squared # Coeff. determination with R
+## [1] 0.8328665&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Coefficient of determination by &amp;#39;hand-calculation&amp;#39;
+SSreg &amp;lt;- sum((predict(mod) - mean(mtcars$mpg))^2)
+SStot &amp;lt;- sum((mtcars$mpg - mean(mtcars$mpg))^2)
+SSres &amp;lt;- sum(residuals(mod)^2)
+SSreg/SStot
+## [1] 0.9852479
+1 - SSres/SStot
+## [1] -1.084229&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# The R^2
+R.coef &amp;lt;- cor(mtcars$mpg, fitted(mod))
+R.coef^2
+## [1] 0.002746157&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We are now ready to draw our second conclusion.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;CONCLUSION 2: with all linear models, apart from simple linear regression, the &lt;span class=&#34;math inline&#34;&gt;\(r^2\)&lt;/span&gt; symbol should not be used for the coefficient of determination, because this latter index IS NOT, in general, equal to the square of the coefficient of correlation. The &lt;span class=&#34;math inline&#34;&gt;\(R^2\)&lt;/span&gt; symbol is a much better choice.&lt;/strong&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;linear-models-with-no-intercept&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Linear models with no intercept&lt;/h1&gt;
+&lt;p&gt;The situation becomes much more complex for linear models with no intercept. For these models, the squared multiple correlation coefficient IS NOT ALWAYS equal to the proportion of variance accounted for. Let’s look at the following example:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod2 &amp;lt;- lm(Y ~ - 1 + X)
+summary(mod2)$r.squared # Proportion of variance accounted for
+## [1] 0.4390065
+R.coef &amp;lt;- cor(Y, fitted(mod2))
+R.coef^2
+## [1] 0.9270622&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In other words, the coefficient of determination IS NOT ALWAYS the &lt;span class=&#34;math inline&#34;&gt;\(R^2\)&lt;/span&gt;; however, the coefficient of determination can be calculated by using &lt;span class=&#34;math inline&#34;&gt;\(CD_1 = CD_2\)&lt;/span&gt;, provided that &lt;span class=&#34;math inline&#34;&gt;\(SS_{tot}\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(SS_{reg}\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(SS_{res}\)&lt;/span&gt; are obtained in a way that accounts for the missing intercept. Schabenberger and Pierce recommend the following equations and the symbols they use clearly reflect that those equations do not return the squared multiple correlation coefficient:&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;math display&#34;&gt;\[R^2_{noint} = \frac{\sum_{i = 1}^{n}{\hat{y_i}^2}}{\sum_{i = 1}^{n}{y_i^2}} \quad \textrm{or} \quad R^{2*}_{noint} =1 - \frac{SS_{res}}{\sum_{i = 1}^{n}{y_i^2}}\]&lt;/span&gt;&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;SSreg &amp;lt;- sum(fitted(mod2)^2)
+SStot &amp;lt;- sum(Y^2)
+SSres &amp;lt;- sum(residuals(mod2)^2)
+SSreg/SStot # R^2 ok
+## [1] 0.4390065
+1 - SSres/SStot # R^2 ok
+## [1] 0.4390065&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We are ready for our third conclusion.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;CONCLUSION 3: in the case of models with no intercept, neither the &lt;span class=&#34;math inline&#34;&gt;\(r^2\)&lt;/span&gt; nor the &lt;span class=&#34;math inline&#34;&gt;\(R^2\)&lt;/span&gt; symbols should be used for the coefficient of determination. The proportion of variability accounted for by the model can be calculated by using a modified formula and should be reported by using a different symbol (e.g. &lt;span class=&#34;math inline&#34;&gt;\(R^2_{noint}\)&lt;/span&gt; or &lt;span class=&#34;math inline&#34;&gt;\(R^2_0\)&lt;/span&gt; or similar).&lt;/strong&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;nonlinear-regression&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Nonlinear regression&lt;/h1&gt;
+&lt;p&gt;With this class of models, we have two main problems:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;they do not have an intercept term, at least, not in the usual sense. Consequently, the square of the multiple coefficient of correlation does not represent the proportion of variance accounted for by the model;&lt;/li&gt;
+&lt;li&gt;the equality &lt;span class=&#34;math inline&#34;&gt;\(SS_{tot} = SS_{reg} + SS_{res}\)&lt;/span&gt; may not hold and thus the equations for &lt;span class=&#34;math inline&#34;&gt;\(CD_1\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(CD_2\)&lt;/span&gt; may produce different results.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;In contrast to linear models with no intercept, for nonlinear models we do not have any general modified formula that consistently returns the proportion of variance accounted for by the model (i.e., the coefficient of determination). However, Schabenberger and Pierce (2002) suggested that we can still use &lt;span class=&#34;math inline&#34;&gt;\(CD_2\)&lt;/span&gt; as a swift measure of goodness of fit, but they also proposed that we use the term ‘Pseudo-&lt;span class=&#34;math inline&#34;&gt;\(R^2\)&lt;/span&gt;’ instead oft &lt;span class=&#34;math inline&#34;&gt;\(R^2\)&lt;/span&gt;. Why ‘Pseudo’?. For two good reasons:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;the ’Pseudo-&lt;span class=&#34;math inline&#34;&gt;\(R^2\)&lt;/span&gt;’cannot exceed 1, but it may lower than 0;&lt;/li&gt;
+&lt;li&gt;the ‘Pseudo-&lt;span class=&#34;math inline&#34;&gt;\(R^2\)&lt;/span&gt;’ &lt;strong&gt;cannot be interpreted as the proportion of variance explained by the model&lt;/strong&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;In R, the ‘Pseudo-R&lt;sup&gt;2&lt;/sup&gt;’ can be calculated by using the &lt;code&gt;R2.nls()&lt;/code&gt; function in the ‘statforbiology’ package, for nonlinear models fitted with both the &lt;code&gt;nls()&lt;/code&gt; and &lt;code&gt;drm()&lt;/code&gt; functions (this latter function is in the ‘drc’ package).&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(statforbiology)
+X &amp;lt;- c(0.1, 5, 7, 22, 28, 39, 46, 200)
+Y &amp;lt;- c(1, 13.66, 14.11, 14.43, 14.78, 14.86, 14.78, 14.91)
+
+# nls fit
+library(statforbiology)
+model &amp;lt;- nls(Y ~ SSmicmen(X, Vm, K))
+R2nls(model)$PseudoR2
+## [1] 0.9930399
+# It is not the R2, in strict sense
+R.coef &amp;lt;- cor(Y, fitted(model))
+R.coef^2
+## [1] 0.9957255
+# It cannot be calculated by the usual expression!
+SSreg &amp;lt;- sum(fitted(model) - mean(Y))
+SStot &amp;lt;- sum( (Y - mean(Y))^2 )
+SSreg/SStot
+## [1] 0.003622005
+# It can be calculated by using the alternative form
+# that is no longer equivalent
+SSres &amp;lt;- sum(residuals(model)^2)
+1 - SSres/SStot
+## [1] 0.9930399&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We may now come to our final conclusion.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;CONCLUSION 4. With nonlinear models, we should never use either &lt;span class=&#34;math inline&#34;&gt;\(r^2\)&lt;/span&gt; or &lt;span class=&#34;math inline&#34;&gt;\(R^2\)&lt;/span&gt; because they are both wrong. If we need a swift measure of goodness of fit, we can use the &lt;span class=&#34;math inline&#34;&gt;\(CD_2\)&lt;/span&gt; index above, but we should not name it as the &lt;span class=&#34;math inline&#34;&gt;\(R^2\)&lt;/span&gt;, because, in general, it does not correspond to the coefficient of determination. We should better use the term Pseudo-R&lt;sup&gt;2&lt;/sup&gt;.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Hope this was useful; for those who are interested in the use of the Pseudo-&lt;span class=&#34;math inline&#34;&gt;\(R^2\)&lt;/span&gt; in nonlinear regression, I hav already published one post at this link: &lt;a href=&#34;https://www.statforbiology.com/2021/stat_nls_r2/&#34;&gt;https://www.statforbiology.com/2021/stat_nls_r2/&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Thanks for reading and happy coding! And … don’t forget to check out my new book!&lt;/p&gt;
+&lt;p&gt;Prof. Andrea Onofri&lt;br /&gt;
+Department of Agricultural, Food and Environmental Sciences&lt;br /&gt;
+University of Perugia (Italy)&lt;br /&gt;
+Send comments to: &lt;a href=&#34;mailto:andrea.onofri@unipg.it&#34;&gt;andrea.onofri@unipg.it&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href = &#34;https://www.awin1.com/cread.php?awinmid=26429&amp;awinaffid=2675822&amp;ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5&#34;&gt;&lt;img src= &#34;../../_Figures/Email_Signature_978-3-032-08199-5.png&#34; align=&#34;center&#34; alt=&#34;Book cover&#34; class=&#34;cover&#34; /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;hr /&gt;
+&lt;/div&gt;
+&lt;div id=&#34;references&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;References&lt;/h1&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Schabenberger, O., Pierce, F.J., 2002. Contemporary statistical models for the plant and soil sciences. Taylor &amp;amp; Francis, CRC Press, Books.&lt;/li&gt;
+&lt;li&gt;Sokal, R.R., Rohlf F.J., 1981. Biometry. Second Edition, W.H. Freeman and Company, USA.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Stabilising transformations: how do I present my results?</title>
+      <link>https://www.statforbiology.com/2019/stabilising-transformations/</link>
+      <pubDate>Sat, 15 Jun 2019 00:00:00 +0000</pubDate>
+      <author>andrea.onofri@unipg.it (Andrea Onofri)</author>
+      <guid>https://www.statforbiology.com/2019/stabilising-transformations/</guid>
+      <description>
+
+
+&lt;p&gt;ANOVA is routinely used in applied biology for data analyses, although, in some instances, the basic assumptions of normality and homoscedasticity of residuals do not hold. In those instances, most biologists would be inclined to adopt some sort of stabilising transformations (logarithm, square root, arcsin square root…), prior to ANOVA. Yes, there might be more advanced and elegant solutions, but stabilising transformations are suggested in most traditional biometry books, they are very straightforward to apply and they do not require any specific statistical software. I do not think that this traditional technique should be underrated.&lt;/p&gt;
+&lt;p&gt;However, the use of stabilising transformations has one remarkable drawback, it may hinder the clarity of results. I’d like to give a simple, but relevant example.&lt;/p&gt;
+&lt;div id=&#34;an-example-with-counts&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;An example with counts&lt;/h1&gt;
+&lt;p&gt;Consider the following dataset, that represents the counts of insects on 15 independent leaves, treated with the insecticides A, B and C (5 replicates):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;dataset &amp;lt;- structure(data.frame(
+  Insecticide = structure(c(1L, 1L, 1L, 1L, 1L, 
+    2L, 2L, 2L, 2L, 2L, 3L, 3L, 3L, 3L, 3L), 
+    .Label = c(&amp;quot;A&amp;quot;, &amp;quot;B&amp;quot;, &amp;quot;C&amp;quot;), class = &amp;quot;factor&amp;quot;), 
+  Count = c(448, 906, 484, 477, 634, 211, 276, 
+    415, 587, 298, 50, 90, 73, 44, 26)), 
+  .Names = c(&amp;quot;Insecticide&amp;quot;, &amp;quot;Count&amp;quot;))
+dataset
+##    Insecticide Count
+## 1            A   448
+## 2            A   906
+## 3            A   484
+## 4            A   477
+## 5            A   634
+## 6            B   211
+## 7            B   276
+## 8            B   415
+## 9            B   587
+## 10           B   298
+## 11           C    50
+## 12           C    90
+## 13           C    73
+## 14           C    44
+## 15           C    26&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We should not expect that a count variable is normally distributed with equal variances. Indeed, a graph of residuals against expected values shows clear signs of heteroscedasticity.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;mod &amp;lt;- lm(Count ~ Insecticide, data=dataset)
+plot(mod, which = 1)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.statforbiology.com/post/Stat_General_reportingResults_files/figure-html/unnamed-chunk-2-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;In this situation, a logarithmic transformation is often suggested to produce a new normal and homoscedastic dataset. Therefore we take the log-transformed variable and submit it to ANOVA.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;model &amp;lt;- lm(log(Count) ~ Insecticide, data=dataset)
+print(anova(model), digits=6)
+## Analysis of Variance Table
+## 
+## Response: log(Count)
+##             Df   Sum Sq Mean Sq F value     Pr(&amp;gt;F)    
+## Insecticide  2 15.82001 7.91000 50.1224 1.4931e-06 ***
+## Residuals   12  1.89376 0.15781                       
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+ r
+summary(model)
+## 
+## Call:
+## lm(formula = log(Count) ~ Insecticide, data = dataset)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.6908 -0.1849 -0.1174  0.2777  0.5605 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&amp;gt;|t|)    
+## (Intercept)    6.3431     0.1777  35.704 1.49e-13 ***
+## InsecticideB  -0.5286     0.2512  -2.104   0.0572 .  
+## InsecticideC  -2.3942     0.2512  -9.529 6.02e-07 ***
+## ---
+## Signif. codes:  0 &amp;#39;***&amp;#39; 0.001 &amp;#39;**&amp;#39; 0.01 &amp;#39;*&amp;#39; 0.05 &amp;#39;.&amp;#39; 0.1 &amp;#39; &amp;#39; 1
+## 
+## Residual standard error: 0.3973 on 12 degrees of freedom
+## Multiple R-squared:  0.8931,	Adjusted R-squared:  0.8753 
+## F-statistic: 50.12 on 2 and 12 DF,  p-value: 1.493e-06&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In this example, the standard error for each mean (SEM) corresponds to &lt;span class=&#34;math inline&#34;&gt;\(\sqrt{0.158/5}\)&lt;/span&gt;. In the end, we might show the following table of means for transformed data:&lt;/p&gt;
+&lt;!-- table --&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;center&#34;&gt;Insecticide&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;Means (log n.)&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;A&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;6.343&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;B&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;5.815&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;C&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;3.985&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;SEM&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;0.178&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;!-- table --&gt;
+&lt;p&gt;Unfortunately, we loose clarity: how many insects did we have on each leaf? If we present in our manuscript a table like this one we might be asked by our readers or by the reviewer to report the means on the original measurement unit. What should we do, then? Here are some suggestions.&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;We can present the means of the original data with standard deviations. This is clearly less than optimal, if we want to suggest more than the bare variability of the observed sample. Furthermore, &lt;strong&gt;please remember that the means of original data may not be a good measure of central tendency, if the original population is strongly ‘asymmetric’ (skewed)!&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;We can show back-transformed means. Accordingly, if we have done, e.g., a logarithmic transformation, we can exponentiate the means of transformed data and report them back to the original measurement unit. Back-transformed means ‘estimate’ the medians of the original populations, which may be regarded as better measures of central tendency for skewed data.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;We suggest that the use of the second method. However, this leaves us with the problem of adding a measure of uncertainty to back-transformed means. No worries, we can use the delta method to back-transform standard errors. It is straightforward:&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;take the first derivative of the back-transform function [in this case the first derivative of exp(X)=exp(X)] and&lt;/li&gt;
+&lt;li&gt;multiply it by the standard error of the transformed data.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This may be simply done by hand, with e.g &lt;span class=&#34;math inline&#34;&gt;\(exp(6.343) \times 0.178 = 101.19\)&lt;/span&gt; (for insecticide A). This ‘manual’ solution is always available, regardless of the statistical software at hand. With R, we can use the ‘emmeans’ package (Lenth, 2016):&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(emmeans)
+countM &amp;lt;- emmeans(model, ~Insecticide, regrid = &amp;quot;response&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It is enough to set the argument ‘regrid’ to ’response, although the transformation must be embedded in the model. It means: it is ok if we coded the model as:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;log(Count) ~ Insecticide&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;On the contrary, it fails if we coded the model as:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;logCount ~ Insecticide&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;where the transformation was performed prior to fitting (there are methods to circumvent this, but I’ll explain in another post).&lt;/p&gt;
+&lt;p&gt;Obviously, the back-transformed standard error is different for each mean (there is no homogeneity of variances on the original scale, but we knew this already).
+Back-transformed data might be presented as follows:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;center&#34;&gt;Insecticide&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;Mean&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;SE&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;A&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;568.5&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;101.19&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;B&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;335.1&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;59.68&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;center&#34;&gt;C&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;51.88&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;9.57&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;It would be appropriate to state it clearly (e.g. in a footnote), that means and SEs were obtained by back-transformation via the delta method. Far clearer, isn’t it? As I said, there are other solutions, such as fitting a GLM, but stabilising transformations are simple and they are easily acceptable in biological Journals.&lt;/p&gt;
+&lt;p&gt;If you want to know something more about the delta-method you might start from &lt;a href=&#34;https://www.statforbiology.com/2019/stat_general_thedeltamethod/&#34;&gt;my post here&lt;/a&gt;. A few years ago, some collegues and I have also discussed these issues in a journal paper (Onofri et al., 2010).&lt;/p&gt;
+&lt;p&gt;Thanks for reading!&lt;/p&gt;
+&lt;p&gt;Andrea Onofri&lt;br /&gt;
+University of Perugia (Italy)&lt;/p&gt;
+&lt;p&gt;#References&lt;/p&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;Lenth, R.V., 2016. Least-Squares Means: The R Package lsmeans. Journal of Statistical Software 69. &lt;a href=&#34;https://doi.org/10.18637/jss.v069.i01&#34; class=&#34;uri&#34;&gt;https://doi.org/10.18637/jss.v069.i01&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Onofri, A., Carbonell, E.A., Piepho, H.-P., Mortimer, A.M., Cousens, R.D., 2010. Current statistical issues in Weed Research. Weed Research 50, 5–24.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Section 13 Getting the quantiles with ‘drcte’ | Analysing seed germination and emergence data with R: a tutorial</title>
+  <meta name="description" content="This document describes a new framework for the analyses of seed germination and emergence data and it is associated to the new R packages ‘drcte’ and ‘drcSeedGerm’" />
+  <meta name="generator" content="bookdown 0.27 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Section 13 Getting the quantiles with ‘drcte’ | Analysing seed germination and emergence data with R: a tutorial" />
+  <meta property="og:type" content="book" />
+  <meta property="og:image" content="/coversmall.png" />
+  <meta property="og:description" content="This document describes a new framework for the analyses of seed germination and emergence data and it is associated to the new R packages ‘drcte’ and ‘drcSeedGerm’" />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Section 13 Getting the quantiles with ‘drcte’ | Analysing seed germination and emergence data with R: a tutorial" />
+  <meta name="twitter:site" content="@onofriandreapg" />
+  <meta name="twitter:description" content="This document describes a new framework for the analyses of seed germination and emergence data and it is associated to the new R packages ‘drcte’ and ‘drcSeedGerm’" />
+  <meta name="twitter:image" content="/coversmall.png" />
+
+<meta name="author" content="Andrea Onofri" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="peculiarities-of-seed-science-data.html"/>
+<link rel="next" href="quantiles-and-effective-doses-ed.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Time-to-event analyses with R</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#the-r-package"><i class="fa fa-check"></i><b>1.1</b> The R package</a></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#our-purpose"><i class="fa fa-check"></i><b>1.2</b> Our purpose</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html"><i class="fa fa-check"></i><b>2</b> What is time-to-event data?</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#time-to-event-data-are-censored-data"><i class="fa fa-check"></i><b>2.1</b> Time-to-event data are censored data</a></li>
+<li class="chapter" data-level="2.2" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#motivating-example-a-simulated-dataset"><i class="fa fa-check"></i><b>2.2</b> Motivating example: a simulated dataset</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#step-1-the-ungerminated-fraction"><i class="fa fa-check"></i><b>2.2.1</b> Step 1: the ungerminated fraction</a></li>
+<li class="chapter" data-level="2.2.2" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#step-2-germination-times-for-the-germinated-fraction"><i class="fa fa-check"></i><b>2.2.2</b> Step 2: germination times for the germinated fraction</a></li>
+<li class="chapter" data-level="2.2.3" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#step-3-counts-of-germinated-seeds"><i class="fa fa-check"></i><b>2.2.3</b> Step 3: counts of germinated seeds</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#neglecting-censoring"><i class="fa fa-check"></i><b>2.3</b> Neglecting censoring</a></li>
+<li class="chapter" data-level="2.4" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#accounting-for-censoring"><i class="fa fa-check"></i><b>2.4</b> Accounting for censoring</a></li>
+<li class="chapter" data-level="2.5" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#neglecting-or-accounting-for-censoring"><i class="fa fa-check"></i><b>2.5</b> Neglecting or accounting for censoring?</a></li>
+<li class="chapter" data-level="2.6" data-path="what-is-time-to-event-data.html"><a href="what-is-time-to-event-data.html#take-home-message"><i class="fa fa-check"></i><b>2.6</b> Take-home message</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html"><i class="fa fa-check"></i><b>3</b> Reshaping time-to-event data</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html#motivating-example"><i class="fa fa-check"></i><b>3.1</b> Motivating example</a></li>
+<li class="chapter" data-level="3.2" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html#transforming-from-wide-to-long-grouped"><i class="fa fa-check"></i><b>3.2</b> Transforming from WIDE to LONG GROUPED</a></li>
+<li class="chapter" data-level="3.3" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html#transforming-from-wide-to-long-ungrouped"><i class="fa fa-check"></i><b>3.3</b> Transforming from WIDE to LONG UNGROUPED</a></li>
+<li class="chapter" data-level="3.4" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html#from-long-grouped-to-long-ungrouped-and-vice-versa"><i class="fa fa-check"></i><b>3.4</b> From LONG GROUPED to LONG UNGROUPED (and vice-versa)</a></li>
+<li class="chapter" data-level="3.5" data-path="reshaping-time-to-event-data.html"><a href="reshaping-time-to-event-data.html#from-nonlinear-regression-to-long-grouped"><i class="fa fa-check"></i><b>3.5</b> From NONLINEAR REGRESSION to LONG GROUPED</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="time-to-event-models-for-seed-germinationemergence.html"><a href="time-to-event-models-for-seed-germinationemergence.html"><i class="fa fa-check"></i><b>4</b> Time-to-event models for seed germination/emergence</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="time-to-event-models-for-seed-germinationemergence.html"><a href="time-to-event-models-for-seed-germinationemergence.html#parametric-time-to-event-models"><i class="fa fa-check"></i><b>4.1</b> Parametric time-to-event models</a></li>
+<li class="chapter" data-level="4.2" data-path="time-to-event-models-for-seed-germinationemergence.html"><a href="time-to-event-models-for-seed-germinationemergence.html#nonparametric-time-to-event-models"><i class="fa fa-check"></i><b>4.2</b> Nonparametric time-to-event models</a></li>
+<li class="chapter" data-level="4.3" data-path="time-to-event-models-for-seed-germinationemergence.html"><a href="time-to-event-models-for-seed-germinationemergence.html#kernel-density-estimators"><i class="fa fa-check"></i><b>4.3</b> Kernel density estimators</a></li>
+<li class="chapter" data-level="4.4" data-path="time-to-event-models-for-seed-germinationemergence.html"><a href="time-to-event-models-for-seed-germinationemergence.html#ml-npmle-or-kde"><i class="fa fa-check"></i><b>4.4</b> ML, NPMLE or KDE?</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="comparing-germinationemergence-for-several-seed-lots.html"><a href="comparing-germinationemergence-for-several-seed-lots.html"><i class="fa fa-check"></i><b>5</b> Comparing germination/emergence for several seed lots</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="comparing-germinationemergence-for-several-seed-lots.html"><a href="comparing-germinationemergence-for-several-seed-lots.html#a-motivating-example"><i class="fa fa-check"></i><b>5.1</b> A motivating example</a></li>
+<li class="chapter" data-level="5.2" data-path="comparing-germinationemergence-for-several-seed-lots.html"><a href="comparing-germinationemergence-for-several-seed-lots.html#fitting-several-time-to-event-curves"><i class="fa fa-check"></i><b>5.2</b> Fitting several time-to-event curves</a></li>
+<li class="chapter" data-level="5.3" data-path="comparing-germinationemergence-for-several-seed-lots.html"><a href="comparing-germinationemergence-for-several-seed-lots.html#comparing-non-parametric-curves"><i class="fa fa-check"></i><b>5.3</b> Comparing non-parametric curves</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html"><i class="fa fa-check"></i><b>6</b> Fitting time-to-event models with environmental covariates</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#hydro-time-to-event-models"><i class="fa fa-check"></i><b>6.1</b> Hydro-time-to-event models</a></li>
+<li class="chapter" data-level="6.2" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#a-better-modelling-approach"><i class="fa fa-check"></i><b>6.2</b> A better modelling approach</a></li>
+<li class="chapter" data-level="6.3" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#another-modelling-approach"><i class="fa fa-check"></i><b>6.3</b> Another modelling approach</a></li>
+<li class="chapter" data-level="6.4" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#further-detail"><i class="fa fa-check"></i><b>6.4</b> Further detail</a>
+<ul>
+<li class="chapter" data-level="6.4.1" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#htl"><i class="fa fa-check"></i><b>6.4.1</b> <code>HTL()</code></a></li>
+<li class="chapter" data-level="6.4.2" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#htg"><i class="fa fa-check"></i><b>6.4.2</b> <code>HTG()</code></a></li>
+<li class="chapter" data-level="6.4.3" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#htll"><i class="fa fa-check"></i><b>6.4.3</b> <code>HTLL()</code></a></li>
+<li class="chapter" data-level="6.4.4" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#htw1"><i class="fa fa-check"></i><b>6.4.4</b> <code>HTW1()</code></a></li>
+<li class="chapter" data-level="6.4.5" data-path="fitting-time-to-event-models-with-environmental-covariates.html"><a href="fitting-time-to-event-models-with-environmental-covariates.html#htw2"><i class="fa fa-check"></i><b>6.4.5</b> <code>HTW2()</code></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="exploring-the-results-of-a-time-to-event-fit-model-parameters.html"><a href="exploring-the-results-of-a-time-to-event-fit-model-parameters.html"><i class="fa fa-check"></i><b>7</b> Exploring the results of a time-to-event fit: model parameters</a></li>
+<li class="chapter" data-level="8" data-path="predictions-from-a-parametric-time-to-event-model.html"><a href="predictions-from-a-parametric-time-to-event-model.html"><i class="fa fa-check"></i><b>8</b> Predictions from a parametric time-to-event model</a></li>
+<li class="chapter" data-level="9" data-path="predictions-from-non-parametric-time-to-event-models.html"><a href="predictions-from-non-parametric-time-to-event-models.html"><i class="fa fa-check"></i><b>9</b> Predictions from non-parametric time-to-event models</a></li>
+<li class="chapter" data-level="10" data-path="predictions-from-a-time-to-event-model-from-literature.html"><a href="predictions-from-a-time-to-event-model-from-literature.html"><i class="fa fa-check"></i><b>10</b> Predictions from a time-to-event model from literature</a></li>
+<li class="chapter" data-level="11" data-path="quantiles-from-time-to-event-models.html"><a href="quantiles-from-time-to-event-models.html"><i class="fa fa-check"></i><b>11</b> Quantiles from time-to-event models</a></li>
+<li class="chapter" data-level="12" data-path="peculiarities-of-seed-science-data.html"><a href="peculiarities-of-seed-science-data.html"><i class="fa fa-check"></i><b>12</b> Peculiarities of seed science data</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="peculiarities-of-seed-science-data.html"><a href="peculiarities-of-seed-science-data.html#quantiles-and-restricted-quantiles"><i class="fa fa-check"></i><b>12.1</b> Quantiles and ‘restricted’ quantiles</a></li>
+<li class="chapter" data-level="12.2" data-path="peculiarities-of-seed-science-data.html"><a href="peculiarities-of-seed-science-data.html#germinationemergence-rates"><i class="fa fa-check"></i><b>12.2</b> Germination/emergence rates</a></li>
+</ul></li>
+<li class="chapter" data-level="13" data-path="getting-the-quantiles-with-drcte.html"><a href="getting-the-quantiles-with-drcte.html"><i class="fa fa-check"></i><b>13</b> Getting the quantiles with ‘drcte’</a>
+<ul>
+<li class="chapter" data-level="13.1" data-path="getting-the-quantiles-with-drcte.html"><a href="getting-the-quantiles-with-drcte.html#parametric-models"><i class="fa fa-check"></i><b>13.1</b> Parametric models</a></li>
+<li class="chapter" data-level="13.2" data-path="getting-the-quantiles-with-drcte.html"><a href="getting-the-quantiles-with-drcte.html#parametric-models-with-environmental-covariates"><i class="fa fa-check"></i><b>13.2</b> Parametric models with environmental covariates</a></li>
+<li class="chapter" data-level="13.3" data-path="getting-the-quantiles-with-drcte.html"><a href="getting-the-quantiles-with-drcte.html#non-parametric-npmle-models"><i class="fa fa-check"></i><b>13.3</b> Non-parametric (NPMLE) models</a></li>
+</ul></li>
+<li class="chapter" data-level="14" data-path="quantiles-and-effective-doses-ed.html"><a href="quantiles-and-effective-doses-ed.html"><i class="fa fa-check"></i><b>14</b> Quantiles and Effective Doses (ED)</a></li>
+<li class="chapter" data-level="15" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>15</b> References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Analysing seed germination and emergence data with R: a tutorial</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="getting-the-quantiles-with-drcte" class="section level1 hasAnchor" number="13">
+<h1><span class="header-section-number">Section 13</span> Getting the quantiles with ‘drcte’<a href="getting-the-quantiles-with-drcte.html#getting-the-quantiles-with-drcte" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="parametric-models" class="section level2 hasAnchor" number="13.1">
+<h2><span class="header-section-number">13.1</span> Parametric models<a href="getting-the-quantiles-with-drcte.html#parametric-models" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In a previous post we have used the code below to fit a log-logistic time-to-event model to the germination data for three species of the Verbascum genus:</p>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="getting-the-quantiles-with-drcte.html#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(drcte)</span>
+<span id="cb51-2"><a href="getting-the-quantiles-with-drcte.html#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(drcSeedGerm)</span>
+<span id="cb51-3"><a href="getting-the-quantiles-with-drcte.html#cb51-3" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(verbascum)</span>
+<span id="cb51-4"><a href="getting-the-quantiles-with-drcte.html#cb51-4" aria-hidden="true" tabindex="-1"></a>mod1 <span class="ot">&lt;-</span> <span class="fu">drmte</span>(nSeeds <span class="sc">~</span> timeBef <span class="sc">+</span> timeAf, <span class="at">fct =</span> <span class="fu">LL.3</span>(),</span>
+<span id="cb51-5"><a href="getting-the-quantiles-with-drcte.html#cb51-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">curveid =</span> Species, <span class="at">data =</span> verbascum)</span>
+<span id="cb51-6"><a href="getting-the-quantiles-with-drcte.html#cb51-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mod1, <span class="at">units =</span> Dish)</span>
+<span id="cb51-7"><a href="getting-the-quantiles-with-drcte.html#cb51-7" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-8"><a href="getting-the-quantiles-with-drcte.html#cb51-8" aria-hidden="true" tabindex="-1"></a><span class="do">## Model fitted: Log-logistic (ED50 as parameter) with lower limit at 0</span></span>
+<span id="cb51-9"><a href="getting-the-quantiles-with-drcte.html#cb51-9" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-10"><a href="getting-the-quantiles-with-drcte.html#cb51-10" aria-hidden="true" tabindex="-1"></a><span class="do">## Robust estimation: Cluster robust sandwich SEs </span></span>
+<span id="cb51-11"><a href="getting-the-quantiles-with-drcte.html#cb51-11" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-12"><a href="getting-the-quantiles-with-drcte.html#cb51-12" aria-hidden="true" tabindex="-1"></a><span class="do">## Parameter estimates:</span></span>
+<span id="cb51-13"><a href="getting-the-quantiles-with-drcte.html#cb51-13" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb51-14"><a href="getting-the-quantiles-with-drcte.html#cb51-14" aria-hidden="true" tabindex="-1"></a><span class="do">##               Estimate Std. Error  t value  Pr(&gt;|t|)    </span></span>
+<span id="cb51-15"><a href="getting-the-quantiles-with-drcte.html#cb51-15" aria-hidden="true" tabindex="-1"></a><span class="do">## b:arcturus   -9.930005   1.111135  -8.9368 4.286e-16 ***</span></span>
+<span id="cb51-16"><a href="getting-the-quantiles-with-drcte.html#cb51-16" aria-hidden="true" tabindex="-1"></a><span class="do">## b:blattaria  -7.198025   0.578038 -12.4525 &lt; 2.2e-16 ***</span></span>
+<span id="cb51-17"><a href="getting-the-quantiles-with-drcte.html#cb51-17" aria-hidden="true" tabindex="-1"></a><span class="do">## b:creticum  -11.033749   0.943374 -11.6961 &lt; 2.2e-16 ***</span></span>
+<span id="cb51-18"><a href="getting-the-quantiles-with-drcte.html#cb51-18" aria-hidden="true" tabindex="-1"></a><span class="do">## d:arcturus    0.356648   0.047915   7.4433 3.715e-12 ***</span></span>
+<span id="cb51-19"><a href="getting-the-quantiles-with-drcte.html#cb51-19" aria-hidden="true" tabindex="-1"></a><span class="do">## d:blattaria   0.840064   0.025593  32.8242 &lt; 2.2e-16 ***</span></span>
+<span id="cb51-20"><a href="getting-the-quantiles-with-drcte.html#cb51-20" aria-hidden="true" tabindex="-1"></a><span class="do">## d:creticum    0.969990   0.017290  56.1015 &lt; 2.2e-16 ***</span></span>
+<span id="cb51-21"><a href="getting-the-quantiles-with-drcte.html#cb51-21" aria-hidden="true" tabindex="-1"></a><span class="do">## e:arcturus   12.059189   0.486010  24.8126 &lt; 2.2e-16 ***</span></span>
+<span id="cb51-22"><a href="getting-the-quantiles-with-drcte.html#cb51-22" aria-hidden="true" tabindex="-1"></a><span class="do">## e:blattaria   4.031763   0.199741  20.1850 &lt; 2.2e-16 ***</span></span>
+<span id="cb51-23"><a href="getting-the-quantiles-with-drcte.html#cb51-23" aria-hidden="true" tabindex="-1"></a><span class="do">## e:creticum    3.200655   0.103161  31.0259 &lt; 2.2e-16 ***</span></span>
+<span id="cb51-24"><a href="getting-the-quantiles-with-drcte.html#cb51-24" aria-hidden="true" tabindex="-1"></a><span class="do">## ---</span></span>
+<span id="cb51-25"><a href="getting-the-quantiles-with-drcte.html#cb51-25" aria-hidden="true" tabindex="-1"></a><span class="do">## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span></code></pre></div>
+<p>It may be useful to rank the species in terms of their germination velocity and, to that purpose, we could estimate the times to 30% and 50% germination (T30 and T50), that are the 30<sup>th</sup> and 50<sup>th</sup> percentiles of the time-to-event distribution. We can use the <code>quantile()</code> method, where the probability levels are passed in as the vector ‘probs’:</p>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="getting-the-quantiles-with-drcte.html#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">quantile</span>(mod1, <span class="at">probs =</span> <span class="fu">c</span>(<span class="fl">0.3</span>, <span class="fl">0.5</span>))</span>
+<span id="cb52-2"><a href="getting-the-quantiles-with-drcte.html#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb52-3"><a href="getting-the-quantiles-with-drcte.html#cb52-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Estimated quantiles</span></span>
+<span id="cb52-4"><a href="getting-the-quantiles-with-drcte.html#cb52-4" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb52-5"><a href="getting-the-quantiles-with-drcte.html#cb52-5" aria-hidden="true" tabindex="-1"></a><span class="do">##               Estimate Std. Error</span></span>
+<span id="cb52-6"><a href="getting-the-quantiles-with-drcte.html#cb52-6" aria-hidden="true" tabindex="-1"></a><span class="do">## arcturus:30%   14.2634   0.992685</span></span>
+<span id="cb52-7"><a href="getting-the-quantiles-with-drcte.html#cb52-7" aria-hidden="true" tabindex="-1"></a><span class="do">## arcturus:50%       NaN        NaN</span></span>
+<span id="cb52-8"><a href="getting-the-quantiles-with-drcte.html#cb52-8" aria-hidden="true" tabindex="-1"></a><span class="do">## blattaria:30%   3.7156   0.106630</span></span>
+<span id="cb52-9"><a href="getting-the-quantiles-with-drcte.html#cb52-9" aria-hidden="true" tabindex="-1"></a><span class="do">## blattaria:50%   4.2536   0.118066</span></span>
+<span id="cb52-10"><a href="getting-the-quantiles-with-drcte.html#cb52-10" aria-hidden="true" tabindex="-1"></a><span class="do">## creticum:30%    2.9759   0.058279</span></span>
+<span id="cb52-11"><a href="getting-the-quantiles-with-drcte.html#cb52-11" aria-hidden="true" tabindex="-1"></a><span class="do">## creticum:50%    3.2187   0.059480</span></span></code></pre></div>
+<p>We may note that the T50 is not estimable with <em>Verbascum arcturus</em>, as the maximum germinated proportion (<em>d</em> parameter for the time-to-event model above) is 0.36. Standard errors are obtained by using the delta method and they are invalid whenever the experimental units (seeds) are clustered within containers, such as the Petri dishes.</p>
+<p>For all these cases, we should prefer cluster-robust standard errors (Zeileis et al. 2020), which can be obtained by setting the extra argument ‘robust = TRUE’ and providing a clustering variable as the <code>units</code> argument. By setting ‘interval = TRUE’ we can also obtain confidence intervals for the desired probability level (0.95, by default).</p>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="getting-the-quantiles-with-drcte.html#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">quantile</span>(mod1, <span class="at">probs =</span> <span class="fu">c</span>(<span class="fl">0.3</span>, <span class="fl">0.5</span>), <span class="at">robust =</span> T,</span>
+<span id="cb53-2"><a href="getting-the-quantiles-with-drcte.html#cb53-2" aria-hidden="true" tabindex="-1"></a>         <span class="at">units =</span> Dish,</span>
+<span id="cb53-3"><a href="getting-the-quantiles-with-drcte.html#cb53-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">interval =</span> T)</span>
+<span id="cb53-4"><a href="getting-the-quantiles-with-drcte.html#cb53-4" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb53-5"><a href="getting-the-quantiles-with-drcte.html#cb53-5" aria-hidden="true" tabindex="-1"></a><span class="do">## Estimated quantiles</span></span>
+<span id="cb53-6"><a href="getting-the-quantiles-with-drcte.html#cb53-6" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb53-7"><a href="getting-the-quantiles-with-drcte.html#cb53-7" aria-hidden="true" tabindex="-1"></a><span class="do">##               Estimate Std. Error   Lower   Upper</span></span>
+<span id="cb53-8"><a href="getting-the-quantiles-with-drcte.html#cb53-8" aria-hidden="true" tabindex="-1"></a><span class="do">## arcturus:30%   14.2634   0.755294 12.7830 15.7437</span></span>
+<span id="cb53-9"><a href="getting-the-quantiles-with-drcte.html#cb53-9" aria-hidden="true" tabindex="-1"></a><span class="do">## arcturus:50%       NaN        NaN     NaN     NaN</span></span>
+<span id="cb53-10"><a href="getting-the-quantiles-with-drcte.html#cb53-10" aria-hidden="true" tabindex="-1"></a><span class="do">## blattaria:30%   3.7156   0.188941  3.3452  4.0859</span></span>
+<span id="cb53-11"><a href="getting-the-quantiles-with-drcte.html#cb53-11" aria-hidden="true" tabindex="-1"></a><span class="do">## blattaria:50%   4.2536   0.209027  3.8439  4.6632</span></span>
+<span id="cb53-12"><a href="getting-the-quantiles-with-drcte.html#cb53-12" aria-hidden="true" tabindex="-1"></a><span class="do">## creticum:30%    2.9759   0.085151  2.8090  3.1428</span></span>
+<span id="cb53-13"><a href="getting-the-quantiles-with-drcte.html#cb53-13" aria-hidden="true" tabindex="-1"></a><span class="do">## creticum:50%    3.2187   0.104743  3.0134  3.4240</span></span></code></pre></div>
+<p>We may note that cluster robust standard errors are higher than naive standard errors: the seed in the same Petri dish are correlated and, thus, they do not contribute full information.</p>
+<p>If we are interested in the germination rates G30 and G50, we can set the argument ‘rate = T’, as shown in the box below.</p>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="getting-the-quantiles-with-drcte.html#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">quantile</span>(mod1, <span class="at">probs =</span> <span class="fu">c</span>(<span class="fl">0.3</span>, <span class="fl">0.5</span>), <span class="at">robust =</span> T,</span>
+<span id="cb54-2"><a href="getting-the-quantiles-with-drcte.html#cb54-2" aria-hidden="true" tabindex="-1"></a>         <span class="at">units =</span> Dish,</span>
+<span id="cb54-3"><a href="getting-the-quantiles-with-drcte.html#cb54-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">interval =</span> T, <span class="at">rate =</span> T)</span>
+<span id="cb54-4"><a href="getting-the-quantiles-with-drcte.html#cb54-4" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb54-5"><a href="getting-the-quantiles-with-drcte.html#cb54-5" aria-hidden="true" tabindex="-1"></a><span class="do">## Estimated quantiles</span></span>
+<span id="cb54-6"><a href="getting-the-quantiles-with-drcte.html#cb54-6" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb54-7"><a href="getting-the-quantiles-with-drcte.html#cb54-7" aria-hidden="true" tabindex="-1"></a><span class="do">##               Estimate        SE    Lower    Upper</span></span>
+<span id="cb54-8"><a href="getting-the-quantiles-with-drcte.html#cb54-8" aria-hidden="true" tabindex="-1"></a><span class="do">## arcturus:30%   0.07011 0.0037126 0.062833 0.077386</span></span>
+<span id="cb54-9"><a href="getting-the-quantiles-with-drcte.html#cb54-9" aria-hidden="true" tabindex="-1"></a><span class="do">## arcturus:50%   0.00000 0.0000000 0.000000 0.000000</span></span>
+<span id="cb54-10"><a href="getting-the-quantiles-with-drcte.html#cb54-10" aria-hidden="true" tabindex="-1"></a><span class="do">## blattaria:30%  0.26914 0.0136861 0.242315 0.295963</span></span>
+<span id="cb54-11"><a href="getting-the-quantiles-with-drcte.html#cb54-11" aria-hidden="true" tabindex="-1"></a><span class="do">## blattaria:50%  0.23510 0.0115531 0.212454 0.257741</span></span>
+<span id="cb54-12"><a href="getting-the-quantiles-with-drcte.html#cb54-12" aria-hidden="true" tabindex="-1"></a><span class="do">## creticum:30%   0.33604 0.0096153 0.317191 0.354882</span></span>
+<span id="cb54-13"><a href="getting-the-quantiles-with-drcte.html#cb54-13" aria-hidden="true" tabindex="-1"></a><span class="do">## creticum:50%   0.31069 0.0101106 0.290872 0.330505</span></span></code></pre></div>
+</div>
+<div id="parametric-models-with-environmental-covariates" class="section level2 hasAnchor" number="13.2">
+<h2><span class="header-section-number">13.2</span> Parametric models with environmental covariates<a href="getting-the-quantiles-with-drcte.html#parametric-models-with-environmental-covariates" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>If we have fitted a hydro-thermal time model or other models with an environmental covariate, we can also use the <code>quantile()</code> method, and pass a value for that covariate, as shown in the code below.</p>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="getting-the-quantiles-with-drcte.html#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Parametric model with environmental covariate</span></span>
+<span id="cb55-2"><a href="getting-the-quantiles-with-drcte.html#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(rape)</span>
+<span id="cb55-3"><a href="getting-the-quantiles-with-drcte.html#cb55-3" aria-hidden="true" tabindex="-1"></a>modTE <span class="ot">&lt;-</span> <span class="fu">drmte</span>(nSeeds <span class="sc">~</span> timeBef <span class="sc">+</span> timeAf <span class="sc">+</span> Psi,</span>
+<span id="cb55-4"><a href="getting-the-quantiles-with-drcte.html#cb55-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> rape, <span class="at">fct =</span> <span class="fu">HTLL</span>())</span>
+<span id="cb55-5"><a href="getting-the-quantiles-with-drcte.html#cb55-5" aria-hidden="true" tabindex="-1"></a><span class="fu">quantile</span>(modTE, <span class="at">Psi =</span> <span class="dv">0</span>, </span>
+<span id="cb55-6"><a href="getting-the-quantiles-with-drcte.html#cb55-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">probs =</span> <span class="fu">c</span>(<span class="fl">0.05</span>, <span class="fl">0.10</span>, <span class="fl">0.15</span>, <span class="fl">0.21</span>), </span>
+<span id="cb55-7"><a href="getting-the-quantiles-with-drcte.html#cb55-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">restricted =</span> F, <span class="at">rate =</span> T, <span class="at">robust =</span> T,</span>
+<span id="cb55-8"><a href="getting-the-quantiles-with-drcte.html#cb55-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">interval =</span> T)</span>
+<span id="cb55-9"><a href="getting-the-quantiles-with-drcte.html#cb55-9" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb55-10"><a href="getting-the-quantiles-with-drcte.html#cb55-10" aria-hidden="true" tabindex="-1"></a><span class="do">## Estimated quantiles</span></span>
+<span id="cb55-11"><a href="getting-the-quantiles-with-drcte.html#cb55-11" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb55-12"><a href="getting-the-quantiles-with-drcte.html#cb55-12" aria-hidden="true" tabindex="-1"></a><span class="do">##       Estimate      SE  Lower  Upper</span></span>
+<span id="cb55-13"><a href="getting-the-quantiles-with-drcte.html#cb55-13" aria-hidden="true" tabindex="-1"></a><span class="do">## 1:5%    1.6630 0.29134 1.0919 2.2340</span></span>
+<span id="cb55-14"><a href="getting-the-quantiles-with-drcte.html#cb55-14" aria-hidden="true" tabindex="-1"></a><span class="do">## 1:10%   1.6581 0.28523 1.0990 2.2171</span></span>
+<span id="cb55-15"><a href="getting-the-quantiles-with-drcte.html#cb55-15" aria-hidden="true" tabindex="-1"></a><span class="do">## 1:15%   1.6546 0.28115 1.1036 2.2056</span></span>
+<span id="cb55-16"><a href="getting-the-quantiles-with-drcte.html#cb55-16" aria-hidden="true" tabindex="-1"></a><span class="do">## 1:21%   1.6513 0.27745 1.1075 2.1951</span></span></code></pre></div>
+<p>The environmental covariate only accepts a single value; in order to vectorise, we need to use the <code>lapply()</code> function, as shown below.</p>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="getting-the-quantiles-with-drcte.html#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This is to vectorise on Psi</span></span>
+<span id="cb56-2"><a href="getting-the-quantiles-with-drcte.html#cb56-2" aria-hidden="true" tabindex="-1"></a>psiList <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="fl">0.25</span>)</span>
+<span id="cb56-3"><a href="getting-the-quantiles-with-drcte.html#cb56-3" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(psiList) <span class="ot">&lt;-</span> <span class="fu">as.character</span>(psiList)</span>
+<span id="cb56-4"><a href="getting-the-quantiles-with-drcte.html#cb56-4" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(psiList, </span>
+<span id="cb56-5"><a href="getting-the-quantiles-with-drcte.html#cb56-5" aria-hidden="true" tabindex="-1"></a>       <span class="cf">function</span>(x) <span class="fu">quantile</span>(modTE, <span class="at">Psi =</span> x, </span>
+<span id="cb56-6"><a href="getting-the-quantiles-with-drcte.html#cb56-6" aria-hidden="true" tabindex="-1"></a>                            <span class="at">probs =</span> <span class="fu">c</span>(<span class="fl">0.05</span>, <span class="fl">0.10</span>, <span class="fl">0.15</span>, <span class="fl">0.21</span>),</span>
+<span id="cb56-7"><a href="getting-the-quantiles-with-drcte.html#cb56-7" aria-hidden="true" tabindex="-1"></a>                            <span class="at">restricted =</span> F, <span class="at">rate =</span> T,</span>
+<span id="cb56-8"><a href="getting-the-quantiles-with-drcte.html#cb56-8" aria-hidden="true" tabindex="-1"></a>                            <span class="at">interval =</span> <span class="st">&quot;delta&quot;</span>, </span>
+<span id="cb56-9"><a href="getting-the-quantiles-with-drcte.html#cb56-9" aria-hidden="true" tabindex="-1"></a>                            <span class="at">units =</span> rape<span class="sc">$</span>Dish, </span>
+<span id="cb56-10"><a href="getting-the-quantiles-with-drcte.html#cb56-10" aria-hidden="true" tabindex="-1"></a>                            <span class="at">display =</span> F))</span>
+<span id="cb56-11"><a href="getting-the-quantiles-with-drcte.html#cb56-11" aria-hidden="true" tabindex="-1"></a><span class="do">## $`-1`</span></span>
+<span id="cb56-12"><a href="getting-the-quantiles-with-drcte.html#cb56-12" aria-hidden="true" tabindex="-1"></a><span class="do">##        Estimate        SE       Lower     Upper</span></span>
+<span id="cb56-13"><a href="getting-the-quantiles-with-drcte.html#cb56-13" aria-hidden="true" tabindex="-1"></a><span class="do">## 1:5%  0.1854204 0.1316218 -0.07255364 0.4433945</span></span>
+<span id="cb56-14"><a href="getting-the-quantiles-with-drcte.html#cb56-14" aria-hidden="true" tabindex="-1"></a><span class="do">## 1:10% 0.1805588 0.1246436 -0.06373812 0.4248557</span></span>
+<span id="cb56-15"><a href="getting-the-quantiles-with-drcte.html#cb56-15" aria-hidden="true" tabindex="-1"></a><span class="do">## 1:15% 0.1770742 0.1199609 -0.05804492 0.4121932</span></span>
+<span id="cb56-16"><a href="getting-the-quantiles-with-drcte.html#cb56-16" aria-hidden="true" tabindex="-1"></a><span class="do">## 1:21% 0.1737531 0.1157066 -0.05302779 0.4005339</span></span>
+<span id="cb56-17"><a href="getting-the-quantiles-with-drcte.html#cb56-17" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb56-18"><a href="getting-the-quantiles-with-drcte.html#cb56-18" aria-hidden="true" tabindex="-1"></a><span class="do">## $`-0.75`</span></span>
+<span id="cb56-19"><a href="getting-the-quantiles-with-drcte.html#cb56-19" aria-hidden="true" tabindex="-1"></a><span class="do">##        Estimate        SE     Lower     Upper</span></span>
+<span id="cb56-20"><a href="getting-the-quantiles-with-drcte.html#cb56-20" aria-hidden="true" tabindex="-1"></a><span class="do">## 1:5%  0.5548033 0.1603098 0.2406019 0.8690047</span></span>
+<span id="cb56-21"><a href="getting-the-quantiles-with-drcte.html#cb56-21" aria-hidden="true" tabindex="-1"></a><span class="do">## 1:10% 0.5499417 0.1532949 0.2494893 0.8503941</span></span>
+<span id="cb56-22"><a href="getting-the-quantiles-with-drcte.html#cb56-22" aria-hidden="true" tabindex="-1"></a><span class="do">## 1:15% 0.5464571 0.1485831 0.2552394 0.8376747</span></span>
+<span id="cb56-23"><a href="getting-the-quantiles-with-drcte.html#cb56-23" aria-hidden="true" tabindex="-1"></a><span class="do">## 1:21% 0.5431360 0.1442990 0.2603152 0.8259567</span></span>
+<span id="cb56-24"><a href="getting-the-quantiles-with-drcte.html#cb56-24" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb56-25"><a href="getting-the-quantiles-with-drcte.html#cb56-25" aria-hidden="true" tabindex="-1"></a><span class="do">## $`-0.5`</span></span>
+<span id="cb56-26"><a href="getting-the-quantiles-with-drcte.html#cb56-26" aria-hidden="true" tabindex="-1"></a><span class="do">##        Estimate        SE     Lower    Upper</span></span>
+<span id="cb56-27"><a href="getting-the-quantiles-with-drcte.html#cb56-27" aria-hidden="true" tabindex="-1"></a><span class="do">## 1:5%  0.9241862 0.1932594 0.5454048 1.302968</span></span>
+<span id="cb56-28"><a href="getting-the-quantiles-with-drcte.html#cb56-28" aria-hidden="true" tabindex="-1"></a><span class="do">## 1:10% 0.9193246 0.1863806 0.5540254 1.284624</span></span>
+<span id="cb56-29"><a href="getting-the-quantiles-with-drcte.html#cb56-29" aria-hidden="true" tabindex="-1"></a><span class="do">## 1:15% 0.9158400 0.1817648 0.5595875 1.272092</span></span>
+<span id="cb56-30"><a href="getting-the-quantiles-with-drcte.html#cb56-30" aria-hidden="true" tabindex="-1"></a><span class="do">## 1:21% 0.9125189 0.1775713 0.5644855 1.260552</span></span>
+<span id="cb56-31"><a href="getting-the-quantiles-with-drcte.html#cb56-31" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb56-32"><a href="getting-the-quantiles-with-drcte.html#cb56-32" aria-hidden="true" tabindex="-1"></a><span class="do">## $`-0.25`</span></span>
+<span id="cb56-33"><a href="getting-the-quantiles-with-drcte.html#cb56-33" aria-hidden="true" tabindex="-1"></a><span class="do">##       Estimate        SE     Lower    Upper</span></span>
+<span id="cb56-34"><a href="getting-the-quantiles-with-drcte.html#cb56-34" aria-hidden="true" tabindex="-1"></a><span class="do">## 1:5%  1.293569 0.2286380 0.8454469 1.741691</span></span>
+<span id="cb56-35"><a href="getting-the-quantiles-with-drcte.html#cb56-35" aria-hidden="true" tabindex="-1"></a><span class="do">## 1:10% 1.288708 0.2219286 0.8537354 1.723680</span></span>
+<span id="cb56-36"><a href="getting-the-quantiles-with-drcte.html#cb56-36" aria-hidden="true" tabindex="-1"></a><span class="do">## 1:15% 1.285223 0.2174308 0.8590664 1.711379</span></span>
+<span id="cb56-37"><a href="getting-the-quantiles-with-drcte.html#cb56-37" aria-hidden="true" tabindex="-1"></a><span class="do">## 1:21% 1.281902 0.2133475 0.8637483 1.700055</span></span>
+<span id="cb56-38"><a href="getting-the-quantiles-with-drcte.html#cb56-38" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb56-39"><a href="getting-the-quantiles-with-drcte.html#cb56-39" aria-hidden="true" tabindex="-1"></a><span class="do">## $`0`</span></span>
+<span id="cb56-40"><a href="getting-the-quantiles-with-drcte.html#cb56-40" aria-hidden="true" tabindex="-1"></a><span class="do">##       Estimate        SE    Lower    Upper</span></span>
+<span id="cb56-41"><a href="getting-the-quantiles-with-drcte.html#cb56-41" aria-hidden="true" tabindex="-1"></a><span class="do">## 1:5%  1.662952 0.2654765 1.142628 2.183276</span></span>
+<span id="cb56-42"><a href="getting-the-quantiles-with-drcte.html#cb56-42" aria-hidden="true" tabindex="-1"></a><span class="do">## 1:10% 1.658090 0.2589271 1.150603 2.165578</span></span>
+<span id="cb56-43"><a href="getting-the-quantiles-with-drcte.html#cb56-43" aria-hidden="true" tabindex="-1"></a><span class="do">## 1:15% 1.654606 0.2545391 1.155718 2.153493</span></span>
+<span id="cb56-44"><a href="getting-the-quantiles-with-drcte.html#cb56-44" aria-hidden="true" tabindex="-1"></a><span class="do">## 1:21% 1.651285 0.2505575 1.160201 2.142368</span></span></code></pre></div>
+</div>
+<div id="non-parametric-npmle-models" class="section level2 hasAnchor" number="13.3">
+<h2><span class="header-section-number">13.3</span> Non-parametric (NPMLE) models<a href="getting-the-quantiles-with-drcte.html#non-parametric-npmle-models" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The <code>quantile()</code> method can also be used to make predictions from NPMLE fits. This method works by assuming that the events are evenly scattered within each inspection interval (‘interpolation method’). Inferences need to be explicitly requested by using setting ‘interval = T’; in this case, standard errors are estimated by using a resampling approach, that is performed at the group level, whenever a grouping variable is provided, by way of the ‘units’ argument (Davison and Hinkley, 1997).</p>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="getting-the-quantiles-with-drcte.html#cb57-1" aria-hidden="true" tabindex="-1"></a>mod2 <span class="ot">&lt;-</span> <span class="fu">drmte</span>(nSeeds <span class="sc">~</span> timeBef <span class="sc">+</span> timeAf, <span class="at">fct =</span> <span class="fu">NPMLE</span>(),</span>
+<span id="cb57-2"><a href="getting-the-quantiles-with-drcte.html#cb57-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">curveid =</span> Species, <span class="at">data =</span> verbascum)</span>
+<span id="cb57-3"><a href="getting-the-quantiles-with-drcte.html#cb57-3" aria-hidden="true" tabindex="-1"></a><span class="fu">quantile</span>(mod2, <span class="at">probs =</span> <span class="fu">c</span>(<span class="fl">0.3</span>, <span class="fl">0.5</span>), <span class="at">robust =</span> T, <span class="at">units =</span> Dish,</span>
+<span id="cb57-4"><a href="getting-the-quantiles-with-drcte.html#cb57-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">interval =</span> T, <span class="at">rate =</span> T)</span>
+<span id="cb57-5"><a href="getting-the-quantiles-with-drcte.html#cb57-5" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb57-6"><a href="getting-the-quantiles-with-drcte.html#cb57-6" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb57-7"><a href="getting-the-quantiles-with-drcte.html#cb57-7" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb57-8"><a href="getting-the-quantiles-with-drcte.html#cb57-8" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb57-9"><a href="getting-the-quantiles-with-drcte.html#cb57-9" aria-hidden="true" tabindex="-1"></a><span class="do">## Estimated quantiles</span></span>
+<span id="cb57-10"><a href="getting-the-quantiles-with-drcte.html#cb57-10" aria-hidden="true" tabindex="-1"></a><span class="do">## (cluster robust bootstrap-based inference)</span></span>
+<span id="cb57-11"><a href="getting-the-quantiles-with-drcte.html#cb57-11" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb57-12"><a href="getting-the-quantiles-with-drcte.html#cb57-12" aria-hidden="true" tabindex="-1"></a><span class="do">##                 n       Mean   Median        SE   Lower    Upper</span></span>
+<span id="cb57-13"><a href="getting-the-quantiles-with-drcte.html#cb57-13" aria-hidden="true" tabindex="-1"></a><span class="do">## arcturus.30%  999 0.04215854 0.067385 0.0367409 0.00000 0.085837</span></span>
+<span id="cb57-14"><a href="getting-the-quantiles-with-drcte.html#cb57-14" aria-hidden="true" tabindex="-1"></a><span class="do">## arcturus.50%  999 0.00047593 0.000000 0.0056696 0.00000 0.000000</span></span>
+<span id="cb57-15"><a href="getting-the-quantiles-with-drcte.html#cb57-15" aria-hidden="true" tabindex="-1"></a><span class="do">## blattaria.30% 999 0.26933051 0.268456 0.0180207 0.23961 0.308415</span></span>
+<span id="cb57-16"><a href="getting-the-quantiles-with-drcte.html#cb57-16" aria-hidden="true" tabindex="-1"></a><span class="do">## blattaria.50% 999 0.23279718 0.230530 0.0131552 0.21341 0.263740</span></span>
+<span id="cb57-17"><a href="getting-the-quantiles-with-drcte.html#cb57-17" aria-hidden="true" tabindex="-1"></a><span class="do">## creticum.30%  999 0.34397841 0.343750 0.0195091 0.31087 0.379032</span></span>
+<span id="cb57-18"><a href="getting-the-quantiles-with-drcte.html#cb57-18" aria-hidden="true" tabindex="-1"></a><span class="do">## creticum.50%  999 0.30314443 0.302198 0.0117692 0.28139 0.326935</span></span></code></pre></div>
+<p>For KDE models, quantiles are calculated from the time-to-event curve by using a bisection method. However, we are still unsure about the most reliable way to obtain standard errors and, for this reason, inferences are not provided with this type of non-parametric models.</p>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="peculiarities-of-seed-science-data.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="quantiles-and-effective-doses-ed.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["_seedGerminationTutorial.pdf", "_seedGerminationTutorial.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

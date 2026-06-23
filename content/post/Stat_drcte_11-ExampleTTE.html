@@ -18,9 +18,7 @@ archives:
 
 
 <p>This is a follow-up post. If you are interested in other posts of this series, please go to: <a href="https://www.statforbiology.com/tags/drcte/">https://www.statforbiology.com/tags/drcte/</a>. All these posts exapand on a paper that we have recently published in the Journal ‘Weed Science’; please follow <a href="https://doi.org/10.1017/wsc.2022.8">this link</a> to the paper.</p>
-<div id="a-motivating-examples" class="section level1">
-<h1>A motivating examples</h1>
-<p>In recent times, we wanted to model the effect of temperature on seed germination for <em>Hordeum vulgare</em> and we made an assay with three replicated Petri dishes (50 seeds each) at 9 constant temperature levels (1, 3, 7, 10, 15, 20, 25, 30, 35, 40 °C). Germinated seeds were counted and removed daily for 10 days. This unpublished dataset is available as <code>barley</code> in the <code>drcSeedGerm</code> package, which needs to be installed from github (see below), together with the <code>drcte</code> package for time-to-event model fitting. The following code loads the necessary packages, loads the datasets and shows the first six lines.</p>
+<p>In this post, we will consider a recent work, where we wanted to model the effect of temperature on seed germination for <em>Hordeum vulgare</em> and we made an assay with three replicated Petri dishes (50 seeds each) at 9 constant temperature levels (1, 3, 7, 10, 15, 20, 25, 30, 35, 40 °C). Germinated seeds were counted and removed daily for 10 days. This unpublished dataset is available as <code>barley</code> in the <code>drcSeedGerm</code> package, which needs to be installed from github (see below), together with the <code>drcte</code> package for time-to-event model fitting. The following code loads the necessary packages, loads the datasets and shows the first six lines.</p>
 <pre class="r"><code># Installing packages (only at first instance)
 # library(devtools)
 # install_github(&quot;OnofriAndreaPG/drcSeedGerm&quot;)
@@ -38,7 +36,6 @@ head(barley)
 ## 6    1    1       5      6      0    0       0</code></pre>
 <p>In this dataset, ‘timeAf’ represents the moment when germinated seeds were counted, while ’timeBef’ represents the previous inspection time (or the beginning of the assay). The column ’nSeeds’ is the number of seeds that germinated during each time interval between ‘timeBef’ and ‘timeAf. For the analyses, we will also make use of the ’Temp’ (temperature) and ‘Dish’ (Petri dish) columns.</p>
 <p>This dataset was already analysed in Onofri et al. (2018; Example 3 and 4) by using the same methodology, but a different R coding (see the Supplemental Material in that paper), that is now outdated. This post will show you the updated coding.</p>
-</div>
 <div id="a-first-thermal-time-model" class="section level1">
 <h1>A first thermal-time model</h1>
 <p>As we have shown in previous posts (see <a href="https://www.statforbiology.com/2022/stat_drcte_6-ht1step/">here</a> and <a href="https://www.statforbiology.com/2023/stat_drcte_10-examplehtte/">here</a>), the effect of environmental covariates (temperature, in this case) can be simply included by independently coding a different time-to-event curve to each level of that covariate. In other words, considering that a parametric time-to-event curve is defined as a cumulative probability function (<span class="math inline">\(\Phi\)</span>), with three parameters:</p>
@@ -75,12 +72,12 @@ summary(modTTEM, units = Dish)
 ## Parameter estimates:
 ## 
 ##                       Estimate Std. Error t value  Pr(&gt;|t|)    
-## G:(Intercept)         12.46390    2.37116  5.2564 1.883e-07 ***
-## Tc:(Intercept)        82.66899   23.46199  3.5235 0.0004499 ***
-## sigmaTc:(Intercept) 1018.92636  315.59091  3.2286 0.0012943 ** 
-## Tb:(Intercept)        -1.89327    0.38733 -4.8880 1.230e-06 ***
-## ThetaT:(Intercept)    43.41025    4.37048  9.9326 &lt; 2.2e-16 ***
-## b:(Intercept)          5.62759    0.69143  8.1391 1.510e-15 ***
+## G:(Intercept)         12.46391    2.53561  4.9155 1.073e-06 ***
+## Tc:(Intercept)        82.66899   23.50722  3.5167 0.0004613 ***
+## sigmaTc:(Intercept) 1018.92744  350.30011  2.9087 0.0037290 ** 
+## Tb:(Intercept)        -1.89327    0.38777 -4.8824 1.264e-06 ***
+## ThetaT:(Intercept)    43.41025    4.37772  9.9162 &lt; 2.2e-16 ***
+## b:(Intercept)          5.62759    0.69179  8.1348 1.560e-15 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>It is always important not to neglect a graphical inspection of model fit. The <code>plot()</code> method does not work with time-to-event curves with additional covariates (apart from time). However, we can retrieve the fitted data by using the <code>plotData()</code> function and use those predictions within the <code>ggplot()</code> function. The box below shows the appropriate coding; the red circles in the graphs represent the observed means, while the black lines are model predictions).</p>

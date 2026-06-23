@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-131792052-1"></script>
+  
+  <script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  
+    gtag('config', 'UA-131792052-1');
+  </script>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Fixing the bridge between biologists and statisticians  | Plotting weather data with ggplot()</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="https://www.statforbiology.com/css/blog.css" />
+       
+</head>
+<body>
+
+    
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="https://www.statforbiology.com/">Home</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/aboutthis" >About this site</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/tutorials" >Tutorials</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/_Statbook" >Book (Italian)</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/_StatbookEng" >Book (English)</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/rpackages" >R packages</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/recentcourses" >Stat Courses</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/links" >Links</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/about" >About me</a>
+        </div>
+    </nav>
+    
+
+    
+    <section class="hero is-info is-medium">
+        <div class="hero-body" style="background-image: url(https://www.statforbiology.com/img/bg-blog.jpg);">
+            <div class="container has-text-centered">
+                <br>
+                <h1 class="title is-size-1">
+                    
+                        Plotting weather data with ggplot()
+                    
+                </h1>
+                
+            </div>
+        </div>
+    </section>
+
+
+
+<div class="container">
+    <div class="section">
+    
+
+<div class="columns">
+    <div class="column is-9">
+        <div class="tile is-child box">
+          <p class="subtitle is-size-6 has-text-grey-light">
+          Andrea Onofri &middot;&nbsp; Added on June 6, 2024 &middot;
+          <i class="far fa-clock"></i>&nbsp;7 min read 
+          </p><hr/>
+            <div class="content">
+                
+
+
+<p>Very often, we agronomists have to deal with weather data, e.g., to evaluate and explain the behaviour of genotypes in different environments. We are very much used to representing temperature and rainfall data in one single graph with two y-axis, which gives a good immediate insight on the weather pattern at a certain location. Unfortunately, I had to discover that doing such graphs with <code>ggplot()</code> is not a straightforward task.</p>
+<p>Indeed, while searching for possible solutions, I came to discover that graphs with dual-scaled axes are not regarded as a good tool for visualisation; Hadley Wikham, the author of ‘ggplot2’ and several other important R packages, gave some good reasons (e.g., at this link: <a href="https://stackoverflow.com/questions/3099219/ggplot-with-2-y-axes-on-each-side-and-different-scales">https://stackoverflow.com/questions/3099219/ggplot-with-2-y-axes-on-each-side-and-different-scales</a>); I do not intend to question those general reasons, but, nonetheless, the idea that I am not able to do with <code>ggplot()</code> what I could do with Excel gets on my nerves. After all, those graphs may be rather useful in some specific circumstances, such as with weather data.</p>
+<p>Therefore, I started my search for a reasonable solution and I finally found my way, which I would like to share in this post. Let’s consider the dataset ‘DailyMeteoData.csv’ reporting the daily average temperature and rainfall level in two years, in a location of my region (Umbria, central Italy). Let’s open the dataset and use ‘dplyr’ to make a few useful transformations, such as:</p>
+<ol style="list-style-type: decimal">
+<li>transforming the date character into a date object;</li>
+<li>adding fields for Year, Month and the Day Of the Year (DOY);</li>
+</ol>
+<pre class="r"><code>library(dplyr)
+fileName &lt;- &quot;https://www.casaonofri.it/_datasets/DailyMeteoData.csv&quot;
+dataMeteo &lt;- read.csv(fileName) |&gt;
+  mutate(Date = as.Date(Date, format = &quot;%d/%m/%Y&quot;),
+         Year = as.numeric(format(Date, format=&quot;%Y&quot;)),
+         Month = as.numeric(format(Date, format=&quot;%m&quot;)),
+         DOY = as.numeric(format(Date, format=&quot;%j&quot;)))
+head(dataMeteo)
+##         Date Tavg Rain Year Month DOY
+## 1 2011-01-01  5.9  0.0 2011     1   1
+## 2 2011-01-02  6.2  0.6 2011     1   2
+## 3 2011-01-03  4.5  0.0 2011     1   3
+## 4 2011-01-04 -0.3  0.0 2011     1   4
+## 5 2011-01-05  2.3  0.2 2011     1   5
+## 6 2011-01-06  6.9  0.0 2011     1   6</code></pre>
+<p>Temperature is a continuous variable and it is easily represented by using a line graph, while rainfall consists of discrete events, which needs to be accumulated, e.g., over months or decades. Thus, we use ‘dplyr’ once more to get a new rainfall dataset, with the accumulated monthly rainfall, that is more useful to our purposes; for the sake of simplicity, we assume that the year is divided into 12 months of the same length (i.e. 30.4 days, roughly) and we create the DOY for the central day of each month, to be used as the center for the respective plot bar.</p>
+<pre class="r"><code>dataMeteo2 &lt;- dataMeteo |&gt;
+  group_by(Year, Month) |&gt;
+  summarise(Rain = sum(Rain)) |&gt;
+  mutate(DOY = seq(15, 365, by = 365/12))
+head(dataMeteo2)
+## # A tibble: 6 × 4
+## # Groups:   Year [1]
+##    Year Month  Rain   DOY
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1  2011     1  40.4  15  
+## 2  2011     2  32.8  45.4
+## 3  2011     3 113.   75.8
+## 4  2011     4  16.6 106. 
+## 5  2011     5  27.4 137. 
+## 6  2011     6  61.2 167.</code></pre>
+<p>Now we produce our first graph with both rainfall and temperature level; in the box below I have played a little bit with the x-axes ticks and labels and I have left the y-axis label empty, for the moment.</p>
+<pre class="r"><code>library(ggplot2)
+ggplot() +
+  geom_bar(dataMeteo2, mapping = aes(x = DOY, y = Rain), fill = &quot;grey&quot;,
+           stat = &quot;identity&quot;, width = 28) +
+  geom_line(dataMeteo, mapping = aes(x = DOY, y = Tavg), col = &quot;blue&quot;) +
+  scale_x_continuous(breaks = c(365/12, 365/12*4, 365/12*8, 365) - 15, 
+                     labels = c(&quot;Jan&quot;, &quot;Apr&quot;, &quot;Aug&quot;, &quot;Dec&quot;),
+                     name = &quot;&quot;) +
+  scale_y_continuous(name = &quot;&quot;) +
+  facet_wrap(~Year) +
+  theme_bw()</code></pre>
+<p><img src="/post/R_ggplot_dualScaledAxes_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>This graph does not work: the temperature line is hardly visible, as its measurement unit is rather small compared to the rainfall unit; therefore, we need some sort of ‘scaling’ for the temperature variable, so that it ranges approximately between 150 and 250, in such a way that the blue line is clearly visible and does not get in the way of the rainfall bars. The minimum and maximum temperature values are equal, respectively, to -4.2°C and 28.9°C; we would like to match these original values with the new transformed values of 150 and 250, as shown in the Figure below.</p>
+<p><img src="/post/R_ggplot_dualScaledAxes_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>The previous figure tells us that we could transform the original temperature scale by using the equation of the straight line passing through the two points (-4.2, 150) and (28.9, 250). Thanks to some reminiscences from geometry courses, we can calculate the slope of such a straight line as:</p>
+<p><span class="math display">\[m = \frac{250 - 150}{28.9 + 4.2} = 3.02\]</span></p>
+<p>while the intercept is:</p>
+<p><span class="math display">\[q = 250 - 3.02 \times 28.9 = 162.69\]</span></p>
+<p>Thus, the scaling equation is:</p>
+<p><span class="math display">\[Y_N = 162.69 + 3.02 \,\, Y_O\]</span></p>
+<p>where <span class="math inline">\(Y_N\)</span> is the new temperature scale, while <span class="math inline">\(Y_O\)</span> is the original one. The reverse transformation is:</p>
+<p><span class="math display">\[Y_O = \frac{Y_N - 162.69}{3.02}\]</span></p>
+<p>Now, we are ready to plot the graph. We transform the temperature to its new unit and plot it:</p>
+<pre class="r"><code>dataMeteo &lt;- dataMeteo %&gt;% 
+  mutate(newTavg = 162.69 + 3.02 * Tavg)
+
+ggplot() +
+  geom_bar(dataMeteo2, mapping = aes(x = DOY, y = Rain), fill = &quot;grey&quot;,
+           stat = &quot;identity&quot;, width = 28) +
+  geom_line(dataMeteo, mapping = aes(x = DOY, y = newTavg), col = &quot;blue&quot;) +
+  scale_x_continuous(breaks = c(365/12, 365/12*4, 365/12*8, 365) - 15, 
+                     labels = c(&quot;Jan&quot;, &quot;Apr&quot;, &quot;Aug&quot;, &quot;Dec&quot;),
+                     name = &quot;&quot;) +
+  scale_y_continuous(name = &quot;&quot;) +
+  facet_wrap(~Year) +
+  theme_bw()</code></pre>
+<p><img src="/post/R_ggplot_dualScaledAxes_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>Now, we include the second axis, by using the <code>sec.axis</code> argument and the <code>sec_axis()</code> function, wherein we specify the back-transforming function the original scale:</p>
+<pre class="r"><code>dataMeteo &lt;- dataMeteo %&gt;% 
+  mutate(newTavg = 162.69 + 3.02 * Tavg)
+
+ggplot() +
+  geom_bar(dataMeteo2, mapping = aes(x = DOY, y = Rain), fill = &quot;grey&quot;,
+           stat = &quot;identity&quot;, width = 28) +
+  geom_line(dataMeteo, mapping = aes(x = DOY, y = newTavg), col = &quot;blue&quot;) +
+  scale_x_continuous(breaks = c(365/12, 365/12*4, 365/12*8, 365) - 15, 
+                     labels = c(&quot;Jan&quot;, &quot;Apr&quot;, &quot;Aug&quot;, &quot;Dec&quot;),
+                     name = &quot;&quot;) +
+  scale_y_continuous(name = &quot;Rain (mm)&quot;, 
+                     sec.axis = sec_axis(~ (. - 162.69)/3.02, 
+                                         name = &quot;Daily Temperature (°C)&quot;,
+                                         breaks = c(-10, 0, 10, 20, 30))) +
+  facet_wrap(~Year) +
+  theme_bw()</code></pre>
+<p><img src="/post/R_ggplot_dualScaledAxes_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>And we are done! I am sure you have comments to improve this: please, drop me a note at the address below.</p>
+<p>Thanks for reading and happy coding! And … don’t forget to check out my new book!</p>
+<p>Prof. Andrea Onofri<br />
+Department of Agricultural, Food and Environmental Sciences<br />
+University of Perugia (Italy)<br />
+Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<p><a href = "https://www.awin1.com/cread.php?awinmid=26429&awinaffid=2675822&ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src= "../../_Figures/Email_Signature_978-3-032-08199-5.png" align="center" alt="Book cover" class="cover" /></a></p>
+<hr />
+<div id="update-662024" class="section level1">
+<h1>UPDATE (6/6/2024)</h1>
+<p>Ross Gilmoure from Galileo Consulting (Kuala Lumpur) sent me an interesting comment, proposing the use of the ‘lubridate’ package for the management of dates and of the ‘ggh4x’ package, to exploit the nested axis capabilities of this latter. Basically, his graph does not have facets, but the two years are put one after the other. Furthermore, he calculated the montly means for temperature and fitted a cubic spline using ‘geom_smooth()’ and ‘method=“gam”’; he also made use of minor ticks, which might be a good idea. Ross’code is following: I’d like to thank him very much!</p>
+<pre class="r"><code>library(lubridate)
+library(ggh4x)
+dataMeteo1 &lt;- dataMeteo |&gt;
+  mutate(
+    Date = as.Date(Date, format = &quot;%d/%m/%Y&quot;),
+    Year = lubridate::year(Date),
+    Month = lubridate::month(Date))
+
+dataMeteo2 &lt;- dataMeteo1 |&gt;
+  group_by(Year, Month) |&gt;
+  summarise(
+    Rain = sum(Rain),
+    Temp = mean(Tavg, rm.na = TRUE)) |&gt;
+  mutate(Mth = factor(month.abb[Month], 
+                      levels = c(&quot;Jan&quot;, &quot;Feb&quot;, &quot;Mar&quot;, &quot;Apr&quot;,
+                                 &quot;May&quot;, &quot;Jun&quot;, &quot;Jul&quot;, &quot;Aug&quot;,
+                                 &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot;)))
+dataMeteo3 &lt;- dataMeteo2 |&gt;
+  mutate(newTemp = 162.69 + 3.02 * Temp)
+
+ggplot(dataMeteo3, mapping = aes(x = interaction(Mth, Year),
+                                 group = 1)) +
+  geom_col(aes(y = Rain), fill = &quot;grey&quot;) +
+  geom_point(aes(y = newTemp), size = 2, col = &quot;blue&quot;) +
+  geom_smooth(
+    method = &quot;gam&quot;, formula = y ~ s(x, bs = &quot;cc&quot;),
+    aes(x = as.numeric(interaction(Mth, Year)), y = newTemp),
+    col = &quot;blue&quot;) +
+  geom_point(aes(y = newTemp), size = 3, col = &quot;blue&quot;, 
+             fill = &quot;white&quot;, shape = 21, stroke = 1) +
+  scale_y_continuous(
+    minor_breaks = scales::breaks_width(20),
+    name = &quot;Mean Monthly Total Rainfall (mm)&quot;,
+    sec.axis = sec_axis(~ (. - 162.69) / 3.02,
+      name = &quot;Mean Monthly Daily Temperature (°C)&quot;,
+      breaks = c(-10, 0, 10, 20, 30))) +
+  guides(x = &quot;axis_nested&quot;,
+        y = guide_axis(minor.ticks=TRUE),
+        y.sec = guide_axis(minor.ticks=TRUE)) +
+  theme_bw(base_size = 18) +
+  theme(
+     panel.grid.minor = element_blank(),
+     axis.title.x = element_blank(),
+     axis.text.x = element_text(face = &quot;bold&quot;, size = rel(0.5)),
+     axis.ticks = element_line(colour = &quot;red&quot;),
+     ggh4x.axis.nestline.x = element_line(linewidth = 0.6),
+     ggh4x.axis.nesttext.x = element_text(colour = &quot;blue&quot;, 
+                                          face = &quot;bold&quot;, 
+                                          size = rel(1.2))
+  )</code></pre>
+<p><img src="/post/R_ggplot_dualScaledAxes_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+</div>
+
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Tags</h1>
+        <div class="tags">
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/agricensdata">agricensdata</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/ammi_analysis">ammi_analysis</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/aomisc">aomisc</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/asreml">asreml</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/bayesian_stat">bayesian_stat</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/biplot">biplot</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/blogdown">blogdown</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/book">book</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/boxplot">boxplot</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/case_study">case_study</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/climate_data">climate_data</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/correlation">correlation</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/cva">cva</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/data_management">data_management</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/delta_method">delta_method</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/descriptive_statistics">descriptive_statistics</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/diallel_models">diallel_models</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/dplyr">dplyr</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/drcseedgerm">drcseedgerm</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/drcte">drcte</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/drm">drm</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/emmeans">emmeans</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/error_propagation">error_propagation</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/gge_analysis">gge_analysis</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/ggh4x">ggh4x</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/ggplot">ggplot</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/gls">gls</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/gnlht">gnlht</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/jags">jags</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/linear_models">linear_models</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/lm">lm</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/lmdiallel">lmdiallel</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/lme">lme</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/long_term_experiments">long_term_experiments</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/mcp">mcp</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/meta_analysis">meta_analysis</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/metafor">metafor</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/mixed_models">mixed_models</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/multi_environment_studies">multi_environment_studies</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/multiple_comparisons">multiple_comparisons</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/multivariate_stat">multivariate_stat</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/nlme">nlme</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/nls">nls</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/nonlinear_regression">nonlinear_regression</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/p-values">p-values</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/pca">pca</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/percentiles">percentiles</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/plot">plot</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/qq_plot">qq_plot</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/r">r</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/regression">regression</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/repeated_measures">repeated_measures</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/seed_germination">seed_germination</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/sommer">sommer</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/split_plot">split_plot</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/statforbiology">statforbiology</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/statistical_inference">statistical_inference</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/subsampling">subsampling</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/tidyverse">tidyverse</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/time_to_event_models">time_to_event_models</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/variance">variance</a></span>
+        
+        </div>          
+    </div>
+</div><br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Recent posts</h1>
+        
+            <h1><a href="https://www.statforbiology.com/2026/dealing-with-correlation-in-designed-field-experiments-part-ii/">Dealing with correlation in designed field experiments: part II</a></h1>
+            <time class="has-text-grey-light is-size-7">15 April 2026</time>
+        
+            <h1><a href="https://www.statforbiology.com/2026/dealing-with-correlation-in-designed-field-experiments-part-i/">Dealing with correlation in designed field experiments: part I</a></h1>
+            <time class="has-text-grey-light is-size-7">15 April 2026</time>
+        
+            <h1><a href="https://www.statforbiology.com/2026/mixed-models/">Testing for interactions in nonlinear regression</a></h1>
+            <time class="has-text-grey-light is-size-7">14 February 2026</time>
+        
+            <h1><a href="https://www.statforbiology.com/2026/time_to_event_models/">Fitting time-to-event models with an environmental covariate</a></h1>
+            <time class="has-text-grey-light is-size-7">12 February 2026</time>
+        
+            <h1><a href="https://www.statforbiology.com/2026/mixed-models/">Correcting for multiplicity in the &#39;emmeans&#39; package</a></h1>
+            <time class="has-text-grey-light is-size-7">21 January 2026</time>
+        
+    </div>
+</div>
+    <br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Archives</h1>
+        
+            <a href="https://www.statforbiology.com/archives/2026">2026</a> (5)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2025">2025</a> (7)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2024">2024</a> (4)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2023">2023</a> (12)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2022">2022</a> (7)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2021">2021</a> (15)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2020">2020</a> (13)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2019">2019</a> (7)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2018">2018</a> (2)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2014">2014</a> (1)<br>
+        
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+    </div>
+</div>
+<footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+        <p>
+             <span class="icon is-large"><a href="mailto:andrea.onofri@unipg.it" class="mysocial"><i class="far fa-envelope-open fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://github.com/OnofriAndreaPG/" class="mysocial"><i class="fab fa-github fa-3x"></i></a></span>&nbsp;&nbsp;
+           <span class="icon is-large"><a href="https://twitter.com/onofriandreapg" class="mysocial"><i class="fab fa-twitter fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://www.r-project.org/" class="mysocial"><i class="fab fa-r-project fa-3x"></i></a></span>&nbsp;&nbsp;
+ 
+<br>
+<p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/">Copyright &copy; <a property="dct:title" rel="cc:attributionURL" href="https://www.statforbiology.com/aboutthis/">Fixing the bridge between biologists and statisticians</a> by <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://www.statforbiology.com/about/">Andrea Onofri</a> is licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY-NC-SA 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/sa.svg?ref=chooser-v1"></a> - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a></p>
+            
+</div>
+</footer>
+
+<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+</body>
+</html>

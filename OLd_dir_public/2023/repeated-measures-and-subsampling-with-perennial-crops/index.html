@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-131792052-1"></script>
+  
+  <script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  
+    gtag('config', 'UA-131792052-1');
+  </script>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Fixing the bridge between biologists and statisticians  | Repeated measures and subsampling with perennial crops</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="https://www.statforbiology.com/css/blog.css" />
+       
+</head>
+<body>
+
+    
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="https://www.statforbiology.com/">Home</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/aboutthis" >About this site</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/tutorials" >Tutorials</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/_Statbook" >Book (Italian)</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/_StatbookEng" >Book (English)</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/rpackages" >R packages</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/recentcourses" >Stat Courses</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/links" >Links</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/about" >About me</a>
+        </div>
+    </nav>
+    
+
+    
+    <section class="hero is-info is-medium">
+        <div class="hero-body" style="background-image: url(https://www.statforbiology.com/img/bg-blog.jpg);">
+            <div class="container has-text-centered">
+                <br>
+                <h1 class="title is-size-1">
+                    
+                        Repeated measures and subsampling with perennial crops
+                    
+                </h1>
+                
+            </div>
+        </div>
+    </section>
+
+
+
+<div class="container">
+    <div class="section">
+    
+
+<div class="columns">
+    <div class="column is-9">
+        <div class="tile is-child box">
+          <p class="subtitle is-size-6 has-text-grey-light">
+          Andrea Onofri &middot;&nbsp; Added on December 4, 2023 &middot;
+          <i class="far fa-clock"></i>&nbsp;5 min read 
+          </p><hr/>
+            <div class="content">
+                
+
+
+<p>In a recent post, I have talked about repeated measures, for a case where measurements were taken repeatedly in the same plots across years <a href="https://www.statforbiology.com/2023/stat_lmm_perennialcrops/">see here</a>. Previously, in another post, I had talked about subsampling, for a case where several random samples were taken from the same plot <a href="https://www.statforbiology.com/2023/stat_lmm_subsampling_tkw/">see here</a>.</p>
+<p>Repeated measures and subsampling are vastly different: in the first case I am specifically interested in the ‘evolution’ of the response over time (or space, sometimes). In the second case (subsampling), I only want to improve the precision/accuracy of my measurements, by taking multiple random samples in each plot.</p>
+<p>In this post, I decided to consider a situation where we have both repeated measures and subsampling. I have been prompted to work on this post by a colleague, that is struggling to find the appropriate model for such a situation; I hope that I can lend him/her a hand to get over this (thanks for your request, Gal!).</p>
+<p>Let’s consider the dataset below, that refers to the yield of lucerne genotypes in three consecutive years, taken from the same plots in a single experiment lasting for three years. The situation is similar to that of my previous post, but, in this case, in each year, we took two subsamples of 1 m<sup>2</sup> from each plot to obtain two separate yield measurements.</p>
+<pre class="r"><code>rm(list = ls())
+library(nlme)
+library(dplyr)
+filePath &lt;- &quot;https://www.casaonofri.it/_datasets/alfalfa3years_subs.csv&quot;
+dataset &lt;- read.csv(filePath)
+dataset[,1:4] &lt;- lapply(dataset[,1:4],
+                        function(col) factor(col))
+head(dataset)
+##   Plot Block Genotype Year SubSample    Yield
+## 1    1     1 4cascine 2006         1 5.967228
+## 2    1     1 4cascine 2006         2 5.021836
+## 3   25     2 4cascine 2006         1 4.365117
+## 4   25     2 4cascine 2006         2 4.477171
+## 5   60     3 4cascine 2006         1 7.333842
+## 6   60     3 4cascine 2006         2 8.505813</code></pre>
+<p>For this dataset, we need to consider that the observations taken in different years come from the same plots (repeated measures), so that there are three ‘subplots in time’. In each of these subplots (i.e., in each year), we take two subsamples. By considering this, we can follow the usual rules to build the model (Piepho et al., 2004):</p>
+<ol style="list-style-type: decimal">
+<li>Consider one single year and build the treatment model</li>
+<li>Consider one single year and build the block model</li>
+<li>Consider that the ‘plot’ factor in the block model references the randomisation units, i.e. those units which received the the genotypes by a randomisation process. Assign to this plot factor a random effect.</li>
+<li>Include the year factor into the model and combine the year with all the effects in the treatment model, by crossing or nesting as appropriate.</li>
+<li>Excluding the terms for randomisation units, nest the year in all the other terms in the block model.</li>
+<li>Combine random effects for randomisation units with the repeated factor, by using the colon operator, in order to derive the correct error terms to accommodate correlation structures.</li>
+<li>Introduce subsamples, nested within plots and within years. These subsamples must receive a random effect, because they were randomly sampled.</li>
+</ol>
+<p>The models at the different steps are as follows (with R notation):</p>
+<ol style="list-style-type: decimal">
+<li>treatment model: YIELD ~ GENOTYPE</li>
+<li>block model: YIELD ~ BLOCK + BLOCK:PLOT</li>
+<li>block model: YIELD ~ BLOCK + (1|BLOCK:PLOT)</li>
+<li>treatment model: YIELD ~ GENOTYPE * YEAR</li>
+<li>block model: YIELD ~ BLOCK + BLOCK:YEAR + (1|BLOCK:PLOT)</li>
+<li>block model: YIELD ~ BLOCK + BLOCK:YEAR + (1|BLOCK:PLOT) + (1|BLOCK:PLOT:YEAR)</li>
+<li>block model: YIELD ~ BLOCK + BLOCK:YEAR + (1|BLOCK:PLOT) + (1|BLOCK:PLOT:YEAR) + (1|BLOCK:PLOT:YEAR:SUBSAMPLES)</li>
+</ol>
+<p>In this case, we take the block, year and genotype effects as fixed (but you can change this as you please), so that the final model is:</p>
+<p>YIELD ~ GENOTYPE * YEAR + BLOCK + BLOCK:YEAR + (1|BLOCK:PLOT) + (1|BLOCK:PLOT:YEAR) + (1|BLOCK:PLOT:YEAR:SUBSAMPLE)</p>
+<p>where the last term does not need to be fitted in R, as it is the residual term, that is fitted by default.</p>
+<p>We start the analysis by building a new variable to uniquely identify each plot; it is easy, if we think that yield values taken for the same genotype in the same block must have been taken in the same plot. Although this is not strictly necessary, we build another variable to uniquely identify, in each plot, the three ‘subplots in time’, within which subsamples were taken (this facilitates the fitting process in R).</p>
+<pre class="r"><code># Reference the plots
+dataset$Plot &lt;- dataset$Block:dataset$Genotype
+dataset$Subplot &lt;- dataset$Plot:dataset$Year</code></pre>
+<p>Now we can fit the model with the <code>lme()</code> function (we also show the fit with the <code>lmer()</code> function, just in case):</p>
+<pre class="r"><code>mod &lt;- lme(Yield ~ Block + Block:Year + Genotype*Year, 
+           random = ~1|Plot/Subplot,
+           data = dataset)
+anova(mod)
+##               numDF denDF  F-value p-value
+## (Intercept)       1   240 7374.988  &lt;.0001
+## Block             3    57    0.241  0.8676
+## Genotype         19    57    2.361  0.0066
+## Year              2   114 3124.566  &lt;.0001
+## Block:Year        6   114    7.192  &lt;.0001
+## Year:Genotype    38   114    2.524  0.0001
+# library(lme4)
+# mod1 &lt;- lmer(Yield ~ Genotype*Year + Block + Block:Year
+#              + (1|Plot) + (1|Subplot), 
+#              data = dataset)</code></pre>
+<p>As we said in our previous post, the above mixed model analyses regards the design as a sort of ‘split-plot in time’ with sub-replicates and it is not necessarily correct, as it assumes that the within-plot correlation is the same for all pairs of observations, regardless of their distance in time. Further analyses might be necessary to assess whether serial correlation structures are necessary.</p>
+<p>Please, also note that the above model works equally well with annual crops, if we repeat the experiment in several years by using exactly the same plots.</p>
+<p>Thanks for reading and happy coding! And … don’t forget to check out my new book!</p>
+<p>Prof. Andrea Onofri<br />
+Department of Agricultural, Food and Environmental Sciences<br />
+University of Perugia (Italy)<br />
+Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<p><a href = "https://www.awin1.com/cread.php?awinmid=26429&awinaffid=2675822&ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src= "../../_Figures/Email_Signature_978-3-032-08199-5.png" align="center" alt="Book cover" class="cover" /></a></p>
+<hr />
+<div id="reference" class="section level1">
+<h1>Reference</h1>
+<ol style="list-style-type: decimal">
+<li>Piepho, H.-P., Büchse, A., Richter, C., 2004. A Mixed Modelling Approach for Randomized Experiments with Repeated Measures. Journal of Agronomy and Crop Science 190, 230–247.</li>
+</ol>
+</div>
+
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Tags</h1>
+        <div class="tags">
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/agricensdata">agricensdata</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/ammi_analysis">ammi_analysis</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/aomisc">aomisc</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/asreml">asreml</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/bayesian_stat">bayesian_stat</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/biplot">biplot</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/blogdown">blogdown</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/book">book</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/boxplot">boxplot</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/case_study">case_study</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/climate_data">climate_data</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/correlation">correlation</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/cva">cva</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/data_management">data_management</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/delta_method">delta_method</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/descriptive_statistics">descriptive_statistics</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/diallel_models">diallel_models</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/dplyr">dplyr</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/drcseedgerm">drcseedgerm</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/drcte">drcte</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/drm">drm</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/emmeans">emmeans</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/error_propagation">error_propagation</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/gge_analysis">gge_analysis</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/ggh4x">ggh4x</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/ggplot">ggplot</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/gls">gls</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/gnlht">gnlht</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/jags">jags</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/linear_models">linear_models</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/lm">lm</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/lmdiallel">lmdiallel</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/lme">lme</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/long_term_experiments">long_term_experiments</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/mcp">mcp</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/meta_analysis">meta_analysis</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/metafor">metafor</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/mixed_models">mixed_models</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/multi_environment_studies">multi_environment_studies</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/multiple_comparisons">multiple_comparisons</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/multivariate_stat">multivariate_stat</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/nlme">nlme</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/nls">nls</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/nonlinear_regression">nonlinear_regression</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/p-values">p-values</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/pca">pca</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/percentiles">percentiles</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/plot">plot</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/qq_plot">qq_plot</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/r">r</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/regression">regression</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/repeated_measures">repeated_measures</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/seed_germination">seed_germination</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/sommer">sommer</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/split_plot">split_plot</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/statforbiology">statforbiology</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/statistical_inference">statistical_inference</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/subsampling">subsampling</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/tidyverse">tidyverse</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/time_to_event_models">time_to_event_models</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/variance">variance</a></span>
+        
+        </div>          
+    </div>
+</div><br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Recent posts</h1>
+        
+            <h1><a href="https://www.statforbiology.com/2026/dealing-with-correlation-in-designed-field-experiments-part-ii/">Dealing with correlation in designed field experiments: part II</a></h1>
+            <time class="has-text-grey-light is-size-7">15 April 2026</time>
+        
+            <h1><a href="https://www.statforbiology.com/2026/dealing-with-correlation-in-designed-field-experiments-part-i/">Dealing with correlation in designed field experiments: part I</a></h1>
+            <time class="has-text-grey-light is-size-7">15 April 2026</time>
+        
+            <h1><a href="https://www.statforbiology.com/2026/mixed-models/">Testing for interactions in nonlinear regression</a></h1>
+            <time class="has-text-grey-light is-size-7">14 February 2026</time>
+        
+            <h1><a href="https://www.statforbiology.com/2026/time_to_event_models/">Fitting time-to-event models with an environmental covariate</a></h1>
+            <time class="has-text-grey-light is-size-7">12 February 2026</time>
+        
+            <h1><a href="https://www.statforbiology.com/2026/mixed-models/">Correcting for multiplicity in the &#39;emmeans&#39; package</a></h1>
+            <time class="has-text-grey-light is-size-7">21 January 2026</time>
+        
+    </div>
+</div>
+    <br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Archives</h1>
+        
+            <a href="https://www.statforbiology.com/archives/2026">2026</a> (5)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2025">2025</a> (7)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2024">2024</a> (4)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2023">2023</a> (12)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2022">2022</a> (7)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2021">2021</a> (15)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2020">2020</a> (13)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2019">2019</a> (7)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2018">2018</a> (2)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2014">2014</a> (1)<br>
+        
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+    </div>
+</div>
+<footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+        <p>
+             <span class="icon is-large"><a href="mailto:andrea.onofri@unipg.it" class="mysocial"><i class="far fa-envelope-open fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://github.com/OnofriAndreaPG/" class="mysocial"><i class="fab fa-github fa-3x"></i></a></span>&nbsp;&nbsp;
+           <span class="icon is-large"><a href="https://twitter.com/onofriandreapg" class="mysocial"><i class="fab fa-twitter fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://www.r-project.org/" class="mysocial"><i class="fab fa-r-project fa-3x"></i></a></span>&nbsp;&nbsp;
+ 
+<br>
+<p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/">Copyright &copy; <a property="dct:title" rel="cc:attributionURL" href="https://www.statforbiology.com/aboutthis/">Fixing the bridge between biologists and statisticians</a> by <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://www.statforbiology.com/about/">Andrea Onofri</a> is licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY-NC-SA 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/sa.svg?ref=chooser-v1"></a> - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a></p>
+            
+</div>
+</footer>
+
+<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+</body>
+</html>

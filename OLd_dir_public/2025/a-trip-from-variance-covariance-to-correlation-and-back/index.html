@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-131792052-1"></script>
+  
+  <script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+  
+    gtag('config', 'UA-131792052-1');
+  </script>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Fixing the bridge between biologists and statisticians  | A trip from variance-covariance to correlation and back</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="https://www.statforbiology.com/css/blog.css" />
+       
+</head>
+<body>
+
+    
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="https://www.statforbiology.com/">Home</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/aboutthis" >About this site</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/tutorials" >Tutorials</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/_Statbook" >Book (Italian)</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/_StatbookEng" >Book (English)</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/rpackages" >R packages</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/recentcourses" >Stat Courses</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/links" >Links</a>
+            <a class="navbar-item" href="https://www.statforbiology.com/about" >About me</a>
+        </div>
+    </nav>
+    
+
+    
+    <section class="hero is-info is-medium">
+        <div class="hero-body" style="background-image: url(https://www.statforbiology.com/img/bg-blog.jpg);">
+            <div class="container has-text-centered">
+                <br>
+                <h1 class="title is-size-1">
+                    
+                        A trip from variance-covariance to correlation and back
+                    
+                </h1>
+                
+            </div>
+        </div>
+    </section>
+
+
+
+<div class="container">
+    <div class="section">
+    
+
+<div class="columns">
+    <div class="column is-9">
+        <div class="tile is-child box">
+          <p class="subtitle is-size-6 has-text-grey-light">
+          Andrea Onofri &middot;&nbsp; Added on January 24, 2025 &middot;
+          <i class="far fa-clock"></i>&nbsp;6 min read 
+          </p><hr/>
+            <div class="content">
+                
+
+
+<p>The variance-covariance and the correlation matrices are two entities that describe the association between the columns of a two-way data matrix. They are very much used, e.g., in agriculture, biology and ecology and they can be easily calculated with base R, as shown in the box below.</p>
+<pre class="r"><code>data(mtcars)
+matr &lt;- mtcars[,1:4]
+
+# Covariances
+Sigma &lt;- cov(matr)
+
+# Correlations
+R &lt;- cor(matr)
+
+Sigma
+##              mpg        cyl       disp        hp
+## mpg    36.324103  -9.172379  -633.0972 -320.7321
+## cyl    -9.172379   3.189516   199.6603  101.9315
+## disp -633.097208 199.660282 15360.7998 6721.1587
+## hp   -320.732056 101.931452  6721.1587 4700.8669
+ r
+R
+##             mpg        cyl       disp         hp
+## mpg   1.0000000 -0.8521620 -0.8475514 -0.7761684
+## cyl  -0.8521620  1.0000000  0.9020329  0.8324475
+## disp -0.8475514  0.9020329  1.0000000  0.7909486
+## hp   -0.7761684  0.8324475  0.7909486  1.0000000</code></pre>
+<p>It is useful to be able to go back and forth from variance-covariance to correlation, without going back to the original data matrix. Let’s consider that the variance-covariance of the two variables X and Y is:</p>
+<p><span class="math display">\[\textrm{cov}(X, Y) = \sum\limits_{i=1}^{n} {(X_i - \hat{X})(Y_i - \hat{Y})}\]</span></p>
+<p>where <span class="math inline">\(\hat{Y}\)</span> and <span class="math inline">\(\hat{X}\)</span> are the means for each variable. The correlation is:</p>
+<p><span class="math display">\[\textrm{cor}(X, Y) = \frac{\textrm{cov}(X, Y)}{\sigma_x \sigma_y} \]</span></p>
+<p>where <span class="math inline">\(\sigma_x\)</span> and <span class="math inline">\(\sigma_y\)</span> are the standard deviations for X and Y.</p>
+<p>The opposite relationship is clear:</p>
+<p><span class="math display">\[ \textrm{cov}(X, Y) = \textrm{cor}(X, Y) \sigma_x \sigma_y\]</span></p>
+<p>Therefore, converting from covariance to correlation is pretty easy. For example, take the covariance between ‘disp’ and ‘mpg’ above (-633.0972), the correlation is:</p>
+<pre class="r"><code>-633.097208 / (sqrt(36.324103) * sqrt(15360.7998))
+## [1] -0.8475514</code></pre>
+<p>On the reverse, if we have the correlation (-0.8521620), the covariance is</p>
+<pre class="r"><code>-0.8475514 * sqrt(36.324103) * sqrt(15360.7998)
+## [1] -633.0972</code></pre>
+<p>If we consider the whole covariance matrix, we have to take each element in this matrix and divide it by the square roots of the diagonal elements in the same column and in the same row (see figure below).</p>
+<p><img src="https://www.casaonofri.it/_Figures/CovarianceCorrelation.png" style="width:95.0%" /></p>
+<p>The question is: how can we do all these calculations in one single step, for all elements in the covariance matrix, to calculate the corresponding correlation matrix?</p>
+<p>If we have some memories of matrix algebra, we might remember that if we take a diagonal matrix of order <span class="math inline">\(n \times n\)</span> and multiply it by a square matrix with the same order, all elements in each column are multiplied by the diagonal element in the corresponding column:</p>
+<p><span class="math display">\[\begin{pmatrix}
+1 &amp; 1 &amp; 1 &amp; 1 \\
+1 &amp; 1 &amp; 1 &amp; 1 \\
+1 &amp; 1 &amp; 1 &amp; 1 \\
+1 &amp; 1 &amp; 1 &amp; 1
+\end{pmatrix}
+\times
+\begin{pmatrix}
+1 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 2 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 3 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 4
+\end{pmatrix}
+=
+\begin{pmatrix}
+1 &amp; 2 &amp; 3 &amp; 4 \\
+1 &amp; 2 &amp; 3 &amp; 4 \\
+1 &amp; 2 &amp; 3 &amp; 4 \\
+1 &amp; 2 &amp; 3 &amp; 4
+\end{pmatrix}\]</span></p>
+<p>If we reverse the order of factors, all elements in each row are multiplied by the diagonal element in the corresponding row:</p>
+<p><span class="math display">\[
+\begin{pmatrix}
+1 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 2 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 3 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 4
+\end{pmatrix}
+\times
+\begin{pmatrix}
+1 &amp; 1 &amp; 1 &amp; 1 \\
+1 &amp; 1 &amp; 1 &amp; 1 \\
+1 &amp; 1 &amp; 1 &amp; 1 \\
+1 &amp; 1 &amp; 1 &amp; 1
+\end{pmatrix}
+=
+\begin{pmatrix}
+1 &amp; 1 &amp; 1 &amp; 1 \\
+2 &amp; 2 &amp; 2 &amp; 2 \\
+3 &amp; 3 &amp; 3 &amp; 3 \\
+4 &amp; 4 &amp; 4 &amp; 4
+\end{pmatrix}
+\]</span></p>
+<p>Therefore, if we take a covariance matrix <span class="math inline">\(\Sigma\)</span> of order <span class="math inline">\(n \times n\)</span> and pre-multiply and post-multiply it for the same diagonal matrix of order <span class="math inline">\(n \times n\)</span>, each element in <span class="math inline">\(\Sigma\)</span> is multiplied by both the diagonal elements in the same row and same column, which is exactly what we are looking for.</p>
+<p>In the code below, we:</p>
+<ol style="list-style-type: decimal">
+<li>Create a covariance matrix</li>
+<li>Take the square roots of the diagonal element (standard deviations) and load them in a diagonal matrix</li>
+<li>Invert this diagonal matrix</li>
+<li>Pre-multiply and post-multiply the covariance matrix for this diagonal matrix of inverse standard deviations</li>
+</ol>
+<pre class="r"><code>StDev &lt;- sqrt(diag(Sigma))
+StDevMat &lt;- diag(StDev)
+InvStDev &lt;- solve(StDevMat)
+InvStDev %*% Sigma %*% InvStDev
+##            [,1]       [,2]       [,3]       [,4]
+## [1,]  1.0000000 -0.8521620 -0.8475514 -0.7761684
+## [2,] -0.8521620  1.0000000  0.9020329  0.8324475
+## [3,] -0.8475514  0.9020329  1.0000000  0.7909486
+## [4,] -0.7761684  0.8324475  0.7909486  1.0000000</code></pre>
+<p>Going from correlation to covariance can be done similarly, although, in this case, together with the correlation matrix we also need to have the standard deviations of the original variables, because they are not included in the matrix under transformation:</p>
+<pre class="r"><code>StDevMat %*% R %*% StDevMat
+##             [,1]       [,2]       [,3]      [,4]
+## [1,]   36.324103  -9.172379  -633.0972 -320.7321
+## [2,]   -9.172379   3.189516   199.6603  101.9315
+## [3,] -633.097208 199.660282 15360.7998 6721.1587
+## [4,] -320.732056 101.931452  6721.1587 4700.8669</code></pre>
+<div id="solutions-with-r" class="section level1">
+<h1>Solutions with R</h1>
+<p>Is there any other solutions for those who are not accustomed to matrix algebra? The easiest way to go from covariance to correlation is to use the <code>cov2cor()</code> function in the ‘stat’ package.</p>
+<pre class="r"><code># From covariance to correlation
+cov2cor(Sigma)
+##             mpg        cyl       disp         hp
+## mpg   1.0000000 -0.8521620 -0.8475514 -0.7761684
+## cyl  -0.8521620  1.0000000  0.9020329  0.8324475
+## disp -0.8475514  0.9020329  1.0000000  0.7909486
+## hp   -0.7761684  0.8324475  0.7909486  1.0000000</code></pre>
+<p>With base R, we can <code>sweep()</code> twice:</p>
+<pre class="r"><code># From covariance to correlation
+sweep(sweep(Sigma, 1, StDev, FUN = &quot;/&quot;), 2, StDev, FUN = &quot;/&quot;)
+##             mpg        cyl       disp         hp
+## mpg   1.0000000 -0.8521620 -0.8475514 -0.7761684
+## cyl  -0.8521620  1.0000000  0.9020329  0.8324475
+## disp -0.8475514  0.9020329  1.0000000  0.7909486
+## hp   -0.7761684  0.8324475  0.7909486  1.0000000
+ r
+# From correlation to covariance
+sweep(sweep(R, 1, StDev, FUN = &quot;*&quot;), 2, StDev, FUN = &quot;*&quot;)
+##              mpg        cyl       disp        hp
+## mpg    36.324103  -9.172379  -633.0972 -320.7321
+## cyl    -9.172379   3.189516   199.6603  101.9315
+## disp -633.097208 199.660282 15360.7998 6721.1587
+## hp   -320.732056 101.931452  6721.1587 4700.8669</code></pre>
+<p>We can also <code>scale()</code> and <code>t()</code> twice, but it looks far less neat:</p>
+<pre class="r"><code># From covariance to correlation
+scale(t(scale(t(Sigma), center = F, scale = StDev)), 
+      center = F, scale = StDev)
+##             mpg        cyl       disp         hp
+## mpg   1.0000000 -0.8521620 -0.8475514 -0.7761684
+## cyl  -0.8521620  1.0000000  0.9020329  0.8324475
+## disp -0.8475514  0.9020329  1.0000000  0.7909486
+## hp   -0.7761684  0.8324475  0.7909486  1.0000000
+## attr(,&quot;scaled:scale&quot;)
+##        mpg        cyl       disp         hp 
+##   6.026948   1.785922 123.938694  68.562868
+ r
+# From correlation to covariance
+scale(t(scale(t(R), center = F, scale = 1/StDev)), 
+      center = F, scale = 1/StDev)
+##              mpg        cyl       disp        hp
+## mpg    36.324103  -9.172379  -633.0972 -320.7321
+## cyl    -9.172379   3.189516   199.6603  101.9315
+## disp -633.097208 199.660282 15360.7998 6721.1587
+## hp   -320.732056 101.931452  6721.1587 4700.8669
+## attr(,&quot;scaled:scale&quot;)
+##         mpg         cyl        disp          hp 
+## 0.165921457 0.559934979 0.008068505 0.014585154</code></pre>
+<p>Just curious whether you young students have some better solution; I am sure you have one! Please, drop me a line!</p>
+<p>Happy coding! And … don’t forget to check out my new book!</p>
+<p>Prof. Andrea Onofri<br />
+Department of Agricultural, Food and Environmental Sciences<br />
+University of Perugia (Italy)<br />
+Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<p><a href = "https://www.awin1.com/cread.php?awinmid=26429&awinaffid=2675822&ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src= "../../_Figures/Email_Signature_978-3-032-08199-5.png" align="center" alt="Book cover" class="cover" /></a></p>
+</div>
+
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Tags</h1>
+        <div class="tags">
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/agricensdata">agricensdata</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/ammi_analysis">ammi_analysis</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/aomisc">aomisc</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/asreml">asreml</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/bayesian_stat">bayesian_stat</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/biplot">biplot</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/blogdown">blogdown</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/book">book</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/boxplot">boxplot</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/case_study">case_study</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/climate_data">climate_data</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/correlation">correlation</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/cva">cva</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/data_management">data_management</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/delta_method">delta_method</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/descriptive_statistics">descriptive_statistics</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/diallel_models">diallel_models</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/dplyr">dplyr</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/drcseedgerm">drcseedgerm</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/drcte">drcte</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/drm">drm</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/emmeans">emmeans</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/error_propagation">error_propagation</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/gge_analysis">gge_analysis</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/ggh4x">ggh4x</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/ggplot">ggplot</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/gls">gls</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/gnlht">gnlht</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/jags">jags</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/linear_models">linear_models</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/lm">lm</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/lmdiallel">lmdiallel</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/lme">lme</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/long_term_experiments">long_term_experiments</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/mcp">mcp</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/meta_analysis">meta_analysis</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/metafor">metafor</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/mixed_models">mixed_models</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/multi_environment_studies">multi_environment_studies</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/multiple_comparisons">multiple_comparisons</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/multivariate_stat">multivariate_stat</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/nlme">nlme</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/nls">nls</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/nonlinear_regression">nonlinear_regression</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/p-values">p-values</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/pca">pca</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/percentiles">percentiles</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/plot">plot</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/qq_plot">qq_plot</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/r">r</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/regression">regression</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/repeated_measures">repeated_measures</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/seed_germination">seed_germination</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/sommer">sommer</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/split_plot">split_plot</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/statforbiology">statforbiology</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/statistical_inference">statistical_inference</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/subsampling">subsampling</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/tidyverse">tidyverse</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/time_to_event_models">time_to_event_models</a></span>
+        
+            <span class="tag"><a href="https://www.statforbiology.com/tags/variance">variance</a></span>
+        
+        </div>          
+    </div>
+</div><br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Recent posts</h1>
+        
+            <h1><a href="https://www.statforbiology.com/2026/dealing-with-correlation-in-designed-field-experiments-part-ii/">Dealing with correlation in designed field experiments: part II</a></h1>
+            <time class="has-text-grey-light is-size-7">15 April 2026</time>
+        
+            <h1><a href="https://www.statforbiology.com/2026/dealing-with-correlation-in-designed-field-experiments-part-i/">Dealing with correlation in designed field experiments: part I</a></h1>
+            <time class="has-text-grey-light is-size-7">15 April 2026</time>
+        
+            <h1><a href="https://www.statforbiology.com/2026/mixed-models/">Testing for interactions in nonlinear regression</a></h1>
+            <time class="has-text-grey-light is-size-7">14 February 2026</time>
+        
+            <h1><a href="https://www.statforbiology.com/2026/time_to_event_models/">Fitting time-to-event models with an environmental covariate</a></h1>
+            <time class="has-text-grey-light is-size-7">12 February 2026</time>
+        
+            <h1><a href="https://www.statforbiology.com/2026/mixed-models/">Correcting for multiplicity in the &#39;emmeans&#39; package</a></h1>
+            <time class="has-text-grey-light is-size-7">21 January 2026</time>
+        
+    </div>
+</div>
+    <br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Archives</h1>
+        
+            <a href="https://www.statforbiology.com/archives/2026">2026</a> (5)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2025">2025</a> (7)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2024">2024</a> (4)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2023">2023</a> (12)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2022">2022</a> (7)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2021">2021</a> (15)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2020">2020</a> (13)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2019">2019</a> (7)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2018">2018</a> (2)<br>
+        
+            <a href="https://www.statforbiology.com/archives/2014">2014</a> (1)<br>
+        
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+    </div>
+</div>
+<footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+        <p>
+             <span class="icon is-large"><a href="mailto:andrea.onofri@unipg.it" class="mysocial"><i class="far fa-envelope-open fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://github.com/OnofriAndreaPG/" class="mysocial"><i class="fab fa-github fa-3x"></i></a></span>&nbsp;&nbsp;
+           <span class="icon is-large"><a href="https://twitter.com/onofriandreapg" class="mysocial"><i class="fab fa-twitter fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://www.r-project.org/" class="mysocial"><i class="fab fa-r-project fa-3x"></i></a></span>&nbsp;&nbsp;
+ 
+<br>
+<p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/">Copyright &copy; <a property="dct:title" rel="cc:attributionURL" href="https://www.statforbiology.com/aboutthis/">Fixing the bridge between biologists and statisticians</a> by <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://www.statforbiology.com/about/">Andrea Onofri</a> is licensed under <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY-NC-SA 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1"><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/sa.svg?ref=chooser-v1"></a> - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a></p>
+            
+</div>
+</footer>
+
+<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+</body>
+</html>
