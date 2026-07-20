@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Andrea Onofri">
+<meta name="dcterms.date" content="2019-01-08">
+
+<title>Some useful equations for nonlinear regression in R – Statforbiology</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-40660c7df68f9134ae342454c17cf2af.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-GPNY1W5GL5"></script>
+
+<script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-GPNY1W5GL5', { 'anonymize_ip': true});
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Statforbiology</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../aboutThis.html"> 
+<span class="menu-text">About this site</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html"> 
+<span class="menu-text">About me</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Posts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../tutorials.html"> 
+<span class="menu-text">Teaching material</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../Rpackages.html"> 
+<span class="menu-text">Companion R Packages</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../links.html"> 
+<span class="menu-text">Useful links</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/OnofriAndreaPG"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://bsky.app/profile/statforbiology.bsky.social"> <i class="bi bi-bluesky" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Some useful equations for nonlinear regression in R</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">nonlinear_regression</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Andrea Onofri </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">January 8, 2019</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p>Biological phenomena are often studied by examining how a numerical variable, usually called the <em>response</em> (e.g., the weight or height of an organism), is affected by another variable, usually called the <em>predictor</em> (e.g., time or fertiliser application rate). These ‘predictor-response’ relationships are commonly described using <strong>models</strong>, which express the response as a mathematical function of the predictor. In general, a model can be written as:</p>
+<p><span class="math display">\[Y = f(X, \theta)\]</span></p>
+<p>where <span class="math inline">\(Y\)</span> is the response, <span class="math inline">\(X\)</span> is the predictor, and <span class="math inline">\(\theta\)</span> is a collection of parameters, usually denoted by symbols, such as the letters of the Roman or Greek alphabet. The element <span class="math inline">\(f\)</span> is the <em>function</em>, which determines the shape of the relationship when plotted on an <em>x–y</em> graph.</p>
+<p>Because mathematical modelling plays such a central role in biology and many other scientific disciplines, biologists need to be familiar with the most important mathematical functions. More importantly, they need to be able to “read” these functions and use their parameters to describe, interpret, and quantify biological processes. With this aim in mind, I have compiled a collection of the mathematical functions most commonly encountered in biology, explaining the meaning of their parameters, with particular emphasis on their biological interpretation rather than their mathematical properties.</p>
+<section id="curve-shapes" class="level1">
+<h1>Curve shapes</h1>
+<p>Functions are often classified according to the shape they exhibit when plotted on an <em>x–y</em> graph. This approach is adopted, for example, in Ratkowsky (1990), and the classification presented below is largely based on that work.</p>
+<ul>
+<li>Polynomials
+<ol type="1">
+<li><a href="#straight-line-function">Straight line function</a></li>
+<li><a href="#quadratic-polynomial-function">Quadratic polynomial function</a></li>
+</ol></li>
+<li>Concave/Convex curves (no inflection)
+<ol type="1">
+<li><a href="#exponential-function">Exponential function</a></li>
+<li><a href="#asymptotic-function">Asymptotic function / Negative exponential function</a></li>
+<li><a href="#power-function">Power curve function</a></li>
+<li><a href="#logarithmic-function">Logarithmic function</a></li>
+<li><a href="#rectangular-hyperbola">Rectangular hyperbola</a></li>
+</ol></li>
+<li>Sigmoidal curves
+<ol type="1">
+<li><a href="#logistic-function">Logistic function</a></li>
+<li><a href="#gompertz-function">Gompertz function</a></li>
+<li><a href="#modified-gompertz-function">Modified Gompertz function</a></li>
+<li><a href="#log-logistic-function">Log-logistic function</a></li>
+<li><a href="#weibull-function-type-1">Weibull (type 1) function</a></li>
+<li><a href="#weibull-function-type-2">Weibull (type 2) function</a></li>
+</ol></li>
+<li>Curves with maxima/minima
+<ol type="1">
+<li><a href="#bragg-function">Bragg function</a></li>
+<li><a href="#lorentz-function">Lorentz function</a></li>
+<li><a href="#beta-function">Beta function</a></li>
+</ol></li>
+</ul>
+<p>have chosen to include a relatively large number of functions, so this post is necessarily rather long. To make navigation easier, you can first inspect Figure 1 to identify the type of curve of interest and then use the links above to jump directly to the corresponding section.</p>
+<p>Throughout this post, <span class="math inline">\(X\)</span> denotes the predictor, <span class="math inline">\(Y\)</span> the response, and the letters of the Roman alphabet (<span class="math inline">\(a\)</span>, <span class="math inline">\(b\)</span>, <span class="math inline">\(c\)</span>, …) the model parameters, which determine the shape of the function.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="nls_usefulEquations_files/figure-html/fig-1-1.png" class="img-fluid figure-img" style="width:95.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: The shapes of the most important functions
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="polynomials" class="level1">
+<h1>Polynomials</h1>
+<p>Polynomials form a class of their own because their flexible shapes allow them to approximate a wide variety of biological processes, at least over a restricted range of the predictor. The mathematical tractation is very simple, but their main limitation is that they cannot describe asymptotic processes, which are extremely common in biology. Moreover, as the polynomial degree increases, their shapes become increasingly complex and often lack a meaningful biological interpretation.</p>
+<section id="straight-line-function" class="level2">
+<h2 class="anchored" data-anchor-id="straight-line-function">Straight-line function</h2>
+<p>The simplest polynomial is the straight line, with equation:</p>
+<p><span class="math display">\[Y = a + bX \qquad\qquad (1)\]</span></p>
+<p>where <span class="math inline">\(a\)</span> is the value of <span class="math inline">\(Y\)</span> when <span class="math inline">\(X = 0\)</span>, and <span class="math inline">\(b\)</span> is the slope, that is, the change in <span class="math inline">\(Y\)</span> associated with a one-unit increase in <span class="math inline">\(X\)</span>. When <span class="math inline">\(b&gt;0\)</span>, <span class="math inline">\(Y\)</span> increases as <span class="math inline">\(X\)</span> increases; when <span class="math inline">\(b&lt;0\)</span>, it decreases.</p>
+<p>Because of their simplicity, straight lines are mainly used to approximate biological responses over a limited range of the predictor.</p>
+</section>
+<section id="quadratic-polynomial-function" class="level2">
+<h2 class="anchored" data-anchor-id="quadratic-polynomial-function">Quadratic polynomial function</h2>
+<p>The quadratic polynomial is described by the equation:</p>
+<p><span class="math display">\[Y = a + bX + cX^2 \qquad\qquad (2)\]</span></p>
+<p>This equation describes a U-shaped curve (a parabola), which may open upwards or downwards depending on the sign of <span class="math inline">\(c\)</span>. If <span class="math inline">\(c&gt;0\)</span>, the parabola opens upwards; otherwise, it opens downwards.</p>
+<p>The parameter <span class="math inline">\(a\)</span> represents the value of <span class="math inline">\(Y\)</span> when <span class="math inline">\(X=0\)</span>, whereas <span class="math inline">\(b\)</span> and <span class="math inline">\(c\)</span> determine how the response changes as the predictor varies. To better understand the role of these parameters, we can examine the first derivative of Eq. (2). In R, this can be obtained with the <code>D()</code> function, which differentiates an expression with respect to a specified variable:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">D</span>(<span class="at">expr =</span> <span class="fu">expression</span>(a <span class="sc">+</span> b<span class="sc">*</span>X <span class="sc">+</span> c<span class="sc">*</span>X<span class="sc">^</span><span class="dv">2</span>), <span class="at">name =</span> <span class="st">"X"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>b + c * (2 * X)</code></pre>
+</div>
+</div>
+<p>The derivative is not constant but varies with the value of <span class="math inline">\(X\)</span> and, in particular, <span class="math inline">\(b\)</span> represent the variation of <span class="math inline">\(Y\)</span> around the point <span class="math inline">\(X = 0\)</span>. The stationary point, that is, the point where the derivative is zero, occurs at:</p>
+<p><span class="math display">\[X_m = -\frac{b}{2c}\]</span></p>
+<p>This point is a <strong>minimum</strong> when <span class="math inline">\(c&gt;0\)</span> and a <strong>maximum</strong> when <span class="math inline">\(c&lt;0\)</span>.</p>
+<p>The corresponding response is</p>
+<p><span class="math display">\[Y_{\textrm{max}} = \frac{4ac-b^2}{4c}\]</span></p>
+<p>In practice, biologists often use only one branch of the parabola to approximate biological responses showing either a concave or a convex trend over a limited range of the predictor.</p>
+</section>
+</section>
+<section id="concaveconvex-curves-no-inflection-points" class="level1">
+<h1>Concave/Convex curves (no inflection points)</h1>
+<section id="exponential-function" class="level2">
+<h2 class="anchored" data-anchor-id="exponential-function">Exponential function</h2>
+<p>The most common parameterisation of an exponential function is:</p>
+<p><span class="math display">\[ Y = a e^{k X} \quad \quad \quad (3) \]</span></p>
+<p>Depending on the sign of <span class="math inline">\(k\)</span>, Eq. 3 describes a concave-up monotonically increasing shape (exponential growth; <span class="math inline">\(k &gt; 0\)</span>) or a concave-up monotonically decreasing shape (exponential decay; <span class="math inline">\(k &lt; 0\)</span>).</p>
+<p>The parameter <span class="math inline">\(a\)</span> represents the value of <span class="math inline">\(Y\)</span> when <span class="math inline">\(X = 0\)</span>, whereas the meaning of <span class="math inline">\(k\)</span> can be understood by considering the first derivative:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">D</span>(<span class="fu">expression</span>(a <span class="sc">*</span> <span class="fu">exp</span>(k <span class="sc">*</span> X)), <span class="st">"X"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>a * (exp(k * X) * k)</code></pre>
+</div>
+</div>
+<p>In algebraic terms, it is:</p>
+<p><span class="math display">\[\frac{dY}{dX} = k \, a \, e^{k \, X} = k \, Y\]</span></p>
+<p>and thus:</p>
+<p><span class="math display">\[\frac{dY}{dX} \frac{1}{Y} = k\]</span></p>
+<p>Therefore, <span class="math inline">\(k\)</span> represents the relative rate of change (increase/decrease), throughout the domain, which is often known in growth analysis as the Relative Growth Rate (RGR).</p>
+<p>Other equivalent parameterisations are:</p>
+<p><span class="math display">\[ Y = e^{d + k X} \quad \quad \quad (4)\]</span></p>
+<p>and:</p>
+<p><span class="math display">\[Y = a  \, b^X \quad \quad \quad (5)\]</span></p>
+<p>Equations 3-5 are equivalent, as can be shown by setting <span class="math inline">\(b = e^k\)</span> and <span class="math inline">\(a = e^d\)</span>:</p>
+<p><span class="math display">\[a \, b^X  = e ^ d  (e^{kX} ) =  a  \, e^{kX}\]</span></p>
+<p>Another, slightly different, parameterisation is commonly used in bioassay studies, mainly to describe exponential decay processes:</p>
+<p><span class="math display">\[ Y = d \exp(-x/e) \quad \quad \quad (6)\]</span></p>
+<p>where <span class="math inline">\(d\)</span> corresponds to <span class="math inline">\(a\)</span> in the previous models and <span class="math inline">\(e = - 1/k\)</span>.</p>
+<p>For all the exponential decay equations presented above, <span class="math inline">\(Y \rightarrow 0\)</span> as <span class="math inline">\(X \rightarrow \infty\)</span>. A lower asymptote, <span class="math inline">\(c \neq 0\)</span>, can be incorporated into Eq. 6 to account for situations in which the response does not approach zero as the predictor tends to infinity:</p>
+<p><span class="math display">\[ Y = c + (d -c) \exp(-x/e) \quad \quad \quad (7)\]</span></p>
+<p>Exponential functions are often used to describe the growth of populations under non-limiting environmental conditions or the degradation of xenobiotics in the environment (first-order degradation kinetics). In both cases, <span class="math inline">\(X\)</span> represents time and is therefore restricted to non-negative values, while <span class="math inline">\(b\)</span> (or, equivalently, <span class="math inline">\(k\)</span>) must be different from zero.</p>
+</section>
+<section id="asymptotic-function" class="level2">
+<h2 class="anchored" data-anchor-id="asymptotic-function">Asymptotic function</h2>
+<p>This function appears in several different parameterisations and is also known as the <em>monomolecular growth</em> function, the <em>Mitscherlich law</em>, or the <em>von Bertalanffy law</em>. Owing to its biological interpretation, the most widely used parameterisation is:</p>
+<p><span class="math display">\[Y = a - (a - b) \, \exp (- m X) \quad \quad \quad (8)\]</span></p>
+<p>It describes a monotonically increasing, concave-down curve approaching a horizontal asymptote as <span class="math inline">\(X\)</span> tends to infinity. The parameter <span class="math inline">\(a\)</span> represents the maximum attainable value of <span class="math inline">\(Y\)</span> (the plateau), while <span class="math inline">\(b\)</span> is the value of <span class="math inline">\(Y\)</span> when <span class="math inline">\(X = 0\)</span> (the initial value). The parameter <span class="math inline">\(m\)</span> is proportional to the rate at which the response approaches the plateau. Indeed, the first derivative is</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">D</span>(<span class="fu">expression</span>(a <span class="sc">-</span> (a <span class="sc">-</span> b) <span class="sc">*</span> <span class="fu">exp</span> (<span class="sc">-</span> m <span class="sc">*</span> X)), <span class="st">"X"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(a - b) * (exp(-m * X) * m)</code></pre>
+</div>
+</div>
+<p>Considering Eq.8, we can write:</p>
+<p><span class="math display">\[\frac{dY}{dX} = m \, (a - Y)\]</span></p>
+<p>and then:</p>
+<p><span class="math display">\[\frac{dY}{dX} \frac{1}{Y} = m \, \frac{(a - Y)}{Y}\]</span></p>
+<p>The previous expression shows that the relative rate of change in the response (the RGR in growth analysis) is not constant, as it is for the exponential function. Instead, it depends on the attained value of <span class="math inline">\(Y\)</span>. In particular, the RGR is greatest at the beginning of the process, when <span class="math inline">\(Y\)</span> is smallest, and gradually approaches zero as <span class="math inline">\(Y\)</span> approaches the plateau <span class="math inline">\(a\)</span>.</p>
+<p>Another closely related parameterisation is often encountered, in which <span class="math inline">\(a\)</span> is replaced by <span class="math inline">\(d\)</span>, <span class="math inline">\(b\)</span> by <span class="math inline">\(c\)</span>, and <span class="math inline">\(m\)</span> by <span class="math inline">\(e = 1/m\)</span>. Some simple algebraic manipulations are also introduced to make the model consistent with the parameterisation commonly adopted for biological assay models:</p>
+<p><span class="math display">\[Y = c + (d - c) \, \left[1 - \exp \left(- \frac{X}{e} \right) \right] \quad \quad \quad (9)\]</span></p>
+<p>In some applications, <span class="math inline">\(m\)</span> is reparameterised through its logarithm to facilitate model fitting:</p>
+<p><span class="math display">\[Y = a - (a - b) \, \exp (- log(f) X) \quad \quad \quad (10)\]</span></p>
+<p>For all these equations, setting <span class="math inline">\(b = 0\)</span> (or equivalently <span class="math inline">\(c = 0\)</span>) yields a curve passing through the origin. In this case, the most common parameterisation is:</p>
+<p><span class="math display">\[Y = a \left[ 1- \exp (- m X) \right] \quad \quad \quad (11)\]</span></p>
+<p>which is known as the <em>negative exponential function</em>.</p>
+<p>The asymptotic function is widely used in biology, not only for growth analysis but also, for example, in weed competition studies. The negative exponential function has also been used to model the absorbed Photosynthetically Active Radiation (<span class="math inline">\(Y = PAR_a\)</span>) as a function of leaf area index (<span class="math inline">\(X = LAI\)</span>). In this context, <span class="math inline">\(a\)</span> represents the incident PAR (<span class="math inline">\(a = PAR_i\)</span>), while <span class="math inline">\(m\)</span> is the light extinction coefficient.</p>
+</section>
+<section id="power-function" class="level2">
+<h2 class="anchored" data-anchor-id="power-function">Power function</h2>
+<p>The power function is also known as <em>Freundlich function</em> or <em>allometric function</em>. The most common parameterisation is:</p>
+<p><span class="math display">\[Y = a \, X^b \quad \quad \quad (12)\]</span></p>
+<p>Its shape is highly flexible and is determined by the value of the parameter <span class="math inline">\(b\)</span> (see Figure 1). When <span class="math inline">\(0 &lt; b &lt; 1\)</span>, the response <span class="math inline">\(Y\)</span> increases with <span class="math inline">\(X\)</span> and the curve is concave down. When <span class="math inline">\(b &lt; 0\)</span>, <span class="math inline">\(Y\)</span> decreases as <span class="math inline">\(X\)</span> increases and the curve is concave up. Finally, when <span class="math inline">\(b &gt; 1\)</span>, <span class="math inline">\(Y\)</span> increases with <span class="math inline">\(X\)</span> and the curve is concave up. These three cases are illustrated in Figure 1 using different colours. The function is defined only for <span class="math inline">\(X &gt; 0\)</span> and has no horizontal asymptote as <span class="math inline">\(X \rightarrow \infty\)</span>.</p>
+<p>The biological interpretation of the parameters <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> is not straightforward. Both influence the slope of the curve, as can be seen by examining the first derivative:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">D</span>(<span class="fu">expression</span>(a <span class="sc">*</span> X<span class="sc">^</span>b), <span class="st">"X"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>a * (X^(b - 1) * b)</code></pre>
+</div>
+</div>
+<p>The power function is mathematically equivalent to an exponential function of <span class="math inline">\(\log(X)\)</span>, since:</p>
+<p><span class="math display">\[a \,X^b = a \, e^{\log( X^b )} = a \, e^{b \, \log(X)}\]</span></p>
+<p>The power function (named as the Freundlich equation) is widely used in agricultural chemistry, for example to model the sorption of xenobiotics in soil. It is also used to describe the relationship between the number of plant species and the sampled area (the species–area relationship).</p>
+</section>
+<section id="logarithmic-function" class="level2">
+<h2 class="anchored" data-anchor-id="logarithmic-function">Logarithmic function</h2>
+<p>This function is linear in <span class="math inline">\(\log(X)\)</span>:</p>
+<p><span class="math display">\[y = a + b \, \log(X) \quad \quad \quad (13)\]</span></p>
+<p>Because of the logarithmic transformation, the function is only defined for <span class="math inline">\(X &gt; 0\)</span>. The parameter <span class="math inline">\(b\)</span> determines the shape of the curve. When <span class="math inline">\(b &gt; 0\)</span>, the response <span class="math inline">\(Y\)</span> increases with <span class="math inline">\(X\)</span> and the curve is concave down. Conversely, when <span class="math inline">\(b &lt; 0\)</span>, <span class="math inline">\(Y\)</span> decreases as <span class="math inline">\(X\)</span> increases and the curve is concave up, as shown in Figure 1.</p>
+<p>The interpretation of the parameters is fairly straightforward. The parameter <span class="math inline">\(a\)</span> is the value of the response when <span class="math inline">\(X = 1\)</span>. Changing <span class="math inline">\(a\)</span> while keeping <span class="math inline">\(b\)</span> constant simply shifts the curve vertically without altering its shape, so that the difference between any two curves remains constant for every value of <span class="math inline">\(X\)</span> (Fig. 2).</p>
+<p>The parameter <span class="math inline">\(b\)</span> controls the slope of the curve and, more specifically, it is equal to the slope at <span class="math inline">\(X = 1\)</span>, as can be seen from the expression for the first derivative:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">D</span>(<span class="fu">expression</span>(a <span class="sc">+</span> b<span class="sc">*</span><span class="fu">log</span>(X)), <span class="st">"X"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>b * (1/X)</code></pre>
+</div>
+</div>
+<p>Changing <span class="math inline">\(b\)</span> while keeping <span class="math inline">\(a\)</span> constant produces curves that all intersect at <span class="math inline">\(X = 1\)</span> (Fig. 2).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="nls_usefulEquations_files/figure-html/fig-2-1.png" class="img-fluid figure-img" style="width:75.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Effects of changing parameter values on the shape of logarithmic curves. The parameter <span class="math inline">\(a\)</span> is 1 for the red curves and 3 for the black curves, while <span class="math inline">\(b\)</span> is 1 for the solid lines (-1 on the right panel) and 0.5 for the dotted lines (-0.5 in the right panel)
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>In biology, logarithmic functions are used, for example, to describe species–area relationships in ecology, enzyme kinetics in biochemistry, and sensory perception in neurobiology.</p>
+</section>
+<section id="rectangular-hyperbola" class="level2">
+<h2 class="anchored" data-anchor-id="rectangular-hyperbola">Rectangular hyperbola</h2>
+<p>The rectangular hyperbola is commonly known as the Michaelis-Menten function and is usually parameterised as</p>
+<p><span class="math display">\[Y = \frac{a \, X} {b + X} \quad \quad \quad (14)\]</span></p>
+<p>The curve is monotonically increasing and concave down, approaching the horizontal asymptote (plateau) <span class="math inline">\(a\)</span>. It passes through the origin of the axes (<span class="math inline">\(Y = 0\)</span> when <span class="math inline">\(X = 0\)</span>). The parameter <span class="math inline">\(b\)</span> is the value of <span class="math inline">\(X\)</span> that produces a response equal to <span class="math inline">\(a/2\)</span>. Indeed,</p>
+<p><span class="math display">\[\frac{a}{2} = \frac{a \,X_{50} } {b + X_{50} }\]</span></p>
+<p>which is readily solved to obtain <span class="math inline">\(X_{50} = b\)</span>.</p>
+<p>The first derivative is:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">D</span>(<span class="fu">expression</span>( (a<span class="sc">*</span>X) <span class="sc">/</span> (b <span class="sc">+</span> X) ), <span class="st">"X"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>a/(b + X) - (a * X)/(b + X)^2</code></pre>
+</div>
+</div>
+<p>From this expression, we can see that the initial slope (at <span class="math inline">\(X = 0\)</span>) is <span class="math inline">\(i = a/b\)</span>.</p>
+<p>Equation 14 is not defined for <span class="math inline">\(X = -b\)</span> and has no biological meaning for <span class="math inline">\(X &lt; -b\)</span>. In most biological applications, however, both <span class="math inline">\(X\)</span> and <span class="math inline">\(b\)</span> are positive.</p>
+<p>An equivalent parameterisation is:</p>
+<p><span class="math display">\[Y = \frac{a \, X} {b + X} = \frac{a}{ \frac{b}{X} + \frac{X}{X}} = \frac{a}{1 + \frac{b}{X}} \quad \quad \quad (15)\]</span></p>
+<p>In this form, the parameters <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> are often replaced by <span class="math inline">\(d\)</span> and <span class="math inline">\(e\)</span>, respectively. Although the response is not defined for <span class="math inline">\(X = 0\)</span>, it tends to zero as <span class="math inline">\(X \rightarrow 0\)</span>.</p>
+<p>Another common parameterisation includes the initial slope <span class="math inline">\(i\)</span> as an explicit parameter because of its biological relevance. This is obtained by dividing both the numerator and denominator by <span class="math inline">\(b\)</span> and noting that <span class="math inline">\(i = a/b\)</span>, so that <span class="math inline">\(b = a/i\)</span>:</p>
+<p><span class="math display">\[Y = \frac{a \, X} {b + X} = \frac{ \frac{a}{b} \, X} {\frac{b}{b} + \frac{X}{b}} = \frac{i \, X}{1 + \frac{i \, X }{a}} \quad \quad \quad (16)\]</span></p>
+<p>The Michaelis-Menten function is widely used in pesticide chemistry, enzyme kinetics (Eq. 14), biological assay models (Eq. 15), and weed competition studies, where it is used to describe crop yield loss as a function of weed density (Eq. 16).</p>
+</section>
+</section>
+<section id="sigmoidal-curves" class="level1">
+<h1>Sigmoidal curves</h1>
+<p>Sigmoidal curves are S-shaped and they may be increasing, decreasing, symmetric or non-symmetric around the inflection point. They are parameterised in countless ways, which may often be confusing. I will show some widespread parameterisations, that are very useful for bioassays or growth studies. All curves can be turned from increasing to decreasing (and vice-versa) by reversing the sign of the <span class="math inline">\(b\)</span> parameter.</p>
+<section id="logistic-function" class="level2">
+<h2 class="anchored" data-anchor-id="logistic-function">Logistic function</h2>
+<p>The logistic curve is derived from the cumulative logistic distribution function. It is symmetric about its inflection point and can be parameterised as:</p>
+<p><span class="math display">\[Y = c + \frac{d - c}{1 + exp(- b (X - e))} \quad \quad \quad (17)\]</span></p>
+<p>where <span class="math inline">\(d\)</span> is the upper asymptote, <span class="math inline">\(c\)</span> is the lower asymptote, <span class="math inline">\(e\)</span> is the value of <span class="math inline">\(X\)</span> at the inflection point, and <span class="math inline">\(b\)</span> is proportional to the slope at the inflection point. Because the curve is symmetric, <span class="math inline">\(e\)</span> also represents the value of <span class="math inline">\(X\)</span> that produces a response halfway between <span class="math inline">\(d\)</span> and <span class="math inline">\(c\)</span> (commonly referred to as the ED50 in biological assays). The parameter <span class="math inline">\(b\)</span> may be either positive or negative and, consequently, the response may either increase or decrease as <span class="math inline">\(X\)</span> increases.</p>
+<p>This equation is known as the four-parameter logistic model. If appropriate, constraints can be imposed on the parameter values. For example, <span class="math inline">\(c\)</span> may be fixed at 0, yielding the three-parameter logistic model. If, in addition, <span class="math inline">\(d\)</span> is fixed at 1, the model reduces to the two-parameter logistic model.</p>
+</section>
+<section id="gompertz-function" class="level2">
+<h2 class="anchored" data-anchor-id="gompertz-function">Gompertz function</h2>
+<p>The Gompertz curve can be parameterised in many different ways. I prefer a parameterisation that closely resembles that of the logistic function:</p>
+<p><span class="math display">\[Y = c + (d - c) \exp \left\{- \exp \left[ - b \, (X - e) \right] \right\} \quad \quad \quad (18)\]</span></p>
+<p>Unlike the logistic function, the Gompertz curve is not symmetric about its inflection point. It exhibits a longer lag phase at the beginning, followed by a progressively steeper increase before gradually approaching the upper asymptote. The parameters have essentially the same interpretation as those of the logistic function, except that <span class="math inline">\(e\)</span>, the abscissa of the inflection point, does not correspond to the value of <span class="math inline">\(X\)</span> producing a response halfway between <span class="math inline">\(c\)</span> and <span class="math inline">\(d\)</span>.</p>
+<p>As with the logistic function, four-, three-, and two-parameter Gompertz models can be obtained by constraining one or both asymptotes. These models are widely used to describe plant growth and many other biological processes.</p>
+</section>
+<section id="modified-gompertz-function" class="level2">
+<h2 class="anchored" data-anchor-id="modified-gompertz-function">Modified Gompertz function</h2>
+<p>We have seen that the logistic curve is symmetric about its inflection point, whereas the Gompertz curve exhibits a longer lag phase at the beginning, followed by a progressively steeper increase. A different asymmetric pattern can be obtained by modifying the Gompertz function as follows:</p>
+<p><span class="math display">\[ Y = c + (d - c) \left\{ 1 - \exp \left\{- \exp \left[ b \, (X - e) \right] \right\} \right\} \quad \quad \quad (19)\]</span></p>
+<p>The resulting curve increases rapidly at the beginning but gradually slows down as it approaches the upper asymptote. As with the logistic and Gompertz functions, one or both asymptotes can be constrained (<span class="math inline">\(d = 1\)</span> and/or <span class="math inline">\(c = 0\)</span>), giving rise to four-, three-, and two-parameter versions of the modified Gompertz model.</p>
+</section>
+<section id="log-logistic-function" class="level2">
+<h2 class="anchored" data-anchor-id="log-logistic-function">Log-logistic function</h2>
+<p>The log-logistic curve is symmetric with respect to <span class="math inline">\(\log(X)\)</span>. A log-normal curve has a very similar shape, although it is used much less frequently. In biological assays (and also in germination studies), the log-logistic function is commonly parameterised as</p>
+<p><span class="math display">\[Y = c + \frac{d - c}{1 + \exp \left\{ - b \left[ \log(X) - \log(e) \right] \right\} } \quad \quad \quad (20)\]</span></p>
+<p>The parameters have the same interpretation as in the logistic function. In particular, <span class="math inline">\(e\)</span> represents the value of <span class="math inline">\(X\)</span> that produces a response halfway between <span class="math inline">\(c\)</span> and <span class="math inline">\(d\)</span> (the ED50). It is easy to show that the above equation is equivalent to</p>
+<p><span class="math display">\[Y = c + \frac{d - c}{1 + \left( \frac{X}{e} \right)^{-b}}\quad \quad \quad (21)\]</span></p>
+<p>Like the logistic function, the log-logistic model can be fitted in four-, three-, or two-parameter versions by constraining one or both asymptotes. It is widely used to describe dose-response relationships in biological assays, seed germination, and crop growth.</p>
+</section>
+<section id="weibull-function-type-1" class="level2">
+<h2 class="anchored" data-anchor-id="weibull-function-type-1">Weibull function (type 1)</h2>
+<p>The Type I Weibull function is the logarithmic counterpart of the Gompertz function, being defined on <span class="math inline">\(\log(X)\)</span> rather than on <span class="math inline">\(X\)</span>. It is parameterised as</p>
+<p><span class="math display">\[ Y = c + (d - c) \exp \left\{- \exp \left[ - b \, (\log(X) - \log(e)) \right] \right\} \quad \quad \quad (22)\]</span></p>
+<p>The parameters have essentially the same interpretation as those of the other sigmoidal functions presented above. In particular, <span class="math inline">\(c\)</span> and <span class="math inline">\(d\)</span> are the lower and upper asymptotes, respectively, while <span class="math inline">\(e\)</span> is the value of <span class="math inline">\(X\)</span> corresponding to the inflection point. Unlike the log-logistic function, however, <span class="math inline">\(e\)</span> does not correspond to the ED50.</p>
+</section>
+<section id="weibull-function-type-2" class="level2">
+<h2 class="anchored" data-anchor-id="weibull-function-type-2">Weibull function (type 2)</h2>
+<p>The Type II Weibull function is closely related to the Type I Weibull function, but it describes a different type of asymmetry, analogous to that of the modified Gompertz function:</p>
+<p><span class="math display">\[ Y = c + (d - c) \left\{ 1 - \exp \left\{- \exp \left[ b \, (\log(X) - \log(e)) \right] \right\} \right\} \quad \quad \quad (23)\]</span></p>
+<p>The parameters have the same interpretation as those of the Type I Weibull function. In particular, <span class="math inline">\(c\)</span> and <span class="math inline">\(d\)</span> are the lower and upper asymptotes, respectively, while <span class="math inline">\(e\)</span> is the value of <span class="math inline">\(X\)</span> at the inflection point. As with the Type I Weibull function, <span class="math inline">\(e\)</span> does not correspond to the ED50. One or both asymptotes may be constrained, giving rise to four-, three-, and two-parameter versions of the model.</p>
+</section>
+</section>
+<section id="curves-with-maximaminima" class="level1">
+<h1>Curves with maxima/minima</h1>
+<p>It is sometimes necessary to describe phenomena where the <span class="math inline">\(Y\)</span> variable reaches a maximum value at a certain level of the <span class="math inline">\(X\)</span> variable, and drops afterwords. For example, growth or germination rates are higher at optimal temperature levels and lower at supra-optimal or sub-optimal temperature levels. Another example relates to bioassays: in some cases, low doses of toxic substances induce a stimulation of growth (hormesis), which needs to be described by an appropriate model. The second order (and higher order) polynomial funcion we have seen earlier is capable of accounting for maxima/minima, but there are a few other interesting functions that may turn out useful in some circumstances.</p>
+<section id="bragg-function" class="level2">
+<h2 class="anchored" data-anchor-id="bragg-function">Bragg function</h2>
+<p>This function is connected to the normal (Gaussian) distribution and has a symmetric shape with a maximum equal to <span class="math inline">\(d\)</span>, that is reached when <span class="math inline">\(X = e\)</span> and two inflection points. In this model, <span class="math inline">\(b\)</span> relates to the slope at the inflection points; the response <span class="math inline">\(Y\)</span> approaches 0 when <span class="math inline">\(X\)</span> approaches <span class="math inline">\(\pm \infty\)</span>:</p>
+<p><span class="math display">\[Y = d \, \exp \left[ - b (X - e)^2 \right] \quad \quad \quad (24)\]</span></p>
+<p>If we would like to have lower asymptotes different from 0, we should add the parameter <span class="math inline">\(c\)</span>, as follows:</p>
+<p><span class="math display">\[Y = c + (d - c) \, \exp \left[ - b (X - e)^2 \right] \quad \quad \quad (25)\]</span></p>
+<p>The two Bragg functions have proven useful in applications relating to the science of carbon materials.</p>
+</section>
+<section id="lorentz-function" class="level2">
+<h2 class="anchored" data-anchor-id="lorentz-function">Lorentz function</h2>
+<p>The Lorentz function is similar to the Bragg function, although it has worse statistical properties (Ratkowsky, 1990). The equation is:</p>
+<p><span class="math display">\[Y = \frac{d} { 1 + b (X - e)^2 } \quad \quad \quad (26)\]</span></p>
+<p>We can also allow for lower asymptotes different from 0, by adding a further parameter:</p>
+<p><span class="math display">\[Y = c + \frac{d - c} { 1 + b (X - e)^2 } \quad \quad \quad (27)\]</span></p>
+</section>
+<section id="beta-function" class="level2">
+<h2 class="anchored" data-anchor-id="beta-function">Beta function</h2>
+<p>The beta function derives from the beta density function and it has been adapted to describe phenomena taking place only within a minimum and a maximum threshold value (threshold model). One typical example is seed germination, where the germination rate (GR, i.e.&nbsp;the inverse of germination time) is 0 below the base temperature level and above the cutoff temperature level. Between these two extremes, the GR increases with temperature up to a maximum level, that is reached at the optimal temperature level.</p>
+<p>The equation is:</p>
+<p><span class="math display">\[ Y = d \,\left\{  \left( \frac{X - X_b}{X_o - X_b} \right) \left( \frac{X_c - X}{X_c - X_o} \right) ^ {\frac{X_c - X_o}{X_o - X_b}} \right\}^b \quad \quad \quad (28)\]</span></p>
+<p>where <span class="math inline">\(d\)</span> is the maximum level for the expected response <span class="math inline">\(Y\)</span>, <span class="math inline">\(X_b\)</span> and <span class="math inline">\(X_c\)</span> are, respectively, the minumum and maximum threshold levels, <span class="math inline">\(X_o\)</span> is the abscissa at the maximum expected response level and <span class="math inline">\(b\)</span> is a shape parameter. The above function is only defined for <span class="math inline">\(X_b &lt; X &lt; X_c\)</span> and it returns 0 elsewhere.</p>
+</section>
+</section>
+<section id="conclusions" class="level1">
+<h1>Conclusions</h1>
+<p>Here we are; I have discussed more almost 30 functions, which are commonly used to model biological processes. These functions can be found in several different parameterisations and flavours; they can also be modified and combined to suit the needs of several disciplines in biology, chemistry and so on. However, this will require another post.</p>
+<p>Thanks for reading! And … don’t forget to check out my new book!</p>
+<p>Prof.&nbsp;Andrea Onofri<br>
+Department of Agricultural, Food and Environmental Sciences<br>
+University of Perugia (Italy)<br>
+Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<p><a href="https://www.awin1.com/cread.php?awinmid=26429&amp;awinaffid=2675822&amp;ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src="../Figures/Email_Signature_978-3-032-08199-5.png" alt="Book cover" class="cover" align="center"></a></p>
+<hr>
+</section>
+<section id="further-readings" class="level1">
+<h1>Further readings</h1>
+<ol type="1">
+<li>Miguez, F., Archontoulis, S., Dokoohaki, H., Glaz, B., Yeater, K.M., 2018. Chapter 15: Nonlinear Regression Models and Applications, in: ACSESS Publications. American Society of Agronomy, Crop Science Society of America, and Soil Science Society of America, Inc.</li>
+<li>Ratkowsky, D.A., 1990. Handbook of nonlinear regression models. Marcel Dekker Inc., New York, USA.</li>
+<li>Ritz, C., Jensen, S. M., Gerhard, D., Streibig, J. C. (2019) Dose-Response Analysis Using R. CRC Press</li>
+</ol>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/www\.statforbiology\.com");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<hr>
+<p><br> Copyright © 2018-2026 by Andrea Onofri is licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1">CC BY 4.0</a> <img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"> <img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"> <img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1"> <img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/sa.svg?ref=chooser-v1"> This site was built with Quarto.</p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

@@ -1,0 +1,779 @@
+---
+title: Some useful equations for nonlinear regression in R
+author: "Andrea Onofri"
+date: 2019-01-08
+categories: 
+   - nonlinear_regression
+tags:   
+   - drm
+   - statforbiology
+   - nls
+aliases:
+   - /articles/usefulequations/index.html
+   - /tags/nonlinear_regression/usefulequations/index.html
+# knitr:
+#   opts_chunk: 
+#    collapse: true
+---
+
+Biological phenomena are often studied by examining how a numerical variable, usually called the *response* (e.g., the weight or height of an organism), is affected by another variable, usually called the *predictor* (e.g., time or fertiliser application rate). These 'predictor-response' relationships are commonly described using **models**, which express the response as a mathematical function of the predictor. In general, a model can be written as:
+
+$$Y = f(X, \theta)$$
+
+where $Y$ is the response, $X$ is the predictor, and $\theta$ is a collection of parameters, usually denoted by symbols, such as the letters of the Roman or Greek alphabet. The element $f$ is the *function*, which determines the shape of the relationship when plotted on an *x–y* graph.
+
+Because mathematical modelling plays such a central role in biology and many other scientific disciplines, biologists need to be familiar with the most important mathematical functions. More importantly, they need to be able to "read" these functions and use their parameters to describe, interpret, and quantify biological processes. With this aim in mind, I have compiled a collection of the mathematical functions most commonly encountered in biology, explaining the meaning of their parameters, with particular emphasis on their biological interpretation rather than their mathematical properties.
+
+# Curve shapes
+
+Functions are often classified according to the shape they exhibit when plotted on an *x–y* graph. This approach is adopted, for example, in Ratkowsky (1990), and the classification presented below is largely based on that work.
+
+-   Polynomials
+    1.  [Straight line function](#straight-line-function)
+    2.  [Quadratic polynomial function](#quadratic-polynomial-function)
+-   Concave/Convex curves (no inflection)
+    1.  [Exponential function](#exponential-function)
+    2.  [Asymptotic function / Negative exponential function](#asymptotic-function)
+    3.  [Power curve function](#power-function)
+    4.  [Logarithmic function](#logarithmic-function)
+    5.  [Rectangular hyperbola](#rectangular-hyperbola)
+-   Sigmoidal curves
+    1.  [Logistic function](#logistic-function)
+    2.  [Gompertz function](#gompertz-function)
+    3.  [Modified Gompertz function](#modified-gompertz-function)
+    4.  [Log-logistic function](#log-logistic-function)
+    5.  [Weibull (type 1) function](#weibull-function-type-1)
+    6.  [Weibull (type 2) function](#weibull-function-type-2)
+-   Curves with maxima/minima
+    1.  [Bragg function](#bragg-function)
+    2.  [Lorentz function](#lorentz-function)
+    3.  [Beta function](#beta-function)
+
+have chosen to include a relatively large number of functions, so this post is necessarily rather long. To make navigation easier, you can first inspect Figure 1 to identify the type of curve of interest and then use the links above to jump directly to the corresponding section.
+
+Throughout this post, $X$ denotes the predictor, $Y$ the response, and the letters of the Roman alphabet ($a$, $b$, $c$, ...) the model parameters, which determine the shape of the function.
+
+```{r}
+#| label: fig-1
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-cap: The shapes of the most important functions
+#| out-width: 95%
+library(statforbiology)
+par(las=3, mfrow=c(4,4))
+
+# Straight line
+a = 1; b =0.4
+par(mai=c(0,0,0.2,0))
+plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
+     main = "Straight line")
+curve(linear.fun(x, a, b), add = T, col = "red")
+curve(linear.fun(x, a+13, -b), add = T, col = "blue")
+box(which = "plot")
+box(which = "figure")
+
+# Polynomial 2
+a = 1; b =0.06; c = 0.04
+plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
+     main = "Quadratic polynomial")
+curve(poly2.fun(x-10, a, b, c), add = T, col = "red")
+curve(poly2.fun(x-10, a, b, -c) + 13, add = T, col = "blue")
+box(which = "plot")
+box(which = "figure")
+
+# Exponential decay/growth
+a = 1; b =0.09
+plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
+     main = "Exponential growth/decay")
+curve(expoGrowth.fun(x, a, b), add = T, col = "red")
+a = 18; b =-0.09
+curve(expoGrowth.fun(x, a, b), add = T, col = "blue")
+box(which = "plot")
+box(which = "figure")
+
+#Asymptotic 
+a = 4; b = 0.22; c = 17
+plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
+     main = "Asymptotic function")
+curve(asymReg.fun(x, a, b, c) , add = T, col = "red")
+box(which = "plot")
+box(which = "figure")
+
+#Negative exponential
+# a = 0.4; c = 17
+# plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
+#      main = "Negative exponential")
+# curve(negExp.fun(x, c, a) , add = T, col = "red")
+# box(which = "plot")
+# box(which = "figure")
+
+
+# Power curves
+a <- 9; b <- 0.3
+plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
+     main = "Power curves")
+curve(powerCurve.fun(x, 4, b) , add = T, col = "red")
+curve(powerCurve.fun(x, 9, -b) , add = T, col = "blue")
+curve(powerCurve.fun(x, 0.06, 2) , add = T, col = "black")
+box(which = "plot")
+box(which = "figure")
+
+# Logarithmic functions
+#b is positive
+a <- 1.99; b <- 4
+plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
+     main = "Logarithmic functions")
+curve(logCurve.fun(x, a, b) , add = T, col = "red")
+a <- 18; b <- -5
+curve(logCurve.fun(x, a, b) , add = T, col = "blue")
+box(which = "plot")
+box(which = "figure")
+
+# Rectangular hyperbola
+i <- 4; A <- 18
+plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
+     main = "Rectangular hyperbola")
+curve(YL.fun(x, i, A) , add = T, col = "red")
+box(which = "plot")
+box(which = "figure")
+
+# Logistic
+c <- 2; d <- 18; b <- 0.7; e <- 15
+plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
+     main = "Logistic growth")
+curve(L4.fun(x, b, c, d, e) , add = T, col = "red")
+box(which = "plot")
+box(which = "figure")
+
+# Gompertz
+c <- 2; d <- 18; b <- 0.7; e <- 15
+plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
+     main = "Gompertz growth")
+curve(G4.fun(x, b, c, d, e) , add = T, col = "red")
+box(which = "plot")
+box(which = "figure")
+
+# modified Gompertz
+c <- 2; d <- 18; b <- 0.7; e <- 15
+plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
+     main = "Modified Gompertz")
+curve(E4.fun(x, b, c, d, e) , add = T, col = "red")
+box(which = "plot")
+box(which = "figure")
+
+# Log-logistic
+c <- 2; d <- 18; b <- 4; e <- 15
+plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
+     main = "Log-logistic")
+curve(LL4.fun(x, b, c, d, e) , add = T, col = "red")
+box(which = "plot")
+box(which = "figure")
+
+# Weibull I
+c <- 2; d <- 18; b <- 4; e <- 15
+plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
+     main = "Weibull type 1")
+curve(W1.4.fun(x, b, c, d, e) , add = T, col = "red")
+box(which = "plot")
+box(which = "figure")
+
+# Weibull II
+c <- 2; d <- 18; b <- 4; e <- 15
+plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
+     main = "Weibull type 2")
+curve(W2.4.fun(x, b, c, d, e) , add = T, col = "red")
+box(which = "plot")
+box(which = "figure")
+
+# Bragg
+b <- 0.04; e <- 15; d <- 17
+plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
+     main = "Bragg function")
+curve(bragg.3.fun(x, b, d, e) , add = T, col = "red")
+box(which = "plot")
+box(which = "figure")
+
+# Lorentz
+b <- 0.04; e <- 15; d <- 17
+plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
+     main = "Lorentz function")
+curve(lorentz.3.fun(x, b, d, e) , add = T, col = "red")
+box(which = "plot")
+box(which = "figure")
+
+# Lorentz
+b <- 2; d <- 17; Xb <- 7; Xo <- 20; Xc <- 25
+plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
+     main = "Beta function")
+curve(beta.fun(x, b, d, Xb, Xo, Xc) , add = T, col = "red")
+box(which = "plot")
+box(which = "figure")
+
+
+# mtext("Tempo (d)", las=1, side=1, outer=T, at=c(0.5), padj=2.3, cex=1.0)
+# mtext("Proporzione di semi germinati", outer=T, side=2, las=0, at=c(0.5), padj=-2.3, cex=1.0)
+```
+
+# Polynomials
+
+Polynomials form a class of their own because their flexible shapes allow them to approximate a wide variety of biological processes, at least over a restricted range of the predictor. The mathematical tractation is very simple, but their main limitation is that they cannot describe asymptotic processes, which are extremely common in biology. Moreover, as the polynomial degree increases, their shapes become increasingly complex and often lack a meaningful biological interpretation.
+
+## Straight-line function {#straight-line-function}
+
+The simplest polynomial is the straight line, with equation:
+
+$$Y = a + bX \qquad\qquad (1)$$
+
+where $a$ is the value of $Y$ when $X = 0$, and $b$ is the slope, that is, the change in $Y$ associated with a one-unit increase in $X$. When $b>0$, $Y$ increases as $X$ increases; when $b<0$, it decreases.
+
+Because of their simplicity, straight lines are mainly used to approximate biological responses over a limited range of the predictor.
+
+## Quadratic polynomial function {#quadratic-polynomial-function}
+
+The quadratic polynomial is described by the equation:
+
+$$Y = a + bX + cX^2 \qquad\qquad (2)$$
+
+This equation describes a U-shaped curve (a parabola), which may open upwards or downwards depending on the sign of $c$. If $c>0$, the parabola opens upwards; otherwise, it opens downwards.
+
+The parameter $a$ represents the value of $Y$ when $X=0$, whereas $b$ and $c$ determine how the response changes as the predictor varies. To better understand the role of these parameters, we can examine the first derivative of Eq. (2). In R, this can be obtained with the `D()` function, which differentiates an expression with respect to a specified variable:
+
+```{r}
+D(expr = expression(a + b*X + c*X^2), name = "X")
+```
+
+The derivative is not constant but varies with the value of $X$ and, in particular, $b$ represent the variation of $Y$ around the point $X = 0$. The stationary point, that is, the point where the derivative is zero, occurs at:
+
+$$X_m = -\frac{b}{2c}$$
+
+This point is a **minimum** when $c>0$ and a **maximum** when $c<0$.
+
+The corresponding response is
+
+$$Y_{\textrm{max}} = \frac{4ac-b^2}{4c}$$
+
+In practice, biologists often use only one branch of the parabola to approximate biological responses showing either a concave or a convex trend over a limited range of the predictor.
+
+# Concave/Convex curves (no inflection points)
+
+## Exponential function {#exponential-function}
+
+The most common parameterisation of an exponential function is:
+
+$$ Y = a e^{k X} \quad \quad \quad (3) $$
+
+Depending on the sign of $k$, Eq. 3 describes a concave-up monotonically increasing shape (exponential growth; $k > 0$) or a concave-up monotonically decreasing shape (exponential decay; $k < 0$).
+
+The parameter $a$ represents the value of $Y$ when $X = 0$, whereas the meaning of $k$ can be understood by considering the first derivative:
+
+```{r}
+D(expression(a * exp(k * X)), "X")
+```
+
+In algebraic terms, it is:
+
+$$\frac{dY}{dX} = k \, a \, e^{k \, X} = k \, Y$$
+
+and thus:
+
+$$\frac{dY}{dX} \frac{1}{Y} = k$$
+
+Therefore, $k$ represents the relative rate of change (increase/decrease), throughout the domain, which is often known in growth analysis as the Relative Growth Rate (RGR).
+
+Other equivalent parameterisations are:
+
+$$ Y = e^{d + k X} \quad \quad \quad (4)$$
+
+and:
+
+$$Y = a  \, b^X \quad \quad \quad (5)$$
+
+Equations 3-5 are equivalent, as can be shown by setting $b = e^k$ and $a = e^d$:
+
+$$a \, b^X  = e ^ d  (e^{kX} ) =  a  \, e^{kX}$$
+
+Another, slightly different, parameterisation is commonly used in bioassay studies, mainly to describe exponential decay processes:
+
+$$ Y = d \exp(-x/e) \quad \quad \quad (6)$$
+
+where $d$ corresponds to $a$ in the previous models and $e = - 1/k$.
+
+For all the exponential decay equations presented above, $Y \rightarrow 0$ as $X \rightarrow \infty$. A lower asymptote, $c \neq 0$, can be incorporated into Eq. 6 to account for situations in which the response does not approach zero as the predictor tends to infinity:
+
+$$ Y = c + (d -c) \exp(-x/e) \quad \quad \quad (7)$$
+
+Exponential functions are often used to describe the growth of populations under non-limiting environmental conditions or the degradation of xenobiotics in the environment (first-order degradation kinetics). In both cases, $X$ represents time and is therefore restricted to non-negative values, while $b$ (or, equivalently, $k$) must be different from zero.
+
+## Asymptotic function {#asymptotic-function}
+
+This function appears in several different parameterisations and is also known as the *monomolecular growth* function, the *Mitscherlich law*, or the *von Bertalanffy law*. Owing to its biological interpretation, the most widely used parameterisation is:
+
+$$Y = a - (a - b) \, \exp (- m X) \quad \quad \quad (8)$$
+
+It describes a monotonically increasing, concave-down curve approaching a horizontal asymptote as $X$ tends to infinity. The parameter $a$ represents the maximum attainable value of $Y$ (the plateau), while $b$ is the value of $Y$ when $X = 0$ (the initial value). The parameter $m$ is proportional to the rate at which the response approaches the plateau. Indeed, the first derivative is
+
+```{r}
+D(expression(a - (a - b) * exp (- m * X)), "X")
+```
+
+Considering Eq.8, we can write:
+
+$$\frac{dY}{dX} = m \, (a - Y)$$
+
+and then:
+
+$$\frac{dY}{dX} \frac{1}{Y} = m \, \frac{(a - Y)}{Y}$$
+
+The previous expression shows that the relative rate of change in the response (the RGR in growth analysis) is not constant, as it is for the exponential function. Instead, it depends on the attained value of $Y$. In particular, the RGR is greatest at the beginning of the process, when $Y$ is smallest, and gradually approaches zero as $Y$ approaches the plateau $a$.
+
+Another closely related parameterisation is often encountered, in which $a$ is replaced by $d$, $b$ by $c$, and $m$ by $e = 1/m$. Some simple algebraic manipulations are also introduced to make the model consistent with the parameterisation commonly adopted for biological assay models:
+
+$$Y = c + (d - c) \, \left[1 - \exp \left(- \frac{X}{e} \right) \right] \quad \quad \quad (9)$$
+
+In some applications, $m$ is reparameterised through its logarithm to facilitate model fitting:
+
+$$Y = a - (a - b) \, \exp (- log(f) X) \quad \quad \quad (10)$$
+
+For all these equations, setting $b = 0$ (or equivalently $c = 0$) yields a curve passing through the origin. In this case, the most common parameterisation is:
+
+$$Y = a \left[ 1- \exp (- m X) \right] \quad \quad \quad (11)$$
+
+which is known as the *negative exponential function*.
+
+The asymptotic function is widely used in biology, not only for growth analysis but also, for example, in weed competition studies. The negative exponential function has also been used to model the absorbed Photosynthetically Active Radiation ($Y = PAR_a$) as a function of leaf area index ($X = LAI$). In this context, $a$ represents the incident PAR ($a = PAR_i$), while $m$ is the light extinction coefficient.
+
+```{r}
+#| eval: false
+#| include: false
+
+# Some notes
+# La seconda parte della funzione dipinge una curva esponenziale
+# decrescente da 0 ad 1
+# se m > 0 e X > 0
+curve(exp(-0.337*x), xlim=c(0,20))
+
+# Posso introdurre un massimo diverso da 1, moltiplicando
+# sempre un esponenziale è ...
+curve(20*exp(-0.337*x), xlim=c(0,20))
+
+# Se introduco un elemento da cui sottrarre diventa una crescita
+curve(20 - 20*exp(-0.337*x), xlim=c(0,20))
+
+# Queste due curve sono identiche
+curve(20-20*(exp(-0.337*x)), xlim=c(0,20))
+curve(20*(1-exp(-0.337*x)), add=T, col = "red")
+
+# Se il secondo elemento è più basso del primo
+# la crescita non parte da 0. Analogamente
+# nella seconda equazione
+curve(20 - 8*(exp(-0.337*x)), xlim=c(0,20))
+curve(12 + 8*(1-exp(-0.337*x)), add=T, col = "red")
+```
+
+## Power function {#power-function}
+
+The power function is also known as *Freundlich function* or *allometric function*. The most common parameterisation is:
+
+$$Y = a \, X^b \quad \quad \quad (12)$$
+
+Its shape is highly flexible and is determined by the value of the parameter $b$ (see Figure 1). When $0 < b < 1$, the response $Y$ increases with $X$ and the curve is concave down. When $b < 0$, $Y$ decreases as $X$ increases and the curve is concave up. Finally, when $b > 1$, $Y$ increases with $X$ and the curve is concave up. These three cases are illustrated in Figure 1 using different colours. The function is defined only for $X > 0$ and has no horizontal asymptote as $X \rightarrow \infty$.
+
+```{r}
+#| eval: false
+#| include: false
+curve(0.1*x^-0.015, from = -1, to = 1)
+```
+
+The biological interpretation of the parameters $a$ and $b$ is not straightforward. Both influence the slope of the curve, as can be seen by examining the first derivative:
+
+```{r}
+D(expression(a * X^b), "X")
+```
+
+The power function is mathematically equivalent to an exponential function of $\log(X)$, since:
+
+$$a \,X^b = a \, e^{\log( X^b )} = a \, e^{b \, \log(X)}$$
+
+The power function (named as the Freundlich equation) is widely used in agricultural chemistry, for example to model the sorption of xenobiotics in soil. It is also used to describe the relationship between the number of plant species and the sampled area (the species–area relationship).
+
+## Logarithmic function {#logarithmic-function}
+
+This function is linear in $\log(X)$:
+
+$$y = a + b \, \log(X) \quad \quad \quad (13)$$
+
+Because of the logarithmic transformation, the function is only defined for $X > 0$. The parameter $b$ determines the shape of the curve. When $b > 0$, the response $Y$ increases with $X$ and the curve is concave down. Conversely, when $b < 0$, $Y$ decreases as $X$ increases and the curve is concave up, as shown in Figure 1.
+
+The interpretation of the parameters is fairly straightforward. The parameter $a$ is the value of the response when $X = 1$. Changing $a$ while keeping $b$ constant simply shifts the curve vertically without altering its shape, so that the difference between any two curves remains constant for every value of $X$ (Fig. 2).
+
+The parameter $b$ controls the slope of the curve and, more specifically, it is equal to the slope at $X = 1$, as can be seen from the expression for the first derivative:
+
+```{r}
+D(expression(a + b*log(X)), "X")
+```
+
+Changing $b$ while keeping $a$ constant produces curves that all intersect at $X = 1$ (Fig. 2).
+
+```{r}
+#| eval: false
+#| include: false
+
+par(mfrow = c(1,2))
+curve(3 + log(x), from = 0, to = 5, xlab = "X", ylab = "Y")
+# curve(2 + log(x), add = T)
+curve(1 + log(x), add = T, col = "red")
+curve(3 + 0.5 * log(x), add = T, lty = 3)
+# curve(2 + 0.5*log(x), add = T)
+curve(1 + 0.5 * log(x), add = T, lty = 3, col = "red")
+
+curve(3 - log(x), from = 0, to = 5, ylim = c(0, 6), xlab = "X", ylab = "Y")
+# curve(2 - log(x), add = T)
+curve(1 - log(x), add = T, col = "red")
+curve(3 - 0.5 * log(x), add = T, lty = 3)
+# curve(2 - 0.5*log(x), add = T)
+curve(1 - 0.5 * log(x), add = T, col = "red", lty = 3)
+
+X <- seq(0,5,by = 0.1)
+3 - log(X) - (1 - log(X))
+```
+
+```{r}
+#| label: fig-2
+#| echo: false
+#| fig-cap: "Effects of changing parameter values on the shape of logarithmic curves. The parameter $a$ is 1 for the red curves and 3 for the black curves, while $b$ is 1 for the solid lines (-1 on the right panel) and 0.5 for the dotted lines (-0.5 in the right panel)"
+#| out-width: "75%"
+
+par(mfrow = c(1,2))
+curve(3 + log(x), from = 0, to = 5, xlab = "X", ylab = "Y")
+# curve(2 + log(x), add = T)
+curve(1 + log(x), add = T, col = "red")
+curve(3 + 0.5 * log(x), add = T, lty = 3)
+# curve(2 + 0.5*log(x), add = T)
+curve(1 + 0.5 * log(x), add = T, lty = 3, col = "red")
+
+curve(3 - log(x), from = 0, to = 5, ylim = c(0, 6), xlab = "X", ylab = "Y")
+# curve(2 - log(x), add = T)
+curve(1 - log(x), add = T, col = "red")
+curve(3 - 0.5 * log(x), add = T, lty = 3)
+# curve(2 - 0.5*log(x), add = T)
+curve(1 - 0.5 * log(x), add = T, col = "red", lty = 3)
+```
+
+In biology, logarithmic functions are used, for example, to describe species–area relationships in ecology, enzyme kinetics in biochemistry, and sensory perception in neurobiology.
+
+## Rectangular hyperbola {#rectangular-hyperbola}
+
+The rectangular hyperbola is commonly known as the Michaelis-Menten function and is usually parameterised as
+
+$$Y = \frac{a \, X} {b + X} \quad \quad \quad (14)$$
+
+The curve is monotonically increasing and concave down, approaching the horizontal asymptote (plateau) $a$. It passes through the origin of the axes ($Y = 0$ when $X = 0$). The parameter $b$ is the value of $X$ that produces a response equal to $a/2$. Indeed,
+
+$$\frac{a}{2} = \frac{a \,X_{50} } {b + X_{50} }$$
+
+which is readily solved to obtain $X_{50} = b$.
+
+The first derivative is:
+
+```{r}
+D(expression( (a*X) / (b + X) ), "X")
+```
+
+From this expression, we can see that the initial slope (at $X = 0$) is $i = a/b$.
+
+Equation 14 is not defined for $X = -b$ and has no biological meaning for $X < -b$. In most biological applications, however, both $X$ and $b$ are positive.
+
+An equivalent parameterisation is:
+
+$$Y = \frac{a \, X} {b + X} = \frac{a}{ \frac{b}{X} + \frac{X}{X}} = \frac{a}{1 + \frac{b}{X}} \quad \quad \quad (15)$$
+
+In this form, the parameters $a$ and $b$ are often replaced by $d$ and $e$, respectively. Although the response is not defined for $X = 0$, it tends to zero as $X \rightarrow 0$.
+
+Another common parameterisation includes the initial slope $i$ as an explicit parameter because of its biological relevance. This is obtained by dividing both the numerator and denominator by $b$ and noting that $i = a/b$, so that $b = a/i$:
+
+$$Y = \frac{a \, X} {b + X} = \frac{ \frac{a}{b} \, X} {\frac{b}{b} + \frac{X}{b}} = \frac{i \, X}{1 + \frac{i \, X }{a}} \quad \quad \quad (16)$$
+
+The Michaelis-Menten function is widely used in pesticide chemistry, enzyme kinetics (Eq. 14), biological assay models (Eq. 15), and weed competition studies, where it is used to describe crop yield loss as a function of weed density (Eq. 16).
+
+```{r}
+#| eval: false
+#| include: false
+#| 
+library(statforbiology)
+X <- c(0, 5, 7, 22, 28, 39, 46, 200)
+Y <- c(12.74, 13.66, 14.11, 14.43, 14.78, 14.86, 14.78, 14.91)
+
+#drm fit
+model <- drm(Y ~ X, fct = MM.2())
+summary(model)
+plot(model, log = "", main = "Michaelis-Menten function", 
+     ylim = c(12, 15))
+
+curve(SSmicmen(x, coef(model)[1], coef(model)[2]), xlim = c(-10, 1))
+mm2.fun <- function(X, b, e) b/(1 + e/X)
+curve(SSmicmen(x, coef(model)[1], coef(model)[2]), xlim = c(0, 1))
+curve(mm2.fun(x, coef(model)[1], coef(model)[2]), add = T, col = "red")
+mm2.fun(0, coef(model)[1], coef(model)[2])
+```
+
+# Sigmoidal curves
+
+Sigmoidal curves are S-shaped and they may be increasing, decreasing, symmetric or non-symmetric around the inflection point. They are parameterised in countless ways, which may often be confusing. I will show some widespread parameterisations, that are very useful for bioassays or growth studies. All curves can be turned from increasing to decreasing (and vice-versa) by reversing the sign of the $b$ parameter.
+
+## Logistic function {#logistic-function}
+
+The logistic curve is derived from the cumulative logistic distribution function. It is symmetric about its inflection point and can be parameterised as:
+
+$$Y = c + \frac{d - c}{1 + exp(- b (X - e))} \quad \quad \quad (17)$$
+
+where $d$ is the upper asymptote, $c$ is the lower asymptote, $e$ is the value of $X$ at the inflection point, and $b$ is proportional to the slope at the inflection point. Because the curve is symmetric, $e$ also represents the value of $X$ that produces a response halfway between $d$ and $c$ (commonly referred to as the ED50 in biological assays). The parameter $b$ may be either positive or negative and, consequently, the response may either increase or decrease as $X$ increases.
+
+This equation is known as the four-parameter logistic model. If appropriate, constraints can be imposed on the parameter values. For example, $c$ may be fixed at 0, yielding the three-parameter logistic model. If, in addition, $d$ is fixed at 1, the model reduces to the two-parameter logistic model.
+
+```{r}
+#| eval: false
+#| include: false
+
+data(beetGrowth)
+
+# nls fit
+model <- nls(weightInf ~ NLS.L3(DAE, b, d, e), data = beetGrowth)
+model.2 <- nls(weightInf ~ NLS.L4(DAE, b, c, d, e), data = beetGrowth)
+model.3 <- nls(weightInf/max(weightInf) ~ NLS.L2(DAE, b, e), data = beetGrowth)
+
+# drm fit
+model <- drm(weightInf ~ DAE, fct = L.3(), data = beetGrowth)
+model.2 <- drm(weightInf ~ DAE, fct = L.4(), data = beetGrowth)
+model.3 <- drm(weightInf/max(weightInf) ~ DAE, fct = DRC.L2(), data = beetGrowth)
+summary(model)
+plot(model, log="", main = "Logistic function")
+```
+
+## Gompertz function {#gompertz-function}
+
+The Gompertz curve can be parameterised in many different ways. I prefer a parameterisation that closely resembles that of the logistic function:
+
+$$Y = c + (d - c) \exp \left\{- \exp \left[ - b \, (X - e) \right] \right\} \quad \quad \quad (18)$$
+
+Unlike the logistic function, the Gompertz curve is not symmetric about its inflection point. It exhibits a longer lag phase at the beginning, followed by a progressively steeper increase before gradually approaching the upper asymptote. The parameters have essentially the same interpretation as those of the logistic function, except that $e$, the abscissa of the inflection point, does not correspond to the value of $X$ producing a response halfway between $c$ and $d$.
+
+As with the logistic function, four-, three-, and two-parameter Gompertz models can be obtained by constraining one or both asymptotes. These models are widely used to describe plant growth and many other biological processes.
+
+```{r}
+#| eval: false
+#| include: false
+# nls fit
+model <- nls(weightFree ~ NLS.G3(DAE, b, d, e), data = beetGrowth)
+model.2 <- nls(weightFree ~ NLS.G4(DAE, b, c, d, e), data = beetGrowth)
+model.3 <- nls(weightFree/max(weightFree) ~ NLS.G2(DAE, b, e), data = beetGrowth)
+
+# drm fit
+model <- drm(weightFree ~ DAE, fct = G.3(), data = beetGrowth)
+model.2 <- drm(weightFree ~ DAE, fct = G.4(), data = beetGrowth)
+model.3 <- drm(weightFree/max(weightFree) ~ DAE, fct = G.2(), data = beetGrowth)
+summary(model)
+plot(model, log="", main = "Gompertz function")
+```
+
+## Modified Gompertz function {#modified-gompertz-function}
+
+We have seen that the logistic curve is symmetric about its inflection point, whereas the Gompertz curve exhibits a longer lag phase at the beginning, followed by a progressively steeper increase. A different asymmetric pattern can be obtained by modifying the Gompertz function as follows:
+
+$$ Y = c + (d - c) \left\{ 1 - \exp \left\{- \exp \left[ b \, (X - e) \right] \right\} \right\} \quad \quad \quad (19)$$
+
+The resulting curve increases rapidly at the beginning but gradually slows down as it approaches the upper asymptote. As with the logistic and Gompertz functions, one or both asymptotes can be constrained ($d = 1$ and/or $c = 0$), giving rise to four-, three-, and two-parameter versions of the modified Gompertz model.
+
+```{r}
+#| eval: false
+#| include: false
+# nls fit
+model <- nls(weightInf ~ NLS.E3(DAE, b, d, e), data = beetGrowth)
+model.2 <- nls(weightFree ~ NLS.E4(DAE, b, c, d, e), data = beetGrowth)
+model.3 <- nls(I(weightFree/max(weightFree)) ~ NLS.E2(DAE, b, e), data = beetGrowth)
+
+
+# drm fit
+model <- drm(weightInf ~ DAE, fct = DRC.E3(), data = beetGrowth)
+model.2 <- drm(weightFree ~ DAE, fct = DRC.E4(), data = beetGrowth)
+model.3 <- drm(weightFree/max(weightFree) ~ DAE, fct = DRC.E2(), data = beetGrowth)
+summary(model)
+plot(model, log="", main = "Modified Gompertz")
+```
+
+## Log-logistic function {#log-logistic-function}
+
+The log-logistic curve is symmetric with respect to $\log(X)$. A log-normal curve has a very similar shape, although it is used much less frequently. In biological assays (and also in germination studies), the log-logistic function is commonly parameterised as
+
+$$Y = c + \frac{d - c}{1 + \exp \left\{ - b \left[ \log(X) - \log(e) \right] \right\} } \quad \quad \quad (20)$$
+
+The parameters have the same interpretation as in the logistic function. In particular, $e$ represents the value of $X$ that produces a response halfway between $c$ and $d$ (the ED50). It is easy to show that the above equation is equivalent to
+
+$$Y = c + \frac{d - c}{1 + \left( \frac{X}{e} \right)^{-b}}\quad \quad \quad (21)$$
+
+Like the logistic function, the log-logistic model can be fitted in four-, three-, or two-parameter versions by constraining one or both asymptotes. It is widely used to describe dose-response relationships in biological assays, seed germination, and crop growth.
+
+```{r}
+#| eval: false
+#| include: false
+brassica <- getAgroData("brassica")
+
+model <- nls(FW ~ NLS.LL4(Dose, b, c, d, e), data = brassica)
+model <- nls(FW ~ NLS.LL3(Dose, b, d, e), data = brassica)
+model <- nls(FW/max(FW) ~ NLS.LL2(Dose, b, e), data = brassica)
+
+model <- drm(FW ~ Dose, fct = LL.4(), data = brassica)
+summary(model)
+plot(model, ylim = c(0,6), main = "Log-logistic function")
+```
+
+## Weibull function (type 1) {#weibull-function-type-1}
+
+The Type I Weibull function is the logarithmic counterpart of the Gompertz function, being defined on $\log(X)$ rather than on $X$. It is parameterised as
+
+$$ Y = c + (d - c) \exp \left\{- \exp \left[ - b \, (\log(X) - \log(e)) \right] \right\} \quad \quad \quad (22)$$
+
+The parameters have essentially the same interpretation as those of the other sigmoidal functions presented above. In particular, $c$ and $d$ are the lower and upper asymptotes, respectively, while $e$ is the value of $X$ corresponding to the inflection point. Unlike the log-logistic function, however, $e$ does not correspond to the ED50.
+
+```{r}
+#| eval: false
+#| include: false
+data(brassica)
+
+model <- nls(FW ~ NLS.W1.4(Dose, b, c, d, e), data = brassica)
+model.2 <- nls(FW ~ NLS.W1.3(Dose, b, d, e), data = brassica)
+model.3 <- nls(FW/max(FW) ~ NLS.W1.2(Dose, b, e), data = brassica)
+
+model <- drm(FW ~ Dose, fct = W1.4(), data = brassica)
+model.2 <- drm(FW ~ Dose, fct = W1.3(), data = brassica)
+model.3 <- drm(FW/max(FW) ~ Dose, fct = W1.2(), data = brassica)
+summary(model)
+plot(model, ylim = c(0,6), main = "Weibull type 1")
+```
+
+## Weibull function (type 2) {#weibull-function-type-2}
+
+The Type II Weibull function is closely related to the Type I Weibull function, but it describes a different type of asymmetry, analogous to that of the modified Gompertz function:
+
+$$ Y = c + (d - c) \left\{ 1 - \exp \left\{- \exp \left[ b \, (\log(X) - \log(e)) \right] \right\} \right\} \quad \quad \quad (23)$$
+
+The parameters have the same interpretation as those of the Type I Weibull function. In particular, $c$ and $d$ are the lower and upper asymptotes, respectively, while $e$ is the value of $X$ at the inflection point. As with the Type I Weibull function, $e$ does not correspond to the ED50. One or both asymptotes may be constrained, giving rise to four-, three-, and two-parameter versions of the model.
+
+```{r}
+#| eval: false
+#| include: false
+data(brassica)
+
+model <- nls(FW ~ NLS.W2.4(Dose, b, c, d, e), data = brassica)
+model.1 <- nls(FW ~ NLS.W2.3(Dose, b, d, e), data = brassica)
+model.2 <- nls(FW/max(FW) ~ NLS.W2.2(Dose, b, e), data = brassica)
+
+model <- drm(FW ~ Dose, fct = W2.4(), data = brassica)
+summary(model)
+plot(model, ylim = c(0,6), main = "Weibull type 2")
+```
+
+# Curves with maxima/minima
+
+It is sometimes necessary to describe phenomena where the $Y$ variable reaches a maximum value at a certain level of the $X$ variable, and drops afterwords. For example, growth or germination rates are higher at optimal temperature levels and lower at supra-optimal or sub-optimal temperature levels. Another example relates to bioassays: in some cases, low doses of toxic substances induce a stimulation of growth (hormesis), which needs to be described by an appropriate model. The second order (and higher order) polynomial funcion we have seen earlier is capable of accounting for maxima/minima, but there are a few other interesting functions that may turn out useful in some circumstances.
+
+## Bragg function {#bragg-function}
+
+This function is connected to the normal (Gaussian) distribution and has a symmetric shape with a maximum equal to $d$, that is reached when $X = e$ and two inflection points. In this model, $b$ relates to the slope at the inflection points; the response $Y$ approaches 0 when $X$ approaches $\pm \infty$:
+
+$$Y = d \, \exp \left[ - b (X - e)^2 \right] \quad \quad \quad (24)$$
+
+If we would like to have lower asymptotes different from 0, we should add the parameter $c$, as follows:
+
+$$Y = c + (d - c) \, \exp \left[ - b (X - e)^2 \right] \quad \quad \quad (25)$$
+
+The two Bragg functions have proven useful in applications relating to the science of carbon materials.
+
+```{r}
+#| eval: false
+#| include: false
+X <- c(5, 10, 15, 20, 25, 30, 35, 40, 45, 50)
+Y1 <- c(0.1, 2, 5.7, 9.3, 19.7, 28.4, 20.3, 6.6, 1.3, 0.1)
+Y2 <- Y1 + 2
+
+# nls fit
+mod.nls <- nls(Y1 ~ NLS.bragg.3(X, b, d, e) )
+mod.nls2 <- nls(Y2 ~ NLS.bragg.4(X, b, c, d, e) )
+
+# drm fit
+mod.drc <- drm(Y1 ~ X, fct = DRC.bragg.3() )
+mod.drc2 <- drm(Y2 ~ X, fct = DRC.bragg.4() )
+plot(mod.drc, ylim = c(0, 30), log = "") 
+plot(mod.drc2, add = T, col = "red")
+```
+
+## Lorentz function {#lorentz-function}
+
+The Lorentz function is similar to the Bragg function, although it has worse statistical properties (Ratkowsky, 1990). The equation is:
+
+$$Y = \frac{d} { 1 + b (X - e)^2 } \quad \quad \quad (26)$$
+
+We can also allow for lower asymptotes different from 0, by adding a further parameter:
+
+$$Y = c + \frac{d - c} { 1 + b (X - e)^2 } \quad \quad \quad (27)$$
+
+```{r}
+#| eval: false
+#| include: false
+X <- c(5, 10, 15, 20, 25, 30, 35, 40, 45, 50)
+Y1 <- c(0.1, 2, 5.7, 9.3, 19.7, 28.4, 20.3, 6.6, 1.3, 0.1)
+Y2 <- Y1 + 2
+
+# nls fit
+mod.nls <- nls(Y1 ~ NLS.lorentz.3(X, b, d, e) )
+mod.nls2 <- nls(Y2 ~ NLS.lorentz.4(X, b, c, d, e) )
+
+# drm fit
+mod.drc <- drm(Y1 ~ X, fct = DRC.lorentz.3() )
+mod.drc2 <- drm(Y2 ~ X, fct = DRC.lorentz.4() )
+plot(mod.drc, ylim = c(0, 30), log = "") 
+plot(mod.drc2, add = T, col = "red")
+```
+
+## Beta function {#beta-function}
+
+The beta function derives from the beta density function and it has been adapted to describe phenomena taking place only within a minimum and a maximum threshold value (threshold model). One typical example is seed germination, where the germination rate (GR, i.e. the inverse of germination time) is 0 below the base temperature level and above the cutoff temperature level. Between these two extremes, the GR increases with temperature up to a maximum level, that is reached at the optimal temperature level.
+
+The equation is:
+
+$$ Y = d \,\left\{  \left( \frac{X - X_b}{X_o - X_b} \right) \left( \frac{X_c - X}{X_c - X_o} \right) ^ {\frac{X_c - X_o}{X_o - X_b}} \right\}^b \quad \quad \quad (28)$$
+
+where $d$ is the maximum level for the expected response $Y$, $X_b$ and $X_c$ are, respectively, the minumum and maximum threshold levels, $X_o$ is the abscissa at the maximum expected response level and $b$ is a shape parameter. The above function is only defined for $X_b < X < X_c$ and it returns 0 elsewhere.
+
+```{r}
+#| eval: false
+#| include: false
+X <- c(1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50)
+Y <- c(0, 0, 0, 7.7, 12.3, 19.7, 22.4, 20.3, 6.6, 0, 0)
+
+model <- nls(Y ~ NLS.beta(X, b, d, Xb, Xo, Xc))
+model <- drm(Y ~ X, fct = DRC.beta())
+summary(model)
+plot(model, log="", main = "Beta function")
+```
+
+# Conclusions
+
+Here we are; I have discussed more almost 30 functions, which are commonly used to model biological processes. These functions can be found in several different parameterisations and flavours; they can also be modified and combined to suit the needs of several disciplines in biology, chemistry and so on. However, this will require another post.
+
+Thanks for reading! And ... don't forget to check out my new book!
+
+Prof. Andrea Onofri\
+Department of Agricultural, Food and Environmental Sciences\
+University of Perugia (Italy)\
+Send comments to: [andrea.onofri\@unipg.it](mailto:andrea.onofri@unipg.it)
+
+<a href = "https://www.awin1.com/cread.php?awinmid=26429&awinaffid=2675822&ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src="/Figures/Email_Signature_978-3-032-08199-5.png" alt="Book cover" class="cover" align="center"/></a>
+
+------------------------------------------------------------------------
+
+# Further readings
+
+1.  Miguez, F., Archontoulis, S., Dokoohaki, H., Glaz, B., Yeater, K.M., 2018. Chapter 15: Nonlinear Regression Models and Applications, in: ACSESS Publications. American Society of Agronomy, Crop Science Society of America, and Soil Science Society of America, Inc.
+2.  Ratkowsky, D.A., 1990. Handbook of nonlinear regression models. Marcel Dekker Inc., New York, USA.
+3.  Ritz, C., Jensen, S. M., Gerhard, D., Streibig, J. C. (2019) Dose-Response Analysis Using R. CRC Press

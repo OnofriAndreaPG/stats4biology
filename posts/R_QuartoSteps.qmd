@@ -1,0 +1,139 @@
+---
+title: 'Migration from Blogdown to Quarto'
+author: "Andrea Onofri"
+date: 2026-07-15
+categories: [R, Quarto]
+---
+
+More than twenty-five years ago, I had the idea that having a website would be a good way to store my teaching and research materials, keep them organised, retrieve them easily, and share them with students and colleagues.
+
+Since then, I have explored a variety of different solutions, ranging from a website written entirely in HTML to content management systems such as Blogger and WordPress. When I discovered the `blogdown` package, it felt both like paradise and like hell. Paradise because it allowed me to combine text and code into attractive webpages; hell because of the difficulties I experienced in shaping the blog to suit my needs and preferences. I have given an account of the initial difficulties
+
+More recently, I decided to migrate to Quarto for two main reasons. First, the theme I had been using had not been updated for quite some time and had started exhibiting odd behaviour under certain circumstances. Second, I wanted to avoid the intrinsic complexity and rigidity of Hugo.
+
+This post is intended as a diary of my migration notes. Its purpose is to help me keep track of the changes I made to my original website and, if necessary, reproduce them should I ever get stuck during the process.
+
+# Step 1: Getting started with 'Quarto'
+
+First, I used the RStudio Quick Start (File\|New project) to create a Quarto blog in a separate project folder from my original blogdown website folder. This was very easy!
+
+# Step 2: Where do I put my posts?
+
+This was also easy and logic: blog posts, as '.qmd' sorce files need to be put in the 'posts' folder.
+
+# Step 3: Where do I put my non-post pages?
+
+My blog also contains static pages, such as articles, tutorials, a project page, links and other stuff. I put the source code for these pages, as .qmd' files in the root project folder so that they could be rendered as '.html' files in the root folder of the website. Tutorials, books or other projects rendered as self-contained website folders, were also put in the root project folder. All these pages which are not under the 'posts' folder are not listed together with the other post in the home page of the blog, but they are easy to link, considering that Quarto directly translates the source folder structure into the website URL structure. However, static folders need to be listed as 'resources' in the '\_quarto.yml' configuration file, as shown below.
+
+```         
+project:
+  type: website
+  resources:
+    - folder1
+    - folder2
+    - folder3
+```
+
+In this vein, I have also added figures and other materials, which I need to link in webpages and posts, to the 'Figure' folder, within the root project folder, by using the markdown syntax that follows.
+
+```         
+![caption](../Figures/logo.jpg)
+```
+
+Alternatively, the `include_graphics()` function in the `knitr` package can be used with increased flexibility.
+
+```{r}
+#| eval: false
+#| include: true
+knitr::include_graphics("../Figures/logo.jpg")
+```
+
+# Step 4: Support for literature citations
+
+Whenever I need to cite literature references in a post or other page, I simply need to refer to the literature file ('.bib') and the the '.csl' file in the YAML header of the whole project (\_quarto.yml), e.g., :
+
+```         
+bibliography: myFile.bib
+csl: myStyle.csl
+```
+
+Lately, I can cite by using `pandoc-citeproc`.
+
+# Step 5: Latex equations
+
+While this was initially a problem with 'blogdown', latex equations are natively supported and included in 'quarto', as shown below.
+
+```         
+$$Y = a \, \exp{\left(-b \, t\right)}$$
+```
+
+$$Y = a \, \exp{\left(-b \, t\right)}$$
+
+# Step 6: Creating entries for the navigation bar
+
+This was very simple, as the navigation bar is managed within the '\_quarto.yml' configuration file. For example, for this blog, the navigation bar is defined as follows.
+
+```         
+website:
+  navbar:
+    left:
+      - aboutThis.qmd
+      - about.qmd
+      - text: "Posts"
+        href: index.html
+      - tutorials.qmd
+      - Rpackages.qmd
+      - links.qmd
+    right:  
+      - icon: github
+        href: https://github.com/OnofriAndreaPG
+      - icon: bluesky
+        href: https://bsky.app/profile/statforbiology.bsky.social
+```
+
+# Step 7: Adding an RSS Feed
+
+This was super-easy! An RSS is produced by default, although I wanted to have a second feed containing only posts in one specific category ('R'). What I had to do was to modify the YAML matter on the 'index.qmd' file, which was already available whitin the root project directory, as shown below.
+
+```         
+listing:
+  contents: posts
+  categories: true
+  sort: "date desc"
+  type: default
+  sort-ui: false
+  filter-ui: false
+  feed:
+    categories:
+      - R
+```
+
+My blog is listed on R Bloggers, which receives the feed from '/tags/r/index.xml', while my feed for the R category is now produced as '/index-r.xml'. I did not want to change my subscription to R bloggers, and thus I used the automated script execution to have R copy the RSS feed from '/index-r.xml' to '/tags/r/index.xml', so that the second file is an exact copy of the first one. To do so I had to add the following line to the '\_quarto.yml' configuration file:
+
+```         
+project:
+  type: website
+  post-render:
+    - Rscript copy-feed.R
+```
+
+Finally I crated the R script file 'copy-feed.R' in the root project folder, containing the following functions:
+
+```         
+dir.create("_site/tags/r", recursive = TRUE, showWarnings = FALSE)
+
+file.copy(
+  "_site/index-R.xml",
+  "_site/tags/r/index.xml",
+  overwrite = TRUE
+)
+```
+
+# Step 9 - Google Analytics (6/2/2019)
+
+Also for the new blog, I would like to track the visits I receive. I went to Google Analytics to recover my tracking ID and I added such an information to the '\_quarto.yml' configuration file.
+
+```         
+website:
+  google-analytics: "G-myID"
+```
