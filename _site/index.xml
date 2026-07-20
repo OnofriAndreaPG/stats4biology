@@ -602,7 +602,7 @@ Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it
 </section>
 
  ]]></description>
-  <category>nonlinear_regression</category>
+  <category>nonlinear regression</category>
   <guid>https://www.statforbiology.com/posts/nls_usefulEquations.html</guid>
   <pubDate>Mon, 07 Jan 2019 23:00:00 GMT</pubDate>
 </item>
@@ -734,6 +734,287 @@ title: Homepage title
   <pubDate>Wed, 14 Nov 2018 23:00:00 GMT</pubDate>
 </item>
 <item>
+  <title>The Variance Puzzle: Why Doesn’t R Divide by ‘n’?</title>
+  <dc:creator>Andrea Onofri</dc:creator>
+  <link>https://www.statforbiology.com/posts/Stat_General_VarianceSamplePop.html</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>Teaching Experimental Methodology in master’s courses related to agriculture poses some peculiar challenges. One of them is explaining the difference between <strong>population variance</strong> and <strong>sample variance</strong>.</p>
+<p>Students usually have little difficulty understanding that, since the mean represents the “centre” of a dataset, it is natural to measure the average squared distance of all observations from the mean. Of course, we square the distances because, otherwise, positive and negative deviations would cancel each other out.</p>
+<p>It therefore seems perfectly reasonable that the average squared distance (the <strong>variance</strong>) should be calculated as</p>
+<p><img src="https://latex.codecogs.com/png.latex?%7B%5Csigma%20%5E2%7D%20=%20%5Cfrac%7B%5Csum%5Climits_%7Bi%20=%201%7D%5En%20(%7BX_i%7D%20-%20%5Cmu%20)%5E2%7D%7Bn%7D"></p>
+<p>However, this is <strong>not</strong> what R (or most other statistical software) does. Instead, R divides by <img src="https://latex.codecogs.com/png.latex?n-1">, and at this point students inevitably ask:</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>“Why are you telling me to divide the sum of squares by <img src="https://latex.codecogs.com/png.latex?n-1"> instead of <img src="https://latex.codecogs.com/png.latex?n">? I have <img src="https://latex.codecogs.com/png.latex?n"> squared residuals, not <img src="https://latex.codecogs.com/png.latex?n-1">!”</p>
+</div>
+</div>
+<p>You might think that the answer is obvious. I do not.</p>
+<p>At this stage of the course, variance is introduced within the context of descriptive statistics. The students know nothing yet about probability distributions, sampling, statistical inference, or degrees of freedom. If I were teaching mathematics or statistics, I could impress the class with a formal proof showing that <img src="https://latex.codecogs.com/png.latex?n-1"> is the correct denominator whenever a sample is used to estimate the population variance. That proof can be found in virtually every statistics textbook, and I have reproduced it at the end of this post.</p>
+<p>However, I would never present that proof at this point. It assumes concepts that the students have not yet encountered, such as sampling distributions and standard errors. Moreover, agricultural students are generally not enthusiastic when mathematics becomes too abstract!</p>
+<p>Instead of trying to appear clever, I usually ask myself a different question:</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Can we explain the difference between population variance and sample variance without mentioning degrees of freedom or any other difficult concepts?</p>
+</div>
+</div>
+<p>Here is the approach I usually take.</p>
+<p>Let’s consider a large but finite population—for example, one hectare of maize, containing roughly 70,000 plants. Imagine that we know the yield of every single plant. In R we can simulate such a population by generating random values between 150 and 250 g. (Agricultural students immediately recognise these as realistic values, and at this stage I deliberately avoid discussing probability distributions.)</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">set.seed</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1234</span>)</span>
+<span id="cb1-2">pop <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">runif</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">70000</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">min =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">150</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">max =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">250</span>)</span></code></pre></div></div>
+</div>
+<p>We now have our finite population. Since we know every individual, we can calculate both the population mean and the population variance—that is, the average squared distance of all 70,000 observations from their mean. Notice that I use the equation above, with <img src="https://latex.codecogs.com/png.latex?n"> in the denominator.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(pop) </span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 200.0893</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">sigma2 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sum</span>( ( pop <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(pop) )<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> )<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">70000</span></span>
+<span id="cb4-2">sigma2</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 835.184</code></pre>
+</div>
+</div>
+<p>Now let’s forget about the population. In practice, we would never measure the yield of every plant in a hectare because of limitations in time and resources. Instead, suppose we randomly select just ten plants (agricultural experiments often involve surprisingly small sample sizes!).</p>
+<p>We can obtain such a sample in R by drawing observations from the original population.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1">x <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sample</span>(pop, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>)</span>
+<span id="cb6-2">x</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] 174.0269 239.5843 209.6669 222.3267 160.7107 229.6837 238.1470 202.0382
+ [9] 249.2965 170.6348</code></pre>
+</div>
+</div>
+<p>Using the same formula as before (that is, dividing by <img src="https://latex.codecogs.com/png.latex?n=10">), we calculate the sample mean and sample variance.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(x) </span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 209.6116</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1">sigma2_s <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sum</span>( ( x <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(x) )<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> )<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span> </span>
+<span id="cb10-2">sigma2_s</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 908.6202</code></pre>
+</div>
+</div>
+<p>We do not know the population, only the sample. In the absence of any other information, the most reasonable assumption is that the population resembles the sample. The procedure used to obtain this guess is called an <strong>estimator</strong>, while the resulting value is an <strong>estimate</strong>.</p>
+<p>But is it a good estimator?</p>
+<p>We cannot tell from a single sample. Instead, we need to repeat the sampling process many times and examine how the estimates behave in the long run. An estimator is considered good if, on average, it converges to the true population value.</p>
+<p>Let’s repeat the sampling procedure 10,000 times, each time selecting ten plants and calculating both the sample mean and the sample variance.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1">meanS <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>();</span>
+<span id="cb12-2">varS <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>() </span>
+<span id="cb12-3"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span>(i <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10000</span>){   </span>
+<span id="cb12-4">  x <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sample</span>(pop, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>)   </span>
+<span id="cb12-5">  meanS[i] <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(x)   </span>
+<span id="cb12-6">  varS[i] <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sum</span>( ( x <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(x) )<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> )<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span> </span>
+<span id="cb12-7">  }</span>
+<span id="cb12-8"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(meanS)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 199.9096</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(varS)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 752.4658</code></pre>
+</div>
+</div>
+<p>The average of the 10,000 sample means is 199.91, which is extremely close to the true population mean. Therefore, the sample mean is an <strong>unbiased estimator</strong> of the population mean.</p>
+<p>The average of the 10,000 sample variances, however, is 752.47, which is noticeably smaller than the true population variance. In other words, if we divide by <img src="https://latex.codecogs.com/png.latex?n">, we systematically underestimate the population variance.</p>
+<p>Let’s examine the ratio between the true population variance and the average estimated variance:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">var</span>(pop)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(varS)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1.109945</code></pre>
+</div>
+</div>
+<p>The result is approximately <img src="https://latex.codecogs.com/png.latex?10/9">.</p>
+<p>Therefore, if we</p>
+<ol type="1">
+<li>calculate the sample variance by dividing by <img src="https://latex.codecogs.com/png.latex?n">,</li>
+<li>multiply by <img src="https://latex.codecogs.com/png.latex?n">, and</li>
+<li>divide by <img src="https://latex.codecogs.com/png.latex?n-1">,</li>
+</ol>
+<p>we obtain an estimator that is correct on average.</p>
+<p>This leads to the familiar formula</p>
+<p><img src="https://latex.codecogs.com/png.latex?%7B%5Csigma%20%5E2%7D%20=%20%5Cfrac%7B%5Csum%5Climits_%7Bi%20=%201%7D%5En%20(%7BX_i%7D%20-%20m%20)%5E2%7D%7Bn%20-%201%7D"></p>
+<p>which is exactly the sample variance calculated by R.</p>
+<section id="which-formula-should-we-use" class="level1">
+<h1>Which formula should we use?</h1>
+<p>The answer is easy to remember.</p>
+<ol type="1">
+<li>If we know the entire population, the variance is the average squared deviation from the population mean, so we divide by <img src="https://latex.codecogs.com/png.latex?n">.</li>
+<li>If we only have a random sample and our goal is to estimate the population variance, we divide by <img src="https://latex.codecogs.com/png.latex?n-1">. Otherwise, our estimate will be systematically too small.</li>
+</ol>
+<p>Thanks for reading! And … don’t forget to check out my new book!</p>
+<p>Prof.&nbsp;Andrea Onofri<br>
+Department of Agricultural, Food and Environmental Sciences<br>
+University of Perugia (Italy)<br>
+Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<p><a href="https://www.awin1.com/cread.php?awinmid=26429&amp;awinaffid=2675822&amp;ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src="https://www.statforbiology.com/Figures/Email_Signature_978-3-032-08199-5.png" alt="Book cover" class="cover" align="center"></a></p>
+<hr>
+</section>
+<section id="the-formal-proof-look-how-clever-i-am" class="level1">
+<h1>The formal proof (look how clever I am!)</h1>
+<p>We have a population with mean equal to <img src="https://latex.codecogs.com/png.latex?%5Cmu"> and variance equal to <img src="https://latex.codecogs.com/png.latex?%5Csigma%5E2">. Let’s take a sample with its mean <img src="https://latex.codecogs.com/png.latex?m%20%5Cneq%20%5Cmu"> and <img src="https://latex.codecogs.com/png.latex?m%20-%20%5Cmu%20=%20%5Cvarepsilon">. For the population, we can write:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Csum%5Climits_%7Bi%20=%201%7D%5En%20(X_i%20-%20%5Cmu%20)%5E2%20%20=%20%5Csum%5Climits_%7Bi%20=%201%7D%5En%20(X_%20i%20-%20m%20+%20%5Cvarepsilon)%5E2%20=%20%5Csum%5Climits_%7Bi%20=%201%7D%5En%20(%7BX_i%7D%20-%20m)%5E2%20+%20n%20%5Cvarepsilon%5E2"></p>
+<p>We already see that the sum of squared residuals is higher if we take <img src="https://latex.codecogs.com/png.latex?m"> instead of <img src="https://latex.codecogs.com/png.latex?%5Cmu">, unless <img src="https://latex.codecogs.com/png.latex?%5Cvarepsilon%20=%200">, i.e.&nbsp;<img src="https://latex.codecogs.com/png.latex?m%20=%20%5Cmu">. From the above, we derive</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Csum%5Climits_%7Bi%20=%201%7D%5En%20(X_i%20-%20%5Cmu)%5E2%20=%20%20%5Csum%5Climits_%7Bi%20=%201%7D%5En%20(X_i%20-%20%5Cmu%20)%5E2%20%20-%20n%20(%20%7Bm%20-%20%5Cmu%20%7D%20)%5E2"></p>
+<p>If we consider the first equation above (variance for the population) we have</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Csum%5Climits_%7Bi%20=%201%7D%5En%20(X_i%20-%20%5Cmu)%5E2%20=%20%20n%20%5Csigma%5E2%20-%20n(%20m%20-%20%5Cmu%20%20)%5E2"></p>
+<p>We see that the rightmost term of this equation (<img src="https://latex.codecogs.com/png.latex?n%20(%20m%20-%20%5Cmu%20%20)%5E2"> is the sum of squared distances for the sampling distribution of the mean. That is <img src="https://latex.codecogs.com/png.latex?n"> times the squared standard error. Therefore:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Csum%5Climits_%7Bi%20=%201%7D%5En%20%7B%7B%7B(%7BX_i%7D%20-%20%5Cbar%20X)%7D%5E2%7D%20=%20%7D%20n%7B%5Csigma%20%5E2%7D%20-%20n%5Cleft(%20%7B%5Cfrac%7B%7B%7B%5Csigma%20%5E2%7D%7D%7D%7Bn%7D%7D%20%5Cright)"></p>
+<p>and</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Csum%5Climits_%7Bi%20=%201%7D%5En%20%7B%7B%7B(%7BX_i%7D%20-%20%5Cbar%20X)%7D%5E2%7D%20=%20%7D%20(n%20-%201)%7B%5Csigma%20%5E2%7D"></p>
+<p>Here we go! Indeed:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%20%5Cfrac%7B%5Csum%5Climits_%7Bi%20=%201%7D%5En%20(X_i%20-%20m)%5E2%20%7D%7Bn%20-%201%7D%20=%20%7B%5Csigma%20%5E2%7D"></p>
+
+
+</section>
+
+ ]]></description>
+  <category>Descriptive statistics</category>
+  <guid>https://www.statforbiology.com/posts/Stat_General_VarianceSamplePop.html</guid>
+  <pubDate>Thu, 08 Nov 2018 23:00:00 GMT</pubDate>
+  <media:content url="https://www.statforbiology.com/Figures/VarianceSamplePop.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
   <title>Is R dangerous? Side effects of free software for biologists</title>
   <dc:creator>Andrea Onofri</dc:creator>
   <link>https://www.statforbiology.com/posts/R_TheDangerOfR.html</link>
@@ -743,12 +1024,14 @@ title: Homepage title
 
 
 
-<p>When I started my career in the biological field (it’s almost years ago), only the luckiest of us had access to very advanced statistical software. Licenses were very expensive and it was not easy to convince the boss that they were really necessary: “Why do you need to spend so much money to perform an ANOVA?”. Indeed, simple one-way or two-ways ANOVAs were quite easy to perform and one of the people in my group had already built the appropriate routines for several designs, by using the GW-BASIC language. But I wanted more!</p>
-<p>My agriculture experiments often showed complex designs and split-plot, strip-plot, subsampling and repeated measures/experiments were much more than an exception. I decided to start writing several Quick-BASIC routines to implement those types of ANOVAs on my PC. At the beginning of the ’90s, nonlinear response models became in fashion and I had to programme my first Gauss-Newton optimiser, also with Quick-BASIC. GLMs were not yet widespread among biologists and I mainly relied on stabilising transformations for those cases where the basic assumptions for linear/nonlinear models were not met.</p>
-<p>This ‘poor and humble’ statistical life gave me an undeniable advantage: it forced me into thoroughly studying and understanding the principles of each new technique and algorithm, before I could be able to programme it. I had to become acquainted with all those strange mathematical objects, such as matrices, eigenvalues and determinants, which are not usually a part of the mathematical background of biologists (at least in Italy). And my BASIC routines, once completed, could only do what they were programmed to do; only one specific solution to one specific task, no further options and no odd behaviour. In one sentence: no general solutions.</p>
-<p>Nowadays I have R: it is free and everything is possible and smooth. A few lines of code and I can fit whatever model comes to my mind in a few minutes. I can try several options: which is the best one? Which is the one that makes my data tell the story I would like to tell? Biometry books have changed as well; they have taken a more ‘algorithmic’ approach and math is confined within boxes that may be easily skipped. I have to admit that I frequently skip them: code snippets are more than enough to do the trick and I can also find thousands of them in the Internet. In other words, why should I bother studying such an abstract thing called statistics when I have R?</p>
-<p>Obviously this is just an exaggeration. However, I have the feeling that there might be some drawbacks relating to the availability of such a powerful free software. Biologists (especially students) may mistake studying R for studying stats. I am very much surprised to see how many complex models are fit on these days, with hardly any biological and statistical justifications and with very little care about the basic assumptions that these models make. A few days ago a PhD student at my Department showed me the results of fitting a reduced rank regression to a biological dataset. He was very proud of how he mastered the R coding process: by using the correct option (found after a thorough search over the Internet). He had even managed to avoid a ‘pretty strange’ warning message. Unfortunately, that warning message had been misinterpreted and therefore the analysis was wrong from the very beginning.</p>
-<p>A warning message for all biologists (including myself): R is really wonderful, but it will not necessarily bring to sound data analyses. Let’s use R, but let’s study stats first!</p>
+<p>When I started my career in biology (almost forty years ago), only the luckiest of us had access to advanced statistical software. Licences were very expensive, and it was not easy to convince the boss that they were really necessary: <em>“Why do you need to spend so much money just to perform an ANOVA?”</em> In fact, simple one- or two-way ANOVAs were not difficult to carry out, and one of my colleagues had already written the appropriate routines for several experimental designs using GW-BASIC. But I wanted more!</p>
+<p>My agricultural experiments often involved complex designs. Split-plot, strip-plot, subsampling, and repeated-measures experiments were the rule rather than the exception. I therefore started writing a series of QuickBASIC programs to analyse those designs on my PC. In the early 1990s, nonlinear response models became increasingly popular, and I had to write my first Gauss-Newton optimiser, again in QuickBASIC. Generalised linear models were not yet widely used by biologists, so I mainly relied on variance-stabilising transformations whenever the assumptions of linear or nonlinear models were not met.</p>
+<p>That rather humble statistical life gave me an undeniable advantage: it forced me to study and understand the principles behind every new method and algorithm before I could even think of programming it. I had to become familiar with all those strange mathematical objects—matrices, eigenvalues, determinants—which are not usually part of a biologist’s mathematical background (at least in Italy). And once my BASIC programs were finished, they could do only what they had been programmed to do: solve one specific problem, in one specific way. No additional options, no hidden defaults, no unexpected behaviour. In short, no general-purpose solutions.</p>
+<p>Today I have R. It is free, incredibly powerful, and almost anything is possible. With just a few lines of code, I can fit almost any model that comes to mind in a matter of minutes. I can compare several alternatives: Which one is the best? Which one tells the story I would like my data to tell? Biometry textbooks have changed as well. They have become much more algorithm-oriented, while the mathematics is often confined to boxes that can easily be skipped. I have to admit that I often skip them myself: a few code snippets are usually enough to get the job done, and if they are not, I can find thousands more on the Internet. So why should I bother studying an abstract subject like statistics when I have R?</p>
+<p>Of course, this is an exaggeration. Nevertheless, I sometimes wonder whether the widespread availability of such a powerful free tool has a downside. Biologists—especially students—may mistake learning R for learning statistics. I am often surprised by how many sophisticated models are fitted nowadays with little biological or statistical justification, and with very little attention paid to the assumptions on which those models rely.</p>
+<p>A few days ago, a PhD student in my department proudly showed me the results of a reduced-rank regression fitted to a biological dataset. He was particularly pleased that he had managed to write the correct R code after a long search on the Internet. He had even succeeded in getting rid of a “rather strange” warning message. Unfortunately, he had misunderstood what that warning meant, and the analysis had therefore been incorrect from the very beginning.</p>
+<p>So here is a friendly reminder to all biologists—including myself. R is a wonderful piece of software, but it does not automatically lead to sound statistical analyses.</p>
+<p>Let’s use R—but let’s study stats first!</p>
 <hr>
 <p>Prof.&nbsp;Andrea Onofri<br>
 Department of Agricultural, Food and Environmental Sciences<br>
