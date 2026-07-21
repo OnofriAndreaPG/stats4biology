@@ -22,15 +22,17 @@ knitr::knit_hooks$set(document = function(x){
 })
 ```
 
-Usually, the first step of every nonlinear regression analysis is to select the function $f$, which best describes the phenomenon under study. The next step is to fit this function to the observed data, possibly by using some sort of nonlinear least squares algorithms. In relation to the first task, we have devoted a post to it, which you can find at [https://www.statforbiology.com/posts/nls_usefulequations](https://www.statforbiology.com/posts/nls_usefulequations).
+Usually, the first step of every nonlinear regression analysis is to select the function $f$, which best describes the phenomenon under study. The next step is to fit this function to the observed data, possibly by using some sort of nonlinear least squares algorithms.
+
+In relation to the first task, we have devoted a post to it, which you can find at <https://www.statforbiology.com/posts/nls_usefulequations>.
 
 In relation to the second step, the main problem is that nonlinear least squares algorithms are iterative, in the sense that they start from some initial values of model parameters and repeat a sequence of operations, which continuously improve the initial guesses, until the least squares solution is approximately reached. Quite often, providing initial values for all model parameters becomes a problem; if our guesses are not close enough to least squares estimates, the algorithm may freeze during the estimation process and may not reach convergence. Unfortunately, guessing good initial values for model parameters is not always easy, especially for students and practitioners. This is where self-starters come in handy.
 
 Self-starter functions can automatically calculate initial values for any given dataset and, therefore, they can make nonlinear regression analysis as smooth as linear regression analysis. From a teaching perspective, this means that the transition from linear to nonlinear models is immediate and hassle-free!
 
-In a recent post ([see here](https://www.statforbiology.com/2020/stat_nls_selfstarting/)) I gave detail on how self-starters can be built, both for the `nls()` function in the 'stats' package and for the `drm()` function in the 'drc' package (Ritz et al., 2019). Both `nls()` and `drm()` can be used to fit nonlinear regression models in R and the respective packages already contain several robust self-starting functions. I am a long-time user of both `nls()` and `drm()` and I have little-by-little built a rather wide knowledge base of self-starters for both. I'll describe them in this post; they are available within the package `statforbiology`, that is the accompanying package for this blog.
+In another post ([see here](https://www.statforbiology.com/2020/stat_nls_selfstarting/)) I give detail on how self-starters can be built, both for the `nls()` function in the 'stats' package and for the `drm()` function in the 'drc' package (Ritz et al., 2019). In this post I would like to give an account on the self starting functions that already exist in R, in any of the available packages, such as 'stat', drc, 'nlme' and 'nlraa', as well as on 'statforbiology', which is the accompanying package for this blog.
 
-First of all, we need to install this package (if necessary) and load it, by using the code below.
+First of all, we need to install (if necessary) and load these packages, by using the code below.
 
 ```{r message=FALSE, warning=FALSE}
 # installing package, if not yet available
@@ -40,33 +42,32 @@ First of all, we need to install this package (if necessary) and load it, by usi
 library(statforbiology)
 ```
 
-
 # Functions and curve shapes
 
-Nonlinear regression functions are usually classified according to the shape they show when they are plotted in a XY-graph. Such an approach is taken, e.g., in the great book of Ratkowsky (1990). The following classification is heavily based on that book:
+As in other posts, I have classified linear/nonlinear regression functions according to the shape they show when they are plotted in an *x-y* graph, following the approach taken in Ratkowsky (1990):
 
-- Polynomials
-  1.  [Straight line function](#straight-line-function)
-  2.  [Quadratic polynomial function](#quadratic-polynomial-function)
-- Concave/Convex curves (no inflection)
-  1.  [Exponential function](#exponential-function)
-  2.  [Asymptotic function / Negative exponential function](#asymptotic-function)
-  3.  [Power curve function](#power-function)
-  4.  [Logarithmic function](#logarithmic-function)
-  5.  [Rectangular hyperbola](#rectangular-hyperbola)
-- Sigmoidal curves
-  1.  [Logistic function](#logistic-function)
-  2.  [Gompertz function](#gompertz-function)
-  3.  [Modified Gompertz function](#modified-gompertz-function)
-  4.  [Log-logistic function](#log-logistic-function)
-  5.  [Weibull (type 1) function](#weibull-function-type-1)
-  6.  [Weibull (type 2) function](#weibull-function-type-2)
-- Curves with maxima/minima
-  1.  [Bragg function](#bragg-function)
-  2.  [Lorentz function](#lorentz-function)
-  3.  [Beta function](#beta-function)
+-   Polynomials
+    1.  [Straight line function](#straight-line-function)
+    2.  [Quadratic polynomial function](#quadratic-polynomial-function)
+-   Concave/Convex curves (no inflection)
+    1.  [Exponential function](#exponential-function)
+    2.  [Asymptotic function / Negative exponential function](#asymptotic-function)
+    3.  [Power function](#power-function)
+    4.  [Logarithmic function](#logarithmic-function)
+    5.  [Rectangular hyperbola](#rectangular-hyperbola)
+-   Sigmoidal curves
+    1.  [Logistic function](#logistic-function)
+    2.  [Gompertz function](#gompertz-function)
+    3.  [Modified Gompertz function](#modified-gompertz-function)
+    4.  [Log-logistic function](#log-logistic-function)
+    5.  [Weibull (type 1) function](#weibull-function-type-1)
+    6.  [Weibull (type 2) function](#weibull-function-type-2)
+-   Curves with maxima/minima
+    1.  [Bragg function](#bragg-function)
+    2.  [Lorentz function](#lorentz-function)
+    3.  [Beta function](#beta-function)
 
-Let's go through these functions and see how we can fit them both with 'nls()' and 'drm()', by using the appropriate self-starters. There are many functions and, therefore, the post is rather long... however, you can look at the graph below to spot the function you are interested in and use the link above to reach the relevant part in this web page.
+To make navigation easier, you can first inspect Figure 1 to identify the type of curve of interest and then use the links above to jump directly to the corresponding section.
 
 ```{r echo=FALSE, out.width="95%", fig.cap = "The shapes of the most important functions"}
 par(las=3, mfrow=c(4,4))
@@ -222,107 +223,86 @@ box(which = "figure")
 # mtext("Proporzione di semi germinati", outer=T, side=2, las=0, at=c(0.5), padj=-2.3, cex=1.0)
 ```
 
-------------------------------------------------------------------------
 
 # Polynomials
 
-Polynomials are a group on their own, as they are characterized by very flexible shapes, which can be used to describe several different biological processes. They are simple and, although they may be curvilinear, they are always linear in the parameters and can be fitted by using least squares methods. One disadvantage is that they cannot describe asymptotic processes, which are very common in biology. Furthermore, polynomials are prone to overfitting, as we may be tempted to add terms to improve the fit, with little care for biological realism.
-
-Nowadays, thanks to the wide availability of nonlinear regression algorithms, the use of polynomials has sensibly decreased; linear or quadratic polynomials are mainly used when we want to approximate the observed response within a narrow range of a quantitative predictor. On the other hand, higher order polynomials are very rarely seen, in practice.
-
 ## Straight line function {#straight-line-function}
 
-Among the polynomials, we should cite the straight line. Obviously, this is not a curve, although it deserves to be mentioned here. The equation is:
+The equation is:
 
 $$Y = b_0 + b_1 \, X \quad \quad \quad (1)$$
 
-where $b_0$ is the value of $Y$ when $X = 0$, $b_1$ is the slope, i.e. the increase/decrease in $Y$ for a unit-increase in $X$. The Y increases as X increases when $b_1 > 0$, otherwise it decreases. Straight lines are the most common functions for regression and they are most often used to approximate biological phenomena within a small range for the predictor.
+where $b_0$ is the value of $Y$ when $X = 0$, $b_1$ is the slope, i.e. the increase/decrease in $Y$ for a unit-increase in $X$. In R, linear regression is fitted by using 'lm()'; however, in a couple of cases, I found myself in the need of fitting a polynomial by using nonlinear regression algorithms, although it needs to be clarly stated that this is rather inefficient (as a partial excuse, I should say that some methods for 'drc' objects are rather handy also for linear regression, e.g. to compare regression curves in ANCOVA models). For these unusual cases, we can use the `NLS.linear()` and `DRC.linear()` functions, in the 'statforbiology' package.
+
+### Example 1
+
+Let's consider the 'metamitron' dataset, which is available in 'statforbiology' and describes the degradation of the sugarbeet herbicide metamitron (M) in soil, either alone or in the presence of two co-applied herbicides, i.e. phenmedipham (P) and chloridazon (C). Independent soil samples treated with the four herbicide combinations (i.e. M, MP, MC and MPC) were assayed in eight different times (0, 7, 14, 21, 32, 42, 55 and 67 days after treatment, with three replicates per date) to determine the residual concentration of metamitron. In my book (Onofri, 2026; page 212) I have analysed this dataset by using linear regression, while, in this case, I would like to give an account of how the same model can be fitted with the `drm()` function in the 'drc' package, obtaining the slopes and intercepts for all combinations directly as the output of the `summary()` method.
+
+```{r}
+# Example of fitting four straight lines at once
+library(statforbiology)
+dataset <- getAgroData("metamitron")
+model <- drm(log(Conc) ~ Time, fct = DRC.linear(),
+             curveid = Herbicide, data = dataset)
+summary(model)
+```
+
 
 ## Quadratic polynomial function {#quadratic-polynomial-function}
 
-The quadratic polynomial is:
+The equation is:
 
-$$Y = b_0 + b_1\, X + b_2 \, X^2 \quad \quad \quad (2)$$
+$$Y = a + b\, X + c \, X^2 \quad \quad \quad (2)$$
 
-where $b_0$ is the value of $Y$ when $X = 0$, while $b_1$ and $b_2$, taken separately, lack a clear biological meaning. However, it is interesting to consider the first derivative, which measures the rate at which the value $Y$ changes with respect to the change of $X$. Calculating a derivative may be tricky for biologists; however, we can make use of the available facilities in R, represented by the D() function, which requires an expression as the argument:
+where $b_0$ is the value of $Y$ when $X = 0$, while $b_1$ and $b_2$ relate to the shape of the parabola and to the abscissa of its maximum/minimum value $X_m = - b_1 / 2 b_2$. In the same vein of the straight line function, a second order polynomial can be fitted with the `lm()` function. If necessary, it can also be fitted with `nls()` or `drm()`, by using the functions `NLS.poly2()`, and `DRC.poly2()`.
 
-```{r}
-D(expression(a + b*X + c*X^2), "X")
-```
+### Example 2
 
-We see that the first derivative is not constant, but it changes according to the level of $X$. The stationary point, i.e. the point at which the derivative is zero, is $X_m = - b_1 / 2 b_2$; this point is a maximum when $b_2 > 0$, otherwise it is a minimum.
-
-The maximum/minimum value is:
-
-$$Y_m = \frac{4\,b_0\,b_2 - b_1^2}{4\,b_2}$$
-
-## Polynomial fitting in R
-
-In R, polynomials are fitted by using 'lm()'. In a couple of cases, I found myself in the need of fitting a polynomial by using nonlinear regression with 'nls()' o 'drm()'. I know, this is not efficient..., but some methods for 'drc' objects are rather handy. For these unusual cases, we can use the `NLS.linear()`, `NLS.poly2()`, `DRC.linear()` and `DRC.poly2()` self-starting functions, as available in the 'statforbiology' package. An example of usage is given below: in this case, the polynomial has been used to describe a concave increasing trend.
+The dataset 'waterProductivity' shows the relationship between water productivity in lattuce, as affected by irrigation regime, as determined on a simulated experiment, shaped after Toscano et al (2026). It is expected that the relationship under study might show a maximum value, at an intermediate irrigation regime, which is confirmed by fitting a second order polynomial function. This same analysis could be more efficiently performed by using linear regression.
 
 ```{r}
-X <- seq(5, 50, 5)
-Y <- c(12.6, 74.1, 157.6, 225.5, 303.4, 462.8, 
-       669.9, 805.3, 964.2, 1169)
+library(statforbiology)
+dataset <- getAgroData("waterProductivity")
 
 # nls fit
-model <- nls(Y ~ NLS.poly2(X, a, b, c))
+model <- nls(WP ~ NLS.poly2(Regime, a, b, c),
+             data = dataset)
 
 #drc fit
-model <- drm(Y ~ X, fct = DRC.poly2())
+model <- drm(WP ~ Regime, fct = DRC.poly2(),
+             data = dataset)
 summary(model)
-plot(model, log = "", main = "2nd order polynomial")
+plot(model, log = "", main = "2nd order polynomial",
+     xlab = "Irrigation Regime (% of WC)", ylab = "Water Productivity")
 ```
 
-------------------------------------------------------------------------
 
 # Concave/Convex curves
 
 ## Exponential function {#exponential-function}
 
-The exponential function describes an increasing/decreasing trend, with constant relative rate. The most common equation is:
+The most common equations are:
 
 $$ Y = a  e^{k X} \quad \quad \quad (3) $$
 
-Two additional and equivalent parameterisations are:
 
-$$ Y = a b^X  =  e^{d + k X} \quad \quad \quad (4)$$
+$$ Y = e^{d + k X} \quad \quad \quad (4)$$
+$$Y = a  \, b^X \quad \quad \quad (5)$$
 
-The Equations 3 and the two equations 4 are equivalent, as proved by setting $b = e^k$ e $a = e^d$:
+$$ Y = d \exp(-x/e) \quad \quad \quad (6)$$
 
-$$a  b^X  = a  (e^k)^{X} =  a  e^{kX}$$
+and, for the cases where a lower asymptote $c \neq 0$ is needed:
 
-and:
+$$ Y = c + (d -c) \exp(-x/e) \quad \quad \quad (7)$$
 
-$$a  e^{kX} = e^d \cdot e^{kX} =  e^{d + kX}$$
+Several self-starting functions are available: in the package `statforbiology` you can find `NLS.expoGrowth()`, `NLS.expoDecay()`, `DRC.expoGrowth()` and `DRC.expoDecay()`, which can be used to fit the Equation 3, respectively with 'nls()' and 'drm()'. The 'drc' package also contains the functions `EXD.2()` and `EXD.3()`, which can be used to fit, respectively, the Equations 6 and 7.
 
-The meaning of $a$ is clear: this is the value of $Y$ when $X = 0$. In order to understand the meaning of $k$, we can calculate the first derivative of the exponential function:
+### Example 3
 
-```{r}
-D(expression(a * exp(k * X)), "X")
-```
-
-From there, we see that the ratio of increase/decrease of $Y$ is:
-
-$$ \frac{dY}{dX} = k \, a \, e^{k \, X} = k \, Y$$
-
-That is, the relative ratio of increase/decrease is constant and equal to $k$:
-
-$$ \frac{dY}{dX} \frac{1}{Y} = k$$
-
-$Y$ increases as $X$ increases if $k > 0$ (exponential growth), while it decreases when $k < 0$ (exponential decay). This curve is used to describe the growth of populations in non-limiting environmental conditions, or to describe the degradation of xenobiotics in the environment (first-order degradation kinetic).
-
-Another slightly different parameterisation exists, which is common in bioassay work and it is mainly used as an exponential decay model:
-
-$$ Y = d \exp(-x/e) \quad \quad \quad (5)$$
-
-where $d$ is the same as $a$ in the model above and $e = - 1/k$. For all the aforementioned exponential decay equations $Y \rightarrow 0$ as $X \rightarrow \infty$. In the above curve, a lower asymptote $c \neq 0$ can also be included, for those situations where the phenomenon under study does not approach 0 when the independent variable approaches infinity:
-
-$$ Y = c + (d -c) \exp(-x/e) \quad \quad \quad (6)$$
-
-The exponential function is nonlinear in $k$ and needs to be fitted by using 'nls()' or 'drm()'. Several self-starting functions are available: in the package `statforbiology` you can find `NLS.expoGrowth()`, `NLS.expoDecay()`, `DRC.expoGrowth()` and `DRC.expoDecay()`, which can be used to fit the Equation 3, respectively with 'nls()' and 'drm()'. The 'drc' package also contains the functions `EXD.2()` and `EXD.3()`, which can be used to fit, respectively, the Equations 5 and 6. Examples of usage are given below.
+The 'degradation' data, which are available in the 'statforbiology' package refer to an herbicide degradation experiment, where it is supposed that the drop in concentration over time should follow a first order kinetics, according to an exponential decay function.
 
 ```{r}
+library(statforbiology)
 data(degradation)
 
 # nls fit
@@ -333,83 +313,61 @@ model <- nls(Conc ~ NLS.expoDecay(Time, a, k),
 model <- drm(Conc ~ Time, fct = DRC.expoDecay(),
              data = degradation)
 summary(model)
-plot(model, log = "", main = "Exponential decay", ylim = c(0, 110))
+plot(model, log = "", main = "Exponential decay", ylim = c(0, 110),
+     xlab = "Time (days)", ylab = "Concentration (ng/g)")
 ```
 
-------------------------------------------------------------------------
 
 ## Asymptotic function {#asymptotic-function}
 
-The asymptotic function can be used to model the growth of a population/individual, where $Y$ approaches an horizontal asymptote as $X$ tends to infinity. This function is used in several different parameterisations and it is also known as the monomolecular growth function, the Mitscherlich law or the von Bertalanffy law. Due to its biological meaning, the most widespread parameterisation is:
+The following parameterisations are available:
 
-$$Y = a - (a - b) \, \exp (- c  X) \quad \quad \quad (7)$$
+$$Y = a - (a - b) \, \exp (- m X) \quad \quad \quad (8)$$
 
-where $a$ is the maximum attainable value for $Y$ (plateau), $b$ is the initial $Y$ value (at $X = 0$) and $c$ is proportional to the relative rate of increase for $Y$ when $X$ increases. Indeed, we can see that the first derivative is:
 
-```{r}
-D(expression(a - (a - b) * exp (- c * X)), "X")
-```
+$$Y = c + (d - c) \, \left[1 - \exp \left(- \frac{X}{e} \right) \right] \quad \quad \quad (9)$$
 
-that is, the absolute ratio of increase of $Y$ at a given $X$ is not constant, but depends on the attained value of $Y$:
+$$Y = a - (a - b) \, \exp (- log(f) X) \quad \quad \quad (10)$$
 
-$$ \frac{dY}{dX} = c \, (a - Y)$$
+If we $b = 0$ (or equivalently $c = 0$) in the previous curves we obtain a curve passing through the origin, which is usually named the *negative exponential function* and it is most commonly parameterised as:
 
-If we consider the relative rate of increase of $Y$, we see that:
+$$Y = a \left[ 1- \exp (- m X) \right] \quad \quad \quad (11)$$
 
-$$\frac{dY}{dX} \frac{1}{Y} = c \, \frac{(a - Y)}{Y}$$
+In order to fit the asymptotic function, the 'statforbiology' package contains the self-starting routines `NLS.asymReg()` and `DRC.asymReg()`, which can be used to fit Eq. 8, respectively, with `nls()` and `drm()`. The 'drc' package contains the function `AR.3()` to fit Eq. 9 with 'drm()', while the 'nlme' package contains `SSasymp()` that provides Eq. 10, to be fitted with `nls()`. The negative exponential function can be fitted with `NLS.negExp()`, `DRC.negExp()`, `AR.2()` and `SSasympOrig()`.
 
-It means that the relative rate of increase of $Y$ is maximum at the beginning and approaches 0 when $Y$ approaches the plateau $a$.
+### Example 4
 
-In order to fit the asymptotic function, the 'statforbiology' package contains the self-starting routines `NLS.asymReg()` and `DRC.asymReg()`, which can be used, respectively, with 'nls()' and 'drm()'. The 'drc' package contains the function `AR.3()`, that is a similar parameterisation where $c$ is replaced by $e = 1/c$. The 'nlme' package also contains an alternative parameterisation, named `SSasymp()`, where $c$ is replaced by $\phi_3 = \log(c)$.
-
-Let's see an example.
+In this case we consider a growth curve with where the weight of a crop is measured in different times. The data do not show any visible inflection point and, therefore, an asymptotic regression model is fitted to them.
 
 ```{r}
-X <- c(1, 3, 5, 7, 9, 11, 13, 20)
-Y <- c(8.22, 14.0, 17.2, 16.9, 19.2, 19.6, 19.4, 19.6)
+Time <- c(1, 3, 5, 7, 9, 11, 13, 20)
+Weight <- c(8.22, 14.0, 17.2, 16.9, 19.2, 19.6, 19.4, 19.6)
 
 # nls fit
-model <- nls(Y ~ NLS.asymReg(X, init, m, plateau) )
+model <- nls(Weight ~ NLS.asymReg(Time, b, m, a) )
 
 # drm fit
-model <- drm(Y ~ X, fct = DRC.asymReg())
+model <- drm(Weight ~ Time, fct = DRC.asymReg(names = c("b", "m", "a")))
+summary(model)
 plot(model, log="", main = "Asymptotic regression", 
      ylim = c(0,25), xlim = c(0,20))
 ```
 
-------------------------------------------------------------------------
 
-If we take the asymptotic function and set $b = 0$, we get the negative exponential function:
-
-$$Y = a [1 -  \exp (- c  X) ] \quad \quad \quad (8)$$
-
-This function shows a similar shape as the asymptotic function, but $Y$ is 0 when $X$ is 0 (the curve passes through the origin). It is often used to model the absorbed Photosintetically Active Radiation ($Y = PAR_a$) as a function of Leaf Area Index (X = LAI). In this case, $a$ represents the incident PAR ($a = PAR_i$), and $c$ represents the extinction coefficient.
-
-In order to fit the Equation 8, we can use the self-starters `NLS.negExp()` with 'nls()' and `DRC.negExp()` with 'drm()'; both self-starters are available within the 'statforbiology' package. The 'drc' package contains the function `AR.2()`, where $c$ is replaced by $e = 1/c$. The 'nlme' package also contains an alternative parameterisation, named `SSasympOrig()`, where $c$ is replaced by $\phi_3 = \log(c)$.
-
-------------------------------------------------------------------------
 
 ## Power function {#power-function}
 
-The power function is also known as Freundlich function or allometric function and the most common parameterisation is:
+The most common parameterisation is:
 
-$$Y = a \, X^b \quad \quad \quad (9)$$
+$$Y = a \, X^b \quad \quad \quad (12)$$
+and it is available as the `DRC.powerCurve()` and `NLS.powerCurve()` functions in the 'statforbiology' package.
 
-This curve is perfectly equivalent to an exponential curve on the logarithm of $X$. Indeed:
+### Example 5
 
-$$a\,X^b  = a\, e^{\log( X^b )}  = a\,e^{b \, \log(x)}$$
-
-This curve does not have an asymptote for $X \rightarrow \infty$. The slope (first derivative) of the curve is:
-
-```{r}
-D(expression(a * X^b), "X")
-```
-
-We see that both parameters relate to the 'slope' of the curve and $b$ dictates its shape. If $0 < b < 1$, the response $Y$ increases as $X$ increases and the curve is convex up. If $b < 0$, the curve is concave up and $Y$ decreases as $X$ increases. Otherwise, if $b > 1$, the curve is concave up and $Y$ increases as $X$ increases. The three curve types are shown in Figure 1, above.
-
-The power function (Freundlich equation) is often used in agricultural chemistry, e.g. to model the sorption of xenobiotics in soil. It is also used to model the number of plant species as a function of sampling area (Muller-Dumbois method). The following example uses the `DRC.powerCurve()` and `NLS.powerCurve()` self starters in the 'statforbiology' package to fit a species-area curve.
+The 'speciesArea' dataset in 'statforbiology' was obtained in an experiment aimed at determining the species-area relationship for the weed community in an orange grove. The response is the number of species, while the predictor is the surface of sampled area. 
 
 ```{r}
+library(statforbiology)
 speciesArea <- getAgroData("speciesArea")
 
 #nls fit
@@ -420,35 +378,40 @@ model <- nls(numSpecies ~ NLS.powerCurve(Area, a, b),
 model <- drm(numSpecies ~ Area, fct = DRC.powerCurve(),
              data = speciesArea)
 summary(model)
+plot(model, log="", main = "Power function", 
+     ylab = "Number of weed species", xlab = "Sampled area (m2)")
 ```
 
-------------------------------------------------------------------------
 
 ## Logarithmic function {#logarithmic-function}
 
-This is indeed a linear model on log-transformed $X$:
+It has the following main parameterisation:
 
-$$y = a + b \, \log(X) \quad \quad \quad (10)$$
+$$y = a + b \, \log(X) \quad \quad \quad (13)$$
 
-Due to the logarithmic function, it must be $X > 0$. The parameter $b$ dictates the shape: if $b > 0$, the curve is convex up and $Y$ increases as $X$ increases. If $b < 0$, the curve is concave up and $Y$ decreases as $X$ increases, as shown in Figure 1 above.
+The logarithmic function can be fitted by using 'lm()', by using a log-transformed predictor. If necessary, it can also be fit by using 'nls()' and 'drm()', with the self-starting functions `NLS.logCurve()` and `DRC.logCurve()`, which are available within the 'statforbiology' package.
 
-The logarithmic equation can be fit by using 'lm()'. If necessary, it can also be fit by using 'nls()' and 'drm()': the self-starting functions `NLS.logCurve()` and `DRC.logCurve()` are available within the 'statforbiology' package. We show an example of their usage in the box below.
+### Example 6
+
+In this example we use the 'speciesArea' dataset to fit a logarithm curve, that is also a candidate model to describe species-area curves. In this case, based on the AIC value, we can see that the power function provides a better fit to the observed data.
 
 ```{r}
-X <- c(1,2,4,5,7,12)
-Y <- c(1.97, 2.32, 2.67, 2.71, 2.86, 3.09)
+library(statforbiology)
+speciesArea <- getAgroData("speciesArea")
 
-# lm fit
-model <- lm(Y ~ log(X) )
-
-# nls fit
-model <- nls(Y ~ NLS.logCurve(X, a, b) )
+#nls fit
+model2 <- nls(numSpecies ~ NLS.logCurve(Area, a, b),
+             data = speciesArea)
 
 # drm fit
-model <- drm(Y ~ X, fct = DRC.logCurve() )
+model2 <- drm(numSpecies ~ Area, fct = DRC.logCurve(),
+             data = speciesArea)
+summary(model2)
+plot(model2, log="", main = "Power curve", 
+     ylab = "Number of weed species", xlab = "Sampled area (m2)")
+AIC(model, model2)
 ```
 
-------------------------------------------------------------------------
 
 ## Rectangular hyperbola {#rectangular-hyperbola}
 
