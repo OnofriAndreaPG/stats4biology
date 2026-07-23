@@ -9,7 +9,7 @@
 <meta name="author" content="Andrea Onofri">
 <meta name="dcterms.date" content="2019-01-08">
 
-<title>Some useful equations for nonlinear regression in R – Statforbiology</title>
+<title>Some useful equations for biological processes – Statforbiology</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -214,7 +214,7 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Some useful equations for nonlinear regression in R</h1>
+      <h1 class="title">Some useful equations for biological processes</h1>
                                 <div class="quarto-categories">
                 <div class="quarto-category">nonlinear regression</div>
               </div>
@@ -280,18 +280,19 @@ window.Quarto = {
 <li><a href="#gompertz-function">Gompertz function</a></li>
 <li><a href="#modified-gompertz-function">Modified Gompertz function</a></li>
 <li><a href="#log-logistic-function">Log-logistic function</a></li>
-<li><a href="#weibull-function-type-1">Weibull (type 1) function</a></li>
-<li><a href="#weibull-function-type-2">Weibull (type 2) function</a></li>
+<li><a href="#weibull-function-type-1">Weibull (type-1) function</a></li>
+<li><a href="#weibull-function-type-2">Weibull (type-2) function</a></li>
 </ol></li>
 <li>Curves with maxima/minima
 <ol type="1">
+<li><a href="#brain-function">Peaked sigmoidal function</a></li>
 <li><a href="#bragg-function">Bragg function</a></li>
 <li><a href="#lorentz-function">Lorentz function</a></li>
 <li><a href="#beta-function">Beta function</a></li>
 </ol></li>
 </ul>
-<p>have chosen to include a relatively large number of functions, so this post is necessarily rather long. To make navigation easier, you can first inspect Figure 1 to identify the type of curve of interest and then use the links above to jump directly to the corresponding section.</p>
-<p>Throughout this post, <span class="math inline">\(X\)</span> denotes the predictor, <span class="math inline">\(Y\)</span> the response, and the letters of the Roman alphabet (<span class="math inline">\(a\)</span>, <span class="math inline">\(b\)</span>, <span class="math inline">\(c\)</span>, …) the model parameters, which determine the shape of the function.</p>
+<p>I have chosen to include a relatively large number of functions, so this post is necessarily rather long. To make navigation easier, you can first inspect Figure 1 to identify the type of curve of interest and then use the links above to jump directly to the corresponding section.</p>
+<p>Throughout this post, <span class="math inline">\(X\)</span> denotes the predictor, <span class="math inline">\(Y\)</span> denotes the response, and the letters of the Roman alphabet (<span class="math inline">\(a\)</span>, <span class="math inline">\(b\)</span>, <span class="math inline">\(c\)</span>, …) denote the model parameters, which determine the shape of the function.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-1" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -300,7 +301,7 @@ window.Quarto = {
 <img src="nls_usefulEquations_files/figure-html/fig-1-1.png" class="img-fluid figure-img" style="width:95.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: The shapes of the most important functions
+Figure&nbsp;1: The shapes of the most important functions. The different colors indicate the possible different shapes of the same function, with different parameters. In the case of the Bragg/Lorentz function, the red color indicate the Bragg function and the blue color indicate the Lorentz function (same parameter values).
 </figcaption>
 </figure>
 </div>
@@ -464,9 +465,38 @@ Figure&nbsp;2: Effects of changing parameter values on the shape of logarithmic 
 <p>The Michaelis-Menten function is widely used in pesticide chemistry, enzyme kinetics (Eq. 14), biological assay models (Eq. 15), and weed competition studies, where it is used to describe crop yield loss as a function of weed density (Eq. 16). An example of fitting is shown in another post, <a href="../posts/nls_usefulEquations.html#rectangular-hyperbola">at this link</a>.</p>
 </section>
 </section>
-<section id="sigmoidal-curves" class="level1">
-<h1>Sigmoidal curves</h1>
-<p>Sigmoidal curves are S-shaped and they may be increasing, decreasing, symmetric or non-symmetric around the inflection point. They are parameterised in countless ways, which may often be confusing. I will show some widespread parameterisations, that are very useful for bioassays or growth studies. All curves can be turned from increasing to decreasing (and vice-versa) by reversing the sign of the <span class="math inline">\(b\)</span> parameter.</p>
+<section id="sigmoidal-function" class="level1">
+<h1>Sigmoidal functions</h1>
+<p>Sigmoidal functions are S-shaped, with two horizontal asymptotes (a lower and an upper asymptote) and an inflection point. They can be parameterised in countless ways, which may be confusing when selecting the most appropriate model for a particular biological process. In this post, I will use the parameterisations proposed in Ritz et al (2019), which is very consistent and puts all the curves on the same ground. Furthermore, the fitting properties are good, which contribute to good convergence and reliable estimation.</p>
+<p>For the sake of simplicity, it is useful to recognise that most sigmoidal models belong to one of three basic families, which differ only in the position of the inflection point relative to the two asymptotes:</p>
+<ol type="1">
+<li><strong>Logistic</strong>: the ordinate of the inflection point lies halfway between the lower and upper asymptotes; consequently, the S-shape is symmetric (the concave-up and the concave-down portions ‘mirror’ each other).</li>
+<li><strong>Gompertz</strong>: the ordinate of the inflection point lies closer to the lower asymptote, and, thus, the concave-up portions is ‘shorter’ than the concave-down portion.</li>
+<li><strong>Modified Gompertz</strong>: the ordinate of the inflection point lies closer to the upper asymptote, and, thus, the concave-up portion is ‘longer’ than than the concave-down portion.</li>
+</ol>
+<p>Each of these three equations can describe either increasing or decreasing responses, depending on the sign of one of the model parameters (see below). Their different shapes are compared side by side in Fig. 3.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-3" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="nls_usefulEquations_files/figure-html/fig-3-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: The different shapes of sigmoidal curves based on x: logistic (red lines), Gompertz (blue lines) and modified Gompertz (green lines).
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Each of these three families (logistic, Gompertz and modified Gompertz) can be transformed by replacing <span class="math inline">\(X\)</span> with <span class="math inline">\(\log(X)\)</span>, giving raise to three corresponding families:</p>
+<ol type="1">
+<li><strong>Log-logistic</strong></li>
+<li><strong>Type-I Weibull</strong></li>
+<li><strong>Type-II Weibull</strong></li>
+</ol>
+<p>Like their linear-scale counterparts, these three families can describe either increasing or decreasing responses, depending on the sign of the same model parameter (see below). In the end, we have twelve different sigmoidal functions to choose from. The choice among them depends primarily on the expected symmetry of the response and on whether the predictor is more naturally interpreted on a linear or logarithmic scale.</p>
+<p>Thanks to their versatility, sigmoidal functions have been used for an uncountable number of biological applications. Just to mention a few examples in agriculture, I would like to cite plant growth, dose-response curves in biological assays and the time-course of seed germination. For some examples, take a look at my post <a href="../posts/nls_modelFitting.html#sigmoidal-function">at this link</a>.</p>
 <section id="logistic-function" class="level2">
 <h2 class="anchored" data-anchor-id="logistic-function">Logistic function</h2>
 <p>The logistic curve is derived from the cumulative logistic distribution function. It is symmetric about its inflection point and can be parameterised as:</p>
@@ -479,7 +509,7 @@ Figure&nbsp;2: Effects of changing parameter values on the shape of logarithmic 
 <p>The Gompertz curve can be parameterised in many different ways. I prefer a parameterisation that closely resembles that of the logistic function:</p>
 <p><span class="math display">\[Y = c + (d - c) \exp \left\{- \exp \left[ - b \, (X - e) \right] \right\} \quad \quad \quad (18)\]</span></p>
 <p>Unlike the logistic function, the Gompertz curve is not symmetric about its inflection point. It exhibits a longer lag phase at the beginning, followed by a progressively steeper increase before gradually approaching the upper asymptote. The parameters have essentially the same interpretation as those of the logistic function, except that <span class="math inline">\(e\)</span>, the abscissa of the inflection point, does not correspond to the value of <span class="math inline">\(X\)</span> producing a response halfway between <span class="math inline">\(c\)</span> and <span class="math inline">\(d\)</span>.</p>
-<p>As with the logistic function, four-, three-, and two-parameter Gompertz models can be obtained by constraining one or both asymptotes. These models are widely used to describe plant growth and many other biological processes.</p>
+<p>As with the logistic function, four-, three-, and two-parameter Gompertz models can be obtained by constraining one or both asymptotes.</p>
 </section>
 <section id="modified-gompertz-function" class="level2">
 <h2 class="anchored" data-anchor-id="modified-gompertz-function">Modified Gompertz function</h2>
@@ -492,25 +522,52 @@ Figure&nbsp;2: Effects of changing parameter values on the shape of logarithmic 
 <p>The log-logistic curve is symmetric with respect to <span class="math inline">\(\log(X)\)</span>. A log-normal curve has a very similar shape, although it is used much less frequently. In biological assays (and also in germination studies), the log-logistic function is commonly parameterised as</p>
 <p><span class="math display">\[Y = c + \frac{d - c}{1 + \exp \left\{ - b \left[ \log(X) - \log(e) \right] \right\} } \quad \quad \quad (20)\]</span></p>
 <p>The parameters have the same interpretation as in the logistic function. In particular, <span class="math inline">\(e\)</span> represents the value of <span class="math inline">\(X\)</span> that produces a response halfway between <span class="math inline">\(c\)</span> and <span class="math inline">\(d\)</span> (the ED50). It is easy to show that the above equation is equivalent to</p>
-<p><span class="math display">\[Y = c + \frac{d - c}{1 + \left( \frac{X}{e} \right)^{-b}}\quad \quad \quad (21)\]</span></p>
+<p><span class="math display">\[Y = c + \frac{d - c}{1 + \left( \frac{X}{e} \right)^{-b}}\]</span></p>
 <p>Like the logistic function, the log-logistic model can be fitted in four-, three-, or two-parameter versions by constraining one or both asymptotes. It is widely used to describe dose-response relationships in biological assays, seed germination, and crop growth.</p>
 </section>
 <section id="weibull-function-type-1" class="level2">
 <h2 class="anchored" data-anchor-id="weibull-function-type-1">Weibull function (type 1)</h2>
 <p>The Type I Weibull function is the logarithmic counterpart of the Gompertz function, being defined on <span class="math inline">\(\log(X)\)</span> rather than on <span class="math inline">\(X\)</span>. It is parameterised as</p>
-<p><span class="math display">\[ Y = c + (d - c) \exp \left\{- \exp \left[ - b \, (\log(X) - \log(e)) \right] \right\} \quad \quad \quad (22)\]</span></p>
+<p><span class="math display">\[ Y = c + (d - c) \exp \left\{- \exp \left[ - b \, (\log(X) - \log(e)) \right] \right\} \quad \quad \quad (21)\]</span></p>
 <p>The parameters have essentially the same interpretation as those of the other sigmoidal functions presented above. In particular, <span class="math inline">\(c\)</span> and <span class="math inline">\(d\)</span> are the lower and upper asymptotes, respectively, while <span class="math inline">\(e\)</span> is the value of <span class="math inline">\(X\)</span> corresponding to the inflection point. Unlike the log-logistic function, however, <span class="math inline">\(e\)</span> does not correspond to the ED50.</p>
 </section>
 <section id="weibull-function-type-2" class="level2">
 <h2 class="anchored" data-anchor-id="weibull-function-type-2">Weibull function (type 2)</h2>
 <p>The Type II Weibull function is closely related to the Type I Weibull function, but it describes a different type of asymmetry, analogous to that of the modified Gompertz function:</p>
-<p><span class="math display">\[ Y = c + (d - c) \left\{ 1 - \exp \left\{- \exp \left[ b \, (\log(X) - \log(e)) \right] \right\} \right\} \quad \quad \quad (23)\]</span></p>
+<p><span class="math display">\[ Y = c + (d - c) \left\{ 1 - \exp \left\{- \exp \left[ b \, (\log(X) - \log(e)) \right] \right\} \right\} \quad \quad \quad (22)\]</span></p>
 <p>The parameters have the same interpretation as those of the Type I Weibull function. In particular, <span class="math inline">\(c\)</span> and <span class="math inline">\(d\)</span> are the lower and upper asymptotes, respectively, while <span class="math inline">\(e\)</span> is the value of <span class="math inline">\(X\)</span> at the inflection point. As with the Type I Weibull function, <span class="math inline">\(e\)</span> does not correspond to the ED50. One or both asymptotes may be constrained, giving rise to four-, three-, and two-parameter versions of the model.</p>
+</section>
+<section id="another-flexible-sigmoid" class="level2">
+<h2 class="anchored" data-anchor-id="another-flexible-sigmoid">Another ‘flexible’ sigmoid</h2>
+<p>I would also like to mention another sigmoidal function that has been widely used in biology because of its supposed flexibility: the <em>Richards</em> function:</p>
+<p><span class="math display">\[Y = c + \frac{d - c}{\left[1 + exp(- b (X - e))\right]^{1/f}}\]</span></p>
+<p>In this model, the degree of asymmetry is controlled by the parameter <span class="math inline">\(f\)</span>. When <span class="math inline">\(f = 1\)</span>, the function reduces to the logistic model, whereas, as <span class="math inline">\(f\)</span> decreases below 1, the curve progressively resembles a Gompertz function. Figure 4 illustrates the different shapes obtained for different values of <span class="math inline">\(f\)</span>.</p>
+<p>Despite this apparent flexibility, the Richards function has poor statistical properties for parameter estimation. In particular, the additional parameter often causes strong correlations among the estimates, making the fitting process unstable and the parameter estimates difficult to interpret. Ratkowsky (1990) described it as having <em>“more undesirable nonlinear regression behaviour than almost any nonlinear regression model in common use.”</em> For these reasons, the Richards function will not be considered further in this blog.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-4" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="nls_usefulEquations_files/figure-html/fig-4-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: The different shapes of the Richard’s function, based on the <span class="math inline">\(f\)</span> parameter: <span class="math inline">\(f = 1\)</span> (black line), <span class="math inline">\(f = 0.5\)</span> (blue line) and <span class="math inline">\(f = 1.5\)</span> (red line)
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
 </section>
 </section>
 <section id="curves-with-maximaminima" class="level1">
 <h1>Curves with maxima/minima</h1>
 <p>It is sometimes necessary to describe phenomena where the <span class="math inline">\(Y\)</span> variable reaches a maximum value at a certain level of the <span class="math inline">\(X\)</span> variable, and drops afterwords. For example, growth or germination rates are higher at optimal temperature levels and lower at supra-optimal or sub-optimal temperature levels. Another example relates to bioassays: in some cases, low doses of toxic substances induce a stimulation of growth (hormesis), which needs to be described by an appropriate model. The second order (and higher order) polynomial funcion we have seen earlier is capable of accounting for maxima/minima, but there are a few other interesting functions that may turn out useful in some circumstances.</p>
+<section id="brain-function" class="level2">
+<h2 class="anchored" data-anchor-id="brain-function">Peaked sigmoidal function</h2>
+<p>The log-logistic decreasing curve can be modified to account for possible hormetic effects at low doses, by combining mathematical switching functions (Schabenberger and Pierce, 2002; pag. 275). The most widespread parameterisation, that was originally devised by Brain and Cousens (<em>Brain, P., Cousens, R., 1989. An equation to describe dose responses where there is stimulation of growth at low doses. Weed Research 29, 93–96</em>) in a slightly different form, is:</p>
+<p><span class="math display">\[Y = c + \frac{d - c + f \, X}{1 + \exp \left\{ - b \left[ \log(X) - \log(e) \right] \right\} } \quad \quad \quad (23)\]</span></p>
+<p>The parameters have the same interpretation as in the log-logistic curves, but <span class="math inline">\(e\)</span> does not represent the response half-way between the lower and higher asymptote and <span class="math inline">\(f &gt; 0\)</span> represents the size of the hormetic effect, which increases as <span class="math inline">\(f\)</span> increases, while <span class="math inline">\(f = 0\)</span> corresponds to the situation of no hormesis (and the function reduces to a log-logistic.</p>
+</section>
 <section id="bragg-function" class="level2">
 <h2 class="anchored" data-anchor-id="bragg-function">Bragg function</h2>
 <p>This function is connected to the normal (Gaussian) distribution and has a symmetric shape with a maximum equal to <span class="math inline">\(d\)</span>, that is reached when <span class="math inline">\(X = e\)</span> and two inflection points. In this model, <span class="math inline">\(b\)</span> relates to the slope at the inflection points; the response <span class="math inline">\(Y\)</span> approaches 0 when <span class="math inline">\(X\)</span> approaches <span class="math inline">\(\pm \infty\)</span>:</p>
@@ -536,7 +593,7 @@ Figure&nbsp;2: Effects of changing parameter values on the shape of logarithmic 
 </section>
 <section id="conclusions" class="level1">
 <h1>Conclusions</h1>
-<p>Here we are; I have discussed more almost 30 functions, which are commonly used to model biological processes. These functions can be found in several different parameterisations and flavours; they can also be modified and combined to suit the needs of several disciplines in biology, chemistry and so on. However, this will require another post.</p>
+<p>Here we are; I have discussed more almost 30 functions, which are commonly used to model biological processes. These functions can be found in several other different parameterisations and I suggest you read the book chapter by Miguez et al.&nbsp;(2018), for other interesting information.</p>
 <p>Thanks for reading! And … don’t forget to check out my new book!</p>
 <p>Prof.&nbsp;Andrea Onofri<br>
 Department of Agricultural, Food and Environmental Sciences<br>
@@ -550,7 +607,8 @@ Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it
 <ol type="1">
 <li>Miguez, F., Archontoulis, S., Dokoohaki, H., Glaz, B., Yeater, K.M., 2018. Chapter 15: Nonlinear Regression Models and Applications, in: ACSESS Publications. American Society of Agronomy, Crop Science Society of America, and Soil Science Society of America, Inc.</li>
 <li>Ratkowsky, D.A., 1990. Handbook of nonlinear regression models. Marcel Dekker Inc., New York, USA.</li>
-<li>Ritz, C., Jensen, S. M., Gerhard, D., Streibig, J. C. (2019) Dose-Response Analysis Using R. CRC Press</li>
+<li>Ritz, C., Jensen, S. M., Gerhard, D., Streibig, J. C., 2019. Dose-Response Analysis Using R. CRC Press</li>
+<li>Schabenberger, O., Pierce, F.J., 2002. Contemporary statistical models for the plant and soil sciences. Taylor &amp; Francis, CRC Press, Books.</li>
 </ol>
 
 

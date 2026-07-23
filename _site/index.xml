@@ -496,7 +496,7 @@ font-style: inherit;">""</span>, <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">main =</span> <span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">"Asymptotic regression"</span>, </span>
+font-style: inherit;">"Asymptotic function"</span>, </span>
 <span id="cb12-2">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">ylim =</span> <span class="fu" style="color: #4758AB;
@@ -707,7 +707,7 @@ font-style: inherit;">""</span>, <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">main =</span> <span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">"Power curve"</span>, </span>
+font-style: inherit;">"Logarithmic function"</span>, </span>
 <span id="cb18-2">     <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">ylab =</span> <span class="st" style="color: #20794D;
@@ -833,75 +833,240 @@ font-style: inherit;">0.5</span>))</span></code></pre></div></div>
 </section>
 </section>
 </section>
-<section id="sigmoidal-curves" class="level1">
+<section id="sigmoidal-function" class="level1">
 <h1>Sigmoidal curves</h1>
-<p>Sigmoidal curves are S-shaped and they have been used to describe the results of an awful lot of experiments of different types. In most cases, they are interchangeable, in the sense that they can all fitted to the same data, usually in search of the best fitting one in a certain setting, which depends on how symmetric the trend appears, around the inflection point. Basically, the sigmoidal curves can be (1) symmetric with respect to the inflection point, (2) increasing faster at the beginning and slower next, (3) increasing slower at the beginning and faster next; furthermore, these symmetries/asymmetries can occur either with respect to <img src="https://latex.codecogs.com/png.latex?X"> or with respect to the logarithm of <img src="https://latex.codecogs.com/png.latex?X">. A guess that a table to summarise these concepts is necessary, at this point.</p>
-<p>TABELLA DA FARE</p>
-<p>The three curves based on the untransformed predictor <img src="https://latex.codecogs.com/png.latex?X"> are very often used to describe plant growth; their most widespread parameterisations are:</p>
+<p>In the previous post (<a href="https://www.statforbiology.com/posts/nls_usefulEquations.qmd">at this link</a>) we have examined six different sigmoidal shapes based on <img src="https://latex.codecogs.com/png.latex?X">, to be selected on the basis of the expected symmetry of the response. The equations are the logistic, Gompertz and modified Gompertz, with, respectively, the following three equations:</p>
 <p><img src="https://latex.codecogs.com/png.latex?Y%20=%20c%20+%20%5Cfrac%7Bd%20-%20c%7D%7B1%20+%20exp(-%20b%20(X%20-%20e))%7D%20%5Cquad%20%5Cquad%20%5Cquad%20(17)"></p>
-<p>where <img src="https://latex.codecogs.com/png.latex?d"> is the higher asymptote, <img src="https://latex.codecogs.com/png.latex?c"> is the lower asymptote, <img src="https://latex.codecogs.com/png.latex?e"> is <img src="https://latex.codecogs.com/png.latex?X"> value at the inflection point, while <img src="https://latex.codecogs.com/png.latex?b"> is the slope at the inflection point. As the curve is symmetric, <img src="https://latex.codecogs.com/png.latex?e"> represents also the <img src="https://latex.codecogs.com/png.latex?X"> value producing a response half-way between <img src="https://latex.codecogs.com/png.latex?d"> and <img src="https://latex.codecogs.com/png.latex?c"> (usually known as the ED50, in biological assay). The parameter <img src="https://latex.codecogs.com/png.latex?b"> can be positive or negative and, consequently, <img src="https://latex.codecogs.com/png.latex?Y"> may increase or decrease as <img src="https://latex.codecogs.com/png.latex?X"> increases.</p>
-<p>The above function is known as the four-parameter logistic. If necessary, constraints can be put on parameter values, i.e.&nbsp;<img src="https://latex.codecogs.com/png.latex?c"> can be constrained to 0 (three-parameter logistic) and, additionally, <img src="https://latex.codecogs.com/png.latex?d"> can be constrained to 1 (two-parameter logistic).</p>
-<p>In the ‘statforbiology’ package, the three logistic curves (four-, three- and two-parameters) are available as <code>NLS.L4()</code>, <code>NLS.L3()</code> and <code>NLS.L2()</code>, respectively. With ‘drm()’, we can use the self-starting functions <code>L.4()</code> and <code>L.3()</code> in the package ‘drc’, while the <code>DRC.L2()</code> function for the two-parameter logistic has been included in the ‘statforbiology’ package. The only difference between the self-starters for ‘drm()’ and the self-starters for ‘nls()’ is that, in the former, the sign for the <img src="https://latex.codecogs.com/png.latex?b"> parameter is reversed, i.e.&nbsp;it is negative for increasing curves and positive for decreasing curves.</p>
-<p>The four- and three-parameter logistic curves can also be fit with ‘nls()’, respectively with the self-starting functions <code>SSfpl()</code> and <code>SSlogis()</code>, in the ‘nlme’ package. In these functions, <img src="https://latex.codecogs.com/png.latex?b"> is replaced by <img src="https://latex.codecogs.com/png.latex?scal%20=%20-1/b">.</p>
-<p>In the box below, I show an example, regarding the growth of a sugar-beet crop.</p>
+<p><img src="https://latex.codecogs.com/png.latex?%20Y%20=%20c%20+%20(d%20-%20c)%20%5Cexp%20%5Cleft%5C%7B-%20%5Cexp%20%5Cleft%5B%20-%20b%20%5C,%20(X%20-%20e)%20%5Cright%5D%20%5Cright%5C%7D%20%5Cquad%20%5Cquad%20%5Cquad%20(18)"> <img src="https://latex.codecogs.com/png.latex?%20Y%20=%20c%20+%20(d%20-%20c)%20%5Cleft%5C%7B%201%20-%20%5Cexp%20%5Cleft%5C%7B-%20%5Cexp%20%5Cleft%5B%20b%20%5C,%20(X%20-%20e)%20%5Cright%5D%20%5Cright%5C%7D%20%5Cright%5C%7D%20%5Cquad%20%5Cquad%20%5Cquad%20(19)"></p>
+<p>The same curves can be based on the logarithm of <img src="https://latex.codecogs.com/png.latex?X">, to obtain the corresponding log-logistic, Type-1 Weibull and Type-2 Weibull equations, that are, respectively:</p>
+<p><img src="https://latex.codecogs.com/png.latex?Y%20=%20c%20+%20%5Cfrac%7Bd%20-%20c%7D%7B1%20+%20%5Cexp%20%5Cleft%5C%7B%20-%20b%20%5Cleft%5B%20%5Clog(X)%20-%20%5Clog(e)%20%5Cright%5D%20%5Cright%5C%7D%20%7D%20%5Cquad%20%5Cquad%20%5Cquad%20(20)"></p>
+<p><img src="https://latex.codecogs.com/png.latex?%20Y%20=%20c%20+%20(d%20-%20c)%20%5Cexp%20%5Cleft%5C%7B-%20%5Cexp%20%5Cleft%5B%20-%20b%20%5C,%20(%5Clog(X)%20-%20%5Clog(e))%20%5Cright%5D%20%5Cright%5C%7D%20%5Cquad%20%5Cquad%20%5Cquad%20(21)"></p>
+<p><img src="https://latex.codecogs.com/png.latex?%20Y%20=%20c%20+%20(d%20-%20c)%20%5Cleft%5C%7B%201%20-%20%5Cexp%20%5Cleft%5C%7B-%20%5Cexp%20%5Cleft%5B%20b%20%5C,%20(%5Clog(X)%20-%20%5Clog(e))%20%5Cright%5D%20%5Cright%5C%7D%20%5Cright%5C%7D%20%5Cquad%20%5Cquad%20%5Cquad%20(22)"></p>
+<p>The meaning of model parameters and details about the shapes you can consult another post <a href="nls_UsefulEquations.qmd#sigmoidal">at this link</a></p>
+<p>For all these curves with four parameters, it is possible to put constraints on <img src="https://latex.codecogs.com/png.latex?c%20=%200">, to obtain the 3-parameters curves (17a), (18a), (19a), (20a), (21a) and (22a). Likewise, we can constraint both <img src="https://latex.codecogs.com/png.latex?c%20=%200"> and <img src="https://latex.codecogs.com/png.latex?d%20=%201">, to obtain the 2-parameters curves (17b), (18b), (19b), (20b), (21b) and (22b). The collection of self-starters is huge; thus, I will make a summary table.</p>
+<table class="caption-top table">
+<caption>List of sigmoidal functions, together with self-starters for fitting with <code>drm()</code> and <code>nls()</code>. (1) these self starters are included in the ‘drc’ package and the corresponding curves are of increasing shape when <img src="https://latex.codecogs.com/png.latex?b%20%3C%200"> and of decreasing shape, when <img src="https://latex.codecogs.com/png.latex?b%20%3E%200">. For all other self starters, that are available in the ‘statforbiology’ package, the reverse is true (which is the most common definition, apart from the case of herbicide bioassays){#tbl-models}</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Eq. No.</th>
+<th style="text-align: left;">for <code>drm()</code></th>
+<th style="text-align: left;">for <code>nls()</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Logistic (4-parameters)</td>
+<td style="text-align: left;">(17)</td>
+<td style="text-align: left;"><code>L.4()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.L4()</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Logistic (3-parameters)</td>
+<td style="text-align: left;">(17a)</td>
+<td style="text-align: left;"><code>L.3()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.L3()</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Logistic (2-parameters)</td>
+<td style="text-align: left;">(17b)</td>
+<td style="text-align: left;"><code>L.2()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.L2()</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gompertz (4-parameters)</td>
+<td style="text-align: left;">(18)</td>
+<td style="text-align: left;"><code>G.4()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.G4()</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Gompertz (3-parameters)</td>
+<td style="text-align: left;">(18a)</td>
+<td style="text-align: left;"><code>G.3()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.G3()</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gompertz (2-parameters)</td>
+<td style="text-align: left;">(18b)</td>
+<td style="text-align: left;"><code>G.2()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.G2()</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">mod-Gompertz (4-parameters)</td>
+<td style="text-align: left;">(19)</td>
+<td style="text-align: left;"><code>DRC.E4()</code></td>
+<td style="text-align: left;"><code>NLS.E4()</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">mod-Gompertz (3-parameters)</td>
+<td style="text-align: left;">(19a)</td>
+<td style="text-align: left;"><code>DRC.E3()</code></td>
+<td style="text-align: left;"><code>NLS.E3()</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">mod-Gompertz (2-parameters)</td>
+<td style="text-align: left;">(19b)</td>
+<td style="text-align: left;"><code>DRC.E2()</code></td>
+<td style="text-align: left;"><code>NLS.E2()</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Log-logistic (4-parameters)</td>
+<td style="text-align: left;">(20)</td>
+<td style="text-align: left;"><code>LL.4()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.LL4()</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Log-logistic (3-parameters)</td>
+<td style="text-align: left;">(20a)</td>
+<td style="text-align: left;"><code>LL.3()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.LL3()</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Log-logistic (2-parameters)</td>
+<td style="text-align: left;">(20b)</td>
+<td style="text-align: left;"><code>LL.2()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.LL2()</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Type-1 Weibull (4-parameters)</td>
+<td style="text-align: left;">(21)</td>
+<td style="text-align: left;"><code>W1.4()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.W1.4()</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Type-1 Weibull (3-parameters)</td>
+<td style="text-align: left;">(21a)</td>
+<td style="text-align: left;"><code>W1.3()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.W1.3()</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Type-1 Weibull (2-parameters)</td>
+<td style="text-align: left;">(21b)</td>
+<td style="text-align: left;"><code>W1.2()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.W1.2()</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Type-2 Weibull (4-parameters)</td>
+<td style="text-align: left;">(22)</td>
+<td style="text-align: left;"><code>W2.4()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.W2.4()</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Type-2 Weibull (3-parameters)</td>
+<td style="text-align: left;">(22a)</td>
+<td style="text-align: left;"><code>W2.3()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.W2.3()</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Type-2 Weibull (2-parameters)</td>
+<td style="text-align: left;">(22b)</td>
+<td style="text-align: left;"><code>W2.2()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.W2.2()</code></td>
+</tr>
+</tbody>
+</table>
+<section id="example-8" class="level2">
+<h2 class="anchored" data-anchor-id="example-8">Example 8</h2>
+<p>The dataset ‘beetGrowth’ in the ‘statforbiology’ package reports the results of an experiment in which the growth of sugarbeet was evaluated in either weed-free, or weed-infested conditions <span class="citation" data-cites="covarelli_1998">(<strong>covarelli_1998?</strong>)</span>. In the following example we consider the time-course of crop weight in infested conditions and fit the logistic, Gompertz and modified-Gompertz functions to the observed data. We see that, based on the AIC, the three fit are equivalent, in practice. We fit the same models with ‘drm()’ to show that the two fitting functions gave the same results, apart from the sign of the <img src="https://latex.codecogs.com/png.latex?b"> parameter, which is reversed in the <code>L.3()</code> function.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">data</span>(beetGrowth)</span>
-<span id="cb24-2"></span>
-<span id="cb24-3"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># nls fit</span></span>
-<span id="cb24-4">model <span class="ot" style="color: #003B4F;
+font-style: inherit;">library</span>(statforbiology)</span>
+<span id="cb24-2">beetGrowth <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">nls</span>(weightInf <span class="sc" style="color: #5E5E5E;
+font-style: inherit;">getAgroData</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"beetGrowth"</span>)</span>
+<span id="cb24-3"></span>
+<span id="cb24-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># nls fit</span></span>
+<span id="cb24-5">model<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">nls</span>(Infested <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">NLS.L3</span>(DAE, b, d, e), <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">data =</span> beetGrowth)</span>
-<span id="cb24-5">model<span class="fl" style="color: #AD0000;
+<span id="cb24-6">model<span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">.2</span> <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">nls</span>(weightInf <span class="sc" style="color: #5E5E5E;
+font-style: inherit;">nls</span>(Infested <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">NLS.L4</span>(DAE, b, c, d, e), <span class="at" style="color: #657422;
+font-style: inherit;">NLS.G3</span>(DAE, b, d, e), <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">data =</span> beetGrowth)</span>
-<span id="cb24-6">model<span class="fl" style="color: #AD0000;
+<span id="cb24-7">model<span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">.3</span> <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">nls</span>(weightInf<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">max</span>(weightInf) <span class="sc" style="color: #5E5E5E;
+font-style: inherit;">nls</span>(Infested <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">NLS.L2</span>(DAE, b, e), <span class="at" style="color: #657422;
+font-style: inherit;">NLS.E3</span>(DAE, b, d, e), <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">data =</span> beetGrowth)</span>
-<span id="cb24-7"></span>
-<span id="cb24-8"><span class="co" style="color: #5E5E5E;
+<span id="cb24-8"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">AIC</span>(model<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span>, model<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.2</span>, model<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.3</span>)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        df      AIC
+model.1  4 250.2906
+model.2  4 250.7596
+model.3  4 250.8456</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summary</span>(model<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span>)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Formula: Infested ~ NLS.L3(DAE, b, d, e)
+
+Parameters:
+   Estimate Std. Error t value Pr(&gt;|t|)    
+b 1.188e-01  1.874e-02   6.338 1.33e-05 ***
+d 2.512e+03  1.277e+02  19.671 4.01e-12 ***
+e 5.803e+01  1.823e+00  31.836 3.46e-15 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 222 on 15 degrees of freedom
+
+Number of iterations to convergence: 6 
+Achieved convergence tolerance: 4.299e-06</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># drm fit</span></span>
-<span id="cb24-9">model <span class="ot" style="color: #003B4F;
+<span id="cb28-2">model <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">drm</span>(weightInf <span class="sc" style="color: #5E5E5E;
+font-style: inherit;">drm</span>(Infested <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">~</span> DAE, <span class="at" style="color: #657422;
 background-color: null;
@@ -910,41 +1075,7 @@ background-color: null;
 font-style: inherit;">L.3</span>(), <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">data =</span> beetGrowth)</span>
-<span id="cb24-10">model<span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">.2</span> <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">drm</span>(weightInf <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> DAE, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">fct =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">L.4</span>(), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> beetGrowth)</span>
-<span id="cb24-11">model<span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">.3</span> <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">drm</span>(weightInf<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">max</span>(weightInf) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> DAE, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">fct =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">DRC.L2</span>(), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> beetGrowth)</span>
-<span id="cb24-12"><span class="fu" style="color: #4758AB;
+<span id="cb28-3"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">summary</span>(model)</span></code></pre></div></div>
 <div class="cell-output cell-output-stdout">
@@ -953,18 +1084,18 @@ Model fitted: Logistic (ED50 as parameter) with lower limit fixed at 0 (3 parms)
 
 Parameter estimates:
 
-               Estimate Std. Error t-value   p-value    
-b:(Intercept) -0.118771   0.018319 -6.4835 1.032e-05 ***
-d:(Intercept) 25.118357   1.279417 19.6327 4.127e-12 ***
-e:(Intercept) 58.029764   1.834414 31.6340 3.786e-15 ***
+                Estimate Std. Error t-value   p-value    
+b:(Intercept)   -0.11876    0.01832  -6.483 1.033e-05 ***
+d:(Intercept) 2511.95664  127.95600  19.631 4.131e-12 ***
+e:(Intercept)   58.03099    1.83458  31.632 3.788e-15 ***
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 Residual standard error:
 
- 2.219389 (15 degrees of freedom)</code></pre>
+ 221.9644 (15 degrees of freedom)</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><span class="fu" style="color: #4758AB;
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>(model, <span class="at" style="color: #657422;
 background-color: null;
@@ -974,7 +1105,7 @@ font-style: inherit;">""</span>, <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">main =</span> <span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">"Logistic function"</span>)</span></code></pre></div></div>
+font-style: inherit;">"Logistic growth function"</span>)</span></code></pre></div></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -983,352 +1114,24 @@ font-style: inherit;">"Logistic function"</span>)</span></code></pre></div></div
 </div>
 </div>
 </div>
-<hr>
-<section id="gompertz-function" class="level2">
-<h2 class="anchored" data-anchor-id="gompertz-function">Gompertz function</h2>
-<p>The Gompertz curve is parameterised in very many ways. I tend to prefer a parameterisation that resembles the one used for the logistic function:</p>
-<p><img src="https://latex.codecogs.com/png.latex?%20Y%20=%20c%20+%20(d%20-%20c)%20%5Cexp%20%5Cleft%5C%7B-%20%5Cexp%20%5Cleft%5B%20-%20b%20%5C,%20(X%20-%20e)%20%5Cright%5D%20%5Cright%5C%7D%20%5Cquad%20%5Cquad%20%5Cquad%20(14)"></p>
-<p>The difference between the logistic and Gompertz functions is that this latter is not symmetric around the inflection point: it shows a longer lag at the beginning, but raises steadily afterwards. The parameters have the same meaning as those in the logistic function, apart from the fact that <img src="https://latex.codecogs.com/png.latex?e">, i.e.&nbsp;the abscissa of the inflection point, does not give a response half-way between <img src="https://latex.codecogs.com/png.latex?c"> and <img src="https://latex.codecogs.com/png.latex?d">. As for the logistic, we can have four-, three- and two-parameter Gompertz functions, which can be used to describe plant growth or several other biological processes.</p>
-<p>In R, the Gompertz equation can be fit by using ‘drm()’ and, respectively the <code>G.4()</code>, <code>G.3()</code> and <code>G.2()</code> self-starters. With ‘nls’, the ‘statforbiology’ package contains the corresponding functions <code>NLS.G4()</code>, <code>NLS.G3()</code> and <code>NLS.G2()</code>. As for the logistic, the only difference between the self starters for ‘drm()’ and the self starters for ‘nls()’ is that, in the former, the sign for the <img src="https://latex.codecogs.com/png.latex?b"> parameter is reversed, i.e.&nbsp;it is negative for increasing curves and positive for decreasing curves.</p>
-<p>The three-parameter Gompertz can also be fit with ‘nls()’, by using the <code>SSGompertz()</code> self-starter in the ‘nlme’ package, although this is a different parameterisation.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># nls fit</span></span>
-<span id="cb27-2">model <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nls</span>(weightFree <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">NLS.G3</span>(DAE, b, d, e), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> beetGrowth)</span>
-<span id="cb27-3">model<span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">.2</span> <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nls</span>(weightFree <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">NLS.G4</span>(DAE, b, c, d, e), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> beetGrowth)</span>
-<span id="cb27-4">model<span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">.3</span> <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nls</span>(weightFree<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">max</span>(weightFree) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">NLS.G2</span>(DAE, b, e), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> beetGrowth)</span>
-<span id="cb27-5"></span>
-<span id="cb27-6"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># drm fit</span></span>
-<span id="cb27-7">model <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">drm</span>(weightFree <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> DAE, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">fct =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">G.3</span>(), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> beetGrowth)</span>
-<span id="cb27-8">model<span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">.2</span> <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">drm</span>(weightFree <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> DAE, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">fct =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">G.4</span>(), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> beetGrowth)</span>
-<span id="cb27-9">model<span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">.3</span> <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">drm</span>(weightFree<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">max</span>(weightFree) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> DAE, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">fct =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">G.2</span>(), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> beetGrowth)</span>
-<span id="cb27-10"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">summary</span>(model)</span></code></pre></div></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-Model fitted: Gompertz with lower limit at 0 (3 parms)
-
-Parameter estimates:
-
-               Estimate Std. Error t-value   p-value    
-b:(Intercept) -0.122255   0.029938 -4.0836 0.0009783 ***
-d:(Intercept) 35.078529   1.668665 21.0219 1.531e-12 ***
-e:(Intercept) 49.008075   1.165191 42.0601 &lt; 2.2e-16 ***
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-Residual standard error:
-
- 2.995873 (15 degrees of freedom)</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">plot</span>(model, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">log=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">""</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">main =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Gompertz function"</span>)</span></code></pre></div></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="https://www.statforbiology.com/posts/nls_modelFitting_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<hr>
 </section>
-<section id="modified-gompertz-function" class="level2">
-<h2 class="anchored" data-anchor-id="modified-gompertz-function">Modified Gompertz function</h2>
-<p>We have seen that the logistic curve is symmetric around the inflection point, while the Gompertz shows a longer lag at the beginning and raises steadily afterwards. We can describe a different pattern by modifying the Gompertz function as follows:</p>
-<p><img src="https://latex.codecogs.com/png.latex?%20Y%20=%20c%20+%20(d%20-%20c)%20%5Cleft%5C%7B%201%20-%20%5Cexp%20%5Cleft%5C%7B-%20%5Cexp%20%5Cleft%5B%20b%20%5C,%20(X%20-%20e)%20%5Cright%5D%20%5Cright%5C%7D%20%5Cright%5C%7D%20%5Cquad%20%5Cquad%20%5Cquad%20(15)"></p>
-<p>The resulting curve increases steadily at the beginning, but slows down later on. Also for this function, we can put constraints on <img src="https://latex.codecogs.com/png.latex?d%20=%201"> and/or <img src="https://latex.codecogs.com/png.latex?c%20=%200">, so that we have four-parameter, three-parameter and two-parameter modified Gompertz equations; these models can be fit by using ‘nls()’ and the self starters <code>NLS.E4()</code>, <code>NLS.E3()</code> and <code>NLS.E2()</code> in the ‘statforbiology’ package. Likewise, the modified Gompertz equations can be fit with ‘drm()’ and the self starters <code>DRC.E4()</code>, <code>DRC.E3()</code> and <code>DRC.E2()</code>, also available in the ‘statforbiology’ package</p>
+<section id="example-9" class="level2">
+<h2 class="anchored" data-anchor-id="example-9">Example 9</h2>
+<p>The dataset ‘brassica’ in the ’statforbiology package reports the results of a short-term pot-bioassay to determine the phytotoxicity of imazethapyr in hydroponic solution (Onofri, 1994). The response variable is the weight of the test plant (<em>Brassica rapa</em>), as affected by the herbicide concentration in the nutrient solution, which requires a descreasing sigmoidal curve. In the code below, we fit either a 4-parameters log-logistic and a 3-parameters log-logistic (with <img src="https://latex.codecogs.com/png.latex?c%20=%200">) functions and graphically compare the two fits.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><span class="co" style="color: #5E5E5E;
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;"># nls fit</span></span>
-<span id="cb30-2">model <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nls</span>(weightInf <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">NLS.E3</span>(DAE, b, d, e), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> beetGrowth)</span>
-<span id="cb30-3">model<span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">.2</span> <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nls</span>(weightFree <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">NLS.E4</span>(DAE, b, c, d, e), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> beetGrowth)</span>
-<span id="cb30-4">model<span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">.3</span> <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nls</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">I</span>(weightFree<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">max</span>(weightFree)) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">NLS.E2</span>(DAE, b, e), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> beetGrowth)</span>
-<span id="cb30-5"></span>
-<span id="cb30-6"></span>
-<span id="cb30-7"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># drm fit</span></span>
-<span id="cb30-8">model <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">drm</span>(weightInf <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> DAE, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">fct =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">DRC.E3</span>(), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> beetGrowth)</span>
-<span id="cb30-9">model<span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">.2</span> <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">drm</span>(weightFree <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> DAE, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">fct =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">DRC.E4</span>(), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> beetGrowth)</span>
-<span id="cb30-10">model<span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">.3</span> <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">drm</span>(weightFree<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">max</span>(weightFree) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> DAE, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">fct =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">DRC.E2</span>(), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> beetGrowth)</span>
-<span id="cb30-11"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">summary</span>(model)</span></code></pre></div></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-Model fitted: Modified Gompertz equation (3 parameters) (3 parms)
-
-Parameter estimates:
-
-               Estimate Std. Error t-value   p-value    
-b:(Intercept)  0.092508   0.013231  6.9917 4.340e-06 ***
-d:(Intercept) 25.107004   1.304379 19.2482 5.493e-12 ***
-e:(Intercept) 63.004111   1.747087 36.0624 4.945e-16 ***
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-Residual standard error:
-
- 2.253878 (15 degrees of freedom)</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">plot</span>(model, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">log=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">""</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">main =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Modified Gompertz"</span>)</span></code></pre></div></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="https://www.statforbiology.com/posts/nls_modelFitting_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<hr>
-</section>
-<section id="log-logistic-function" class="level2">
-<h2 class="anchored" data-anchor-id="log-logistic-function">Log-logistic function</h2>
-<p>The log-logistic curve is symmetric on the logarithm of <img src="https://latex.codecogs.com/png.latex?X"> (a log-normal curve would be practically equivalent, but it is used far less often). For example, in biologic assays (but also in germination assays), the log-logistic curve is defined as follows:</p>
-<p><img src="https://latex.codecogs.com/png.latex?Y%20=%20c%20+%20%5Cfrac%7Bd%20-%20c%7D%7B1%20+%20%5Cexp%20%5Cleft%5C%7B%20-%20b%20%5Cleft%5B%20%5Clog(X)%20-%20%5Clog(e)%20%5Cright%5D%20%5Cright%5C%7D%20%7D%20%5Cquad%20%5Cquad%20%5Cquad%20(16)"></p>
-<p>The parameters have the same meaning as the logistic equation given above. In particular, <img src="https://latex.codecogs.com/png.latex?e"> represents the X-level which gives a response half-way between <img src="https://latex.codecogs.com/png.latex?c"> and <img src="https://latex.codecogs.com/png.latex?d"> (ED50). It is easy to see that the above equation is equivalent to:</p>
-<p><img src="https://latex.codecogs.com/png.latex?Y%20=%20c%20+%20%5Cfrac%7Bd%20-%20c%7D%7B1%20+%20%5Cleft(%20%5Cfrac%7BX%7D%7Be%7D%20%5Cright)%5E%7B-b%7D%7D"></p>
-<p>Log-logistic functions are used for crop growth, seed germination and bioassay work and they can have the same constraints as the logistic function (four- three- and two-parameter log-logistic). They can be fit by ‘drm()’ and the self starters <code>LL.4()</code> (four-parameter log-logistic), <code>LL.3()</code> (three-parameter log-logistic, with <img src="https://latex.codecogs.com/png.latex?c%20=%200">) and <code>LL.2()</code> (two-parameter log-logistic, with <img src="https://latex.codecogs.com/png.latex?d%20=%201"> and <img src="https://latex.codecogs.com/png.latex?c%20=%200">), as available in the ‘drc’ package. With respect to Equation 16, in these self-starters the sign for <img src="https://latex.codecogs.com/png.latex?b"> is reversed, i.e.&nbsp;it is negative for the increasing log-logistic curve and positive for the decreasing curve. In the package ‘statforbiology’, the corresponding self starters for ‘nls()’ are <code>NLS.LL4()</code>, <code>NLS.LL3()</code> and <code>NLS.LL2()</code>, which are all derived from Equation 15 (i.e.&nbsp;the sign of <img src="https://latex.codecogs.com/png.latex?b"> is positive for increasing curves and negative for decreasing curves).</p>
-<p>We show an example of a log-logistic fit, relating to a bioassay with <em>Brassica rapa</em> treated at increasing dosages of an herbicide.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1">brassica <span class="ot" style="color: #003B4F;
+font-style: inherit;">library</span>(statforbiology)</span>
+<span id="cb31-2">brassica <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">getAgroData</span>(<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"brassica"</span>)</span>
-<span id="cb33-2"></span>
-<span id="cb33-3">model <span class="ot" style="color: #003B4F;
+<span id="cb31-3">model<span class="fl" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nls</span>(FW <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">NLS.LL4</span>(Dose, b, c, d, e), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> brassica)</span>
-<span id="cb33-4">model <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nls</span>(FW <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">NLS.LL3</span>(Dose, b, d, e), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> brassica)</span>
-<span id="cb33-5">model <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nls</span>(FW<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">max</span>(FW) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">NLS.LL2</span>(Dose, b, e), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> brassica)</span>
-<span id="cb33-6"></span>
-<span id="cb33-7">model <span class="ot" style="color: #003B4F;
+font-style: inherit;">.1</span> <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1341,121 +1144,7 @@ background-color: null;
 font-style: inherit;">LL.4</span>(), <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">data =</span> brassica)</span>
-<span id="cb33-8"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">summary</span>(model)</span></code></pre></div></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-Model fitted: Log-logistic (ED50 as parameter) (4 parms)
-
-Parameter estimates:
-
-              Estimate Std. Error t-value   p-value    
-b:(Intercept)  1.45113    0.24113  6.0181 1.743e-06 ***
-c:(Intercept)  0.34948    0.18580  1.8810   0.07041 .  
-d:(Intercept)  4.53636    0.20514 22.1140 &lt; 2.2e-16 ***
-e:(Intercept)  2.46557    0.35111  7.0221 1.228e-07 ***
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-Residual standard error:
-
- 0.4067837 (28 degrees of freedom)</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">plot</span>(model, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">ylim =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0</span>,<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">6</span>), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">main =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Log-logistic function"</span>)</span></code></pre></div></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="https://www.statforbiology.com/posts/nls_modelFitting_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<hr>
-</section>
-<section id="weibull-function-type-1" class="level2">
-<h2 class="anchored" data-anchor-id="weibull-function-type-1">Weibull function (type 1)</h2>
-<p>The type 1 Weibull function corresponds to the Gompertz, but it is based on the logarithm of <img src="https://latex.codecogs.com/png.latex?X">. The equation is as follows:</p>
-<p><img src="https://latex.codecogs.com/png.latex?%20Y%20=%20c%20+%20(d%20-%20c)%20%5Cexp%20%5Cleft%5C%7B-%20%5Cexp%20%5Cleft%5B%20-%20b%20%5C,%20(%5Clog(X)%20-%20%5Clog(e))%20%5Cright%5D%20%5Cright%5C%7D%20%5Cquad%20%5Cquad%20%5Cquad%20(17)"></p>
-<p>The parameters have the same meaning as the other sigmoidal curves given above, apart from the fact that <img src="https://latex.codecogs.com/png.latex?e"> is the abscissa of the inflection point, but it is not the ED50.</p>
-<p>The four-parameters, three-parameters and two-parameters Weibull functions can be fit by using ‘drm()’ and the self-starters available within the ‘drc’ package, i.e.&nbsp;<code>W1.4()</code>, <code>W1.3()</code> and <code>W1.2()</code>. The ‘statforbiology’ package contains the corresponding self-starters <code>NLS.W1.4()</code>, <code>NLS.W1.3()</code> and <code>NLS.W1.2()</code>, which can be used with ‘nls()’.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">data</span>(brassica)</span></code></pre></div></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in data(brassica): data set 'brassica' not found</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1">model <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nls</span>(FW <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">NLS.W1.4</span>(Dose, b, c, d, e), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> brassica)</span>
-<span id="cb38-2">model<span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">.2</span> <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nls</span>(FW <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">NLS.W1.3</span>(Dose, b, d, e), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> brassica)</span>
-<span id="cb38-3">model<span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">.3</span> <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nls</span>(FW<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">max</span>(FW) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">NLS.W1.2</span>(Dose, b, e), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> brassica)</span>
-<span id="cb38-4"></span>
-<span id="cb38-5">model <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">drm</span>(FW <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> Dose, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">fct =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">W1.4</span>(), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> brassica)</span>
-<span id="cb38-6">model<span class="fl" style="color: #AD0000;
+<span id="cb31-4">model<span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">.2</span> <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -1467,191 +1156,75 @@ font-style: inherit;">~</span> Dose, <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">fct =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">W1.3</span>(), <span class="at" style="color: #657422;
+font-style: inherit;">LL.3</span>(), <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">data =</span> brassica)</span>
-<span id="cb38-7">model<span class="fl" style="color: #AD0000;
+<span id="cb31-5"><span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">.3</span> <span class="ot" style="color: #003B4F;
+font-style: inherit;">anova</span>(model<span class="fl" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+font-style: inherit;">.1</span>, model<span class="fl" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">drm</span>(FW<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">max</span>(FW) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> Dose, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">fct =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">W1.2</span>(), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> brassica)</span>
-<span id="cb38-8"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">summary</span>(model)</span></code></pre></div></div>
+font-style: inherit;">.2</span>)</span></code></pre></div></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
-Model fitted: Weibull (type 1) (4 parms)
-
-Parameter estimates:
-
-              Estimate Std. Error t-value   p-value    
-b:(Intercept)  1.01252    0.15080  6.7143 2.740e-07 ***
-c:(Intercept)  0.50418    0.14199  3.5507  0.001381 ** 
-d:(Intercept)  4.56137    0.19846 22.9841 &lt; 2.2e-16 ***
-e:(Intercept)  3.55327    0.45039  7.8894 1.359e-08 ***
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-Residual standard error:
-
- 0.3986775 (28 degrees of freedom)</code></pre>
+1st model
+ fct:      LL.3()
+2nd model
+ fct:      LL.4()</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><span class="fu" style="color: #4758AB;
+<div class="cell-output cell-output-stdout">
+<pre><code>ANOVA table
+
+          ModelDf    RSS Df F value p value
+2nd model      29 5.0848                   
+1st model      28 4.6332  1  2.7288  0.1097</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">plot</span>(model, <span class="at" style="color: #657422;
+font-style: inherit;">plot</span>(model<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.2</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">main =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Log-logistic function"</span>, <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">ylim =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">0</span>,<span class="dv" style="color: #AD0000;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">6</span>), <span class="at" style="color: #657422;
+font-style: inherit;">5</span>))</span>
+<span id="cb34-2"><span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">main =</span> <span class="st" style="color: #20794D;
+font-style: inherit;">plot</span>(model<span class="fl" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">"Weibull type 1"</span>)</span></code></pre></div></div>
+font-style: inherit;">.1</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">add =</span> T, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">lty =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">col =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"red"</span>)</span></code></pre></div></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://www.statforbiology.com/posts/nls_modelFitting_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="https://www.statforbiology.com/posts/nls_modelFitting_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-<hr>
-</section>
-<section id="weibull-function-type-2" class="level2">
-<h2 class="anchored" data-anchor-id="weibull-function-type-2">Weibull function (type 2)</h2>
-<p>The type 2 Weibull is similar to the type 1 Weibull, but describes a different type of asymmetry, corresponding to the modified Gompertz function above:</p>
-<p><img src="https://latex.codecogs.com/png.latex?%20Y%20=%20c%20+%20(d%20-%20c)%20%5Cleft%5C%7B%201%20-%20%5Cexp%20%5Cleft%5C%7B-%20%5Cexp%20%5Cleft%5B%20b%20%5C,%20(%5Clog(X)%20-%20%5Clog(e))%20%5Cright%5D%20%5Cright%5C%7D%20%5Cright%5C%7D%20%5Cquad%20%5Cquad%20%5Cquad%20(18)"></p>
-<p>As for fitting, the ‘drc’ package contains the self-starting functions <code>W2.4()</code>, <code>W2.3()</code> and <code>W2.2()</code>, which can be used with ‘drm()’ (be careful: the sign for <img src="https://latex.codecogs.com/png.latex?b"> is reversed, with respect to Equation 18). The ‘statforbiology’ package contains the corresponding self-starters <code>NLS.W2.4()</code>, <code>NLS.W2.3()</code> and <code>NLS.W2.2()</code>, which can be used with ‘nls()’.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">data</span>(brassica)</span></code></pre></div></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in data(brassica): data set 'brassica' not found</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1">model <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nls</span>(FW <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">NLS.W2.4</span>(Dose, b, c, d, e), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> brassica)</span>
-<span id="cb43-2">model<span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">.1</span> <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nls</span>(FW <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">NLS.W2.3</span>(Dose, b, d, e), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> brassica)</span>
-<span id="cb43-3">model<span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">.2</span> <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nls</span>(FW<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">max</span>(FW) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">NLS.W2.2</span>(Dose, b, e), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> brassica)</span>
-<span id="cb43-4"></span>
-<span id="cb43-5">model <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">drm</span>(FW <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> Dose, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">fct =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">W2.4</span>(), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> brassica)</span>
-<span id="cb43-6"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">summary</span>(model)</span></code></pre></div></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-Model fitted: Weibull (type 2) (4 parms)
-
-Parameter estimates:
-
-              Estimate Std. Error t-value   p-value    
-b:(Intercept) -0.96191    0.17684 -5.4395 8.353e-06 ***
-c:(Intercept)  0.18068    0.25191  0.7173    0.4792    
-d:(Intercept)  4.53804    0.21576 21.0328 &lt; 2.2e-16 ***
-e:(Intercept)  1.66342    0.25240  6.5906 3.793e-07 ***
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-Residual standard error:
-
- 0.4215551 (28 degrees of freedom)</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">plot</span>(model, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">ylim =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0</span>,<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">6</span>), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">main =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Weibull type 2"</span>)</span></code></pre></div></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="https://www.statforbiology.com/posts/nls_modelFitting_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<hr>
 </section>
 </section>
 <section id="curves-with-maximaminima" class="level1">
 <h1>Curves with maxima/minima</h1>
-<p>It is sometimes necessary to describe phenomena where the <img src="https://latex.codecogs.com/png.latex?Y"> variable reaches a maximum value at a certain level of the <img src="https://latex.codecogs.com/png.latex?X"> variable, and drops afterwords. For example, growth or germination rates are higher at optimal temperature levels and lower at supra-optimal or sub-optimal temperature levels. Another example relates to bioassays: in some cases, low doses of toxic substances induce a stimulation of growth (hormesis), which needs to be described by an appropriate model. Let’s see some functions which may turn out useful in these circumstances.</p>
+<p>The models with maxima/minima are useful describe phenomena where the response increases at first reaches a maximum value and decreases afterwords. In a previous post we have described four functions: For example, growth or germination rates are higher at optimal temperature levels and lower at supra-optimal or sub-optimal temperature levels. Another example relates to bioassays: in some cases, low doses of toxic substances induce a stimulation of growth (hormesis), which needs to be described by an appropriate model. Let’s see some functions which may turn out useful in these circumstances.</p>
 <section id="bragg-function" class="level2">
 <h2 class="anchored" data-anchor-id="bragg-function">Bragg function</h2>
 <p>This function is connected to the normal (Gaussian) distribution and has a symmetric shape with a maximum equal to <img src="https://latex.codecogs.com/png.latex?d">, that is reached when <img src="https://latex.codecogs.com/png.latex?X%20=%20e"> and two inflection points. In this model, <img src="https://latex.codecogs.com/png.latex?b"> relates to the slope at the inflection points; the response <img src="https://latex.codecogs.com/png.latex?Y"> approaches 0 when <img src="https://latex.codecogs.com/png.latex?X"> approaches <img src="https://latex.codecogs.com/png.latex?%5Cpm%20%5Cinfty">:</p>
@@ -1660,7 +1233,7 @@ font-style: inherit;">"Weibull type 2"</span>)</span></code></pre></div></div>
 <p><img src="https://latex.codecogs.com/png.latex?%20Y%20=%20c%20+%20(d%20-%20c)%20%5C,%20%5Cexp%20%5Cleft%5B%20-%20b%20(X%20-%20e)%5E2%20%5Cright%5D%20%5Cquad%20%5Cquad%20%5Cquad%20(20)"></p>
 <p>The two Bragg curves have been used in applications relating to the science of carbon materials. We can fit them with ‘drm()’, by using the self starters <code>DRC.bragg.3()</code> (Equation 19) and <code>DRC.bragg.4</code> (Equation 20), in the ‘statforbiology’ package. With ‘nls()’, you can use the corresponding self-starters <code>NLS.bragg.3()</code> and <code>NLS.bragg.4</code>, also in the ‘statforbiology’ package.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1">X <span class="ot" style="color: #003B4F;
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1">X <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1685,7 +1258,7 @@ background-color: null;
 font-style: inherit;">45</span>, <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">50</span>)</span>
-<span id="cb46-2">Y1 <span class="ot" style="color: #003B4F;
+<span id="cb35-2">Y1 <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1710,18 +1283,18 @@ background-color: null;
 font-style: inherit;">1.3</span>, <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.1</span>)</span>
-<span id="cb46-3">Y2 <span class="ot" style="color: #003B4F;
+<span id="cb35-3">Y2 <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> Y1 <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">2</span></span>
-<span id="cb46-4"></span>
-<span id="cb46-5"><span class="co" style="color: #5E5E5E;
+<span id="cb35-4"></span>
+<span id="cb35-5"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># nls fit</span></span>
-<span id="cb46-6">mod.nls <span class="ot" style="color: #003B4F;
+<span id="cb35-6">mod.nls <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1730,7 +1303,7 @@ background-color: null;
 font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">NLS.bragg.3</span>(X, b, d, e) )</span>
-<span id="cb46-7">mod.nls2 <span class="ot" style="color: #003B4F;
+<span id="cb35-7">mod.nls2 <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1739,11 +1312,11 @@ background-color: null;
 font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">NLS.bragg.4</span>(X, b, c, d, e) )</span>
-<span id="cb46-8"></span>
-<span id="cb46-9"><span class="co" style="color: #5E5E5E;
+<span id="cb35-8"></span>
+<span id="cb35-9"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># drm fit</span></span>
-<span id="cb46-10">mod.drc <span class="ot" style="color: #003B4F;
+<span id="cb35-10">mod.drc <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1754,7 +1327,7 @@ background-color: null;
 font-style: inherit;">fct =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">DRC.bragg.3</span>() )</span>
-<span id="cb46-11">mod.drc2 <span class="ot" style="color: #003B4F;
+<span id="cb35-11">mod.drc2 <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1765,7 +1338,7 @@ background-color: null;
 font-style: inherit;">fct =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">DRC.bragg.4</span>() )</span>
-<span id="cb46-12"><span class="fu" style="color: #4758AB;
+<span id="cb35-12"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>(mod.drc, <span class="at" style="color: #657422;
 background-color: null;
@@ -1780,7 +1353,7 @@ background-color: null;
 font-style: inherit;">log =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">""</span>) </span>
-<span id="cb46-13"><span class="fu" style="color: #4758AB;
+<span id="cb35-13"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>(mod.drc2, <span class="at" style="color: #657422;
 background-color: null;
@@ -1792,7 +1365,7 @@ font-style: inherit;">"red"</span>)</span></code></pre></div></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://www.statforbiology.com/posts/nls_modelFitting_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="https://www.statforbiology.com/posts/nls_modelFitting_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -1806,7 +1379,7 @@ font-style: inherit;">"red"</span>)</span></code></pre></div></div>
 <p><img src="https://latex.codecogs.com/png.latex?%20Y%20=%20c%20+%20%5Cfrac%7Bd%20-%20c%7D%20%7B%201%20+%20b%20(X%20-%20e)%5E2%20%7D%20%5Cquad%20%5Cquad%20%5Cquad%20(22)"></p>
 <p>The two Lorentz functions can be fit with ‘drm()’, by using the self-starters <code>DRC.lorentz.3()</code> (Equation 21) and <code>DRC.lorentz.4</code> (Equation 22), in the ‘statforbiology’ package. With ‘nls()’, you can use the corresponding self-starters <code>NLS.lorentz.3()</code> and <code>NLS.lorentz.4</code>, also in the ‘statforbiology’ package.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1">X <span class="ot" style="color: #003B4F;
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1">X <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1831,7 +1404,7 @@ background-color: null;
 font-style: inherit;">45</span>, <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">50</span>)</span>
-<span id="cb47-2">Y1 <span class="ot" style="color: #003B4F;
+<span id="cb36-2">Y1 <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1856,18 +1429,18 @@ background-color: null;
 font-style: inherit;">1.3</span>, <span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.1</span>)</span>
-<span id="cb47-3">Y2 <span class="ot" style="color: #003B4F;
+<span id="cb36-3">Y2 <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> Y1 <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">2</span></span>
-<span id="cb47-4"></span>
-<span id="cb47-5"><span class="co" style="color: #5E5E5E;
+<span id="cb36-4"></span>
+<span id="cb36-5"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># nls fit</span></span>
-<span id="cb47-6">mod.nls <span class="ot" style="color: #003B4F;
+<span id="cb36-6">mod.nls <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1876,7 +1449,7 @@ background-color: null;
 font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">NLS.lorentz.3</span>(X, b, d, e) )</span>
-<span id="cb47-7">mod.nls2 <span class="ot" style="color: #003B4F;
+<span id="cb36-7">mod.nls2 <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1885,11 +1458,11 @@ background-color: null;
 font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">NLS.lorentz.4</span>(X, b, c, d, e) )</span>
-<span id="cb47-8"></span>
-<span id="cb47-9"><span class="co" style="color: #5E5E5E;
+<span id="cb36-8"></span>
+<span id="cb36-9"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># drm fit</span></span>
-<span id="cb47-10">mod.drc <span class="ot" style="color: #003B4F;
+<span id="cb36-10">mod.drc <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1900,7 +1473,7 @@ background-color: null;
 font-style: inherit;">fct =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">DRC.lorentz.3</span>() )</span>
-<span id="cb47-11">mod.drc2 <span class="ot" style="color: #003B4F;
+<span id="cb36-11">mod.drc2 <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1911,7 +1484,7 @@ background-color: null;
 font-style: inherit;">fct =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">DRC.lorentz.4</span>() )</span>
-<span id="cb47-12"><span class="fu" style="color: #4758AB;
+<span id="cb36-12"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>(mod.drc, <span class="at" style="color: #657422;
 background-color: null;
@@ -1926,7 +1499,7 @@ background-color: null;
 font-style: inherit;">log =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">""</span>) </span>
-<span id="cb47-13"><span class="fu" style="color: #4758AB;
+<span id="cb36-13"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>(mod.drc2, <span class="at" style="color: #657422;
 background-color: null;
@@ -1938,7 +1511,7 @@ font-style: inherit;">"red"</span>)</span></code></pre></div></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://www.statforbiology.com/posts/nls_modelFitting_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="https://www.statforbiology.com/posts/nls_modelFitting_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -1952,7 +1525,7 @@ font-style: inherit;">"red"</span>)</span></code></pre></div></div>
 <p>where <img src="https://latex.codecogs.com/png.latex?d"> is the maximum level for the expected response <img src="https://latex.codecogs.com/png.latex?Y">, <img src="https://latex.codecogs.com/png.latex?X_b"> and <img src="https://latex.codecogs.com/png.latex?X_c"> are, respectively, the minumum and maximum threshold levels, <img src="https://latex.codecogs.com/png.latex?X_o"> is the abscissa at the maximum expected response level and <img src="https://latex.codecogs.com/png.latex?b"> is a shape parameter. The above function is only defined for <img src="https://latex.codecogs.com/png.latex?X_b%20%3C%20X%20%3C%20X_c"> and it returns 0 elsewhere.</p>
 <p>In R, the beta function can be fitted either with ‘drm()’ and the self-starter <code>DRC.beta()</code>, or with ‘nls()’ and the self-starter <code>NLS.beta()</code>. Both the self-starters are available within the ‘statforbiology’ package.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1">X <span class="ot" style="color: #003B4F;
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1">X <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -1979,7 +1552,7 @@ background-color: null;
 font-style: inherit;">45</span>, <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">50</span>)</span>
-<span id="cb48-2">Y <span class="ot" style="color: #003B4F;
+<span id="cb37-2">Y <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -2006,8 +1579,8 @@ background-color: null;
 font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0</span>)</span>
-<span id="cb48-3"></span>
-<span id="cb48-4">model <span class="ot" style="color: #003B4F;
+<span id="cb37-3"></span>
+<span id="cb37-4">model <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -2016,7 +1589,7 @@ background-color: null;
 font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">NLS.beta</span>(X, b, d, Xb, Xo, Xc))</span>
-<span id="cb48-5">model <span class="ot" style="color: #003B4F;
+<span id="cb37-5">model <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -2027,7 +1600,7 @@ background-color: null;
 font-style: inherit;">fct =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">DRC.beta</span>())</span>
-<span id="cb48-6"><span class="fu" style="color: #4758AB;
+<span id="cb37-6"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">summary</span>(model)</span></code></pre></div></div>
 <div class="cell-output cell-output-stdout">
@@ -2049,7 +1622,7 @@ Residual standard error:
 
  0.7251948 (6 degrees of freedom)</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><span class="fu" style="color: #4758AB;
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>(model, <span class="at" style="color: #657422;
 background-color: null;
@@ -2063,7 +1636,7 @@ font-style: inherit;">"Beta function"</span>)</span></code></pre></div></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://www.statforbiology.com/posts/nls_modelFitting_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="https://www.statforbiology.com/posts/nls_modelFitting_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -2288,7 +1861,7 @@ Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it
   <pubDate>Mon, 24 Nov 2025 23:00:00 GMT</pubDate>
 </item>
 <item>
-  <title>Some useful equations for nonlinear regression in R</title>
+  <title>Some useful equations for biological processes</title>
   <dc:creator>Andrea Onofri</dc:creator>
   <link>https://www.statforbiology.com/posts/nls_usefulEquations.html</link>
   <description><![CDATA[ 
@@ -2324,18 +1897,19 @@ Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it
 <li>Gompertz function</li>
 <li>Modified Gompertz function</li>
 <li>Log-logistic function</li>
-<li>Weibull (type 1) function</li>
-<li>Weibull (type 2) function</li>
+<li>Weibull (type-1) function</li>
+<li>Weibull (type-2) function</li>
 </ol></li>
 <li>Curves with maxima/minima
 <ol type="1">
+<li>Peaked sigmoidal function</li>
 <li>Bragg function</li>
 <li>Lorentz function</li>
 <li>Beta function</li>
 </ol></li>
 </ul>
-<p>have chosen to include a relatively large number of functions, so this post is necessarily rather long. To make navigation easier, you can first inspect Figure 1 to identify the type of curve of interest and then use the links above to jump directly to the corresponding section.</p>
-<p>Throughout this post, <img src="https://latex.codecogs.com/png.latex?X"> denotes the predictor, <img src="https://latex.codecogs.com/png.latex?Y"> the response, and the letters of the Roman alphabet (<img src="https://latex.codecogs.com/png.latex?a">, <img src="https://latex.codecogs.com/png.latex?b">, <img src="https://latex.codecogs.com/png.latex?c">, …) the model parameters, which determine the shape of the function.</p>
+<p>I have chosen to include a relatively large number of functions, so this post is necessarily rather long. To make navigation easier, you can first inspect Figure 1 to identify the type of curve of interest and then use the links above to jump directly to the corresponding section.</p>
+<p>Throughout this post, <img src="https://latex.codecogs.com/png.latex?X"> denotes the predictor, <img src="https://latex.codecogs.com/png.latex?Y"> denotes the response, and the letters of the Roman alphabet (<img src="https://latex.codecogs.com/png.latex?a">, <img src="https://latex.codecogs.com/png.latex?b">, <img src="https://latex.codecogs.com/png.latex?c">, …) denote the model parameters, which determine the shape of the function.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-1" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -2344,7 +1918,7 @@ Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it
 <img src="https://www.statforbiology.com/posts/nls_usefulEquations_files/figure-html/fig-1-1.png" class="img-fluid figure-img" style="width:95.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: The shapes of the most important functions
+Figure&nbsp;1: The shapes of the most important functions. The different colors indicate the possible different shapes of the same function, with different parameters. In the case of the Bragg/Lorentz function, the red color indicate the Bragg function and the blue color indicate the Lorentz function (same parameter values).
 </figcaption>
 </figure>
 </div>
@@ -2594,9 +2168,38 @@ font-style: inherit;">"X"</span>)</span></code></pre></div></div>
 <p>The Michaelis-Menten function is widely used in pesticide chemistry, enzyme kinetics (Eq. 14), biological assay models (Eq. 15), and weed competition studies, where it is used to describe crop yield loss as a function of weed density (Eq. 16). An example of fitting is shown in another post, <a href="../posts/nls_usefulEquations.html#rectangular-hyperbola">at this link</a>.</p>
 </section>
 </section>
-<section id="sigmoidal-curves" class="level1">
-<h1>Sigmoidal curves</h1>
-<p>Sigmoidal curves are S-shaped and they may be increasing, decreasing, symmetric or non-symmetric around the inflection point. They are parameterised in countless ways, which may often be confusing. I will show some widespread parameterisations, that are very useful for bioassays or growth studies. All curves can be turned from increasing to decreasing (and vice-versa) by reversing the sign of the <img src="https://latex.codecogs.com/png.latex?b"> parameter.</p>
+<section id="sigmoidal-function" class="level1">
+<h1>Sigmoidal functions</h1>
+<p>Sigmoidal functions are S-shaped, with two horizontal asymptotes (a lower and an upper asymptote) and an inflection point. They can be parameterised in countless ways, which may be confusing when selecting the most appropriate model for a particular biological process. In this post, I will use the parameterisations proposed in Ritz et al (2019), which is very consistent and puts all the curves on the same ground. Furthermore, the fitting properties are good, which contribute to good convergence and reliable estimation.</p>
+<p>For the sake of simplicity, it is useful to recognise that most sigmoidal models belong to one of three basic families, which differ only in the position of the inflection point relative to the two asymptotes:</p>
+<ol type="1">
+<li><strong>Logistic</strong>: the ordinate of the inflection point lies halfway between the lower and upper asymptotes; consequently, the S-shape is symmetric (the concave-up and the concave-down portions ‘mirror’ each other).</li>
+<li><strong>Gompertz</strong>: the ordinate of the inflection point lies closer to the lower asymptote, and, thus, the concave-up portions is ‘shorter’ than the concave-down portion.</li>
+<li><strong>Modified Gompertz</strong>: the ordinate of the inflection point lies closer to the upper asymptote, and, thus, the concave-up portion is ‘longer’ than than the concave-down portion.</li>
+</ol>
+<p>Each of these three equations can describe either increasing or decreasing responses, depending on the sign of one of the model parameters (see below). Their different shapes are compared side by side in Fig. 3.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-3" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://www.statforbiology.com/posts/nls_usefulEquations_files/figure-html/fig-3-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: The different shapes of sigmoidal curves based on x: logistic (red lines), Gompertz (blue lines) and modified Gompertz (green lines).
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Each of these three families (logistic, Gompertz and modified Gompertz) can be transformed by replacing <img src="https://latex.codecogs.com/png.latex?X"> with <img src="https://latex.codecogs.com/png.latex?%5Clog(X)">, giving raise to three corresponding families:</p>
+<ol type="1">
+<li><strong>Log-logistic</strong></li>
+<li><strong>Type-I Weibull</strong></li>
+<li><strong>Type-II Weibull</strong></li>
+</ol>
+<p>Like their linear-scale counterparts, these three families can describe either increasing or decreasing responses, depending on the sign of the same model parameter (see below). In the end, we have twelve different sigmoidal functions to choose from. The choice among them depends primarily on the expected symmetry of the response and on whether the predictor is more naturally interpreted on a linear or logarithmic scale.</p>
+<p>Thanks to their versatility, sigmoidal functions have been used for an uncountable number of biological applications. Just to mention a few examples in agriculture, I would like to cite plant growth, dose-response curves in biological assays and the time-course of seed germination. For some examples, take a look at my post <a href="../posts/nls_modelFitting.html#sigmoidal-function">at this link</a>.</p>
 <section id="logistic-function" class="level2">
 <h2 class="anchored" data-anchor-id="logistic-function">Logistic function</h2>
 <p>The logistic curve is derived from the cumulative logistic distribution function. It is symmetric about its inflection point and can be parameterised as:</p>
@@ -2609,7 +2212,7 @@ font-style: inherit;">"X"</span>)</span></code></pre></div></div>
 <p>The Gompertz curve can be parameterised in many different ways. I prefer a parameterisation that closely resembles that of the logistic function:</p>
 <p><img src="https://latex.codecogs.com/png.latex?Y%20=%20c%20+%20(d%20-%20c)%20%5Cexp%20%5Cleft%5C%7B-%20%5Cexp%20%5Cleft%5B%20-%20b%20%5C,%20(X%20-%20e)%20%5Cright%5D%20%5Cright%5C%7D%20%5Cquad%20%5Cquad%20%5Cquad%20(18)"></p>
 <p>Unlike the logistic function, the Gompertz curve is not symmetric about its inflection point. It exhibits a longer lag phase at the beginning, followed by a progressively steeper increase before gradually approaching the upper asymptote. The parameters have essentially the same interpretation as those of the logistic function, except that <img src="https://latex.codecogs.com/png.latex?e">, the abscissa of the inflection point, does not correspond to the value of <img src="https://latex.codecogs.com/png.latex?X"> producing a response halfway between <img src="https://latex.codecogs.com/png.latex?c"> and <img src="https://latex.codecogs.com/png.latex?d">.</p>
-<p>As with the logistic function, four-, three-, and two-parameter Gompertz models can be obtained by constraining one or both asymptotes. These models are widely used to describe plant growth and many other biological processes.</p>
+<p>As with the logistic function, four-, three-, and two-parameter Gompertz models can be obtained by constraining one or both asymptotes.</p>
 </section>
 <section id="modified-gompertz-function" class="level2">
 <h2 class="anchored" data-anchor-id="modified-gompertz-function">Modified Gompertz function</h2>
@@ -2622,25 +2225,52 @@ font-style: inherit;">"X"</span>)</span></code></pre></div></div>
 <p>The log-logistic curve is symmetric with respect to <img src="https://latex.codecogs.com/png.latex?%5Clog(X)">. A log-normal curve has a very similar shape, although it is used much less frequently. In biological assays (and also in germination studies), the log-logistic function is commonly parameterised as</p>
 <p><img src="https://latex.codecogs.com/png.latex?Y%20=%20c%20+%20%5Cfrac%7Bd%20-%20c%7D%7B1%20+%20%5Cexp%20%5Cleft%5C%7B%20-%20b%20%5Cleft%5B%20%5Clog(X)%20-%20%5Clog(e)%20%5Cright%5D%20%5Cright%5C%7D%20%7D%20%5Cquad%20%5Cquad%20%5Cquad%20(20)"></p>
 <p>The parameters have the same interpretation as in the logistic function. In particular, <img src="https://latex.codecogs.com/png.latex?e"> represents the value of <img src="https://latex.codecogs.com/png.latex?X"> that produces a response halfway between <img src="https://latex.codecogs.com/png.latex?c"> and <img src="https://latex.codecogs.com/png.latex?d"> (the ED50). It is easy to show that the above equation is equivalent to</p>
-<p><img src="https://latex.codecogs.com/png.latex?Y%20=%20c%20+%20%5Cfrac%7Bd%20-%20c%7D%7B1%20+%20%5Cleft(%20%5Cfrac%7BX%7D%7Be%7D%20%5Cright)%5E%7B-b%7D%7D%5Cquad%20%5Cquad%20%5Cquad%20(21)"></p>
+<p><img src="https://latex.codecogs.com/png.latex?Y%20=%20c%20+%20%5Cfrac%7Bd%20-%20c%7D%7B1%20+%20%5Cleft(%20%5Cfrac%7BX%7D%7Be%7D%20%5Cright)%5E%7B-b%7D%7D"></p>
 <p>Like the logistic function, the log-logistic model can be fitted in four-, three-, or two-parameter versions by constraining one or both asymptotes. It is widely used to describe dose-response relationships in biological assays, seed germination, and crop growth.</p>
 </section>
 <section id="weibull-function-type-1" class="level2">
 <h2 class="anchored" data-anchor-id="weibull-function-type-1">Weibull function (type 1)</h2>
 <p>The Type I Weibull function is the logarithmic counterpart of the Gompertz function, being defined on <img src="https://latex.codecogs.com/png.latex?%5Clog(X)"> rather than on <img src="https://latex.codecogs.com/png.latex?X">. It is parameterised as</p>
-<p><img src="https://latex.codecogs.com/png.latex?%20Y%20=%20c%20+%20(d%20-%20c)%20%5Cexp%20%5Cleft%5C%7B-%20%5Cexp%20%5Cleft%5B%20-%20b%20%5C,%20(%5Clog(X)%20-%20%5Clog(e))%20%5Cright%5D%20%5Cright%5C%7D%20%5Cquad%20%5Cquad%20%5Cquad%20(22)"></p>
+<p><img src="https://latex.codecogs.com/png.latex?%20Y%20=%20c%20+%20(d%20-%20c)%20%5Cexp%20%5Cleft%5C%7B-%20%5Cexp%20%5Cleft%5B%20-%20b%20%5C,%20(%5Clog(X)%20-%20%5Clog(e))%20%5Cright%5D%20%5Cright%5C%7D%20%5Cquad%20%5Cquad%20%5Cquad%20(21)"></p>
 <p>The parameters have essentially the same interpretation as those of the other sigmoidal functions presented above. In particular, <img src="https://latex.codecogs.com/png.latex?c"> and <img src="https://latex.codecogs.com/png.latex?d"> are the lower and upper asymptotes, respectively, while <img src="https://latex.codecogs.com/png.latex?e"> is the value of <img src="https://latex.codecogs.com/png.latex?X"> corresponding to the inflection point. Unlike the log-logistic function, however, <img src="https://latex.codecogs.com/png.latex?e"> does not correspond to the ED50.</p>
 </section>
 <section id="weibull-function-type-2" class="level2">
 <h2 class="anchored" data-anchor-id="weibull-function-type-2">Weibull function (type 2)</h2>
 <p>The Type II Weibull function is closely related to the Type I Weibull function, but it describes a different type of asymmetry, analogous to that of the modified Gompertz function:</p>
-<p><img src="https://latex.codecogs.com/png.latex?%20Y%20=%20c%20+%20(d%20-%20c)%20%5Cleft%5C%7B%201%20-%20%5Cexp%20%5Cleft%5C%7B-%20%5Cexp%20%5Cleft%5B%20b%20%5C,%20(%5Clog(X)%20-%20%5Clog(e))%20%5Cright%5D%20%5Cright%5C%7D%20%5Cright%5C%7D%20%5Cquad%20%5Cquad%20%5Cquad%20(23)"></p>
+<p><img src="https://latex.codecogs.com/png.latex?%20Y%20=%20c%20+%20(d%20-%20c)%20%5Cleft%5C%7B%201%20-%20%5Cexp%20%5Cleft%5C%7B-%20%5Cexp%20%5Cleft%5B%20b%20%5C,%20(%5Clog(X)%20-%20%5Clog(e))%20%5Cright%5D%20%5Cright%5C%7D%20%5Cright%5C%7D%20%5Cquad%20%5Cquad%20%5Cquad%20(22)"></p>
 <p>The parameters have the same interpretation as those of the Type I Weibull function. In particular, <img src="https://latex.codecogs.com/png.latex?c"> and <img src="https://latex.codecogs.com/png.latex?d"> are the lower and upper asymptotes, respectively, while <img src="https://latex.codecogs.com/png.latex?e"> is the value of <img src="https://latex.codecogs.com/png.latex?X"> at the inflection point. As with the Type I Weibull function, <img src="https://latex.codecogs.com/png.latex?e"> does not correspond to the ED50. One or both asymptotes may be constrained, giving rise to four-, three-, and two-parameter versions of the model.</p>
+</section>
+<section id="another-flexible-sigmoid" class="level2">
+<h2 class="anchored" data-anchor-id="another-flexible-sigmoid">Another ‘flexible’ sigmoid</h2>
+<p>I would also like to mention another sigmoidal function that has been widely used in biology because of its supposed flexibility: the <em>Richards</em> function:</p>
+<p><img src="https://latex.codecogs.com/png.latex?Y%20=%20c%20+%20%5Cfrac%7Bd%20-%20c%7D%7B%5Cleft%5B1%20+%20exp(-%20b%20(X%20-%20e))%5Cright%5D%5E%7B1/f%7D%7D"></p>
+<p>In this model, the degree of asymmetry is controlled by the parameter <img src="https://latex.codecogs.com/png.latex?f">. When <img src="https://latex.codecogs.com/png.latex?f%20=%201">, the function reduces to the logistic model, whereas, as <img src="https://latex.codecogs.com/png.latex?f"> decreases below 1, the curve progressively resembles a Gompertz function. Figure 4 illustrates the different shapes obtained for different values of <img src="https://latex.codecogs.com/png.latex?f">.</p>
+<p>Despite this apparent flexibility, the Richards function has poor statistical properties for parameter estimation. In particular, the additional parameter often causes strong correlations among the estimates, making the fitting process unstable and the parameter estimates difficult to interpret. Ratkowsky (1990) described it as having <em>“more undesirable nonlinear regression behaviour than almost any nonlinear regression model in common use.”</em> For these reasons, the Richards function will not be considered further in this blog.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-4" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://www.statforbiology.com/posts/nls_usefulEquations_files/figure-html/fig-4-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: The different shapes of the Richard’s function, based on the <img src="https://latex.codecogs.com/png.latex?f"> parameter: <img src="https://latex.codecogs.com/png.latex?f%20=%201"> (black line), <img src="https://latex.codecogs.com/png.latex?f%20=%200.5"> (blue line) and <img src="https://latex.codecogs.com/png.latex?f%20=%201.5"> (red line)
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
 </section>
 </section>
 <section id="curves-with-maximaminima" class="level1">
 <h1>Curves with maxima/minima</h1>
 <p>It is sometimes necessary to describe phenomena where the <img src="https://latex.codecogs.com/png.latex?Y"> variable reaches a maximum value at a certain level of the <img src="https://latex.codecogs.com/png.latex?X"> variable, and drops afterwords. For example, growth or germination rates are higher at optimal temperature levels and lower at supra-optimal or sub-optimal temperature levels. Another example relates to bioassays: in some cases, low doses of toxic substances induce a stimulation of growth (hormesis), which needs to be described by an appropriate model. The second order (and higher order) polynomial funcion we have seen earlier is capable of accounting for maxima/minima, but there are a few other interesting functions that may turn out useful in some circumstances.</p>
+<section id="brain-function" class="level2">
+<h2 class="anchored" data-anchor-id="brain-function">Peaked sigmoidal function</h2>
+<p>The log-logistic decreasing curve can be modified to account for possible hormetic effects at low doses, by combining mathematical switching functions (Schabenberger and Pierce, 2002; pag. 275). The most widespread parameterisation, that was originally devised by Brain and Cousens (<em>Brain, P., Cousens, R., 1989. An equation to describe dose responses where there is stimulation of growth at low doses. Weed Research 29, 93–96</em>) in a slightly different form, is:</p>
+<p><img src="https://latex.codecogs.com/png.latex?Y%20=%20c%20+%20%5Cfrac%7Bd%20-%20c%20+%20f%20%5C,%20X%7D%7B1%20+%20%5Cexp%20%5Cleft%5C%7B%20-%20b%20%5Cleft%5B%20%5Clog(X)%20-%20%5Clog(e)%20%5Cright%5D%20%5Cright%5C%7D%20%7D%20%5Cquad%20%5Cquad%20%5Cquad%20(23)"></p>
+<p>The parameters have the same interpretation as in the log-logistic curves, but <img src="https://latex.codecogs.com/png.latex?e"> does not represent the response half-way between the lower and higher asymptote and <img src="https://latex.codecogs.com/png.latex?f%20%3E%200"> represents the size of the hormetic effect, which increases as <img src="https://latex.codecogs.com/png.latex?f"> increases, while <img src="https://latex.codecogs.com/png.latex?f%20=%200"> corresponds to the situation of no hormesis (and the function reduces to a log-logistic.</p>
+</section>
 <section id="bragg-function" class="level2">
 <h2 class="anchored" data-anchor-id="bragg-function">Bragg function</h2>
 <p>This function is connected to the normal (Gaussian) distribution and has a symmetric shape with a maximum equal to <img src="https://latex.codecogs.com/png.latex?d">, that is reached when <img src="https://latex.codecogs.com/png.latex?X%20=%20e"> and two inflection points. In this model, <img src="https://latex.codecogs.com/png.latex?b"> relates to the slope at the inflection points; the response <img src="https://latex.codecogs.com/png.latex?Y"> approaches 0 when <img src="https://latex.codecogs.com/png.latex?X"> approaches <img src="https://latex.codecogs.com/png.latex?%5Cpm%20%5Cinfty">:</p>
@@ -2666,7 +2296,7 @@ font-style: inherit;">"X"</span>)</span></code></pre></div></div>
 </section>
 <section id="conclusions" class="level1">
 <h1>Conclusions</h1>
-<p>Here we are; I have discussed more almost 30 functions, which are commonly used to model biological processes. These functions can be found in several different parameterisations and flavours; they can also be modified and combined to suit the needs of several disciplines in biology, chemistry and so on. However, this will require another post.</p>
+<p>Here we are; I have discussed more almost 30 functions, which are commonly used to model biological processes. These functions can be found in several other different parameterisations and I suggest you read the book chapter by Miguez et al.&nbsp;(2018), for other interesting information.</p>
 <p>Thanks for reading! And … don’t forget to check out my new book!</p>
 <p>Prof.&nbsp;Andrea Onofri<br>
 Department of Agricultural, Food and Environmental Sciences<br>
@@ -2680,7 +2310,8 @@ Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it
 <ol type="1">
 <li>Miguez, F., Archontoulis, S., Dokoohaki, H., Glaz, B., Yeater, K.M., 2018. Chapter 15: Nonlinear Regression Models and Applications, in: ACSESS Publications. American Society of Agronomy, Crop Science Society of America, and Soil Science Society of America, Inc.</li>
 <li>Ratkowsky, D.A., 1990. Handbook of nonlinear regression models. Marcel Dekker Inc., New York, USA.</li>
-<li>Ritz, C., Jensen, S. M., Gerhard, D., Streibig, J. C. (2019) Dose-Response Analysis Using R. CRC Press</li>
+<li>Ritz, C., Jensen, S. M., Gerhard, D., Streibig, J. C., 2019. Dose-Response Analysis Using R. CRC Press</li>
+<li>Schabenberger, O., Pierce, F.J., 2002. Contemporary statistical models for the plant and soil sciences. Taylor &amp; Francis, CRC Press, Books.</li>
 </ol>
 
 
