@@ -1,7 +1,7 @@
 ---
-title: Some useful equations for nonlinear regression in R
+title: Some useful equations for biological processes
 author: "Andrea Onofri"
-date: 2019-01-08
+date: 2026-07-24
 categories: 
    - "nonlinear regression"
 tags:   
@@ -34,7 +34,7 @@ Functions are often classified according to the shape they exhibit when plotted 
 - Concave/Convex curves (no inflection)
   1.  [Exponential function](#exponential-function)
   2.  [Asymptotic function / Negative exponential function](#asymptotic-function)
-  3.  [Power curve function](#power-function)
+  3.  [Power function](#power-function)
   4.  [Logarithmic function](#logarithmic-function)
   5.  [Rectangular hyperbola](#rectangular-hyperbola)
 - Sigmoidal curves
@@ -42,24 +42,28 @@ Functions are often classified according to the shape they exhibit when plotted 
   2.  [Gompertz function](#gompertz-function)
   3.  [Modified Gompertz function](#modified-gompertz-function)
   4.  [Log-logistic function](#log-logistic-function)
-  5.  [Weibull (type 1) function](#weibull-function-type-1)
-  6.  [Weibull (type 2) function](#weibull-function-type-2)
+  5.  [Weibull (type-1) function](#weibull-function-type-1)
+  6.  [Weibull (type-2) function](#weibull-function-type-2)
 - Curves with maxima/minima
-  1.  [Bragg function](#bragg-function)
-  2.  [Lorentz function](#lorentz-function)
-  3.  [Beta function](#beta-function)
+  1.  [Peaked sigmoidal function](#brain-function)
+  2.  [Bragg function](#bragg-function)
+  3.  [Lorentz function](#lorentz-function)
+  4.  [Beta function](#beta-function)
 
-have chosen to include a relatively large number of functions, so this post is necessarily rather long. To make navigation easier, you can first inspect Figure 1 to identify the type of curve of interest and then use the links above to jump directly to the corresponding section.
+I have chosen to include a relatively large number of functions, so this post is necessarily rather long. To make navigation easier, you can first inspect Figure 1 to identify the type of curve of interest and then use the links above to jump directly to the corresponding section.
 
-Throughout this post, $X$ denotes the predictor, $Y$ the response, and the letters of the Roman alphabet ($a$, $b$, $c$, ...) the model parameters, which determine the shape of the function.
+Throughout this post, $X$ denotes the predictor, $Y$ denotes the response, and the letters of the Roman alphabet ($a$, $b$, $c$, ...) denote the model parameters, which determine the shape of the function.
 
 ```{r}
 #| label: fig-1
 #| echo: false
 #| message: false
 #| warning: false
-#| fig-cap: The shapes of the most important functions
+#| fig-cap: The shapes of the most important functions. The different colors indicate the possible different shapes of the same function, with different parameters. In the case of the Bragg/Lorentz function, the red color indicate the Bragg function and the blue color indicate the Lorentz function (same parameter values).
 #| out-width: 95%
+#| fig-width: 8
+#| fig-height: 8
+
 library(statforbiology)
 par(las=3, mfrow=c(4,4))
 
@@ -95,7 +99,7 @@ box(which = "figure")
 #Asymptotic 
 a = 4; b = 0.22; c = 17
 plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
-     main = "Asymptotic function")
+     main = "Asymptotic")
 curve(asymReg.fun(x, a, b, c) , add = T, col = "red")
 box(which = "plot")
 box(which = "figure")
@@ -112,7 +116,7 @@ box(which = "figure")
 # Power curves
 a <- 9; b <- 0.3
 plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
-     main = "Power curves")
+     main = "Power")
 curve(powerCurve.fun(x, 4, b) , add = T, col = "red")
 curve(powerCurve.fun(x, 9, -b) , add = T, col = "blue")
 curve(powerCurve.fun(x, 0.06, 2) , add = T, col = "black")
@@ -123,7 +127,7 @@ box(which = "figure")
 #b is positive
 a <- 1.99; b <- 4
 plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
-     main = "Logarithmic functions")
+     main = "Logarithmic")
 curve(logCurve.fun(x, a, b) , add = T, col = "red")
 a <- 18; b <- -5
 curve(logCurve.fun(x, a, b) , add = T, col = "blue")
@@ -141,7 +145,7 @@ box(which = "figure")
 # Logistic
 c <- 2; d <- 18; b <- 0.7; e <- 15
 plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
-     main = "Logistic growth")
+     main = "Logistic")
 curve(L4.fun(x, b, c, d, e) , add = T, col = "red")
 box(which = "plot")
 box(which = "figure")
@@ -149,7 +153,7 @@ box(which = "figure")
 # Gompertz
 c <- 2; d <- 18; b <- 0.7; e <- 15
 plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
-     main = "Gompertz growth")
+     main = "Gompertz")
 curve(G4.fun(x, b, c, d, e) , add = T, col = "red")
 box(which = "plot")
 box(which = "figure")
@@ -173,7 +177,7 @@ box(which = "figure")
 # Weibull I
 c <- 2; d <- 18; b <- 4; e <- 15
 plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
-     main = "Weibull type 1")
+     main = "Weibull type-1")
 curve(W1.4.fun(x, b, c, d, e) , add = T, col = "red")
 box(which = "plot")
 box(which = "figure")
@@ -181,38 +185,45 @@ box(which = "figure")
 # Weibull II
 c <- 2; d <- 18; b <- 4; e <- 15
 plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
-     main = "Weibull type 2")
+     main = "Weibull type-2")
 curve(W2.4.fun(x, b, c, d, e) , add = T, col = "red")
 box(which = "plot")
 box(which = "figure")
 
-# Bragg
+# Peaked sigmoidal
+c <- 2; d <- 18; b <- 4; e <- 15; f <- 1.5
+bc <- BC.5()
+plot(0, type="n", xlim=c(0,50), ylim=c(0,30), axes=F,
+     main = "Peaked sigmoidal")
+curve(bc$fct(x, parm = matrix(c(b, c, d, e, f), 1, 5)), add = T, col = "red")
+box(which = "plot")
+box(which = "figure")
+
+
+# Bragg/Lorentz
 b <- 0.04; e <- 15; d <- 17
 plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
-     main = "Bragg function")
+     main = "Bragg/Lorentz")
 curve(bragg.3.fun(x, b, d, e) , add = T, col = "red")
+curve(lorentz.3.fun(x, b, d, e) , add = T, col = "blue")
 box(which = "plot")
 box(which = "figure")
 
 # Lorentz
-b <- 0.04; e <- 15; d <- 17
-plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
-     main = "Lorentz function")
-curve(lorentz.3.fun(x, b, d, e) , add = T, col = "red")
-box(which = "plot")
-box(which = "figure")
+# b <- 0.04; e <- 15; d <- 17
+# plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
+#      main = "Lorentz function")
+# curve(lorentz.3.fun(x, b, d, e) , add = T, col = "red")
+# box(which = "plot")
+# box(which = "figure")
 
-# Lorentz
+# Beta
 b <- 2; d <- 17; Xb <- 7; Xo <- 20; Xc <- 25
 plot(0, type="n", xlim=c(0,30), ylim=c(0,20), axes=F,
-     main = "Beta function")
+     main = "Betan")
 curve(beta.fun(x, b, d, Xb, Xo, Xc) , add = T, col = "red")
 box(which = "plot")
 box(which = "figure")
-
-
-# mtext("Tempo (d)", las=1, side=1, outer=T, at=c(0.5), padj=2.3, cex=1.0)
-# mtext("Proporzione di semi germinati", outer=T, side=2, las=0, at=c(0.5), padj=-2.3, cex=1.0)
 ```
 
 # Polynomials
@@ -227,7 +238,7 @@ $$Y = a + bX \qquad\qquad (1)$$
 
 where $a$ is the value of $Y$ when $X = 0$, and $b$ is the slope, that is, the change in $Y$ associated with a one-unit increase in $X$. When $b>0$, $Y$ increases as $X$ increases; when $b<0$, it decreases.
 
-Because of their simplicity, straight lines are mainly used to approximate biological responses over a limited range of the predictor.
+Because of their simplicity, straight lines are mainly used to approximate biological responses over a limited range of the predictor. Should you need it, an example of fitting a straight line to research data is given elsewhere [at this link](nls_modelFitting.qmd#straight-line-function).
 
 ## Quadratic polynomial function {#quadratic-polynomial-function}
 
@@ -253,7 +264,7 @@ The corresponding response is
 
 $$Y_{\textrm{max}} = \frac{4ac-b^2}{4c}$$
 
-In practice, biologists often use only one branch of the parabola to approximate biological responses showing either a concave or a convex trend over a limited range of the predictor.
+In practice, biologists often use only one branch of the parabola to approximate biological responses showing either a concave or a convex trend over a limited range of the predictor. Check [this link](nls_modelFitting.qmd#quadratic-polynomial-function) for an example of fitting.
 
 # Concave/Convex curves (no inflection points)
 
@@ -303,7 +314,7 @@ For all the exponential decay equations presented above, $Y \rightarrow 0$ as $X
 
 $$ Y = c + (d -c) \exp(-x/e) \quad \quad \quad (7)$$
 
-Exponential functions are often used to describe the growth of populations under non-limiting environmental conditions or the degradation of xenobiotics in the environment (first-order degradation kinetics). In both cases, $X$ represents time and is therefore restricted to non-negative values, while $b$ (or, equivalently, $k$) must be different from zero.
+Exponential functions are often used to describe the growth of populations under non-limiting environmental conditions or the degradation of xenobiotics in the environment (first-order degradation kinetics). In both cases, $X$ represents time and is therefore restricted to non-negative values, while $b$ (or, equivalently, $k$) must be different from zero. Check the post [at this link](nls_modelFitting.qmd#exponential-function) for an example of fitting.
 
 ## Asymptotic function {#asymptotic-function}
 
@@ -341,7 +352,7 @@ $$Y = a \left[ 1- \exp (- m X) \right] \quad \quad \quad (11)$$
 
 which is known as the *negative exponential function*.
 
-The asymptotic function is widely used in biology, not only for growth analysis but also, for example, in weed competition studies. The negative exponential function has also been used to model the absorbed Photosynthetically Active Radiation ($Y = PAR_a$) as a function of leaf area index ($X = LAI$). In this context, $a$ represents the incident PAR ($a = PAR_i$), while $m$ is the light extinction coefficient.
+The asymptotic function is widely used in biology, not only for growth analysis but also, for example, in weed competition studies. The negative exponential function has also been used to model the absorbed Photosynthetically Active Radiation ($Y = PAR_a$) as a function of leaf area index ($X = LAI$). In this context, $a$ represents the incident PAR ($a = PAR_i$), while $m$ is the light extinction coefficient. Check the post [at this link](nls_modelFitting.qmd#asymptotic-function) for an example of fitting.
 
 ```{r}
 #| eval: false
@@ -395,7 +406,7 @@ The power function is mathematically equivalent to an exponential function of $\
 
 $$a \,X^b = a \, e^{\log( X^b )} = a \, e^{b \, \log(X)}$$
 
-The power function (named as the Freundlich equation) is widely used in agricultural chemistry, for example to model the sorption of xenobiotics in soil. It is also used to describe the relationship between the number of plant species and the sampled area (the species–area relationship).
+The power function (named as the Freundlich equation) is widely used in agricultural chemistry, for example to model the sorption of xenobiotics in soil. It is also used to describe the relationship between the number of plant species and the sampled area (the species–area relationship). Check the post [at this link](nls_modelFitting.qmd#power-function) for an example of fitting.
 
 ## Logarithmic function {#logarithmic-function}
 
@@ -460,7 +471,7 @@ curve(3 - 0.5 * log(x), add = T, lty = 3)
 curve(1 - 0.5 * log(x), add = T, col = "red", lty = 3)
 ```
 
-In biology, logarithmic functions are used, for example, to describe species–area relationships in ecology, enzyme kinetics in biochemistry, and sensory perception in neurobiology.
+In biology, logarithmic functions are used, for example, to describe species–area relationships in ecology, enzyme kinetics in biochemistry, and sensory perception in neurobiology. Check the post [at this link](nls_modelFitting.qmd#logarithmic-function) for an example of fitting.
 
 ## Rectangular hyperbola {#rectangular-hyperbola}
 
@@ -494,7 +505,7 @@ Another common parameterisation includes the initial slope $i$ as an explicit pa
 
 $$Y = \frac{a \, X} {b + X} = \frac{ \frac{a}{b} \, X} {\frac{b}{b} + \frac{X}{b}} = \frac{i \, X}{1 + \frac{i \, X }{a}} \quad \quad \quad (16)$$
 
-The Michaelis-Menten function is widely used in pesticide chemistry, enzyme kinetics (Eq. 14), biological assay models (Eq. 15), and weed competition studies, where it is used to describe crop yield loss as a function of weed density (Eq. 16).
+The Michaelis-Menten function is widely used in pesticide chemistry, enzyme kinetics (Eq. 14), biological assay models (Eq. 15), and weed competition studies, where it is used to describe crop yield loss as a function of weed density (Eq. 16). An example of fitting is shown in another post, [at this link](nls_usefulEquations.qmd#rectangular-hyperbola).
 
 ```{r}
 #| eval: false
@@ -517,9 +528,57 @@ curve(mm2.fun(x, coef(model)[1], coef(model)[2]), add = T, col = "red")
 mm2.fun(0, coef(model)[1], coef(model)[2])
 ```
 
-# Sigmoidal curves
+# Sigmoidal functions {#sigmoidal-function}
 
-Sigmoidal curves are S-shaped and they may be increasing, decreasing, symmetric or non-symmetric around the inflection point. They are parameterised in countless ways, which may often be confusing. I will show some widespread parameterisations, that are very useful for bioassays or growth studies. All curves can be turned from increasing to decreasing (and vice-versa) by reversing the sign of the $b$ parameter.
+Sigmoidal functions are S-shaped, with two horizontal asymptotes (a lower and an upper asymptote) and an inflection point. They can be parameterised in countless ways, which may be confusing when selecting the most appropriate model for a particular biological process. In this post, I will use the parameterisations proposed in Ritz et al (2019), which is very consistent and puts all the curves on the same ground. Furthermore, the fitting properties are good, which contribute to good convergence and reliable estimation.
+
+For the sake of simplicity, it is useful to recognise that most sigmoidal models belong to one of three basic families, which differ only in the position of the inflection point relative to the two asymptotes:
+
+1. **Logistic**: the ordinate of the inflection point lies halfway between the lower and upper asymptotes; consequently, the S-shape is symmetric (the concave-up and the concave-down portions 'mirror' each other).
+2. **Gompertz**: the ordinate of the inflection point lies closer to the lower asymptote, and, thus, the concave-up portions is 'shorter' than the concave-down portion.
+3. **Modified Gompertz**: the ordinate of the inflection point lies closer to the upper asymptote, and, thus, the concave-up portion is 'longer' than than the concave-down portion.
+
+Each of these three equations can describe either increasing or decreasing responses, depending on the sign of one of the model parameters (see below). Their different shapes are compared side by side in Fig. 3.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-cap: "The different shapes of sigmoidal curves based on x: logistic (red lines), Gompertz (blue lines) and modified Gompertz (green lines)."
+#| label: fig-3
+
+
+library(statforbiology)
+
+# Sigmoidal increase
+par(mfrow = c(1,2))
+c <- 2; d <- 18; b <- 0.03; e <- 115
+plot(0, type="n", xlim=c(0,300), ylim=c(0,20),
+     main = "Ascending sigmoids", xlab = "X", ylab = "Y")
+curve(L4.fun(x, b, c, d, e) , add = T, col = "red")
+curve(G4.fun(x, b, c, d, e) , add = T, col = "blue")
+curve(E4.fun(x, b, c, d, e) , add = T, col = "green")
+
+# Sigmoidal decrease
+c <- 2; d <- 18; b <- -0.03; e <- 115
+plot(0, type="n", xlim=c(0,300), ylim=c(0,20),
+     main = "Descending sigmoids", xlab = "X", ylab = "Y")
+curve(L4.fun(x, b, c, d, e) , add = T, col = "red")
+curve(G4.fun(x, b, c, d, e) , add = T, col = "blue")
+curve(E4.fun(x, b, c, d, e) , add = T, col = "green")
+```
+
+Each of these three families (logistic, Gompertz and modified Gompertz) can be transformed by replacing $X$ with $\log(X)$, giving raise to three corresponding families:
+
+1. **Log-logistic**
+2. **Type-I Weibull**
+3. **Type-II Weibull**
+
+
+Like their linear-scale counterparts, these three families can describe either increasing or decreasing responses, depending on the sign of the same model parameter (see below). In the end, we have twelve different sigmoidal functions to choose from. The choice among them depends primarily on the expected symmetry of the response and on whether the predictor is more naturally interpreted on a linear or logarithmic scale.
+
+Thanks to their versatility, sigmoidal functions have been used for an uncountable number of biological applications. Just to mention a few examples in agriculture, I would like to cite plant growth, dose-response curves in biological assays and the time-course of seed germination. For some examples, take a look at my post [at this link](nls_modelFitting.qmd#sigmoidal-function).
+
 
 ## Logistic function {#logistic-function}
 
@@ -558,7 +617,7 @@ $$Y = c + (d - c) \exp \left\{- \exp \left[ - b \, (X - e) \right] \right\} \qua
 
 Unlike the logistic function, the Gompertz curve is not symmetric about its inflection point. It exhibits a longer lag phase at the beginning, followed by a progressively steeper increase before gradually approaching the upper asymptote. The parameters have essentially the same interpretation as those of the logistic function, except that $e$, the abscissa of the inflection point, does not correspond to the value of $X$ producing a response halfway between $c$ and $d$.
 
-As with the logistic function, four-, three-, and two-parameter Gompertz models can be obtained by constraining one or both asymptotes. These models are widely used to describe plant growth and many other biological processes.
+As with the logistic function, four-, three-, and two-parameter Gompertz models can be obtained by constraining one or both asymptotes.
 
 ```{r}
 #| eval: false
@@ -592,7 +651,6 @@ model <- nls(weightInf ~ NLS.E3(DAE, b, d, e), data = beetGrowth)
 model.2 <- nls(weightFree ~ NLS.E4(DAE, b, c, d, e), data = beetGrowth)
 model.3 <- nls(I(weightFree/max(weightFree)) ~ NLS.E2(DAE, b, e), data = beetGrowth)
 
-
 # drm fit
 model <- drm(weightInf ~ DAE, fct = DRC.E3(), data = beetGrowth)
 model.2 <- drm(weightFree ~ DAE, fct = DRC.E4(), data = beetGrowth)
@@ -609,7 +667,7 @@ $$Y = c + \frac{d - c}{1 + \exp \left\{ - b \left[ \log(X) - \log(e) \right] \ri
 
 The parameters have the same interpretation as in the logistic function. In particular, $e$ represents the value of $X$ that produces a response halfway between $c$ and $d$ (the ED50). It is easy to show that the above equation is equivalent to
 
-$$Y = c + \frac{d - c}{1 + \left( \frac{X}{e} \right)^{-b}}\quad \quad \quad (21)$$
+$$Y = c + \frac{d - c}{1 + \left( \frac{X}{e} \right)^{-b}}$$
 
 Like the logistic function, the log-logistic model can be fitted in four-, three-, or two-parameter versions by constraining one or both asymptotes. It is widely used to describe dose-response relationships in biological assays, seed germination, and crop growth.
 
@@ -631,7 +689,7 @@ plot(model, ylim = c(0,6), main = "Log-logistic function")
 
 The Type I Weibull function is the logarithmic counterpart of the Gompertz function, being defined on $\log(X)$ rather than on $X$. It is parameterised as
 
-$$ Y = c + (d - c) \exp \left\{- \exp \left[ - b \, (\log(X) - \log(e)) \right] \right\} \quad \quad \quad (22)$$
+$$ Y = c + (d - c) \exp \left\{- \exp \left[ - b \, (\log(X) - \log(e)) \right] \right\} \quad \quad \quad (21)$$
 
 The parameters have essentially the same interpretation as those of the other sigmoidal functions presented above. In particular, $c$ and $d$ are the lower and upper asymptotes, respectively, while $e$ is the value of $X$ corresponding to the inflection point. Unlike the log-logistic function, however, $e$ does not correspond to the ED50.
 
@@ -655,7 +713,7 @@ plot(model, ylim = c(0,6), main = "Weibull type 1")
 
 The Type II Weibull function is closely related to the Type I Weibull function, but it describes a different type of asymmetry, analogous to that of the modified Gompertz function:
 
-$$ Y = c + (d - c) \left\{ 1 - \exp \left\{- \exp \left[ b \, (\log(X) - \log(e)) \right] \right\} \right\} \quad \quad \quad (23)$$
+$$ Y = c + (d - c) \left\{ 1 - \exp \left\{- \exp \left[ b \, (\log(X) - \log(e)) \right] \right\} \right\} \quad \quad \quad (22)$$
 
 The parameters have the same interpretation as those of the Type I Weibull function. In particular, $c$ and $d$ are the lower and upper asymptotes, respectively, while $e$ is the value of $X$ at the inflection point. As with the Type I Weibull function, $e$ does not correspond to the ED50. One or both asymptotes may be constrained, giving rise to four-, three-, and two-parameter versions of the model.
 
@@ -673,9 +731,45 @@ summary(model)
 plot(model, ylim = c(0,6), main = "Weibull type 2")
 ```
 
-# Curves with maxima/minima
+## Another 'flexible' sigmoid
+
+I would also like to mention another sigmoidal function that has been widely used in biology because of its supposed flexibility: the *Richards* function:
+
+$$Y = c + \frac{d - c}{\left[1 + exp(- b (X - e))\right]^{1/f}}$$
+
+In this model, the degree of asymmetry is controlled by the parameter $f$. When $f = 1$, the function reduces to the logistic model, whereas, as $f$ decreases below 1, the curve progressively resembles a Gompertz function. Figure 4 illustrates the different shapes obtained for different values of $f$.
+
+Despite this apparent flexibility, the Richards function has poor statistical properties for parameter estimation. In particular, the additional parameter often causes strong correlations among the estimates, making the fitting process unstable and the parameter estimates difficult to interpret. Ratkowsky (1990) described it as having *"more undesirable nonlinear regression behaviour than almost any nonlinear regression model in common use."* For these reasons, the Richards function will not be considered further in this blog.
+
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-cap: "The different shapes of the Richard's function, based on the $f$ parameter: $f = 1$ (black line), $f = 0.5$ (blue line) and $f = 1.5$ (red line)"
+#| label: fig-4
+
+beta <- 0.1; gamma <- 50
+curve(1/((1 + exp(-beta*(x - gamma)))^1), from=0, to=100,
+      ylim = c(0, 1))
+curve(1/((1 + exp(-beta*(x - gamma)))^(1/0.5)), add = T, col = "red")
+curve(1/((1 + exp(-beta*(x - gamma)))^(1/1.5)), add = T, col = "blue")
+```
+
+
+
+# Curves with maxima/minima {#maxima-fun}
 
 It is sometimes necessary to describe phenomena where the $Y$ variable reaches a maximum value at a certain level of the $X$ variable, and drops afterwords. For example, growth or germination rates are higher at optimal temperature levels and lower at supra-optimal or sub-optimal temperature levels. Another example relates to bioassays: in some cases, low doses of toxic substances induce a stimulation of growth (hormesis), which needs to be described by an appropriate model. The second order (and higher order) polynomial funcion we have seen earlier is capable of accounting for maxima/minima, but there are a few other interesting functions that may turn out useful in some circumstances.
+
+## Peaked sigmoidal function {#brain-function}
+
+The log-logistic decreasing curve can be modified to account for possible hormetic effects at low doses, by combining mathematical switching functions (Schabenberger and Pierce, 2002; pag. 275). The most widespread parameterisation, that was originally devised by Brain and Cousens (*Brain, P., Cousens, R., 1989. An equation to describe dose responses where there is stimulation of growth at low doses. Weed Research 29, 93–96*) in a slightly different form, is:
+
+$$Y = c + \frac{d - c + f \, X}{1 + \exp \left\{ - b \left[ \log(X) - \log(e) \right] \right\} } \quad \quad \quad (23)$$
+
+The parameters have the same interpretation as in the log-logistic curves, but $e$ does not represent the response half-way between the lower and higher asymptote and $f > 0$  represents the size of the hormetic effect, which increases as $f$ increases, while $f = 0$ corresponds to the situation of no hormesis (and the function reduces to a log-logistic.
+
 
 ## Bragg function {#bragg-function}
 
@@ -685,7 +779,7 @@ $$Y = d \, \exp \left[ - b (X - e)^2 \right] \quad \quad \quad (24)$$
 
 If we would like to have lower asymptotes different from 0, we should add the parameter $c$, as follows:
 
-$$Y = c + (d - c) \, \exp \left[ - b (X - e)^2 \right] \quad \quad \quad (25)$$
+$$Y = c + (d - c) \, \exp \left[ - b (X - e)^2 \right] \quad \quad \quad (24a)$$
 
 The two Bragg functions have proven useful in applications relating to the science of carbon materials.
 
@@ -711,11 +805,11 @@ plot(mod.drc2, add = T, col = "red")
 
 The Lorentz function is similar to the Bragg function, although it has worse statistical properties (Ratkowsky, 1990). The equation is:
 
-$$Y = \frac{d} { 1 + b (X - e)^2 } \quad \quad \quad (26)$$
+$$Y = \frac{d} { 1 + b (X - e)^2 } \quad \quad \quad (25)$$
 
 We can also allow for lower asymptotes different from 0, by adding a further parameter:
 
-$$Y = c + \frac{d - c} { 1 + b (X - e)^2 } \quad \quad \quad (27)$$
+$$Y = c + \frac{d - c} { 1 + b (X - e)^2 } \quad \quad \quad (25a)$$
 
 ```{r}
 #| eval: false
@@ -741,7 +835,7 @@ The beta function derives from the beta density function and it has been adapted
 
 The equation is:
 
-$$ Y = d \,\left\{  \left( \frac{X - X_b}{X_o - X_b} \right) \left( \frac{X_c - X}{X_c - X_o} \right) ^ {\frac{X_c - X_o}{X_o - X_b}} \right\}^b \quad \quad \quad (28)$$
+$$ Y = d \,\left\{  \left( \frac{X - X_b}{X_o - X_b} \right) \left( \frac{X_c - X}{X_c - X_o} \right) ^ {\frac{X_c - X_o}{X_o - X_b}} \right\}^b \quad \quad \quad (26)$$
 
 where $d$ is the maximum level for the expected response $Y$, $X_b$ and $X_c$ are, respectively, the minumum and maximum threshold levels, $X_o$ is the abscissa at the maximum expected response level and $b$ is a shape parameter. The above function is only defined for $X_b < X < X_c$ and it returns 0 elsewhere.
 
@@ -757,9 +851,10 @@ summary(model)
 plot(model, log="", main = "Beta function")
 ```
 
+
 # Conclusions
 
-Here we are; I have discussed more almost 30 functions, which are commonly used to model biological processes. These functions can be found in several different parameterisations and flavours; they can also be modified and combined to suit the needs of several disciplines in biology, chemistry and so on. However, this will require another post.
+Here we are; I have discussed more almost 30 functions, which are commonly used to model biological processes. These functions can be found in several other different parameterisations and I suggest you read the book chapter by Miguez et al. (2018), for other interesting information.
 
 Thanks for reading! And ... don't forget to check out my new book!
 
@@ -770,10 +865,13 @@ Send comments to: [andrea.onofri\@unipg.it](mailto:andrea.onofri@unipg.it)
 
 <a href = "https://www.awin1.com/cread.php?awinmid=26429&awinaffid=2675822&ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src="/Figures/Email_Signature_978-3-032-08199-5.png" alt="Book cover" class="cover" align="center"/></a>
 
-------------------------------------------------------------------------
+---
 
 # Further readings
 
 1.  Miguez, F., Archontoulis, S., Dokoohaki, H., Glaz, B., Yeater, K.M., 2018. Chapter 15: Nonlinear Regression Models and Applications, in: ACSESS Publications. American Society of Agronomy, Crop Science Society of America, and Soil Science Society of America, Inc.
 2.  Ratkowsky, D.A., 1990. Handbook of nonlinear regression models. Marcel Dekker Inc., New York, USA.
-3.  Ritz, C., Jensen, S. M., Gerhard, D., Streibig, J. C. (2019) Dose-Response Analysis Using R. CRC Press
+3.  Ritz, C., Jensen, S. M., Gerhard, D., Streibig, J. C., 2019. Dose-Response Analysis Using R. CRC Press
+4. Schabenberger, O., Pierce, F.J., 2002. Contemporary statistical models for the plant and soil sciences. Taylor & Francis, CRC Press, Books.
+
+This post was originally published in this blog on 2019-01-08

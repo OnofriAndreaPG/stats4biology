@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Andrea Onofri">
+<meta name="dcterms.date" content="2026-07-21">
+
+<title>A collection of self-starters for nonlinear regression in R – Statforbiology</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-40660c7df68f9134ae342454c17cf2af.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-GPNY1W5GL5"></script>
+
+<script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-GPNY1W5GL5', { 'anonymize_ip': true});
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Statforbiology</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../aboutThis.html"> 
+<span class="menu-text">About this site</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html"> 
+<span class="menu-text">About me</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Posts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../tutorials.html"> 
+<span class="menu-text">Teaching material</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../Rpackages.html"> 
+<span class="menu-text">Companion R Packages</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../links.html"> 
+<span class="menu-text">Useful links</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/OnofriAndreaPG"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://bsky.app/profile/statforbiology.bsky.social"> <i class="bi bi-bluesky" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">A collection of self-starters for nonlinear regression in R</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">R</div>
+                <div class="quarto-category">nonlinear regression</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Andrea Onofri </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">July 21, 2026</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p>Usually, the first step in every nonlinear regression analysis is to select the function <span class="math inline">\(f\)</span> that best describes the phenomenon under study. The next step is to fit this function to the observed data, possibly by using some sort of nonlinear least squares algorithm.</p>
+<p>We have already devoted a post to the first task, which you can find <a href="../posts/nls_usefulEquations.html">at this link</a>.</p>
+<p>As for the second step, the main problem is that nonlinear least squares algorithms are iterative, in the sense that they start from some initial guesses for the model parameters, which are continuously improved until the least squares solution is approximately reached. Quite often, providing such initial guesses for all model parameters becomes a problem: if our guesses are not close enough to the least squares estimates, the algorithm may stall and fail to converge. Or, even worse, it may converge to the wrong solution. How do we obtain good initial guesses for the model parameters? This is not easily accomplished, especially for students and practitioners. This is where self-starters come in handy.</p>
+<p>Self-starter functions can automatically calculate initial values for any given dataset and, therefore, they can make nonlinear regression almost as straightforward as linear regression. From a teaching perspective, this means that the transition from linear to nonlinear models is immediate and hassle-free.</p>
+<p>In another post, <a href="../posts/nls_selfStarting.html">at this link</a>, I explained how self-starters can be built for both the <code>nls()</code> function in the ‘stats’ package and the <code>drm()</code> function in the ‘drc’ package (Ritz et al., 2019). In this post, I would like to provide an overview of the self-starting functions that already exist in R, either in the ‘stats’, ‘drc’, or ‘statforbiology’ packages. I do not aim for completeness here, as other packages also contain self-starters, such as the ‘nlraa’ package (Miguez, 2025), with which I am not sufficiently familiar. The exemplary datasets are included in the ‘statforbiology’ package and they all come from real field or greenhouse experiments; further information and citations to the original works can be found in my book (Onofri, 2026), or in the additional meterial at <a href="https://www.statforbiology.com/_statbookeng/">this link</a>.</p>
+<section id="functions-and-curve-shapes" class="level1">
+<h1>Functions and curve shapes</h1>
+<p>As in the other post, I have classified linear/nonlinear regression functions according to the shape they show when they are plotted in an <em>x-y</em> graph, following the approach taken in Ratkowsky (1990):</p>
+<ul>
+<li>Polynomials
+<ol type="1">
+<li><a href="#straight-line-function">Straight line function</a></li>
+<li><a href="#quadratic-polynomial-function">Quadratic polynomial function</a></li>
+</ol></li>
+<li>Concave/Convex curves (no inflection)
+<ol type="1">
+<li><a href="#exponential-function">Exponential function</a></li>
+<li><a href="#asymptotic-function">Asymptotic function / Negative exponential function</a></li>
+<li><a href="#power-function">Power function</a></li>
+<li><a href="#logarithmic-function">Logarithmic function</a></li>
+<li><a href="#rectangular-hyperbola">Rectangular hyperbola</a></li>
+</ol></li>
+<li>Sigmoidal curves
+<ol type="1">
+<li><a href="#sigmoidal-function">Logistic function</a></li>
+<li><a href="#sigmoidal-function">Gompertz function</a></li>
+<li><a href="#sigmoidal-function">Modified Gompertz function</a></li>
+<li><a href="#sigmoidal-function">Log-logistic function</a></li>
+<li><a href="#sigmoidal-function">Weibull (type-1) function</a></li>
+<li><a href="#sigmoidal-function">Weibull (type-2) function</a></li>
+</ol></li>
+<li>Curves with maxima/minima
+<ol type="1">
+<li><a href="#curve-maxima">Peaked sigmoidal function</a></li>
+<li><a href="#curve-maxima">Bragg function</a></li>
+<li><a href="#curve-maxima">Lorentz function</a></li>
+<li><a href="#curve-maxima">Beta function</a></li>
+</ol></li>
+</ul>
+<p>To make navigation easier, you can first inspect Figure 1 to identify the type of curve of interest and then use the links above to jump directly to the corresponding section.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="nls_modelFitting_files/figure-html/fig-1-1.png" class="img-fluid figure-img" style="width:95.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: The shapes of the most important functions. The different colors indicate the possible different shapes of the same function, with different parameters. In the case of the Bragg/Lorentz function, the red color indicate the Bragg function and the blue color indicate the Lorentz function (same parameter values).
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>First of all, we need to install (if necessary) and load these packages, by using the code below.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># installing package, if not yet available</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("statforbiology")</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># loading package</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(statforbiology)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="polynomials" class="level1">
+<h1>Polynomials</h1>
+<section id="straight-line-function" class="level2">
+<h2 class="anchored" data-anchor-id="straight-line-function">Straight line function</h2>
+<p>The equation is:</p>
+<p><span class="math display">\[Y = b_0 + b_1 , X \quad \quad \quad (1)\]</span></p>
+<p>Please check the details of parameter interpretation in <a href="../posts/nls_usefulEquations.html#straight-line-function">my previous post</a>. This is a linear model and, in R, linear regression is fitted by using the <code>lm()</code> function. However, in a few circumstances I have found it useful to fit a linear regression model by using nonlinear regression algorithms. I know that this is rather inefficient, but, as a partial excuse, I should say that some methods for ‘drc’ objects are also rather handy for linear regression, for example, to obtain parameter estimates and compare regression curves in ANCOVA models. For these unusual cases, we can use the <code>NLS.linear()</code> and <code>DRC.linear()</code> functions in the ‘statforbiology’ package.</p>
+<section id="example-1" class="level3">
+<h3 class="anchored" data-anchor-id="example-1">Example 1</h3>
+<p>Let’s consider the ‘metamitron’ dataset, which is available in ‘statforbiology’. It describes the degradation of the sugarbeet herbicide metamitron (M) in soil, either alone or in the presence of two co-applied herbicides, namely phenmedipham (P) and chloridazon (C). Independent soil samples treated with the four herbicide combinations (i.e.&nbsp;M, MP, MC and MPC) were assayed at eight different times (0, 7, 14, 21, 32, 42, 55 and 67 days after treatment, with three replicates per sampling date) to determine the residual concentration of metamitron. In my book (Onofri, 2026, p.&nbsp;212), I analysed this dataset by using linear regression. Here, instead, I would like to show how the same model can be fitted with the <code>drm()</code> function in the ‘drc’ package, obtaining the slopes and intercepts for all herbicide combinations directly from the output of the <code>summary()</code> method.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example of fitting four straight lines at once</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(statforbiology)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> <span class="fu">getAgroData</span>(<span class="st">"metamitron"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">drm</span>(<span class="fu">log</span>(Conc) <span class="sc">~</span> Time, <span class="at">fct =</span> <span class="fu">DRC.linear</span>(),</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">curveid =</span> Herbicide, <span class="at">data =</span> dataset)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Model fitted: Straight line (2 parms)
+
+Parameter estimates:
+
+        Estimate Std. Error t-value   p-value    
+a:M    4.5159111  0.0577603  78.184 &lt; 2.2e-16 ***
+a:MP   4.6304853  0.0577603  80.167 &lt; 2.2e-16 ***
+a:MC   4.5401707  0.0577603  78.604 &lt; 2.2e-16 ***
+a:MPC  4.7546974  0.0577603  82.318 &lt; 2.2e-16 ***
+b:M   -0.0386165  0.0015585 -24.777 &lt; 2.2e-16 ***
+b:MP  -0.0318908  0.0015585 -20.462 &lt; 2.2e-16 ***
+b:MC  -0.0231879  0.0015585 -14.878 &lt; 2.2e-16 ***
+b:MPC -0.0234014  0.0015585 -15.015 &lt; 2.2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error:
+
+ 0.1687429 (88 degrees of freedom)</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="quadratic-polynomial-function" class="level2">
+<h2 class="anchored" data-anchor-id="quadratic-polynomial-function">Quadratic polynomial function</h2>
+<p>The equation is:</p>
+<p><span class="math display">\[Y = a + b\, X + c \, X^2 \quad \quad \quad (2)\]</span></p>
+<p>Check the post <a href="../posts/nls_usefulEquations.html#quadratic-polynomial-function">at this link</a> for details about the biological interpretation of the model parameters. In the same vein as the straight line function, a second-order polynomial can be fitted with the <code>lm()</code> function, but, if necessary, it can also be fitted with <code>nls()</code> or <code>drm()</code>, by using the functions <code>NLS.poly2()</code> and <code>DRC.poly2()</code>.</p>
+<section id="example-2" class="level3">
+<h3 class="anchored" data-anchor-id="example-2">Example 2</h3>
+<p>The dataset ‘waterProductivity’ in the ‘statforbiology’ package shows the relationship between water productivity in lettuce, as affected by the irrigation regime and as determined in a simulated experiment based on the data from Toscano et al.&nbsp;(2026). It is expected that the relationship under study may show a maximum at an intermediate irrigation regime, which is confirmed by fitting a second-order polynomial function. This same analysis could, of course, be performed more efficiently by using linear regression.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(statforbiology)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> <span class="fu">getAgroData</span>(<span class="st">"waterProductivity"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># nls fit</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">nls</span>(WP <span class="sc">~</span> <span class="fu">NLS.poly2</span>(Regime, a, b, c),</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">data =</span> dataset)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">#drc fit</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">drm</span>(WP <span class="sc">~</span> Regime, <span class="at">fct =</span> <span class="fu">DRC.poly2</span>(),</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>             <span class="at">data =</span> dataset)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Model fitted: Second Order Polynomial (3 parms)
+
+Parameter estimates:
+
+                 Estimate  Std. Error  t-value   p-value    
+a:(Intercept)  1.9187e+00  2.3171e-01   8.2806 1.679e-05 ***
+b:(Intercept)  4.2977e-01  8.4554e-03  50.8287 2.217e-12 ***
+c:(Intercept) -3.3618e-03  6.6586e-05 -50.4884 2.355e-12 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error:
+
+ 0.1441625 (9 degrees of freedom)</code></pre>
+</div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="nls_modelFitting_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="480"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="concaveconvex-curves" class="level1">
+<h1>Concave/Convex curves</h1>
+<section id="exponential-function" class="level2">
+<h2 class="anchored" data-anchor-id="exponential-function">Exponential function</h2>
+<p>The most common equations are:</p>
+<p><span class="math display">\[Y = a  e^{k \, X} \quad \quad \quad (3)\]</span></p>
+<p><span class="math display">\[Y = e^{d + k \, X} \quad \quad \quad (4)\]</span></p>
+<p><span class="math display">\[Y = a  \, b^X \quad \quad \quad (5)\]</span></p>
+<p><span class="math display">\[ Y = d \exp(-x/e) \quad \quad \quad (6)\]</span></p>
+<p>and, for the cases where a lower asymptote <span class="math inline">\(c \neq 0\)</span> is needed:</p>
+<p><span class="math display">\[ Y = c + (d -c) \exp(-x/e) \quad \quad \quad (7)\]</span></p>
+<p>Check the post <a href="../posts/nls_usefulEquations.html#exponential-function">at this link</a> for details about the model parameters. In order to fit these models, several self-starting functions are available. In the <code>statforbiology</code> package, you can find <code>NLS.expoGrowth()</code>, <code>NLS.expoDecay()</code>, <code>DRC.expoGrowth()</code>, and <code>DRC.expoDecay()</code>, which can be used to fit the exponential growth and decay models represented by Equation 3 with <code>nls()</code> and <code>drm()</code>, respectively. The <code>drc</code> package also contains the functions <code>EXD.2()</code> and <code>EXD.3()</code>, which can be used to fit Equations 6 and 7, respectively.</p>
+<section id="example-3" class="level3">
+<h3 class="anchored" data-anchor-id="example-3">Example 3</h3>
+<p>The ‘degradation’ dataset, which is available in the ‘statforbiology’ package, refers to an herbicide degradation experiment, where the decrease in concentration over time is assumed to follow first-order kinetics, according to an exponential decay function.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(statforbiology)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(degradation)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># nls fit</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">nls</span>(Conc <span class="sc">~</span> <span class="fu">NLS.expoDecay</span>(Time, a, k),</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">data =</span> degradation)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co"># drm fit</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">drm</span>(Conc <span class="sc">~</span> Time, <span class="at">fct =</span> <span class="fu">DRC.expoDecay</span>(),</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>             <span class="at">data =</span> degradation)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Model fitted: Exponential Decay Model (2 parms)
+
+Parameter estimates:
+
+                 Estimate Std. Error t-value   p-value    
+C0:(Intercept) 99.6349312  1.4646680  68.026 &lt; 2.2e-16 ***
+k:(Intercept)   0.0670391  0.0019089  35.120 &lt; 2.2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error:
+
+ 2.621386 (22 degrees of freedom)</code></pre>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="nls_modelFitting_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="480"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="asymptotic-function" class="level2">
+<h2 class="anchored" data-anchor-id="asymptotic-function">Asymptotic function</h2>
+<p>The following parameterisations are available:</p>
+<p><span class="math display">\[Y = a - (a - b) \, \exp (- m \, X) \quad \quad \quad (8)\]</span></p>
+<p><span class="math display">\[Y = c + (d - c) \, \left[1 - \exp \left(- \frac{X}{e} \right) \right] \quad \quad \quad (9)\]</span></p>
+<p><span class="math display">\[Y = a - (a - b) \, \exp (- log(f)\, X) \quad \quad \quad (10)\]</span></p>
+<p>If we set <span class="math inline">\(b = 0\)</span> (or, equivalently, <span class="math inline">\(c = 0\)</span>) in the equations above, we obtain a curve passing through the origin, which is usually referred to as the <em>negative exponential function</em> and is most commonly parameterised as:</p>
+<p><span class="math display">\[Y = a \left[ 1- \exp (- m X) \right] \quad \quad \quad (11)\]</span></p>
+<p>Check the post <a href="../posts/nls_usefulEquations.html#asymptotic-function">at this link</a> for details about the model parameters. To fit the asymptotic function, the ‘statforbiology’ package contains the self-starting routines <code>NLS.asymReg()</code> and <code>DRC.asymReg()</code>, which can be used to fit Eq. 8 with <code>nls()</code> and <code>drm()</code>, respectively. The ‘drc’ package contains the function <code>AR.3()</code> to fit Eq. 9 with <code>drm()</code>, while the ‘stats’ package contains <code>SSasymp()</code>, which can be used to fit Eq. 10 with <code>nls()</code>. The negative exponential function can be fitted with <code>NLS.negExp()</code>, <code>DRC.negExp()</code> (in ‘statforbiology’), <code>AR.2()</code> (in ‘drc’), and <code>SSasympOrig()</code> (in ‘stats’).</p>
+<section id="example-4" class="level3">
+<h3 class="anchored" data-anchor-id="example-4">Example 4</h3>
+<p>In this example, we consider a growth curve where the weight of a crop is measured at different times. As the data do not show any visible inflection point, we fit an asymptotic regression model.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>Time <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">9</span>, <span class="dv">11</span>, <span class="dv">13</span>, <span class="dv">20</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>Weight <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">8.22</span>, <span class="fl">14.0</span>, <span class="fl">17.2</span>, <span class="fl">16.9</span>, <span class="fl">19.2</span>, <span class="fl">19.6</span>, <span class="fl">19.4</span>, <span class="fl">19.6</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># nls fit</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">nls</span>(Weight <span class="sc">~</span> <span class="fu">NLS.asymReg</span>(Time, b, m, a) )</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># drm fit</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">drm</span>(Weight <span class="sc">~</span> Time, <span class="at">fct =</span> <span class="fu">DRC.asymReg</span>(<span class="at">names =</span> <span class="fu">c</span>(<span class="st">"b"</span>, <span class="st">"m"</span>, <span class="st">"a"</span>)))</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Model fitted: Asymptotic Regression Model (3 parms)
+
+Parameter estimates:
+
+               Estimate Std. Error t-value   p-value    
+b:(Intercept)  3.756123   1.367835  2.7460  0.040500 *  
+m:(Intercept)  0.337078   0.052704  6.3957  0.001385 ** 
+a:(Intercept) 19.629817   0.420557 46.6758 8.525e-08 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error:
+
+ 0.639656 (5 degrees of freedom)</code></pre>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="nls_modelFitting_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="480"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="power-function" class="level2">
+<h2 class="anchored" data-anchor-id="power-function">Power function</h2>
+<p>The most common parameterisation is:</p>
+<p><span class="math display">\[Y = a \, X^b \quad \quad \quad (12)\]</span></p>
+<p>Check the post <a href="../posts/nls_usefulEquations.html#power-function">at this link</a> for details about the model parameters. This function can be fitted by using the self-starting functions <code>DRC.powerCurve()</code> and <code>NLS.powerCurve()</code> in the ‘statforbiology’ package.</p>
+<section id="example-5" class="level3">
+<h3 class="anchored" data-anchor-id="example-5">Example 5</h3>
+<p>The ‘speciesArea’ dataset in the ‘statforbiology’ package was obtained from an experiment aimed at determining the species–area relationship for the weed community in an orange grove. The response variable is the number of species, while the predictor is the sampled area.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(statforbiology)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>speciesArea <span class="ot">&lt;-</span> <span class="fu">getAgroData</span>(<span class="st">"speciesArea"</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#nls fit</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">nls</span>(numSpecies <span class="sc">~</span> <span class="fu">NLS.powerCurve</span>(Area, a, b),</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">data =</span> speciesArea)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co"># drm fit</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">drm</span>(numSpecies <span class="sc">~</span> Area, <span class="at">fct =</span> <span class="fu">DRC.powerCurve</span>(),</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>             <span class="at">data =</span> speciesArea)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Model fitted: Power curve (Freundlich equation) (2 parms)
+
+Parameter estimates:
+
+              Estimate Std. Error t-value   p-value    
+a:(Intercept) 4.348404   0.337197  12.896 3.917e-06 ***
+b:(Intercept) 0.329770   0.016723  19.719 2.155e-07 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error:
+
+ 0.9588598 (7 degrees of freedom)</code></pre>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="nls_modelFitting_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="480"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="logarithmic-function" class="level2">
+<h2 class="anchored" data-anchor-id="logarithmic-function">Logarithmic function</h2>
+<p>It has the following main parameterisation:</p>
+<p><span class="math display">\[y = a + b \, \log(X) \quad \quad \quad (13)\]</span></p>
+<p>Check the post <a href="../posts/nls_usefulEquations.html#logarithmic-function">at this link</a> for details about the parameters. The logarithmic function can be fitted by using <code>lm()</code>, with a log-transformed predictor. If necessary, it can also be fitted by using <code>nls()</code> and <code>drm()</code>, with the self-starting functions <code>NLS.logCurve()</code> and <code>DRC.logCurve()</code>, which are available in the ‘statforbiology’ package.</p>
+<section id="example-6" class="level3">
+<h3 class="anchored" data-anchor-id="example-6">Example 6</h3>
+<p>In this example, we use the ‘speciesArea’ dataset to fit a logarithmic curve, which is another candidate model for describing species–area curves. In this case, based on the AIC value, we can conclude that the power function provides a better fit to the observed data.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(statforbiology)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>speciesArea <span class="ot">&lt;-</span> <span class="fu">getAgroData</span>(<span class="st">"speciesArea"</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">#nls fit</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>model2 <span class="ot">&lt;-</span> <span class="fu">nls</span>(numSpecies <span class="sc">~</span> <span class="fu">NLS.logCurve</span>(Area, a, b),</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">data =</span> speciesArea)</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co"># drm fit</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>model2 <span class="ot">&lt;-</span> <span class="fu">drm</span>(numSpecies <span class="sc">~</span> Area, <span class="at">fct =</span> <span class="fu">DRC.logCurve</span>(),</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>             <span class="at">data =</span> speciesArea)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Model fitted: Linear regression on log-transformed x (2 parms)
+
+Parameter estimates:
+
+              Estimate Std. Error t-value   p-value    
+a:(Intercept)  1.51111    1.17401  1.2871     0.239    
+b:(Intercept)  4.06359    0.35575 11.4224 8.847e-06 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error:
+
+ 1.910082 (7 degrees of freedom)</code></pre>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="nls_modelFitting_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="480"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       df      AIC
+model   3 28.52288
+model2  3 40.92769</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="rectangular-hyperbola" class="level2">
+<h2 class="anchored" data-anchor-id="rectangular-hyperbola">Rectangular hyperbola</h2>
+<p>Common parameterisations are:</p>
+<p><span class="math display">\[Y = \frac{a \, X} {b + X} \quad \quad \quad (14)\]</span></p>
+<p><span class="math display">\[Y = \frac{d}{1 + \frac{e}{X}} \quad \quad \quad (15)\]</span></p>
+<p><span class="math display">\[Y = c + \frac{d - c}{1 + \frac{e}{X}} \quad \quad \quad (15a)\]</span></p>
+<p><span class="math display">\[Y = \frac{i \, X}{1 + \frac{i \, X }{a}} \quad \quad \quad (16)\]</span></p>
+<p>The derivation of the alternative parameterisations and the interpretation of the parameters are described in another post <a href="../posts/nls_usefulEquations.html#rectangular-hyperbola">at this link</a>. In R, the rectangular hyperbola can be fitted by using ‘nls()’ and the self-starting function <code>SSmicmen()</code>, available in the ‘nlme’ package. If you prefer a ‘drm()’ fit, you can use the <code>MM.2()</code> and <code>MM.3()</code> functions in the ‘drc’ package, which use the parameterisations in Eq. 15 and 15a, respectively. For competition studies, Eq. 16 is available through the self-starting functions <code>NLS.YL()</code> and <code>DRC.YL()</code>.</p>
+<section id="example-7" class="level3">
+<h3 class="anchored" data-anchor-id="example-7">Example 7</h3>
+<p>The dataset ‘Ammi94_YL’ contains the results of a competition experiment on the effect of increasing densities of the weed species <em>Ammi majus</em> on sunflower achene yield. Yield data were expressed as yield losses relative to the yield in weed-free plots and were used as the response variable to fit Eq. 16 and derive the competition index <span class="math inline">\(i\)</span>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(statforbiology)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> <span class="fu">getAgroData</span>(<span class="st">"Ammi94_YL"</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">#drm fit</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">drm</span>(YL <span class="sc">~</span> Density, <span class="at">fct =</span> <span class="fu">DRC.YL</span>(), <span class="at">data =</span> dataset)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Model fitted: Yield-Loss function (Cousens, 1985) (2 parms)
+
+Parameter estimates:
+
+               Estimate Std. Error t-value p-value  
+i:(Intercept) 0.0118359  0.0045637  2.5935 0.02228 *
+A:(Intercept) 0.4841796  0.1863969  2.5976 0.02211 *
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error:
+
+ 0.05453432 (13 degrees of freedom)</code></pre>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="nls_modelFitting_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="480"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="sigmoidal-function" class="level1">
+<h1>Sigmoidal curves</h1>
+<p>In the previous post (<a href="https://www.statforbiology.com/posts/nls_usefulEquations.qmd">at this link</a>) we examined six different sigmoidal shapes based on <span class="math inline">\(X\)</span>, to be selected according to the expected symmetry of the response. The equations are the logistic, Gompertz, and modified Gompertz functions, with the following three equations, respectively:</p>
+<p><span class="math display">\[Y = c + \frac{d - c}{1 + exp(- b (X - e))} \quad \quad \quad (17)\]</span></p>
+<p><span class="math display">\[ Y = c + (d - c) \exp \left\{- \exp \left[ - b \, (X - e) \right] \right\} \quad \quad \quad (18)\]</span></p>
+<p><span class="math display">\[ Y = c + (d - c) \left\{ 1 - \exp \left\{- \exp \left[ b \, (X - e) \right] \right\} \right\} \quad \quad \quad (19)\]</span></p>
+<p>The same curves can be based on the logarithm of <span class="math inline">\(X\)</span>, to obtain the corresponding log-logistic, Type-1 Weibull, and Type-2 Weibull equations, which are, respectively:</p>
+<p><span class="math display">\[Y = c + \frac{d - c}{1 + \exp \left\{ - b \left[ \log(X) - \log(e) \right] \right\} } \quad \quad \quad (20)\]</span></p>
+<p><span class="math display">\[ Y = c + (d - c) \exp \left\{- \exp \left[ - b \, (\log(X) - \log(e)) \right] \right\} \quad \quad \quad (21)\]</span></p>
+<p><span class="math display">\[ Y = c + (d - c) \left\{ 1 - \exp \left\{- \exp \left[ b \, (\log(X) - \log(e)) \right] \right\} \right\} \quad \quad \quad (22)\]</span></p>
+<p>The meaning of the model parameters and details about the shapes can be found in another post <a href="nls_UsefulEquations.qmd#sigmoidal">at this link</a>.</p>
+<p>For all these four-parameter curves, it is possible to set <span class="math inline">\(c = 0\)</span> to obtain the three-parameter curves (17a), (18a), (19a), (20a), (21a), and (22a). Likewise, we can constrain both <span class="math inline">\(c = 0\)</span> and <span class="math inline">\(d = 1\)</span> to obtain the two-parameter curves (17b), (18b), (19b), (20b), (21b), and (22b). The collection of self-starters is huge; therefore, I will provide a summary table.</p>
+<table class="caption-top table">
+<caption>List of sigmoidal functions, together with self-starters for fitting with <code>drm()</code> and <code>nls()</code>. (1) These self-starters are included in the ‘drc’ package and the corresponding curves have an increasing shape when <span class="math inline">\(b &lt; 0\)</span> and a decreasing shape when <span class="math inline">\(b &gt; 0\)</span>. For all other self-starters, which are available in the ‘statforbiology’ package, the reverse is true (which is the most common definition, apart from the case of herbicide bioassays){#tbl-models}</caption>
+<colgroup>
+<col style="width: 45%">
+<col style="width: 13%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Eq. No.</th>
+<th style="text-align: left;">for <code>drm()</code></th>
+<th style="text-align: left;">for <code>nls()</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Logistic (4-parameters)</td>
+<td style="text-align: left;">(17)</td>
+<td style="text-align: left;"><code>L.4()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.L4()</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Logistic (3-parameters)</td>
+<td style="text-align: left;">(17a)</td>
+<td style="text-align: left;"><code>L.3()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.L3()</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Logistic (2-parameters)</td>
+<td style="text-align: left;">(17b)</td>
+<td style="text-align: left;"><code>L.2()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.L2()</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gompertz (4-parameters)</td>
+<td style="text-align: left;">(18)</td>
+<td style="text-align: left;"><code>G.4()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.G4()</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Gompertz (3-parameters)</td>
+<td style="text-align: left;">(18a)</td>
+<td style="text-align: left;"><code>G.3()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.G3()</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gompertz (2-parameters)</td>
+<td style="text-align: left;">(18b)</td>
+<td style="text-align: left;"><code>G.2()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.G2()</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">mod-Gompertz (4-parameters)</td>
+<td style="text-align: left;">(19)</td>
+<td style="text-align: left;"><code>DRC.E4()</code></td>
+<td style="text-align: left;"><code>NLS.E4()</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">mod-Gompertz (3-parameters)</td>
+<td style="text-align: left;">(19a)</td>
+<td style="text-align: left;"><code>DRC.E3()</code></td>
+<td style="text-align: left;"><code>NLS.E3()</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">mod-Gompertz (2-parameters)</td>
+<td style="text-align: left;">(19b)</td>
+<td style="text-align: left;"><code>DRC.E2()</code></td>
+<td style="text-align: left;"><code>NLS.E2()</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Log-logistic (4-parameters)</td>
+<td style="text-align: left;">(20)</td>
+<td style="text-align: left;"><code>LL.4()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.LL4()</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Log-logistic (3-parameters)</td>
+<td style="text-align: left;">(20a)</td>
+<td style="text-align: left;"><code>LL.3()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.LL3()</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Log-logistic (2-parameters)</td>
+<td style="text-align: left;">(20b)</td>
+<td style="text-align: left;"><code>LL.2()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.LL2()</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Type-1 Weibull (4-parameters)</td>
+<td style="text-align: left;">(21)</td>
+<td style="text-align: left;"><code>W1.4()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.W1.4()</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Type-1 Weibull (3-parameters)</td>
+<td style="text-align: left;">(21a)</td>
+<td style="text-align: left;"><code>W1.3()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.W1.3()</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Type-1 Weibull (2-parameters)</td>
+<td style="text-align: left;">(21b)</td>
+<td style="text-align: left;"><code>W1.2()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.W1.2()</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Type-2 Weibull (4-parameters)</td>
+<td style="text-align: left;">(22)</td>
+<td style="text-align: left;"><code>W2.4()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.W2.4()</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Type-2 Weibull (3-parameters)</td>
+<td style="text-align: left;">(22a)</td>
+<td style="text-align: left;"><code>W2.3()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.W2.3()</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Type-2 Weibull (2-parameters)</td>
+<td style="text-align: left;">(22b)</td>
+<td style="text-align: left;"><code>W2.2()</code> (1)</td>
+<td style="text-align: left;"><code>NLS.W2.2()</code></td>
+</tr>
+</tbody>
+</table>
+<section id="example-8" class="level2">
+<h2 class="anchored" data-anchor-id="example-8">Example 8</h2>
+<p>The dataset ‘beetGrowth’ in the ‘statforbiology’ package reports the results of an experiment in which the growth of sugar beet was evaluated under either weed-free or weed-infested conditions. In the following example, we consider the time course of crop weight under infested conditions and fit the logistic, Gompertz, and modified Gompertz functions to the observed data. We see that, based on the AIC, the three fits are equivalent in practice. We fit the same models with ‘drm()’ to show that the two fitting functions give the same results, apart from the sign of the <span class="math inline">\(b\)</span> parameter, which is reversed in the <code>L.3()</code> function.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(statforbiology)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>beetGrowth <span class="ot">&lt;-</span> <span class="fu">getAgroData</span>(<span class="st">"beetGrowth"</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># nls fit</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>model<span class="fl">.1</span> <span class="ot">&lt;-</span> <span class="fu">nls</span>(Infested <span class="sc">~</span> <span class="fu">NLS.L3</span>(DAE, b, d, e), <span class="at">data =</span> beetGrowth)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>model<span class="fl">.2</span> <span class="ot">&lt;-</span> <span class="fu">nls</span>(Infested <span class="sc">~</span> <span class="fu">NLS.G3</span>(DAE, b, d, e), <span class="at">data =</span> beetGrowth)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>model<span class="fl">.3</span> <span class="ot">&lt;-</span> <span class="fu">nls</span>(Infested <span class="sc">~</span> <span class="fu">NLS.E3</span>(DAE, b, d, e), <span class="at">data =</span> beetGrowth)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="fu">AIC</span>(model<span class="fl">.1</span>, model<span class="fl">.2</span>, model<span class="fl">.3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        df      AIC
+model.1  4 250.2906
+model.2  4 250.7596
+model.3  4 250.8456</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model<span class="fl">.1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Formula: Infested ~ NLS.L3(DAE, b, d, e)
+
+Parameters:
+   Estimate Std. Error t value Pr(&gt;|t|)    
+b 1.188e-01  1.874e-02   6.338 1.33e-05 ***
+d 2.512e+03  1.277e+02  19.671 4.01e-12 ***
+e 5.803e+01  1.823e+00  31.836 3.46e-15 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 222 on 15 degrees of freedom
+
+Number of iterations to convergence: 6 
+Achieved convergence tolerance: 4.299e-06</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># drm fit</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">drm</span>(Infested <span class="sc">~</span> DAE, <span class="at">fct =</span> <span class="fu">L.3</span>(), <span class="at">data =</span> beetGrowth)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Model fitted: Logistic (ED50 as parameter) with lower limit fixed at 0 (3 parms)
+
+Parameter estimates:
+
+                Estimate Std. Error t-value   p-value    
+b:(Intercept)   -0.11876    0.01832  -6.483 1.033e-05 ***
+d:(Intercept) 2511.95664  127.95600  19.631 4.131e-12 ***
+e:(Intercept)   58.03099    1.83458  31.632 3.788e-15 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error:
+
+ 221.9644 (15 degrees of freedom)</code></pre>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="nls_modelFitting_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="480"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="example-9" class="level2">
+<h2 class="anchored" data-anchor-id="example-9">Example 9</h2>
+<p>The dataset ‘brassica’ in the ‘statforbiology’ package reports the results of a short-term pot bioassay to determine the phytotoxicity of imazethapyr in hydroponic solution (Onofri, 1994). The response variable is the weight of the test plant (<em>Brassica rapa</em>), as affected by the herbicide concentration in the nutrient solution, which requires a decreasing sigmoidal curve. In the code below, we fit both a 4-parameter log-logistic and a 3-parameter log-logistic (with <span class="math inline">\(c = 0\)</span>) function and graphically compare the two fits.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(statforbiology)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>brassica <span class="ot">&lt;-</span> <span class="fu">getAgroData</span>(<span class="st">"brassica"</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>model<span class="fl">.1</span> <span class="ot">&lt;-</span> <span class="fu">drm</span>(FW <span class="sc">~</span> Dose, <span class="at">fct =</span> <span class="fu">LL.4</span>(), <span class="at">data =</span> brassica)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>model<span class="fl">.2</span> <span class="ot">&lt;-</span> <span class="fu">drm</span>(FW <span class="sc">~</span> Dose, <span class="at">fct =</span> <span class="fu">LL.3</span>(), <span class="at">data =</span> brassica)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="nls_modelFitting_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="480"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="curve-maxima" class="level1">
+<h1>Curves with maxima/minima</h1>
+<p>Curves with maxima are most often used to model phenomena where the response variable reaches a maximum value at a certain level of the <span class="math inline">\(X\)</span> variable and decreases afterwards. In a previous post, we showed four possible functions, namely the sigmoidal peaked function, the Bragg function, the Lorentz function, and the beta function, with the following equations, respectively. The numbering refers to the post <a href="../posts/nls_usefulEquations.html#maxima-fun">at this link</a>, where you can find further information on model parameters and their biological meaning.</p>
+<p><span class="math display">\[Y = c + \frac{d - c + f \, X}{1 + \exp \left\{ - b \left[ \log(X) - \log(e) \right] \right\} } \quad \quad \quad (23)\]</span></p>
+<p><span class="math display">\[Y = c + (d - c) \, \exp \left[ - b (X - e)^2 \right] \quad \quad \quad (24a)\]</span></p>
+<p><span class="math display">\[Y = c + \frac{d - c} { 1 + b (X - e)^2 } \quad \quad \quad (25a)\]</span></p>
+<p><span class="math display">\[ Y = d \,\left\{  \left( \frac{X - X_b}{X_o - X_b} \right) \left( \frac{X_c - X}{X_c - X_o} \right) ^ {\frac{X_c - X_o}{X_o - X_b}} \right\}^b \quad \quad \quad (26)\]</span></p>
+<p>The sigmoidal peaked function (Eq. 23) can be fitted with <code>drm()</code>, by using the self-starter ‘BC.5()’. Another self-starter is available to impose the constraint <span class="math inline">\(c = 0\)</span> in Eq. 23, namely <code>BC.4()</code>. For the Bragg function, self-starters are available in ‘statforbiology’, which can be used to fit Eq. 24a with both <code>nls()</code> and <code>drm()</code>, namely <code>NLS.Bragg.4()</code> and <code>DRC.Bragg.4()</code>. <code>NLS.Bragg.3()</code> and <code>DRC.Bragg.3()</code> allow us to constrain <span class="math inline">\(c = 0\)</span>. Finally, for the Lorentz equation, the self-starters are <code>NLS.Lorentz.4()</code> and <code>DRC.Lorentz.4()</code>, as well as, for the constrained version, <code>NLS.Lorentz.3()</code> and <code>DRC.Lorentz.3()</code>.</p>
+<p>Curves with maxima have been used in bioassay studies to describe the stimulation of growth at low doses and in seed germination studies to describe the effect of temperature on the germination rates of seed lots.</p>
+<section id="example-10" class="level2">
+<h2 class="anchored" data-anchor-id="example-10">Example 10</h2>
+<p>The dataset ‘SOLNI-hormesis’ in the ‘statforbiology’ package reports the results of a pot bioassay study evaluating the efficacy of rimsulfuron against <em>Solanum nigrum</em> at the 4-leaf stage. The response curve shows clear signs of stimulation at low herbicide doses (hormesis), which needs to be described by using a peaked sigmoidal function.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(statforbiology)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> <span class="fu">getAgroData</span>(<span class="st">"SOLNI_hormesis"</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">drm</span>(FW <span class="sc">~</span> Dose, <span class="at">fct =</span> <span class="fu">BC.5</span>(),</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> dataset)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Model fitted: Brain-Cousens (hormesis) (5 parms)
+
+Parameter estimates:
+
+              Estimate Std. Error t-value   p-value    
+b:(Intercept)  3.57034    1.25309  2.8492 0.0082868 ** 
+c:(Intercept)  3.76335    0.85964  4.3778 0.0001619 ***
+d:(Intercept) 14.14991    1.36933 10.3334 6.992e-11 ***
+e:(Intercept)  2.85405    0.76931  3.7099 0.0009485 ***
+f:(Intercept)  5.26894    3.38238  1.5578 0.1309350    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error:
+
+ 2.97547 (27 degrees of freedom)</code></pre>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="nls_modelFitting_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="480"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="example-11" class="level2">
+<h2 class="anchored" data-anchor-id="example-11">Example 11</h2>
+<p>The dataset ‘Hordeum_GR’ reports the germination rates of <em>Hordeum spontaneum</em> as affected by environmental temperatures. We clearly see that the response reaches a maximum value at intermediate temperature levels.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(statforbiology)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> <span class="fu">getAgroData</span>(<span class="st">"Hordeum_GR"</span>)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">drm</span>(GR50 <span class="sc">~</span> Temp, <span class="at">fct =</span> <span class="fu">DRC.bragg.4</span>(),</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> dataset)</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Model fitted: Bragg equation with four parameters
+
+Parameter estimates:
+
+                Estimate Std. Error t-value   p-value    
+b:(Intercept)  0.0052849  0.0036063  1.4654 0.2804269    
+c:(Intercept)  0.0039006  0.0131491  0.2966 0.7947090    
+d:(Intercept)  0.0290870  0.0010552 27.5646 0.0013135 ** 
+e:(Intercept) 18.0013282  0.5220972 34.4789 0.0008401 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error:
+
+ 0.001544712 (2 degrees of freedom)</code></pre>
+</div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="nls_modelFitting_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="480"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="conclusions" class="level1">
+<h1>Conclusions</h1>
+<p>Here we are; I hope that this deep dive into nonlinear regression was useful. Thanks for reading! And … don’t forget to check out my new book!</p>
+<p>Prof.&nbsp;Andrea Onofri<br>
+Department of Agricultural, Food and Environmental Sciences<br>
+University of Perugia (Italy)<br>
+Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<p><a href="https://www.awin1.com/cread.php?awinmid=26429&amp;awinaffid=2675822&amp;ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src="../../Figures/Email_Signature_978-3-032-08199-5.png" alt="Book cover" class="cover" align="center"></a></p>
+<hr>
+</section>
+<section id="further-readings" class="level1">
+<h1>Further readings</h1>
+<ol type="1">
+<li>Miguez, F., Archontoulis, S., Dokoohaki, H., Glaz, B., Yeater, K.M., 2018. Chapter 15: Nonlinear Regression Models and Applications, in: ACSESS Publications. American Society of Agronomy, Crop Science Society of America, and Soil Science Society of America, Inc.</li>
+<li>Onofri, A., 2026. Field Research Methods in Agriculture: An Introduction with R. Springer Nature Switzerland, Cham. https://doi.org/10.1007/978-3-032-08199-5</li>
+<li>Ratkowsky, D.A., 1990. Handbook of nonlinear regression models. Marcel Dekker Inc., New York, USA.</li>
+<li>Ritz, C., Jensen, S. M., Gerhard, D., Streibig, J. C. (2019) Dose-Response Analysis Using R. CRC Press Miguez F (2025). <em>nlraa: Nonlinear Regression for Agricultural Applications</em>. doi:10.32614/CRAN.package.nlraa <a href="https://doi.org/10.32614/CRAN.package.nlraa" class="uri">https://doi.org/10.32614/CRAN.package.nlraa</a>, R package version 1.9.10, <a href="https://CRAN.R-project.org/package=nlraa" class="uri">https://CRAN.R-project.org/package=nlraa</a>.</li>
+</ol>
+<p>This post was originally published in this blog on 2020-02-26.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/www\.statforbiology\.com");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<hr>
+<p><br> Copyright © 2018-2026 by Andrea Onofri is licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1">CC BY 4.0</a> <img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"> <img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"> <img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1"> <img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/sa.svg?ref=chooser-v1"> This site was built with Quarto.</p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
