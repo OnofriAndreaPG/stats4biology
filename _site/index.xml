@@ -471,6 +471,7 @@ Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it
 
  ]]></description>
   <category>nonlinear regression</category>
+  <category>R-bloggers</category>
   <guid>https://www.statforbiology.com/posts/nls_usefulEquations.html</guid>
   <pubDate>Thu, 23 Jul 2026 22:00:00 GMT</pubDate>
 </item>
@@ -1657,6 +1658,7 @@ Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it
  ]]></description>
   <category>R</category>
   <category>nonlinear regression</category>
+  <category>R-bloggers</category>
   <guid>https://www.statforbiology.com/posts/nls_modelFitting.html</guid>
   <pubDate>Mon, 20 Jul 2026 22:00:00 GMT</pubDate>
 </item>
@@ -1681,7 +1683,7 @@ Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it
 
 
  ]]></description>
-  <category>News</category>
+  <category>news</category>
   <guid>https://www.statforbiology.com/posts/news_SwitchToQuarto.html</guid>
   <pubDate>Sun, 19 Jul 2026 22:00:00 GMT</pubDate>
   <media:content url="https://www.statforbiology.com/Figures/logo.png" medium="image" type="image/png" height="57" width="144"/>
@@ -1791,7 +1793,7 @@ file.copy(
 </section>
 <section id="step-9---google-analytics-622019" class="level1">
 <h1>Step 9 - Google Analytics (6/2/2019)</h1>
-<p>Also for the new blog, I would like to track the visits I receive. I went to Google Analytics to recover my tracking ID and I added such an information to the ’_quarto.yml’ configuration file.</p>
+<p>Also for the new blog, I would like to track the visits I receive. I went to Google Analytics to recover my tracking ID and I added such an information to the ‘_quarto.yml’ configuration file.</p>
 <pre><code>website:
   google-analytics: "G-myID"</code></pre>
 
@@ -1800,9 +1802,608 @@ file.copy(
 
  ]]></description>
   <category>R</category>
-  <category>Quarto</category>
+  <category>quarto</category>
   <guid>https://www.statforbiology.com/posts/R_QuartoSteps.html</guid>
   <pubDate>Tue, 14 Jul 2026 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>How do we combine errors, in biology? The delta method</title>
+  <dc:creator>Andrea Onofri</dc:creator>
+  <link>https://www.statforbiology.com/posts/general_DeltaMethod.html</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>In a recent post I have shown that we can build linear combinations of model parameters (<a href="https://www.statforbiology.com/2024/stat_general_errorpropagation/">see here</a> ). For example, if we have two parameter estimates, say <img src="https://latex.codecogs.com/png.latex?X"> and <img src="https://latex.codecogs.com/png.latex?Z">, with standard errors respectively equal to <img src="https://latex.codecogs.com/png.latex?%5Csigma_X"> and <img src="https://latex.codecogs.com/png.latex?%5Csigma_Z"> and a covariance of <img src="https://latex.codecogs.com/png.latex?%5Csigma_%7BXZ%7D"> we can build a linear combination as follows:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%20Y%20=%20f(X,Z)%20=%20aX%20+%20bZ%20+%20c"></p>
+<p>where <img src="https://latex.codecogs.com/png.latex?a">, <img src="https://latex.codecogs.com/png.latex?b"> and <img src="https://latex.codecogs.com/png.latex?c"> are three numeric constants. The standard error for this combination can be obtained as:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%20%5Csigma_Y%20=%20%5Csqrt%7B%20a%5E2%20%5Csigma%5E2_X%20+%20b%5E2%20%5Csigma%5E2_Z%20+%202ab%20%5C,%20%5Csigma_%7BXZ%7D%20%7D"></p>
+<p>In biology, nonlinear transformations are much more frequent than linear transformations. Nonlinear transformations are, e.g., <img src="https://latex.codecogs.com/png.latex?Y%20=%20f(X,Z)%20=%20exp(X,%20Z)">, or, <img src="https://latex.codecogs.com/png.latex?Y%20=%201/(X%20+%20Z)">; we may wonder: what is the standard error for these nonlinear transformations? The solution to this problem is named the ‘delta method’ and may be beyond biologists with an average level of statistical proficiency. I thought it might be useful to talk about it, by using a very simple language and a few examples.</p>
+<p>Let’s start with the transformation of a single variable <img src="https://latex.codecogs.com/png.latex?Y%20=%20f(X)">.</p>
+<section id="example-1-the-half-life-of-a-herbicide" class="level1">
+<h1>Example 1: The half-life of a herbicide</h1>
+<p>A herbicide has proven to follow a first order degradation kinetic in soil, with constant degradation rate <img src="https://latex.codecogs.com/png.latex?X%20=%20-0.035"> and standard error equal <img src="https://latex.codecogs.com/png.latex?%5Csigma_X%20=%200.00195">. What is the half-life of this herbicide and its standard error?</p>
+<p>Every pesticide chemist knows that the half-life is derived by the degradation rate, according to the following equation:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%20y%20=%20%5Cfrac%7B%5Clog(0.5)%7D%7Bx%7D"></p>
+<p>Therefore, if we plug-in x = X, the half-life of our herbicide is:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1">Y <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">log</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.035</span></span>
+<span id="cb1-2">Y</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 19.80421</code></pre>
+</div>
+</div>
+<p>But … what is the standard error of this half-life? There is some uncertainty around the estimate of <img src="https://latex.codecogs.com/png.latex?Y"> and it is clear that such an uncertainty should propagate to the estimate of <img src="https://latex.codecogs.com/png.latex?Z%20=%20f(Q)">; unfortunately, the transformation is nonlinear and we cannot use the expression given above for linear transformations.</p>
+<section id="the-basic-idea-beyond-the-delta-method" class="level3">
+<h3 class="anchored" data-anchor-id="the-basic-idea-beyond-the-delta-method">The basic idea beyond the delta method</h3>
+<p>The basic idea behind the delta method is that most of the simple nonlinear functions, which we use in biology, can be locally approximated by the tangent line through a point of interest. For example, our nonlinear half-life function is <img src="https://latex.codecogs.com/png.latex?y%20%20=%20f(x)%20=%20%5Cfrac%7B%5Clog(0.5)%7D%7Bx%7D"> and, obviously, we are interested in the point where <img src="https://latex.codecogs.com/png.latex?x%20=%20X%20=%20-0.035">. In the graph below, we have represented our nonlinear function (in black) and its tangent line (in red) through the above point: we can see that the approximation is fairly good in the close vicinity of <img src="https://latex.codecogs.com/png.latex?Q%20=%20-0.035">.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://www.statforbiology.com/posts/general_DeltaMethod_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>What is the equation of the tangent line? In general, if the nonlinear function is <img src="https://latex.codecogs.com/png.latex?f(x)">, you may remember from high school that the slope <img src="https://latex.codecogs.com/png.latex?m"> of the tangent line is equal to the first derivative of <img src="https://latex.codecogs.com/png.latex?f(x)">, that is <img src="https://latex.codecogs.com/png.latex?f'(x)">. You may also remember that the equation of a line with slope <img src="https://latex.codecogs.com/png.latex?m"> through the point <img src="https://latex.codecogs.com/png.latex?P(X,%20Y)"> is <img src="https://latex.codecogs.com/png.latex?y%20-%20Y%20=%20m(x%20-%20X)">. As <img src="https://latex.codecogs.com/png.latex?Y%20=%20f(X)">, the tangent line has equation:</p>
+<p><img src="https://latex.codecogs.com/png.latex?y%20=%20f(X)%20+%20f'(Y)(x%20-%20X)"></p>
+</section>
+<section id="we-need-the-derivative" class="level3">
+<h3 class="anchored" data-anchor-id="we-need-the-derivative">We need the derivative!</h3>
+<p>In order to write the equation of the red line in the Figure above, we need to consider that <img src="https://latex.codecogs.com/png.latex?X%20=%20-0.035"> and we need to be able to calculate the first derivative of our nonlinear half-life fuction. I am not able to derive the expression of the first derivative for all nonlinear functions and it was a relief for me to discover that R can handle this task in simple ways, e.g.&nbsp;by using the function <code>D()</code>. For our case, it is:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">D</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">expression</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">log</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>X), <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"X"</span>)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>-(log(0.5)/X^2)</code></pre>
+</div>
+</div>
+<p>Therefore, we can use this R function to calculate the slope <img src="https://latex.codecogs.com/png.latex?m"> of the tangent line in the figure above:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1">X <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.035</span></span>
+<span id="cb5-2">m <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">eval</span>( <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">D</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">expression</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">log</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>X), <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"X"</span>) )</span>
+<span id="cb5-3">m</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 565.8344</code></pre>
+</div>
+</div>
+<p>We already know that <img src="https://latex.codecogs.com/png.latex?f(-0.035)%20=%2019.80421">. Therefore, we can write the equation of the tangent line (red line in the graph above):</p>
+<p><img src="https://latex.codecogs.com/png.latex?y%20=%2019.80421%20+%20565.8344%20%5C,%20(x%20+%200.035)"></p>
+<p>that is:</p>
+<p><img src="https://latex.codecogs.com/png.latex?y%20=%2019.80421%20+%20565.8344%20%5C,%20x%20+%20565.8344%20%5Ccdot%200.035%20=%2039.60841%20+%20565.8344%20%5C,%20x"></p>
+</section>
+<section id="replacing-a-curve-with-a-line" class="level3">
+<h3 class="anchored" data-anchor-id="replacing-a-curve-with-a-line">Replacing a curve with a line</h3>
+<p>Now, we have two functions:</p>
+<ol type="1">
+<li>the original nonlinear half-life function <img src="https://latex.codecogs.com/png.latex?y%20=%20%5Clog(0.5)/x">$</li>
+<li>a new linear function (<img src="https://latex.codecogs.com/png.latex?y%20=%2039.60841%20+%20565.8344%20%5C,%20x">), that is a very close approximation to the previous one, at least near to the point <img src="https://latex.codecogs.com/png.latex?X%20=%20-0.035">, which we are interested in.</li>
+</ol>
+<p>Therefore, we can approximate the former with the latter! If we use the linear function, we see that the half-life is:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">39.60841</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">565.8344</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.035</span></span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 19.80421</code></pre>
+</div>
+</div>
+<p>which is what we expected. The advantage is that we can now use the low of propagation of errors to estimate the standard error (see the first and second equation in this post):</p>
+<p><img src="https://latex.codecogs.com/png.latex?%20%5Csigma_%7B%20%5Cleft%5B%2039.60841%20+%20565.8344%20%5C,%20X%20%5Cright%5D%7D%20=%20%5Csqrt%7B%20562.8344%5E2%20%5C,%20%5Csigma%5E2_X%7D"></p>
+<p>Here we go:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sqrt</span>( m<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> (<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.00195</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>) )</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1.103377</code></pre>
+</div>
+</div>
+</section>
+<section id="in-general" class="level2">
+<h2 class="anchored" data-anchor-id="in-general">In general…</h2>
+<p>If we have a nonlinear transformation <img src="https://latex.codecogs.com/png.latex?f(X)">, the standard error for this transformation is approximated by knowing the first derivative <img src="https://latex.codecogs.com/png.latex?f'(X)"> and the standard error of <img src="https://latex.codecogs.com/png.latex?X">:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Csigma_%7BG(X)%7D%20%20%5Csimeq%20%5Csqrt%7B%20%5Bf'(X)%5D%5E2%20%5C,%20%5Csigma%5E2_X%20%7D"></p>
+</section>
+</section>
+<section id="example-2-a-back-transformed-count" class="level1">
+<h1>Example 2: a back-transformed count</h1>
+<p>A paper reports that the mean number of microorganisms in a substrate, on a logarithmic scale, was <img src="https://latex.codecogs.com/png.latex?X%20=%205"> with standard error <img src="https://latex.codecogs.com/png.latex?%5Csigma%20=%200.84">. It is easy to derive that the actual number of micro-organisms was <img src="https://latex.codecogs.com/png.latex?%5Cexp%7B5%7D%20=%20148.4132">; what is the standard error of the back-transformed mean?</p>
+<p>The first derivative of our nonlinear function is:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">D</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">expression</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">exp</span>(X)), <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"X"</span>)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>exp(X)</code></pre>
+</div>
+</div>
+<p>and thus the slope of the tangent line is:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1">X <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span></span>
+<span id="cb13-2">m <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">eval</span>( <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">D</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">expression</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">exp</span>(X)), <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"X"</span>) )</span>
+<span id="cb13-3">m</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 148.4132</code></pre>
+</div>
+</div>
+<p>According to the function above, the standard error for the back-transformed mean is:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1">sigma <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.84</span></span>
+<span id="cb15-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sqrt</span>( m<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> sigma<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> )</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 124.6671</code></pre>
+</div>
+</div>
+</section>
+<section id="example-3-selenium-concentration-in-olive-drupes" class="level1">
+<h1>Example 3: Selenium concentration in olive drupes</h1>
+<p>When the combination is nonlinear and involves two parameters, such as:</p>
+<p><img src="https://latex.codecogs.com/png.latex?Y%20=%20%5Cfrac%7BX%7D%7BZ%7D%20%5Cquad%20%5Ctextrm%7Bor%7D%20%5Cquad%20Y%20=%20X%20%5C,%20Z"></p>
+<p>the delta method requires a slightly more complex formula, which we will see by using another example.</p>
+<p>The concentration of selenium in olive drupes was found to be <img src="https://latex.codecogs.com/png.latex?3.1%20%5C,%20%5Cmu%20g%20%5C,%5C,%20g%5E%7B-1%7D"> with standard error equal to 0.8. What is the intake of selenium when eating one drupe? Please, consider that one drupe weights, on average, 3.4 g (SE = 0.31) and that selenium concentration and drupe weight show a covariance of 0.55.</p>
+<p>The amount of selenium is easily calculated as:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1">X <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3.1</span>; Z <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3.4</span></span>
+<span id="cb17-2">Y <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> X <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> Z</span>
+<span id="cb17-3">Y</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 10.54</code></pre>
+</div>
+</div>
+<p>Delta standard errors can be obtained by considering the partial derivatives for each of the two variables and combining them as follows:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1">dX <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">eval</span>( <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">D</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">expression</span>(X <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> Z), <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"X"</span>) )</span>
+<span id="cb19-2">dZ <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">eval</span>( <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">D</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">expression</span>(X <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> Z), <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Z"</span>) )</span>
+<span id="cb19-3"></span>
+<span id="cb19-4">sigmaX <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.8</span>; sigmaZ <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.31</span>; sigmaXZ <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.55</span></span>
+<span id="cb19-5"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sqrt</span>( (dX<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> sigmaX<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> (dZ<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> sigmaZ<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> dX <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> dZ <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> sigmaXZ )</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4.462726</code></pre>
+</div>
+</div>
+<p>In general terms, when <img src="https://latex.codecogs.com/png.latex?y%20=%20f(x,%20z)"> and it is nonlinear, it is:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%20%5Csigma_y%20=%20%5Csqrt%7B%20(f'_x)%5E2%20%5C,%20%5Csigma%5E2_x%20+%20(f'_z)%5E2%20%5C,%20%5Csigma%5E2_z%20+%202f'_x%5C,f'_z%20%5C,%20%5Csigma_%7Bxz%7D%20%7D"></p>
+<p>For those of you who would like to get involved with matrix notation: we can reach the same result via matrix multiplication (see below). This might be easier when we have more than two variables to combine.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1">der <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">matrix</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(dX, dZ), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb21-2">sigma <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">matrix</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(sigmaX<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, sigmaXZ, sigmaXZ, sigmaZ<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">byrow =</span> T)</span>
+<span id="cb21-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sqrt</span>( der <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%*%</span> sigma <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%*%</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">t</span>(der) )</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>         [,1]
+[1,] 4.462726</code></pre>
+</div>
+</div>
+</section>
+<section id="the-delta-method-with-r" class="level1">
+<h1>The delta method with R</h1>
+<p>In R there is a shortcut function to calculate delta standard errors, that is available in the ‘car’ package. In order to use it, we need to have:</p>
+<ol type="1">
+<li>a named vector for the variables that we have to combine</li>
+<li>an expression for the transformation</li>
+<li>a variance-covariance matrix</li>
+</ol>
+<p>For the first example, we have:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1">obj <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"X"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.035</span>)</span>
+<span id="cb23-2">sigma <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">matrix</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.00195</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb23-3"></span>
+<span id="cb23-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(car)</span></code></pre></div></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: carData</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">deltaMethod</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">object =</span> obj, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">g=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"log(0.5)/X"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">vcov =</span> sigma)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           Estimate      SE   2.5 % 97.5 %
+log(0.5)/X  19.8042  1.1034 17.6416 21.967</code></pre>
+</div>
+</div>
+<p>For the second example:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1">obj <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"X"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>)</span>
+<span id="cb27-2">sigma <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">matrix</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.84</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb27-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">deltaMethod</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">object =</span> obj, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">g=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"exp(X)"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">vcov =</span> sigma)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       Estimate     SE  2.5 % 97.5 %
+exp(X)   148.41 124.67 -95.93 392.76</code></pre>
+</div>
+</div>
+<p>For the third example:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1">obj <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"X"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3.1</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Z"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3.4</span>)</span>
+<span id="cb29-2">sigma <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">matrix</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.8</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.55</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.55</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.31</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">byrow =</span> T)</span>
+<span id="cb29-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">deltaMethod</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">object =</span> obj, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">g=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"X * Z"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">vcov =</span> sigma)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      Estimate      SE   2.5 % 97.5 %
+X * Z  10.5400  4.4627  1.7932 19.287</code></pre>
+</div>
+</div>
+<p>The function ‘deltaMethod()’ is very handy to be used in connection with model objects, as we do not need to provide anything, but the transformation function. But this is something that requires another post!</p>
+<p>However, two final notes relating to the delta method need to be pointed out here:</p>
+<ol type="1">
+<li>the delta standard error is always approximate;</li>
+<li>if the original variables are gaussian, the transformed variable, usually, is not gaussian.</li>
+</ol>
+<p>Thanks for reading—and don’t forget to check out my new book below!</p>
+<p>Andrea Onofri<br>
+Department of Agricultural, Food and Environmental Sciences<br>
+University of Perugia (Italy)<br>
+Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<p><a href="https://www.awin1.com/cread.php?awinmid=26429&amp;awinaffid=2675822&amp;ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src="https://www.statforbiology.com/../Figures/Email_Signature_978-3-032-08199-5.png" align="center" alt="Book cover" class="cover"></a> <br></p>
+</section>
+<section id="reference" class="level1">
+<h1>Reference</h1>
+<ol type="1">
+<li>Beyene, J., Moineddin, R., 2005. Methods for confidence interval estimation of a ratio parameter with application to location quotients. BMC Med Res Methodol 5, 32. https://doi.org/10.1186/1471-2288-5-32</li>
+</ol>
+<hr>
+<p>Post written on 25/5/2019 and edited on 22/11/2024 and 12/12/2025</p>
+
+
+</section>
+
+ ]]></description>
+  <category>R</category>
+  <category>general</category>
+  <category>R-bloggers</category>
+  <guid>https://www.statforbiology.com/posts/general_DeltaMethod.html</guid>
+  <pubDate>Thu, 11 Dec 2025 23:00:00 GMT</pubDate>
 </item>
 <item>
   <title>Field Research methods in Agriculture</title>
@@ -1847,9 +2448,1387 @@ Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it
 
 
  ]]></description>
-  <category>News</category>
+  <category>news</category>
   <guid>https://www.statforbiology.com/posts/news_NewBook.html</guid>
   <pubDate>Mon, 24 Nov 2025 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>How do we combine errors? The linear case</title>
+  <dc:creator>Andrea Onofri</dc:creator>
+  <link>https://www.statforbiology.com/posts/general_ErrorPropagation.html</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>In our research work, we usually fit models to experimental data. Our aim is to estimate some biologically relevant parameters, together with their standard errors. Very often, these parameters are interesting in themselves, as they represent means, differences, rates or other important descriptors. In other cases, we use those estimates to derive further indices, by way of some appropriate calculations. For example, think that we have two parameter estimates, say Q and W, with standard errors respectively equal to <img src="https://latex.codecogs.com/png.latex?%5Csigma_Q"> and <img src="https://latex.codecogs.com/png.latex?%5Csigma_W">: it might be relevant to calculate the amount:</p>
+<p><img src="https://latex.codecogs.com/png.latex?Z%20=%20aQ%20+%20bW%20+%20c"></p>
+<p>where <img src="https://latex.codecogs.com/png.latex?a">, <img src="https://latex.codecogs.com/png.latex?b"> and <img src="https://latex.codecogs.com/png.latex?c"> are three coefficients. The above operation is named ‘linear combination’; it is a sort of a weighted sum of model parameters. The question is: what is the standard error of Z? I would like to show this by way of a simple biological example.</p>
+<section id="example" class="level1">
+<h1>Example</h1>
+<p>We have measured the germination rate for seeds of <em>Brassica rapa</em> at six levels of water potential in the substrate (-1, -0.9, -0.8, -0.7, -0.6 and -0.5 MPa). We would like to predict the germination rate for a water potential level of -0.75 MPa.</p>
+<p>Literature references suggest that the relationship between germination rate and water potential in the substrate is linear. Therefore, as the first step, we fit a linear regression model to our observed data. If we are into R, the code to accomplish this task is shown below.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1">GR <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.11</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.20</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.34</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.46</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.56</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.68</span>)</span>
+<span id="cb1-2">Psi <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.9</span>, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.8</span>, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.7</span>, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.6</span>, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>)</span>
+<span id="cb1-3">lMod <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lm</span>(GR <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> Psi)</span>
+<span id="cb1-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summary</span>(lMod)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = GR ~ Psi)
+
+Residuals:
+         1          2          3          4          5          6 
+ 0.0076190 -0.0180952  0.0061905  0.0104762 -0.0052381 -0.0009524 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  1.25952    0.02179   57.79 5.37e-07 ***
+Psi          1.15714    0.02833   40.84 2.15e-06 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.01185 on 4 degrees of freedom
+Multiple R-squared:  0.9976,    Adjusted R-squared:  0.997 
+F-statistic:  1668 on 1 and 4 DF,  p-value: 2.148e-06</code></pre>
+</div>
+</div>
+<p>It is clear that we can use the fitted model to calculate the GR-value at -0.75 MPa, as <img src="https://latex.codecogs.com/png.latex?GR%20=%201.26%20-%201.16%20%5Ctimes%200.75%20=%200.39">. This is indeed a linear combination of model parameters, as we have shown above. Q and W are the estimated model parameters, while <img src="https://latex.codecogs.com/png.latex?a%20=%201">, <img src="https://latex.codecogs.com/png.latex?b%20=%20-0.75"> and <img src="https://latex.codecogs.com/png.latex?c%20=%200">.</p>
+<p>Of course, the derived response is also an estimate and we need to give a measure of uncertainty. For both model parameters we have standard errors; the question is: how does the uncertainty in parameter estimates propagates to their linear combination? In simpler words: it is easy to build a weighted sum of model parameters, but, how do we make a weighted sum of their standard errors?</p>
+<p>Sokal and Rohlf (1981) at pag. 818 of their book, show that, in general, it is:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%20%5Ctextrm%7Bvar%7D(a%20%5C,%20Q%20+%20b%20%5C,%20W)%20=%20a%5E2%20%5Csigma%5E2_Q%20+%20b%5E2%20%5Csigma%5E2_W%20+%202ab%20%5Csigma_%7BQW%7D%20"></p>
+<p>where <img src="https://latex.codecogs.com/png.latex?%5Csigma_%7BQW%7D"> is the covariance of Q and W. I attach the proof below; it is pretty simple to understand and it is worth the effort. However, several students in biology are rather reluctant when they have to delve into maths. Therefore, I would also like to give an empirical ‘proof’, by using some simple R code.</p>
+<p>Let’s take two samples (Q and W) and combine them by using two coefficients <img src="https://latex.codecogs.com/png.latex?a"> and <img src="https://latex.codecogs.com/png.latex?b">. Let’s calculate the variance for the combination:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1">Q <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">12</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">14</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">11</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9</span>)</span>
+<span id="cb3-2">W <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>)</span>
+<span id="cb3-3">a <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span></span>
+<span id="cb3-4">b <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span></span>
+<span id="cb3-5">c <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span></span>
+<span id="cb3-6"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">var</span>(a <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> Q <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> b <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> W <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> c)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 35.58333</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1">a<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">var</span>(Q) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> b<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">var</span>(W) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> a <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> b <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cov</span>(Q, W)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 35.58333</code></pre>
+</div>
+</div>
+<p>We see that the results match exactly! In our example, the variance and covariance of estimates are retrieved by using the ‘vcov()’ function:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vcov</span>(lMod)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             (Intercept)          Psi
+(Intercept) 0.0004749433 0.0006020408
+Psi         0.0006020408 0.0008027211</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1">sigma2Q <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vcov</span>(lMod)[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]</span>
+<span id="cb9-2">sigma2W <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vcov</span>(lMod)[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>]</span>
+<span id="cb9-3">sigmaQW <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vcov</span>(lMod)[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>]</span></code></pre></div></div>
+</div>
+<p>The standard error for the prediction is simply obtained as:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sqrt</span>( sigma2Q <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.75</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> sigma2W <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.75</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> sigmaQW )</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.004838667</code></pre>
+</div>
+</div>
+</section>
+<section id="the-functions-predict-and-glht" class="level1">
+<h1>The functions ‘predict()’ and ‘glht()’</h1>
+<p>Now that we have understood the concept, we can use R to make the calculations. For this example, the ‘predict()’ method represents the most logical approach. We only need to pass the model object and the X value which we have to make a prediction for. This latter value needs to be organised as a data frame, with column name(s) matching the name(s) of the X-variable(s) in the original dataset:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(lMod, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">newdata =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">Psi =</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.75</span>), </span>
+<span id="cb12-2">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">se.fit =</span> T)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$fit
+        1 
+0.3916667 
+
+$se.fit
+[1] 0.004838667
+
+$df
+[1] 4
+
+$residual.scale
+[1] 0.01185227</code></pre>
+</div>
+</div>
+<p>Apart from the predict method, there is another function of more general interest, which can be used to build linear combinations of model parameters. It is the ‘glht()’ function in the ‘multcomp’ package. To use this function, we need a model object and we need to organise the coefficients for the transformation in a matrix, with as many rows as there are combinations to calculate. When writing the coefficients, we disregard C: we have seen that every constant value does not affect the variance of the transformation.</p>
+<p>For example, just imagine that we want to predict the GR for two levels of water potential, i.e.&nbsp;-0.75 (as above) and -0.55 MPa. The coefficients (A, B) for the combinations are:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1">Z1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.75</span>)</span>
+<span id="cb14-2">Z2 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.55</span>)</span></code></pre></div></div>
+</div>
+<p>We pile up the two vectors in one matrix with two rows:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1">M <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">matrix</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(Z1, Z2), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">byrow =</span> T)</span></code></pre></div></div>
+</div>
+<p>And now we pass that matrix to the ‘glht()’ function as an argument:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(multcomp)</span>
+<span id="cb16-2">lcombs <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">glht</span>(lMod, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">linfct =</span> M)</span>
+<span id="cb16-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summary</span>(lcombs)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+     Simultaneous Tests for General Linear Hypotheses
+
+Fit: lm(formula = GR ~ Psi)
+
+Linear Hypotheses:
+       Estimate Std. Error t value Pr(&gt;|t|)    
+1 == 0 0.391667   0.004839   80.94 2.30e-07 ***
+2 == 0 0.623095   0.007451   83.62 2.02e-07 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+(Adjusted p values reported -- single-step method)</code></pre>
+</div>
+</div>
+<p>The above method can be easily extended to other types of linear models and linear combinations of model parameters. The ‘adjust’ argument is useful whenever we want to obtain familywise confidence intervals, which can account for the multiplicity problem. But this is another story…</p>
+<p>Happy work with these functions! And … don’t forget to check out my new book!</p>
+<p>Prof.&nbsp;Andrea Onofri<br>
+Department of Agricultural, Food and Environmental Sciences<br>
+University of Perugia (Italy)<br>
+Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<p><a href="https://www.awin1.com/cread.php?awinmid=26429&amp;awinaffid=2675822&amp;ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src="https://www.statforbiology.com/../Figures/Email_Signature_978-3-032-08199-5.png" align="center" alt="Book cover" class="cover"></a></p>
+<hr>
+</section>
+<section id="appendix" class="level1">
+<h1>Appendix</h1>
+<p>We know that the variance for a random variable is defined as:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%7B%5Cbegin%7Barray%7D%7Bl%7D%0Avar(Z)%20=%20%5Cfrac%7B1%7D%7Bn-1%7D%5Csum%20%5Cleft(Z%20-%20%5Chat%7BZ%7D%5Cright)%5E2%20=%20%5C%5C%0A=%20%5Cfrac%7B1%7D%7Bn-1%7D%5Csum%20%5Cleft(Z%20-%20%5Cfrac%7B1%7D%7Bn%7D%20%5Csum%7BZ%7D%5Cright)%5E2%0A%5Cend%7Barray%7D%7D"></p>
+<p>If <img src="https://latex.codecogs.com/png.latex?Z%20=%20aQ%20+%20bW%20+%20c">, where <img src="https://latex.codecogs.com/png.latex?a">, <img src="https://latex.codecogs.com/png.latex?b"> and <img src="https://latex.codecogs.com/png.latex?c"> are the coefficients and Q and W are two random variables, we have:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%20%7B%5Cbegin%7Barray%7D%7Bl%7D%0Avar(Z)%20=%20%5Cfrac%7B1%7D%7Bn-1%7D%5Csum%20%5Cleft%5BaQ%20+%20bW%20+%20c%20-%20%5Cfrac%7B1%7D%7Bn%7D%20%5Csum%7B%20%5Cleft(aQ%20+%20bW%20+%20c%5Cright)%7D%5Cright%5D%5E2%20=%20%5C%5C%0A=%20%5Cfrac%7B1%7D%7Bn-1%7D%5Csum%20%5Cleft%5BaQ%20+%20bW%20+%20c%20-%20%5Cfrac%7B1%7D%7Bn%7D%20%5Csum%7B%20aQ%7D%20-%20%5Cfrac%7B1%7D%7Bn%7D%20%5Csum%7B%20bW%7D%20-%20%5Cfrac%7B1%7D%7Bn%7D%20%5Csum%7B%20c%7D%5Cright%5D%5E2%20=%0A%5Cend%7Barray%7D%7D%0A"></p>
+<p><img src="https://latex.codecogs.com/png.latex?%7B%5Cbegin%7Barray%7D%7Bl%7D%0A=%20%5Cfrac%7B1%7D%7Bn-1%7D%5Csum%20%5Cleft%5BaQ%20+%20bW%20+%20c%20-%20a%20%5Chat%7BQ%7D%20-%20b%20%5Chat%7BW%7D%20-%20c%20%5Cright%5D%5E2%20=%5C%5C%0A=%20%5Cfrac%7B1%7D%7Bn-1%7D%5Csum%20%5Cleft%5B%5Cleft(%20aQ%20-%20a%20%5Chat%7BQ%7D%5Cright)%20+%20%5Cleft(%20aW%20-%20a%5Chat%7BW%7D%5Cright)%20%5Cright%5D%5E2%20=%0A%5Cend%7Barray%7D%7D"></p>
+<p><img src="https://latex.codecogs.com/png.latex?%7B%5Cbegin%7Barray%7D%7Bl%7D%0A=%5Cfrac%7B1%7D%7Bn-1%7D%5Csum%20%5Cleft%5Ba%20%5Cleft(%20Q%20-%20%5Chat%7BQ%7D%5Cright)%20+%20b%20%5Cleft(%20W%20-%20%5Chat%7BW%7D%5Cright)%20%5Cright%5D%5E2%20=%5C%5C%0A=%20%5Cfrac%7B1%7D%7Bn-1%7D%5Csum%20%5Cleft%5Ba%5E2%20%5Cleft(%20Q%20-%20%5Chat%7BQ%7D%5Cright)%5E2%20+%20b%5E2%20%5Cleft(%20W%20-%20%5Chat%7BW%7D%5Cright)%5E2%20+%202ab%20%5Cleft(%20Q%20-%20%5Chat%7BQ%7D%5Cright)%20%5Cleft(%20W%20-%20%5Chat%7BW%7D%5Cright)%5Cright%5D%20=%0A%5Cend%7Barray%7D%7D%0A"></p>
+<p><img src="https://latex.codecogs.com/png.latex?%20=%20a%5E2%20%5Cfrac%7B1%7D%7Bn-1%7D%20%5Csum%7B%5Cleft(%20Q%20-%20%5Chat%7BQ%7D%5Cright)%5E2%7D%20+%20b%5E2%20%5Cfrac%7B1%7D%7Bn-1%7D%5Csum%20%5Cleft(%20W%20-%20%5Chat%7BW%7D%5Cright)%5E2%20+%202ab%20%5Cfrac%7B1%7D%7Bn-1%7D%5Csum%7B%5Cleft%5B%5Cleft(%20Q%20-%20%5Chat%7BQ%7D%5Cright)%20%5Cleft(%20W%20-%20%5Chat%7BW%7D%5Cright)%5Cright%5D%7D"></p>
+<p>Therefore:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%20%5Ctextrm%7Bvar%7D(Z)%20=%20a%5E2%20%5Csigma%5E2_Q%20+%20b%5E2%20%5Csigma%5E2_W%20+%202ab%20%5Csigma_%7BQ,W%7D"></p>
+
+
+</section>
+
+ ]]></description>
+  <category>R</category>
+  <category>linear models</category>
+  <category>R-bloggers</category>
+  <guid>https://www.statforbiology.com/posts/general_ErrorPropagation.html</guid>
+  <pubDate>Thu, 21 Nov 2024 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Accounting for the experimental design in linear/nonlinear regression analyses</title>
+  <dc:creator>Andrea Onofri</dc:creator>
+  <link>https://www.statforbiology.com/posts/nlmm_DesignConstraints.html</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>In this post, I am going to talk about an issue that is often overlooked by agronomists and biologists. The point is that field experiments are very often laid down in blocks, using split-plot designs, strip-plot designs or other types of designs with grouping factors (blocks, main-plots, sub-plots). We know that these grouping factors should be appropriately accounted for in data analyses: ‘analyze them as you have randomized them’ is a common saying attributed to Ronald Fisher. Indeed, observations in the same group are correlated, as they are more alike than observations in different groups. What happens if we neglect the grouping factors? We break the independence assumption and our inferences are invalid (Onofri et al., 2010).</p>
+<p>To my experience, field scientists are totally aware of this issue when they deal with ANOVA-type models (e.g., see Jensen et al., 2018). However, a brief survey of literature shows that there is not the same awareness, when field scientists deal with linear/nonlinear regression models. Therefore, I decided to sit down and write this post, in the hope that it may be useful to obtain more reliable data analyses.</p>
+<section id="an-example-with-linear-regression" class="level1">
+<h1>An example with linear regression</h1>
+<p>Let’s take a look at the ‘yieldDensity.csv’ dataset, that is available on gitHub. It represents an experiment where sunflower was tested with increasing weed densities (0, 14, 19, 28, 32, 38, 54, 82 plants per <img src="https://latex.codecogs.com/png.latex?m%5E2">), on a randomised complete block design, with 10 blocks. a swift plot shows that yield is linearly related to weed density, which calls for linear regression analysis.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rm</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">list=</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ls</span>())</span>
+<span id="cb1-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(nlme)</span>
+<span id="cb1-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(lattice)</span>
+<span id="cb1-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(statforbiology)</span>
+<span id="cb1-5">dataset <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">getAgroData</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"yieldDensityB"</span>)</span>
+<span id="cb1-6">dataset<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>block <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">factor</span>(dataset<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>block)</span>
+<span id="cb1-7"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">head</span>(dataset)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  block density yield
+1     1       0 29.90
+2     2       0 34.23
+3     3       0 37.12
+4     4       0 26.37
+5     5       0 34.48
+6     6       0 33.70</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(yield <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> density, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> dataset)</span></code></pre></div></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://www.statforbiology.com/posts/nlmm_DesignConstraints_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We might be tempted to neglect the block effect and run a linear regression analysis of yield against density. This is clearly wrong (I am violating the independence assumption) and inefficient, as any block-to-block variability goes into the residual error term, which is, therefore, inflated.</p>
+<p>Some of my collegues would take the means for densities and use those to fit a linear regression model (two-steps analysis). By doing so, block-to-block variability is cancelled out and the analysis becomes more efficient. However, such a solution is not general, as it is not feasible, e.g., when we have unbalanced designs and heteroscedastic data. With the appropriate approach, sound analyses can also be made in two-steps (Damesa et al., 2017). From my point of view, it is reasonable to search for more general solutions to deal with one-step analyses.</p>
+<p>Based on our experience with traditional ANOVA models, we might think of taking the block effect as fixed and fit it as and additive term. See the code below.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">mod.reg <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lm</span>(yield <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> block <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> density, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data=</span>dataset)</span>
+<span id="cb4-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summary</span>(mod.reg)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = yield ~ block + density, data = dataset)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-2.6062 -0.8242 -0.3315  0.7505  4.6244 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) 29.10462    0.57750  50.397  &lt; 2e-16 ***
+block2       4.57750    0.74668   6.130 4.81e-08 ***
+block3       7.05875    0.74668   9.453 4.49e-14 ***
+block4      -3.98000    0.74668  -5.330 1.17e-06 ***
+block5       6.17625    0.74668   8.272 6.37e-12 ***
+block6       5.92750    0.74668   7.938 2.59e-11 ***
+block7       1.23750    0.74668   1.657  0.10199    
+block8       1.25500    0.74668   1.681  0.09733 .  
+block9       2.34875    0.74668   3.146  0.00245 ** 
+block10      2.25125    0.74668   3.015  0.00359 ** 
+density     -0.26744    0.00701 -38.149  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 1.493 on 69 degrees of freedom
+Multiple R-squared:  0.9635,    Adjusted R-squared:  0.9582 
+F-statistic: 181.9 on 10 and 69 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>With regression, this solution is not convincing. Indeed, the above model assumes that the blocks produce an effect only on the intercept of the regression line, while the slope is unaffected. Is this a reasonable assumption? I vote no.</p>
+<p>Let’s check this by fitting a different regression model per block (ten different slopes + ten different intercepts):</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1">mod.reg2 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lm</span>(yield <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> block<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>density <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> block, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data=</span>dataset)</span>
+<span id="cb6-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">anova</span>(mod.reg, mod.reg2)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Variance Table
+
+Model 1: yield ~ block + density
+Model 2: yield ~ block/density + block
+  Res.Df    RSS Df Sum of Sq      F  Pr(&gt;F)  
+1     69 153.88                              
+2     60 115.75  9    38.135 2.1965 0.03465 *
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p>The p-level confirms that the block had a significant effect both on the intercept and on the slope. To describe such an effect we need 20 parameters in the model, which is not very parsimonious. And above all: which regression line do we use for predictions? Taking the block effect as fixed is clearly sub-optimal with regression models.</p>
+<p>The question is: can we fit a simpler and clearer model? The answer is: yes. Why don’t we take the block effect as random? This is perfectly reasonable. Let’s do it.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1">modMix<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lme</span>(yield <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> density, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">random =</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> density<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|</span>block, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data=</span>dataset)</span>
+<span id="cb8-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summary</span>(modMix<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span>)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed-effects model fit by REML
+  Data: dataset 
+       AIC      BIC    logLik
+  340.9166 355.0569 -164.4583
+
+Random effects:
+ Formula: ~density | block
+ Structure: General positive-definite, Log-Cholesky parametrization
+            StdDev     Corr  
+(Intercept) 3.16871858 (Intr)
+density     0.02255249 0.09  
+Residual    1.38891957       
+
+Fixed effects:  yield ~ density 
+               Value Std.Error DF   t-value p-value
+(Intercept) 31.78987 1.0370844 69  30.65311       0
+density     -0.26744 0.0096629 69 -27.67704       0
+ Correlation: 
+        (Intr)
+density -0.078
+
+Standardized Within-Group Residuals:
+       Min         Q1        Med         Q3        Max 
+-1.9923722 -0.5657555 -0.1997103  0.4961675  2.6699060 
+
+Number of Observations: 80
+Number of Groups: 10 </code></pre>
+</div>
+</div>
+<p>The above fit shows that the random effects (slope and intercept) are sligthly correlated (r = 0.091). We might like to try a simpler model, where random effects are independent. To do so, we need to consider that the above model is equivalent to the following model:</p>
+<pre><code>modMix.1 &lt;- lme(yield ~ density, random = list(block = pdSymm(~density)), data=dataset)</code></pre>
+<p>It’s just two different ways to code the very same model. However, this latter coding, based on a ‘pdMat’ structure, can be easily modified to remove the correlation. Indeed, ‘pdSymm’ specifies a totally unstructured variance-covariance matrix for random effects and it can be replaced by ‘pdDiag’, which specifies a diagonal matrix, where covariances (off-diagonal terms) are constrained to 0. The coding is as follows:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1">modMix<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.2</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lme</span>(yield <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> density, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">random =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">block =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">pdDiag</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span>density)), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data=</span>dataset)</span>
+<span id="cb11-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summary</span>(modMix<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.2</span>)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed-effects model fit by REML
+  Data: dataset 
+      AIC      BIC   logLik
+  338.952 350.7355 -164.476
+
+Random effects:
+ Formula: ~density | block
+ Structure: Diagonal
+        (Intercept)    density Residual
+StdDev:    3.198277 0.02293222 1.387147
+
+Fixed effects:  yield ~ density 
+               Value Std.Error DF   t-value p-value
+(Intercept) 31.78987 1.0460314 69  30.39093       0
+density     -0.26744 0.0097463 69 -27.44020       0
+ Correlation: 
+        (Intr)
+density -0.139
+
+Standardized Within-Group Residuals:
+       Min         Q1        Med         Q3        Max 
+-1.9991181 -0.5451478 -0.1970266  0.4925097  2.6700397 
+
+Number of Observations: 80
+Number of Groups: 10 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">anova</span>(modMix<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span>, modMix<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.2</span>)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>         Model df      AIC      BIC    logLik   Test    L.Ratio p-value
+modMix.1     1  6 340.9166 355.0569 -164.4583                          
+modMix.2     2  5 338.9520 350.7355 -164.4760 1 vs 2 0.03535079  0.8509</code></pre>
+</div>
+</div>
+<p>The model could be further simplified. For example, the code below shows how we could fit models with either random intercept or random slope.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#Model with only random intercept</span></span>
+<span id="cb15-2">modMix<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.3</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lme</span>(yield <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> density, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">random =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">block =</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data=</span>dataset)</span>
+<span id="cb15-3"></span>
+<span id="cb15-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#Alternative</span></span>
+<span id="cb15-5"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#random = ~ 1|block</span></span>
+<span id="cb15-6"></span>
+<span id="cb15-7"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#Model with only random slope</span></span>
+<span id="cb15-8">modMix<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.4</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lme</span>(yield <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> density, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">random =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">block =</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> density <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data=</span>dataset)</span>
+<span id="cb15-9"></span>
+<span id="cb15-10"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#Alternative</span></span>
+<span id="cb15-11"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#random = ~density - 1 | block</span></span></code></pre></div></div>
+</div>
+</section>
+<section id="an-example-with-nonlinear-regression" class="level1">
+<h1>An example with nonlinear regression</h1>
+<p>The problem may become trickier if we have a nonlinear relationship. Let’s have a look at another similar dataset (‘YieldLossB.csv’), that is also available on gitHub. It represents another experiment where sunflower was grown with the same increasing densities of another weed (0, 14, 19, 28, 32, 38, 54, 82 plants per <img src="https://latex.codecogs.com/png.latex?m%5E2">), on a randomised complete block design, with 8 blocks. In this case, the yield loss was recorded and analysed.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rm</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">list=</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ls</span>())</span>
+<span id="cb16-2">dataset <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">getAgroData</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"YieldLossB"</span>)</span>
+<span id="cb16-3">dataset<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>block <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">factor</span>(dataset<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>block)</span>
+<span id="cb16-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">head</span>(dataset)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  block density yieldLoss
+1     1       0     1.532
+2     2       0    -0.661
+3     3       0    -0.986
+4     4       0    -0.697
+5     5       0    -2.264
+6     6       0    -1.623</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(yieldLoss <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> density, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> dataset)</span></code></pre></div></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://www.statforbiology.com/posts/nlmm_DesignConstraints_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>A swift plot shows that the relationship between density and yield loss is not linear. Literature references (Cousens, 1985) show that this could be modelled by using a rectangular hyperbola:</p>
+<p><img src="https://latex.codecogs.com/png.latex?YL%20=%20%5Cfrac%7Bi%20%5C,%20D%7D%7B1%20+%20%5Cfrac%7Bi%20%5C,%20D%7D%7Ba%7D%7D"></p>
+<p>where <img src="https://latex.codecogs.com/png.latex?YL"> is the yield loss, <img src="https://latex.codecogs.com/png.latex?D"> is weed density, <img src="https://latex.codecogs.com/png.latex?i"> is the slope at the origin of axes and <img src="https://latex.codecogs.com/png.latex?a"> is the maximum asymptotic yield loss. This function, together with self-starters, is available in the ‘NLS.YL()’ function in the ‘statforbiology’ package, which is the accompanying package for this blog. If you do not have this package, please refer to <a href="https://www.statforbiology.com/rpackages/">this link</a> to download it.</p>
+<p>The problem is the very same as above: the block effect may produce random fluctuations for both model parameters. The only difference is that we need to use the ‘nlme()’ function instead of ‘lme()’. With nonlinear mixed models, I strongly suggest you use a ‘groupedData’ object, which permits to avoid several problems. The second line below shows how to turn a data frame into a ‘groupedData’ object.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1">datasetG <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">groupedData</span>(yieldLoss <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|</span>block, dataset)</span>
+<span id="cb19-2">nlin.mix <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">nlme</span>(yieldLoss <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">NLS.YL</span>(density, i, A), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data=</span>datasetG, </span>
+<span id="cb19-3">                        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fixed =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(i <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, A <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>),</span>
+<span id="cb19-4">            <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">random =</span> i <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> A <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|</span>block)</span>
+<span id="cb19-5"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summary</span>(nlin.mix)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Nonlinear mixed-effects model fit by maximum likelihood
+  Model: yieldLoss ~ NLS.YL(density, i, A) 
+  Data: datasetG 
+       AIC      BIC    logLik
+  474.8228 491.5478 -231.4114
+
+Random effects:
+ Formula: list(i ~ 1, A ~ 1)
+ Level: block
+ Structure: General positive-definite, Log-Cholesky parametrization
+         StdDev    Corr 
+i        0.1112839 i    
+A        4.0444506 0.195
+Residual 1.4142272      
+
+Fixed effects:  list(i ~ 1, A ~ 1) 
+     Value Std.Error  DF  t-value p-value
+i  1.23238 0.0382246 104 32.24039       0
+A 68.52305 1.9449741 104 35.23083       0
+ Correlation: 
+  i     
+A -0.408
+
+Standardized Within-Group Residuals:
+       Min         Q1        Med         Q3        Max 
+-2.4416763 -0.7049387 -0.1805690  0.3385457  2.8788978 
+
+Number of Observations: 120
+Number of Groups: 15 </code></pre>
+</div>
+</div>
+<p>Similarly to linear mixed models, the above coding implies correlated random effects (r = 0.194). Alternatively, the above model can be coded by using a ’pdMat construct, as follows:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1">nlin.mix2 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">nlme</span>(yieldLoss <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">NLS.YL</span>(density, i, A), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data=</span>datasetG, </span>
+<span id="cb21-2">                              <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fixed =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(i <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, A <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>),</span>
+<span id="cb21-3">                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">random =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">pdSymm</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(i <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, A <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)))</span>
+<span id="cb21-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summary</span>(nlin.mix2)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Nonlinear mixed-effects model fit by maximum likelihood
+  Model: yieldLoss ~ NLS.YL(density, i, A) 
+  Data: datasetG 
+       AIC      BIC    logLik
+  474.8225 491.5474 -231.4112
+
+Random effects:
+ Formula: list(i ~ 1, A ~ 1)
+ Level: block
+ Structure: General positive-definite
+         StdDev    Corr 
+i        0.1112838 i    
+A        4.0468317 0.194
+Residual 1.4141994      
+
+Fixed effects:  list(i ~ 1, A ~ 1) 
+     Value Std.Error  DF  t-value p-value
+i  1.23242  0.038225 104 32.24113       0
+A 68.52052  1.945185 104 35.22571       0
+ Correlation: 
+  i     
+A -0.409
+
+Standardized Within-Group Residuals:
+       Min         Q1        Med         Q3        Max 
+-2.4413858 -0.7049356 -0.1805303  0.3385254  2.8787261 
+
+Number of Observations: 120
+Number of Groups: 15 </code></pre>
+</div>
+</div>
+<p>Now we can try to simplify the model, for example by excluding the correlation between random effects.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1">nlin.mix3 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">nlme</span>(yieldLoss <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">NLS.YL</span>(density, i, A), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data=</span>datasetG, </span>
+<span id="cb23-2">                              <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fixed =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(i <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, A <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>),</span>
+<span id="cb23-3">                  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">random =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">pdDiag</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(i <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, A <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)))</span>
+<span id="cb23-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">summary</span>(nlin.mix3)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Nonlinear mixed-effects model fit by maximum likelihood
+  Model: yieldLoss ~ NLS.YL(density, i, A) 
+  Data: datasetG 
+       AIC      BIC    logLik
+  472.9076 486.8451 -231.4538
+
+Random effects:
+ Formula: list(i ~ 1, A ~ 1)
+ Level: block
+ Structure: Diagonal
+                i        A Residual
+StdDev: 0.1172791 4.389173 1.408963
+
+Fixed effects:  list(i ~ 1, A ~ 1) 
+     Value Std.Error  DF  t-value p-value
+i  1.23243 0.0393514 104 31.31852       0
+A 68.57655 1.9905549 104 34.45097       0
+ Correlation: 
+  i     
+A -0.459
+
+Standardized Within-Group Residuals:
+       Min         Q1        Med         Q3        Max 
+-2.3577291 -0.6849962 -0.1785860  0.3255925  2.8592764 
+
+Number of Observations: 120
+Number of Groups: 15 </code></pre>
+</div>
+</div>
+<p>With a little fantasy, we can easily code several alternative models to represent alternative hypotheses about the observed data. Obviously, the very same method can be used (and SHOULD be used) to account for other grouping factors, such as main-plots in split-plot designs or plots in repeated measure designs.</p>
+<p>Happy coding! And… don’t forget to check out my new book below!</p>
+<p>Andrea Onofri<br>
+Department of Agricultural, Food and Environmental Sciences<br>
+University of Perugia (Italy)<br>
+Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<p><a href="https://www.awin1.com/cread.php?awinmid=26429&amp;awinaffid=2675822&amp;ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src="https://www.statforbiology.com/../Figures/Email_Signature_978-3-032-08199-5.png" align="center" alt="Book cover" class="cover"></a> <br></p>
+<hr>
+</section>
+<section id="references" class="level1">
+<h1>References</h1>
+<ol type="1">
+<li>Cousens, R., 1985. A simple model relating yield loss to weed density. Annals of Applied Biology 107, 239–252. https://doi.org/10.1111/j.1744-7348.1985.tb01567.x</li>
+<li>Jensen, S.M., Schaarschmidt, F., Onofri, A., Ritz, C., 2018. Experimental design matters for statistical analysis: how to handle blocking: Experimental design matters for statistical analysis. Pest Management Science 74, 523–534. https://doi.org/10.1002/ps.4773</li>
+<li>Onofri, A., Carbonell, E.A., Piepho, H.-P., Mortimer, A.M., Cousens, R.D., 2010. Current statistical issues in Weed Research. Weed Research 50, 5–24.</li>
+</ol>
+
+
+</section>
+
+ ]]></description>
+  <category>R</category>
+  <category>Mixed models</category>
+  <category>nonlinear regression</category>
+  <category>nlme</category>
+  <category>R-bloggers</category>
+  <guid>https://www.statforbiology.com/posts/nlmm_DesignConstraints.html</guid>
+  <pubDate>Thu, 03 Dec 2020 23:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>QQ-plots and Box-Whisker plots: where do they come from?</title>
+  <dc:creator>Andrea Onofri</dc:creator>
+  <link>https://www.statforbiology.com/posts/general_percentiles.html</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>This post is ‘only’ for the most curious students…</p>
+<p>QQ-plots and Box-Whisker plots usually become part of the statistical toolbox for the students attending my course of ‘Experimental methods in agriculture’. Most of them learn that the QQ-plot can be used to check for the basic assumption of gaussian residuals in linear models and that the Box-Whisker plot can be used to describe the experimental groups, when their size is big enough and we do not want to assume a gaussian distribution. Furthermore, most students learn to use the <code>plot()</code> method on an ‘lm’ object and the <code>boxplot()</code> function in the base ‘graphic’ package and concentrate on the interpretation of the R output. To me, in practical terms, this is enough; however, there is at least a couple of students per year who think that this is not enough and they want to know more. What is the math behind those useful plots? Can we draw them by hand?</p>
+<p>If I were to give further detail about these two types of graphs, I should give a more detailed explanation of percentiles, at the very beginning of my course. I usually present the concept, which is rather easy to grasp, for students and I also give an example of how to calculate the 50th percentile (i.e.&nbsp;the median). So far, so good. But, what about the 25th and 75th percentiles, which are needed to build the Box-Whisker plot? As a teacher, I must admit I usually skip this aspect; I resort to showing the use of the <code>quantile()</code> function and the students are happy, apart the same couple per year, who asks: “what is this function doing in the background?”.</p>
+<p>Usually, there is no time to satisfy the above thirst for knowledge. First of all, I need time to introduce other important concepts for agricultural student; second, giving more detail would imply a high risk of being ‘beaten’ by all the other, less eager, students. Therefore, I decided to put my explanation here, to the benefit of the most curious of my students.</p>
+<p>As an example, we will use 11 observations, randomly selected from a uniform distribution. First of all, we sort them out in increasing order.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">set.seed</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1234</span>)</span>
+<span id="cb1-2">y <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sort</span>( <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">runif</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">11</span>))</span>
+<span id="cb1-3">y</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] 0.009495756 0.113703411 0.232550506 0.514251141 0.609274733 0.622299405
+ [7] 0.623379442 0.640310605 0.666083758 0.693591292 0.860915384</code></pre>
+</div>
+</div>
+<section id="the-p-values-of-observations" class="level1">
+<h1>The P-values of observations</h1>
+<p>Let’s try to imagine that our eleven observations are percentiles, although we do not know what their percentage point is. Well, we know something, at least; we have an odd number of observations and we know that the central value (0.622299405) is the median, i.e.&nbsp;the 50th percentile. But, what about the other values? In other words, we are looking for the P-values associated to each observation (probability points).</p>
+<p>In order to determine the P-values, we divide the whole scale from 0 to 100% into as many intervals as there are values in our sample, that is eleven intervals. Each interval contains <img src="https://latex.codecogs.com/png.latex?1%20/%2011%20%5Ctimes%20100%20=%209.09%5C%25"> of the whole scale: the first interval goes from 0% to 9.09%, the second goes from 9.09% to 18.18% and so on, until the 11th interval, that goes from 90.91% to 100%.</p>
+<p>Now, each value in the ordered sample is associated to one probability interval. The problem is: where do we put the value, within each interval? A possible line of attack, that is the default in R with <img src="https://latex.codecogs.com/png.latex?n%20%3E%2010">, is to put the value in the middle of the interval, as shown in the Figure below.</p>
+<p><img src="https://www.casaonofri.it/_Figures/PercentagePoints.png" class="img-fluid" style="width:95.0%"></p>
+<p>Consequently, each point corresponds to the following P-values:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1">(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">11</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">11</span></span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] 0.04545455 0.13636364 0.22727273 0.31818182 0.40909091 0.50000000
+ [7] 0.59090909 0.68181818 0.77272727 0.86363636 0.95454545</code></pre>
+</div>
+</div>
+<p>In general:</p>
+<p><img src="https://latex.codecogs.com/png.latex?p_i%20=%20%5Cfrac%7Bi%20-%200.5%7D%7Bn%7D%20"></p>
+<p>where <img src="https://latex.codecogs.com/png.latex?n"> is the number of values and <img src="https://latex.codecogs.com/png.latex?i"> is the index of each value in the sorted vector. In other words, the first value is the 4.5th percentile, the second value is the 13.64th percentile and so on, until the 11th value that is the 95.45th percentile.</p>
+<p>Unfortunately, the calculation of P-values is not unique and there are other ways to locate the values within each interval. A second possibility, is to put the value close to the beginning of each interval. In this case, the corresponding P-values can be calculated as:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1">(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">11</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">11</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0</code></pre>
+</div>
+</div>
+<p>In general:</p>
+<p><img src="https://latex.codecogs.com/png.latex?p_i%20=%20%5Cfrac%7Bi%20-%201%7D%7Bn%20-%201%7D%20"></p>
+<p>According to this definition, the first value is the 0th percentile, the second is the 10th percentile and so on.</p>
+<p>A third possibility, is to put the value at the end of each interval. In this case, each point corresponds to the following P-values:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">11</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">11</span></span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] 0.09090909 0.18181818 0.27272727 0.36363636 0.45454545 0.54545455
+ [7] 0.63636364 0.72727273 0.81818182 0.90909091 1.00000000</code></pre>
+</div>
+</div>
+<p>In general, it is:</p>
+<p><img src="https://latex.codecogs.com/png.latex?p_i%20=%20%5Cfrac%7Bi%7D%7Bn%7D%20"></p>
+<p>Although it is not the default in R, this third approach is, perhaps, the most understandable, as it is more closely related to the definition of percentiles. It is clear that there is 9.09% subjects equal to or lower than the first one and that there is 18.18% of subjects equal to or lower than the second one.</p>
+<p>Several other possibilities exist, but we will not explore them here. However, the most common function in R to calculate probability points is the <code>ppoints()</code> function, which gives different results, according to the selection of the ‘a’ argument. In detail, if <img src="https://latex.codecogs.com/png.latex?a%20=%200.5"> (the default) we obtain the first series of P-values (where each of the original values is put in the middle of each interval) while, if <img src="https://latex.codecogs.com/png.latex?a%20=%201">, we obtain the second series of P-values (where each of the original values is put near to the beginning of each interval).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ppoints</span>(y)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] 0.04545455 0.13636364 0.22727273 0.31818182 0.40909091 0.50000000
+ [7] 0.59090909 0.68181818 0.77272727 0.86363636 0.95454545</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ppoints</span>(y, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">a =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0</code></pre>
+</div>
+</div>
+</section>
+<section id="from-ppoints-to-the-qq-plot" class="level1">
+<h1>From <code>ppoints()</code> to the QQ-plot</h1>
+<p>P-values are used to draw quantile-quantile plots. Let’s imagine that we want to know whether the eleven values in the vector ‘y’ can be regarded as a sample from a gaussian distribution. To this aim, we can standardise them and plot them against the corresponding percentiles of a gaussian distribution, which we derive from the above determined P-values, by the <code>pnorm()</code> function. The output is exactly the same as that produced by a call to the <code>qqnorm()</code> function.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1">x.coord <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">qnorm</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ppoints</span>(y))</span>
+<span id="cb13-2">y.coord <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale</span>(y, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">scale =</span> T) </span>
+<span id="cb13-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(y.coord <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> x.coord, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">main =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Manual QQ-plot"</span>,</span>
+<span id="cb13-4">     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xlab =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Theoretical quantiles"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ylab =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Standardised values"</span>,</span>
+<span id="cb13-5">     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ylim =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.5</span>))</span></code></pre></div></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://www.statforbiology.com/posts/general_percentiles_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="percentiles" class="level1">
+<h1>Percentiles</h1>
+<p>Percentiles can be calculated by solving the three equations above for <img src="https://latex.codecogs.com/png.latex?i">. For example, from the first equation, with simple math, we derive:</p>
+<p><img src="https://latex.codecogs.com/png.latex?i%20=%20n%20p_i%20+%200.5"></p>
+<p>which gives the index for the required percentile. If we look for the 30th percentile, the index is <img src="https://latex.codecogs.com/png.latex?11%20%5Ctimes%200.30%20+%200.5%20=%203.8">, i.e.&nbsp;this percentile is between the 3rd and the 4th value, that are, respectively, 0.232550506 and 0.514251141. We can find the exact percentile by a sort of ‘weighted average’ of these two values, considering the decimal part of the index (0.8):</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1">(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.8</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> y[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.8</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> y[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>]</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.457911</code></pre>
+</div>
+</div>
+<p>We can get the same result, by using the <code>quantile()</code> function in R and setting the ‘type = 5’ argument.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">quantile</span>(y, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.3</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     30% 
+0.457911 </code></pre>
+</div>
+</div>
+<p>If we start from the second equation, we derive:</p>
+<p><img src="https://latex.codecogs.com/png.latex?i%20=%20p%20%5Ctimes%20(n%20-%201)%20+%201"></p>
+<p>For the 30th percentile, the index is <img src="https://latex.codecogs.com/png.latex?0.3%20%5Ctimes%20(11%20-%201)%20+%201%20=%204">. Thus, the required percentile is exactly in 4th position (0.5142511). With R, we can use the same <code>quantile()</code> function, but we have to set the ‘type = 7’ argument, that is the default.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">quantile</span>(y, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.3</span>)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      30% 
+0.5142511 </code></pre>
+</div>
+</div>
+<p>If we take the third equation above, we derive:</p>
+<p><img src="https://latex.codecogs.com/png.latex?i%20=%20n%20%5Ctimes%20p"></p>
+<p>and thus the index for the 30th percentile is: <img src="https://latex.codecogs.com/png.latex?11%20%5Ctimes%200.3%20=%203.3">. We use the same kind of ‘weighted average’ to retrieve the exact percentile:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1">(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.3</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> y[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.3</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> y[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>]</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.3170607</code></pre>
+</div>
+</div>
+<p>With R:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">quantile</span>(y, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.3</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>)</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      30% 
+0.3170607 </code></pre>
+</div>
+</div>
+<p>If we use the above math to derive the 25th, the 50th and the 75th percentile, we are ready to draw our boxplot by hand. Please, consider that the <code>boxplot()</code> function in R uses the default quantiles (‘type = 7’).</p>
+<p>It’s all, for today. Happy work with these functions! And … don’t forget to check out my new book!</p>
+<p>Prof.&nbsp;Andrea Onofri<br>
+Department of Agricultural, Food and Environmental Sciences<br>
+University of Perugia (Italy)<br>
+Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<p><a href="https://www.awin1.com/cread.php?awinmid=26429&amp;awinaffid=2675822&amp;ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src="https://www.statforbiology.com/../Figures/Email_Signature_978-3-032-08199-5.png" align="center" alt="Book cover" class="cover"></a></p>
+
+
+</section>
+
+ ]]></description>
+  <category>R</category>
+  <category>descriptive statistics</category>
+  <category>R-bloggers</category>
+  <guid>https://www.statforbiology.com/posts/general_percentiles.html</guid>
+  <pubDate>Wed, 14 Oct 2020 22:00:00 GMT</pubDate>
 </item>
 <item>
   <title>Self-starting routines for nonlinear regression models</title>
@@ -1861,7 +3840,7 @@ Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it
 
 
 
-<p>(Post updated on 17/07/2023) In R, the <code>drc</code> package represents one of the main solutions for nonlinear regression and dose-response analyses (Ritz et al., 2015). It comes with a lot of nonlinear models, which are useful to describe several biological processes, from plant growth to bioassays, from herbicide degradation to seed germination. These models are provided with self-starting functions, which free the user from the hassle of providing initial guesses for model parameters. Indeed, getting these guesses may be a tricky task, both for students and for practitioners.</p>
+<p>In R, the <code>drc</code> package represents one of the main solutions for nonlinear regression and dose-response analyses (Ritz et al., 2015). It comes with a lot of nonlinear models, which are useful to describe several biological processes, from plant growth to bioassays, from herbicide degradation to seed germination. These models are provided with self-starting functions, which free the user from the hassle of providing initial guesses for model parameters. Indeed, getting these guesses may be a tricky task, both for students and for practitioners.</p>
 <p>Obviously, we should not expect that all possible models and parameterisations are included in the ‘drc’ package; therefore, sooner or later, we may all find ourselves in the need of building a user-defined function, for some peculiar tasks of nonlinear regression analysis. I found myself in that position several times in the past and it took me awhile to figure out a solution.</p>
 <p>In this post, I’ll describe how we can simply build self-starters for our nonlinear regression analyses, to be used in connection with the ‘drm()’ function in the ‘drc’ package. In the end, I will also extend the approach to work with the ‘nls()’ function in the ‘stats’ package.</p>
 <p>Let’s consider the following dataset, depicting the relationship between temperature and growth rate. We may note that the response reaches a maximum value around 30°C, while it is lower below and above such an optimal value.</p>
@@ -2522,7 +4501,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 Residual standard error: 1.718 on 7 degrees of freedom
 
 Number of iterations to convergence: 8 
-Achieved convergence tolerance: 5.213e-06</code></pre>
+Achieved convergence tolerance: 5.208e-06</code></pre>
 </div>
 </div>
 <p>I have been building a lot of self-starters, both for <code>drm()</code> and for <code>nls()</code> and I have shared them within my <code>statdforbiology</code> package. Therefore, should you need to fit some unusual nonlinear regression model, it may be worth to take a look at that package, to see whether you find something suitable.</p>
@@ -2540,6 +4519,7 @@ Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it
 <li>Kniss, A.R., Vassios, J.D., Nissen, S.J., Ritz, C., 2011. Nonlinear Regression Analysis of Herbicide Absorption Studies. Weed Science 59, 601–610. https://doi.org/10.1614/WS-D-11-00034.1</li>
 <li>Ritz, C., Baty, F., Streibig, J. C., Gerhard, D. (2015) Dose-Response Analysis Using R PLOS ONE, 10(12), e0146021</li>
 </ol>
+<p>Post originally written on 14/02/2020, updated on 17/07/2023 and 27/7/2026</p>
 
 
 </section>
@@ -2547,6 +4527,7 @@ Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it
  ]]></description>
   <category>R</category>
   <category>nonlinear regression</category>
+  <category>R-bloggers</category>
   <guid>https://www.statforbiology.com/posts/nls_selfStarting.html</guid>
   <pubDate>Thu, 13 Feb 2020 23:00:00 GMT</pubDate>
 </item>
@@ -2673,7 +4654,7 @@ title: Homepage title
 </section>
 
  ]]></description>
-  <category>General</category>
+  <category>R</category>
   <guid>https://www.statforbiology.com/posts/R_BlogdownSteps.html</guid>
   <pubDate>Wed, 14 Nov 2018 23:00:00 GMT</pubDate>
 </item>
@@ -2954,6 +4935,7 @@ Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it
 
  ]]></description>
   <category>descriptive statistics</category>
+  <category>R-bloggers</category>
   <guid>https://www.statforbiology.com/posts/general_VarianceSamplePop.html</guid>
   <pubDate>Thu, 08 Nov 2018 23:00:00 GMT</pubDate>
   <media:content url="https://www.statforbiology.com/Figures/VarianceSamplePop.jpg" medium="image" type="image/jpeg"/>
@@ -2987,6 +4969,7 @@ Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it
 
  ]]></description>
   <category>R</category>
+  <category>R-bloggers</category>
   <guid>https://www.statforbiology.com/posts/R_TheDangerOfR.html</guid>
   <pubDate>Sat, 07 Jun 2014 22:00:00 GMT</pubDate>
 </item>
