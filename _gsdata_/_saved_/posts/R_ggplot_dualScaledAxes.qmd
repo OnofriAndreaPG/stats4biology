@@ -1,0 +1,220 @@
+---
+title: "Dual scaled y-axis with ggplot()"
+author: "Andrea Onofri"
+date: 2026-08-11
+categories:
+  - R
+  - 'R-bloggers'
+  - 'ggplot'
+tags:
+  - R
+  - 'ggplot'
+  - 'plot'
+  - 'climate_data'
+  - 'ggh4x'
+aliases: 
+  - 2024/r_ggplot_dualscaledaxes/index.html
+---
+
+I have often found myself needing to plot a single graph with two y-axes having different scales. For example, this might be useful for representing temperature and rainfall data at a given location. Unfortunately, doing this with `ggplot()` is not straightforward.
+
+While searching for possible solutions, I discovered that graphs with dual y-axes are generally not regarded as good tools for data visualisation. Hadley Wickham, the author of `ggplot2` and several other important R packages, has given some good reasons for this (e.g., at [this link](https://stackoverflow.com/questions/3099219/ggplot-with-2-y-axes-on-each-side-and-different-scales)). I do not intend to question these general arguments. Nonetheless, the idea that I cannot do with `ggplot()` something that I could easily do with Excel gets on my nerves. After all, such graphs can be quite useful in some specific circumstances, such as when displaying weather data.
+
+I therefore started looking for a reasonable solution and eventually found my way. I would like to share it in this post.
+
+Let's consider the dataset `DailyMeteoData.csv`, which contains daily average temperature and rainfall data for two years at a location in my region (Umbria, central Italy). Let's open the dataset and use `dplyr` to make a few useful transformations, such as:
+
+1. converting the date character string into a date object;
+2. adding variables for Year, Month, and Day of the Year (DOY).
+
+
+```{r message=FALSE, warning=FALSE}
+library(dplyr)
+fileName <- "https://www.casaonofri.it/_datasets/DailyMeteoData.csv"
+dataMeteo <- read.csv(fileName) |>
+  mutate(Date = as.Date(Date, format = "%d/%m/%Y"),
+         Year = as.numeric(format(Date, format="%Y")),
+         Month = as.numeric(format(Date, format="%m")),
+         DOY = as.numeric(format(Date, format="%j")))
+head(dataMeteo)
+```
+
+Temperature is a continuous variable and can be easily represented using a line graph, whereas rainfall consists of discrete events and is therefore more usefully accumulated over periods such as ten-days or a month. We can use `dplyr` once more to create a new rainfall dataset containing the accumulated monthly rainfall, which is more suitable for our purposes. For the sake of simplicity, we assume that the year is divided into 12 months of equal length (approximately 30.4 days), and we calculate the DOY corresponding to the central day of each month, which will be used as the centre of the respective plot bar.
+
+```{r message=FALSE, warning=FALSE}
+dataMeteo2 <- dataMeteo |>
+  group_by(Year, Month) |>
+  summarise(Rain = sum(Rain)) |>
+  mutate(DOY = seq(15, 365, by = 365/12))
+head(dataMeteo2)
+```
+
+Now we can produce our first graph showing both rainfall and temperature. In the box below, I have played a little with the x-axis ticks and labels, and I have left the y-axis label empty for the moment.
+
+```{r}
+#| fig-width: 8
+#| fig-height: 4
+library(ggplot2)
+ggplot() +
+  geom_bar(dataMeteo2, mapping = aes(x = DOY, y = Rain), fill = "grey",
+           stat = "identity", width = 28) +
+  geom_line(dataMeteo, mapping = aes(x = DOY, y = Tavg), col = "blue") +
+  scale_x_continuous(breaks = c(365/12, 365/12*4, 365/12*8, 365) - 15, 
+                     labels = c("Jan", "Apr", "Aug", "Dec"),
+                     name = "") +
+  scale_y_continuous(name = "") +
+  facet_wrap(~Year) +
+  theme_bw()
+```
+
+The previous graph does not work very well: the temperature line is hardly visible because its measurement scale is much smaller than that of rainfall. We therefore need to 'scale' the temperature variable so that it ranges approximately from 150 to 250. This will make the blue line clearly visible without interfering with the rainfall bars. The minimum and maximum temperature values are -4.2°C and 28.9°C, respectively; we want to map these original values to the new values 150 and 250, respectively, as shown in the figure below.
+
+```{r echo=FALSE}
+#| fig-width: 6
+#| fig-height: 6
+#| fig-align: center
+# min(dataMeteo$Tavg)
+# max(dataMeteo$Tavg)
+# (250-150)/(28.9 + 4.2) # Slope
+# 250 - 3.021148*28.9 # Intercept
+dfr <- data.frame(x = c(-4.2, 28.9),
+                  y = c(150, 250))
+
+plot(y ~ x, data = dfr, xlim = c(-10, 40), ylim = c(100, 300),
+     xlab = "Temperature", ylab = "Transformed temperature")
+abline(162.69, 3.021148)
+segments(-4.2, 100, -4.2, 150, col = "red")
+arrows(-4.2, 150, -10, 150, col = "red")
+segments(28.9, 100, 28.9, 250, col = "red")
+arrows(28.9, 250, -10, 250, col = "red")
+```
+
+The previous figure tells us that we could transform the original temperature scale by using the equation of the straight line passing through the two points (-4.2, 150) and (28.9, 250). Thanks to what we remember from geometry courses, we can calculate the slope of such a straight line as:
+
+$$m = \frac{250 - 150}{28.9 + 4.2} = 3.02$$
+
+while the intercept is:
+
+$$q = 250 - 3.02 \times 28.9 = 162.69$$
+
+Thus, the scaling equation is:
+
+$$Y_N = 162.69 + 3.02 ,, Y_O$$
+
+where $Y_N$ is the new temperature scale, while $Y_O$ is the original one. The reverse transformation is:
+
+$$Y_O = \frac{Y_N - 162.69}{3.02}$$
+
+Now, we are ready to plot the graph. We transform the temperature to the new scale and plot it; furthermore, we include the second axis by using the `sec.axis` argument and the `sec_axis()` function, in which we specify the back-transformation function to the original scale.
+
+
+
+```{r}
+#| fig-width: 8
+#| fig-height: 4
+dataMeteo <- dataMeteo %>% 
+  mutate(newTavg = 162.69 + 3.02 * Tavg)
+
+ggplot() +
+  geom_bar(dataMeteo2, mapping = aes(x = DOY, y = Rain), fill = "grey",
+           stat = "identity", width = 28) +
+  geom_line(dataMeteo, mapping = aes(x = DOY, y = newTavg), col = "blue") +
+  scale_x_continuous(breaks = c(365/12, 365/12*4, 365/12*8, 365) - 15, 
+                     labels = c("Jan", "Apr", "Aug", "Dec"),
+                     name = "") +
+  scale_y_continuous(name = "Rain (mm)", 
+                     sec.axis = sec_axis(~ (. - 162.69)/3.02, 
+                                         name = "Daily Temperature (°C)",
+                                         breaks = c(-10, 0, 10, 20, 30))) +
+  facet_wrap(~Year) +
+  theme_bw()
+```
+
+And we are done!
+
+# Another possible approach 
+
+Ross Gilmore from Galileo Consulting (Kuala Lumpur) sent me an interesting comment, suggesting the use of the `lubridate` package for managing dates and the `ggh4x` package to take advantage of its nested-axis capabilities. Basically, his graph does not use facets; instead, the two years are placed one after the other. Furthermore, he calculated the monthly means for temperature and fitted a cubic spline using `geom_smooth()` and `method = "gam"`. He also made use of minor ticks, which might be a good idea.
+
+Ross' code follows. I'd like to thank him very much!
+
+
+```{r message=FALSE, warning=FALSE}
+#| fig-width: 8
+#| fig-height: 6
+library(lubridate)
+library(ggh4x)
+dataMeteo1 <- dataMeteo |>
+  mutate(
+    Date = as.Date(Date, format = "%d/%m/%Y"),
+    Year = lubridate::year(Date),
+    Month = lubridate::month(Date))
+
+dataMeteo2 <- dataMeteo1 |>
+  group_by(Year, Month) |>
+  summarise(
+    Rain = sum(Rain),
+    Temp = mean(Tavg, rm.na = TRUE)) |>
+  mutate(Mth = factor(month.abb[Month], 
+                      levels = c("Jan", "Feb", "Mar", "Apr",
+                                 "May", "Jun", "Jul", "Aug",
+                                 "Sep", "Oct", "Nov", "Dec")))
+dataMeteo3 <- dataMeteo2 |>
+  mutate(newTemp = 162.69 + 3.02 * Temp)
+
+ggplot(dataMeteo3, mapping = aes(x = interaction(Mth, Year),
+                                 group = 1)) +
+  geom_col(aes(y = Rain), fill = "grey") +
+  geom_point(aes(y = newTemp), size = 2, col = "blue") +
+  geom_smooth(
+    method = "gam", formula = y ~ s(x, bs = "cc"),
+    aes(x = as.numeric(interaction(Mth, Year)), y = newTemp),
+    col = "blue") +
+  geom_point(aes(y = newTemp), size = 3, col = "blue", 
+             fill = "white", shape = 21, stroke = 1) +
+  scale_y_continuous(
+    minor_breaks = scales::breaks_width(20),
+    name = "Mean Monthly Total Rainfall (mm)",
+    sec.axis = sec_axis(~ (. - 162.69) / 3.02,
+      name = "Mean Monthly Daily Temperature (°C)",
+      breaks = c(-10, 0, 10, 20, 30))) +
+  guides(x = "axis_nested",
+        y = guide_axis(minor.ticks=TRUE),
+        y.sec = guide_axis(minor.ticks=TRUE)) +
+  theme_bw(base_size = 18) +
+  theme(
+     panel.grid.minor = element_blank(),
+     axis.title.x = element_blank(),
+     axis.text.x = element_text(face = "bold", size = rel(0.5), angle = 90),
+     axis.ticks = element_line(colour = "red"),
+     ggh4x.axis.nestline.x = element_line(linewidth = 0.6),
+     ggh4x.axis.nesttext.x = element_text(colour = "blue", 
+                                          face = "bold", 
+                                          size = rel(1.0))
+  )
+
+```
+
+
+
+
+Thanks for reading and happy coding; should you have further comments to improve these graphs, please, drop me a note at the address below.
+
+And ... don't forget to check out my new book!
+
+
+Prof. Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences    
+University of Perugia (Italy)    
+Send comments to: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)
+
+
+<a href = "https://www.awin1.com/cread.php?awinmid=26429&awinaffid=2675822&ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src="../../Figures/Email_Signature_978-3-032-08199-5.png" alt="Book cover" class="cover" align="center"/></a>
+
+---
+This post was originally published on 6-11-2023, and updated on 06-06-2024
+
+
+
+
+

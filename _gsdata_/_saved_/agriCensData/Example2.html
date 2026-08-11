@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Andrea Onofri, Hans-Peter Piepho and Marcin Kozak" />
+
+
+<title>Example 2. Analyzing time-to-event data</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = false;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">agriCensData</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="Example1.html">Example 1</a>
+</li>
+<li>
+  <a href="Example2.html">Example 2</a>
+</li>
+<li>
+  <a href="Example3.html">Example 3</a>
+</li>
+<li>
+  <a href="RandomEffects.html">Random effects</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Example 2. Analyzing time-to-event data</h1>
+<h4 class="author"><em>Andrea Onofri, Hans-Peter Piepho and Marcin Kozak</em></h4>
+
+</div>
+
+
+<hr />
+<div id="the-dataset" class="section level1">
+<h1>The dataset</h1>
+<p>This simple dataset was taken from an unpublished experiment with <em>Lobelia erinus</em> L. The germination behaviour of a seed lot was tested at two different temperatures (15 and 25°C), by using one Petri dish with 100 seeds per temperature. Germinated seeds were counted every second day for 39 days, and after being counting they were removed from the Petri dishes. The experiment aimed to quantify the effect of temperature on germination velocity, by comparing the time to 50% germination (T50) at both temperatures.</p>
+<p>Let’s read the data into R, after loading all the necessary packages.</p>
+<pre class="r"><code>library(drc)
+library(survival)
+library(emmeans)
+# library(devtools)
+# install_github(&quot;OnofriAndreaPG/AgriCensData&quot;)
+library(agriCensData)
+data(Germination)
+head(Germination)</code></pre>
+<pre><code>##   obsT temp counts
+## 1    1   15      2
+## 2    3   15     12
+## 3    5   15     11
+## 4    7   15     13
+## 5    9   15     14
+## 6   11   15      4</code></pre>
+<p>The dataset reflects the way the data were collected: the data are shown as counts (<code>counts</code>) of germinated seeds at each assessment time (<code>obsT</code>) and temperature (<code>temp</code>). Note that it is not true that, for instance, 12 seeds germinated 3 days After the Beginning of the Assay (ABA) (look at the second raw of the dataset): actually, they germinated in an unknown moment between 1 and 3 ABA.</p>
+<hr />
+</div>
+<div id="a-traditional-nonlinear-regression-model" class="section level1">
+<h1>A traditional nonlinear regression model</h1>
+<p>The traditional method of data analysis is based on</p>
+<ol style="list-style-type: decimal">
+<li>transforming the observed counts into cumulative proportions of germinated seeds and</li>
+<li>fitting a Gaussian cumulative probability density function, using nonlinear least squares regression.</li>
+</ol>
+<p>We accomplished this part by using the <code>drm()</code> function in the <code>drc</code> package <span class="citation">(Ritz et al. 2015)</span>. We decided to fit a log-normal (<code>LN.2()</code>) probability density function, because we expected the distribution of germination times within the population to be log-normal. The argument <code>curveid</code> specifies that we need two curves (one per temperature), and the argument <code>pmodels</code> specify that the first parameter (<em>b</em>, a slope of the curve in the inflection point) is common for the two curves (~1), while the second (<em>e</em>, time to 50% germination, i.e., T50) depends on the temperature.</p>
+<pre class="r"><code>cumProp &lt;- as.numeric(
+  unlist(with(
+    Germination,
+    tapply(counts, temp, cumsum)))/100
+  )
+
+mod &lt;- drm(cumProp ~ obsT, fct = LN.2(), 
+           curveid = temp,
+           pmodels = list(~ 1, ~ temp - 1), 
+           data = Germination)
+summary(mod)</code></pre>
+<pre><code>## 
+## Model fitted: Log-normal with lower limit at 0 and upper limit at 1 (2 parms)
+## 
+## Parameter estimates:
+## 
+##               Estimate Std. Error t-value   p-value    
+## b:(Intercept) 0.871778   0.017726  49.182 &lt; 2.2e-16 ***
+## e:temp15      9.106622   0.178919  50.898 &lt; 2.2e-16 ***
+## e:temp25      5.429718   0.136514  39.774 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error:
+## 
+##  0.02043963 (37 degrees of freedom)</code></pre>
+<p>As noted in the paper (<em>Literature reference, when available</em>), this traditional method of data analysis is suboptimal for several reasons:</p>
+<ol style="list-style-type: decimal">
+<li>modelling cumulative proportions instead of observed counts does not match the real process of data collection</li>
+<li>nonlinear regression assumes that a certain proportion of germinated seeds is reached at the exact moment of observation, but this does not have to be true</li>
+<li>nonlinear regression assumes model errors (deviations of observed proportions from the fitted curve) to be normally distributed, homoscedastic, and independent, which assumptions are often violated in germination assays.</li>
+</ol>
+<hr />
+</div>
+<div id="a-time-to-event-model" class="section level1">
+<h1>A time-to-event model</h1>
+<p>For this example, a time-to-event model is more appropriate than nonlinear regression. The term <em>time-to-event model</em> is just another name for a survival model used when we are studying the time to the occurence of an event that is not the death.</p>
+<p>In order to fit a time-to-event model in R, we could use the <code>survreg()</code> function in the <code>survival</code> package <span class="citation">(Therneau 1999)</span>, as we did for the first example. The observational unit is the seed and, therefore, we need to reorganise the dataset, so that there is one record for each seed in the lot (200 records in all). For each temperature subset, records are added also for the seeds that did not germinate at the end of the assay. Each record needs to be characterised by three variables: the temperature at which the seed was tested and the two limits of the interval within which it germinated (<code>timeBef</code> and <code>timeAf</code>). Seeds which already germinated at the first monitoring time have <code>timeBef</code> equal to NA (not available). Seeds which did not germinate at the final monitoring time have <code>timeAf</code> equal to NA. The process of data reorganisation can be done by using the following code, which produces the dataset <code>germination2</code>.</p>
+<pre class="r"><code>countsC &lt;- with(
+  Germination,
+  c(counts[1:20], 
+    100 - sum(counts[1:20]), 
+    counts[21:40],
+    100 - sum(counts[21:40]))
+  ) 
+
+Germination2 &lt;- data.frame(
+  temp = rep(factor(rep(c(15, 20), each = 21)), countsC),
+  timeBef = rep(c(NA, Germination$obsT[1:20], NA, 
+                  Germination$obsT[21:40]), countsC),
+  timeAf = rep(c(Germination$obsT[1:20], NA, 
+                 Germination$obsT[21:40], NA), countsC)
+  )
+
+rm(countsC)
+head(Germination2, 10)</code></pre>
+<pre><code>##    temp timeBef timeAf
+## 1    15      NA      1
+## 2    15      NA      1
+## 3    15       1      3
+## 4    15       1      3
+## 5    15       1      3
+## 6    15       1      3
+## 7    15       1      3
+## 8    15       1      3
+## 9    15       1      3
+## 10   15       1      3</code></pre>
+<p>Now we can fit a time-to-event model, using a log-normal distribution of germination times (<code>dist = &quot;lognormal&quot;</code>).</p>
+<pre class="r"><code>modTE1 &lt;- survreg(Surv(timeBef, timeAf, type = &quot;interval2&quot;) ~ temp,
+  dist = &quot;lognormal&quot;, data = Germination2)
+summary(modTE1)</code></pre>
+<pre><code>## 
+## Call:
+## survreg(formula = Surv(timeBef, timeAf, type = &quot;interval2&quot;) ~ 
+##     temp, data = Germination2, dist = &quot;lognormal&quot;)
+##               Value Std. Error     z       p
+## (Intercept)  2.2415     0.1173 19.11 &lt; 2e-16
+## temp20      -0.6221     0.1666 -3.73 0.00019
+## Log(scale)   0.1453     0.0563  2.58 0.00989
+## 
+## Scale= 1.16 
+## 
+## Log Normal distribution
+## Loglik(model)= -525.3   Loglik(intercept only)= -532.1
+##  Chisq= 13.57 on 1 degrees of freedom, p= 0.00023 
+## Number of Newton-Raphson Iterations: 3 
+## n= 200</code></pre>
+<p>This function returns three parameters: (i) the logarithm of the time to 50% germination (T50) at 15°C (Intercept), (ii) the difference in log-T50 between 20 and 15°C, and (iii) the standard deviation of the log-normal distribution of germination times, assumed to be unaffected by temperature (homoscedasticity). We may be interested in the T50 at both temperatures. We can retrive them by back-transforming the model parameters (e.g <span class="math inline">\(exp(2.2415)\)</span> and <span class="math inline">\(exp(2.2415 - 0.6221)\)</span>), which is easily done by using the <code>emmeans()</code> function in the <code>emmeans</code> package <span class="citation">(Lenth 2016)</span>.</p>
+<pre class="r"><code>emmeans(modTE1, ~ temp, transform = &quot;response&quot;)</code></pre>
+<pre><code>##  temp response        SE  df lower.CL  upper.CL
+##  15   9.407324 1.1034551 197 7.231223 11.583425
+##  20   5.050110 0.5974451 197 3.871901  6.228319
+## 
+## Confidence level used: 0.95</code></pre>
+</div>
+<div id="a-more-general-method-to-fit-time-to-event-models" class="section level1">
+<h1>A more general method to fit time-to-event models</h1>
+<p>The <code>survreg()</code> function is a good tool to fit time-to-event models, but it has a notable limitation: it assumes that all individuals should experience the event of interest in one specific time, either before or after the end of the experiment. While this may be acceptable with survival studies, in germination assays there will almost always be a final fraction of dormant seeds, which will never germinate at the given environmental conditions. In our example, this fraction was negligible and, therefore, <code>survreg()</code> gave a good fit.</p>
+<p>In general, with seed germination assays, it is necessary to use a time-to-event function which accounts for the final fraction of germinated seeds. In R, we can use the <code>drm()</code> function in the <code>drc</code> package. This function works with datasets in the grouped form, like the original dataset <code>Germination</code>, which we used for nonlinear regression. However, for each Petri dish, we need to add one record to store the number of ungerminated seeds at the end of the assay. For each record, we should specify the temperature, the number of germinated seeds, and the two limits of the interval within which those seeds germinated. For the ungerminated seeds, the lower limit of the interval is set to the final assessment time, and the highest limit is set to <code>Inf</code> (see below).</p>
+<p>The model call is similar to the one we used for nonlinear regression, with the only differences in the dependent variable (the limits of the interval the germinations took place within) and the <code>type</code> argument, which has been explicitely set to <code>event</code>.</p>
+<pre class="r"><code>countsC &lt;- with(Germination, 
+                c(counts[1:20], 100 - sum(counts[1:20]), 
+                  counts[21:40], 100 - sum(counts[21:40]))
+                )
+
+Germination3 &lt;- data.frame(
+  temp = factor(rep(c(15, 20), each = 21)),
+  timeBef = c(0, Germination$obsT[1:20], 
+              0, Germination$obsT[21:40]),
+  timeAf = c(Germination$obsT[1:20], Inf, 
+             Germination$obsT[21:40], Inf),
+  counts = countsC)
+
+head(Germination3, 10)</code></pre>
+<pre><code>##    temp timeBef timeAf counts
+## 1    15       0      1      2
+## 2    15       1      3     12
+## 3    15       3      5     11
+## 4    15       5      7     13
+## 5    15       7      9     14
+## 6    15       9     11      4
+## 7    15      11     13      6
+## 8    15      13     15      4
+## 9    15      15     17      5
+## 10   15      17     19      5</code></pre>
+<pre class="r"><code>modTE &lt;- drm(counts ~ timeBef + timeAf, fct = LN.2(),
+             type = &quot;event&quot;, curveid = temp, 
+             data = Germination3, 
+             pmodels=list(~ 1, ~ temp - 1))
+summary(modTE)</code></pre>
+<pre><code>## 
+## Model fitted: Log-normal with lower limit at 0 and upper limit at 1 (2 parms)
+## 
+## Parameter estimates:
+## 
+##               Estimate Std. Error t-value   p-value    
+## b:(Intercept) 0.864686   0.048715 17.7498 &lt; 2.2e-16 ***
+## e:temp15      9.407667   1.103586  8.5246 &lt; 2.2e-16 ***
+## e:temp20      5.050970   0.597632  8.4516 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>As we discuss in our paper (<em>Literature reference, when available</em>), the difference between nonlinear regression and time-to-event regression mainly relates to standard errors.</p>
+<hr />
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
+<div id="refs" class="references">
+<div id="ref-lenth2016_LeastSquaresMeansPackage">
+<p><span style="font-variant: small-caps;">Lenth, RV</span> (2016) Least-Squares Means: The <em>R</em> Package <strong>Lsmeans</strong>. <em>Journal of Statistical Software</em> <strong>69</strong></p>
+</div>
+<div id="ref-ritz2015_DoseResponseAnalysisUsing">
+<p><span style="font-variant: small-caps;">Ritz, C, F Baty, JC Streibig, D Gerhard</span> (2015) Dose-Response Analysis Using R. <em>PLOS ONE</em> <strong>10</strong>, e0146021</p>
+</div>
+<div id="ref-therneau_package_1999">
+<p><span style="font-variant: small-caps;">Therneau, T</span> (1999) <em>A Package for Survival Analysis in S</em>. R package version 2.36-14, Survival</p>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
