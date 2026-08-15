@@ -1,0 +1,216 @@
+---
+title: 'Some everyday data tasks: a few hints with R'
+author: "Andrea Onofri"
+date: 2026-08-14
+tags: 
+  - R
+  - 'Data_management'
+categories:
+  - R
+  - 'R-bloggers'
+  - 'Data management'
+aliases:
+  - /2020/stat_r_shapingdata2/index.html
+---
+
+
+It is important to know how to reshape a dataframe into a form that might be more suitable for the analyses we intend to perform. For me, it is also important to know how to do this with base R, without using any other packages. Yes, I know that other packages, such as `dplyr` and `tidyr`, are much better... Still, having the skills to perform most of our everyday tasks with base R may be a good idea. In particular, there are at least four routine tasks that we need to be able to perform:
+
+1. subsetting
+2. sorting
+3. casting
+4. melting
+
+
+# Subsetting the data
+
+Subsetting means selecting the records (rows) or the variables (columns) that satisfy certain criteria. In base R, we can use the `subset()` function.
+
+Let's consider the `students` dataset, which is available in the `statforbiology` package. It represents a collection of exams taken by students at my university in different subjects. Let's load it using the `getAgroData()` function from the `statforbiology` package.
+
+```{r}
+library(statforbiology)
+students <- getAgroData("students")
+head(students)
+```
+
+
+Let's say that we want a new dataset that contains only the records where the mark was equal to or above 28 (please note that, in Italy, an exam is passed with a minimum mark of 18, while the maximum mark is 30).
+
+```{r}
+subData <- subset(students, Mark >= 28)
+head(subData)
+```
+
+Let's make it more difficult and extract the records where the mark ranges from 26 to 28 (margins included). Look at the AND clause, which is expressed by using the `&` operator:
+
+```{r}
+subData <- subset(students, Mark <= 28 & Mark >= 26)
+head(subData)
+```
+
+Now we are interested in those students who got a mark ranging from 26 to 28 in MATHS (please note the equality operator, written as `==`):
+
+```{r}
+subData <- subset(students, Mark <= 28 & Mark >= 26 & 
+                    Subject == "MATHS")
+head(subData)
+```
+
+Let's look for good students who got a mark ranging from 26 to 28 either in MATHS or in CHEMISTRY (OR clause; note the `|` operator):
+
+```{r}
+subData <- subset(students, Mark <= 28 & Mark >= 26 & 
+                    (Subject == "MATHS" | 
+                     Subject == "CHEMISTRY"))
+head(subData)
+```
+
+We can also select columns; for example, we may want to display only the `Subject`, `Mark`, and `HighSchool` columns:
+
+```{r}
+subData <- subset(students, Mark <= 28 & Mark >= 26 & 
+                    (Subject == "MATHS" | 
+                     Subject == "CHEMISTRY"),
+                  select = c(Subject, Mark, HighSchool))
+head(subData)
+```
+
+We can also drop unwanted columns:
+
+```{r}
+subData <- subset(students, Mark <= 28 & Mark >= 26 & 
+                    (Subject == "MATHS" | 
+                     Subject == "CHEMISTRY"),
+                  select = c(-Id, 
+                             -Date,
+                             -Year))
+head(subData)
+```
+
+The `subset()` function is very easy to use. However, we might have greater flexibility by using indices for subsetting. We already know that the notation `dataframe[i, j]` returns the element in the i-th row and j-th column of a data frame. We can, of course, replace `i` and `j` with some subsetting rules. For example, selecting the exams where the mark is between 25 and 29 is done as follows:
+
+```{r}
+subData <- students[(students$Mark <= 29 & students$Mark >= 25),]
+head(subData)
+```
+
+This is useful for quickly editing the data. For example, if we want to replace all marks from 25 to 29 with `NA`s (missing values), we can simply do:
+
+```{r}
+subData <- students
+subData[(subData$Mark <= 29 & subData$Mark >= 25), "Mark"] <- NA
+head(subData)
+```
+
+Please note that I created a new dataset to make the replacement, so as not to modify the original dataset. Of course, I can use the `is.na()` function to find missing values and edit them.
+
+```{r}
+subData[is.na(subData$Mark), "Mark"] <- 0 
+head(subData)
+```
+
+# Sorting the data
+
+Sorting is very similar to subsetting by indexing. We simply need to use the `order()` function. For example, let's sort the `students` dataset by mark:
+
+```{r}
+sortedData <- students[order(students$Mark), ]
+head(sortedData)
+```
+
+We can also sort in decreasing order:
+
+```{r}
+sortedData <- students[order(-students$Mark), ]
+head(sortedData)
+```
+
+We can obviously use multiple keys. For example, let's sort by mark and, within each mark, by subject:
+
+```{r}
+sortedData <- students[order(-students$Mark, students$Subject), ]
+head(sortedData)
+```
+
+If I want to sort a character variable (such as `Subject`) in decreasing order, I need to use the helper function `xtfrm()`:
+
+```{r}
+sortedData <- students[order(-students$Mark, -xtfrm(students$Subject)), ]
+head(sortedData)
+```
+
+# Casting and melting
+
+These are two operations that we can perform on the entire dataframe, to reshape it from:
+
+1. LONG to WIDE format (casting)
+2. WIDE to LONG format (melting)
+
+In base R, we use the same function, namely `reshape()`, which was originally tailored to the needs of longitudinal data management. Although the terminology comes from this original conceptual framework (which is quite confusing at the beginning), you can use this function for any type of data that needs to be reshaped from LONG to WIDE or vice versa.
+
+# Casting the data
+
+We might be familiar with the 'pivot table' function in Excel, which reshapes a dataset from the LONG format to the WIDE format. For example, let's take the `rimsulfuron` dataset in the `statforbiology` package, which contains the results of an experiment in blocks designed to compare 16 herbicides for weed control in maize. The dataset is in the LONG format, with one row for each plot and the observations made in each plot listed in different columns.
+
+```{r}
+rimsulfuron <- getAgroData("rimsulfuron")
+head(rimsulfuron)
+```
+
+Let's put this data frame in the WIDE format, so that we have the 16 herbicides in different rows, and the observations for each herbicide are listed in different columns, with a separate column per each block (provided that we have only one observation per herbicide in each block, which is the case here). In base R, we can use the `reshape()` function with `direction = "wide"`. Basically, we need to specify which variable should identify the rows (in our case, `idvar = "Herbicide"`) and which variable identifies the different sets of observations (in our case, `timevar = "Block"`). The name `timevar` shows that this function was initially tailored to the needs of longitudinal data. Initially, we have to subset the data frame to retain only the columns we need to display in the final table, although we can also use the `drop` argument to exclude the variables we do not intend to use.
+
+```{r}
+castData <- reshape(
+  rimsulfuron[, c("Herbicide", "Block", "Yield")], 
+  direction = "wide",
+  idvar = "Herbicide",
+  timevar = "Block"
+)
+castData
+```
+
+
+# Melting the data
+
+The `reshape()` function can also be used to transform a dataset from WIDE to LONG format by setting the `direction = "long"` argument. For this task, let's use the `WeedPop` dataset in the `statforbiology` package, which reports the results of a weed survey involving six species in nine conditions (the letters from A to I in the `Code` variable). The experimental unit is the condition and, for each condition, the ground cover of the six species is reported in different columns.
+
+Now, we want to reshape this data frame so that we have one row for each combination of species and condition, with the ground cover listed in a single column. In order to use the `reshape()` function, we need to think of this table as if it represented longitudinal data, with repeated measurements taken at different time points on the same subject (id). Thus, the values that change with 'time' (the `varying` variables) are those contained in the original dataset in columns 2 to 7. These variables will be combined into a single column in the newly created dataset, which we will name `WeedCover` (`v.names = "WeedCover"`).
+
+Now, we have to add at least two other variables to this newly created dataset. The first one represents the subjects (`idvar`) and must contain the codes contained in the `WeedPop$Code` column (`ids = WeedPop$Code`). We will name this variable `Code` (`idvar = "Code"`).
+
+The second variable must contain the names of the original variables (`times = colnames(WeedPop[2:7])`) corresponding to the observations taken for each subject. We can assign a name to this newly created variable by using `timevar = "Weed name"`.
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+WeedPop <- getAgroData("WeedPop")
+WeedPop
+mdati <- reshape(
+  WeedPop,
+  direction = "long",
+  varying = colnames(WeedPop[2:7]),
+  v.names = "WeedCover",
+  times = colnames(WeedPop[2:7]),
+  timevar = "Weed name",
+  ids = WeedPop$Code,
+  idvar = "Code",
+)
+head(mdati)
+```
+
+I must admit that these functions are not particularly intuitive to use and the corresponding functions in the packages 'dplyr' and 'tidyr' may be easier to use. However, I like my students to have a good command of base R before they move on to other dialects
+
+Have fun working with these functions! Should you have comments, please, drop me a note at the address below.
+
+And ... don't forget to check out my new book!
+
+
+Prof. Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences    
+University of Perugia (Italy)    
+Send comments to: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)
+
+
+<a href = "https://www.awin1.com/cread.php?awinmid=26429&awinaffid=2675822&ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src="../../Figures/Email_Signature_978-3-032-08199-5.png" alt="Book cover" class="cover" align="center"/></a>
+
+---
+This post was originally published on 2019-03-27
