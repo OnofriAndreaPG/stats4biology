@@ -9,7 +9,7 @@
 <meta name="author" content="Andrea Onofri">
 <meta name="dcterms.date" content="2026-08-14">
 
-<title>Some everyday data tasks: a few hints with R – Statforbiology</title>
+<title>Some everyday data tasks: a few hints with R (for dinosaurs) – Statforbiology</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -185,11 +185,14 @@ gtag('config', 'G-GPNY1W5GL5', { 'anonymize_ip': true});
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Some everyday data tasks: a few hints with R</h1>
+      <h1 class="title">Some everyday data tasks: a few hints with R (for dinosaurs)</h1>
                                 <div class="quarto-categories">
                 <div class="quarto-category">R</div>
                 <div class="quarto-category">R-bloggers</div>
                 <div class="quarto-category">Data management</div>
+                <div class="quarto-category">dplyr</div>
+                <div class="quarto-category">tidyr</div>
+                <div class="quarto-category">tidyverse</div>
               </div>
                   </div>
   </div>
@@ -226,13 +229,16 @@ gtag('config', 'G-GPNY1W5GL5', { 'anonymize_ip': true});
 
 
 
-<p>It is important to know how to reshape a dataframe into a form that might be more suitable for the analyses we intend to perform. For me, it is also important to know how to do this with base R, without using any other packages. Yes, I know that other packages, such as <code>dplyr</code> and <code>tidyr</code>, are much better… Still, having the skills to perform most of our everyday tasks with base R may be a good idea. In particular, there are at least four routine tasks that we need to be able to perform:</p>
+<p>It is important to know how to reshape a dataframe for data analysis. Personally, I also value being able to perform the most important reshaping tasks (and other common tasks) with base R, without relying on external packages, according to a ‘learn Base-R first, and switch to the tidyverse next’ approach, which represents my current teaching ‘phylosophy’.</p>
+<p>I am well aware that ‘dplyr’ and ‘tidyr’ are two excellent packages and that my teaching approach is open to debate (<a href="https://www.researchgate.net/post/What-is-better-to-learn-base-R-first-and-then-tidyverse-or-tidyverse-first-and-then-base-R">see this thread</a>); I also realize this stance might make me look like a bit of a ‘dinosaur’…</p>
+<p>Regardless, I decided to write this post about how we handle common data manipulation tasks by using base R, namely:</p>
 <ol type="1">
 <li>subsetting</li>
 <li>sorting</li>
 <li>casting</li>
 <li>melting</li>
 </ol>
+<p>We will use datasets from ‘staforbiology’, the accompanying package for this blog. Please ensure you have it installed if you intend to follow along with the code.</p>
 <section id="subsetting-the-data" class="level1">
 <h1>Subsetting the data</h1>
 <p>Subsetting means selecting the records (rows) or the variables (columns) that satisfy certain criteria. In base R, we can use the <code>subset()</code> function.</p>
@@ -510,7 +516,123 @@ gtag('config', 'G-GPNY1W5GL5', { 'anonymize_ip': true});
 <span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a><span class="do">## E.POLLA    E     POLLA       5.0</span></span>
 <span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a><span class="do">## F.POLLA    F     POLLA      11.0</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>I must admit that these functions are not particularly intuitive to use and the corresponding functions in the packages ‘dplyr’ and ‘tidyr’ may be easier to use. However, I like my students to have a good command of base R before they move on to other dialects</p>
+</section>
+<section id="how-about-the-tidyverse-first-approach" class="level1">
+<h1>How about the ‘tidyverse first’ approach?</h1>
+<p>I must admit that base R functions are not always intuitive, but as mentioned, I prefer my students to gain a solid command of base R before adopting other dialects. However, many instructors prefer a “tidyverse first” teaching philosophy. In that framework, the toolset changes significantly.</p>
+<p>For subsetting, we can use the <code>filter()</code> function from the ‘dplyr’ package using very similar logical conditions. Note that the ‘stats’ package (loaded by default) also contains a function named <code>filter()</code>, so explicitly using dplyr::filter() prevents namespace conflicts.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>subData <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(students, Mark <span class="sc">&gt;=</span> <span class="dv">28</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(subData)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="do">##   Id  Subject       Date Mark Year  HighSchool</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="do">## 1  1 AGRONOMY 10/06/2002   30 2001  HUMANITIES</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="do">## 2  3 AGRONOMY 24/06/2002   30 2001 AGRICULTURE</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="do">## 3  5 AGRONOMY 23/01/2003   30 2001  HUMANITIES</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 4  6 AGRONOMY 09/09/2002   28 2001 AGRICULTURE</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 5 11 AGRONOMY 09/09/2002   28 2001  SCIENTIFIC</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 6 17 AGRONOMY 10/06/2002   30 2001  HUMANITIES</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>A key difference is that <code>dplyr::filter()</code> only selects rows, not columns. For column selection, ‘dplyr’ provides <code>select()</code>. Therefore, if we want to filter students with marks between 26 and 28 in Maths or Chemistry and keep only the columns Subject, Mark, and HighSchool, we combine both operations using the pipe operator (|&gt;).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># subData &lt;- subset(students, Mark &lt;= 28 &amp; Mark &gt;=26 &amp;</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co">#                     (Subject == "MATHS" |</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co">#                     Subject == "CHEMISTRY"),</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co">#                  select = c(Subject, Mark, HighSchool))</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>subData1 <span class="ot">&lt;-</span> students <span class="sc">|&gt;</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(Mark <span class="sc">&lt;=</span> <span class="dv">28</span> <span class="sc">&amp;</span> Mark <span class="sc">&gt;=</span><span class="dv">26</span> <span class="sc">&amp;</span> </span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>                    (Subject <span class="sc">==</span> <span class="st">"MATHS"</span> <span class="sc">|</span> </span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>                    Subject <span class="sc">==</span> <span class="st">"CHEMISTRY"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(Subject, Mark, HighSchool)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(subData1)</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="do">##     Subject Mark   HighSchool</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="do">## 1 CHEMISTRY   28 OTHER SCHOOL</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="do">## 2 CHEMISTRY   26   ACCOUNTING</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="do">## 3 CHEMISTRY   27  AGRICULTURE</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a><span class="do">## 4 CHEMISTRY   27   SCIENTIFIC</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a><span class="do">## 5 CHEMISTRY   27  AGRICULTURE</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a><span class="do">## 6 CHEMISTRY   28  AGRICULTURE</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>This two-step process highlights the intuitive nature of the ‘pipe’ operator: it effectively replaces the word “then” between operations (i.e., ‘filter’ then ‘select’ translates to <code>filter() |&gt; select()</code>).</p>
+<p>To sort a dataframe, <code>order()</code> is replaced by <code>dplyr::arrange()</code>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># sortedData &lt;- students[order(-students$Mark, students$Subject), ]</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># head(sortedData)</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>sortedData <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">arrange</span>(students, dplyr<span class="sc">::</span><span class="fu">desc</span>(Mark), Subject)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(sortedData)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="do">##   Id  Subject       Date Mark Year  HighSchool</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="do">## 1  1 AGRONOMY 10/06/2002   30 2001  HUMANITIES</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 2  3 AGRONOMY 24/06/2002   30 2001 AGRICULTURE</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 3  5 AGRONOMY 23/01/2003   30 2001  HUMANITIES</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 4 17 AGRONOMY 10/06/2002   30 2001  HUMANITIES</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 5 18 AGRONOMY 10/06/2002   30 2001 AGRICULTURE</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="do">## 6 19 AGRONOMY 09/09/2002   30 2001 AGRICULTURE</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="co"># sortedData &lt;- students[order(-students$Mark, -xtfrm(students$Subject)), ]</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="co"># head(sortedData)</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>sortedData <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">arrange</span>(students, dplyr<span class="sc">::</span><span class="fu">desc</span>(Mark), <span class="fu">desc</span>(Subject))</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(sortedData)</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a><span class="do">##    Id Subject       Date Mark Year   HighSchool</span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a><span class="do">## 1 116   MATHS 01/07/2002   30 2001 OTHER SCHOOL</span></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a><span class="do">## 2 117   MATHS 18/06/2002   30 2001   ACCOUNTING</span></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a><span class="do">## 3 118   MATHS 09/07/2002   30 2001  AGRICULTURE</span></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a><span class="do">## 4 121   MATHS 18/06/2002   30 2001   ACCOUNTING</span></span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a><span class="do">## 5 123   MATHS 09/07/2002   30 2001   HUMANITIES</span></span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a><span class="do">## 6 130   MATHS 07/02/2002   30 2001   SCIENTIFIC</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>For sorting, there is no contest! The <code>arrange()</code> function, combined with <code>desc()</code> for descending order, is far cleaner and more readable than <code>order()</code> and <code>xtfrm()</code>.</p>
+<p>For casting and melting, ‘tidyr’ offers <code>pivot_wider()</code> and <code>pivot_longer()</code>. The former converts data from LONG to WIDE format; it is generally more flexible than <code>reshape()</code>, notably because preliminary column selection is unnecessary.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># castData &lt;- reshape(</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   rimsulfuron[, c("Herbicide", "Block", "Yield")], </span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   direction = "wide",</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   idvar = "Herbicide",</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   timevar = "Block"</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="co"># castData</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>castData <span class="ot">&lt;-</span> rimsulfuron <span class="sc">|&gt;</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">pivot_wider</span>(<span class="at">id_cols =</span> Herbicide,</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>              <span class="at">names_from =</span> Block, </span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>              <span class="at">values_from =</span> Yield)</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(castData)</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a><span class="do">## # A tibble: 6 × 5</span></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a><span class="do">##   Herbicide                      `1`   `2`   `3`   `4`</span></span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a><span class="do">##   &lt;chr&gt;                        &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a><span class="do">## 1 Rimsulfuron (40)              85.9  91.1 111.   93.2</span></span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a><span class="do">## 2 Rimsulfuron (45)              93.0 105    89.2  79.0</span></span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a><span class="do">## 3 Rimsulfuron (50)              86.9 106.  110.   89.1</span></span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a><span class="do">## 4 Rimsulfuron (60)              53.0 103.  101.   97.0</span></span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a><span class="do">## 5 Rimsulfuron (50+30 split)     71.4  77.6 116.   92.2</span></span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a><span class="do">## 6 Rimsulfuron + thyfensulfuron  75.3  82.6  95.0  85.8</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>To melt data (rescaling from WIDE to LONG format), we use <code>pivot_longer()</code>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># mdati &lt;- reshape(</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   WeedPop,</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   direction = "long",</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   varying = colnames(WeedPop[2:7]),</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   v.names = "WeedCover",</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   times = colnames(WeedPop[2:7]),</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   timevar = "Weed name",</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   ids = WeedPop$Code,</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   idvar = "Code",</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="co"># head(mdati)</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>mdati <span class="ot">&lt;-</span> WeedPop <span class="sc">|&gt;</span></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">pivot_longer</span>(<span class="at">names_to =</span> <span class="st">"Weed name"</span>, </span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>                      <span class="at">values_to =</span> <span class="st">"Weed Cover"</span>,</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>             <span class="at">cols =</span> <span class="fu">c</span>(<span class="dv">2</span><span class="sc">:</span><span class="dv">7</span>))</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(mdati)</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a><span class="do">## # A tibble: 6 × 3</span></span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a><span class="do">##   Code  `Weed name` `Weed Cover`</span></span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a><span class="do">##   &lt;chr&gt; &lt;chr&gt;              &lt;dbl&gt;</span></span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a><span class="do">## 1 A     POLLA                0.1</span></span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a><span class="do">## 2 A     CHEPO               33  </span></span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a><span class="do">## 3 A     ECHCG               11  </span></span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a><span class="do">## 4 A     AMARE                0  </span></span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a><span class="do">## 5 A     XANST                0.1</span></span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a><span class="do">## 6 A     POLAV                0.1</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 <p>Have fun working with these functions! Should you have comments, please, drop me a note at the address below.</p>
 <p>And … don’t forget to check out my new book!</p>
 <p>Prof.&nbsp;Andrea Onofri<br>
