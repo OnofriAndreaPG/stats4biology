@@ -1,0 +1,276 @@
+---
+title: "General code to fit ANOVA models with JAGS and 'rjags'"
+author: "Andrea Onofri"
+date: 2026-09-16
+tags:
+  - R
+  - JAGS
+  - 'Bayesian_stat'
+categories:
+  - R
+  - JAGS
+  - 'Bayesian_stat'
+aliases:
+  - /2020/stat_bayesian_anovamodels/index.html
+---
+
+
+There is a quote I really love from Marc Kéry’s book, *"Introduction to WinBUGS for Ecologists"* (2010, p. 11):
+
+> *"WinBUGS helps free the modeler in you."*
+
+And it’s so true! Once you deeply understand a statistical model in all its moving parts, translating it into BUGS code feels remarkably logical and natural.
+
+The downside? More often than not, the resulting code turns out to be very problem-specific. If you want to reuse it for a slightly different experimental setup, you usually end up doing a lot of tedious copy-pasting and editing.
+
+Take **ANOVA models** with all their different "flavors": one-way, two-way with interaction, nested, randomized blocks, and so on. These models are the bread and butter of agricultural research and genotype trials. While coding them individually in BUGS isn't overly difficult, transitioning from one model structure to another requires manual code tweaks. And as anyone who has worked with BUGS/JAGS knows, spotting a subtle typo in BUGS code can easily eat up your entire afternoon...
+
+For example, consider a field experiment where seven wheat genotypes were compared in a field trial laid out as a randomized complete block design with three replicates. The data comes from `statforbiology`, the companion R package for this blog. Let's load the package and data:
+
+```{r}
+library(statforbiology)
+dataset <- getAgroData("WinterWheat2002")
+head(dataset)
+```
+
+This is a classic scenario where we want to fit an ANOVA model with Yield as the response variable, and Block and Genotype as explanatory fixed factors. In R, that model would be straightforward to fit, using the `lm()` function, while the genotype means with confidence intervals can be obtained by the `emmeans()` function.
+
+```{r}
+# Fitting an ANOVA model with R
+library(emmeans)
+mod <- lm(Yield ~ Genotype + Block, data = dataset)
+mm <- emmeans(mod, ~Genotype)
+mm
+```
+
+The above coding is rather 'reusable' in the sense that, every other linear model can be fitted by simply changing the listing of effects and their relationships, namely the equations `Yield ~ Genotype + Block` and `~ Genotype` in the calls to `lm()` and `emmeans()`, respectively.
+
+If we want to fit the same model in the Bayesian platform with BUGS or one of its dialects, we could also use a similar coding, based on listing the predictors and their relationships (see for example Kéry, 2010). However, such coding would be specific to the experiment at hand and would not be easy to reuse for other linear models with different predictors. The question is: *“Can we write a general BUGS/JAGS code that works for all ANOVA models without needing major edits every single time?”*
+
+After some tinkering, I came up with a neat solution! Since it took me a little while to get everything working smoothly, I thought I’d share it here for anyone interested in fitting ANOVA models within a Bayesian framework. We will be using **JAGS** (Just Another Gibbs Sampler) along with the `rjags` package in R (Plummer, 2019), but the coding can be easily adapted to other BUGS dialects.
+
+# Linear models in matrix notation
+
+Apart from the 'conceptual' formula above, every linear model can also be specified in matrix notation, as:
+
+$$ Y = X \, \beta + \varepsilon$$
+where $Y$ is the vector of observed responses, $\beta$ is the vector of estimated parameters and $\epsilon$ is the vector of residuals, that are assumed to be independent, gaussian and homoscedastic. Consequently, we could as well say that the observed responses in themselves are sampled from a gaussian distribution, with expectation equal to $X \beta$ and standard deviation equal to $\sigma$.
+
+$$ Y \sim N(X \beta, \sigma^2 I)$$
+Does this sound unfamiliar? Keep in mind that matrix $X$ represents the 'translation' of our conceptual formula ('~ Genotype + Block') into a form that is understood by the fitting algorithm. If we change the dataset, we need to supply a different $X$ matrix, but the specification of the model does not change, as it is completely general.
+
+Likewise, the calculation of marginal means can be obtained via matrix multiplication, as:
+
+$$M = K \beta $$
+where $K$ is the so-called 'linear combination matrix'. Also in this case, the expression is general and we can change the specification of what means we want to calculate by supplying a different $K$ matrix.
+
+For any fitted model, both the matrices $X$ and $K$ can be easily obtained with R: look at the code below to grasp the equivalence between the two model specifications ('conceptual' formula and in matrix form). Please, note the use of the `%*%` operator for matrix multiplication.
+
+```{r}
+X <- model.matrix(mod)
+# X <- model.matrix( ~ Block + Genotype, data = dataset) # equivalent
+K <- mm@linfct
+beta <- coef(mod)
+
+# Fitted data
+fitted(mod)
+as.numeric( X %*% beta )
+
+# Marginal means
+mm
+as.numeric (K %*% beta)
+```
+
+ 
+```{r}
+#| eval: false
+#| include: false
+# Note not to be shown
+# Medie
+K <- mm@linfct
+K %*% mm@bhat
+beta <- coef(mod)
+K %*% beta
+
+# Pairwise differences
+comp <- contrast(mm, method = "pairwise")
+coef(comp)
+```
+
+
+# Specification of a JAGS model
+
+In JAGS (and other BUGS dialects), we can code **any** linear model using matrix notation, as long as we feed it the appropriate design matrix $X$. Likewise, we can calculate means and, if necessary, pairwise differences by feeding it the appropriate linear combination matrix $K$.
+
+The main problem, for me, was to figure out a way to multiply matrices in JAGS. Lately, I discovered that it is necessary to use a `for()` loop and the `inprod()` function, which, for each i^th^ observation, sums the products of all element in the i^th^ row of $X$ by the corresponding elements in the vector of estimated parameters $\beta$, to obtain the expected value. Let's see the full JAGS coding in the box below.
+
+```{r}
+# Coding a JAGS model
+modelSpec <- "
+data {
+n <- length(Y)
+np <- dim(X)
+nk <- dim(K)
+}
+
+model {
+# Model
+for (i in 1:n) {
+   expected[i] <- inprod(X[i,], beta)
+   Y[i] ~ dnorm(expected[i], tau)
+  }
+
+# Priors
+beta[1] ~ dunif(0, 1000000)
+for (i in 2:np[2]){
+  beta[i] ~ dnorm(0, 0.000001)
+  }
+sigma ~ dunif(0, 100)
+
+# Derived quantities (model specific)
+tau <- 1 / ( sigma * sigma)
+
+# Contrasts of interest
+for (i in 1:nk[1]) {
+   mu[i] <- inprod(K[i,], beta)
+  }
+}"
+writeLines(modelSpec, con="ModelAOV.txt")
+```
+
+
+Let's break down what's going on here. The code consists of two main blocks enclosed in curly braces:
+
+1. A `data` block
+2. A `model` block
+
+In the `data` block, we dynamically compute three dimensions: the number of observations ($n$), the number of parameters (`np`), and the number of contrasts (`nk`). These are derived automatically by counting the elements in $Y$, the columns of the design matrix $X$, and the rows of the linear combination matrix $K$.
+
+In the `model` block, we have three key components:
+
+1. **Model Specification**: We combine deterministic and stochastic statements. For each observation $i$, the expected value is calculated by taking the inner product of row $i$ of $X$ and the vector of parameters $\beta$, using the statement `inprod(X[i,], beta)`. Then, we specify that `Y[i]` follows a normal distribution (`dnorm`) centered at `expected[i]` with precision `tau` (remember that BUGS/JAGS uses precision $\tau = 1/\sigma^2$, rather than standard deviation $\sigma$).
+2. **Priors**: These express our expectations about model parameters before observing the data. Here, we use very vague priors: a wide uniform prior for the intercept (`beta[1] ~ dunif(0, 1000000)`), normal priors with mean 0 and near-zero precision for all other parameters in $\beta$, and a uniform prior from 0 to 100 for the residual standard deviation ($\sigma$).
+3. **Derived Quantities & Linear combinations of model parameters**: We convert $\sigma$ into precision $\tau$, and we compute treatment means by multiplying the linear combination matrix $K$ with the vector of estimated parameters $\beta$, using `inprod(K[i,], beta)`.
+
+We save the string containing the JAGS coding into an external text file ('ModelAOV.txt') using `writeLines()`.
+
+Notice that this JAGS script is completely generic! It expects only three inputs from R: the response vector $Y$, the design matrix $X$, and the linear combination matrix $K$.
+
+# Fitting the JAGS model in R
+
+Now we can fit our model using the package 'rjags' (Plummer, 2019). Here are the steps:
+
+1. Extract the response vector Y;
+2. Build the design matrix X using `model.matrix()`;
+3. Retrieve the linear combination matrix from the 'emmeans' object
+4. Pass everything to JAGS and run the MCMC sampler.
+
+```{r}
+# Same as above
+Y <- dataset$Yield
+X <- model.matrix(mod)
+K <- mm@linfct
+```
+
+Now, let's launch the sampler.
+
+
+```{r message=F}
+library(rjags)
+
+# Create lists
+dataList <- list(Y = Y, X = X, K = K)
+initList <- list(beta = beta, sigma = summary(mod)$sigma)
+
+# Start sampler
+mcmc <- jags.model("modelAOV.txt",
+                   data = dataList, inits = initList,
+                   n.chains = 4, n.adapt = 100)
+
+# Get samples
+res <- coda.samples(mcmc, variable.names = c("beta", "sigma", "mu"),
+                    n.iter = 1000)
+
+out <- summary(window(res, start = 110))
+res <- cbind(out$statistics[,1:2], out$quantiles[,c(1,5)])
+res
+```
+
+From the posterior distributions, we obtain posterior means, standard deviations, and 95% credible intervals. Because we used vague priors, the numerical results are almost identical to those from a standard frequentist ANOVA.
+
+# Reusing the EXACT same code for a multi-environment experiment
+
+Here is where the magic happens! What if our genotype evaluation trial was conducted across multiple years?
+
+In that case, we would want an ANOVA model with Year, Block (nested within Year), Genotype, and the Year by Genotype interaction.
+
+Do we need to write a new JAGS script? Not at all! The 'ModelAOV.txt' file remains 100% untouched. All we need to do is update $Y$, $X$, and $K$ in R:
+
+```{r}
+#| message: false
+#| warning: false
+# Loading the data
+library(dplyr)
+dataset <- getAgroData("WinterWheat")
+dataset <- dataset |>
+  mutate(across(c(Block, Year, Genotype), .fns = factor))
+head(dataset)
+
+# Fit the model in R and calculate means
+mod <- lm(Yield ~ Genotype*Year +  Block:Year, data = dataset)
+mm <- emmeans(mod, ~Genotype|Year)
+mm
+
+# Create input matrices
+Y <- dataset$Yield
+X <- model.matrix(mod)
+K <- mm@linfct
+
+# Create lists
+dataList <- list(Y = Y, X = X, K = K)
+initList <- list(beta = coef(mod), sigma = summary(mod)$sigma)
+
+# Start sampler
+mcmc <- jags.model("modelAOV.txt",
+                   data = dataList, inits = initList,
+                   n.chains = 4, n.adapt = 100)
+
+# Get samples
+res <- coda.samples(mcmc, variable.names = c("beta", "sigma", "mu"),
+                    n.iter = 1000)
+
+out <- summary(window(res, start = 110))
+res <- cbind(out$statistics[,1:2], '50%'=out$quantiles[,3],
+             out$quantiles[,c(1, 5)])
+head(res)
+#....
+tail(res)
+```
+
+Discovering how to leverage the `inprod()` function alongside R's `model.matrix()` was a major lightbulb moment for me. This approach makes Bayesian model specification extremely flexible and opens the door to fitting mixed models effortlessly—something I’ll cover in future posts!
+
+
+Thanks for reading, and happy coding!
+
+(P.S. If you enjoyed this post, check out my book "Field Research Methods in Agriculture: An Introduction with R" via the link below!)
+
+
+Prof. Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences   
+University of Perugia (Italy)   
+Send comments to: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)   
+
+
+<a href = "https://www.awin1.com/cread.php?awinmid=26429&awinaffid=2675822&ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src="../../Figures/Email_Signature_978-3-032-08199-5.png" alt="Book cover" class="cover" align="center"/></a>
+
+---
+
+This post was originally published on 2020-12-23
+
+---
+
+# References
+
+1. Kery, M., 2010. Introduction to WinBUGS for ecologists. A Bayesian approach to regression, ANOVA, mixed models and related analyses. Academic Press, Burlington, MA (USA).
+2. Plummer M. (2019). rjags: Bayesian Graphical Models using MCMC. R package version 4-10. https://CRAN.R-project.org/package=rjags
+
