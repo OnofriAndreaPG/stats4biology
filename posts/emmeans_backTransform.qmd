@@ -1,0 +1,111 @@
+---
+title: "Back-transformations with emmeans()"
+author: "Andrea Onofri"
+date: 2026-09-28
+categories:
+  - R
+  - 'linear_models'
+  - 'emmeans'
+tags:
+  - R
+  - 'linear_models'
+aliases:
+  - /2023/stat_emmeans_backtransform/index.html
+---
+
+
+I am one of those old guys who still uses variance-stabilising transformations when data do not conform to the basic assumptions of ANOVA. Indeed, apart from counts and proportions, where GLMs are extremely useful, I have not yet found a simpler way to deal with heteroscedasticity for continuous variables like yield, weight, height, and so on. Yes, I know, Generalized Least Squares (GLS) can fit heteroscedastic models, but I would argue that stabilising transformations are conceptually much simpler and can be easily taught to PhD students and practitioners with only a basic background in statistics.
+
+The `emmeans` package gives us a big boost thanks to its elegant handling of back-transformations. For example, in the code box below, I perform an ANOVA on log-transformed data and retrieve the back-transformed means on the original count scale.
+
+```{r}
+library(emmeans)
+library(statforbiology)
+dataset <- getAgroData("insects")
+model <- lm(log(Count) ~ Insecticide, data = dataset)
+emmeans(model, ~Insecticide, type = "response")
+```
+
+It is very straightforward: `emmeans()` auto-detects the transformation function (when specified inside the model formula) and automatically produces the back-transformation when requested using the `type = "response"` argument (we can also use `regrid = "response"`, with subtle differences that I will discuss in a future post).
+
+However, not all transformations are automatically detected or built directly into the formula. For example, let's consider the dataset 'Hours_to_failure', included in the 'statforbiology' package, which reports the time-to-failure (in hours) for a device as affected by the operating temperature. If we treat temperature as a factor, we can fit an ANOVA model; checking with the `boxcox()` function from the 'MASS' package suggests that this dataset might require an inverse transformation.
+
+```{r}
+library(MASS)
+library(emmeans)
+library(statforbiology)
+dataset <- getAgroData("Hours_to_failure")
+dataset$Temp <- factor(dataset$Temp)
+head(dataset)
+model <- lm(Hours_to_failure ~ Temp, data = dataset)
+tp <- boxcox(model)
+```
+
+As we see below, the inverse transformation is not auto-detected.
+
+```{r}
+model2 <- lm(1/Hours_to_failure ~ Temp, data = dataset)
+emmeans(model2, ~ Temp, type = "response")
+```
+
+In this situation, an alternative approach must be used. After fitting the model with the pre-transformed variable, we can update the 'reference grid' for the model, explicitly specifying the transformation used (`tran = "inverse"`). Finally, we pass the updated grid to the `emmeans()` function. And... back-transformation is served!
+
+```{r}
+dataset$invHours <- 1/dataset$Hours_to_failure
+model3 <- lm(invHours ~ Temp, data = dataset)
+updGrid <- update(ref_grid(model3), tran = "inverse")
+emmeans(updGrid, ~Temp, type = "response")
+```
+
+We can use this method with several functions, such as: `"identity"`, `"1/mu^2"`, `"inverse",` `"reciprocal"`, `"log10"`, `"log2"`, `"asin.sqrt"`, and `"asinh.sqrt"`.
+
+Sometimes, however, we need extra flexibility. If we look at the Box-Cox plot above, we see that while the reciprocal/inverse transformation is acceptable ($\lambda = -1$ falls within the confidence limits), the maximum likelihood estimate for $\lambda$ is actually -0.62:
+
+```{r}
+ml.lambda <- tp$x[which.max(tp$y)]
+```
+
+Therefore, we might prefer to use the exact Box-Cox transformation parameter:
+
+$$W = \frac{Y^{-0.62} - 1}{-0.62}$$
+
+This type of transformation is not manageable with the previous code and we need to use the `make.tran()` function, specifying the value of $\lambda$ (`alpha = -0.62`).
+
+```{r}
+dataset$bcHours <- ((dataset$Hours_to_failure)^(ml.lambda) - 1)/(ml.lambda)
+model4 <- lm(bcHours ~ Temp, data = dataset)
+updGrid <- update(ref_grid(model4), 
+                  tran = make.tran("boxcox", alpha = ml.lambda))
+emmeans(updGrid, ~Temp, type = "response")
+```
+
+
+```{r}
+#| eval: false
+#| include: false 
+# Verifica retro-trasformazione
+# (1.586707*(-0.6262626) + 1)^(-1/0.6262626)
+```
+
+The function `make.tran()` can be used to specify several other transformation functions, such as the angular transformation that is often used for percentages and proportions. We can also use transformations requiring a displacement parameter; you can get a full list by searching help ('?make.tran') from inside R.
+
+In conclusion, stabilising transformations, in spite of their age, can still be useful to fit heteroscedastic models; do not underrate them, just because they are no longer in fashion!
+
+Thanks for reading, and happy coding!
+
+(P.S. If you enjoyed this post, check out my book "Field Research Methods in Agriculture: An Introduction with R" via the link below!)
+
+---
+
+Prof. Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences   
+University of Perugia (Italy)   
+Send comments to: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)   
+
+
+<a href = "https://www.awin1.com/cread.php?awinmid=26429&awinaffid=2675822&ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src="../../Figures/Email_Signature_978-3-032-08199-5.png" alt="Book cover" class="cover" align="center"/></a>
+
+---
+
+This post was originally published on 2023-11-30
+
