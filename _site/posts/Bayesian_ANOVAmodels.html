@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.36">
+<meta name="generator" content="quarto-1.9.37">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -76,7 +76,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../site_libs/bootstrap/bootstrap-40660c7df68f9134ae342454c17cf2af.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -393,6 +393,19 @@ window.Quarto = {
 <li><strong>Priors</strong>: These express our expectations about model parameters before observing the data. Here, we use very vague priors: a wide uniform prior for the intercept (<code>beta[1] ~ dunif(0, 1000000)</code>), normal priors with mean 0 and near-zero precision for all other parameters in <span class="math inline">\(\beta\)</span>, and a uniform prior from 0 to 100 for the residual standard deviation (<span class="math inline">\(\sigma\)</span>).</li>
 <li><strong>Derived Quantities &amp; Linear combinations of model parameters</strong>: We convert <span class="math inline">\(\sigma\)</span> into precision <span class="math inline">\(\tau\)</span>, and we compute treatment means by multiplying the linear combination matrix <span class="math inline">\(K\)</span> with the vector of estimated parameters <span class="math inline">\(\beta\)</span>, using <code>inprod(K[i,], beta)</code>.</li>
 </ol>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Caution
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>With the parameterization adopted in this post (which is the default in R), the intercept represents the yield of the first genotype in alphabetical order, so I decided to constrain it to be positive. Imposing hard constraints on the intercept may not always be a good idea, as they can lead to unstable or unreliable results. Bob Carpenter, one of the authors of STAN, recommended to me by email that, whenever such constraints are imposed, the posterior distributions should be inspected carefully to make sure that the constraints are compatible with the data.</p>
+</div>
+</div>
 <p>We save the string containing the JAGS coding into an external text file (‘ModelAOV.txt’) using <code>writeLines()</code>.</p>
 <p>Notice that this JAGS script is completely generic! It expects only three inputs from R: the response vector <span class="math inline">\(Y\)</span>, the design matrix <span class="math inline">\(X\)</span>, and the linear combination matrix <span class="math inline">\(K\)</span>.</p>
 </section>
@@ -445,26 +458,26 @@ window.Quarto = {
 <span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">summary</span>(<span class="fu">window</span>(res, <span class="at">start =</span> <span class="dv">110</span>))</span>
 <span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">cbind</span>(out<span class="sc">$</span>statistics[,<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>], out<span class="sc">$</span>quantiles[,<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">5</span>)])</span>
 <span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>res</span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="do">##                 Mean         SD       2.5%       97.5%</span></span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[1]   4.66740054 0.22439571  4.1979113  5.06441664</span></span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[2]  -0.55980555 0.29585913 -1.1584100  0.02490133</span></span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[3]  -0.65073584 0.28471236 -1.2191430 -0.08028573</span></span>
-<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[4]  -0.54978109 0.29371087 -1.1231974  0.03034234</span></span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[5]   0.07317355 0.29282793 -0.4902310  0.66231043</span></span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[6]  -0.38497449 0.29637499 -0.9532325  0.21138754</span></span>
-<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[7]  -1.54843837 0.29222147 -2.1103928 -0.94686684</span></span>
-<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[8]  -0.10076062 0.29183689 -0.6744496  0.48676787</span></span>
-<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[9]   0.21432729 0.18084840 -0.1557948  0.58040579</span></span>
-<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[10]  0.44837515 0.17509894  0.1037637  0.80207375</span></span>
-<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a><span class="do">## mu[1]     4.88830135 0.20473653  4.4619243  5.27594195</span></span>
-<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a><span class="do">## mu[2]     4.32849580 0.21135822  3.9198300  4.74828013</span></span>
-<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a><span class="do">## mu[3]     4.23756552 0.20707861  3.8216813  4.64967694</span></span>
-<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a><span class="do">## mu[4]     4.33852026 0.20751869  3.9220627  4.74494130</span></span>
-<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a><span class="do">## mu[5]     4.96147490 0.20887845  4.5521376  5.35845719</span></span>
-<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a><span class="do">## mu[6]     4.50332687 0.21327517  4.0869722  4.92864554</span></span>
-<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a><span class="do">## mu[7]     3.33986298 0.20632363  2.9374304  3.75619210</span></span>
-<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a><span class="do">## mu[8]     4.78754073 0.20535788  4.3825095  5.19164748</span></span>
-<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a><span class="do">## sigma     0.35427037 0.07650813  0.2371840  0.53884644</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="do">##                 Mean        SD        2.5%       97.5%</span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[1]   4.68481035 0.2522892  4.15660994  5.15043281</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[2]  -0.57449013 0.3076642 -1.16991620  0.04060667</span></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[3]  -0.65229045 0.3089697 -1.25305991 -0.03366790</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[4]  -0.55749808 0.3078888 -1.14746369  0.07502598</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[5]   0.07003549 0.3032103 -0.50429485  0.69129385</span></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[6]  -0.39412836 0.3086740 -1.00093575  0.22169931</span></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[7]  -1.56162371 0.3065781 -2.18751751 -0.94061557</span></span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[8]  -0.11309184 0.3038215 -0.70588383  0.51107719</span></span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[9]   0.19846526 0.1818750 -0.16175677  0.55948307</span></span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[10]  0.43934414 0.1835708  0.07844613  0.80896593</span></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a><span class="do">## mu[1]     4.89741348 0.2229498  4.43845798  5.31844848</span></span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a><span class="do">## mu[2]     4.32292335 0.2102618  3.90823417  4.73944849</span></span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a><span class="do">## mu[3]     4.24512303 0.2115564  3.81701202  4.67065102</span></span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a><span class="do">## mu[4]     4.33991540 0.2131683  3.91553164  4.77651601</span></span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a><span class="do">## mu[5]     4.96744897 0.2077845  4.55469138  5.37304200</span></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a><span class="do">## mu[6]     4.50328512 0.2097551  4.09314230  4.92917927</span></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a><span class="do">## mu[7]     3.33578977 0.2060217  2.91038594  3.75048534</span></span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a><span class="do">## mu[8]     4.78432164 0.2103964  4.36596552  5.20926773</span></span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a><span class="do">## sigma     0.35599004 0.0785686  0.24311799  0.54637035</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>From the posterior distributions, we obtain posterior means, standard deviations, and 95% credible intervals. Because we used vague priors, the numerical results are almost identical to those from a standard frequentist ANOVA.</p>
 </section>
@@ -609,21 +622,21 @@ window.Quarto = {
 <span id="cb7-133"><a href="#cb7-133" aria-hidden="true" tabindex="-1"></a>             out<span class="sc">$</span>quantiles[,<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>)])</span>
 <span id="cb7-134"><a href="#cb7-134" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(res)</span>
 <span id="cb7-135"><a href="#cb7-135" aria-hidden="true" tabindex="-1"></a><span class="do">##               Mean        SD        50%       2.5%       97.5%</span></span>
-<span id="cb7-136"><a href="#cb7-136" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[1]  6.4512556 0.2348996  6.4483819  6.0339374  6.90509104</span></span>
-<span id="cb7-137"><a href="#cb7-137" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[2] -0.7297626 0.3083972 -0.7279188 -1.3362588 -0.13185075</span></span>
-<span id="cb7-138"><a href="#cb7-138" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[3] -0.7199168 0.3209744 -0.7346565 -1.3373535 -0.06732405</span></span>
-<span id="cb7-139"><a href="#cb7-139" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[4] -0.0836033 0.2978078 -0.1000129 -0.6467272  0.52781949</span></span>
-<span id="cb7-140"><a href="#cb7-140" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[5] -0.3105609 0.2969215 -0.3266184 -0.8699413  0.27832506</span></span>
-<span id="cb7-141"><a href="#cb7-141" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[6] -0.6340574 0.3001412 -0.6253718 -1.2251315 -0.05338648</span></span>
+<span id="cb7-136"><a href="#cb7-136" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[1]  6.5510765 0.2360890  6.5639019  5.9913289  6.92418081</span></span>
+<span id="cb7-137"><a href="#cb7-137" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[2] -0.8308049 0.3189499 -0.8330956 -1.4530406 -0.18361736</span></span>
+<span id="cb7-138"><a href="#cb7-138" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[3] -0.8087588 0.3251846 -0.8239563 -1.4274178 -0.12820484</span></span>
+<span id="cb7-139"><a href="#cb7-139" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[4] -0.1511830 0.3136045 -0.1635136 -0.7297586  0.46866628</span></span>
+<span id="cb7-140"><a href="#cb7-140" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[5] -0.3896099 0.3053606 -0.4213978 -0.9390689  0.24120172</span></span>
+<span id="cb7-141"><a href="#cb7-141" aria-hidden="true" tabindex="-1"></a><span class="do">## beta[6] -0.7484503 0.3241374 -0.7679729 -1.3322287 -0.08567512</span></span>
 <span id="cb7-142"><a href="#cb7-142" aria-hidden="true" tabindex="-1"></a><span class="co">#....</span></span>
 <span id="cb7-143"><a href="#cb7-143" aria-hidden="true" tabindex="-1"></a><span class="fu">tail</span>(res)</span>
 <span id="cb7-144"><a href="#cb7-144" aria-hidden="true" tabindex="-1"></a><span class="do">##             Mean         SD       50%      2.5%     97.5%</span></span>
-<span id="cb7-145"><a href="#cb7-145" aria-hidden="true" tabindex="-1"></a><span class="do">## mu[52] 4.3416059 0.22862717 4.3442274 3.8853432 4.7861050</span></span>
-<span id="cb7-146"><a href="#cb7-146" aria-hidden="true" tabindex="-1"></a><span class="do">## mu[53] 4.9660729 0.22653761 4.9679031 4.5204568 5.4057118</span></span>
-<span id="cb7-147"><a href="#cb7-147" aria-hidden="true" tabindex="-1"></a><span class="do">## mu[54] 4.5032505 0.22913111 4.5073263 4.0549511 4.9434493</span></span>
-<span id="cb7-148"><a href="#cb7-148" aria-hidden="true" tabindex="-1"></a><span class="do">## mu[55] 3.3373595 0.22397281 3.3443957 2.8823111 3.7731531</span></span>
-<span id="cb7-149"><a href="#cb7-149" aria-hidden="true" tabindex="-1"></a><span class="do">## mu[56] 4.7916823 0.22784332 4.7884743 4.3398725 5.2358610</span></span>
-<span id="cb7-150"><a href="#cb7-150" aria-hidden="true" tabindex="-1"></a><span class="do">## sigma  0.3899112 0.02850618 0.3880595 0.3405575 0.4515394</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb7-145"><a href="#cb7-145" aria-hidden="true" tabindex="-1"></a><span class="do">## mu[52] 4.3366379 0.22785412 4.3372320 3.8857869 4.7828900</span></span>
+<span id="cb7-146"><a href="#cb7-146" aria-hidden="true" tabindex="-1"></a><span class="do">## mu[53] 4.9651166 0.22484067 4.9647538 4.5190489 5.4051481</span></span>
+<span id="cb7-147"><a href="#cb7-147" aria-hidden="true" tabindex="-1"></a><span class="do">## mu[54] 4.5054675 0.22922658 4.5076611 4.0604750 4.9621521</span></span>
+<span id="cb7-148"><a href="#cb7-148" aria-hidden="true" tabindex="-1"></a><span class="do">## mu[55] 3.3370695 0.22681039 3.3354671 2.8762304 3.7850720</span></span>
+<span id="cb7-149"><a href="#cb7-149" aria-hidden="true" tabindex="-1"></a><span class="do">## mu[56] 4.7915692 0.22331820 4.7920685 4.3528006 5.2289495</span></span>
+<span id="cb7-150"><a href="#cb7-150" aria-hidden="true" tabindex="-1"></a><span class="do">## sigma  0.3907631 0.02849568 0.3887718 0.3399424 0.4527258</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Discovering how to leverage the <code>inprod()</code> function alongside R’s <code>model.matrix()</code> was a major lightbulb moment for me. This approach makes Bayesian model specification extremely flexible and opens the door to fitting mixed models effortlessly—something I’ll cover in future posts!</p>
 <p>Thanks for reading, and happy coding!</p>
@@ -635,7 +648,6 @@ Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it
 <p><a href="https://www.awin1.com/cread.php?awinmid=26429&amp;awinaffid=2675822&amp;ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src="../../Figures/Email_Signature_978-3-032-08199-5.png" alt="Book cover" class="cover" align="center"></a></p>
 <hr>
 <p>This post was originally published on 2020-12-23</p>
-<hr>
 </section>
 <section id="references" class="level1">
 <h1>References</h1>
