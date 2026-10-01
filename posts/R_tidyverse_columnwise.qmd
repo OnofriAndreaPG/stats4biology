@@ -20,7 +20,6 @@ aliases:
 rm(list = ls())
 ```
 
-
 Today, I want to discuss performing column-wise tasks on relatively large datasets. These tasks are particularly common in agricultural and biological research, where we often evaluate multiple experimental subjects across different treatment groups and record a large number of traits for each subject. Under these conditions, the very first step of data analysis is calculating descriptive statistics for every variable across each group of subjects.
 
 What is the best way to do this in R? Let's explore a few different approaches, starting with a real-life example.
@@ -207,9 +206,9 @@ Another solution comes from the tidyverse. Here, we use `pivot_longer()` to resh
 library(tidyverse)
 range_cols <- c(3:length(dataset[1,]))
 returnList5 <- dataset |>
-  select(-Sample) |> 
+  dplyr::select(-Sample) |> 
   pivot_longer(names_to = "Toxin", values_to = "Conc",
-               cols = range_cols - 1) |>
+               cols = -c(1:2)) |>
   group_by(Toxin, Region) |>
   summarise(as_tibble_row(funBec2(Conc)), 
             .groups = "drop_last") |>
@@ -228,7 +227,8 @@ After sharing an earlier draft of this problem, Bryan Hutchinson (UK) wrote to m
 library(data.table)
 library(DescTools)
  
-dataset <- fread("https://casaonofri.it/_datasets/Mycotoxins.csv", header = T)
+dataset <- fread("https://casaonofri.it/_datasets/Mycotoxins.csv", 
+                 header = T)
 tnames <- names(dataset[,-c(1:2)])
  
 sum_stats <- function(var) {
@@ -255,6 +255,7 @@ df_long[Toxin == "CRV", sum_stats(Conc), .(Toxin, Region)]
 # df_long[Region == "Lombardy", sum_stats(Conc), .(Region, Toxin)]
 ```
 
+Job Nmadu (Nigeria) 
 
 Do you have a different strategy or favorite trick for column-wise operations in R? Drop me an email—I'd love to hear your thoughts and share them here!
 

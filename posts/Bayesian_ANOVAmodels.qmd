@@ -153,6 +153,10 @@ In the `model` block, we have three key components:
 2. **Priors**: These express our expectations about model parameters before observing the data. Here, we use very vague priors: a wide uniform prior for the intercept (`beta[1] ~ dunif(0, 1000000)`), normal priors with mean 0 and near-zero precision for all other parameters in $\beta$, and a uniform prior from 0 to 100 for the residual standard deviation ($\sigma$).
 3. **Derived Quantities & Linear combinations of model parameters**: We convert $\sigma$ into precision $\tau$, and we compute treatment means by multiplying the linear combination matrix $K$ with the vector of estimated parameters $\beta$, using `inprod(K[i,], beta)`.
 
+::: {.callout-caution}
+With the parameterization adopted in this post (which is the default in R), the intercept represents the yield of the first genotype in alphabetical order, so I decided to constrain it to be positive. Imposing hard constraints on the intercept may not always be a good idea, as they can lead to unstable or unreliable results. Bob Carpenter, one of the authors of STAN, recommended to me by email that, whenever such constraints are imposed, the posterior distributions should be inspected carefully to make sure that the constraints are compatible with the data.
+:::
+
 We save the string containing the JAGS coding into an external text file ('ModelAOV.txt') using `writeLines()`.
 
 Notice that this JAGS script is completely generic! It expects only three inputs from R: the response vector $Y$, the design matrix $X$, and the linear combination matrix $K$.
@@ -255,7 +259,6 @@ Thanks for reading, and happy coding!
 
 (P.S. If you enjoyed this post, check out my book "Field Research Methods in Agriculture: An Introduction with R" via the link below!)
 
-
 Prof. Andrea Onofri   
 Department of Agricultural, Food and Environmental Sciences   
 University of Perugia (Italy)   
@@ -268,7 +271,6 @@ Send comments to: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)
 
 This post was originally published on 2020-12-23
 
----
 
 # References
 
