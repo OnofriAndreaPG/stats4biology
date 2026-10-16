@@ -1,0 +1,144 @@
+---
+title: 'Can we trust the correlation coefficient in designed field experiments?'
+subtitle: 'Spoiler: no, we cannot...'
+author: Andrea Onofri
+date: '2026-10-16'
+categories:
+  - R
+  - correlation
+  - 'R-bloggers'
+tags:
+  - R
+  - correlation
+aliases:
+  - /dealing-with-correlation-in-designed-field-experiments-part-i/index.html 
+---
+
+One of the fundamental aims of field experiments is to explorare the relationships between several experimental traits, which have been recorded/measured altogheter for all the experimental units. For example, think about a genotype experiment with 27 winter wheat genotypes in a Randomised Complete Block Design with three replicates. If we aim at assessing yield and yield quality, we have to measure, in each plot, several traits, such as grain yield and the weight of thousand kernels (TKW). Apart from separately analysing these two variables, we might be interested in describing their reciprocal relationships, by using the Pearson's correlation coefficient. Let's do this, by using the dataset 'WheatQuality', which is available in the 'statforbiology' package; we have 81 plots and just as many couples of measures in all.
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+library(Hmisc)
+library(dplyr)
+library(statforbiology)
+dataset <- getAgroData("WheatQuality")
+head(dataset)
+```
+
+Now, we consider the whole lot of measures and calculate the correlation coefficient between yield and TKW; we also use a t-test for the hypothesis that the correlation coefficient is equal to 0. This is the result:
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+ra <- with(dataset, rcorr(Yield, TKW) )
+# 
+# Correlation coefficient
+ra$r[1,2] 
+#
+# P-level
+ra$P[1,2] 
+```
+
+The conclusion is: the correlation coefficient is positive and significantly different from 0, which supports the idea that plots with a high value on yield tend to have a high value on TKW, as well.
+
+Such an approach is very often seen also in high ranking Journals, but: is it correct? Can we trust the conclusions? The answer is no, not completely. And here is why. Please, note that in this post I am following the point made by Bland and Altman (1994), by using an example that is more closely related to plant/crop science.
+
+# Statistical testing is invalid
+
+The correlation coefficient is a measure of joint variability and makes some basic assumptions (e.g. linearity), which I have detailed elsewhere ([see here](https://www.statforbiology.com/2019/stat_general_correlation_alookat/)). In particular, the t-test requires that all the couples of observations are taken on independent subjects.
+
+In our case, the 81 plots are not independent, as they are grouped by block and genotype, so that observations in the same block or for the same genotype are more alike than observations in different blocks and different genotypes (intra-class correlation). Consequently, the t-test is invalid and **we are not allowed to conclude that the correlation is significant, because such a conclusion is not necessarily supported by the data**.
+
+Unfortunately, such lack of independence relates to all designed experiments, which seems to be a fact that goes largely unnoticed. **In general correlation coefficients calculated for raw data from designed experiments, cannot be submitted to t-tests, without accounting for the effects of all treatment and grouping factors.**
+
+
+# Correlation is not unique
+
+Apart from statistical testing, the correlation coefficient we have calculated above (0.541) maintain its value as a descriptive measure of joint variability. But are we sure that using the raw observed data is the best way to go?
+
+For one, such correlation coefficient highlights that yield and TKW are positively correlated, but is this true for all genotypes and for all blocks? Let's check this.
+
+
+```{r}
+# Correlations within genotypes
+wgCors <- by(dataset, list(dataset$Genotype), function(x) cor(x$Yield, x$TKW))
+wgCors
+
+# Correlations within blocks
+wbCors <- by(dataset, list(dataset$Block), function(x) cor(x$Yield, x$TKW))
+wbCors
+```
+
+As for the genotypes, we have 27 correlation coefficients, ranging from -0.999 to 0.985. We only have three couples of measurements per genotype and it is clear that this is not much, to reliably estimate a correlation coefficient. However, it is enough to be suspicious about the extent of correlation between yield and TKW, as it may depend on the genotype.
+
+On the other hand, the correlation within blocks is more constant, independent on the block and similar to the correlation between plots.
+
+It may be interesting to get an estimate of the average within-group correlation. To this aim, we can perform two separate ANOVAs (one per trait), including all relevant effects (blocks and genotypes) and calculate the correlation between the residuals:
+
+```{r}
+mod1 <- lm(Yield ~ factor(Block) + Genotype, data = dataset)
+mod2 <- lm(TKW ~ factor(Block) + Genotype, data = dataset)
+wCor <- rcorr(residuals(mod1), residuals(mod2))
+wCor$r
+wCor$P
+```
+
+The average within-group correlation is very small and unsignificant. Let's think about this correlation: residuals represent yield and TKW values for all plots, once the effects of blocks and genotypes have been removed. A high correlation of residuals would mean that, letting aside the effects of the block and genotype to which it belongs, a plot with a high value on yield also shows a high value on TKW. **The correct conclusion, indeed, is that, once the effects of treatment ang grouping factors have been removed, there is no correlation between the traits under study.**
+
+But, this is not enough to stop our investigations. We could also consider the means for genotypes/blocks and see whether they are correlated. Blocks and genotypes are independent and, in principle, significance testing is permitted. However, this is not recommended with block means, as three data are too few to make any tests.
+
+
+```{r}
+means <- aggregate(dataset[,c(4,6)], list(dataset$Genotype), mean)
+rgPear <- rcorr( as.matrix(means[,2:3]) )
+rgPear$r
+rgPear$P
+
+means <- aggregate(dataset[,c(4,6)], list(dataset$Block), mean)
+rbPear <- cor( as.matrix(means[,2:3]) )
+rbPear
+```
+
+We note that the correlation between genotype means is high and significant. On the contrary, the correlation between block means is near to 0.
+
+
+# And so what?
+
+At this stage, you may be confused... Let's try to clear the fog.
+
+A naive correlation analysis on raw data brought us to the conclusion that yield and TKW are significantly correlated. Unfortunately, such a conclusion is overly simplistic and it is hardly supported by the data.
+
+A more careful process of data analysis should not neglect that in every designed field experiment we have groups of subjects and there are several possible types of correlation:
+
+1. correlation between plot measurements (naive correlation)
+2. correlation between the residuals
+3. correlation between treatment/block means
+ 
+
+All these correlations should be investigated and used for interpretation.
+
+1. The 'naive' correlation between the plot measurements is very easily calculated, but it is grossy misleading. Indeed, it disregards the treatment/block effects and it does not permit hypotheses testing, as the subjects are not independent. **I think it is reasonable to suggest that the 'naive' correlation coefficient is never used for interpretation**.
+2. The correlation between the residuals is a reliable measure of joint variation, because the experimental design is adequately referenced, by removing the effects of tratments/blocks. In this example, residuals are not correlated. Further analyses show that the correlation between yield and TKW, if any, may depend on the genotype, while it does not depend on the block.
+3. The correlation between treatment/block means permits to assess whether the treatment/block effects on the two traits are correlated. In this case, while we are not allowed to conclude that yield and TKW are, in general, correlated, we can conclude that the genotypes with a high level of yield also show a high level of TKW.
+
+An elegant and advanced method to tackle correlation analyses on data from designed field experiments has been put forward by Piepho (2018), within the frame of mixed models. But this deserves another post.
+
+Thanks for reading, and happy coding!
+
+(P.S. If you enjoyed this post, check out my book "Field Research Methods in Agriculture: An Introduction with R" via the link below!)
+
+Prof. Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences   
+University of Perugia (Italy)   
+Send comments to: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)   
+
+
+<a href = "https://www.awin1.com/cread.php?awinmid=26429&awinaffid=2675822&ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src="../../Figures/Email_Signature_978-3-032-08199-5.png" alt="Book cover" class="cover" align="center"/></a>
+
+---
+
+# References
+
+1. Bland, J.M., Altman, D.G., 1994. Statistics Notes: Correlation, regression, and repeated data. BMJ 308, 896–896.
+2. Piepho, H.-P., 2018. Allowing for the structure of a designed experiment when estimating and testing trait correlations. The Journal of Agricultural Science 156, 59–70.
+
+---
+Originally published on 2019-04-30
+

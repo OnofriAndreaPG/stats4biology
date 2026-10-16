@@ -9,8 +9,632 @@
 <link>https://www.statforbiology.com/</link>
 <atom:link href="https://www.statforbiology.com/index.xml" rel="self" type="application/rss+xml"/>
 <description>Fixing the bridge between biologists and statisticians</description>
-<generator>quarto-1.9.37</generator>
-<lastBuildDate>Wed, 14 Oct 2026 22:00:00 GMT</lastBuildDate>
+<generator>quarto-1.9.36</generator>
+<lastBuildDate>Thu, 15 Oct 2026 22:00:00 GMT</lastBuildDate>
+<item>
+  <title>Can we trust the correlation coefficient in designed field experiments?</title>
+  <dc:creator>Andrea Onofri</dc:creator>
+  <link>https://www.statforbiology.com/posts/general_CorrelationIndependence1.html</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>One of the fundamental aims of field experiments is to explorare the relationships between several experimental traits, which have been recorded/measured altogheter for all the experimental units. For example, think about a genotype experiment with 27 winter wheat genotypes in a Randomised Complete Block Design with three replicates. If we aim at assessing yield and yield quality, we have to measure, in each plot, several traits, such as grain yield and the weight of thousand kernels (TKW). Apart from separately analysing these two variables, we might be interested in describing their reciprocal relationships, by using the Pearson’s correlation coefficient. Let’s do this, by using the dataset ‘WheatQuality’, which is available in the ‘statforbiology’ package; we have 81 plots and just as many couples of measures in all.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(Hmisc)</span>
+<span id="cb1-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(dplyr)</span>
+<span id="cb1-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(statforbiology)</span>
+<span id="cb1-4">dataset <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">getAgroData</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"WheatQuality"</span>)</span>
+<span id="cb1-5"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">head</span>(dataset)</span>
+<span id="cb1-6"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##     Genotype Block Height  TKW Whectol Yield</span></span>
+<span id="cb1-7"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 1 arcobaleno     1     90 44.5    83.2 64.40</span></span>
+<span id="cb1-8"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 2 arcobaleno     2     90 42.8    82.2 60.58</span></span>
+<span id="cb1-9"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 3 arcobaleno     3     88 42.7    83.1 59.42</span></span>
+<span id="cb1-10"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 4       baio     1     80 40.6    81.8 51.93</span></span>
+<span id="cb1-11"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 5       baio     2     75 42.7    81.3 51.34</span></span>
+<span id="cb1-12"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 6       baio     3     76 41.1    81.1 47.78</span></span></code></pre></div></div>
+</div>
+<p>Now, we consider the whole lot of measures and calculate the correlation coefficient between yield and TKW; we also use a t-test for the hypothesis that the correlation coefficient is equal to 0. This is the result:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1">ra <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">with</span>(dataset, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rcorr</span>(Yield, TKW) )</span>
+<span id="cb2-2"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># </span></span>
+<span id="cb2-3"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Correlation coefficient</span></span>
+<span id="cb2-4">ra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>r[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>] </span>
+<span id="cb2-5"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 0.540957</span></span>
+<span id="cb2-6"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#</span></span>
+<span id="cb2-7"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># P-level</span></span>
+<span id="cb2-8">ra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>P[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>] </span>
+<span id="cb2-9"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 1.850931e-07</span></span></code></pre></div></div>
+</div>
+<p>The conclusion is: the correlation coefficient is positive and significantly different from 0, which supports the idea that plots with a high value on yield tend to have a high value on TKW, as well.</p>
+<p>Such an approach is very often seen also in high ranking Journals, but: is it correct? Can we trust the conclusions? The answer is no, not completely. And here is why. Please, note that in this post I am following the point made by Bland and Altman (1994), by using an example that is more closely related to plant/crop science.</p>
+<section id="statistical-testing-is-invalid" class="level1">
+<h1>Statistical testing is invalid</h1>
+<p>The correlation coefficient is a measure of joint variability and makes some basic assumptions (e.g.&nbsp;linearity), which I have detailed elsewhere (<a href="https://www.statforbiology.com/2019/stat_general_correlation_alookat/">see here</a>). In particular, the t-test requires that all the couples of observations are taken on independent subjects.</p>
+<p>In our case, the 81 plots are not independent, as they are grouped by block and genotype, so that observations in the same block or for the same genotype are more alike than observations in different blocks and different genotypes (intra-class correlation). Consequently, the t-test is invalid and <strong>we are not allowed to conclude that the correlation is significant, because such a conclusion is not necessarily supported by the data</strong>.</p>
+<p>Unfortunately, such lack of independence relates to all designed experiments, which seems to be a fact that goes largely unnoticed. <strong>In general correlation coefficients calculated for raw data from designed experiments, cannot be submitted to t-tests, without accounting for the effects of all treatment and grouping factors.</strong></p>
+</section>
+<section id="correlation-is-not-unique" class="level1">
+<h1>Correlation is not unique</h1>
+<p>Apart from statistical testing, the correlation coefficient we have calculated above (0.541) maintain its value as a descriptive measure of joint variability. But are we sure that using the raw observed data is the best way to go?</p>
+<p>For one, such correlation coefficient highlights that yield and TKW are positively correlated, but is this true for all genotypes and for all blocks? Let’s check this.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Correlations within genotypes</span></span>
+<span id="cb3-2">wgCors <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">by</span>(dataset, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(dataset<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>Genotype), <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(x) <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cor</span>(x<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>Yield, x<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>TKW))</span>
+<span id="cb3-3">wgCors</span>
+<span id="cb3-4"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : arcobaleno</span></span>
+<span id="cb3-5"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 0.9847228</span></span>
+<span id="cb3-6"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-7"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : baio</span></span>
+<span id="cb3-8"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 0.1611952</span></span>
+<span id="cb3-9"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-10"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : claudio</span></span>
+<span id="cb3-11"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] -0.9993872</span></span>
+<span id="cb3-12"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-13"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : colorado</span></span>
+<span id="cb3-14"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 0.9837293</span></span>
+<span id="cb3-15"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-16"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : colosseo</span></span>
+<span id="cb3-17"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 0.4564855</span></span>
+<span id="cb3-18"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-19"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : creso</span></span>
+<span id="cb3-20"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] -0.5910193</span></span>
+<span id="cb3-21"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-22"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : duilio</span></span>
+<span id="cb3-23"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] -0.988233</span></span>
+<span id="cb3-24"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-25"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : gianni</span></span>
+<span id="cb3-26"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] -0.7603802</span></span>
+<span id="cb3-27"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-28"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : giotto</span></span>
+<span id="cb3-29"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 0.9520211</span></span>
+<span id="cb3-30"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-31"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : grazia</span></span>
+<span id="cb3-32"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 0.4980828</span></span>
+<span id="cb3-33"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-34"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : iride</span></span>
+<span id="cb3-35"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 0.7563338</span></span>
+<span id="cb3-36"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-37"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : meridano</span></span>
+<span id="cb3-38"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 0.1174342</span></span>
+<span id="cb3-39"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-40"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : neodur</span></span>
+<span id="cb3-41"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 0.4805871</span></span>
+<span id="cb3-42"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-43"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : orobel</span></span>
+<span id="cb3-44"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 0.8907754</span></span>
+<span id="cb3-45"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-46"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : pietrafitta</span></span>
+<span id="cb3-47"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] -0.9633891</span></span>
+<span id="cb3-48"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-49"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : portobello</span></span>
+<span id="cb3-50"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 0.9210135</span></span>
+<span id="cb3-51"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-52"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : portofino</span></span>
+<span id="cb3-53"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] -0.9900764</span></span>
+<span id="cb3-54"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-55"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : portorico</span></span>
+<span id="cb3-56"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 0.1394211</span></span>
+<span id="cb3-57"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-58"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : preco</span></span>
+<span id="cb3-59"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 0.9007067</span></span>
+<span id="cb3-60"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-61"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : quadrato</span></span>
+<span id="cb3-62"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] -0.5840238</span></span>
+<span id="cb3-63"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-64"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : sancarlo</span></span>
+<span id="cb3-65"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] -0.646067</span></span>
+<span id="cb3-66"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-67"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : simeto</span></span>
+<span id="cb3-68"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] -0.4051779</span></span>
+<span id="cb3-69"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-70"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : solex</span></span>
+<span id="cb3-71"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] -0.6066363</span></span>
+<span id="cb3-72"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-73"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : terrabianca</span></span>
+<span id="cb3-74"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] -0.4076416</span></span>
+<span id="cb3-75"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-76"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : verdi</span></span>
+<span id="cb3-77"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 0.5801404</span></span>
+<span id="cb3-78"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-79"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : vesuvio</span></span>
+<span id="cb3-80"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] -0.7797493</span></span>
+<span id="cb3-81"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-82"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : vitromax</span></span>
+<span id="cb3-83"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] -0.8056514</span></span>
+<span id="cb3-84"></span>
+<span id="cb3-85"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Correlations within blocks</span></span>
+<span id="cb3-86">wbCors <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">by</span>(dataset, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(dataset<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>Block), <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(x) <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cor</span>(x<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>Yield, x<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>TKW))</span>
+<span id="cb3-87">wbCors</span>
+<span id="cb3-88"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : 1</span></span>
+<span id="cb3-89"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 0.5998137</span></span>
+<span id="cb3-90"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-91"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : 2</span></span>
+<span id="cb3-92"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 0.539999</span></span>
+<span id="cb3-93"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## ------------------------------------------------------------ </span></span>
+<span id="cb3-94"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## : 3</span></span>
+<span id="cb3-95"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## [1] 0.5370398</span></span></code></pre></div></div>
+</div>
+<p>As for the genotypes, we have 27 correlation coefficients, ranging from -0.999 to 0.985. We only have three couples of measurements per genotype and it is clear that this is not much, to reliably estimate a correlation coefficient. However, it is enough to be suspicious about the extent of correlation between yield and TKW, as it may depend on the genotype.</p>
+<p>On the other hand, the correlation within blocks is more constant, independent on the block and similar to the correlation between plots.</p>
+<p>It may be interesting to get an estimate of the average within-group correlation. To this aim, we can perform two separate ANOVAs (one per trait), including all relevant effects (blocks and genotypes) and calculate the correlation between the residuals:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">mod1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lm</span>(Yield <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">factor</span>(Block) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> Genotype, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> dataset)</span>
+<span id="cb4-2">mod2 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lm</span>(TKW <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">factor</span>(Block) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> Genotype, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> dataset)</span>
+<span id="cb4-3">wCor <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rcorr</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">residuals</span>(mod1), <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">residuals</span>(mod2))</span>
+<span id="cb4-4">wCor<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>r</span>
+<span id="cb4-5"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##            x          y</span></span>
+<span id="cb4-6"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## x 1.00000000 0.03133109</span></span>
+<span id="cb4-7"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## y 0.03133109 1.00000000</span></span>
+<span id="cb4-8">wCor<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>P</span>
+<span id="cb4-9"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##           x         y</span></span>
+<span id="cb4-10"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## x        NA 0.7812693</span></span>
+<span id="cb4-11"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## y 0.7812693        NA</span></span></code></pre></div></div>
+</div>
+<p>The average within-group correlation is very small and unsignificant. Let’s think about this correlation: residuals represent yield and TKW values for all plots, once the effects of blocks and genotypes have been removed. A high correlation of residuals would mean that, letting aside the effects of the block and genotype to which it belongs, a plot with a high value on yield also shows a high value on TKW. <strong>The correct conclusion, indeed, is that, once the effects of treatment ang grouping factors have been removed, there is no correlation between the traits under study.</strong></p>
+<p>But, this is not enough to stop our investigations. We could also consider the means for genotypes/blocks and see whether they are correlated. Blocks and genotypes are independent and, in principle, significance testing is permitted. However, this is not recommended with block means, as three data are too few to make any tests.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1">means <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aggregate</span>(dataset[,<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>)], <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(dataset<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>Genotype), mean)</span>
+<span id="cb5-2">rgPear <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rcorr</span>( <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.matrix</span>(means[,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>]) )</span>
+<span id="cb5-3">rgPear<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>r</span>
+<span id="cb5-4"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##             TKW     Yield</span></span>
+<span id="cb5-5"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## TKW   1.0000000 0.5855966</span></span>
+<span id="cb5-6"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## Yield 0.5855966 1.0000000</span></span>
+<span id="cb5-7">rgPear<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>P</span>
+<span id="cb5-8"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##              TKW      Yield</span></span>
+<span id="cb5-9"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## TKW           NA 0.00133149</span></span>
+<span id="cb5-10"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## Yield 0.00133149         NA</span></span>
+<span id="cb5-11"></span>
+<span id="cb5-12">means <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aggregate</span>(dataset[,<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>)], <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(dataset<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>Block), mean)</span>
+<span id="cb5-13">rbPear <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cor</span>( <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.matrix</span>(means[,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>]) )</span>
+<span id="cb5-14">rbPear</span>
+<span id="cb5-15"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">##               TKW       Yield</span></span>
+<span id="cb5-16"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## TKW    1.00000000 -0.08812544</span></span>
+<span id="cb5-17"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## Yield -0.08812544  1.00000000</span></span></code></pre></div></div>
+</div>
+<p>We note that the correlation between genotype means is high and significant. On the contrary, the correlation between block means is near to 0.</p>
+</section>
+<section id="and-so-what" class="level1">
+<h1>And so what?</h1>
+<p>At this stage, you may be confused… Let’s try to clear the fog.</p>
+<p>A naive correlation analysis on raw data brought us to the conclusion that yield and TKW are significantly correlated. Unfortunately, such a conclusion is overly simplistic and it is hardly supported by the data.</p>
+<p>A more careful process of data analysis should not neglect that in every designed field experiment we have groups of subjects and there are several possible types of correlation:</p>
+<ol type="1">
+<li>correlation between plot measurements (naive correlation)</li>
+<li>correlation between the residuals</li>
+<li>correlation between treatment/block means</li>
+</ol>
+<p>All these correlations should be investigated and used for interpretation.</p>
+<ol type="1">
+<li>The ‘naive’ correlation between the plot measurements is very easily calculated, but it is grossy misleading. Indeed, it disregards the treatment/block effects and it does not permit hypotheses testing, as the subjects are not independent. <strong>I think it is reasonable to suggest that the ‘naive’ correlation coefficient is never used for interpretation</strong>.</li>
+<li>The correlation between the residuals is a reliable measure of joint variation, because the experimental design is adequately referenced, by removing the effects of tratments/blocks. In this example, residuals are not correlated. Further analyses show that the correlation between yield and TKW, if any, may depend on the genotype, while it does not depend on the block.</li>
+<li>The correlation between treatment/block means permits to assess whether the treatment/block effects on the two traits are correlated. In this case, while we are not allowed to conclude that yield and TKW are, in general, correlated, we can conclude that the genotypes with a high level of yield also show a high level of TKW.</li>
+</ol>
+<p>An elegant and advanced method to tackle correlation analyses on data from designed field experiments has been put forward by Piepho (2018), within the frame of mixed models. But this deserves another post.</p>
+<p>Thanks for reading, and happy coding!</p>
+<p>(P.S. If you enjoyed this post, check out my book “Field Research Methods in Agriculture: An Introduction with R” via the link below!)</p>
+<p>Prof.&nbsp;Andrea Onofri<br>
+Department of Agricultural, Food and Environmental Sciences<br>
+University of Perugia (Italy)<br>
+Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<p><a href="https://www.awin1.com/cread.php?awinmid=26429&amp;awinaffid=2675822&amp;ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src="https://www.statforbiology.com/../Figures/Email_Signature_978-3-032-08199-5.png" alt="Book cover" class="cover" align="center"></a></p>
+<hr>
+</section>
+<section id="references" class="level1">
+<h1>References</h1>
+<ol type="1">
+<li>Bland, J.M., Altman, D.G., 1994. Statistics Notes: Correlation, regression, and repeated data. BMJ 308, 896–896.</li>
+<li>Piepho, H.-P., 2018. Allowing for the structure of a designed experiment when estimating and testing trait correlations. The Journal of Agricultural Science 156, 59–70.</li>
+</ol>
+<hr>
+<p>Originally published on 2019-04-30</p>
+
+
+</section>
+
+ ]]></description>
+  <category>R</category>
+  <category>correlation</category>
+  <category>R-bloggers</category>
+  <guid>https://www.statforbiology.com/posts/general_CorrelationIndependence1.html</guid>
+  <pubDate>Thu, 15 Oct 2026 22:00:00 GMT</pubDate>
+</item>
 <item>
   <title>A Trip from Covariance to Correlation and Back</title>
   <dc:creator>Andrea Onofri</dc:creator>
@@ -11250,288 +11874,6 @@ title: Homepage title
   <category>R</category>
   <guid>https://www.statforbiology.com/posts/R_BlogdownSteps.html</guid>
   <pubDate>Wed, 14 Nov 2018 23:00:00 GMT</pubDate>
-</item>
-<item>
-  <title>The Variance Puzzle: Why Doesn’t R Divide by ‘n’?</title>
-  <dc:creator>Andrea Onofri</dc:creator>
-  <link>https://www.statforbiology.com/posts/general_VarianceSamplePop.html</link>
-  <description><![CDATA[ 
-
-
-
-
-
-<p>Teaching Experimental Methodology in master’s courses related to agriculture poses some peculiar challenges. One of them is explaining the difference between <strong>population variance</strong> and <strong>sample variance</strong>.</p>
-<p>Students usually have little difficulty understanding that, since the mean represents the “centre” of a dataset, it is natural to measure the average squared distance of all observations from the mean. Of course, we square the distances because, otherwise, positive and negative deviations would cancel each other out.</p>
-<p>It therefore seems perfectly reasonable that the average squared distance (the <strong>variance</strong>) should be calculated as</p>
-<p><img src="https://latex.codecogs.com/png.latex?%7B%5Csigma%20%5E2%7D%20=%20%5Cfrac%7B%5Csum%5Climits_%7Bi%20=%201%7D%5En%20(%7BX_i%7D%20-%20%5Cmu%20)%5E2%7D%7Bn%7D"></p>
-<p>However, this is <strong>not</strong> what R (or most other statistical software) does. Instead, R divides by <img src="https://latex.codecogs.com/png.latex?n-1">, and at this point students inevitably ask:</p>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Important
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>“Why are you telling me to divide the sum of squares by <img src="https://latex.codecogs.com/png.latex?n-1"> instead of <img src="https://latex.codecogs.com/png.latex?n">? I have <img src="https://latex.codecogs.com/png.latex?n"> squared residuals, not <img src="https://latex.codecogs.com/png.latex?n-1">!”</p>
-</div>
-</div>
-<p>You might think that the answer is obvious. I do not.</p>
-<p>At this stage of the course, variance is introduced within the context of descriptive statistics. The students know nothing yet about probability distributions, sampling, statistical inference, or degrees of freedom. If I were teaching mathematics or statistics, I could impress the class with a formal proof showing that <img src="https://latex.codecogs.com/png.latex?n-1"> is the correct denominator whenever a sample is used to estimate the population variance. That proof can be found in virtually every statistics textbook, and I have reproduced it at the end of this post.</p>
-<p>However, I would never present that proof at this point. It assumes concepts that the students have not yet encountered, such as sampling distributions and standard errors. Moreover, agricultural students are generally not enthusiastic when mathematics becomes too abstract!</p>
-<p>Instead of trying to appear clever, I usually ask myself a different question:</p>
-<div class="callout callout-style-default callout-important callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Important
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Can we explain the difference between population variance and sample variance without mentioning degrees of freedom or any other difficult concepts?</p>
-</div>
-</div>
-<p>Here is the approach I usually take.</p>
-<p>Let’s consider a large but finite population—for example, one hectare of maize, containing roughly 70,000 plants. Imagine that we know the yield of every single plant. In R we can simulate such a population by generating random values between 150 and 250 g. (Agricultural students immediately recognise these as realistic values, and at this stage I deliberately avoid discussing probability distributions.)</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">set.seed</span>(<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1234</span>)</span>
-<span id="cb1-2">pop <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">runif</span>(<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">70000</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">min =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">150</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">max =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">250</span>)</span></code></pre></div></div>
-</div>
-<p>We now have our finite population. Since we know every individual, we can calculate both the population mean and the population variance—that is, the average squared distance of all 70,000 observations from their mean. Notice that I use the equation above, with <img src="https://latex.codecogs.com/png.latex?n"> in the denominator.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">mean</span>(pop) </span></code></pre></div></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 200.0893</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">sigma2 <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">sum</span>( ( pop <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">mean</span>(pop) )<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span> )<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">70000</span></span>
-<span id="cb4-2">sigma2</span></code></pre></div></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 835.184</code></pre>
-</div>
-</div>
-<p>Now let’s forget about the population. In practice, we would never measure the yield of every plant in a hectare because of limitations in time and resources. Instead, suppose we randomly select just ten plants (agricultural experiments often involve surprisingly small sample sizes!).</p>
-<p>We can obtain such a sample in R by drawing observations from the original population.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1">x <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">sample</span>(pop, <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">10</span>)</span>
-<span id="cb6-2">x</span></code></pre></div></div>
-<div class="cell-output cell-output-stdout">
-<pre><code> [1] 174.0269 239.5843 209.6669 222.3267 160.7107 229.6837 238.1470 202.0382
- [9] 249.2965 170.6348</code></pre>
-</div>
-</div>
-<p>Using the same formula as before (that is, dividing by <img src="https://latex.codecogs.com/png.latex?n=10">), we calculate the sample mean and sample variance.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">mean</span>(x) </span></code></pre></div></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 209.6116</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1">sigma2_s <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">sum</span>( ( x <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">mean</span>(x) )<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span> )<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">10</span> </span>
-<span id="cb10-2">sigma2_s</span></code></pre></div></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 908.6202</code></pre>
-</div>
-</div>
-<p>We do not know the population, only the sample. In the absence of any other information, the most reasonable assumption is that the population resembles the sample. The procedure used to obtain this guess is called an <strong>estimator</strong>, while the resulting value is an <strong>estimate</strong>.</p>
-<p>But is it a good estimator?</p>
-<p>We cannot tell from a single sample. Instead, we need to repeat the sampling process many times and examine how the estimates behave in the long run. An estimator is considered good if, on average, it converges to the true population value.</p>
-<p>Let’s repeat the sampling procedure 10,000 times, each time selecting ten plants and calculating both the sample mean and the sample variance.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1">meanS <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">c</span>();</span>
-<span id="cb12-2">varS <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">c</span>() </span>
-<span id="cb12-3"><span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">for</span>(i <span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">in</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">10000</span>){   </span>
-<span id="cb12-4">  x <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">sample</span>(pop, <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">10</span>)   </span>
-<span id="cb12-5">  meanS[i] <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">mean</span>(x)   </span>
-<span id="cb12-6">  varS[i] <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">sum</span>( ( x <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">mean</span>(x) )<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span> )<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">10</span> </span>
-<span id="cb12-7">  }</span>
-<span id="cb12-8"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">mean</span>(meanS)</span></code></pre></div></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 199.9096</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">mean</span>(varS)</span></code></pre></div></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 752.4658</code></pre>
-</div>
-</div>
-<p>The average of the 10,000 sample means is 199.91, which is extremely close to the true population mean. Therefore, the sample mean is an <strong>unbiased estimator</strong> of the population mean.</p>
-<p>The average of the 10,000 sample variances, however, is 752.47, which is noticeably smaller than the true population variance. In other words, if we divide by <img src="https://latex.codecogs.com/png.latex?n">, we systematically underestimate the population variance.</p>
-<p>Let’s examine the ratio between the true population variance and the average estimated variance:</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">var</span>(pop)<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">mean</span>(varS)</span></code></pre></div></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 1.109945</code></pre>
-</div>
-</div>
-<p>The result is approximately <img src="https://latex.codecogs.com/png.latex?10/9">.</p>
-<p>Therefore, if we</p>
-<ol type="1">
-<li>calculate the sample variance by dividing by <img src="https://latex.codecogs.com/png.latex?n">,</li>
-<li>multiply by <img src="https://latex.codecogs.com/png.latex?n">, and</li>
-<li>divide by <img src="https://latex.codecogs.com/png.latex?n-1">,</li>
-</ol>
-<p>we obtain an estimator that is correct on average.</p>
-<p>This leads to the familiar formula</p>
-<p><img src="https://latex.codecogs.com/png.latex?%7B%5Csigma%20%5E2%7D%20=%20%5Cfrac%7B%5Csum%5Climits_%7Bi%20=%201%7D%5En%20(%7BX_i%7D%20-%20m%20)%5E2%7D%7Bn%20-%201%7D"></p>
-<p>which is exactly the sample variance calculated by R.</p>
-<section id="which-formula-should-we-use" class="level1">
-<h1>Which formula should we use?</h1>
-<p>The answer is easy to remember.</p>
-<ol type="1">
-<li>If we know the entire population, the variance is the average squared deviation from the population mean, so we divide by <img src="https://latex.codecogs.com/png.latex?n">.</li>
-<li>If we only have a random sample and our goal is to estimate the population variance, we divide by <img src="https://latex.codecogs.com/png.latex?n-1">. Otherwise, our estimate will be systematically too small.</li>
-</ol>
-<p>Thanks for reading! And … don’t forget to check out my new book!</p>
-<p>Prof.&nbsp;Andrea Onofri<br>
-Department of Agricultural, Food and Environmental Sciences<br>
-University of Perugia (Italy)<br>
-Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
-<p><a href="https://www.awin1.com/cread.php?awinmid=26429&amp;awinaffid=2675822&amp;ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src="https://www.statforbiology.com/Figures/Email_Signature_978-3-032-08199-5.png" alt="Book cover" class="cover" align="center"></a></p>
-<hr>
-</section>
-<section id="the-formal-proof-look-how-clever-i-am" class="level1">
-<h1>The formal proof (look how clever I am!)</h1>
-<p>We have a population with mean equal to <img src="https://latex.codecogs.com/png.latex?%5Cmu"> and variance equal to <img src="https://latex.codecogs.com/png.latex?%5Csigma%5E2">. Let’s take a sample with its mean <img src="https://latex.codecogs.com/png.latex?m%20%5Cneq%20%5Cmu"> and <img src="https://latex.codecogs.com/png.latex?m%20-%20%5Cmu%20=%20%5Cvarepsilon">. For the population, we can write:</p>
-<p><img src="https://latex.codecogs.com/png.latex?%5Csum%5Climits_%7Bi%20=%201%7D%5En%20(X_i%20-%20%5Cmu%20)%5E2%20%20=%20%5Csum%5Climits_%7Bi%20=%201%7D%5En%20(X_%20i%20-%20m%20+%20%5Cvarepsilon)%5E2%20=%20%5Csum%5Climits_%7Bi%20=%201%7D%5En%20(%7BX_i%7D%20-%20m)%5E2%20+%20n%20%5Cvarepsilon%5E2"></p>
-<p>We already see that the sum of squared residuals is higher if we take <img src="https://latex.codecogs.com/png.latex?m"> instead of <img src="https://latex.codecogs.com/png.latex?%5Cmu">, unless <img src="https://latex.codecogs.com/png.latex?%5Cvarepsilon%20=%200">, i.e.&nbsp;<img src="https://latex.codecogs.com/png.latex?m%20=%20%5Cmu">. From the above, we derive</p>
-<p><img src="https://latex.codecogs.com/png.latex?%5Csum%5Climits_%7Bi%20=%201%7D%5En%20(X_i%20-%20%5Cmu)%5E2%20=%20%20%5Csum%5Climits_%7Bi%20=%201%7D%5En%20(X_i%20-%20%5Cmu%20)%5E2%20%20-%20n%20(%20%7Bm%20-%20%5Cmu%20%7D%20)%5E2"></p>
-<p>If we consider the first equation above (variance for the population) we have</p>
-<p><img src="https://latex.codecogs.com/png.latex?%5Csum%5Climits_%7Bi%20=%201%7D%5En%20(X_i%20-%20%5Cmu)%5E2%20=%20%20n%20%5Csigma%5E2%20-%20n(%20m%20-%20%5Cmu%20%20)%5E2"></p>
-<p>We see that the rightmost term of this equation (<img src="https://latex.codecogs.com/png.latex?n%20(%20m%20-%20%5Cmu%20%20)%5E2"> is the sum of squared distances for the sampling distribution of the mean. That is <img src="https://latex.codecogs.com/png.latex?n"> times the squared standard error. Therefore:</p>
-<p><img src="https://latex.codecogs.com/png.latex?%5Csum%5Climits_%7Bi%20=%201%7D%5En%20%7B%7B%7B(%7BX_i%7D%20-%20%5Cbar%20X)%7D%5E2%7D%20=%20%7D%20n%7B%5Csigma%20%5E2%7D%20-%20n%5Cleft(%20%7B%5Cfrac%7B%7B%7B%5Csigma%20%5E2%7D%7D%7D%7Bn%7D%7D%20%5Cright)"></p>
-<p>and</p>
-<p><img src="https://latex.codecogs.com/png.latex?%5Csum%5Climits_%7Bi%20=%201%7D%5En%20%7B%7B%7B(%7BX_i%7D%20-%20%5Cbar%20X)%7D%5E2%7D%20=%20%7D%20(n%20-%201)%7B%5Csigma%20%5E2%7D"></p>
-<p>Here we go! Indeed:</p>
-<p><img src="https://latex.codecogs.com/png.latex?%20%5Cfrac%7B%5Csum%5Climits_%7Bi%20=%201%7D%5En%20(X_i%20-%20m)%5E2%20%7D%7Bn%20-%201%7D%20=%20%7B%5Csigma%20%5E2%7D"></p>
-
-
-</section>
-
- ]]></description>
-  <category>descriptive statistics</category>
-  <category>R-bloggers</category>
-  <guid>https://www.statforbiology.com/posts/general_VarianceSamplePop.html</guid>
-  <pubDate>Thu, 08 Nov 2018 23:00:00 GMT</pubDate>
-  <media:content url="https://www.statforbiology.com/Figures/VarianceSamplePop.jpg" medium="image" type="image/jpeg"/>
 </item>
 </channel>
 </rss>
