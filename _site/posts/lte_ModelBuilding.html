@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Andrea Onofri">
+<meta name="dcterms.date" content="2020-08-20">
+
+<title>Building ANOVA-models for long-term experiments in agriculture – Statforbiology</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-40660c7df68f9134ae342454c17cf2af.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-GPNY1W5GL5"></script>
+
+<script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-GPNY1W5GL5', { 'anonymize_ip': true});
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Statforbiology</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../aboutThis.html"> 
+<span class="menu-text">About this site</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html"> 
+<span class="menu-text">About me</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Posts</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../tutorials.html"> 
+<span class="menu-text">Teaching material</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../Rpackages.html"> 
+<span class="menu-text">Companion R Packages</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../links.html"> 
+<span class="menu-text">Useful links</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/OnofriAndreaPG"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://bsky.app/profile/statforbiology.bsky.social"> <i class="bi bi-bluesky" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Building ANOVA-models for long-term experiments in agriculture</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">R</div>
+                <div class="quarto-category">long_term_experiments</div>
+                <div class="quarto-category">multi_environment_studies</div>
+                <div class="quarto-category">lme</div>
+                <div class="quarto-category">mixed_models</div>
+                <div class="quarto-category">R-bloggers</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Andrea Onofri </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">August 20, 2020</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<p>This is the follow-up of a manuscript that we (some colleagues and I) have published in 2016 in the European Journal of Agronomy (Onofri et al., 2016). I thought that it might be a good idea to rework some concepts to make them less formal, simpler to follow and more closely related to the implementation with R. Please, be patient: this lesson may be longer than usual.</p>
+<p>First question: what are long-term experiments? Agricultural experiments have to deal with long-term effects of cropping practices. Think about fertilisation: certain types of organic fertilisers may give effects on soil fertility, which are only observed after a relatively high number of years (say: 10-15). In order to observe those long-term effects, we need to plan Long Term Experiments (LTEs), wherein each plot is regarded as a small cropping system, with the selected combination of rotation, fertilisation, weed control and other cropping practices. Due to the fact that yield and other relevant variables are repeatedly recorded over time, LTEs represent a particular class of multi-environment experiments with repeated measures.</p>
+<section id="the-main-problem-with-ltes-lack-of-independence" class="level1">
+<h1>The main problem with LTEs: lack of independence</h1>
+<p>We know that, with linear models, once the effects of experimental factors have been accounted for, the residuals must be independent. Otherwise, inferences are invalid.</p>
+<p>With LTEs, observations are repeatedly taken on the same plot and, therefore, the residuals cannot be independent. Indeed, all measurements taken on one specific plot will be affected by the peculiar characteristics of that plot and they will be more alike than measurements taken in different plots. Thus, there will be a ‘plot’ effect, which will induce a within-plot correlation. The problem is: how do we restore the necessary independence of residuals?</p>
+<p>At the basic level, the main way to account for the ‘plot’ effect is by including a random term in the model; in this way, we recognise that there is a plot-to-plot variability, following a gaussian distribution, with mean equal to 0 and standard deviation equal to <span class="math inline">\(\sigma^2_B\)</span> (‘plot’ error). This plot-to-plot variability is additional to the usual residual variability (within-plot error), that is also gaussian with mean equal to 0 and standard deviation equal to <span class="math inline">\(\sigma^2\)</span>.</p>
+<p>As the result, if we take one observation, the variance will be equal to the sum <span class="math inline">\(\sigma^2_B + \sigma^2\)</span>. If we take two observations in different plots, they will have different random ‘plot’ effects and, thus, they will be independent. Otherwise, if we take two observations in the same plot, they will share the same random plot effect and they will ‘co-vary’, showing a positive covariance equal to <span class="math inline">\(\sigma^2_B\)</span>. The correlation among observations in the same plot will be quantified by the ratio <span class="math inline">\(\rho = \sigma^2_B / (\sigma^2_B + \sigma^2)\)</span> (intra-class correlation).</p>
+<p>In simple words, adding a random plot effect to the model accounts for the fact that observations in the same plot are correlated. This would be similar to a split-plot design (indeed, we talk about split-plot in time) with the important difference that the sub-plot factor (year) is not randomised. The correlation of observations in one plot will always be the same, independent from the year, which is known as Compound Symmetry (CS) correlation structure. Be careful: <strong>it may be more reasonable to assume that observations close in time are more correlated than observations distant in time</strong>, but we will address this point elsewhere.</p>
+<p>It is necessary to remember that, apart from plots, the experimental design may be characterised by other grouping structures, such as blocks or main plots. All these grouping structures must be appropriately referenced in the model, to account for intra-group correlation. I’ll be back into this in a few moments.</p>
+</section>
+<section id="another-problem-with-ltes-rotation-treatments" class="level1">
+<h1>Another problem with LTEs: rotation treatments</h1>
+<p>In many instances, the aim of LTEs is to compare different cropping systems, which are allocated to different plots, possibly in different blocks. When the different cropping systems involve rotations, we need to consider a very important rule, that was pointed out by W.G. Cochran in a seminal paper dating back to 1937: “<em>The most important rule about rotation experiments is that each crop in the rotation must be grown every year</em>”. If we do not follow this rule, “<em>the experiment has to last longer to obtain equal information on the long-term effects of the treatments</em>” and “<em>the effects of the treatments on the separate crops are obtained under different seasonal conditions, so that a compact summary of the results of the experiment as a whole is made exceedingly difficult</em>”.</p>
+<p>The above rule has important consequences: first of all, with, e.g., a three year rotation, we need three plots per treatment and per block in each year, which increases the size of the experiment (that’s why some LTEs are designed without within-year replicates; Patterson, 1964). Secondly, if we want to consider only one crop in the rotation, the experiment becomes unbalanced, as not all plots contribute useful data in each one year. Last, but not least, in long rotations the test crop may return onto the same plot after a relatively long period of time, which may create a totally different correlation structure, compared to short rotations.</p>
+</section>
+<section id="how-do-we-build-anova-like-models-for-ltes" class="level1">
+<h1>How do we build ‘ANOVA-like’ models for LTEs?</h1>
+<p>For the reasons explained above, building ANOVA-like models for data analyses may be a daunting task and it is useful to follow a structured procedure. First of all, we need to remember that ANOVA models are based on classification variables, commonly known as factors. There are three types of factors:</p>
+<ol type="1">
+<li>treatment factors, which are randomly allocated to randomisation units (e.g.&nbsp;rotations, fertilisations, management of crop residues);</li>
+<li>block factors, which group the observations according to some ‘innate’ (not randomly allocated) criterion (e.g.&nbsp;by position), such as the blocks, the locations, the main-plots, the sub-plots and so on. Block factors may represent the randomisation units, to which treatments are randomly allocated;</li>
+<li>repeated factors, which relate to time and thus cannot be randomised (e.g.&nbsp;years, cycles …).</li>
+</ol>
+<p>In order to build a model, the starting point is to list all factors (treatment, grouping and repeated) and their relationships. We can follow the general method proposed by Piepho et al.&nbsp;(2003), which we have slightly modified, to make it more ‘R-centric’. The relationships among factors can be specified by using the following operators:</p>
+<ol type="1">
+<li>the ‘colon’ operator denotes an interaction of crossed effects (e.g.&nbsp;A:B means that A and B are crossed factors);</li>
+<li>the ‘nesting’ operator denotes nested effects (e.g.&nbsp;A/B means that B is nested within A and it is equal to A + A:B);</li>
+<li>the ‘crossing’ operator denotes the full factorial model for two terms (A*B = A + B + A:B).</li>
+</ol>
+<p>When building models we need to pay attention to properly code interactions. Let’s have a look at a simple two-way ANOVA, with the ‘JohnsonGrass.csv’ dataset. In this case we have the two crossed effects Length and Timing and we could build a model as: ‘RIZOMEWEIGHT ~ LENGTH + TIMING + LENGTH:TIMING’ that is shortened as: ’RIZOMEWEIGHT ~ LENGTH*TIMING’. However, if we build our model as: ‘RIZOMEWEIGHT ~ LENGTH:TIMING’, the two main effects are ‘absorbed’ by the term ‘LENGTH:TIMING’, which is no longer an interaction. The code below may clear up what I mean.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(statforbiology)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> <span class="fu">getAgroData</span>(<span class="st">"JohnsonGrass"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>mod1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(RhizomeWeight <span class="sc">~</span> Length <span class="sc">+</span> Timing <span class="sc">+</span> Length<span class="sc">:</span>Timing, <span class="at">data =</span> dataset)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(mod1)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="do">## Analysis of Variance Table</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Response: RhizomeWeight</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="do">##               Df  Sum Sq Mean Sq F value    Pr(&gt;F)    </span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="do">## Length         2  1762.2   881.1  9.4795 0.0002961 ***</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="do">## Timing         5 16927.9  3385.6 36.4241 3.896e-16 ***</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="do">## Length:Timing 10   952.7    95.3  1.0250 0.4354263    </span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="do">## Residuals     54  5019.2    92.9                      </span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="do">## ---</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="do">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>mod2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(RhizomeWeight <span class="sc">~</span> Length<span class="sc">:</span>Timing, <span class="at">data =</span> dataset)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(mod2)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="do">## Analysis of Variance Table</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="do">## Response: RhizomeWeight</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="do">##               Df  Sum Sq Mean Sq F value    Pr(&gt;F)    </span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="do">## Length:Timing 17 19642.8 1155.46  12.431 4.766e-13 ***</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="do">## Residuals     54  5019.2   92.95                      </span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="do">## ---</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="do">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="steps-to-model-building" class="level1">
+<h1>Steps to model building</h1>
+<p>The steps to model building may be summarised as follows:</p>
+<ol type="1">
+<li>Select the repeated factor.</li>
+<li>Consider one fixed level of the repeated factor and build a treatment model for the randomized treatment factors.</li>
+<li>Consider one fixed level of the repeated factor and build a block model for block factors.</li>
+<li>Check whether randomised treatment factors might interact with block effects: if such an interaction is to be expected it should be added to the model.</li>
+<li>Include the unrandomised repeated factor into the model.</li>
+<li>Combine treatment model and repeated factor model, by crossing or nesting as appropriate.</li>
+<li>Consider which effects in the block model reference randomisation units, i.e.&nbsp;those units which receive the levels of a factor or factor combination by a randomisation process. It should be clear that randomisation units can be seen as randomly selected from a wider population. Therefore, the corresponding terms should be assigned a separate random effect, as explicitly recommended in Piepho (2004).</li>
+<li>Excluding the terms for randomisation units, nest the repeated factor in all the other terms in the block model.</li>
+<li>Combine random effects for randomisation units with the repeated factor, by using the colon operator, in order to derive the correct error terms to accommodate correlation structures.</li>
+<li>Apart from randomisation units (see #7), decide which factors are random and which are fixed. In our examples, the random model will include all random terms for randomisation units (terms at steps 7 and 9), while the fixed model will include all the other terms. Several extensions/changes to this basic approach are possible.</li>
+</ol>
+<p>The key idea for the above approach is that for a properly designed experiment, valid analyses should be possible for the data at each single level of the repeated factor. Such a basic requirement should never be taken for granted, but it should be carefully checked before the beginning of the model building process (see later for Example 3).</p>
+</section>
+<section id="some-further-definitions" class="level1">
+<h1>Some further definitions</h1>
+<p>It is perhaps important to clear up some definitions, which we will use afterwards. Each crop component in a rotation is usually known as a phase; e.g., in the rotation Maize-Wheat-Wheat, Maize is phase 1, Wheat is phase 2 and Wheat is phase 3. The number of phases defines the period (duration) of the rotation. All phases need to be contemporarily present in any one year and, therefore, we can define the so-called sequences: i.e.&nbsp;each of the <span class="math inline">\(n\)</span> possible arrangements for a rotation of <span class="math inline">\(n\)</span> years, having the same crop ordering, but different initial phases (e.g Maize - Wheat - Wheat, Wheat - Wheat - Maize and Wheat - Maize - Wheat). Each sequences is uniquely identified by its starting phase, which needs to be randomly allocated to each plot at the start of the experiment.</p>
+<hr>
+</section>
+<section id="examples" class="level1">
+<h1>Examples</h1>
+<p>In order to give a practical demonstration, we have selected five exemplary datasets, relating to LTEs with different designs. If you are in a hurry, you can follow the links below to jump directly to the example that is most relevant for you.</p>
+<ol type="1">
+<li>Example 1. <a href="#example-1-ltes-with-monocultures-or-perennial-crops">LTEs to compare monocultures or perennial crops</a></li>
+<li>Example 2. <a href="#example-2.-ltes-with-different-rotations-of-the-same-length-and-one-test-crop-per-rotation-cycle">LTEs to compare rotations of the same length and one test crop per rotation cycle</a></li>
+<li>Example 3. <a href="#example-3.-ltes-with-a-fixed-rotation-one-test-crop-per-cycle-and-different-treatments">LTEs with a fixed rotation (one test crop per cycle) and different treatments</a></li>
+<li>Example 4. <a href="#example-4.-lte-with-a-fixed-rotation-different-treatments-and-more-than-one-phase-per-crop-and-cycle">LTE with a fixed rotation, different treatments and more than one phase per crop and cycle</a></li>
+<li>Example 5. <a href="#example-5-ltes-with-several-rotations-of-different-lengths-and-different-number-of-phases-per-crop-and-rotation-cycle">LTEs with several rotations of different lengths and different number of phases per crop and rotation cycle</a></li>
+</ol>
+<p>We will analyse all examples, using the ‘tidyverse’ (Wickham, 2019) for data management and the ‘nlme’ package to fit random effect models (Pinheiro et al., 2019). We will also use the ‘asreml-R’ (Butler, 2019) package, for those of you who own a licence. Let’s load those packages in the R environment.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(statforbiology)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(nlme)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="example-1-ltes-with-monocultures-or-perennial-crops" class="level2">
+<h2 class="anchored" data-anchor-id="example-1-ltes-with-monocultures-or-perennial-crops">Example 1: LTEs with monocultures or perennial crops</h2>
+<p>Wheat is grown in continuous cropping from 1983 to 2012, with three fertilisation levels (150, 200 and 250 kg N ha<span class="math inline">\(^{-1}\)</span>), randomly assigned to three plots in each of three blocks. In all, there are nine plots with yearly sampling, with a total of 270 wheat yield observations in 30 years. The following figure shows the design for one block: the spatial split for each plot represents the actual temporal split.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../../../../../../../Figures/Stat_lte_ModelBuildingFigure1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:80.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>For this example, the repeated factor is the year (YEAR). In one year, the treatment factor is nitrogen fertilisation (N) and there are two block factors, i.e.&nbsp;the blocks (BLOCK) and the plots within each block (PLOT). Therefore, the block model is BLOCK + BLOCK:PLOT.</p>
+<p>We now introduce the repeated factor YEAR and combine it with the treatment model, by including N*YEAR = N + YEAR + N:YEAR. The term BLOCK:PLOT references the randomisation units and receives a random effect. As the year might interact with the block, we add the term BLOCK:YEAR. We also combine the year with the random effect for plots (BLOCK:PLOT:YEAR), although this residual term does not need to be explicitly coded when implementing the model. The final model is (the operator ~ means ‘is modelled as’):</p>
+<pre><code>YIELD ~ N + BLOCK + YEAR + N:YEAR + BLOCK:YEAR
+RANDOM = BLOCK:PLOT + BLOCK:PLOT:YEAR</code></pre>
+<p>Now we can use the above notation in R, as shown in the box below.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> statforbiology<span class="sc">::</span><span class="fu">getAgroData</span>(<span class="st">"LTE1"</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> dataset <span class="sc">|&gt;</span> </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(Block, Plot, Year, N), factor))</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dataset)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="do">##   Plot     N Year Block Yield</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 1   33 fn150 1983     1  4.54</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 2   98 fn150 1983     3  4.18</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 3  162 fn150 1983     2  3.70</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 4   33 fn150 1984     1  4.57</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="do">## 5   98 fn150 1984     3  5.04</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="do">## 6  162 fn150 1984     2  5.06</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Implementation with lme</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">&lt;-</span> <span class="fu">lme</span>(Yield <span class="sc">~</span> Block <span class="sc">+</span> Year <span class="sc">+</span> N <span class="sc">+</span> N<span class="sc">:</span>Year <span class="sc">+</span> Block<span class="sc">:</span>Year,</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>           <span class="at">random =</span> <span class="sc">~</span> <span class="dv">1</span><span class="sc">|</span>Plot, <span class="at">data =</span> dataset)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(mod)</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="do">##             numDF denDF  F-value p-value</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="do">## (Intercept)     1   116 5434.428  &lt;.0001</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="do">## Block           2     4    0.300  0.7564</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="do">## Year           29   116   36.496  &lt;.0001</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="do">## N               2     4    1.304  0.3664</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="do">## Year:N         58   116    1.663  0.0105</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="do">## Block:Year     58   116    2.545  &lt;.0001</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Implementation with asreml (the residual statement is unnecessary, here)</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Need to sort the data according to the residual statement</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="co"># datasetS &lt;- dataset %&gt;% </span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="co">#  arrange(Plot, Year)</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="co"># mod &lt;- asreml(Yield ~ Block + Year + N + N:Year + Block:Year,</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="co">#           random = ~ Plot, </span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="co">#           residual = ~ Plot:Year, data = datasetS)</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="co"># wald(mod)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>It is worth to notice that the same model may be fitted in an alternative way, i.e.&nbsp;by dropping the BLOCK:PLOT random effects and using the residual term BLOCK:PLOT:YEAR to accommodate the CS structure into the model. This may be done very intuitively with ‘asreml’, by using the following notation:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Code not run</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># mod &lt;- asreml(Yield ~ Block + Year + N + N:Year + Block:Year,</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">#           residual = ~ Plot:cor(Year), data = datasetS)</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># summary(mod)$varcomp</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>We see that the final command returns the correlation between observations in the same plot. With ‘lme’ package, the notation is different, as we have to switch from the ‘lme()’ to the ‘gls()’ function:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">&lt;-</span> <span class="fu">gls</span>(Yield <span class="sc">~</span> Block <span class="sc">+</span> Year <span class="sc">+</span> N <span class="sc">+</span> N<span class="sc">:</span>Year <span class="sc">+</span> Block<span class="sc">:</span>Year,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">correlation =</span> <span class="fu">corCompSymm</span>(<span class="at">form =</span> <span class="sc">~</span><span class="dv">1</span><span class="sc">|</span>Plot), <span class="at">data =</span> dataset)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>mod<span class="sc">$</span>modelStruct<span class="sc">$</span>corStruct</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Correlation structure of class corCompSymm representing</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="do">##       Rho </span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="do">## 0.1269864</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>This alternative coding can be used to implement different correlation structures for the cases when a simple CS correlation structure is not satisfactory. For example, when the observations close in time are more correlated than those distant in time, we can implement a serial correlation structure by appropriately changing the ‘residual’ argument in ‘asreml()’ or the ‘correlation’ argument in ‘lme()’.</p>
+</section>
+<section id="example-2.-ltes-with-different-rotations-of-the-same-length-and-one-test-crop-per-rotation-cycle" class="level2">
+<h2 class="anchored" data-anchor-id="example-2.-ltes-with-different-rotations-of-the-same-length-and-one-test-crop-per-rotation-cycle">Example 2. LTEs with different rotations of the same length and one test crop per rotation cycle</h2>
+<p>Wheat is grown in five types of two-year rotations, with either pea (<em>Pisum sativum</em> L), grain sorghum (<em>Sorghum bicolor</em> (L.) Moench), sugar beet (<em>Beta vulgaris</em> L. subsp. <em>saccharifera</em>), sunflower (<em>Helianthus annuus</em> L.) and faba bean (<em>Vicia faba</em> L. subsp. <em>minor</em>). For each rotation, there are two possible sequences (wheat in odd years and wheat in even years) and the ten combinations (five rotations by two sequences) are completely randomised to ten plots per each of three blocks (Figure 2). Therefore, five wheat plots out of the available ten plots are used from each block and year, for a total of 450 observations, from 1983 to 2012. The experimental design for one block is shown in the figure below.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../../../../../../../Figures/Stat_lte_ModelBuildingFigure2.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:90.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>In this example we have two crops in a rotation and both crops are grown in different plots in the same year. Thus, for each rotation, we have two sequences in time (e.g., maize-sunflower and sunflower-maize). If we consider only one of the two crops, the main difference with respect to Example 1 is that the data obtained in two consecutive years for the same treatment and block are independent, in the sense that they are obtained in different plots. Otherwise, data obtained in a two-year interval (on different rotation cycles) on the same block are correlated, as they originate from the same plot.</p>
+<p>Which is the repeated factor? Indeed, if we look only at one phase in the rotation (in this case wheat), we note that observations are repeated every second year on the same plot (Figure above), according to the sequence they belong to. In other words, observations are repeated on each rotation cycle (CYC; two years) in the same plot, while there is neither a within-cycle repetition nor a within-cycle phase difference: we have only one observation per plot per cycle. Therefore, it is natural to take the rotation cycle as the repeated factor (CYC instead of YEAR).</p>
+<p>As the next step, we should look at what happens in one fixed level of CYC: what did we randomize to the ten plots in a two-years time slot? It is clear that, considering only wheat, we randomised each combination of rotation (ROT) and positioning in the sequence (SEQ; i.e.&nbsp;wheat as the first crop of the sequence and wheat as the second crop of the sequence). Therefore, the treatment factors are ROT and SEQ. Now we can cross the repeated factor with the treatment factors. Accordingly, The model is:</p>
+<pre><code>YIELD ~ SEQ*ROT + BLOCK + CYC + ROT:CYC + BLOCK:CYC
+RANDOM: BLOCK:PLOT + BLOCK:PLOT:CYC </code></pre>
+<p>The code below shows how to fit the model with R.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> statforbiology<span class="sc">::</span><span class="fu">getAgroData</span>(<span class="st">"LTE2"</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> dataset <span class="sc">|&gt;</span> </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">7</span>), factor))</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dataset)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="do">##   Block Main Plot Rot Year Sequence Cycle Yield</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 1     1  1_1    4 SBW 1983        1     1  5.10</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 2     3  3_1   70 SBW 1983        1     1  4.50</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 3     2  2_1  135 SBW 1983        1     1  4.53</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 4     1  1_0   27 SBW 1984        0     1  5.83</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="do">## 5     3  3_0   95 SBW 1984        0     1  6.26</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="do">## 6     2  2_0  160 SBW 1984        0     1  6.22</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Implementation with lme</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">&lt;-</span> <span class="fu">lme</span>(Yield <span class="sc">~</span> Block <span class="sc">+</span> Rot<span class="sc">*</span>Sequence <span class="sc">+</span> Block<span class="sc">:</span>Sequence <span class="sc">+</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>             Cycle <span class="sc">+</span> Cycle<span class="sc">:</span>Sequence <span class="sc">+</span> Rot<span class="sc">:</span>Cycle <span class="sc">+</span> </span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>             Rot<span class="sc">:</span>Sequence<span class="sc">:</span>Cycle <span class="sc">+</span> Cycle<span class="sc">:</span>Block <span class="sc">+</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>             Cycle<span class="sc">:</span>Block<span class="sc">:</span>Sequence,</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>             <span class="at">random =</span> <span class="sc">~</span><span class="dv">1</span><span class="sc">|</span>Plot,</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>           <span class="at">data =</span> dataset)</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(mod)</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="do">##                      numDF denDF   F-value p-value</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="do">## (Intercept)              1   224 115809.71  &lt;.0001</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="do">## Block                    2    16     42.68  &lt;.0001</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="do">## Rot                      4    16      4.19  0.0165</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="do">## Sequence                 1    16     26.14  0.0001</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="do">## Cycle                   14   224    133.43  &lt;.0001</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="do">## Rot:Sequence             4    16      3.60  0.0283</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span class="do">## Block:Sequence           2    16      2.24  0.1384</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="do">## Sequence:Cycle          14   224    119.86  &lt;.0001</span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="do">## Rot:Cycle               56   224      1.74  0.0025</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="do">## Block:Cycle             28   224      8.77  &lt;.0001</span></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="do">## Rot:Sequence:Cycle      56   224      1.61  0.0081</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="do">## Block:Sequence:Cycle    28   224      6.85  &lt;.0001</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>This approach is commonly suggested in literature (see Yates, 1954) and it is convenient, mainly because the resulting model is orthogonal and may be fitted by ordinary least squares. Indeed, for Dataset 2 (and similar experiments), there is only one observation for each block, treatment, cycle, sequence and no missing data (in our case: 3 blocks x 5 rotations x 2 sequences x 15 cycles = 450 observations). The phase should not enter into this model, as we are looking only at one of the two crops (only one phase).</p>
+<p>However, the drawback is that such an approach cannot be immediately extended to the other more complex examples (e.g.&nbsp;rotations with different lengths and/or with a different number of test-crops). Furthermore, the effect of years is partitioned into three components, i.e.&nbsp;‘cycles’, ‘sequences’ and ‘cycle x sequences’, which might make modeling possible ’fertility’ trends over time less immediate. In this respect, we should note that possible differences between sequences for a given cycle (wheat as the first crop of the sequence and wheat as the second crop of the sequence, i.e.&nbsp;wheat in even years and wheat in odd years) do not carry any meaning that helps understand the behaviour of rotations.</p>
+<p>An alternative and more natural approach is to take the year as the repeated factor; indeed, for Example 2, the year effect is totally confounded with the factorial combination of ‘cycle’ and ‘sequence’ (15 cycles x 2 sequences = 30 years). If we consider the YEAR as the repeated factor, in one year the treatment model is composed only by the rotation (ROT), that is allocated to plots (PLOT), within blocks. The block model for one year is BLOCK/PLOT = BLOCK + BLOCK:PLOT. We can combine the treatment model with the repeated factor (ROT:YEAR) and add the term BLOCK:YEAR. The final model is:</p>
+<pre><code>YIELD ~ ROT + BLOCK + YEAR + ROT:YEAR + BLOCK:YEAR
+RANDOM: BLOCK:PLOT + BLOCK:PLOT:YEAR </code></pre>
+<p>Apart from random effects for randomisation units, this model is totally similar to the one used for multi-environment genotype experiments and, represents a convenient and clear platform for the analyses of LTE data. We remind the reader that the residual term (BLOCK:PLOT:YEAR) does not need to be explicitly coded when implementing the model.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Implementation with lme</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">&lt;-</span> <span class="fu">lme</span>(Yield <span class="sc">~</span> Block <span class="sc">+</span> Rot <span class="sc">+</span> Year <span class="sc">+</span> Rot<span class="sc">:</span>Year <span class="sc">+</span> Block<span class="sc">:</span>Year,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">random =</span> <span class="sc">~</span><span class="dv">1</span><span class="sc">|</span>Plot,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">data =</span> dataset)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>This gives us a good common modelling platform for all datasets, although it may be argued that the models are no longer orthogonal, as not all plots produce data in all years. It should be recognised, however, that the lack of orthogonality can easily be accommodated within mixed models.</p>
+<p>The situation is totally different if we look at both the phases of the rotation (e.g.&nbsp;wheat and sunflower): in this case, we have a phase difference within each cycle and, considering one level of the repeated factor year, the treatment model should contain both the rotation and the phase, together with their interaction. When we introduce the year (steps 5 and 6 above), we also introduce the interactions ‘year x rotation’, ‘year x phase’ and ‘year x rotation x phase’, which are all meaningful when studying the behaviour of rotations.</p>
+</section>
+<section id="example-3.-ltes-with-a-fixed-rotation-one-test-crop-per-cycle-and-different-treatments" class="level2">
+<h2 class="anchored" data-anchor-id="example-3.-ltes-with-a-fixed-rotation-one-test-crop-per-cycle-and-different-treatments">Example 3. LTEs with a fixed rotation (one test crop per cycle) and different treatments</h2>
+<p>Durum wheat (<em>Triticum durum</em> L.) is grown in a two-year rotation with a spring crop and nine cropping systems, consisting of the factorial combination of three soil tillage methods (CT: conventional 40 cm deep ploughing; M: scarification at 25 cm; S: sod seeding with chemical desiccation and chopping) and three N-fertilisation levels (N0, N90 and N180, corresponding to 0, 90 and 180 kg N <span class="math inline">\(ha^{-1}\)</span>). The two possible rotation sequences (wheat-spring crop and spring crop-wheat) are arranged in two adjacent fields, which therefore host the two different crops of the rotation in the same year. Within the two fields, there are two independent randomisations, each with two blocks, tillage levels randomised to main-plots (1500 <span class="math inline">\(m^2\)</span>) and N levels randomised to sub-plots (500 <span class="math inline">\(m^2\)</span>), according to a split-plot design with two replicates. The design is taken from Seddaiu et al.&nbsp;(2016), while the data have been simulated by using Monte Carlo methods.</p>
+<p>This type of LTE is very similar to the previous one, though we have a different experimental layout:</p>
+<ol type="1">
+<li>there are two experimental treatments, laid out in a split-plot design;</li>
+<li>the two sequences are accommodated in two fields.</li>
+</ol>
+<p>The experimental design for Dataset 3, for each of two fields in one year is reported in the figure below. The position of wheat and spring crop is exchanged in the following year (CT: conventional ploughing; M: scarification; S: sod seeding; 0: no nitrogen fertilisation; 1: 90 kg N <span class="math inline">\(ha^{-1}\)</span>; 2: 180 kg N <span class="math inline">\(ha^{-1}\)</span>).</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../../../../../../../Figures/Stat_lte_ModelBuildingFigure3.jpg" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:90.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Before proceeding to model building for Example 3, we need to discuss whether valid analyses are possible at each single level of the repeated factor. Indeed, this is clearly true if we take the year as the repeated factor and consider only one of the two crops in the rotation (wheat, in this case). However, if we intended to consider both crops and compare e.g.&nbsp;their yields, the crop effect would be confounded with the field effect within a single year and, therefore, valid within-year analyses would not be possible. In this case, we should resort to taking the rotation cycle as the repeated factor.</p>
+<p>Dealing only with wheat, we can therefore take the YEAR as the repeated factor and consider that, in one year, the randomised treatment factors are tillage (T) and nitrogen fertilisation (N) and the treatment model is T + N + T:N.</p>
+<p>The block factors are the FIELDS, the BLOCKS within fields, the MAIN plots within blocks and the subplots (SUB) within main plots. The block model (for one year) is FIELD + FIELD:BLOCK + FIELD:BLOCK:MAIN + FIELD:BLOCK:MAIN:SUB.</p>
+<p>The treatment and repeated model can be combined as: (T + N + T:N)*YEAR = T + N + T:N + YEAR + T:YEAR + N:YEAR + T:N:YEAR.</p>
+<p>At this stage, the FIELD main effect needs to be removed, as it is totally confounded with the years. We assign a random effect to the other randomisation units, i.e.&nbsp;FIELD:BLOCK, FIELD:BLOCK:MAIN and FIELD:BLOCK:MAIN:SUB and combine these random terms with the repeated factor YEAR, by using the colon operator, which leads us to:</p>
+<pre><code>YIELD ~ T + N + T:N + YEAR + T:YEAR + N:YEAR + T:N:YEAR
+RANDOM: FIELD:BLOCK + FIELD:BLOCK:MAIN + FIELD:BLOCK:MAIN:SUB + FIELD:BLOCK:YEAR + FIELD:BLOCK:MAIN:YEAR + FIELD:BLOCK:MAIN:SUB:YEAR</code></pre>
+<p>As usual, the last term (residual) does not need to be explicitly included when implementing the model, but it can be used, together with the two previous ones (FIELD:BLOCK:YEAR + FIELD:BLOCK:MAIN:YEAR) to accommodate possible serial correlation structures into the model, by allowing year-specifity of all design effects and the residuals. For this types of models with several crossed random effects, the coding of ‘lme()’ is not straightforward and it does not always lead to a flexible implementation of correlation structures.</p>
+<p>In the code below we need to build dummy variables for all random effects (five variables, excluding the residual error term, which is not needed). Afterwards, we have to code the random effects as a list; R expects that the element of such list are nested and, therefore, we need to work around this by coding an additional variable, which takes the value of ‘1’ for all subjects, so that the nesting structure is only artificial. We use the ‘pdIdent’ construct to say that each random effect is homoscedastic and uncorrelated.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> statforbiology<span class="sc">::</span><span class="fu">getAgroData</span>(<span class="st">"LTE3"</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> dataset <span class="sc">|&gt;</span> </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>), factor)) <span class="sc">|&gt;</span> </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">FB =</span> <span class="fu">factor</span>(Block<span class="sc">:</span>Field),</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">FBM =</span> <span class="fu">factor</span>(FB<span class="sc">:</span>Main),</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">FBMS =</span> <span class="fu">factor</span>(FBM<span class="sc">:</span>Sub),</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">FBY =</span> <span class="fu">factor</span>(FB<span class="sc">:</span>Year),</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">FBMY =</span> <span class="fu">factor</span>(FBM<span class="sc">:</span>Year),</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">one =</span> <span class="dv">1</span>L)</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">&lt;-</span> <span class="fu">lme</span>(Yield <span class="sc">~</span> T <span class="sc">+</span> N <span class="sc">+</span> N<span class="sc">:</span>T <span class="sc">+</span> </span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>                 Year <span class="sc">+</span> Year<span class="sc">:</span>T <span class="sc">+</span> Year<span class="sc">:</span>N <span class="sc">+</span> Year<span class="sc">:</span>N<span class="sc">:</span>T,</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>                 <span class="at">random =</span> <span class="fu">list</span>(<span class="at">one =</span> <span class="fu">pdIdent</span>(<span class="sc">~</span>FB <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>                               <span class="at">one =</span> <span class="fu">pdIdent</span>(<span class="sc">~</span>FBM <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>                               <span class="at">one =</span> <span class="fu">pdIdent</span>(<span class="sc">~</span>FBMS <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>                               <span class="at">one =</span> <span class="fu">pdIdent</span>(<span class="sc">~</span>FBY <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>                               <span class="at">one =</span> <span class="fu">pdIdent</span>(<span class="sc">~</span>FBMY <span class="sc">-</span> <span class="dv">1</span>)),</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> dataset, <span class="at">na.action =</span> na.omit)</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Fixed effects tested by using LRT</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(car)</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="fu">Anova</span>(mod)</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="do">## Analysis of Deviance Table (Type II tests)</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a><span class="do">## Response: Yield</span></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a><span class="do">##             Chisq Df Pr(&gt;Chisq)    </span></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a><span class="do">## T          5.1169  2    0.07743 .  </span></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a><span class="do">## N        804.1717  2  &lt; 2.2e-16 ***</span></span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a><span class="do">## Year     446.6794 17  &lt; 2.2e-16 ***</span></span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a><span class="do">## T:N        6.2105  4    0.18397    </span></span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a><span class="do">## T:Year   142.5132 34  3.065e-15 ***</span></span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a><span class="do">## N:Year   246.5584 34  &lt; 2.2e-16 ***</span></span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a><span class="do">## T:N:Year 159.3230 68  2.705e-09 ***</span></span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a><span class="do">## ---</span></span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a><span class="do">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The fit takes a long time and it is not easy to manipulate the model to introduce correlation structures for the random effects. However, it is not difficult to introduce the correlation of residuals, by using the ‘correlation’ argument (see above).</p>
+<p>Coding the same model with ‘asreml()’ is easier and so is to introduce patterned correlations structures. However, the design has to be balanced and, therefore, we need to introduce NAs for missing observations.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Asreml fit (not run)</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># datasetS &lt;- dataset %&gt;% </span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">#  arrange(Sub, Year)</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># mod2 &lt;- asreml(Yield ~ T + N + N:T + </span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">#                 Year + Year:T + Year:N + Year:N:T,</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">#                 random = ~FB + FB:Main + FB:Main:Sub + </span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co">#                 FB:Year + FB:Main:Year,</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co">#               residual = ~ Sub:Year,</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co">#               data = datasetS)</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co"># summary(mod2)$varcomp</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="example-4.-lte-with-a-fixed-rotation-different-treatments-and-more-than-one-phase-per-crop-and-cycle" class="level2">
+<h2 class="anchored" data-anchor-id="example-4.-lte-with-a-fixed-rotation-different-treatments-and-more-than-one-phase-per-crop-and-cycle">Example 4. LTE with a fixed rotation, different treatments and more than one phase per crop and cycle</h2>
+<p>Wheat is grown in a three-year rotation maize-wheat-wheat, under two types of management of crop residues (burial and removal), which are randomised to main plots, while the three possible rotation sequences are randomised to subplots. This experiment has 18 plots (three sequences x two treatment levels x three blocks) and, in every year, 12 of those are cropped with wheat and six with maize.</p>
+<p>Also in this case, the response variable is wheat yield from 1983 to 2012, i.e.&nbsp;twelve observations per year and 360 observations in total. Data obtained in the same plot in different years belong to two different phases (wheat after maize and wheat after wheat; the experimental design for one block is shown in the figure below).</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../../../../../../../../Figures/Stat_lte_ModelBuildingFigure4.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:80.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>With respect to Example 3, the situation becomes more complex, because we have two distinct phases in each rotation cycle (phase difference: wheat after maize and wheat after wheat). As usual, we start by regarding the YEAR as the repeated factor. In one year, the treatment factors are the management of soil residues (RES, that is randomly allocated to main-plots) and the phases (P; randomly allocated to subplots); the treatment model is indeed: RES*P.</p>
+<p>In one year, the block model is: BLOCK/MAIN/SUB = BLOCK + BLOCK:MAIN + BLOCK:MAIN:SUB. Introducing the YEAR as repeated factor, we can combine the treatment model with the repeated model as: RES + P + RES:P + YEAR + RES:YEAR + P:YEAR + RES:P:YEAR.</p>
+<p>The terms BLOCK:MAIN and BLOCK:MAIN:SUB reference randomisation units and should receive random effects. The blocks may interact with the years (BLOCK:YEAR), while the random effects for randomisation units can be made year-specific by adding BLOCK:MAIN:YEAR and the residual term BLOCK:MAIN:SUB:YEAR. The final model is:</p>
+<pre><code>YIELD ~ RES + P + RES:P + YEAR + RES:YEAR + P:YEAR + RES:P:YEAR + BLOCK + BLOCK:YEAR
+RANDOM: BLOCK:MAIN + BLOCK:MAIN:SUB + BLOCK:MAIN:YEAR + BLOCK:MAIN:SUB:YEAR</code></pre>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> statforbiology<span class="sc">::</span><span class="fu">getAgroData</span>(<span class="st">"LTE4"</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> dataset <span class="sc">|&gt;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">7</span>), factor)) <span class="sc">|&gt;</span> </span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Main =</span> <span class="fu">factor</span>(Block<span class="sc">:</span>Res),</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">Sub =</span> <span class="fu">factor</span>(Main<span class="sc">:</span>Sub))</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">&lt;-</span> <span class="fu">lme</span>(Yield <span class="sc">~</span> Block <span class="sc">+</span> Res<span class="sc">*</span>P <span class="sc">+</span> </span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>              Year <span class="sc">+</span> Year<span class="sc">:</span>Res <span class="sc">+</span> Year<span class="sc">:</span>P <span class="sc">+</span> Year<span class="sc">:</span>Res<span class="sc">:</span>P <span class="sc">+</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>              Block<span class="sc">:</span>Year, </span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>           <span class="at">random =</span> <span class="fu">list</span>(<span class="at">Main =</span> <span class="fu">pdIdent</span>(<span class="sc">~</span><span class="dv">1</span>),</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>                         <span class="at">Main =</span> <span class="fu">pdIdent</span>(<span class="sc">~</span>Sub <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>                         <span class="at">Main =</span> <span class="fu">pdIdent</span>(<span class="sc">~</span>Year <span class="sc">-</span> <span class="dv">1</span>)),</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>           <span class="at">data =</span> dataset)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="example-5-ltes-with-several-rotations-of-different-lengths-and-different-number-of-phases-per-crop-and-rotation-cycle" class="level2">
+<h2 class="anchored" data-anchor-id="example-5-ltes-with-several-rotations-of-different-lengths-and-different-number-of-phases-per-crop-and-rotation-cycle">Example 5: LTEs with several rotations of different lengths and different number of phases per crop and rotation cycle</h2>
+<p>Wheat is grown in five maize (M) - wheat (W) rotations of different lengths, i.e.&nbsp;M-W, M-W-W, M-W-W-W, M-W-W-W-W, M-W-W-W-W-W. For all rotations, all phases are contemporarily present in each year, for a total of 20 plots (one for each of the possible sequences, i.e.&nbsp;2 + 3 + 4 + 5 + 6 = 20) in each of three blocks. Considering wheat yield as the response variable, we find that only 15 observations are obtained in each year, for a total of 1350 data, from 1983 to 2012.</p>
+<p>Experiments of this type represent a high degree of complexity. Indeed, in contrast to all other examples, after 30 years there are plots with: (i) a different number of observations for the same test crop; (ii) a different number of cycles (in some cases the last cycle is also incomplete); (iii) a different number of phases for wheat.</p>
+<p>In some cases, it is necessary to compare several rotations with different characteristics (e.g.&nbsp;a different duration and/or a different number of tests crops and /or a different number of phases per crop), which may create a complex design with some degree of non-orthogonality.</p>
+<p>The repeated factor is again the YEAR. In one year, the treatment factors are the rotation system (ROT) and the rotation phase (P), which are randomly allocated to plots. As there is a different number of phases for each rotation, we nest the phase within the rotation, leading to the following treatment model: ROT/P = ROT + P:ROT.</p>
+<p>In one year, the block model is BLOCK/PLOT = BLOCK + BLOCK:PLOT. The repeated factor is included and combined with the treatment model, by introducing YEAR + ROT:YEAR + ROT:P:YEAR.</p>
+<p>The term BLOCK:PLOT references randomisation units and needs to receive a random effect, while the term YEAR:BLOCK can be added to the model, together with the residual term BLOCK:PLOT:YEAR. The final model is:</p>
+<pre><code>YIELD ~ ROT + P:ROT + YEAR + ROT:YEAR + ROT:P:YEAR
+RANDOM: BLOCK:PLOT + BLOCK:PLOT:YEAR</code></pre>
+<p>In the implementation below we did not succeed reaching convergence with ‘lme()’, but we were successful ‘with asreml()’.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> <span class="fu">getAgroData</span>(<span class="st">"LTE5"</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> dataset <span class="sc">|&gt;</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">7</span>), factor))</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co"># mod &lt;- asreml(Yield ~ Block + Rot + Rot:P + </span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co">#                 Year + Year:Rot + Year:Rot:P + Block:Year,</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co">#               random = ~Plot,</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co">#               data = dataset)</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="co"># mod &lt;- lme(Yield ~ Block + Rot + Rot:P + </span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="co">#                Year + Year:Rot + Year:Rot:P + Block:Year, </span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="co">#                random=~1|Plot,</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="co">#              data = dataset)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+</section>
+<section id="warning" class="level1">
+<h1>Warning!</h1>
+<p>Models 1 to 5 are fairly similar and they are very closely related to those used for multi-environment experiments. However, there are some peculiar aspects which needs to be taken under consideration.</p>
+<ol type="1">
+<li>Apart from Dataset 1, there is always a certain degree of unbalance, as plots do not produce data every year. Testing for fixed effects requires great care.</li>
+<li>In all cases, the model formulations shown above induce a compound symmetry correlation structure for observations taken in the same plot over time (‘split-plot in time’). This is seldom appropriate and, thus, more complex correlations structures should be considered.</li>
+<li>In the above formulations, only randomisation units have been given a random effect, while all the other effects have been regarded as fixed. Obviously, depending on the aims of the analyses, it might be convenient and appropriate to regard some of these effects (e.g., the year main effect and interactions) as random.</li>
+</ol>
+<p>It’s all, thanks for reading this far. If you have any comments, please, drop me a note at <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a>.</p>
+<p>Happy coding!</p>
+<p>(P.S. If you enjoyed this post, check out my book “Field Research Methods in Agriculture: An Introduction with R” via the link below!)</p>
+<p>Prof.&nbsp;Andrea Onofri<br>
+Department of Agricultural, Food and Environmental Sciences<br>
+University of Perugia (Italy)<br>
+Send comments to: <a href="mailto:andrea.onofri@unipg.it">andrea.onofri@unipg.it</a></p>
+<p><a href="https://www.awin1.com/cread.php?awinmid=26429&amp;awinaffid=2675822&amp;ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src="../../Figures/Email_Signature_978-3-032-08199-5.png" alt="Book cover" class="cover" align="center"></a></p>
+<hr>
+</section>
+<section id="references" class="level1">
+<h1>References</h1>
+<ol type="1">
+<li>Brien, C.J., Demetrio, C.G.B., 2009. Formulating mixed models for experiments, including longitudinal experiments. Journal of Agricultural, Biological and Environmental Statistics 14, 253–280.</li>
+<li>David Butler (2019). asreml: Fits the Linear Mixed Model. R package version 4.1.0.110. www.vsni.co.uk</li>
+<li>Cochran, W.G., 1939. Long-Term Agricultural Experiments. Supplement to the Journal of the Royal Statistical Society 6, 104–148.</li>
+<li>Onofri, A., Seddaiu, G., Piepho, H.-P., 2016. Long-Term Experiments with cropping systems: Case studies on data analysis. European Journal of Agronomy 77, 223–235.</li>
+<li>Patterson, H.D., 1964. Theory of Cyclic Rotation Experiments. Journal of the Royal Statistical Society. Series B (Methodological) 26, 1–45.</li>
+<li>Payne, R.W., 2015. The design and analysis of long-term rotation experiments. Agronomy Journal 107, 772–785.</li>
+<li>Piepho, H.-P., Büchse, A., Emrich, K., 2003. A Hitchhiker’s Guide to Mixed Models for Randomized Experiments. Journal of Agronomy and Crop Science 189, 310–322.</li>
+<li>Piepho, H.-P., Büchse, A., Richter, C., 2004. A Mixed Modelling Approach for Randomized Experiments with Repeated Measures. Journal of Agronomy and Crop Science 190, 230–247.</li>
+<li>Pinheiro J, Bates D, DebRoy S, Sarkar D, R Core Team (2019). <em>nlme: Linear and Nonlinear Mixed Effects Models</em>. R package version 3.1-142, &lt;URL: https://CRAN.R-project.org/package=nlme&gt;.</li>
+<li>Seddaiu, G., Iocola, I., Farina, R., Orsini, R., Iezzi, G., Roggero, P.P., 2016. Long term effects of tillage practices and N fertilization in rainfed Mediterranean cropping systems: durum wheat, sunflower and maize grain yield. European Journal of Agronomy 77, 166–178. https://doi.org/10.1016/j.eja.2016.02.008</li>
+<li>Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Software, 4(43), 1686, https://doi.org/10.21105/joss.01686.</li>
+</ol>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/www\.statforbiology\.com");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<hr>
+<p><br> Copyright © 2018-2026 by Andrea Onofri is licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1">CC BY 4.0</a> <img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"> <img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"> <img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1"> <img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/sa.svg?ref=chooser-v1"> This site was built with Quarto.</p>
+</div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
