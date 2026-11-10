@@ -4,17 +4,19 @@ subtitle: 'Spoiler: no, we cannot...'
 author: Andrea Onofri
 date: '2026-10-16'
 categories:
-  - R
-  - correlation
-  - 'R-bloggers'
+- R
+- correlation
+- R-bloggers
 tags:
-  - R
-  - correlation
+- R
+- correlation
 aliases:
-  - /dealing-with-correlation-in-designed-field-experiments-part-i/index.html 
+- /dealing-with-correlation-in-designed-field-experiments-part-i/index.html
+image: "/Figures/CorrelationIndependence1.png" 
 ---
 
-One of the fundamental aims of field experiments is to explorare the relationships between several experimental traits, which have been recorded/measured altogheter for all the experimental units. For example, think about a genotype experiment with 27 winter wheat genotypes in a Randomised Complete Block Design with three replicates. If we aim at assessing yield and yield quality, we have to measure, in each plot, several traits, such as grain yield and the weight of thousand kernels (TKW). Apart from separately analysing these two variables, we might be interested in describing their reciprocal relationships, by using the Pearson's correlation coefficient. Let's do this, by using the dataset 'WheatQuality', which is available in the 'statforbiology' package; we have 81 plots and just as many couples of measures in all.
+A primary objective of field experiments is to explore relationships among multiple traits measured simultaneously on the same experimental units. For example, think about a genotype experiment with 27 winter wheat genotypes in a Randomised Complete Block Design with three replicates. If we aim at assessing yield and yield quality, we have to measure, in each plot, several traits, such as grain yield and the weight of a thousand kernels (TKW). Apart from separately analysing these two variables, we might be interested in describing their reciprocal relationships by using Pearson's correlation coefficient.
+ Let's do this by using the dataset 'WheatQuality', which is available in the 'statforbiology' package and gives us 81 plots and 81 corresponding pairs of measurements.
 
 ```{r message=FALSE, warning=FALSE, paged.print=FALSE}
 library(Hmisc)
@@ -36,17 +38,17 @@ ra$r[1,2]
 ra$P[1,2] 
 ```
 
-The conclusion is: the correlation coefficient is positive and significantly different from 0, which supports the idea that plots with a high value on yield tend to have a high value on TKW, as well.
+The conclusion is: the correlation coefficient is positive and significantly different from 0, which supports the idea that plots with a high value on yield tend to have a high value on TKW as well.
 
-Such an approach is very often seen also in high ranking Journals, but: is it correct? Can we trust the conclusions? The answer is no, not completely. And here is why. Please, note that in this post I am following the point made by Bland and Altman (1994), by using an example that is more closely related to plant/crop science.
+This approach is frequently seen also in high-ranking JOurnals. But is it valid? Can we trust the conclusions? The answer is no, not completely. And here is why. Please note that in this post I am following the point made by Bland and Altman (1994), by using an example that is more closely related to plant/crop science.
 
 # Statistical testing is invalid
 
-The correlation coefficient is a measure of joint variability and makes some basic assumptions (e.g. linearity), which I have detailed elsewhere ([see here](https://www.statforbiology.com/2019/stat_general_correlation_alookat/)). In particular, the t-test requires that all the couples of observations are taken on independent subjects.
+The correlation coefficient is a measure of joint variability and makes some basic assumptions (e.g. linearity), which I have detailed elsewhere ([see here](https://www.statforbiology.com/2019/stat_general_correlation_alookat/)). In particular, the t-test requires that all the pairs of observations are taken on independent subjects.
 
-In our case, the 81 plots are not independent, as they are grouped by block and genotype, so that observations in the same block or for the same genotype are more alike than observations in different blocks and different genotypes (intra-class correlation). Consequently, the t-test is invalid and **we are not allowed to conclude that the correlation is significant, because such a conclusion is not necessarily supported by the data**.
+In our case, the 81 plots are not independent, as they are grouped by block and genotype, meaning that observations in the same block or for the same genotype are more alike than observations in different blocks and different genotypes (intra-class correlation). Consequently, the t-test is invalid and **we are not allowed to conclude that the correlation is significant, because such a conclusion is not necessarily supported by the data**.
 
-Unfortunately, such lack of independence relates to all designed experiments, which seems to be a fact that goes largely unnoticed. **In general correlation coefficients calculated for raw data from designed experiments, cannot be submitted to t-tests, without accounting for the effects of all treatment and grouping factors.**
+Unfortunately, such lack of independence relates to all designed experiments, which seems to be a fact that goes largely unnoticed. **In general, correlation coefficients calculated on raw data from designed experiments should never be submitted to t-tests without adjusting for the effects of all treatment and grouping factors.**
 
 
 # Correlation is not unique
@@ -66,7 +68,7 @@ wbCors <- by(dataset, list(dataset$Block), function(x) cor(x$Yield, x$TKW))
 wbCors
 ```
 
-As for the genotypes, we have 27 correlation coefficients, ranging from -0.999 to 0.985. We only have three couples of measurements per genotype and it is clear that this is not much, to reliably estimate a correlation coefficient. However, it is enough to be suspicious about the extent of correlation between yield and TKW, as it may depend on the genotype.
+As for the genotypes, we have 27 correlation coefficients, ranging from -0.999 to 0.985. With only three pairs of measurements per genotype, we obviously cannot estimate individual correlations reliably. However, it is enough to be suspicious about the extent of correlation between yield and TKW, as it may depend on the genotype.
 
 On the other hand, the correlation within blocks is more constant, independent on the block and similar to the correlation between plots.
 
@@ -80,9 +82,9 @@ wCor$r
 wCor$P
 ```
 
-The average within-group correlation is very small and unsignificant. Let's think about this correlation: residuals represent yield and TKW values for all plots, once the effects of blocks and genotypes have been removed. A high correlation of residuals would mean that, letting aside the effects of the block and genotype to which it belongs, a plot with a high value on yield also shows a high value on TKW. **The correct conclusion, indeed, is that, once the effects of treatment ang grouping factors have been removed, there is no correlation between the traits under study.**
+The average within-group correlation is close to zero and statistically non-significant. Let's think about this correlation: residuals represent yield and TKW values for all plots, once the effects of blocks and genotypes have been removed. A high correlation of residuals would mean that, setting aside the effects of the block and genotype to which it belongs, a plot with a high value on yield also shows a high value on TKW. **The correct conclusion, indeed, is that, once the effects of treatment ang grouping factors have been removed, there is no correlation between the traits under study.**
 
-But, this is not enough to stop our investigations. We could also consider the means for genotypes/blocks and see whether they are correlated. Blocks and genotypes are independent and, in principle, significance testing is permitted. However, this is not recommended with block means, as three data are too few to make any tests.
+But, this is not enough to stop our investigations. We could also consider the means for genotypes/blocks and see whether they are correlated. Blocks and genotypes are independent and, in principle, significance testing is permitted. However, this is not recommended with block means, as three data points are too few to make any tests.
 
 
 ```{r}
@@ -96,7 +98,7 @@ rbPear <- cor( as.matrix(means[,2:3]) )
 rbPear
 ```
 
-We note that the correlation between genotype means is high and significant. On the contrary, the correlation between block means is near to 0.
+We note that the correlation between genotype means is high and significant. On the contrary, the correlation between block means is close to 0.
 
 
 # And so what?
@@ -114,8 +116,8 @@ A more careful process of data analysis should not neglect that in every designe
 
 All these correlations should be investigated and used for interpretation.
 
-1. The 'naive' correlation between the plot measurements is very easily calculated, but it is grossy misleading. Indeed, it disregards the treatment/block effects and it does not permit hypotheses testing, as the subjects are not independent. **I think it is reasonable to suggest that the 'naive' correlation coefficient is never used for interpretation**.
-2. The correlation between the residuals is a reliable measure of joint variation, because the experimental design is adequately referenced, by removing the effects of tratments/blocks. In this example, residuals are not correlated. Further analyses show that the correlation between yield and TKW, if any, may depend on the genotype, while it does not depend on the block.
+1. Naive plot correlation: Easy to compute, but highly misleading. It ignores design structures and invalidates standard hypothesis testing because the underlying units are not independent. **This naive correlation should generally be avoided in statistical interpretation**.
+2. The correlation between the residuals is a reliable measure of joint variation, because the experimental design is adequately referenced, by removing the effects of treatments/blocks. In this example, residuals are not correlated. Further analyses show that the correlation between yield and TKW, if any, may depend on the genotype, while it does not depend on the block.
 3. The correlation between treatment/block means permits to assess whether the treatment/block effects on the two traits are correlated. In this case, while we are not allowed to conclude that yield and TKW are, in general, correlated, we can conclude that the genotypes with a high level of yield also show a high level of TKW.
 
 An elegant and advanced method to tackle correlation analyses on data from designed field experiments has been put forward by Piepho (2018), within the frame of mixed models. But this deserves another post.

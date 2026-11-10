@@ -1,0 +1,110 @@
+---
+title: "lmDiallel: a new R package to fit diallel models. Introduction"
+author: "Andrea Onofri, Niccolò Terzaroli and Luigi Russi"
+date: 2020-11-11
+tags:
+  - R
+  - 'multi_environment_studies'
+categories:
+  - R
+  - 'multi_environment_studies'
+  - 'lmDiallel'
+  - 'diallel_models'
+  - R-bloggers
+aliases:
+  - /2020/stat_met_diallel1/index.html
+---
+
+Together with some colleagues from the plant breeding group, we have just published a new paper, where we presented a bunch of R functions to analyse the data from diallel experiments. The paper is titled '*Linear models for diallel crosses: a review with R functions*' and it is published in the '*Theoretical and Applied Genetics*' Journal. If you are interested, you can take a look [here at this link](https://rdcu.be/caxZh).
+
+If you are not a plant breeder or a geneticist in general, you may be asking: "But... what is a 'diallel'?". From the ancient Greek language, the 'diallel' word means 'reciprocating' and a diallel cross is a set of several possible crosses and selfs between some parental lines. For example, if we take the male lines A, B and C together with the same female lines A, B and C and we imagine to cross those lines with one another, we obtain:
+
+1. the selfs A$\times$A, B$\times$B and C$\times$C, 
+2. the crosses A$\times$B, A$\times$C and B$\times$C,
+3. and, in some instances, the reciprocals B$\times$A, C$\times$A and C$\times$B (where the father and mother are swapped).
+
+The performances of crosses and/or selfs and/or reciprocals can be compared by planning field experiments, usually known as **diallel experiments** and designed as randomised complete blocks with 3-4 replicates. In more detail, depending on how the experiment whether reciprocals and selfs are included, we can have four types of experimental designs:
+
+1. Crosses + reciprocals + selfs (complete diallel)
+2. Crosses and reciprocals (no selfs)
+3. Crosses and selfs (no reciprocals)
+4. Only crosses (no selfs, no reciprocals)
+
+The above designs are often named, respectively, Type I to Type IV diallel designs.
+
+# What model do we use for diallel experiments?
+
+In order to describe the data from a diallel experiment, we might think of a two-way ANOVA model, where the 'father' and 'mother' lines  are used as the explanatory factors.This is a very tempting solution, but we should resist: a two way ANOVA model regards the 'father' and 'mother' effects as two completely different series of treatments, neglecting the fact that they are, indeed, the same genotypes in different combinations. That is exactly why we need specific **diallel models** to describe the results of diallel experiments!
+
+In diallel models, the yield of a cross is expressed as a function of some genetic traits of parents, such as their general combining ability (GCA), specific combining ability (SCA), reciprocal (maternal) effects and the amount of heterosis. For example, a simple diallel model looks like the following one:
+
+$$y _{ij} = \mu + \textrm{g}_i + \textrm{g}_j + \textrm{s}_{ij} + \varepsilon_{ij}$$
+where the yield of the cross between the parents $i$ and $j$ is expressed as the sum of the expected value (the overall mean, in the balanced case) $\mu$, plus the general combining abilities (GCAs) of each respective parent ($\textrm{g}_i$ and $\textrm{g}_j$), plus their total **specific combining ability** (SCA) (the $\textrm{s}_{ij}$), plus the residual error term $\varepsilon_{ij}$. Depending on the mating design, we can have several models, such as:
+
+1. The Hyman's models
+2. The Griffing's models
+3. The Gardner-Eberhart models.
+
+I have described these models in full detail in other posts in this blog; it is easy to see that they are nothing but linear models (Mohring et al., 2011), and, therefore, it should be possible to fit them by using the `lm()` function in R and related platform, as long as the appropriate incidence matrices are available. The reason why we decided to sit and code a new R package is that these incidence matrices are not available in R or, when they are available (see, for example, the functions `and()` in 'asreml' and `overlay()` in 'sommer'), they do not play well with the `lm()` function.
+
+The core functions for 'lmDiallel' are named after the corresponding genetic effects, i.e.: `GCA()` (general combining ability), `tSCA()` (total Specific Combining Ability), `RGCA()` (reciprocal general combining ability), `RSCA()` (reciprocal specific combining ability), `REC()` (RECiprocal effects = RGCA + RSCA), `DD()` (Dominance Deviation), `MDD()` (Mean Dominance Deviation), `H.BAR()` (Average Heterosis), `Hi()` (Average hetorosis for one parent), `VEi()` (Variety Effect), `SP()` (effect of Selfed Parents) and `GCAC()` (GCA for parents in their crosses). The usage of these functions is very simple. For example, let's assume that we have the two variables 'Par1' and 'Par2' in a dataset, to represent the two parental lines (father and mother); the GCA effect is coded as:
+
+```
+GCA(Par1, Par2)
+```
+
+while the SCA effect is coded as:
+
+```
+SCA(Par1, Par2)
+```
+
+By using these R functions as building blocks, we can fit all diallel models inside the `lm()` and `lme()` functions. For example, the following line of code fits a diallel model containing the GCA and SCA effects, to the data contained in the 'df' dataframe:
+
+```
+lm(yield ~ GCA(Par1, Par2) + SCA(Par1, Par2), data = df)
+```
+
+Similarly, the effect of reciprocals and random blocks can be introduced by the following code:
+
+```
+lme(yield ~ GCA(Par1, Par2) + SCA(Par1, Par2) +
+            REC(Par1, Par2),
+            random = ~1|Block, data = df)
+```
+
+The model building process outlined above is clearly rooted in the frame of general linear models, although we recognise that plant breeders usually refer to certain relevant parameterisations of diallel models by using the name of the authors. In this respect, it is very common to use the terms "HAYMAN1", "GRIFFING1", "GRIFFING2", "HAYMAN2", "GE2" and "GE3" to refer to the main six diallel models available in literature (see Hayman, 1954; Griffing, 1956; Gardner and Eberhart, 1966). Although these models can be built and fit by using the above method, we thought it might be useful to simplify the whole process. For this reason, we also built a wrapper function named `lm.diallel()`, which can be used in the very same fashion as `lm()`. The syntax is:
+
+```
+lm.diallel(formula, Block, Env, data, fct)
+```
+
+where 'formula' uses the regular R syntax to specify the response variable and the two variables for parentals (e.g., Yield ~ Par1 + Par2). The two arguments 'Block' and 'Env' are used to specify optional variables, coding for blocks and environments, respectively. The argument 'data' is a 'dataframe' where to look for explanatory variables. Finally, 'fct' is a string variable coding for the selected model, i.e. "HAYMAN1", "GRIFFING1", "GRIFFING2", "HAYMAN2", "GE2", "GE3", according to the existing literature.
+
+We have also built the `summary()`, `vcov(),` `anova()` and `predict()` methods for 'lm.diallel' objects, in order to obey to some peculiar aspects of diallel models.
+
+I believe that increasing the usability of existing packages that have gained a wide popularity may be an advantageous programming strategy, compared to the usual strategy of building brand new platforms. From the point of view of the developer, it is efficient, as it requires a minor programming effort. From the point of view of the users (professionals, technicians and students), it is handy to be put in the conditions of making statistical analyses, without the need of learning new softwares and/or languages and/or syntaxes. Due to its open-source nature, the R environment is often overwhelming for users, that are confused by the extremely wide availability of alternative methods to perform the same task. In this regard, a programming strategy aimed at supporting some existing reference platforms might help build a more comfortable environment for statistical analyses.
+
+
+Thanks for reading and, please, stay tuned! If you have comments, please, drop me a line at the email address below. Best wishes,
+
+(P.S. If you enjoyed this post, check out my book "Field Research Methods in Agriculture: An Introduction with R" via the link below!)
+
+Prof. Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences   
+University of Perugia (Italy)   
+Send comments to: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)   
+
+
+<a href = "https://www.awin1.com/cread.php?awinmid=26429&awinaffid=2675822&ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src="../../Figures/Email_Signature_978-3-032-08199-5.png" alt="Book cover" class="cover" align="center"/></a>
+
+---
+
+# References
+
+1. Covarrubias-Pazaran G (2016) Genome-assisted prediction of quantitative traits using the R package sommer. PLoS ONE 11:e0156744.
+2. Gardner CO, Eberhart SA (1966) Analysis and interpretation of the variety cross diallel and related populations. Biometrics 22:439–452.
+3. Gilmoure A, Gogel BJ, Cullis BR, Whelam SJ, Thompson R (2015) ASReml user guide release 4.1 structural specification. VSN International Ltd, Hemel Hempstead, HP1 1ES, UK
+4. Griffing B (1956) Concept of general and specific combining ability in relation to diallel crossing systems. Aust J Biol Sci 9:463–493
+5. Möhring J, Melchinger AE, Piepho HP (2011) REML-based diallel analysis. Crop Sci 51:470–478.
+

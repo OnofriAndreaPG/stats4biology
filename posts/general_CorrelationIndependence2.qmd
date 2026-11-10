@@ -1,0 +1,265 @@
+---
+title: 'Multi-trait models for correlation analyses in designed experiments'
+subtitle: "A solution with R and 'sommer'"
+author: Andrea Onofri
+date: '2026-10-21'
+categories:
+- R
+- correlation
+- R-bloggers
+tags:
+- R
+- correlation
+aliases:
+- /2025/stat_general_correlationindependence2/index.html
+image: "/Figures/CorrelationIndependence2.png"
+---
+
+Imagine a field experiment comparing several treatments in a randomised complete block design. In each plot, we usually record several traits of interest, and we may want to investigate how they are associated with one another, without necessarily assuming a causal relationship. So, how can we carry out a sound correlation analysis?
+
+In a previous post, I showed that simply calculating Pearson's correlation coefficient from the raw plot data is not the best approach ([follow this link, if you would like to read that post](https://www.statforbiology.com/2019/stat_general_correlationindependence1/)). In particular, I emphasised two issues.
+
+1. First, the observations are not independent: they are grouped by treatment and block. Ignoring this structure can invalidate standard tests and confidence intervals that rely on an independence assumption.
+2. Second, in a designed experiment, there is no single correlation coefficient that answers every possible question. We might be interested in (i) the correlation between plot measurements, (ii) the correlation between genotype effects, (iii) the correlation between block effects, or (iv) the correlation between residuals. These correlations have different interpretations, and focusing only on the first may lead to an oversimplified interpretation of the results.
+
+In [previous post](https://www.statforbiology.com/2019/stat_general_correlationindependence1/) I used the raw data, genotype means, block means and the residuals under simple univariable ANOVA models to calculate the Pearson's correlation coefficients between yield and TKW.
+
+However, this blog is about modelling, and I started wondering whether I could estimate all four types of correlation within a single modelling framework. An interesting approach was put forward by Piepho (2018) and it is based on multi-trait mixed models, which jointly consider two or more traits as responses and allow us to estimate the variances and covariances associated with different sources of variation.
+
+For a randomised complete block design, we can write the model as:
+
+$$ Y_{ijk} = \mu_i + \beta_{ik} + \tau_{ij} + \epsilon_{ijk}$$
+
+
+where $Y_{ijk}$ is the response for the trait $i$, the treatment $j$ and the block $k$, $\mu_i$ is the mean for the trait $i$, $\beta_{ik}$ is the effect of the block $k$ and trait $i$, $\tau_{ij}$ is the effect of treatment $j$ for the trait $i$ and $\epsilon_{ijk}$ is the residual for the trait $i$, the treatment $j$ and the block $k$.
+
+In this model, we make the following assumptions (Piepho, 2018):
+
+1. **Trait-specific means**. The trait effect is treated as fixed, with no intercept, so that each trait has its own mean, ($\mu_i$).
+2. **Random genotype and block effects**. The genotype and block effects ((\tau_{ij}) and (\beta_{ik})) are treated as random. This is useful here because our main interest is in their variances and covariances, rather than in estimating each individual effect. For each source of variation, we allow the variance to differ between traits and estimate the covariance between traits. In mixed-model terminology, we use an unstructured variance-covariance matrix for the effects associated with each genotype and each block.
+3. **Correlated residuals**. The residuals are assumed to follow a multivariate normal distribution, with trait-specific variances and a covariance between traits measured on the same plot. Thus, the residual variance-covariance matrix is unstructured within each plot.
+
+These assumptions allow us to estimate the correlations between genotype effects, between block effects, and between residuals, directly from model fit. Considering that the genotype, block, and residual components are mutually independent, we can also derive the marginal correlation between plot measurements by combining the corresponding variance and covariance components.
+
+Of course, in other applications, genotype effects (and sometimes block effects) might be better treated as fixed. The appropriate choice depends on the research question and the population to which we want to generalise. We will not pursue that alternative here.
+
+Fitting a multi-trait model in R is not entirely straightforward. For this example, I find the 'sommer' package (Covarrubias-Pazaran, 2016) particularly useful, because it provides a flexible way to specify mixed models with a range of variance-covariance structures.
+
+# Fitting a bivariate mixed model with 'sommer'
+
+Let's consider the WheatQuality dataset, available in the statforbiology package. It contains data from a genotype experiment with 27 genotypes arranged in three complete blocks. Suppose that we measured two traits in every plot: grain yield and thousand-kernel weight (TKW). How are these two traits correlated, and does the answer depend on which source of variation we consider?
+
+```{r}
+library(dplyr)
+library(statforbiology)
+#
+# Loading data
+dataset <- getAgroData("WheatQuality") |>
+  mutate(across(1:2, .fns = factor))
+head(dataset)
+```
+
+
+We can fit a bivariate mixed model using 'sommer'. The code below is intended for version 4.4.98. Because the package has undergone some recent changes, it may not work with earlier versions.
+
+There are four main steps:
+
+1. **Reshape the data**. We need to convert the dataset to long format, stacking the two traits in a single response column. We also need a factor identifying the original plots, because each plot contributes two observations, one for each trait. The `stackTraits()` function in 'sommer' does this and creates three variables: 'record', identifying the plots; 'trait', identifying the traits; and 'value', containing the observed responses.
+2. **Specify the fixed effects**. We use the usual R formula `value ~ trait - 1`. Removing the intercept allows us to estimate a separate mean for each trait.
+3. **Specify the random effects**. In sommer, the general structure `vsm(usm(StructuringFactor), ism(GroupingFactor))` allows us to specify the variance-covariance structure of the random effects associated with the levels of 'GroupingFactor', using 'StructuringFactor' to define the covariance structure across traits. Here, `usm()` specifies an unstructured covariance matrix (other functions are available in 'sommer' to model different structures), while `ism()` identifies the grouping structure. We use this specification twice: once for genotypes and once for blocks. In both cases, we allow the two traits to have different variances and a non-zero covariance.
+4. **Specify the residual structure**. Finally, we allow the residuals for the two traits measured on the same plot to be correlated, using `rcov = ~ vsm(usm(trait), ism(record))`.
+
+The final model call is reported in the box below:
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+library(sommer)
+
+# Put the dataset in long format
+mdataset <- dataset |>
+  sommer::stackTraits(c("Yield", "TKW"), keep = 1:2) |>
+  dplyr::mutate(across(c(1,2), .fns = factor))
+head(mdataset)
+
+# Fit the model
+mod.bimix <- mmes(value ~ trait - 1,
+                  random = ~ vsm(usm(trait), ism(Genotype)) +
+                             vsm(usm(trait), ism(Block)),
+                  rcov = ~vsm(usm(trait), ism(record)),
+                  data = mdataset,
+                  verbose = FALSE, dateWarning = FALSE)
+bimix.obj <- summary(mod.bimix)
+coefs <- bimix.obj$varcomp
+coefs[,-5]
+```
+
+The model output contains the estimated variance-covariance parameters. We can use these estimates to calculate the corresponding correlations. Recall that a correlation is the covariance divided by the product of the two standard deviations.
+
+The `vpredict()` function in sommer allows us to calculate these quantities and obtain their standard errors. In the following code, V1, V2, and so on refer to the variance-covariance parameters in the order in which they appear in the model output. It is important to check this ordering against the output from your fitted model before interpreting the results.
+
+```{r}
+# Correlation between genotype effects
+vpredict(mod.bimix, rg ~ V2 / (sqrt(V1)*sqrt(V3) ))
+
+# Correlation between block effects
+vpredict(mod.bimix, rt ~ V5 / (sqrt(V4)*sqrt(V6) ))
+
+# Correlation of residuals under the bivariate model
+vpredict(mod.bimix, re ~ V8 / (sqrt(V7)*sqrt(V9) ))
+```
+
+We can also calculate the marginal correlation between plot measurements. Under this model, the marginal variance of each trait is the sum of its genotype, block, and residual variances. Similarly, the marginal covariance between the two traits is the sum of the corresponding covariances. We can therefore calculate the plot-level correlation as follows:
+
+```{r}
+# Correlation of plot values
+vpredict(mod.bimix, rp ~ (V2 + V5 + V8) / (sqrt(V1 + V4 + V7)*sqrt(V3 + V6 + V9) ))
+```
+
+We can also use `covmatrix_mmes()` to obtain the estimated correlation matrices and their standard errors.
+
+```{r}
+# Correlation between genotype effects (with standard errors)
+covmatrix_mmes(mod.bimix, term = 1)$correlation
+covmatrix_mmes(mod.bimix, term = 1)$correlation.se
+
+# Correlation between block effects (with standard errors)
+covmatrix_mmes(mod.bimix, term = 2)$correlation
+covmatrix_mmes(mod.bimix, term = 2)$correlation.se
+
+# Correlation between the residuals (with standard errors)
+covmatrix_mmes(mod.bimix, term = 3)$correlation
+covmatrix_mmes(mod.bimix, term = 3)$correlation.se
+```
+
+The estimated correlations are quite close to the Pearson correlation coefficients obtained from the raw data (see my previous post). However, the main advantage of the mixed-model approach is that it separates the different sources of variation and allows us to investigate whether the corresponding covariance components differ from zero.
+
+For example, we can investigate whether the residuals for the two traits are correlated by fitting a reduced model in which the residual variances are trait-specific but the residual covariance is constrained to zero. We can then compare this model with the full model using a likelihood-ratio statistic. In 'sommer', we can impose such a restriction by replacing `usm()` with `dsm()`, which specifies a diagonal variance-covariance structure. The code is shown below.
+
+One important caveat: likelihood-ratio tests for variance-covariance parameters require care. Testing whether a variance component is zero involves a boundary condition, whereas testing whether a covariance is zero, with both variances positive, is generally an interior test. Nevertheless, the validity of the usual chi-squared reference distribution depends on the model and the assumptions underlying the test. It is therefore important to check how the test is implemented and interpreted for the fitted models.
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+mod.bimix2 <- mmes(value ~ trait - 1,
+                  random = ~ vsm(usm(trait), ism(Genotype)) +
+                             vsm(usm(trait), ism(Block)),
+                  rcov = ~vsm(dsm(trait), ism(record)),
+                  data = mdataset,
+                  verbose = FALSE, dateWarning = FALSE)
+
+# Likelihood ratio test
+LRT1 <- anova(mod.bimix, mod.bimix2)
+```
+
+Similarly, we can impose restrictions on the variance-covariance matrix for random effects, to test for the hypothesis that the correlation between genotype/block effects is zero.
+
+```{r message=FALSE, warning=FALSE}
+# Removing correlation between block effects
+mod.bimix3 <- mmes(value ~ trait - 1,
+                  random = ~ vsm(usm(trait), ism(Genotype)) +
+                             vsm(dsm(trait), ism(Block)),
+                  rcov = ~vsm(usm(trait), ism(record)),
+                  data = mdataset,
+                  verbose = FALSE, dateWarning = FALSE)
+LRT2 <- anova(mod.bimix, mod.bimix3)
+
+# Removing correlation between genotype effects
+mod.bimix4 <- mmes(value ~ trait - 1,
+                  random = ~ vsm(dsm(trait), ism(Genotype)) +
+                             vsm(usm(trait), ism(Block)),
+                  rcov = ~vsm(usm(trait), ism(record)),
+                  data = mdataset,
+                  verbose = FALSE, dateWarning = FALSE)
+# Likelihood ratio test
+LRT3 <- anova(mod.bimix, mod.bimix4)
+```
+
+In this example, the genotype effects show evidence of a correlation between the two traits, whereas the correlations between block effects and between residuals do not appear to be statistically significant under the tests considered. This does not necessarily mean that the latter correlations are zero; rather, the data did not provide sufficient evidence that they differ from zero.
+
+This illustrates why it can be useful to distinguish among the different sources of correlation in a designed experiment. A single correlation coefficient calculated from the raw data cannot tell us whether the association arises mainly from differences between genotypes, differences between blocks, or the remaining plot-level variation.
+
+I hope this example has been useful. If you know of a better solution, or if you have suggestions for improving this approach, I'd be happy to hear from you. Please drop me a line at the address below.
+
+(P.S. If you enjoyed this post, check out my book "Field Research Methods in Agriculture: An Introduction with R" via the link below!)
+
+Prof. Andrea Onofri   
+Department of Agricultural, Food and Environmental Sciences   
+University of Perugia (Italy)   
+Send comments to: [andrea.onofri@unipg.it](mailto:andrea.onofri@unipg.it)   
+
+
+<a href = "https://www.awin1.com/cread.php?awinmid=26429&awinaffid=2675822&ued=https%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-032-08199-5"><img src="../../Figures/Email_Signature_978-3-032-08199-5.png" alt="Book cover" class="cover" align="center"/></a>
+
+---
+
+# References
+
+- Butler, D., Cullis, B.R., Gilmour, A., Gogel, B., Thomson, R., 2018. ASReml-r reference manual, version 4. UK.
+- Covarrubias-Pazaran, G., 2016. Genome-Assisted Prediction of Quantitative Traits Using the R Package sommer. PLOS ONE 11, e0156744. https://doi.org/10.1371/journal.pone.0156744
+- Piepho, H.-P., 2018. Allowing for the structure of a designed experiment when estimating and testing trait correlations. The Journal of Agricultural Science 156, 59–70.
+- Pinheiro, J.C., Bates, D.M., 2000. Mixed-effects models in s and s-plus. Springer-Verlag Inc., New York.
+
+# Appendix
+
+Is it possible to fit the above models with other packages in R? In a previous version of this post I have used the 'asreml' package (Butler et al., 2018), although this is a paid option. However, here is the relevant code:
+
+```{r}
+#| include: TRUE
+#| eval: FALSE
+
+mod.asreml <- asreml(cbind(Yield, TKW) ~ trait - 1,
+        random = ~ Genotype:us(trait, init = c(3.7, -0.25, 1.7)) + 
+          Block:us(trait, init = c(77, 38, 53)),
+        residual = ~ units:us(trait, init = c(6, 0.16, 4.5)), 
+        data=dataset)
+#summary(mod.asreml)$varcomp[,1:3]
+##                                   component  std.error    z.ratio
+## Block:trait!trait_Yield:Yield     3.7104778  3.9364268  0.9426005
+## Block:trait!trait_TKW:Yield      -0.2428390  1.9074544 -0.1273105
+## Block:trait!trait_TKW:TKW         1.6684568  1.8343662  0.9095549
+## Genotype:trait!trait_Yield:Yield 77.6346623 22.0956257  3.5135761
+## Genotype:trait!trait_TKW:Yield   38.8322972 15.0909109  2.5732242
+## Genotype:trait!trait_TKW:TKW     53.8616088 15.3520661  3.5084274
+## units:trait!R                     1.0000000         NA         NA
+## units:trait!trait_Yield:Yield     6.0939037  1.1951128  5.0990195
+## units:trait!trait_TKW:Yield       0.1635551  0.7242690  0.2258209
+## units:trait!trait_TKW:TKW         4.4717901  0.8769902  5.0990195
+
+# Reduced model
+mod.asreml2 <- asreml(cbind(Yield, TKW) ~ trait - 1,
+        random = ~ Genotype:us(trait) + Block:us(trait),
+        residual = ~ units:idh(trait), 
+        data=dataset)
+# LRT
+lrt.asreml(mod.asreml, mod.asreml2)        
+```
+
+To the best of my knowledge, there is no way to fit such a complex model with the 'nlme' package and related `lme()` function. However, if we are willing to treat the 'block' effect as fixed, we can fit a bivariate mixed model with the `lme()` function (Pinheiro and Bates, 2000). This alternative retains correlated genotype effects and allows the residual variances to differ between traits, with a correlation between the two observations from the same plot. The code is shown below.
+
+
+```{r}
+#| include: TRUE
+#| eval: FALSE
+library(nlme)
+mod <- lme(value ~ trait*Block, 
+                 random = list(Genotype = pdSymm(~trait - 1)),
+                 weight = varIdent(form=~1|trait), 
+                 correlation = corCompSymm(form=~1|Genotype/record),
+                 data = mdataset)
+```
+
+
+```{r eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+# The Bayesian perspective
+
+# All the above models regard the genotype and block effects as random. The opportunity of such an assumption is the object of a long discussion in Piepho's paper. As the author notes, all conceptual difficulties disappear if the model is fitted under the Bayesian framework. This can be easily done in R by using the 'MCMCglmm()' function in the 'MCMCglmm' package (Hadfield, 2012). The code is given below.
+
+library(MCMCglmm)
+prior = list(R = list(V = diag(2), n = 1.002),
+      G = list(G1 = list(V = diag(2), n = 1.002),
+               G2 = list(V = diag(2), n = 1.002)))
+mod.bay <- MCMCglmm(cbind(Yield, TKW) ~ trait - 1,
+       random = ~ Genotype:us(trait) + Block:us(trait),
+       rcov = ~ units:us(trait), 
+       family = rep("gaussian", 2),
+       prior = prior,
+       nitt = 150000, burnin = 30000, thin=100,
+       data = dataset)
+```
